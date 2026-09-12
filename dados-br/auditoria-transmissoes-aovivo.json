@@ -17,7 +17,7 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 7,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 44,
+    "candidatos_oficiais_encontrados": 41,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 0,
     "search_api_jogos_pulados_grade_estavel": 1,
@@ -83,12 +83,12 @@
       "descoberta_antecipada": true
     },
     {
-      "event_id": "401841234",
+      "event_id": "401841229",
       "rodada": 27,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Palmeiras x São Paulo",
-      "data_iso": "2026-09-12T18:30:00-03:00",
+      "jogo": "Botafogo x Bragantino",
+      "data_iso": "2026-09-12T20:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -282,11 +282,11 @@
       "fonte": "cazetv",
       "video_id": "XBQnGKkz3Q0",
       "url": "https://www.youtube.com/watch?v=XBQnGKkz3Q0",
-      "titulo": "AO VIVO: CHAPECOENSE X INTERNACIONAL | BRASILEIRÃO 2026 | 27ª RODADA",
+      "titulo": "AO VIVO: INTER VENCE O DUELO DOS DESESPERADOS, MAS SEGUE NA ZONA | RODA DE BOBO",
       "status": "live",
-      "confianca": 0.925,
+      "confianca": 0.745,
       "motivos": [
-        "os dois clubes aparecem no título",
+        "um clube aparece no título e o outro na descrição",
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
         "transmissão já está ao vivo",
@@ -303,16 +303,6 @@
       "titulo": "SBT Ao Vivo",
       "status": "live",
       "inicio_programado": "2025-02-24T18:51:26-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "-T-G_2z0F7c",
-      "url": "https://www.youtube.com/watch?v=-T-G_2z0F7c",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: FLAMENGO X SÃO PAULO | SEMIFINAL | BRASILEIRÃO FEMININO 2026 | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-09-12T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -476,16 +466,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "zQv2Wv2bGcU",
-      "url": "https://www.youtube.com/watch?v=zQv2Wv2bGcU",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: PALMEIRAS X SÃO PAULO | BRASILERÃO 2026 | PRÉ-JOGO | Premiere",
-      "status": "live",
-      "inicio_programado": "2026-09-12T17:30:00-03:00",
-      "motivo": "conteúdo rejeitado: pre jogo"
-    },
-    {
       "video_id": "0yxdrt1C_kM",
       "url": "https://www.youtube.com/watch?v=0yxdrt1C_kM",
       "fonte": "cazetv",
@@ -494,16 +474,6 @@
       "status": "live",
       "inicio_programado": "2026-09-12T17:15:00-03:00",
       "motivo": "conteúdo rejeitado: react"
-    },
-    {
-      "video_id": "2OWPaTGkLRQ",
-      "url": "https://www.youtube.com/watch?v=2OWPaTGkLRQ",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: PÓS-JOGO CHAPECOENSE X INTERNACIONAL | RODA DE BOBO",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-12T19:00:00-03:00",
-      "motivo": "conteúdo rejeitado: pos jogo"
     },
     {
       "video_id": "4PnH-jA__xc",
@@ -668,19 +638,19 @@
   ],
   "search_api_pulados": [
     {
-      "event_id": "401841234",
-      "jogo": "Palmeiras x São Paulo",
-      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
+      "event_id": "401841229",
+      "jogo": "Botafogo x Bragantino",
+      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
     }
   ],
   "sem_transmissao": [
     {
-      "event_id": "401841234",
+      "event_id": "401841229",
       "rodada": 27,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Palmeiras x São Paulo",
-      "data_iso": "2026-09-12T18:30:00-03:00",
+      "jogo": "Botafogo x Bragantino",
+      "data_iso": "2026-09-12T20:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -694,5 +664,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-12T18:15:43-03:00"
+  "atualizado_em": "2026-09-12T19:02:43-03:00"
 }
