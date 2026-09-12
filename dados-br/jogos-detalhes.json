@@ -1,6 +1,6 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-11T23:27:42.975329-03:00",
+  "gerado_em": "2026-09-11T23:32:29.468737-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 257,
   "total_com_estatisticas": 257,
@@ -650,8 +650,8 @@
       "placar_visitante": 0,
       "estadio": "Estadio Manoel Barradas",
       "publico": 8934,
-      "publico_tipo": "total",
-      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/09/07/vitoria-vence-duelo-direto-contra-o-gremio-quebra-jejum-e-se-afasta-do-z-4-do-brasileiro.amp.htm",
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/09/06/remo-0-x-1-flamengo-tem-o-maior-publico-da-26a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "arbitro": "Savio Pereira Sampaio",
       "stats": [
         {
@@ -1213,7 +1213,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-09T00:11:18.617079-03:00",
       "renda": 215031,
-      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 8885
     },
     "401841220": {
       "event_id": "401841220",
@@ -1785,7 +1786,7 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-08T05:15:19.556188-03:00",
-      "publico_pagante": 44280,
+      "publico_pagante": 44130,
       "renda": 3098748,
       "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
@@ -4088,7 +4089,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-08T05:15:21.071032-03:00",
       "renda": 1055965,
-      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 23368
     },
     "401841219": {
       "event_id": "401841219",
@@ -4668,7 +4670,7 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-08T05:15:21.454204-03:00",
       "publico_pagante": 26100,
-      "renda": 804279,
+      "renda": 804278,
       "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841227": {
@@ -5237,7 +5239,7 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-07T05:12:57.481508-03:00",
       "publico_pagante": 35487,
-      "renda": 2887181,
+      "renda": 2887101,
       "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841226": {
@@ -6375,7 +6377,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-07T05:12:58.302483-03:00",
       "renda": 96655,
-      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 3028
     },
     "401913077": {
       "event_id": "401913077",
@@ -144877,5 +144880,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 249,
+  "total_com_renda": 256
 }
