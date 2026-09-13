@@ -2178,59 +2178,99 @@
         "player GE TV marcado como transmissão integral, mas canal ausente da grade completa"
       ],
       "resumo": "Partida confirmada: Flamengo x Corinthians, Brasileirão Série A, 27ª rodada, domingo, 13/09/2026, às 17h30 (BRT), no Maracanã. Há evidência direta de transmissão integral na GE TV pelo título do vídeo oficial no YouTube (“ao vivo e com imagens”). Porém, nas fontes oficiais/veículos permitidos consultados agora, não foi encontrada confirmação atual suficiente para validar a grade completa — especificamente Globo e Premiere — sem inferência. Por isso, a grade não é fechada."
+    },
+    {
+      "event_id": "401841230",
+      "jogo": "Bahia x Remo",
+      "data_iso": "2026-09-14T20:00:00-03:00",
+      "checkpoint": -1440,
+      "executado_em": "2026-09-13T20:04:21-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video",
+        "Disney+ / ESPN"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/05/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-26a-rodada.ghtml",
+        "https://ge.globo.com/ba/futebol/times/bahia/noticia/2026/09/05/atuacoes-do-bahia-rodrigo-nestor-e-garcom-e-erick-e-decisivo-contra-o-bragantino-de-a-sua-nota.ghtml",
+        "https://ge.globo.com/ba/futebol/times/bahia/noticia/2026/09/06/erick-recebe-o-terceiro-cartao-amarelo-e-desfalca-o-bahia-contra-o-remo.ghtml",
+        "https://ge.globo.com/google/amp/ba/futebol/times/bahia/noticia/2026/09/10/bahia-conta-com-bom-momento-para-encarar-o-remo-maior-pedra-no-sapato-em-2026.ghtml",
+        "https://ge.globo.com/google/amp/pa/futebol/times/remo/noticia/2026/08/14/cbf-detalha-jogos-do-remo-contra-coritiba-e-flamengo-na-serie-a.ghtml",
+        "https://ge.globo.com/google/amp/pa/futebol/times/remo/noticia/2026/09/01/cbf-detalha-rodadas-27-a-30-da-serie-a-veja-os-jogos-do-remo.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://ge.globo.com/pa/futebol/times/remo/noticia/2025/12/16/cbf-divulga-tabela-basica-do-brasileirao-2026-confira-as-datas-dos-jogos-do-remo.ghtml",
+        "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/09/09/sem-vencer-ha-quase-quatro-meses-fora-de-casa-remo-reencontra-principal-vitima-no-ano.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/bahia-x-remo/832159",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-e-pro-rim-levam-a-doacao-de-orgaos-para-dentro-de-campo-na-27-rodada-do-brasileirao",
+        "https://www.uol.com.br/esporte/futebol/times/remo",
+        "https://www.youtube.com/watch?v=opNwlEDGdg0"
+      ],
+      "canais_depois": [
+        "Premiere"
+      ],
+      "exclusivo": true,
+      "confianca": 0.98,
+      "fontes_aceitas": [
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/bahia-x-remo/832159"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado: Bahia x Remo, Brasileirão Série A 2026, 27ª rodada, segunda-feira, 14/09/2026, às 20h (horário de Brasília), na Casa de Apostas Arena Fonte Nova, em Salvador. A grade oficial consultada do ge informa transmissão integral exclusiva no Premiere. GE TV, Globo, SporTV, Prime Video e Disney+ / ESPN não constam como transmissoras deste jogo."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841237",
-    "jogo": "Flamengo x Corinthians",
-    "data_iso": "2026-09-13T17:30:00-03:00",
-    "checkpoint": -15,
-    "executado_em": "2026-09-13T17:20:06-03:00",
+    "event_id": "401841230",
+    "jogo": "Bahia x Remo",
+    "data_iso": "2026-09-14T20:00:00-03:00",
+    "checkpoint": -1440,
+    "executado_em": "2026-09-13T20:04:21-03:00",
     "chamada_openai": true,
-    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+    "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
       "GE TV",
       "Premiere",
-      "Globo"
+      "SporTV",
+      "Globo",
+      "Prime Video",
+      "Disney+ / ESPN"
     ],
-    "status": "nao_resolvido",
+    "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://credencial.cbf.com.br/competicoes/listar/1016/166",
-      "https://credencial.cbf.com.br/competicoes/listar/42/1",
-      "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/05/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-26a-rodada.ghtml",
+      "https://ge.globo.com/ba/futebol/times/bahia/noticia/2026/09/05/atuacoes-do-bahia-rodrigo-nestor-e-garcom-e-erick-e-decisivo-contra-o-bragantino-de-a-sua-nota.ghtml",
+      "https://ge.globo.com/ba/futebol/times/bahia/noticia/2026/09/06/erick-recebe-o-terceiro-cartao-amarelo-e-desfalca-o-bahia-contra-o-remo.ghtml",
+      "https://ge.globo.com/google/amp/ba/futebol/times/bahia/noticia/2026/09/10/bahia-conta-com-bom-momento-para-encarar-o-remo-maior-pedra-no-sapato-em-2026.ghtml",
+      "https://ge.globo.com/google/amp/pa/futebol/times/remo/noticia/2026/08/14/cbf-detalha-jogos-do-remo-contra-coritiba-e-flamengo-na-serie-a.ghtml",
+      "https://ge.globo.com/google/amp/pa/futebol/times/remo/noticia/2026/09/01/cbf-detalha-rodadas-27-a-30-da-serie-a-veja-os-jogos-do-remo.ghtml",
       "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://globoplay.globo.com/v/10050745",
-      "https://globoplay.globo.com/v/10814583",
-      "https://globoplay.globo.com/v/1100831",
-      "https://globoplay.globo.com/v/1258619",
-      "https://globoplay.globo.com/v/13966463",
-      "https://globoplay.globo.com/v/2976909",
-      "https://globoplay.globo.com/v/3630706",
-      "https://globoplay.globo.com/v/6541204",
-      "https://globoplay.globo.com/v/7069374",
-      "https://globoplay.globo.com/v/7668137",
-      "https://globoplay.globo.com/v/7669308",
-      "https://globoplay.globo.com/v/7669366",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/sub-17/2026/flamengo-x-corinthians/834541",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-feminino-a1/a/brasileirao-feminino-a-1-com-uma-jogadora-expulsa-corinthians-derrota-flamengo-no-rio-de-janeiro",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/botafogo-segura-palmeiras-e-ajuda-fla-a-tomar-a-lideranca-do-brasileirao",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/flamengo-vence-mirassol-e-cola-no-palmeiras",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/santos-e-flamengo-vencem-classicos-pelo-brasileirao-betano",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/serie-a-corinthians-e-sao-paulo-vao-esquentar-disputa-pela-lideranca-entre-flamengo-e-palmeiras",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/vitoria-bate-gremio-e-se-distancia-do-z-4-do-brasileirao-da-serie-a",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/jogos-inesqueciveis/a-trajetoria-da-selecao-brasileira-na-copa-de-1982/corinthians-vence-flamengo-e-conquista-supercopa-rei-superbet-2026",
-      "https://www.youtube.com/watch?v=KLQC8yobuKc",
-      "https://www.youtube.com/watch?v=WibYwzP0zhI",
-      "https://www.youtube.com/watch?v=xd1foM2WmqI"
+      "https://ge.globo.com/pa/futebol/times/remo/noticia/2025/12/16/cbf-divulga-tabela-basica-do-brasileirao-2026-confira-as-datas-dos-jogos-do-remo.ghtml",
+      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/09/09/sem-vencer-ha-quase-quatro-meses-fora-de-casa-remo-reencontra-principal-vitima-no-ano.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/bahia-x-remo/832159",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-e-pro-rim-levam-a-doacao-de-orgaos-para-dentro-de-campo-na-27-rodada-do-brasileirao",
+      "https://www.uol.com.br/esporte/futebol/times/remo",
+      "https://www.youtube.com/watch?v=opNwlEDGdg0"
     ],
-    "rejeicoes": [
-      "modelo não conseguiu confirmar a grade",
-      "grade vazia",
-      "confiança 0.580 abaixo do limiar",
-      "player GE TV marcado como transmissão integral, mas canal ausente da grade completa"
+    "canais_depois": [
+      "Premiere"
     ],
-    "resumo": "Partida confirmada: Flamengo x Corinthians, Brasileirão Série A, 27ª rodada, domingo, 13/09/2026, às 17h30 (BRT), no Maracanã. Há evidência direta de transmissão integral na GE TV pelo título do vídeo oficial no YouTube (“ao vivo e com imagens”). Porém, nas fontes oficiais/veículos permitidos consultados agora, não foi encontrada confirmação atual suficiente para validar a grade completa — especificamente Globo e Premiere — sem inferência. Por isso, a grade não é fechada."
+    "exclusivo": true,
+    "confianca": 0.98,
+    "fontes_aceitas": [
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/bahia-x-remo/832159"
+    ],
+    "youtube": [],
+    "youtube_removidos": [],
+    "overlay_alterado": true,
+    "resumo": "Confirmado: Bahia x Remo, Brasileirão Série A 2026, 27ª rodada, segunda-feira, 14/09/2026, às 20h (horário de Brasília), na Casa de Apostas Arena Fonte Nova, em Salvador. A grade oficial consultada do ge informa transmissão integral exclusiva no Premiere. GE TV, Globo, SporTV, Prime Video e Disney+ / ESPN não constam como transmissoras deste jogo."
   },
-  "atualizado_em": "2026-09-13T17:20:06-03:00"
+  "atualizado_em": "2026-09-13T20:04:21-03:00"
 }
