@@ -18,8 +18,9 @@ Política resumida
    Placar/gol AO VIVO NÃO dispara pipeline pesado: a classificação live é
    calculada no navegador a partir do scoreboard ESPN.
 2. Públicos pendentes:
-   - primeira tentativa 15 min após o FINAL;
-   - retentativas com backoff, sem reprocessar o Brasileirão inteiro.
+   - primeira tentativa 30 min após o FINAL;
+   - retentativas seguem o relógio por campo gravado pela própria camada de IA;
+   - erro técnico usa backoff curto e não vira fracasso documental.
 3. Melhores momentos:
    - primeira busca 10 min após o FINAL;
    - retentativas com backoff, sem rodar eternamente a cada 10 min.
@@ -136,14 +137,16 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "manutencao_diaria_apos": "05:10",
     },
     "publicos": {
-        "primeira_tentativa_apos_final_minutos": 15,
+        "primeira_tentativa_apos_final_minutos": 30,
         "intervalos_retentativa": [
             {"ate_horas": 2, "minutos": 30},
             {"ate_horas": 6, "minutos": 60},
+            {"ate_horas": 12, "minutos": 90},
             {"ate_horas": 24, "minutos": 120},
+            {"ate_horas": 48, "minutos": 180},
             {"ate_horas": 72, "minutos": 360},
             {"ate_horas": 168, "minutos": 720},
-            {"ate_horas": 99999, "minutos": 1440},
+            {"ate_horas": 99999, "minutos": 720},
         ],
     },
     "melhores_momentos": {
@@ -786,33 +789,77 @@ def pending_publics(config: Mapping[str, Any], now: datetime, tz: ZoneInfo) -> l
     return pending
 
 
+def public_state_due_info(
+    event_id: str,
+    campos_faltando: Sequence[str],
+    now: datetime,
+    tz: ZoneInfo,
+) -> tuple[bool, datetime | None, bool]:
+    """Alinha o orquestrador ao backoff por campo persistido pela camada IA.
+
+    Retorna (tem_campo_vencido, proximo_horario_futuro, possui_estado).
+    Uma política antiga é considerada vencida imediatamente para permitir a
+    migração da busca restrita para a busca web ampla.
+    """
+    estado = load_json(PUBLIC_AI_STATE_PATH, {})
+    try:
+        policy = int(estado.get("search_policy_version") or 0) if isinstance(estado, Mapping) else 0
+    except (TypeError, ValueError):
+        policy = 0
+    if policy < 3:
+        return True, None, False
+    jogos = estado.get("jogos") if isinstance(estado, Mapping) else {}
+    row = jogos.get(event_id) if isinstance(jogos, Mapping) else None
+    if not isinstance(row, Mapping):
+        return True, None, False
+    campos = row.get("campos") if isinstance(row.get("campos"), Mapping) else {}
+    futuros: list[datetime] = []
+    for campo in campos_faltando:
+        st = campos.get(str(campo)) if isinstance(campos, Mapping) else None
+        if not isinstance(st, Mapping):
+            return True, None, True
+        if st.get("status") == "resolved":
+            # Artefatos discordantes: rode para reconciliar em vez de silenciar.
+            return True, None, True
+        next_at = parse_dt(st.get("proxima_tentativa"), tz)
+        if next_at is None or now >= next_at:
+            return True, next_at, True
+        futuros.append(next_at)
+    return False, min(futuros) if futuros else None, True
+
+
 def public_decision(config: Mapping[str, Any], now: datetime, tz: ZoneInfo, runs: Sequence[Mapping[str, Any]]) -> Decision | None:
+    del runs  # o relógio correto é o estado por campo, não a idade do último workflow.
     pending = pending_publics(config, now, tz)
     if not pending:
         return None
-    last, _ = last_run(runs, WORKFLOW_PUBLICOS, tz)
-    first_due = list(pending) if last is None else [(row, ended) for row, ended in pending if ended > last]
-    if first_due:
-        row, ended = min(first_due, key=lambda item: item[1])
-        event_id = str(row.get("event_id") or "")
-        label = f"{team_name(row.get('mandante'))} x {team_name(row.get('visitante'))}".strip(" x")
-        return Decision(
-            "publicos",
-            f"Primeira busca de público/renda: {label or event_id} terminou há {int(minutes_since(ended, now))} min e segue com lacuna ({','.join(row.get('faltando_publicos') or [])}).",
-            event_id=event_id,
-            mode="incremental",
+
+    vencidos: list[tuple[dict[str, Any], datetime, bool]] = []
+    for row, ended in pending:
+        event_id = str(row.get("event_id") or row.get("id") or "").strip()
+        faltando = [str(x) for x in (row.get("faltando_publicos") or [])]
+        due, next_at, tem_estado = public_state_due_info(event_id, faltando, now, tz)
+        if due:
+            vencidos.append((row, ended, tem_estado))
+
+    if not vencidos:
+        return None
+
+    row, ended, tem_estado = min(vencidos, key=lambda item: item[1])
+    event_id = str(row.get("event_id") or row.get("id") or "").strip()
+    label = f"{team_name(row.get('mandante'))} x {team_name(row.get('visitante'))}".strip(" x")
+    faltando = ",".join(row.get("faltando_publicos") or [])
+    if tem_estado:
+        motivo = (
+            f"Retentativa de público/renda vencida: {label or event_id} segue com lacuna "
+            f"({faltando}); relógio por campo liberou nova pesquisa."
         )
-    min_interval = min(public_retry_interval(minutes_since(ended, now) / 60.0, config) for _, ended in pending)
-    if minutes_since(last, now) >= min_interval:
-        oldest_row, oldest_end = min(pending, key=lambda item: item[1])
-        event_id = str(oldest_row.get("event_id") or "")
-        return Decision(
-            "publicos",
-            f"Retentativa de público/renda: ainda há {len(pending)} jogo(s) finalizado(s) com lacunas; backoff atual {min_interval} min.",
-            event_id=event_id,
-            mode="incremental",
+    else:
+        motivo = (
+            f"Primeira busca de público/renda: {label or event_id} terminou há "
+            f"{int(minutes_since(ended, now))} min e segue com lacuna ({faltando})."
         )
-    return None
+    return Decision("publicos", motivo, event_id=event_id, mode="incremental")
 
 
 def linked_mm_ids() -> set[str]:
@@ -1533,13 +1580,41 @@ def self_test() -> int:
     }]
     assert tv_decision(tx_cfg, tx_now, tz, six_hours_tv, critical_summary).action == "transmissoes_tv"
 
+
+    # O orquestrador deve respeitar exatamente o próximo horário por campo da IA,
+    # não um backoff aproximado baseado no último run do workflow.
+    original_state_path = globals()["PUBLIC_AI_STATE_PATH"]
+    try:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            fake_state = Path(tmpdir) / "estado-publicos-ia.json"
+            globals()["PUBLIC_AI_STATE_PATH"] = fake_state
+            fake_state.write_text(json.dumps({
+                "search_policy_version": 3,
+                "jogos": {
+                    "x": {
+                        "campos": {
+                            "publico": {
+                                "status": "pending",
+                                "proxima_tentativa": (tx_now + timedelta(minutes=20)).isoformat(),
+                            }
+                        }
+                    }
+                }
+            }), encoding="utf-8")
+            due, next_at, tem_estado = public_state_due_info("x", ["publico"], tx_now, tz)
+            assert not due and tem_estado and next_at == tx_now + timedelta(minutes=20)
+            due, _, _ = public_state_due_info("x", ["publico"], tx_now + timedelta(minutes=21), tz)
+            assert due
+    finally:
+        globals()["PUBLIC_AI_STATE_PATH"] = original_state_path
+
     assert canonical_hash({"b": 2, "a": 1}) == canonical_hash({"a": 1, "b": 2})
 
     assert public_retry_interval(1.0, config) == 30
     assert public_retry_interval(5.0, config) == 60
     assert public_retry_interval(20.0, config) == 120
     assert public_retry_interval(100.0, config) == 720
-    assert public_retry_interval(500.0, config) == 1440
+    assert public_retry_interval(500.0, config) == 720
 
     # --- Contrato de hash entre orquestrador e gerador ----------------------
     # Este teste existe porque a divergência entre as duas formas de calcular o

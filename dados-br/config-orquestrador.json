@@ -73,46 +73,42 @@
     "bloquear_se_writer_ativo": true
   },
   "publicos": {
-    "primeira_tentativa_apos_final_minutos": 120,
+    "primeira_tentativa_apos_final_minutos": 30,
     "intervalos_retentativa": [
       {
-        "ate_horas": 4,
-        "minutos": 120
+        "ate_horas": 2,
+        "minutos": 30
       },
       {
         "ate_horas": 6,
-        "minutos": 120
-      },
-      {
-        "ate_horas": 9,
-        "minutos": 180
+        "minutos": 60
       },
       {
         "ate_horas": 12,
-        "minutos": 180
-      },
-      {
-        "ate_horas": 18,
-        "minutos": 360
+        "minutos": 90
       },
       {
         "ate_horas": 24,
-        "minutos": 360
-      },
-      {
-        "ate_horas": 36,
-        "minutos": 720
+        "minutos": 120
       },
       {
         "ate_horas": 48,
+        "minutos": 180
+      },
+      {
+        "ate_horas": 72,
+        "minutos": 360
+      },
+      {
+        "ate_horas": 168,
         "minutos": 720
       },
       {
         "ate_horas": 99999,
-        "minutos": 1440
+        "minutos": 720
       }
     ],
-    "politica": "público e renda independentes; sem esgotamento definitivo; após 48h retentar diariamente até resolução documental"
+    "politica": "público e renda independentes; IA com web_search amplo e obrigatório; erro técnico não consome tentativa documental; sem esgotamento definitivo; após 72h retentar no máximo a cada 12h até resolução documental"
   },
   "backoff_falhas": {
     "ativo": true,

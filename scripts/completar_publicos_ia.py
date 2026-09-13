@@ -19,7 +19,7 @@ Princípios (iguais aos do coletor determinístico)
   * só preenche lacuna; nunca sobrescreve público já existente;
   * público PRESENTE ou TOTAL; pagante nunca vira presente;
   * a URL declarada pelo modelo precisa constar nas fontes que a própria
-    ferramenta web devolveu, e o domínio precisa estar na allowlist;
+    ferramenta web efetivamente devolveu/leu; não existe allowlist rígida de domínio;
   * uma única requisição por execução, com teto de chamadas de ferramenta;
   * nenhuma lacuna é abandonada por contagem de tentativas; público e renda
     possuem backoff independente e permanecem elegíveis até resolução documental.
@@ -61,14 +61,14 @@ FUSO_BRASILIA = timezone(timedelta(hours=-3))
 OPENAI_URL = "https://api.openai.com/v1/responses"
 DEFAULT_MODEL = "gpt-5.6-sol"
 
-# Público e renda são ficha técnica, não interpretação editorial. Quem publica
-# primeiro é a imprensa regional e os portais dos clubes — e a allowlist curta
-# da auditoria diária deixava tudo isso de fora, cegando a busca para matérias
-# que qualquer pessoa acha no Google em dez segundos. A proteção real não é o
-# domínio: é a validação determinística mais abaixo (URL precisa constar entre
-# as páginas efetivamente lidas, faixa de sanidade, confiança mínima, pagante
-# nunca vira presente, nunca sobrescreve valor existente).
-ALLOWED_WEB_DOMAINS = (
+# Público e renda são ficha técnica, não interpretação editorial. Fontes oficiais,
+# imprensa esportiva e imprensa regional são PREFERIDAS, mas não formam uma cerca
+# de busca: uma allowlist rígida foi justamente o que impediu o resgate de dados
+# já publicados em portais válidos. A proteção real é determinística: a URL precisa
+# constar entre as páginas efetivamente retornadas/lidas pelo web_search, o número
+# passa por faixa de sanidade e confiança mínima, pagante nunca vira presente e
+# nenhum valor existente é sobrescrito.
+PREFERRED_WEB_DOMAINS = (
     # oficiais e agências
     "cbf.com.br",
     "ge.globo.com",
@@ -124,10 +124,12 @@ ALLOWED_WEB_DOMAINS = (
 
 MIN_CONFIANCA = 0.90
 MAX_PUBLICO = 250_000
-GRACE_HORAS_PADRAO = 2.0
+GRACE_HORAS_PADRAO = 0.5
 MAX_TENTATIVAS_PADRAO = 0  # compatibilidade CLI; não existe mais esgotamento definitivo
 MAX_JOGOS_PADRAO = 10
-DEFAULT_RETRY_BANDS = ((4, 120), (6, 120), (9, 180), (12, 180), (18, 360), (24, 360), (36, 720), (48, 720), (99999, 1440))
+SEARCH_POLICY_VERSION = 3
+TECHNICAL_RETRY_MINUTES = 30
+DEFAULT_RETRY_BANDS = ((2, 30), (6, 60), (12, 90), (24, 120), (48, 180), (72, 360), (168, 720), (99999, 720))
 
 
 class PublicoIAError(RuntimeError):
@@ -169,14 +171,15 @@ def normalizar_url(valor: Any) -> str:
     return f"https://{host}{caminho}"
 
 
-def dominio_permitido(url: str) -> bool:
+def dominio_preferido(url: str) -> bool:
+    """Sinal informativo; nunca bloqueia uma fonte que o web_search realmente leu."""
     try:
         host = urllib.parse.urlsplit(url).netloc.lower()
     except ValueError:
         return False
     if host.startswith("www."):
         host = host[4:]
-    return any(host == d or host.endswith("." + d) for d in ALLOWED_WEB_DOMAINS)
+    return any(host == d or host.endswith("." + d) for d in PREFERRED_WEB_DOMAINS)
 
 
 def parse_dt(valor: Any) -> datetime | None:
@@ -280,6 +283,34 @@ def pendencias(
     tentativas = estado.get("jogos") if isinstance(estado, Mapping) else {}
     if not isinstance(tentativas, dict):
         tentativas = {}
+
+    # Política v3: libera imediatamente estados pendentes criados pela antiga
+    # busca cercada por allowlist. Mantemos a contagem histórica, mas zeramos
+    # relógios de backoff uma única vez para que a nova busca ampla tente agora.
+    try:
+        policy_version = int(estado.get("search_policy_version") or 0)
+    except (TypeError, ValueError):
+        policy_version = 0
+    if policy_version < SEARCH_POLICY_VERSION:
+        for event_id, row in list(tentativas.items()):
+            if not isinstance(row, Mapping):
+                continue
+            novo = dict(row)
+            campos = novo.get("campos") if isinstance(novo.get("campos"), Mapping) else {}
+            novos_campos: dict[str, Any] = {}
+            for campo, raw_st in campos.items():
+                if not isinstance(raw_st, Mapping):
+                    continue
+                st = dict(raw_st)
+                if st.get("status") != "resolved":
+                    st["ultima_tentativa"] = ""
+                    st["proxima_tentativa"] = ""
+                    st.pop("backoff_minutos", None)
+                novos_campos[str(campo)] = st
+            novo["campos"] = novos_campos
+            novo["proxima_tentativa"] = ""
+            tentativas[str(event_id)] = novo
+        estado["search_policy_version"] = SEARCH_POLICY_VERSION
 
     pendentes: list[dict[str, Any]] = []
     for bruto in linhas or []:
@@ -400,8 +431,11 @@ def montar_payload(pendentes: Sequence[Mapping[str, Any]], model: str, max_tool_
         "aparecer na ficha técnica sob rótulos como 'Renda', 'Renda bruta' ou 'Borderô', muitas vezes numa "
         "matéria diferente daquela que traz o público. Quando a renda vier de outra página, informe a URL "
         "dela em 'fonte_url_renda'; quando vier da mesma, repita a URL. "
-        "Para CADA partida, busque a reportagem do jogo ou a ficha técnica em fontes esportivas "
-        "reconhecidas. Regras inegociáveis: "
+        "Para CADA partida, USE O WEB_SEARCH e busque a reportagem do jogo ou a ficha técnica. "
+        "Priorize CBF, ge, grandes portais esportivos, imprensa regional e páginas oficiais dos clubes, "
+        "mas NÃO deixe de usar outra página jornalística válida quando ela for a única que já publicou "
+        "a ficha técnica exata. Evite redes sociais, fóruns, casas de aposta e páginas sem autoria/ficha técnica. "
+        "Regras inegociáveis: "
         "(1) informe como 'presente' apenas o público presente/total declarado pela fonte; "
         "(2) NUNCA converta público pagante em presente — se a fonte só traz pagantes, preencha 'pagantes' "
         "e deixe 'publico' nulo com tipo 'indefinido'; "
@@ -437,10 +471,16 @@ def montar_payload(pendentes: Sequence[Mapping[str, Any]], model: str, max_tool_
         },
         "tools": [{
             "type": "web_search",
-            "search_context_size": "medium",
-            "filters": {"allowed_domains": list(ALLOWED_WEB_DOMAINS)},
+            "search_context_size": "high",
+            "user_location": {
+                "type": "approximate",
+                "country": "BR",
+                "timezone": "America/Sao_Paulo",
+            },
         }],
-        "tool_choice": "auto",
+        # Há apenas uma ferramenta disponível; required garante pesquisa real
+        # em vez de permitir resposta só com memória do modelo.
+        "tool_choice": "required",
         "max_tool_calls": int(max_tool_calls),
         "include": ["web_search_call.action.sources"],
     }
@@ -564,8 +604,6 @@ def validar(
             alvo = normalizar_url(url_bruta)
             if not alvo:
                 motivos.append(f"{rotulo} inválida")
-            elif not dominio_permitido(alvo):
-                motivos.append(f"{rotulo}: domínio fora da allowlist")
             elif alvo not in fontes_web:
                 motivos.append(f"{rotulo} não consta entre as páginas efetivamente lidas pela busca")
             else:
@@ -616,6 +654,7 @@ def validar(
             registro["fonte_renda"] = fonte_renda or fonte
         if not registro.get("fonte"):
             registro["fonte"] = fonte or fonte_renda
+        registro["fonte_preferida"] = bool(dominio_preferido(registro.get("fonte") or registro.get("fonte_renda") or ""))
         aceitos.append({"event_id": event_id, "registro": registro, "justificativa": str(item.get("justificativa") or "")})
 
     return aceitos, rejeitados
@@ -728,6 +767,7 @@ def atualizar_estado(
         }
 
     estado["schema_version"] = 2
+    estado["search_policy_version"] = SEARCH_POLICY_VERSION
     estado["_comentario"] = (
         "Estado por campo da camada IA de público/renda. Não há esgotamento definitivo: "
         "lacunas permanecem em backoff até serem resolvidas documentalmente."
@@ -740,9 +780,68 @@ def atualizar_estado(
         "rejeitados": len([r for r in rejeitados if not r.get("nao_e_erro")]),
         "nao_encontrados": len([r for r in rejeitados if r.get("nao_e_erro")]),
         "erro": erro,
+        "rejeicoes_detalhadas": [
+            {
+                "event_id": str(r.get("event_id") or ""),
+                "motivos": [str(m)[:240] for m in (r.get("motivos") or [])][:6],
+                "nao_e_erro": bool(r.get("nao_e_erro")),
+            }
+            for r in rejeitados[:20]
+        ],
     }
     # Compatibilidade de leitura para versões antigas do orquestrador. A lista
     # permanece vazia por definição no schema v2.
+    estado["esgotados"] = []
+    return estado
+
+
+def atualizar_estado_erro_tecnico(
+    estado: dict[str, Any],
+    pendentes: Sequence[Mapping[str, Any]],
+    erro: str,
+    agora: datetime,
+) -> dict[str, Any]:
+    """Erro de API/rede não conta como tentativa documental da partida."""
+    jogos_antigos = estado.get("jogos") if isinstance(estado.get("jogos"), dict) else {}
+    jogos: dict[str, Any] = {str(k): dict(v) for k, v in jogos_antigos.items() if isinstance(v, Mapping)}
+    proxima = agora + timedelta(minutes=TECHNICAL_RETRY_MINUTES)
+    for p in pendentes:
+        event_id = str(p.get("event_id") or "")
+        if not event_id:
+            continue
+        anterior = jogos.get(event_id) if isinstance(jogos.get(event_id), Mapping) else {}
+        campos_antigos = anterior.get("campos") if isinstance(anterior.get("campos"), Mapping) else {}
+        campos: dict[str, Any] = {str(k): dict(v) for k, v in campos_antigos.items() if isinstance(v, Mapping)}
+        for campo in p.get("faltando") or []:
+            st = _legacy_field_state(anterior, str(campo))
+            st["status"] = "pending"
+            st["proxima_tentativa"] = proxima.isoformat()
+            st["backoff_minutos"] = TECHNICAL_RETRY_MINUTES
+            st["ultima_falha_tecnica"] = agora.isoformat()
+            st["falhas_tecnicas"] = int(st.get("falhas_tecnicas") or 0) + 1
+            # Não alteramos tentativas/ultima_tentativa: não houve pesquisa documental válida.
+            campos[str(campo)] = st
+        jogos[event_id] = {
+            "schema_version": 2,
+            "rodada": p.get("rodada"),
+            "partida": f"{p.get('mandante')} x {p.get('visitante')}",
+            "campos": campos,
+            "esgotado": False,
+            "proxima_tentativa": proxima.isoformat(),
+        }
+    estado["schema_version"] = 2
+    estado["search_policy_version"] = SEARCH_POLICY_VERSION
+    estado["jogos"] = jogos
+    estado["gerado_em"] = agora.isoformat()
+    estado["ultima_execucao"] = {
+        "pendentes_avaliados": len(pendentes),
+        "aceitos": 0,
+        "rejeitados": 0,
+        "nao_encontrados": 0,
+        "erro": erro,
+        "falha_tecnica": True,
+        "retry_em_minutos": TECHNICAL_RETRY_MINUTES,
+    }
     estado["esgotados"] = []
     return estado
 
@@ -770,9 +869,12 @@ def self_test() -> int:
     assert aceitos[0]["registro"]["publico"] == 41234
     assert aceitos[0]["registro"]["pagantes"] == 38000
 
-    fora = [dict(ok[0], fonte_url="https://exemplo-aleatorio.com/x", fonte_url_renda="https://exemplo-aleatorio.com/x")]
-    _, rej = validar(fora, pend, fontes)
-    assert rej and any("allowlist" in m for m in rej[0]["motivos"]), rej
+    # Domínio fora da antiga allowlist agora é aceito SE foi realmente retornado/lido
+    # pelo web_search. Isso evita cegueira para imprensa regional válida.
+    URL_REGIONAL = normalizar_url("https://www.futebolinterior.com.br/exemplo-ficha")
+    regional = [dict(ok[0], fonte_url=URL_REGIONAL, fonte_url_renda=URL_REGIONAL)]
+    ac, rej = validar(regional, pend, fontes | {URL_REGIONAL})
+    assert len(ac) == 1 and not rej, (ac, rej)
 
     nao_lida = [dict(ok[0], fonte_url="https://ge.globo.com/outra/materia.ghtml",
                      fonte_url_renda="https://ge.globo.com/outra/materia.ghtml")]
@@ -845,9 +947,19 @@ def self_test() -> int:
     assert migrated["status"] == "pending" and migrated["tentativas"] == 8
 
     payload = montar_payload(pend, DEFAULT_MODEL, 4)
-    assert payload["tools"][0]["filters"]["allowed_domains"] == list(ALLOWED_WEB_DOMAINS)
+    assert "filters" not in payload["tools"][0], "busca não pode ficar presa a allowlist"
+    assert payload["tools"][0]["search_context_size"] == "high"
+    assert payload["tool_choice"] == "required"
     assert payload["text"]["format"]["strict"] is True
     assert payload["max_tool_calls"] == 4
+
+    # Erro técnico não pode aumentar tentativas documentais nem gerar backoff longo.
+    base = atualizar_estado({}, pend, [], [], max_tentativas=3, erro="", agora=agora)
+    tent_antes = base["jogos"]["1"]["campos"]["publico"]["tentativas"]
+    tecnico = atualizar_estado_erro_tecnico(base, pend, "timeout", agora + timedelta(minutes=5))
+    st = tecnico["jogos"]["1"]["campos"]["publico"]
+    assert st["tentativas"] == tent_antes
+    assert st["backoff_minutos"] == TECHNICAL_RETRY_MINUTES
 
     # Estado tem de sobreviver mesmo quando não há chave nem pendência: é o único
     # rastro auditável de que a camada rodou.
@@ -913,6 +1025,7 @@ def main() -> int:
             novo_estado = dict(estado)
             novo_estado.setdefault("jogos", estado.get("jogos") or {})
             novo_estado["schema_version"] = 2
+            novo_estado["search_policy_version"] = SEARCH_POLICY_VERSION
             novo_estado["_comentario"] = (
                 "Estado por campo da camada IA de público/renda. Não há esgotamento definitivo: "
                 "lacunas permanecem em backoff até serem resolvidas documentalmente."
@@ -945,7 +1058,7 @@ def main() -> int:
         return encerrar("OPENAI_API_KEY ausente no ambiente do workflow", contar_tentativa=False)
 
     model = os.environ.get("OPENAI_PUBLICOS_MODEL", os.environ.get("OPENAI_MODEL", DEFAULT_MODEL)).strip() or DEFAULT_MODEL
-    max_tool_calls = min(20, max(4, len(pendentes) * 4))
+    max_tool_calls = min(40, max(8, len(pendentes) * 6))
 
     print(f"Consultando {len(pendentes)} partida(s) com lacuna de público/renda (modelo {model}, até {max_tool_calls} buscas).")
     for p in pendentes:
@@ -954,6 +1067,7 @@ def main() -> int:
     erro = ""
     aceitos: list[dict[str, Any]] = []
     rejeitados: list[dict[str, Any]] = []
+    fontes_web: set[str] = set()
     try:
         resposta = chamar_openai(montar_payload(pendentes, model, max_tool_calls), api_key)
         fontes_web = coletar_fontes(resposta)
@@ -962,6 +1076,13 @@ def main() -> int:
     except PublicoIAError as exc:
         erro = str(exc)[:500]
         print(f"Camada de IA falhou: {erro}", file=sys.stderr)
+
+    if erro and not args.dry_run:
+        estado = atualizar_estado_erro_tecnico(estado, pendentes, erro, agora)
+        salvar_json(ESTADO, estado)
+        print(f"Falha técnica: nova tentativa em {TECHNICAL_RETRY_MINUTES} min sem consumir tentativa documental.")
+        print("novos=false")
+        return 0
 
     gravados = 0
     if aceitos and not args.dry_run:
@@ -981,6 +1102,8 @@ def main() -> int:
 
     if not args.dry_run:
         estado = atualizar_estado(estado, pendentes, aceitos, rejeitados, args.max_tentativas, erro, agora)
+        if isinstance(estado.get("ultima_execucao"), dict):
+            estado["ultima_execucao"]["fontes_consultadas"] = sorted(fontes_web)[:60]
         salvar_json(ESTADO, estado)
 
     print(f"novos={'true' if gravados else 'false'}")
