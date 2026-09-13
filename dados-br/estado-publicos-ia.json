@@ -1,6 +1,6 @@
 {
   "_comentario": "Controle de tentativas da camada de IA de público. \"esgotados\" faz o orquestrador parar de redisparar o coletor para partidas cujo público nunca foi divulgado.",
-  "gerado_em": "2026-09-12T22:06:35-03:00",
+  "gerado_em": "2026-09-12T22:45:35-03:00",
   "jogos": {
     "401841210": {
       "tentativas": 6,
@@ -31,40 +31,52 @@
       "esgotado": false
     },
     "401841231": {
-      "tentativas": 7,
-      "ultima_tentativa": "2026-09-12T22:06:35-03:00",
+      "tentativas": 8,
+      "ultima_tentativa": "2026-09-12T22:45:35-03:00",
       "rodada": 27,
       "partida": "Atlético-MG x Fluminense",
-      "esgotado": false
+      "esgotado": true,
+      "motivo": "público não divulgado por nenhuma fonte permitida após o limite de tentativas"
     },
     "401841236": {
-      "tentativas": 7,
-      "ultima_tentativa": "2026-09-12T22:06:35-03:00",
+      "tentativas": 8,
+      "ultima_tentativa": "2026-09-12T22:45:35-03:00",
       "rodada": 27,
       "partida": "Grêmio x Vasco da Gama",
-      "esgotado": false
+      "esgotado": true,
+      "motivo": "público não divulgado por nenhuma fonte permitida após o limite de tentativas"
     },
     "401841228": {
-      "tentativas": 5,
-      "ultima_tentativa": "2026-09-12T22:06:35-03:00",
+      "tentativas": 6,
+      "ultima_tentativa": "2026-09-12T22:45:35-03:00",
       "rodada": 27,
       "partida": "Chapecoense x Internacional",
       "esgotado": false
     },
     "401841234": {
-      "tentativas": 2,
-      "ultima_tentativa": "2026-09-12T22:06:35-03:00",
+      "tentativas": 3,
+      "ultima_tentativa": "2026-09-12T22:45:35-03:00",
       "rodada": 27,
       "partida": "Palmeiras x São Paulo",
       "esgotado": false
+    },
+    "401841229": {
+      "tentativas": 1,
+      "ultima_tentativa": "2026-09-12T22:45:35-03:00",
+      "rodada": 27,
+      "partida": "Botafogo x Bragantino",
+      "esgotado": false
     }
   },
-  "esgotados": [],
+  "esgotados": [
+    "401841231",
+    "401841236"
+  ],
   "ultima_execucao": {
-    "pendentes_avaliados": 4,
+    "pendentes_avaliados": 5,
     "aceitos": 0,
     "rejeitados": 0,
-    "nao_encontrados": 4,
+    "nao_encontrados": 5,
     "erro": ""
   }
 }
