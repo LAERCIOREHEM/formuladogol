@@ -2126,58 +2126,111 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: Flamengo x Corinthians, Brasileirão Série A 2026, fase única, rodada 27, neste domingo (13/09/2026), às 17h30 (horário de Brasília), no Maracanã. A página oficial da CBF lista a grade completa: GE TV, Globo e Premiere. Não é exclusivo."
+    },
+    {
+      "event_id": "401841237",
+      "jogo": "Flamengo x Corinthians",
+      "data_iso": "2026-09-13T17:30:00-03:00",
+      "checkpoint": -15,
+      "executado_em": "2026-09-13T17:20:06-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+      "canais_antes": [
+        "GE TV",
+        "Premiere",
+        "Globo"
+      ],
+      "status": "nao_resolvido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://credencial.cbf.com.br/competicoes/listar/1016/166",
+        "https://credencial.cbf.com.br/competicoes/listar/42/1",
+        "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://globoplay.globo.com/v/10050745",
+        "https://globoplay.globo.com/v/10814583",
+        "https://globoplay.globo.com/v/1100831",
+        "https://globoplay.globo.com/v/1258619",
+        "https://globoplay.globo.com/v/13966463",
+        "https://globoplay.globo.com/v/2976909",
+        "https://globoplay.globo.com/v/3630706",
+        "https://globoplay.globo.com/v/6541204",
+        "https://globoplay.globo.com/v/7069374",
+        "https://globoplay.globo.com/v/7668137",
+        "https://globoplay.globo.com/v/7669308",
+        "https://globoplay.globo.com/v/7669366",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/sub-17/2026/flamengo-x-corinthians/834541",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-feminino-a1/a/brasileirao-feminino-a-1-com-uma-jogadora-expulsa-corinthians-derrota-flamengo-no-rio-de-janeiro",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/botafogo-segura-palmeiras-e-ajuda-fla-a-tomar-a-lideranca-do-brasileirao",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/flamengo-vence-mirassol-e-cola-no-palmeiras",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/santos-e-flamengo-vencem-classicos-pelo-brasileirao-betano",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/serie-a-corinthians-e-sao-paulo-vao-esquentar-disputa-pela-lideranca-entre-flamengo-e-palmeiras",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/vitoria-bate-gremio-e-se-distancia-do-z-4-do-brasileirao-da-serie-a",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/jogos-inesqueciveis/a-trajetoria-da-selecao-brasileira-na-copa-de-1982/corinthians-vence-flamengo-e-conquista-supercopa-rei-superbet-2026",
+        "https://www.youtube.com/watch?v=KLQC8yobuKc",
+        "https://www.youtube.com/watch?v=WibYwzP0zhI",
+        "https://www.youtube.com/watch?v=xd1foM2WmqI"
+      ],
+      "rejeicoes": [
+        "modelo não conseguiu confirmar a grade",
+        "grade vazia",
+        "confiança 0.580 abaixo do limiar",
+        "player GE TV marcado como transmissão integral, mas canal ausente da grade completa"
+      ],
+      "resumo": "Partida confirmada: Flamengo x Corinthians, Brasileirão Série A, 27ª rodada, domingo, 13/09/2026, às 17h30 (BRT), no Maracanã. Há evidência direta de transmissão integral na GE TV pelo título do vídeo oficial no YouTube (“ao vivo e com imagens”). Porém, nas fontes oficiais/veículos permitidos consultados agora, não foi encontrada confirmação atual suficiente para validar a grade completa — especificamente Globo e Premiere — sem inferência. Por isso, a grade não é fechada."
     }
   ],
   "ultima_execucao": {
     "event_id": "401841237",
     "jogo": "Flamengo x Corinthians",
     "data_iso": "2026-09-13T17:30:00-03:00",
-    "checkpoint": -90,
-    "executado_em": "2026-09-13T16:12:20-03:00",
+    "checkpoint": -15,
+    "executado_em": "2026-09-13T17:20:06-03:00",
     "chamada_openai": true,
-    "motivo_chamada": "checkpoint de auditoria completa",
+    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
     "canais_antes": [
       "GE TV",
       "Premiere",
       "Globo"
     ],
-    "status": "confirmado",
+    "status": "nao_resolvido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
       "https://credencial.cbf.com.br/competicoes/listar/1016/166",
       "https://credencial.cbf.com.br/competicoes/listar/42/1",
-      "https://ge.globo.com/ajuda",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/03/22/corinthians-x-flamengo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/05/17/botafogo-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/futebol/times/corinthians/noticia/2026/09/09/estudiantes-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/getv",
-      "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/flamengo-x-corinthians-veja-onde-assistir-escalacoes-desfalques-e-arbitragem-1.ghtml",
-      "https://ge.globo.com/google/amp/futebol/supercopa-do-brasil/noticia/2026/02/01/flamengo-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/08/30/flamengo-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/video/flamengo-enfrenta-o-corinthians-na-supercopa-rei-2026-14304774.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/flamengo-x-corinthians/832151"
+      "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml",
+      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+      "https://globoplay.globo.com/v/10050745",
+      "https://globoplay.globo.com/v/10814583",
+      "https://globoplay.globo.com/v/1100831",
+      "https://globoplay.globo.com/v/1258619",
+      "https://globoplay.globo.com/v/13966463",
+      "https://globoplay.globo.com/v/2976909",
+      "https://globoplay.globo.com/v/3630706",
+      "https://globoplay.globo.com/v/6541204",
+      "https://globoplay.globo.com/v/7069374",
+      "https://globoplay.globo.com/v/7668137",
+      "https://globoplay.globo.com/v/7669308",
+      "https://globoplay.globo.com/v/7669366",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/sub-17/2026/flamengo-x-corinthians/834541",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-feminino-a1/a/brasileirao-feminino-a-1-com-uma-jogadora-expulsa-corinthians-derrota-flamengo-no-rio-de-janeiro",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/botafogo-segura-palmeiras-e-ajuda-fla-a-tomar-a-lideranca-do-brasileirao",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/flamengo-vence-mirassol-e-cola-no-palmeiras",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/santos-e-flamengo-vencem-classicos-pelo-brasileirao-betano",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/serie-a-corinthians-e-sao-paulo-vao-esquentar-disputa-pela-lideranca-entre-flamengo-e-palmeiras",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/vitoria-bate-gremio-e-se-distancia-do-z-4-do-brasileirao-da-serie-a",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/jogos-inesqueciveis/a-trajetoria-da-selecao-brasileira-na-copa-de-1982/corinthians-vence-flamengo-e-conquista-supercopa-rei-superbet-2026",
+      "https://www.youtube.com/watch?v=KLQC8yobuKc",
+      "https://www.youtube.com/watch?v=WibYwzP0zhI",
+      "https://www.youtube.com/watch?v=xd1foM2WmqI"
     ],
-    "canais_depois": [
-      "GE TV",
-      "Globo",
-      "Premiere"
+    "rejeicoes": [
+      "modelo não conseguiu confirmar a grade",
+      "grade vazia",
+      "confiança 0.580 abaixo do limiar",
+      "player GE TV marcado como transmissão integral, mas canal ausente da grade completa"
     ],
-    "exclusivo": false,
-    "confianca": 0.99,
-    "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/flamengo-x-corinthians/832151"
-    ],
-    "youtube": [
-      {
-        "url": "https://www.youtube.com/watch?v=KLQC8yobuKc",
-        "scope": "match",
-        "valid_for_match": true,
-        "reason": "O vídeo informado está identificado como “FLAMENGO X CORINTHIANS | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv”, com início antes da bola rolar; além disso, a CBF confirma oficialmente a GE TV na grade desta partida. Portanto, trata-se de transmissão integral do jogo, não apenas aquecimento, narração alternativa ou melhores momentos."
-      }
-    ],
-    "youtube_removidos": [],
-    "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: Flamengo x Corinthians, Brasileirão Série A 2026, fase única, rodada 27, neste domingo (13/09/2026), às 17h30 (horário de Brasília), no Maracanã. A página oficial da CBF lista a grade completa: GE TV, Globo e Premiere. Não é exclusivo."
+    "resumo": "Partida confirmada: Flamengo x Corinthians, Brasileirão Série A, 27ª rodada, domingo, 13/09/2026, às 17h30 (BRT), no Maracanã. Há evidência direta de transmissão integral na GE TV pelo título do vídeo oficial no YouTube (“ao vivo e com imagens”). Porém, nas fontes oficiais/veículos permitidos consultados agora, não foi encontrada confirmação atual suficiente para validar a grade completa — especificamente Globo e Premiere — sem inferência. Por isso, a grade não é fechada."
   },
-  "atualizado_em": "2026-09-13T16:12:20-03:00"
+  "atualizado_em": "2026-09-13T17:20:06-03:00"
 }
