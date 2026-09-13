@@ -2,7 +2,7 @@
   "schema_version": 1,
   "projeto": "AF-Previsão",
   "temporada": 2026,
-  "gerado_em": "2026-09-12T20:42:52-03:00",
+  "gerado_em": "2026-09-12T22:42:59-03:00",
   "status": "ok",
   "escopo_publico": {
     "inicio_historico_classificacao": "2026-07-17T22:05:00-03:00",
@@ -13,18 +13,18 @@
   },
   "integridade": {
     "historico_temporada_schema": 5,
-    "snapshots_temporada": 90,
-    "hash_final_temporada": "82d61f70da0545bf3059c051aac0a20cc7bd3dfe14f00f2a2bfadb2e49700d63",
-    "historico_pre_jogo_total": 8352,
-    "hash_pre_jogo": "6572f5ff5b59731ba1a3f78da12fa587d35449a34fe2c9e23b6d700184268a1e",
-    "ultima_previsao_temporada": "2026-09-12T20:23:00-03:00"
+    "snapshots_temporada": 91,
+    "hash_final_temporada": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+    "historico_pre_jogo_total": 8470,
+    "hash_pre_jogo": "f3241942e87d77a0c690ea9a2e3990b8bed379decfea36ebb20a80b8ce4c8f7e",
+    "ultima_previsao_temporada": "2026-09-12T22:26:00-03:00"
   },
   "jogos": {
-    "jogos_avaliados": 67,
+    "jogos_avaliados": 68,
     "maior_probabilidade": {
-      "amostra": 67,
+      "amostra": 68,
       "confirmadas": 30,
-      "taxa_confirmacao_pct": 44.78
+      "taxa_confirmacao_pct": 44.12
     },
     "alta_confianca_80": {
       "amostra": 0,
@@ -58,10 +58,10 @@
           20,
           30
         ],
-        "amostra": 95,
-        "probabilidade_media_pct": 26.0039,
-        "frequencia_observada_pct": 29.4737,
-        "erro_absoluto_pp": 3.4698
+        "amostra": 97,
+        "probabilidade_media_pct": 25.9343,
+        "frequencia_observada_pct": 29.8969,
+        "erro_absoluto_pp": 3.9626
       },
       {
         "faixa_pct": [
@@ -88,10 +88,10 @@
           50,
           60
         ],
-        "amostra": 15,
-        "probabilidade_media_pct": 54.6326,
-        "frequencia_observada_pct": 40.0,
-        "erro_absoluto_pp": 14.6326
+        "amostra": 16,
+        "probabilidade_media_pct": 54.6396,
+        "frequencia_observada_pct": 37.5,
+        "erro_absoluto_pp": 17.1396
       },
       {
         "faixa_pct": [
@@ -115,8 +115,8 @@
       }
     ],
     "metricas_tecnicas": {
-      "brier_multiclasse_medio": 0.20381126,
-      "log_loss_medio": 1.01918593
+      "brier_multiclasse_medio": 0.20530919,
+      "log_loss_medio": 1.02501337
     },
     "por_rodada": [
       {
@@ -181,12 +181,12 @@
       },
       {
         "rodada": 27,
-        "jogos_avaliados": 8,
-        "maior_probabilidade_avaliada": 8,
+        "jogos_avaliados": 9,
+        "maior_probabilidade_avaliada": 9,
         "maior_probabilidade_confirmada": 5,
         "previsoes_fortes_60_total": 2,
         "previsoes_fortes_60_confirmadas": 2,
-        "taxa_confirmacao_pct": 62.5,
+        "taxa_confirmacao_pct": 55.56,
         "taxa_fortes_60_pct": 100.0
       }
     ]
@@ -2492,6 +2492,32 @@
           "libertadores": 95.16005,
           "sul_americana": 4.8369
         }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "23acde17de821a3bc5e3baf93447f21e90eca13dd4a48a002d96181dbbf2f005",
+        "jogos_atuais": 27,
+        "rodada_referencia": 27,
+        "posicao_atual": 3,
+        "pontos_atuais": 46,
+        "posicao_projetada": 3,
+        "posicao_media_estimada": 4.2475,
+        "faixa_posicao_80": {
+          "melhor": 3,
+          "pior": 6
+        },
+        "pontos_projetados": 63,
+        "faixa_pontos_80": {
+          "min": 57,
+          "max": 68
+        },
+        "probabilidades_pct": {
+          "campeao": 0.07605,
+          "libertadores": 95.49655,
+          "sul_americana": 4.50025
+        }
       }
     ],
     "Atlético-MG": [
@@ -4781,6 +4807,32 @@
           "campeao": 0.00075,
           "libertadores": 77.657,
           "sul_americana": 21.76985
+        }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "591ec922aa9a7d19cebc6e2c6bba6a6565598b4798b6c3dc1fde2678a4825c1a",
+        "jogos_atuais": 26,
+        "rodada_referencia": 27,
+        "posicao_atual": 7,
+        "pontos_atuais": 39,
+        "posicao_projetada": 7,
+        "posicao_media_estimada": 6.9656,
+        "faixa_posicao_80": {
+          "melhor": 4,
+          "pior": 10
+        },
+        "pontos_projetados": 57,
+        "faixa_pontos_80": {
+          "min": 51,
+          "max": 62
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0006,
+          "libertadores": 78.225,
+          "sul_americana": 21.2241
         }
       }
     ],
@@ -7072,6 +7124,32 @@
           "libertadores": 77.6602,
           "sul_americana": 22.1716
         }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "fdc5d9e6e5bf0e22c26000d8b890b4e50f9a6d9edd448b2915f88f9377dff958",
+        "jogos_atuais": 26,
+        "rodada_referencia": 26,
+        "posicao_atual": 5,
+        "pontos_atuais": 43,
+        "posicao_projetada": 6,
+        "posicao_media_estimada": 5.8559,
+        "faixa_posicao_80": {
+          "melhor": 3,
+          "pior": 9
+        },
+        "pontos_projetados": 59,
+        "faixa_pontos_80": {
+          "min": 54,
+          "max": 65
+        },
+        "probabilidades_pct": {
+          "campeao": 0.007,
+          "libertadores": 78.73045,
+          "sul_americana": 21.10915
+        }
       }
     ],
     "Botafogo": [
@@ -9361,6 +9439,32 @@
           "campeao": 0.0,
           "libertadores": 26.61595,
           "sul_americana": 65.2311
+        }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "4a4bd945d480611def01a67d619330077d0cee3c085745599e81c883c2dfb884",
+        "jogos_atuais": 26,
+        "rodada_referencia": 27,
+        "posicao_atual": 14,
+        "pontos_atuais": 32,
+        "posicao_projetada": 9,
+        "posicao_media_estimada": 10.003,
+        "faixa_posicao_80": {
+          "melhor": 7,
+          "pior": 14
+        },
+        "pontos_projetados": 52,
+        "faixa_pontos_80": {
+          "min": 46,
+          "max": 57
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0,
+          "libertadores": 19.65825,
+          "sul_americana": 69.19605
         }
       }
     ],
@@ -11652,6 +11756,32 @@
           "libertadores": 20.6892,
           "sul_americana": 70.2284
         }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "9b6c097d7237577c8789b757a55dceeb7638d67878c0b91caf68a38622072c81",
+        "jogos_atuais": 26,
+        "rodada_referencia": 27,
+        "posicao_atual": 9,
+        "pontos_atuais": 36,
+        "posicao_projetada": 8,
+        "posicao_media_estimada": 9.5839,
+        "faixa_posicao_80": {
+          "melhor": 6,
+          "pior": 13
+        },
+        "pontos_projetados": 52,
+        "faixa_pontos_80": {
+          "min": 46,
+          "max": 57
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0,
+          "libertadores": 22.20005,
+          "sul_americana": 70.12295
+        }
       }
     ],
     "Chapecoense": [
@@ -13473,6 +13603,32 @@
           "campeao": 0.0,
           "libertadores": 0.0,
           "sul_americana": 0.00375
+        }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "c93ba33c50f99947a6efbd10a11a361476b0d5b84ee356c0bcb7e67a45586792",
+        "jogos_atuais": 26,
+        "rodada_referencia": 27,
+        "posicao_atual": 20,
+        "pontos_atuais": 17,
+        "posicao_projetada": 20,
+        "posicao_media_estimada": 19.9191,
+        "faixa_posicao_80": {
+          "melhor": 20,
+          "pior": 20
+        },
+        "pontos_projetados": 27,
+        "faixa_pontos_80": {
+          "min": 22,
+          "max": 32
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0,
+          "libertadores": 0.0,
+          "sul_americana": 0.00355
         }
       }
     ],
@@ -15764,6 +15920,32 @@
           "libertadores": 8.24165,
           "sul_americana": 53.6361
         }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "57fa4d0410eb20b2a0d2bc746c4437a064107aa8cbf6a276ad19686ac4342435",
+        "jogos_atuais": 26,
+        "rodada_referencia": 26,
+        "posicao_atual": 12,
+        "pontos_atuais": 32,
+        "posicao_projetada": 13,
+        "posicao_media_estimada": 12.9603,
+        "faixa_posicao_80": {
+          "melhor": 9,
+          "pior": 17
+        },
+        "pontos_projetados": 47,
+        "faixa_pontos_80": {
+          "min": 42,
+          "max": 53
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0,
+          "libertadores": 8.48815,
+          "sul_americana": 53.71965
+        }
       }
     ],
     "Coritiba": [
@@ -18053,6 +18235,32 @@
           "campeao": 0.0,
           "libertadores": 12.24535,
           "sul_americana": 74.48305
+        }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "e4727cde592473239c1483d91d300cfe8c0f3f8f49aad63e3370e2e7cc01a587",
+        "jogos_atuais": 27,
+        "rodada_referencia": 27,
+        "posicao_atual": 8,
+        "pontos_atuais": 38,
+        "posicao_projetada": 10,
+        "posicao_media_estimada": 10.58,
+        "faixa_posicao_80": {
+          "melhor": 7,
+          "pior": 14
+        },
+        "pontos_projetados": 51,
+        "faixa_pontos_80": {
+          "min": 46,
+          "max": 56
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0,
+          "libertadores": 12.99205,
+          "sul_americana": 73.8735
         }
       }
     ],
@@ -20344,6 +20552,32 @@
           "libertadores": 84.86755,
           "sul_americana": 15.05595
         }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "5698e82ad79756293adac14adecee4e3870e7f7f324820d1b727a3dab89ca7b7",
+        "jogos_atuais": 26,
+        "rodada_referencia": 26,
+        "posicao_atual": 6,
+        "pontos_atuais": 42,
+        "posicao_projetada": 5,
+        "posicao_media_estimada": 5.2925,
+        "faixa_posicao_80": {
+          "melhor": 3,
+          "pior": 8
+        },
+        "pontos_projetados": 60,
+        "faixa_pontos_80": {
+          "min": 55,
+          "max": 66
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0144,
+          "libertadores": 85.55655,
+          "sul_americana": 14.36505
+        }
       }
     ],
     "Flamengo": [
@@ -22579,6 +22813,32 @@
         },
         "probabilidades_pct": {
           "campeao": 60.3291,
+          "libertadores": 99.99995,
+          "sul_americana": 5e-05
+        }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "f9fd320b69ca5e8d7ae55da26b1649a35dc2d2f7ddb81914dc81eb5c36483a0f",
+        "jogos_atuais": 26,
+        "rodada_referencia": 26,
+        "posicao_atual": 2,
+        "pontos_atuais": 54,
+        "posicao_projetada": 1,
+        "posicao_media_estimada": 1.4071,
+        "faixa_posicao_80": {
+          "melhor": 1,
+          "pior": 2
+        },
+        "pontos_projetados": 78,
+        "faixa_pontos_80": {
+          "min": 73,
+          "max": 84
+        },
+        "probabilidades_pct": {
+          "campeao": 60.26635,
           "libertadores": 99.99995,
           "sul_americana": 5e-05
         }
@@ -24872,6 +25132,32 @@
           "libertadores": 90.59765,
           "sul_americana": 9.3717
         }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "816c20c47d91b0b4b3f2a149d743906a71ea6e91256a7dc298b14ffe26d5ef9b",
+        "jogos_atuais": 27,
+        "rodada_referencia": 27,
+        "posicao_atual": 4,
+        "pontos_atuais": 45,
+        "posicao_projetada": 4,
+        "posicao_media_estimada": 4.9645,
+        "faixa_posicao_80": {
+          "melhor": 3,
+          "pior": 7
+        },
+        "pontos_projetados": 61,
+        "faixa_pontos_80": {
+          "min": 56,
+          "max": 67
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0143,
+          "libertadores": 91.0122,
+          "sul_americana": 8.9579
+        }
       }
     ],
     "Grêmio": [
@@ -27161,6 +27447,32 @@
           "campeao": 0.0,
           "libertadores": 50.25625,
           "sul_americana": 10.6533
+        }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "aa1f79dd4ff87c2d6838d3cd6c466f7493e925d34eb77400b778e82022ff503c",
+        "jogos_atuais": 26,
+        "rodada_referencia": 27,
+        "posicao_atual": 15,
+        "pontos_atuais": 28,
+        "posicao_projetada": 18,
+        "posicao_media_estimada": 16.0323,
+        "faixa_posicao_80": {
+          "melhor": 13,
+          "pior": 19
+        },
+        "pontos_projetados": 42,
+        "faixa_pontos_80": {
+          "min": 36,
+          "max": 47
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0,
+          "libertadores": 50.28535,
+          "sul_americana": 10.69535
         }
       }
     ],
@@ -29452,6 +29764,32 @@
           "libertadores": 0.19805,
           "sul_americana": 18.00155
         }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "81ad7197349a95f24bae1d0bc39691e76cbf7f3fbd2e6af2dee2fe60b521f738",
+        "jogos_atuais": 27,
+        "rodada_referencia": 27,
+        "posicao_atual": 18,
+        "pontos_atuais": 28,
+        "posicao_projetada": 17,
+        "posicao_media_estimada": 16.0147,
+        "faixa_posicao_80": {
+          "melhor": 13,
+          "pior": 19
+        },
+        "pontos_projetados": 42,
+        "faixa_pontos_80": {
+          "min": 37,
+          "max": 48
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0,
+          "libertadores": 0.2102,
+          "sul_americana": 18.13975
+        }
       }
     ],
     "Mirassol": [
@@ -31742,6 +32080,32 @@
           "libertadores": 1.7009,
           "sul_americana": 43.26465
         }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "9fdf0c4542678ac497872156b9345374a2a11e6a28b8042791a0d24cda73e636",
+        "jogos_atuais": 26,
+        "rodada_referencia": 26,
+        "posicao_atual": 16,
+        "pontos_atuais": 28,
+        "posicao_projetada": 15,
+        "posicao_media_estimada": 13.9855,
+        "faixa_posicao_80": {
+          "melhor": 10,
+          "pior": 18
+        },
+        "pontos_projetados": 45,
+        "faixa_pontos_80": {
+          "min": 40,
+          "max": 51
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0,
+          "libertadores": 1.83015,
+          "sul_americana": 43.37515
+        }
       }
     ],
     "Palmeiras": [
@@ -33927,6 +34291,32 @@
           "campeao": 39.555,
           "libertadores": 99.99975,
           "sul_americana": 0.00025
+        }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "4a57c5d2b1547dcf95ba03e085a1fee3aaaee4ab68294d9715bc53eefeb5ec89",
+        "jogos_atuais": 27,
+        "rodada_referencia": 27,
+        "posicao_atual": 1,
+        "pontos_atuais": 56,
+        "posicao_projetada": 2,
+        "posicao_media_estimada": 1.6222,
+        "faixa_posicao_80": {
+          "melhor": 1,
+          "pior": 2
+        },
+        "pontos_projetados": 77,
+        "faixa_pontos_80": {
+          "min": 72,
+          "max": 82
+        },
+        "probabilidades_pct": {
+          "campeao": 39.6213,
+          "libertadores": 99.99985,
+          "sul_americana": 0.00015
         }
       }
     ],
@@ -36218,6 +36608,32 @@
           "libertadores": 0.00585,
           "sul_americana": 2.0594
         }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "82a91f9cd47248445e41ce39771e39b335aa6ecf0030cd8230545ec7ed0fb2f2",
+        "jogos_atuais": 26,
+        "rodada_referencia": 26,
+        "posicao_atual": 19,
+        "pontos_atuais": 23,
+        "posicao_projetada": 19,
+        "posicao_media_estimada": 18.2582,
+        "faixa_posicao_80": {
+          "melhor": 16,
+          "pior": 19
+        },
+        "pontos_projetados": 37,
+        "faixa_pontos_80": {
+          "min": 31,
+          "max": 42
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0,
+          "libertadores": 0.00505,
+          "sul_americana": 2.06315
+        }
       }
     ],
     "Santos": [
@@ -38507,6 +38923,32 @@
           "campeao": 0.0,
           "libertadores": 14.88345,
           "sul_americana": 52.66385
+        }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "babb1ce8d89252031d16e7f2a22f613dc471b4b176dbce0b202848a8ba7c18f9",
+        "jogos_atuais": 25,
+        "rodada_referencia": 26,
+        "posicao_atual": 13,
+        "pontos_atuais": 32,
+        "posicao_projetada": 12,
+        "posicao_media_estimada": 12.4622,
+        "faixa_posicao_80": {
+          "melhor": 8,
+          "pior": 16
+        },
+        "pontos_projetados": 48,
+        "faixa_pontos_80": {
+          "min": 42,
+          "max": 54
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0,
+          "libertadores": 15.2184,
+          "sul_americana": 52.5341
         }
       }
     ],
@@ -40798,6 +41240,32 @@
           "libertadores": 14.9116,
           "sul_americana": 69.3512
         }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "4334bf1d70296e077d0417d6057daec4f2d28a778d73357489b5abd2e7e83645",
+        "jogos_atuais": 26,
+        "rodada_referencia": 27,
+        "posicao_atual": 10,
+        "pontos_atuais": 33,
+        "posicao_projetada": 11,
+        "posicao_media_estimada": 10.7299,
+        "faixa_posicao_80": {
+          "melhor": 7,
+          "pior": 15
+        },
+        "pontos_projetados": 50,
+        "faixa_pontos_80": {
+          "min": 45,
+          "max": 56
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0,
+          "libertadores": 15.5805,
+          "sul_americana": 68.84735
+        }
       }
     ],
     "Vasco da Gama": [
@@ -43088,6 +43556,32 @@
           "libertadores": 27.19755,
           "sul_americana": 17.8031
         }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "739352bd4f52c5cee6fbe394b8c6c6010e07821cd4a0401753c02a17080cdf6e",
+        "jogos_atuais": 26,
+        "rodada_referencia": 27,
+        "posicao_atual": 17,
+        "pontos_atuais": 28,
+        "posicao_projetada": 16,
+        "posicao_media_estimada": 15.6022,
+        "faixa_posicao_80": {
+          "melhor": 12,
+          "pior": 18
+        },
+        "pontos_projetados": 43,
+        "faixa_pontos_80": {
+          "min": 37,
+          "max": 48
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0,
+          "libertadores": 27.27535,
+          "sul_americana": 17.9748
+        }
       }
     ],
     "Vitória": [
@@ -45377,6 +45871,32 @@
           "campeao": 0.0,
           "libertadores": 2.18735,
           "sul_americana": 49.41425
+        }
+      },
+      {
+        "gerado_em": "2026-09-12T22:26:00-03:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_snapshot": "ffa73e793a03db35a7d63560edc48b764ca5317cc722def8bec4a99250495b6d",
+        "hash_previsao_clube": "89e57559e6db29ab0fc30672204971293e8293f7b1792b91cf5bf92ff12e72e9",
+        "jogos_atuais": 26,
+        "rodada_referencia": 26,
+        "posicao_atual": 11,
+        "pontos_atuais": 32,
+        "posicao_projetada": 14,
+        "posicao_media_estimada": 13.5135,
+        "faixa_posicao_80": {
+          "melhor": 10,
+          "pior": 17
+        },
+        "pontos_projetados": 46,
+        "faixa_pontos_80": {
+          "min": 41,
+          "max": 52
+        },
+        "probabilidades_pct": {
+          "campeao": 0.0,
+          "libertadores": 2.3622,
+          "sul_americana": 49.298
         }
       }
     ]
