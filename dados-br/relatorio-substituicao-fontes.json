@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-09-12T23:36:53-03:00",
+  "atualizado_em": "2026-09-13T01:54:26-03:00",
   "fonte": "sanitização e busca oficial de melhores momentos do Brasileirão",
   "politica": {
     "regra": "A grade de transmissão define a prioridade: Prime Video -> Prime Video Sport Brasil; GE TV/Globo/sportv/Premiere/Globoplay -> GE TV; CazéTV/Record -> CazéTV. As demais fontes primárias são fallback; UOL só após 48 horas.",
@@ -9,9 +9,9 @@
   "dry_run": false,
   "youtube_ativo": true,
   "quota_estimada_youtube": {
-    "unidades": 626,
+    "unidades": 26,
     "playlist_items": 25,
-    "search": 6,
+    "search": 0,
     "channels": 1,
     "videos": 0
   },
@@ -22,49 +22,46 @@
   "event_id_alvo": "401841229",
   "resumo_geral_antes": {
     "jogos_resultados": 263,
-    "ge": 254,
+    "ge": 255,
     "caze": 3,
     "prime": 2,
     "uol": 3,
     "outros": 0,
-    "sem_video": 1,
-    "com_fonte_preferida": 262
+    "sem_video": 0,
+    "com_fonte_preferida": 263
   },
   "resumo_geral_depois": {
     "jogos_resultados": 263,
-    "ge": 254,
+    "ge": 255,
     "caze": 3,
     "prime": 2,
     "uol": 3,
     "outros": 0,
-    "sem_video": 1,
-    "com_fonte_preferida": 262
+    "sem_video": 0,
+    "com_fonte_preferida": 263
   },
   "resumo_janela_antes": {
     "jogos_resultados": 1,
-    "ge": 0,
+    "ge": 1,
     "caze": 0,
     "prime": 0,
     "uol": 0,
     "outros": 0,
-    "sem_video": 1,
-    "com_fonte_preferida": 0
+    "sem_video": 0,
+    "com_fonte_preferida": 1
   },
   "resumo_janela_depois": {
     "jogos_resultados": 1,
-    "ge": 0,
+    "ge": 1,
     "caze": 0,
     "prime": 0,
     "uol": 0,
     "outros": 0,
-    "sem_video": 1,
-    "com_fonte_preferida": 0
+    "sem_video": 0,
+    "com_fonte_preferida": 1
   },
   "mantidos_preferidos_na_janela": [],
-  "substituidos_para_fontes_preferidas": [],
-  "removidos_por_fonte_nao_preferida": [],
-  "removidos_por_jogo_nao_finalizado": [],
-  "ainda_sem_link_preferido": [
+  "substituidos_para_fontes_preferidas": [
     {
       "event_id": "401841229",
       "rodada": 27,
@@ -72,88 +69,21 @@
       "visitante": "Bragantino",
       "placar_mandante": 1,
       "placar_visitante": 1,
-      "motivo": "sem link em GE/Globo, CazéTV, Prime Video ou UOL após 48h"
+      "motivo": "fonte_valida_mas_prioridade_da_transmissao_e_prime",
+      "fonte_anterior": "GE TV / YouTube",
+      "channel_title": "",
+      "titulo_anterior": "BOTAFOGO 1 X 1 BRAGANTINO | MELHORES MOMENTOS | 27ª RODADA BRASILEIRÃO 2026 | ge.globo",
+      "url_anterior": "https://www.youtube.com/watch?v=4cVuCTARqkQ",
+      "fonte_nova": "GE TV / YouTube",
+      "channel_title_novo": "ge tv",
+      "titulo_novo": "BOTAFOGO 1 X 1 BRAGANTINO | MELHORES MOMENTOS | 27ª RODADA BRASILEIRÃO 2026 | ge.globo",
+      "url_nova": "https://www.youtube.com/watch?v=4cVuCTARqkQ",
+      "metodo": "playlistItems"
     }
   ],
-  "buscas_executadas_em_canais_preferidos": [
-    {
-      "event_id": "401841229",
-      "rodada": 27,
-      "jogo": "Botafogo x Bragantino",
-      "canal": "prime",
-      "prioridade_fontes": [
-        "prime",
-        "ge",
-        "caze"
-      ],
-      "query": "\"Botafogo 1 x 1 Bragantino\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 6
-    },
-    {
-      "event_id": "401841229",
-      "rodada": 27,
-      "jogo": "Botafogo x Bragantino",
-      "canal": "ge",
-      "prioridade_fontes": [
-        "prime",
-        "ge",
-        "caze"
-      ],
-      "query": "\"Botafogo 1 x 1 Bragantino\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 6
-    },
-    {
-      "event_id": "401841229",
-      "rodada": 27,
-      "jogo": "Botafogo x Bragantino",
-      "canal": "caze",
-      "prioridade_fontes": [
-        "prime",
-        "ge",
-        "caze"
-      ],
-      "query": "\"Botafogo 1 x 1 Bragantino\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 1
-    },
-    {
-      "event_id": "401841229",
-      "rodada": 27,
-      "jogo": "Botafogo x Bragantino",
-      "canal": "prime",
-      "prioridade_fontes": [
-        "prime",
-        "ge",
-        "caze"
-      ],
-      "query": "\"Botafogo x Bragantino\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 6
-    },
-    {
-      "event_id": "401841229",
-      "rodada": 27,
-      "jogo": "Botafogo x Bragantino",
-      "canal": "ge",
-      "prioridade_fontes": [
-        "prime",
-        "ge",
-        "caze"
-      ],
-      "query": "\"Botafogo x Bragantino\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 6
-    },
-    {
-      "event_id": "401841229",
-      "rodada": 27,
-      "jogo": "Botafogo x Bragantino",
-      "canal": "caze",
-      "prioridade_fontes": [
-        "prime",
-        "ge",
-        "caze"
-      ],
-      "query": "\"Botafogo x Bragantino\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 1
-    }
-  ],
+  "removidos_por_fonte_nao_preferida": [],
+  "removidos_por_jogo_nao_finalizado": [],
+  "ainda_sem_link_preferido": [],
+  "buscas_executadas_em_canais_preferidos": [],
   "erros": []
 }
