@@ -2022,58 +2022,87 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: Flamengo x Corinthians, Brasileirão Série A 2026, fase única, rodada 27, neste domingo, 13/09/2026, às 17h30 (horário de Brasília), no Maracanã. A grade completa é GE TV, Globo e Premiere; portanto, não é exclusivo. O ge lista expressamente os três meios como transmissão da partida, e a página oficial da CBF também registra GE TV, Globo e Premiere."
+    },
+    {
+      "event_id": "401841235",
+      "jogo": "Mirassol x Vitória",
+      "data_iso": "2026-09-13T16:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-09-13T14:32:21-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Premiere"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+        "https://ge.globo.com/ba",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
+        "https://ge.globo.com/ba/futebol/times/vitoria/noticia/2026/09/11/vitoria-anuncia-a-contratacao-do-zagueiro-darlan-dutra.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/mirassol-x-vitoria/832155",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/vitoria-x-mirassol/831967",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/brasileirao-betano-21-rodada-comeca-nesta-quarta",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-divulga-tabela-detalhada-das-rodadas-19-a-24-do-brasileirao-serie-a",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/undefined/abc-fc-x-vitoria/mirassol-e-remo-obtem-vitorias-maiusculas-e-galo-vence-classico-no-mineirao",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/undefined/cuiaba-saf-x-coritiba-saf/cbf-divulga-tabela-detalhada-das-primeiras-rodadas-do-brasileirao-2026",
+        "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026"
+      ],
+      "canais_depois": [
+        "Premiere"
+      ],
+      "exclusivo": true,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/mirassol-x-vitoria/832155",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Mirassol x Vitória, Brasileirão Série A 2026, fase única, 27ª rodada, domingo (13/09/2026), às 16h (horário de Brasília), no José Maria de Campos Maia, em Mirassol. A transmissão integral é exclusiva do Premiere. A listagem do ge para a rodada também registra somente Premiere para esta partida; GE TV e Globo aparecem associados a Flamengo x Corinthians, não a Mirassol x Vitória."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841237",
-    "jogo": "Flamengo x Corinthians",
-    "data_iso": "2026-09-13T17:30:00-03:00",
-    "checkpoint": -360,
-    "executado_em": "2026-09-13T11:32:39-03:00",
+    "event_id": "401841235",
+    "jogo": "Mirassol x Vitória",
+    "data_iso": "2026-09-13T16:00:00-03:00",
+    "checkpoint": -90,
+    "executado_em": "2026-09-13T14:32:21-03:00",
     "chamada_openai": true,
-    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+    "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "GE TV",
-      "Premiere",
-      "Globo"
+      "Premiere"
     ],
     "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://cbf-hml.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-b/2026/305435",
-      "https://credencial.cbf.com.br/files/manuais/Manual_Empresa.pdf",
-      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/163056",
-      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/186325",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/atletico-mineiro-x-flamengo/832015",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/corinthians-x-chapecoense/832143",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/corinthians-x-flamengo/831962",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/flamengo-x-corinthians/832151",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/flamengo-x-sao-paulo/832080",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/remo-x-flamengo/832149",
-      "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/20001",
-      "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/20016"
+      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+      "https://ge.globo.com/ba",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
+      "https://ge.globo.com/ba/futebol/times/vitoria/noticia/2026/09/11/vitoria-anuncia-a-contratacao-do-zagueiro-darlan-dutra.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/mirassol-x-vitoria/832155",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/vitoria-x-mirassol/831967",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/brasileirao-betano-21-rodada-comeca-nesta-quarta",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-divulga-tabela-detalhada-das-rodadas-19-a-24-do-brasileirao-serie-a",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/undefined/abc-fc-x-vitoria/mirassol-e-remo-obtem-vitorias-maiusculas-e-galo-vence-classico-no-mineirao",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/undefined/cuiaba-saf-x-coritiba-saf/cbf-divulga-tabela-detalhada-das-primeiras-rodadas-do-brasileirao-2026",
+      "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026"
     ],
     "canais_depois": [
-      "GE TV",
-      "Globo",
       "Premiere"
     ],
-    "exclusivo": false,
+    "exclusivo": true,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/flamengo-x-corinthians/832151"
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/mirassol-x-vitoria/832155",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml"
     ],
-    "youtube": [
-      {
-        "url": "https://www.youtube.com/watch?v=KLQC8yobuKc",
-        "scope": "match",
-        "valid_for_match": true,
-        "reason": "O URL fornecido é identificado como programação da ge tv para Flamengo x Corinthians, com indicação de transmissão ao vivo e com imagens. A validade para a partida é corroborada pela grade do ge e pelo registro oficial da CBF, que apontam GE TV como uma das transmissões integrais do jogo."
-      }
-    ],
+    "youtube": [],
     "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: Flamengo x Corinthians, Brasileirão Série A 2026, fase única, rodada 27, neste domingo, 13/09/2026, às 17h30 (horário de Brasília), no Maracanã. A grade completa é GE TV, Globo e Premiere; portanto, não é exclusivo. O ge lista expressamente os três meios como transmissão da partida, e a página oficial da CBF também registra GE TV, Globo e Premiere."
+    "resumo": "Confirmado para o Brasil: Mirassol x Vitória, Brasileirão Série A 2026, fase única, 27ª rodada, domingo (13/09/2026), às 16h (horário de Brasília), no José Maria de Campos Maia, em Mirassol. A transmissão integral é exclusiva do Premiere. A listagem do ge para a rodada também registra somente Premiere para esta partida; GE TV e Globo aparecem associados a Flamengo x Corinthians, não a Mirassol x Vitória."
   },
-  "atualizado_em": "2026-09-13T11:32:39-03:00"
+  "atualizado_em": "2026-09-13T14:32:21-03:00"
 }

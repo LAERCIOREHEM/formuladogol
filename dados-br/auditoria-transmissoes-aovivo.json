@@ -15,14 +15,14 @@
   "resumo": {
     "jogos_na_janela": 34,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 4,
+    "descobertas_antecipadas": 5,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 34,
+    "candidatos_oficiais_encontrados": 28,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
     "transmissoes_publicadas": 5,
-    "sem_transmissao": 0,
+    "sem_transmissao": 1,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -69,6 +69,18 @@
   },
   "jogos_analisados": [
     {
+      "event_id": "401841235",
+      "rodada": 27,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Mirassol x Vitória",
+      "data_iso": "2026-09-13T16:00:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
+    },
+    {
       "event_id": "401841237",
       "rodada": 27,
       "competicao_chave": "brasileirao",
@@ -80,7 +92,7 @@
         "GE TV"
       ],
       "manual": false,
-      "descoberta_antecipada": false
+      "descoberta_antecipada": true
     },
     {
       "event_id": "401841245",
@@ -223,16 +235,6 @@
   ],
   "rejeitados": [
     {
-      "video_id": "r2yKlymu7O0",
-      "url": "https://www.youtube.com/watch?v=r2yKlymu7O0",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: BRASIL X ARGENTINA | PRÉ-OLÍMPICO FEMININO DE VÔLEI | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-09-13T11:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "LLpNUqHVam8",
       "url": "https://www.youtube.com/watch?v=LLpNUqHVam8",
       "fonte": "sbt",
@@ -353,6 +355,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "XIpzFCh8Xrs",
+      "url": "https://www.youtube.com/watch?v=XIpzFCh8Xrs",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "ALEX, FÁBIO E...ROMÁRIO? OS 11+ INJUSTIÇADOS NA SELEÇÃO BRASILEIRA! | Tropa ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-13T20:33:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "dVD4vqNgu74",
       "url": "https://www.youtube.com/watch?v=dVD4vqNgu74",
       "fonte": "getv",
@@ -393,16 +405,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "4PnH-jA__xc",
-      "url": "https://www.youtube.com/watch?v=4PnH-jA__xc",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: RB LEIPZIG X HAMBURGO | BUNDESLIGA 26/27 | 3ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-13T09:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "BAxm0GVjddE",
       "url": "https://www.youtube.com/watch?v=BAxm0GVjddE",
       "fonte": "cazetv",
@@ -427,8 +429,8 @@
       "url": "https://www.youtube.com/watch?v=G5p6ysqfW2Y",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: JUDÔ | TIME BRASIL NO GRAND SLAM DE BUDAPESTE | DIA 3",
-      "status": "upcoming",
+      "titulo": "AO VIVO: FINAL DA COPA DO MUNDO DE BASQUETE FEMININO | FRANÇA X ESTADOS UNIDOS",
+      "status": "live",
       "inicio_programado": "2026-09-13T11:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -443,63 +445,13 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "QlQZRU-zk_U",
-      "url": "https://www.youtube.com/watch?v=QlQZRU-zk_U",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: FINAL DA COPA DO MUNDO DE BASQUETE FEMININO | FRANÇA X ESTADOS UNIDOS",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-13T14:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "Xut5iFQoL5U",
-      "url": "https://www.youtube.com/watch?v=Xut5iFQoL5U",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ALEMANHA X ESPANHA | COPA DO MUNDO DE BASQUETE | DISPUTA DE 3º LUGAR",
-      "status": "live",
-      "inicio_programado": "2026-09-13T11:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "Y3hJeYLO4dI",
-      "url": "https://www.youtube.com/watch?v=Y3hJeYLO4dI",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): LILLE X ESTAC TROYES | LIGUE 1 26/27 | 4ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-13T09:55:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "dX3Lp34X9WQ",
       "url": "https://www.youtube.com/watch?v=dX3Lp34X9WQ",
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: GETAFE X A CORUÑA | LALIGA 26/27 | 5ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-13T13:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "iqSOyFt4BNE",
-      "url": "https://www.youtube.com/watch?v=iqSOyFt4BNE",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: LEVANTE X BARCELONA | LALIGA 26/27 | 5ª RODADA",
       "status": "live",
-      "inicio_programado": "2026-09-13T10:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "jk5yRWfZ6pA",
-      "url": "https://www.youtube.com/watch?v=jk5yRWfZ6pA",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): LE MANS X LENS | LIGUE 1 26/27 | 4ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-13T12:10:00-03:00",
+      "inicio_programado": "2026-09-13T13:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -513,8 +465,24 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
-  "sem_transmissao": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401841235",
+      "jogo": "Mirassol x Vitória",
+      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
+    }
+  ],
+  "sem_transmissao": [
+    {
+      "event_id": "401841235",
+      "rodada": 27,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Mirassol x Vitória",
+      "data_iso": "2026-09-13T16:00:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
+    }
+  ],
   "erros": [],
   "quota_estimada_youtube": {
     "unidades": 87,
@@ -525,5 +493,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-13T11:30:54-03:00"
+  "atualizado_em": "2026-09-13T14:30:46-03:00"
 }
