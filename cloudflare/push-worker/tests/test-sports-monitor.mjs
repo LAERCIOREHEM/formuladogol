@@ -199,6 +199,31 @@ try {
   assert.equal(queue.length, 1, 'deduplicação deve impedir novo fan-out');
 }
 
+// R10R4: gol anulado usa o mesmo contrato de Gols, persiste em sports_events
+// e entra na fila pública uma única vez.
+{
+  const storage = new FakeStorage();
+  const db = new FakeDB();
+  const queue = [];
+  const monitor = new SportsMonitor({ storage }, { DB: db, PUSH_QUEUE: { send: async (body) => queue.push(body) } });
+  const overturnedEvent = {
+    eventKey: 'goal_overturned:401841235:score:1-2:home',
+    type: 'goal_overturned', sourcePlayKey: '401841235:m1', eventId: '401841235', league: 'bra.1', competitionKey: 'brasileirao', competitionName: 'Brasileirão',
+    kickoff: '2026-09-13T16:00:00-03:00',
+    home: { id: '12345', name: 'Mirassol', abbreviation: 'MIR', score: 0 },
+    away: { id: '3456', name: 'Vitória', abbreviation: 'VIT', score: 2 },
+    scoringTeam: { id: '12345', name: 'Mirassol' }, athlete: { id: 'bruno', name: 'Bruno Santos' }, minute: "68'",
+    ownGoal: false, penalty: false, shootout: false, scoreAfter: { home: 1, away: 2 },
+    detectedAt: new Date(now).toISOString(), confirmedAt: new Date(now).toISOString(),
+    notificationDraft: { title: '🚫 GOL ANULADO', body: 'O placar voltou para Mirassol 0 × 2 Vitória' }
+  };
+  assert.equal(await monitor.recordEvent(overturnedEvent), true);
+  assert.equal(db.events.size, 1);
+  assert.equal(queue.length, 1);
+  assert.equal(await monitor.recordEvent(overturnedEvent), false, 'gol anulado não pode duplicar fan-out');
+  assert.equal(queue.length, 1);
+}
+
 console.log('sports-monitor: PASS');
 } finally {
   Date.now = realNow;

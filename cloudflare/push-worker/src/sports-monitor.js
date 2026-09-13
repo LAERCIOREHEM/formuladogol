@@ -42,7 +42,7 @@ const FAST_POLL_PRE_MS = 20 * 60_000;
 const AUX_SUMMARY_INTERVAL_MS = 30_000;
 const LIVE_POLL_LATE_START_MS = 45 * 60_000;
 const LIVE_POLICY_VERSION = '6-R10';
-const ESSENTIAL_EVENT_TYPES = new Set(['prematch_15', 'goal', 'red_card', 'lineup_confirmed', 'match_start', 'final_whistle']);
+const ESSENTIAL_EVENT_TYPES = new Set(['prematch_15', 'goal', 'goal_overturned', 'red_card', 'lineup_confirmed', 'match_start', 'final_whistle']);
 
 function text(value) { return String(value == null ? '' : value).trim(); }
 function num(value, fallback = 0) { const n = Number(value); return Number.isFinite(n) ? n : fallback; }
@@ -613,7 +613,7 @@ export class SportsMonitor {
   async recordEvent(event) {
     const row = eventRow(event);
     if (!ESSENTIAL_EVENT_TYPES.has(row.event_type)) return false;
-    const goalEvent = row.event_type === 'goal';
+    const goalEvent = row.event_type === 'goal' || row.event_type === 'goal_overturned';
     const prematchEvent = row.event_type === 'prematch_15';
     const inserted = goalEvent
       ? await this.env.DB.prepare(`
@@ -1084,7 +1084,8 @@ export class SportsMonitor {
     return {
       ok: true,
       engineVersion: 5,
-      essentialAlertPolicyVersion: SPORTS_ENGINE_CONSTANTS.ESSENTIAL_ALERT_POLICY_VERSION || '6-R10R3',
+      essentialAlertPolicyVersion: SPORTS_ENGINE_CONSTANTS.ESSENTIAL_ALERT_POLICY_VERSION || '6-R10R4',
+      goalRecoveryPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_RECOVERY_POLICY_VERSION || '6-R10R4',
       readinessVersion: READINESS_VERSION,
       overturnPolicyVersion: SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION,
       goalDetectionPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION,

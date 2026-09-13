@@ -57,6 +57,9 @@ assert.equal(reverted.emitted.length, 0);
 reverted = applyObservation(reverted.match, revertedObs, [], t0 + 76_000);
 assert.equal(reverted.emitted.length, 1);
 assert.equal(reverted.emitted[0].type, 'goal_overturned');
-assert.throws(() => buildSportsPushPayload(reverted.emitted[0]), /unsupported_public_alert_type/, 'gol anulado permanece proteção interna anti-VAR e não é um dos cinco pushes');
+const overturnedPush = buildSportsPushPayload(reverted.emitted[0]);
+assert.equal(overturnedPush.title, '🚫 GOL ANULADO');
+assert.match(overturnedPush.body, /Atlético-MG 0 × 0 Cruzeiro/);
+assert.equal(overturnedPush.data.type, 'goal_overturned');
 
 console.log('end-to-end-synthetic: PASS');

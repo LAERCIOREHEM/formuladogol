@@ -96,6 +96,108 @@ state = step.match;
 assert.equal(step.emitted.length, 1, 'segunda evidência confirma gol anulado');
 assert.equal(step.emitted[0].type, 'goal_overturned');
 
+// R10R4: VAR rápido — mesmo quando o gol é anulado antes dos 20 s e portanto
+// nunca houve push de GOL, duas leituras do placar revertido geram GOL ANULADO.
+{
+  const varBase = normalizeScoreboardEvent(rawScore(1, 2, "70'"), game.league, game);
+  const varBaseline = [
+    { key: 'vb1', teamId: '2022', side: 'away', athleteName: 'A', minute: "3'", shootout: false, homeScoreAfter: 0, awayScoreAfter: 1, order: 1 },
+    { key: 'vb2', teamId: '2022', side: 'away', athleteName: 'B', minute: "12'", shootout: false, homeScoreAfter: 0, awayScoreAfter: 2, order: 2 },
+    { key: 'vb3', teamId: '7632', side: 'home', athleteName: 'C', minute: "68'", shootout: false, homeScoreAfter: 1, awayScoreAfter: 2, order: 3 }
+  ];
+  let varState = applyObservation(initialMatchState(varBase), varBase, varBaseline, t0).match;
+  const transientGoal = normalizeScoreboardEvent(rawScore(1, 3, "72'"), game.league, game);
+  const transientPlays = [...varBaseline, { key: 'var-fast', teamId: '2022', side: 'away', athleteName: 'Atacante', minute: "72'", shootout: false, homeScoreAfter: 1, awayScoreAfter: 3, order: 4 }];
+  let varStep = applyObservation(varState, transientGoal, transientPlays, t0 + 5_000);
+  varState = varStep.match;
+  assert.equal(varStep.emitted.length, 0, 'gol ainda está na janela anti-VAR');
+  const rolledBack = normalizeScoreboardEvent(rawScore(1, 2, "73'"), game.league, game);
+  varStep = applyObservation(varState, rolledBack, varBaseline, t0 + 10_000);
+  varState = varStep.match;
+  assert.equal(varStep.emitted.length, 0, 'primeira leitura do rollback não basta');
+  varStep = applyObservation(varState, rolledBack, varBaseline, t0 + 20_000);
+  assert.equal(varStep.emitted.filter((event) => event.type === 'goal_overturned').length, 1, 'segunda leitura confirma o gol anulado mesmo sem push de gol anterior');
+  assert.equal(varStep.emitted[0].notificationDraft.title, '🚫 GOL ANULADO');
+}
+
+// R10R4 — regressão Mirassol × Vitória (13/09/2026): recovery em 0x2 com
+// summary histórico incompleto não pode engolir o próximo 1x2.
+{
+  const recoveryGame = {
+    eventId: '401841235', league: 'bra.1', competitionKey: 'brasileirao', competitionName: 'Brasileirão',
+    kickoff: '2026-09-13T16:00:00-03:00',
+    state: 'in', completed: false, clock: "60'", period: 2,
+    home: { id: '12345', name: 'Mirassol', abbreviation: 'MIR', score: 0 },
+    away: { id: '3456', name: 'Vitória', abbreviation: 'VIT', score: 2 }
+  };
+  const recoveryNow = Date.parse('2026-09-13T20:00:00Z');
+  let recoveryStep = applyObservation(initialMatchState(recoveryGame), recoveryGame, [], recoveryNow);
+  let recoveryState = recoveryStep.match;
+  assert.equal(recoveryStep.emitted.length, 0, 'gols anteriores ao recovery não viram backlog');
+  assert.equal(recoveryState.baselineComplete, true, 'placar conhecido já deve liberar detecção futura');
+  assert.equal(recoveryState.baselineMode, 'score_anchor');
+  assert.deepEqual(
+    { home: recoveryState.recoveryBaselineScore.home, away: recoveryState.recoveryBaselineScore.away },
+    { home: 0, away: 2 }
+  );
+
+  const mirassolGoal = structuredClone(recoveryGame);
+  mirassolGoal.clock = "68'";
+  mirassolGoal.home.score = 1;
+  const recoveredSummary = [
+    { key: 'v1', sourceId: 'v1', teamId: '3456', side: 'away', athleteId: 'r1', athleteName: 'Renê', minute: "3'", shootout: false, homeScoreAfter: 0, awayScoreAfter: 1, order: 1 },
+    { key: 'v2', sourceId: 'v2', teamId: '3456', side: 'away', athleteId: 'r1', athleteName: 'Renê', minute: "12'", shootout: false, homeScoreAfter: 0, awayScoreAfter: 2, order: 2 },
+    { key: 'm1', sourceId: 'm1', teamId: '12345', side: 'home', athleteId: 'bruno', athleteName: 'Bruno Santos', minute: "68'", shootout: false, homeScoreAfter: 1, awayScoreAfter: 2, order: 3 }
+  ];
+  recoveryStep = applyObservation(recoveryState, mirassolGoal, recoveredSummary, recoveryNow + 5_000);
+  recoveryState = recoveryStep.match;
+  assert.equal(recoveryStep.emitted.length, 0);
+  assert.equal(Object.values(recoveryState.plays).find((play) => play.athleteName === 'Bruno Santos')?.status, 'pending');
+  assert.equal(Object.values(recoveryState.plays).filter((play) => play.status === 'baseline').length, 2, 'gols antigos ficam silenciosos');
+
+  recoveryStep = applyObservation(recoveryState, mirassolGoal, recoveredSummary, recoveryNow + 15_000);
+  recoveryState = recoveryStep.match;
+  assert.equal(recoveryStep.emitted.length, 0);
+  recoveryStep = applyObservation(recoveryState, mirassolGoal, recoveredSummary, recoveryNow + 26_000);
+  recoveryState = recoveryStep.match;
+  assert.equal(recoveryStep.emitted.filter((event) => event.type === 'goal').length, 1, '1x2 novo precisa gerar push mesmo após recovery tardio');
+  assert.equal(recoveryStep.emitted[0].scoringTeam.name, 'Mirassol');
+  assert.equal(recoveryStep.emitted[0].athlete.name, 'Bruno Santos');
+  assert.deepEqual(recoveryStep.emitted[0].scoreAfter, { home: 1, away: 2 });
+
+  // Estado legado persistido no Durable Object antes da R10R4: baselineComplete
+  // ainda falso em 0x2. Se o próximo poll já vier 1x2, a âncora deve usar o
+  // placar ANTERIOR 0x2 e preservar o novo gol.
+  const legacyRecovery = initialMatchState(recoveryGame);
+  legacyRecovery.initialized = true;
+  legacyRecovery.baselineComplete = false;
+  legacyRecovery.state = 'in';
+  legacyRecovery.home = { ...recoveryGame.home };
+  legacyRecovery.away = { ...recoveryGame.away };
+  let legacyStep = applyObservation(legacyRecovery, mirassolGoal, recoveredSummary, recoveryNow + 5_000);
+  let legacyState = legacyStep.match;
+  assert.deepEqual(
+    { home: legacyState.recoveryBaselineScore.home, away: legacyState.recoveryBaselineScore.away },
+    { home: 0, away: 2 },
+    'upgrade de estado legado deve ancorar no placar anterior'
+  );
+  legacyStep = applyObservation(legacyState, mirassolGoal, recoveredSummary, recoveryNow + 15_000);
+  legacyState = legacyStep.match;
+  legacyStep = applyObservation(legacyState, mirassolGoal, recoveredSummary, recoveryNow + 26_000);
+  assert.equal(legacyStep.emitted.filter((event) => event.type === 'goal').length, 1, 'estado legado 0x2 também deve preservar o novo 1x2');
+
+  // Mesmo sem summary detalhado, a âncora 0x2 deve permitir fallback por placar.
+  const scoreOnlyBase = structuredClone(recoveryGame);
+  let scoreOnlyState = applyObservation(initialMatchState(scoreOnlyBase), scoreOnlyBase, null, recoveryNow).match;
+  let scoreOnlyStep = applyObservation(scoreOnlyState, mirassolGoal, null, recoveryNow + 5_000);
+  scoreOnlyState = scoreOnlyStep.match;
+  scoreOnlyStep = applyObservation(scoreOnlyState, mirassolGoal, null, recoveryNow + 15_000);
+  scoreOnlyState = scoreOnlyStep.match;
+  scoreOnlyStep = applyObservation(scoreOnlyState, mirassolGoal, null, recoveryNow + 26_000);
+  assert.equal(scoreOnlyStep.emitted.filter((event) => event.type === 'goal').length, 1, 'fallback do scoreboard também precisa detectar o novo 1x2');
+  assert.equal(scoreOnlyStep.emitted[0].scoringTeam.name, 'Mirassol');
+}
+
 // Regressão E6-R4: desaparecer do feed detalhado NÃO anula gol se o placar não voltou atrás.
 const falseBase = normalizeScoreboardEvent(rawScore(0, 0, "20'"), game.league, game);
 let falseState = applyObservation(initialMatchState(falseBase), falseBase, null, t0).match;
@@ -419,11 +521,12 @@ const agenda = { jogos: [
 assert.deepEqual(selectAgendaCandidates(agenda, Date.parse('2026-09-01T23:50:00Z')).map((x) => x.eventId), [game.eventId]);
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_CONFIRM_MS, 20_000);
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_LATE_SUPPRESS_MS, 180_000);
-assert.equal(SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION, '6-R4');
+assert.equal(SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION, '6-R10R4');
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION, '6-R8');
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_RECONCILIATION_POLICY_VERSION, '6-R9-R1');
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_SCORER_ENRICHMENT_POLICY_VERSION, '6-R9');
-assert.equal(SPORTS_ENGINE_CONSTANTS.ESSENTIAL_ALERT_POLICY_VERSION, '6-R10R3');
+assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_RECOVERY_POLICY_VERSION, '6-R10R4');
+assert.equal(SPORTS_ENGINE_CONSTANTS.ESSENTIAL_ALERT_POLICY_VERSION, '6-R10R4');
 
 // ESPN às vezes publica state=post sem completed; relógio ao vivo não pode virar final fantasma.
 const phantom = rawScore(0, 0, "22'", 'post');
@@ -479,7 +582,7 @@ const leagueStep = applyObservation(leagueState, leaguePenalty, null, t0 + 30_00
 assert.equal(leagueStep.emitted.filter((e) => e.type === 'shootout_start').length, 0);
 
 // Agenda publica SOMENTE o lembrete T-15. Mudança de horário/adiamento continuam
-// sem fan-out público no contrato 6-R10R3. A janela 13–16 min tolera jitter do cron.
+// sem fan-out público no contrato 6-R10R4. A janela 13–16 min tolera jitter do cron.
 const reminderNow = Date.parse('2026-09-01T23:45:30Z');
 const schedulePayload = { jogos: [{
   event_id: game.eventId, espn_league: game.league, data_iso: game.kickoff, competicao_chave: 'copa_do_brasil', competicao_nome_curto: 'Copa do Brasil',

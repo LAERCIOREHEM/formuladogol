@@ -476,6 +476,8 @@ export function initialMatchState(observation) {
     kickoff: text(observation?.kickoff),
     initialized: false,
     baselineComplete: false,
+    baselineMode: 'pending',
+    recoveryBaselineScore: null,
     state: text(observation?.state || 'pre'),
     completed: Boolean(observation?.completed),
     clock: text(observation?.clock),
@@ -704,9 +706,75 @@ export function reconcileScoringPlays(scoringPlays, observation) {
   };
 }
 
+function recoveryBaseline(match) {
+  const baseline = match?.recoveryBaselineScore;
+  if (!baseline || typeof baseline !== 'object') return null;
+  const home = Math.max(0, num(baseline.home, 0));
+  const away = Math.max(0, num(baseline.away, 0));
+  return { home, away, capturedAt: num(baseline.capturedAt, 0), adjustedAt: num(baseline.adjustedAt, 0) };
+}
+
+function setRecoveryBaseline(match, home, away, now) {
+  match.recoveryBaselineScore = {
+    home: Math.max(0, num(home, 0)),
+    away: Math.max(0, num(away, 0)),
+    capturedAt: num(now, Date.now())
+  };
+  match.baselineComplete = true;
+  match.baselineMode = 'score_anchor';
+  return match.recoveryBaselineScore;
+}
+
+function playCoveredByRecoveryBaseline(play, match) {
+  const baseline = recoveryBaseline(match);
+  if (!baseline || !credibleRegulationPlay(play)) return false;
+  const home = num(play?.homeScoreAfter, -1);
+  const away = num(play?.awayScoreAfter, -1);
+  if (home < 0 || away < 0) return false;
+  return home <= baseline.home && away <= baseline.away && home + away <= baseline.home + baseline.away;
+}
+
+function seedRecoveryBaselinePlays(match, plays, now) {
+  for (const play of (Array.isArray(plays) ? plays : [])) {
+    if (!playCoveredByRecoveryBaseline(play, match)) continue;
+    const existing = Object.entries(match.plays || {}).find(([, candidate]) => sameSemanticGoal(candidate, play));
+    if (existing) {
+      const [key, candidate] = existing;
+      const merged = mergeGoalDetails(candidate, play);
+      Object.assign(candidate, merged, { key: candidate.key || key, status: 'baseline', missingCount: 0 });
+      continue;
+    }
+    match.plays[play.key] = { ...play, status: 'baseline', firstSeenAt: now, stableCount: 1, missingCount: 0 };
+  }
+}
+
+function clampRecoveryBaselineToScore(match, observation, now) {
+  const baseline = recoveryBaseline(match);
+  if (!baseline) return false;
+  const currentHome = num(observation?.home?.score, 0);
+  const currentAway = num(observation?.away?.score, 0);
+  if (currentHome >= baseline.home && currentAway >= baseline.away) return false;
+  match.recoveryBaselineScore = {
+    ...baseline,
+    home: Math.min(baseline.home, currentHome),
+    away: Math.min(baseline.away, currentAway),
+    adjustedAt: num(now, Date.now())
+  };
+  for (const play of Object.values(match.plays || {})) {
+    if (play?.status !== 'baseline' || !credibleRegulationPlay(play)) continue;
+    if (!scoreStillContainsPlay(play, observation)) {
+      play.status = 'rejected';
+      play.rejectedAt = now;
+      play.rejectedReason = 'r10r4_recovery_baseline_rollback';
+    }
+  }
+  return true;
+}
+
 function representedScoreFromPlays(match) {
-  let home = 0;
-  let away = 0;
+  const baseline = recoveryBaseline(match);
+  let home = baseline?.home || 0;
+  let away = baseline?.away || 0;
   const active = activeRegulationPlays(match).sort((a, b) => num(a?.order, 0) - num(b?.order, 0));
   for (const play of active) {
     if (play?.homeScoreAfter != null && play?.awayScoreAfter != null) {
@@ -943,7 +1011,9 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
   const wasInitialized = Boolean(match.initialized);
   const previousState = text(match.state);
   const previousShootoutActive = Boolean(match.shootoutActive);
-  const previousScoreTotal = goalCountFromScore(match);
+  const previousHomeScore = num(match?.home?.score, 0);
+  const previousAwayScore = num(match?.away?.score, 0);
+  const previousScoreTotal = previousHomeScore + previousAwayScore;
   const currentScoreTotal = goalCountFromScore(observation);
   const hasSummary = Array.isArray(scoringPlays);
   const rawRegulation = hasSummary ? scoringPlays.filter((play) => !play.shootout) : null;
@@ -981,27 +1051,37 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
 
   if (!match.initialized) {
     match.initialized = true;
+    const kickoffMs = Date.parse(match.kickoff || '');
+    const maybeEmitLateStart = () => {
+      if (observation.state === 'in' && Number.isFinite(kickoffMs) && now - kickoffMs <= 15 * 60_000) {
+        const startEvent = lifecycleEvent('match_start', match, observation, now);
+        if (startEvent) emitted.push(startEvent);
+      }
+    };
     if (currentScoreTotal === 0) {
       match.baselineComplete = true;
-      const kickoffMs = Date.parse(match.kickoff || '');
-      if (observation.state === 'in' && Number.isFinite(kickoffMs) && now - kickoffMs <= 15 * 60_000) {
-        const startEvent = lifecycleEvent('match_start', match, observation, now);
-        if (startEvent) emitted.push(startEvent);
-      }
+      match.baselineMode = 'zero';
+      match.recoveryBaselineScore = null;
+      maybeEmitLateStart();
       return { match, emitted, diagnostic: 'baseline_zero' };
     }
-    if (hasSummary && regulation.length >= currentScoreTotal) {
+    if (hasSummary && regulation.length >= currentScoreTotal && summaryExactlyMatchesScore(regulation, observation)) {
       for (const play of regulation) match.plays[play.key] = { ...play, status: 'baseline', firstSeenAt: now, stableCount: 1, missingCount: 0 };
       match.baselineComplete = true;
-      const kickoffMs = Date.parse(match.kickoff || '');
-      if (observation.state === 'in' && Number.isFinite(kickoffMs) && now - kickoffMs <= 15 * 60_000) {
-        const startEvent = lifecycleEvent('match_start', match, observation, now);
-        if (startEvent) emitted.push(startEvent);
-      }
+      match.baselineMode = 'detailed';
+      match.recoveryBaselineScore = null;
+      maybeEmitLateStart();
       return { match, emitted, diagnostic: 'baseline_existing_goals' };
     }
-    match.baselineComplete = false;
-    return { match, emitted, diagnostic: 'baseline_waiting_summary' };
+
+    // R10R4: se o monitor acorda/reinicia com gols já no placar, o placar atual
+    // vira uma âncora segura. Não precisamos conhecer cada gol antigo para detectar
+    // a PRÓXIMA mudança. Antes, baselineComplete=false podia engolir um gol novo
+    // enquanto o summary histórico ainda estava incompleto.
+    setRecoveryBaseline(match, observation?.home?.score, observation?.away?.score, now);
+    seedRecoveryBaselinePlays(match, regulation, now);
+    maybeEmitLateStart();
+    return { match, emitted, diagnostic: 'baseline_score_anchor' };
   }
 
   if (wasInitialized) {
@@ -1026,15 +1106,27 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
   }
 
   if (!match.baselineComplete) {
-    if (hasSummary && regulation.length >= currentScoreTotal) {
+    // Compatibilidade com estados Durable Object persistidos por versões anteriores.
+    // Se já havia placar conhecido, ancoramos no placar ANTERIOR, não no atual;
+    // assim uma mudança ocorrida entre os polls continua sendo tratada como nova.
+    if (previousScoreTotal > 0) {
+      setRecoveryBaseline(match, previousHomeScore, previousAwayScore, now);
+      seedRecoveryBaselinePlays(match, regulation, now);
+    } else if (hasSummary && regulation.length >= currentScoreTotal && summaryExactlyMatchesScore(regulation, observation)) {
       match.plays = {};
       for (const play of regulation) match.plays[play.key] = { ...play, status: 'baseline', firstSeenAt: now, stableCount: 1, missingCount: 0 };
       match.baselineComplete = true;
+      match.baselineMode = 'detailed';
+      match.recoveryBaselineScore = null;
       return { match, emitted, diagnostic: 'baseline_completed' };
+    } else {
+      setRecoveryBaseline(match, observation?.home?.score, observation?.away?.score, now);
+      seedRecoveryBaselinePlays(match, regulation, now);
+      return { match, emitted, diagnostic: 'baseline_score_anchor' };
     }
-    return { match, emitted, diagnostic: 'baseline_still_waiting' };
   }
 
+  clampRecoveryBaselineToScore(match, observation, now);
   const observedKeys = new Set();
   const summaryConsistent = hasSummary && reconciliation?.state === 'canonical_score_match'
     && summaryExactlyMatchesScore(regulation, observation);
@@ -1060,7 +1152,11 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
     }
     observedKeys.add(storageKey);
     if (!existing) {
-      match.plays[storageKey] = { ...play, status: 'pending', firstSeenAt: num(match.lastScoreChangeAt, 0) || now, stableCount: 1, missingCount: 0 };
+      if (playCoveredByRecoveryBaseline(play, match)) {
+        match.plays[storageKey] = { ...play, status: 'baseline', firstSeenAt: now, stableCount: 1, missingCount: 0 };
+      } else {
+        match.plays[storageKey] = { ...play, status: 'pending', firstSeenAt: num(match.lastScoreChangeAt, 0) || now, stableCount: 1, missingCount: 0 };
+      }
       continue;
     }
     const canonicalKey = existing.key || storageKey;
@@ -1091,9 +1187,35 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
   for (const [key, play] of Object.entries(match.plays)) {
     if (play.shootout || observedKeys.has(key)) continue;
     if (play.status === 'pending') {
-      if (!scoreStillContainsPlay(play, observation) || summaryConsistent) {
+      const rollbackConfirmedByScore = !scoreStillContainsPlay(play, observation);
+      if (rollbackConfirmedByScore) {
+        const hadScoreEvidence = play.scoreFallback === true || play.canonicalScoreEvidence === true;
+        if (!hadScoreEvidence) {
+          // Variantes legadas/inconsistentes que nunca foram sustentadas pelo placar
+          // oficial são apenas descartadas; não podem fabricar um GOL ANULADO.
+          play.status = 'rejected';
+          play.rejectedAt = now;
+          play.rejectedReason = 'r10r4_pending_without_score_evidence';
+          continue;
+        }
+        // R10R4: se a ESPN chegou a elevar o placar e o VAR devolveu o placar
+        // antes dos 20 s anti-VAR, o gol original não foi enviado — mas o usuário
+        // ainda deve receber a informação relevante de GOL ANULADO. Exigimos duas
+        // observações consecutivas do placar revertido para evitar falso rollback.
+        play.missingCount = num(play.missingCount, 0) + 1;
+        if (play.missingCount >= OVERTURN_CONFIRM_OBSERVATIONS) {
+          play.status = 'overturned';
+          play.overturnedAt = now;
+          play.overturnedBeforeGoalDispatch = true;
+          emitted.push(emittedEvent('goal_overturned', play, match, observation, now));
+        }
+        continue;
+      }
+      play.missingCount = 0;
+      if (summaryConsistent) {
         play.status = 'rejected';
         play.rejectedAt = now;
+        play.rejectedReason = 'r10r4_reconciled_duplicate';
       }
       continue;
     }
@@ -1197,6 +1319,8 @@ export function summarizeMatch(match) {
     home: match?.home?.name || '',
     away: match?.away?.name || '',
     baselineComplete: Boolean(match?.baselineComplete),
+    baselineMode: text(match?.baselineMode || (match?.baselineComplete ? 'legacy_complete' : 'pending')),
+    recoveryBaselineScore: recoveryBaseline(match),
     pendingGoals: plays.filter((p) => p.status === 'pending').length,
     confirmedGoals: plays.filter((p) => p.status === 'confirmed').length,
     overturnedGoals: plays.filter((p) => p.status === 'overturned').length,
@@ -1211,9 +1335,10 @@ export const SPORTS_ENGINE_CONSTANTS = Object.freeze({
   GOAL_CONFIRM_OBSERVATIONS,
   OVERTURN_CONFIRM_OBSERVATIONS,
   GOAL_LATE_SUPPRESS_MS,
-  OVERTURN_POLICY_VERSION: '6-R4',
+  OVERTURN_POLICY_VERSION: '6-R10R4',
   GOAL_DETECTION_POLICY_VERSION: '6-R8',
   GOAL_RECONCILIATION_POLICY_VERSION: '6-R9-R1',
   GOAL_SCORER_ENRICHMENT_POLICY_VERSION: '6-R9',
-  ESSENTIAL_ALERT_POLICY_VERSION: '6-R10R3'
+  GOAL_RECOVERY_POLICY_VERSION: '6-R10R4',
+  ESSENTIAL_ALERT_POLICY_VERSION: '6-R10R4'
 });

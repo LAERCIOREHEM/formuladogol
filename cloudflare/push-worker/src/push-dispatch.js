@@ -3,7 +3,7 @@ import { buildPushPayload } from '@block65/webcrypto-web-push';
 const DELIVERY_BATCH_SIZE = 5;
 const TARGET_PAGE_SIZE = 400;
 const MAX_QUEUE_RETRY_DELAY = 300;
-const PUBLIC_ALERT_TYPES = new Set(['prematch_15', 'goal', 'red_card', 'lineup_confirmed', 'match_start', 'final_whistle']);
+const PUBLIC_ALERT_TYPES = new Set(['prematch_15', 'goal', 'goal_overturned', 'red_card', 'lineup_confirmed', 'match_start', 'final_whistle']);
 
 function text(value) { return String(value == null ? '' : value).trim(); }
 function num(value, fallback = 0) { const n = Number(value); return Number.isFinite(n) ? n : fallback; }
@@ -39,6 +39,7 @@ export function preferenceColumnForEvent(type) {
   const map = {
     prematch_15: 'COALESCE(r.prematch_15,1)',
     goal: 'p.goals',
+    goal_overturned: 'p.goals',
     red_card: 'p.red_cards',
     lineup_confirmed: 'p.lineups',
     match_start: 'p.match_start',
@@ -51,6 +52,7 @@ function defaultTitle(type) {
   return ({
     prematch_15: '⏰ Jogo começa em 15 minutos',
     goal: '⚽ GOL!',
+    goal_overturned: '🚫 GOL ANULADO',
     red_card: '🟥 CARTÃO VERMELHO!',
     lineup_confirmed: '👥 ESCALAÇÕES CONFIRMADAS',
     match_start: '▶️ Bola rolando!',
@@ -68,10 +70,10 @@ export function buildSportsPushPayload(event) {
   const eventId = text(item.eventId);
   const type = text(item.type);
   const sourcePlayKey = text(item.sourcePlayKey || item.eventKey);
-  const goalFamily = type === 'goal';
+  const goalFamily = type === 'goal' || type === 'goal_overturned';
   const technicalEspnTest = item.technicalEspnTest === true;
   if (!PUBLIC_ALERT_TYPES.has(type)) throw new Error(`unsupported_public_alert_type:${type || 'empty'}`);
-  const tagSeed = technicalEspnTest ? `technical-espn-${sourcePlayKey}` : goalFamily ? `goal-${sourcePlayKey}` : `${type}-${eventId || sourcePlayKey}`;
+  const tagSeed = technicalEspnTest ? `technical-espn-${sourcePlayKey}` : goalFamily ? `${type}-${sourcePlayKey}` : `${type}-${eventId || sourcePlayKey}`;
   return {
     title: text(draft.title || defaultTitle(type)),
     body: text(draft.body || 'Atualização do Fórmula do Gol.'),
