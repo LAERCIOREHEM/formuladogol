@@ -1,104 +1,153 @@
 {
-  "_comentario": "Controle de tentativas da camada de IA de público. \"esgotados\" faz o orquestrador parar de redisparar o coletor para partidas cujo público nunca foi divulgado.",
-  "gerado_em": "2026-09-13T18:14:57-03:00",
+  "schema_version": 2,
+  "_comentario": "Estado por campo da camada IA de público/renda. Não há esgotamento definitivo: lacunas permanecem em backoff até serem resolvidas documentalmente.",
+  "gerado_em": "2026-09-13T06:11:23-03:00",
   "jogos": {
-    "401841210": {
-      "tentativas": 6,
-      "ultima_tentativa": "2026-08-31T23:10:55-03:00",
-      "rodada": 25,
-      "partida": "Remo x Coritiba",
-      "esgotado": false
-    },
-    "401841225": {
-      "tentativas": 6,
-      "ultima_tentativa": "2026-09-06T21:57:12-03:00",
-      "rodada": 26,
-      "partida": "Remo x Flamengo",
-      "esgotado": false
-    },
-    "401841221": {
-      "tentativas": 2,
-      "ultima_tentativa": "2026-09-06T21:57:12-03:00",
-      "rodada": 26,
-      "partida": "Botafogo x Palmeiras",
-      "esgotado": false
-    },
-    "401841220": {
-      "tentativas": 1,
-      "ultima_tentativa": "2026-09-06T21:57:12-03:00",
-      "rodada": 26,
-      "partida": "Corinthians x Chapecoense",
-      "esgotado": false
-    },
     "401841231": {
-      "tentativas": 8,
-      "ultima_tentativa": "2026-09-12T22:45:35-03:00",
+      "schema_version": 2,
       "rodada": 27,
       "partida": "Atlético-MG x Fluminense",
-      "esgotado": true,
-      "motivo": "público não divulgado por nenhuma fonte permitida após o limite de tentativas"
+      "campos": {
+        "publico": {
+          "status": "pending",
+          "tentativas": 8,
+          "ultima_tentativa": "2026-09-12T22:45:35-03:00",
+          "proxima_tentativa": "",
+          "backoff_minutos": 0
+        },
+        "renda": {
+          "status": "pending",
+          "tentativas": 8,
+          "ultima_tentativa": "2026-09-12T22:45:35-03:00",
+          "proxima_tentativa": "",
+          "backoff_minutos": 0
+        }
+      },
+      "esgotado": false,
+      "proxima_tentativa": "",
+      "migrado_de_schema_1": true
     },
     "401841236": {
-      "tentativas": 8,
-      "ultima_tentativa": "2026-09-12T22:45:35-03:00",
+      "schema_version": 2,
       "rodada": 27,
       "partida": "Grêmio x Vasco da Gama",
-      "esgotado": true,
-      "motivo": "público não divulgado por nenhuma fonte permitida após o limite de tentativas"
+      "campos": {
+        "publico": {
+          "status": "pending",
+          "tentativas": 8,
+          "ultima_tentativa": "2026-09-12T22:45:35-03:00",
+          "proxima_tentativa": "",
+          "backoff_minutos": 0
+        },
+        "renda": {
+          "status": "pending",
+          "tentativas": 8,
+          "ultima_tentativa": "2026-09-12T22:45:35-03:00",
+          "proxima_tentativa": "",
+          "backoff_minutos": 0
+        }
+      },
+      "esgotado": false,
+      "proxima_tentativa": "",
+      "migrado_de_schema_1": true
     },
     "401841228": {
-      "tentativas": 8,
-      "ultima_tentativa": "2026-09-12T23:47:33-03:00",
+      "schema_version": 2,
       "rodada": 27,
       "partida": "Chapecoense x Internacional",
-      "esgotado": true,
-      "motivo": "público não divulgado por nenhuma fonte permitida após o limite de tentativas"
+      "campos": {
+        "renda": {
+          "status": "pending",
+          "tentativas": 8,
+          "ultima_tentativa": "2026-09-12T23:47:33-03:00",
+          "proxima_tentativa": "",
+          "backoff_minutos": 0
+        }
+      },
+      "esgotado": false,
+      "proxima_tentativa": "",
+      "migrado_de_schema_1": true
     },
     "401841234": {
-      "tentativas": 8,
-      "ultima_tentativa": "2026-09-13T01:57:37-03:00",
+      "schema_version": 2,
       "rodada": 27,
       "partida": "Palmeiras x São Paulo",
-      "esgotado": true,
-      "motivo": "público não divulgado por nenhuma fonte permitida após o limite de tentativas"
+      "campos": {
+        "publico": {
+          "status": "pending",
+          "tentativas": 8,
+          "ultima_tentativa": "2026-09-13T01:57:37-03:00",
+          "proxima_tentativa": "",
+          "backoff_minutos": 0
+        },
+        "renda": {
+          "status": "pending",
+          "tentativas": 8,
+          "ultima_tentativa": "2026-09-13T01:57:37-03:00",
+          "proxima_tentativa": "",
+          "backoff_minutos": 0
+        }
+      },
+      "esgotado": false,
+      "proxima_tentativa": "",
+      "migrado_de_schema_1": true
     },
     "401841229": {
-      "tentativas": 8,
-      "ultima_tentativa": "2026-09-13T04:01:01-03:00",
+      "schema_version": 2,
       "rodada": 27,
       "partida": "Botafogo x Bragantino",
-      "esgotado": true,
-      "motivo": "público não divulgado por nenhuma fonte permitida após o limite de tentativas"
+      "campos": {
+        "publico": {
+          "status": "pending",
+          "tentativas": 8,
+          "ultima_tentativa": "2026-09-13T04:01:01-03:00",
+          "proxima_tentativa": "",
+          "backoff_minutos": 0
+        },
+        "renda": {
+          "status": "pending",
+          "tentativas": 8,
+          "ultima_tentativa": "2026-09-13T04:01:01-03:00",
+          "proxima_tentativa": "",
+          "backoff_minutos": 0
+        }
+      },
+      "esgotado": false,
+      "proxima_tentativa": "",
+      "migrado_de_schema_1": true
     },
     "401841233": {
-      "tentativas": 8,
-      "ultima_tentativa": "2026-09-13T06:11:23-03:00",
+      "schema_version": 2,
       "rodada": 27,
       "partida": "Santos x Cruzeiro",
-      "esgotado": true,
-      "motivo": "público não divulgado por nenhuma fonte permitida após o limite de tentativas"
-    },
-    "401841235": {
-      "tentativas": 1,
-      "ultima_tentativa": "2026-09-13T18:14:57-03:00",
-      "rodada": 27,
-      "partida": "Mirassol x Vitória",
-      "esgotado": false
+      "campos": {
+        "publico": {
+          "status": "pending",
+          "tentativas": 8,
+          "ultima_tentativa": "2026-09-13T06:11:23-03:00",
+          "proxima_tentativa": "",
+          "backoff_minutos": 0
+        },
+        "renda": {
+          "status": "pending",
+          "tentativas": 8,
+          "ultima_tentativa": "2026-09-13T06:11:23-03:00",
+          "proxima_tentativa": "",
+          "backoff_minutos": 0
+        }
+      },
+      "esgotado": false,
+      "proxima_tentativa": "",
+      "migrado_de_schema_1": true
     }
   },
-  "esgotados": [
-    "401841228",
-    "401841229",
-    "401841231",
-    "401841233",
-    "401841234",
-    "401841236"
-  ],
+  "esgotados": [],
   "ultima_execucao": {
     "pendentes_avaliados": 1,
     "aceitos": 0,
-    "rejeitados": 0,
-    "nao_encontrados": 1,
+    "rejeitados": 1,
+    "nao_encontrados": 0,
     "erro": ""
-  }
+  },
+  "migracao_schema_2": "Estados legados esgotados foram reabertos; registros já resolvidos foram descartados."
 }

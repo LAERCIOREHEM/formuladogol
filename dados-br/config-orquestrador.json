@@ -73,33 +73,46 @@
     "bloquear_se_writer_ativo": true
   },
   "publicos": {
-    "primeira_tentativa_apos_final_minutos": 15,
+    "primeira_tentativa_apos_final_minutos": 120,
     "intervalos_retentativa": [
       {
-        "ate_horas": 2,
-        "minutos": 30
-      },
-      {
-        "ate_horas": 6,
-        "minutos": 60
-      },
-      {
-        "ate_horas": 24,
+        "ate_horas": 4,
         "minutos": 120
       },
       {
-        "ate_horas": 72,
+        "ate_horas": 6,
+        "minutos": 120
+      },
+      {
+        "ate_horas": 9,
+        "minutos": 180
+      },
+      {
+        "ate_horas": 12,
+        "minutos": 180
+      },
+      {
+        "ate_horas": 18,
         "minutos": 360
       },
       {
-        "ate_horas": 168,
+        "ate_horas": 24,
+        "minutos": 360
+      },
+      {
+        "ate_horas": 36,
+        "minutos": 720
+      },
+      {
+        "ate_horas": 48,
         "minutos": 720
       },
       {
         "ate_horas": 99999,
         "minutos": 1440
       }
-    ]
+    ],
+    "politica": "público e renda independentes; sem esgotamento definitivo; após 48h retentar diariamente até resolução documental"
   },
   "backoff_falhas": {
     "ativo": true,

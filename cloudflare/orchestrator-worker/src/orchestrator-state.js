@@ -416,8 +416,8 @@ export class OrchestratorState {
         return {
           action: 'publicos', eventId: item.eventId,
           reason: last
-            ? `Retentativa de público: ${publics.length} jogo(s) seguem pendentes; backoff ${interval} min.`
-            : `Primeira busca de público para ${item.eventId}; FINAL há ${Math.round(item.ageMinutes)} min.`,
+            ? `Retentativa de público/renda: ${publics.length} jogo(s) seguem pendentes; backoff ${interval} min.`
+            : `Primeira busca de público/renda para ${item.eventId}; FINAL há ${Math.round(item.ageMinutes)} min; faltando=${(item.missingFields || []).join(",") || "reconciliar"}.`,
           retryMinutes: Math.max(1, interval || 1), stateUpdates: updates, hints,
         };
       }

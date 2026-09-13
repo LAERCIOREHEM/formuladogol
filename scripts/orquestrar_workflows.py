@@ -726,6 +726,24 @@ def _attendance_number(value: Any) -> int | None:
         return None
 
 
+def _money_number(value: Any) -> float | None:
+    try:
+        if value is None or isinstance(value, bool):
+            return None
+        if isinstance(value, (int, float)):
+            n = float(value)
+        else:
+            text = str(value).strip().replace("R$", "").replace(" ", "")
+            if not text:
+                return None
+            if "," in text:
+                text = text.replace(".", "").replace(",", ".")
+            n = float(text)
+        return n if n > 0 else None
+    except (TypeError, ValueError):
+        return None
+
+
 def pending_publics(config: Mapping[str, Any], now: datetime, tz: ZoneInfo) -> list[tuple[dict[str, Any], datetime]]:
     results = load_json(RESULTS_PATH, {})
     rows = results.get("resultados") if isinstance(results, Mapping) else []
@@ -737,20 +755,6 @@ def pending_publics(config: Mapping[str, Any], now: datetime, tz: ZoneInfo) -> l
     complements = comp_payload.get("jogos") if isinstance(comp_payload, Mapping) else {}
     if not isinstance(complements, Mapping):
         complements = {}
-    # Partidas cujo público já se provou não divulgado por nenhuma fonte permitida
-    # deixam de ser pendência: sem isto o orquestrador redispara o coletor para
-    # sempre, gastando minuto de Actions sem chance de sucesso.
-    ai_state = load_json(PUBLIC_AI_STATE_PATH, {})
-    exhausted: set[str] = set()
-    if isinstance(ai_state, Mapping):
-        listed = ai_state.get("esgotados")
-        if isinstance(listed, list):
-            exhausted = {str(item) for item in listed if str(item or "").strip()}
-        games_state = ai_state.get("jogos")
-        if isinstance(games_state, Mapping):
-            for key, value in games_state.items():
-                if isinstance(value, Mapping) and value.get("esgotado") is True:
-                    exhausted.add(str(key))
     min_age = int(config.get("publicos", {}).get("primeira_tentativa_apos_final_minutos") or 15)
     pending: list[tuple[dict[str, Any], datetime]] = []
     for raw in rows or []:
@@ -758,17 +762,25 @@ def pending_publics(config: Mapping[str, Any], now: datetime, tz: ZoneInfo) -> l
             continue
         row = dict(raw)
         event_id = str(row.get("event_id") or row.get("id") or "").strip()
-        if not event_id or event_id in exhausted:
+        if not event_id:
             continue
         detail = details.get(event_id) if isinstance(details, Mapping) else None
         complement = complements.get(event_id) if isinstance(complements, Mapping) else None
         detail_public = _attendance_number((detail or {}).get("publico")) if isinstance(detail, Mapping) else None
         comp_public = _attendance_number((complement or {}).get("publico")) if isinstance(complement, Mapping) else None
-        if detail_public is not None or comp_public is not None:
+        detail_renda = _money_number((detail or {}).get("renda")) if isinstance(detail, Mapping) else None
+        comp_renda = _money_number((complement or {}).get("renda")) if isinstance(complement, Mapping) else None
+        faltando = []
+        if detail_public is None and comp_public is None:
+            faltando.append("publico")
+        if detail_renda is None and comp_renda is None:
+            faltando.append("renda")
+        if not faltando:
             continue
         ended = result_final_time(row, tz)
         if ended is None or now < ended + timedelta(minutes=min_age):
             continue
+        row["faltando_publicos"] = faltando
         pending.append((row, ended))
     pending.sort(key=lambda item: item[1], reverse=True)
     return pending
@@ -786,7 +798,7 @@ def public_decision(config: Mapping[str, Any], now: datetime, tz: ZoneInfo, runs
         label = f"{team_name(row.get('mandante'))} x {team_name(row.get('visitante'))}".strip(" x")
         return Decision(
             "publicos",
-            f"Primeira busca de público: {label or event_id} terminou há {int(minutes_since(ended, now))} min e segue sem público presente.",
+            f"Primeira busca de público/renda: {label or event_id} terminou há {int(minutes_since(ended, now))} min e segue com lacuna ({','.join(row.get('faltando_publicos') or [])}).",
             event_id=event_id,
             mode="incremental",
         )
@@ -796,7 +808,7 @@ def public_decision(config: Mapping[str, Any], now: datetime, tz: ZoneInfo, runs
         event_id = str(oldest_row.get("event_id") or "")
         return Decision(
             "publicos",
-            f"Retentativa de público: ainda há {len(pending)} jogo(s) finalizado(s) sem público; backoff atual {min_interval} min.",
+            f"Retentativa de público/renda: ainda há {len(pending)} jogo(s) finalizado(s) com lacunas; backoff atual {min_interval} min.",
             event_id=event_id,
             mode="incremental",
         )

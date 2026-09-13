@@ -11,9 +11,10 @@ export const POLICY = Object.freeze({
   },
   slowEvalMinutes: 5,
   publicos: {
-    firstAfterFinalMinutes: 15,
+    firstAfterFinalMinutes: 120,
     retryBands: [
-      [2, 30], [6, 60], [24, 120], [72, 360], [168, 720], [99999, 1440],
+      [4, 120], [6, 120], [9, 180], [12, 180], [18, 360],
+      [24, 360], [36, 720], [48, 720], [99999, 1440],
     ],
   },
   melhoresMomentos: {
@@ -154,38 +155,60 @@ export function attendanceNumber(value) {
   return Number.isFinite(n) && n >= 100 && n <= 250000 ? n : null;
 }
 
-export function exhaustedPublicIds(aiState) {
-  const out = new Set();
-  for (const id of aiState?.esgotados || []) if (String(id || '').trim()) out.add(String(id));
-  if (aiState?.jogos && typeof aiState.jogos === 'object') {
-    for (const [id, row] of Object.entries(aiState.jogos)) if (row?.esgotado === true) out.add(String(id));
+export function exhaustedPublicIds() {
+  // Compatibilidade de API com testes/consumidores antigos. A política v2 não
+  // abandona definitivamente público/renda; backoff substitui `esgotado`.
+  return new Set();
+}
+
+function pendingPublicFields(aiState, eventId) {
+  const row = aiState?.jogos?.[eventId];
+  if (!row || typeof row !== 'object') return [];
+  const fields = [];
+  if (row.campos && typeof row.campos === 'object') {
+    for (const field of ['publico', 'renda']) {
+      if (row.campos?.[field]?.status === 'pending') fields.push(field);
+    }
+    return fields;
   }
-  return out;
+  // Estado legado `esgotado=true` é reaberto automaticamente. Como o schema
+  // antigo não distinguia campos, deixa o workflow confirmar as lacunas reais.
+  if (row.esgotado === true || Number(row.tentativas || 0) > 0) return ['publico', 'renda'];
+  return [];
 }
 
 export function pendingPublicsFromAudit({ results, audit, aiState, now, minAgeMinutes = POLICY.publicos.firstAfterFinalMinutes }) {
-  const exhausted = exhaustedPublicIds(aiState);
   const auditAt = parseDate(audit?.gerado_em || audit?.atualizado_em);
-  const pendingIds = new Set((audit?.sem_publico || []).map((row) => String(row?.event_id || row?.id || '')).filter(Boolean));
+  const publicIds = new Set((audit?.sem_publico || []).map((row) => String(row?.event_id || row?.id || '')).filter(Boolean));
+  const rentIds = new Set((audit?.sem_renda || []).map((row) => String(row?.event_id || row?.id || '')).filter(Boolean));
   const pending = [];
   for (const raw of results?.resultados || []) {
     const eventId = String(raw?.event_id || raw?.id || '').trim();
-    if (!eventId || exhausted.has(eventId)) continue;
+    if (!eventId) continue;
     const ended = resultFinalTime(raw);
     if (!ended || minutesBetween(ended, now) < minAgeMinutes) continue;
 
-    // Se a auditoria foi gerada DEPOIS do FINAL, ela é a fonte canônica da
-    // pendência: o coletor já conferiu ESPN + complementos documentais. Se a
-    // auditoria ainda é anterior ao jogo, há uma nova partida que nunca foi
-    // avaliada e merece a primeira tentativa. Isso evita baixar o enorme
-    // jogos-detalhes.json (vários MB) no Worker apenas para decidir o gatilho.
+    const stateFields = pendingPublicFields(aiState, eventId);
+    const fields = [];
+    if (publicIds.has(eventId)) fields.push('publico');
+    if (rentIds.has(eventId)) fields.push('renda');
+    for (const field of stateFields) if (!fields.includes(field)) fields.push(field);
+
     const auditedAfterFinal = Boolean(auditAt && auditAt.getTime() >= ended.getTime());
-    if (auditedAfterFinal && !pendingIds.has(eventId)) continue;
-    pending.push({ row: raw, eventId, ended, ageMinutes: minutesBetween(ended, now), firstCheck: !auditedAfterFinal });
+    // Auditoria posterior ao FINAL pode provar que não há lacuna. Porém estados
+    // legados/pending ainda forçam UMA passagem de reconciliação para migrar o
+    // schema antigo; o workflow lê detalhes e descarta o que já estiver resolvido.
+    if (auditedAfterFinal && fields.length === 0) continue;
+    if (!auditedAfterFinal && fields.length === 0) fields.push('publico', 'renda');
+    pending.push({
+      row: raw, eventId, ended, ageMinutes: minutesBetween(ended, now),
+      firstCheck: !auditedAfterFinal, missingFields: fields,
+    });
   }
   pending.sort((a, b) => b.ended - a.ended);
   return pending;
 }
+
 
 export function retryInterval(ageHours, bands) {
   for (const [limit, minutes] of bands) if (ageHours <= limit) return minutes;

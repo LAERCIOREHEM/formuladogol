@@ -21,13 +21,13 @@ Princípios (iguais aos do coletor determinístico)
   * a URL declarada pelo modelo precisa constar nas fontes que a própria
     ferramenta web devolveu, e o domínio precisa estar na allowlist;
   * uma única requisição por execução, com teto de chamadas de ferramenta;
-  * partida sem público divulgado após N tentativas é marcada como esgotada,
-    o que faz o orquestrador parar de disparar o workflow em loop.
+  * nenhuma lacuna é abandonada por contagem de tentativas; público e renda
+    possuem backoff independente e permanecem elegíveis até resolução documental.
 
 Saídas:
   - dados-br/publicos-complementares.json  (mesmo formato do coletor)
   - dados-br/jogos-detalhes.json           (propagação sem rede)
-  - dados-br/estado-publicos-ia.json       (tentativas, esgotados, auditoria)
+  - dados-br/estado-publicos-ia.json       (estado por campo, backoff e auditoria)
 """
 from __future__ import annotations
 
@@ -55,10 +55,11 @@ RESULTADOS = ROOT / "resultados.json"
 DETALHES = ROOT / "dados-br" / "jogos-detalhes.json"
 COMPLEMENTOS = ROOT / "dados-br" / "publicos-complementares.json"
 ESTADO = ROOT / "dados-br" / "estado-publicos-ia.json"
+CONFIG_ORQ = ROOT / "dados-br" / "config-orquestrador.json"
 
 FUSO_BRASILIA = timezone(timedelta(hours=-3))
 OPENAI_URL = "https://api.openai.com/v1/responses"
-DEFAULT_MODEL = "gpt-5.6-terra"
+DEFAULT_MODEL = "gpt-5.6-sol"
 
 # Público e renda são ficha técnica, não interpretação editorial. Quem publica
 # primeiro é a imprensa regional e os portais dos clubes — e a allowlist curta
@@ -124,8 +125,9 @@ ALLOWED_WEB_DOMAINS = (
 MIN_CONFIANCA = 0.90
 MAX_PUBLICO = 250_000
 GRACE_HORAS_PADRAO = 2.0
-MAX_TENTATIVAS_PADRAO = 8
+MAX_TENTATIVAS_PADRAO = 0  # compatibilidade CLI; não existe mais esgotamento definitivo
 MAX_JOGOS_PADRAO = 10
+DEFAULT_RETRY_BANDS = ((4, 120), (6, 120), (9, 180), (12, 180), (18, 360), (24, 360), (36, 720), (48, 720), (99999, 1440))
 
 
 class PublicoIAError(RuntimeError):
@@ -196,6 +198,67 @@ def nome_time(valor: Any) -> str:
     return str(valor or "").strip()
 
 
+def _retry_bands() -> tuple[tuple[float, int], ...]:
+    config = carregar_json(CONFIG_ORQ, {})
+    rows = ((config.get("publicos") or {}).get("intervalos_retentativa") if isinstance(config, Mapping) else None) or []
+    out: list[tuple[float, int]] = []
+    for row in rows:
+        if not isinstance(row, Mapping):
+            continue
+        try:
+            out.append((float(row.get("ate_horas")), int(row.get("minutos"))))
+        except (TypeError, ValueError):
+            continue
+    return tuple(out) or DEFAULT_RETRY_BANDS
+
+
+def retry_minutes(age_hours: float) -> int:
+    for limit, minutes in _retry_bands():
+        if age_hours <= limit:
+            return max(1, int(minutes))
+    return 1440
+
+
+def final_time(raw: Mapping[str, Any], det: Mapping[str, Any] | None) -> datetime | None:
+    for value in ((det or {}).get("finalizado_em"), raw.get("finalizado_em")):
+        dt = parse_dt(value)
+        if dt is not None:
+            return dt
+    kickoff = parse_dt((det or {}).get("data_iso")) or parse_dt(raw.get("data_iso"))
+    return kickoff + timedelta(minutes=115) if kickoff else None
+
+
+def _legacy_field_state(estado_jogo: Mapping[str, Any], campo: str) -> dict[str, Any]:
+    campos = estado_jogo.get("campos") if isinstance(estado_jogo.get("campos"), Mapping) else {}
+    current = campos.get(campo) if isinstance(campos.get(campo), Mapping) else None
+    if current is not None:
+        return dict(current)
+    # Migração transparente do schema antigo. O antigo `esgotado=true` NÃO é
+    # honrado: ele foi justamente a causa de partidas abandonadas cedo demais.
+    last = estado_jogo.get("ultima_tentativa")
+    attempts = int(estado_jogo.get("tentativas") or 0)
+    return {
+        "status": "pending",
+        "tentativas": attempts,
+        "ultima_tentativa": last or "",
+        "proxima_tentativa": "",
+    }
+
+
+def _field_due(estado_jogo: Mapping[str, Any], campo: str, ended: datetime, agora: datetime) -> bool:
+    st = _legacy_field_state(estado_jogo, campo)
+    if st.get("status") == "resolved":
+        return False
+    next_at = parse_dt(st.get("proxima_tentativa"))
+    if next_at is not None:
+        return agora >= next_at
+    last = parse_dt(st.get("ultima_tentativa"))
+    if last is None:
+        return True
+    age_hours = max(0.0, (agora - ended).total_seconds() / 3600.0)
+    return agora >= last + timedelta(minutes=retry_minutes(age_hours))
+
+
 # --------------------------------------------------------------------------- #
 # seleção das pendências
 # --------------------------------------------------------------------------- #
@@ -206,6 +269,7 @@ def pendencias(
     max_jogos: int,
     agora: datetime,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    del max_tentativas  # legado CLI: não existe mais limite definitivo de tentativas.
     resultados = carregar_json(RESULTADOS, {})
     linhas = resultados.get("resultados") if isinstance(resultados, Mapping) else []
     detalhes = carregar_json(DETALHES, {})
@@ -228,11 +292,7 @@ def pendencias(
         cmp_ = jogos_comp.get(event_id) if isinstance(jogos_comp, Mapping) else None
         if not isinstance(det, Mapping) or det.get("placar_mandante") is None:
             continue
-        # Público e renda são lacunas INDEPENDENTES. Antes, assim que o público
-        # entrava a partida saía da fila para sempre e a renda nunca era
-        # buscada de novo — foi assim que Grêmio x Chapecoense ficou pela
-        # metade. Agora a partida permanece elegível enquanto faltar qualquer
-        # um dos dois, e o dossiê diz ao modelo exatamente o que procurar.
+
         tem_publico = (
             numero_publico(det.get("publico")) is not None
             or numero_publico((cmp_ or {}).get("publico")) is not None
@@ -241,34 +301,61 @@ def pendencias(
             numero_renda(det.get("renda")) is not None
             or numero_renda((cmp_ or {}).get("renda")) is not None
         )
-        faltando = [campo for campo, presente in (("publico", tem_publico), ("renda", tem_renda)) if not presente]
-        if not faltando:
+        faltando_real = [campo for campo, presente in (("publico", tem_publico), ("renda", tem_renda)) if not presente]
+        if not faltando_real:
+            # Limpa resíduos de estados antigos/pendências já resolvidas por outra
+            # fonte para que o orquestrador não continue acordando sem necessidade.
+            tentativas.pop(event_id, None)
             continue
-        estado_jogo = tentativas.get(event_id) if isinstance(tentativas.get(event_id), Mapping) else {}
-        if estado_jogo.get("esgotado") is True:
+
+        # Se um dos campos foi resolvido por outra camada, retire-o do estado
+        # pendente mesmo antes desta execução fazer nova busca.
+        estado_jogo_mut = tentativas.get(event_id) if isinstance(tentativas.get(event_id), Mapping) else {}
+        if isinstance(estado_jogo_mut, Mapping) and isinstance(estado_jogo_mut.get("campos"), Mapping):
+            novo_estado_jogo = dict(estado_jogo_mut)
+            novos_campos = {
+                str(k): dict(v)
+                for k, v in estado_jogo_mut.get("campos", {}).items()
+                if isinstance(v, Mapping) and str(k) in faltando_real
+            }
+            novo_estado_jogo["campos"] = novos_campos
+            tentativas[event_id] = novo_estado_jogo
+
+        ended = final_time(bruto, det)
+        if ended is None:
             continue
-        if int(estado_jogo.get("tentativas") or 0) >= max_tentativas:
-            continue
-        inicio = parse_dt(det.get("data_iso")) or parse_dt(bruto.get("data_iso"))
-        if inicio is None:
-            continue
-        horas = (agora - inicio).total_seconds() / 3600.0
+        horas = (agora - ended).total_seconds() / 3600.0
         if horas < grace_horas:
             continue
+
+        estado_jogo = tentativas.get(event_id) if isinstance(tentativas.get(event_id), Mapping) else {}
+        # Cada campo tem agenda própria. Público resolvido não paralisa renda e
+        # nenhuma lacuna é abandonada definitivamente por contagem de tentativas.
+        faltando_due = [campo for campo in faltando_real if _field_due(estado_jogo, campo, ended, agora)]
+        if not faltando_due:
+            continue
+
+        campos_estado = {campo: _legacy_field_state(estado_jogo, campo) for campo in faltando_due}
         pendentes.append({
             "event_id": event_id,
             "rodada": int(det.get("rodada") or bruto.get("rodada") or 0),
-            "data_iso": str(det.get("data_iso") or ""),
+            "data_iso": str(det.get("data_iso") or bruto.get("data_iso") or ""),
+            "finalizado_em": ended.isoformat(),
             "mandante": nome_time(det.get("mandante") or bruto.get("mandante")),
             "visitante": nome_time(det.get("visitante") or bruto.get("visitante")),
             "estadio": str(det.get("estadio") or ""),
             "placar": f"{det.get('placar_mandante')}x{det.get('placar_visitante')}",
-            "horas_desde_inicio": round(horas, 1),
-            "tentativas_anteriores": int(estado_jogo.get("tentativas") or 0),
-            "faltando": faltando,
+            "horas_desde_final": round(horas, 1),
+            "tentativas_anteriores": max((int(v.get("tentativas") or 0) for v in campos_estado.values()), default=0),
+            "faltando": faltando_due,
         })
 
-    pendentes.sort(key=lambda item: item["data_iso"], reverse=True)
+    # Prioriza o mais antigo entre os elegíveis para que uma pendência histórica
+    # não seja eternamente preterida por jogos recém-encerrados.
+    pendentes.sort(key=lambda item: (item.get("finalizado_em") or "", item.get("event_id") or ""))
+    estado["schema_version"] = 2
+    estado["jogos"] = tentativas
+    estado["esgotados"] = []
     return pendentes[: max(1, int(max_jogos))], estado
 
 
@@ -585,25 +672,66 @@ def atualizar_estado(
     erro: str,
     agora: datetime,
 ) -> dict[str, Any]:
-    jogos = estado.get("jogos") if isinstance(estado.get("jogos"), dict) else {}
-    resolvidos = {str(a["event_id"]) for a in aceitos}
+    del max_tentativas  # mantido apenas para compatibilidade com chamadas antigas.
+    jogos_antigos = estado.get("jogos") if isinstance(estado.get("jogos"), dict) else {}
+    jogos: dict[str, Any] = {str(k): dict(v) for k, v in jogos_antigos.items() if isinstance(v, Mapping)}
+    aceitos_por_id = {str(a.get("event_id") or ""): a for a in aceitos if isinstance(a, Mapping)}
+
     for p in pendentes:
         event_id = str(p["event_id"])
-        if event_id in resolvidos:
-            jogos.pop(event_id, None)
-            continue
         anterior = jogos.get(event_id) if isinstance(jogos.get(event_id), Mapping) else {}
-        tentativas = int(anterior.get("tentativas") or 0) + 1
-        registro = {
-            "tentativas": tentativas,
-            "ultima_tentativa": agora.isoformat(),
+        campos_antigos = anterior.get("campos") if isinstance(anterior.get("campos"), Mapping) else {}
+        campos: dict[str, Any] = {str(k): dict(v) for k, v in campos_antigos.items() if isinstance(v, Mapping)}
+        accepted = aceitos_por_id.get(event_id) or {}
+        registro = accepted.get("registro") if isinstance(accepted.get("registro"), Mapping) else {}
+        ended = parse_dt(p.get("finalizado_em")) or agora
+        age_hours = max(0.0, (agora - ended).total_seconds() / 3600.0)
+        interval = retry_minutes(age_hours)
+
+        for campo in p.get("faltando") or []:
+            previo = _legacy_field_state(anterior, str(campo))
+            attempts = int(previo.get("tentativas") or 0) + 1
+            resolvido = (
+                (campo == "publico" and numero_publico(registro.get("publico")) is not None)
+                or (campo == "renda" and numero_renda(registro.get("renda")) is not None)
+            )
+            if resolvido:
+                campos[str(campo)] = {
+                    "status": "resolved",
+                    "tentativas": attempts,
+                    "ultima_tentativa": agora.isoformat(),
+                    "resolvido_em": agora.isoformat(),
+                    "proxima_tentativa": "",
+                }
+            else:
+                campos[str(campo)] = {
+                    "status": "pending",
+                    "tentativas": attempts,
+                    "ultima_tentativa": agora.isoformat(),
+                    "proxima_tentativa": (agora + timedelta(minutes=interval)).isoformat(),
+                    "backoff_minutos": interval,
+                }
+
+        pending_times = [
+            parse_dt(v.get("proxima_tentativa"))
+            for v in campos.values()
+            if isinstance(v, Mapping) and v.get("status") == "pending"
+        ]
+        pending_times = [dt for dt in pending_times if dt is not None]
+        jogos[event_id] = {
+            "schema_version": 2,
             "rodada": p.get("rodada"),
             "partida": f"{p.get('mandante')} x {p.get('visitante')}",
-            "esgotado": tentativas >= max_tentativas,
+            "campos": campos,
+            "esgotado": False,
+            "proxima_tentativa": min(pending_times).isoformat() if pending_times else "",
         }
-        if registro["esgotado"]:
-            registro["motivo"] = "público não divulgado por nenhuma fonte permitida após o limite de tentativas"
-        jogos[event_id] = registro
+
+    estado["schema_version"] = 2
+    estado["_comentario"] = (
+        "Estado por campo da camada IA de público/renda. Não há esgotamento definitivo: "
+        "lacunas permanecem em backoff até serem resolvidas documentalmente."
+    )
     estado["jogos"] = jogos
     estado["gerado_em"] = agora.isoformat()
     estado["ultima_execucao"] = {
@@ -613,7 +741,9 @@ def atualizar_estado(
         "nao_encontrados": len([r for r in rejeitados if r.get("nao_e_erro")]),
         "erro": erro,
     }
-    estado["esgotados"] = sorted(k for k, v in jogos.items() if isinstance(v, Mapping) and v.get("esgotado"))
+    # Compatibilidade de leitura para versões antigas do orquestrador. A lista
+    # permanece vazia por definição no schema v2.
+    estado["esgotados"] = []
     return estado
 
 
@@ -626,7 +756,8 @@ def self_test() -> int:
     fontes = {normalizar_url("https://ge.globo.com/futebol/times/fluminense/noticia/2026/08/22/exemplo.ghtml")}
     pend = [{"event_id": "1", "rodada": 24, "data_iso": "2026-08-22T16:00",
              "mandante": "Fluminense", "visitante": "Remo", "estadio": "Maracanã",
-             "placar": "2x0", "horas_desde_inicio": 14.0, "tentativas_anteriores": 0,
+             "placar": "2x0", "finalizado_em": "2026-08-23T00:00:00-03:00",
+             "horas_desde_final": 12.0, "tentativas_anteriores": 0,
              "faltando": ["publico", "renda"]}]
     URL = normalizar_url("https://ge.globo.com/futebol/times/fluminense/noticia/2026/08/22/exemplo.ghtml")
 
@@ -691,14 +822,27 @@ def self_test() -> int:
 
     agora = datetime(2026, 8, 23, 12, 0, tzinfo=FUSO_BRASILIA)
     estado: dict[str, Any] = {}
-    for _ in range(3):
-        estado = atualizar_estado(estado, pend, [], [], max_tentativas=3, erro="", agora=agora)
-    assert estado["jogos"]["1"]["tentativas"] == 3
-    assert estado["jogos"]["1"]["esgotado"] is True
-    assert estado["esgotados"] == ["1"]
+    for passo in range(3):
+        instante = agora + timedelta(hours=passo * 6)
+        estado = atualizar_estado(estado, pend, [], [], max_tentativas=3, erro="", agora=instante)
+    campos = estado["jogos"]["1"]["campos"]
+    assert campos["publico"]["tentativas"] == 3
+    assert campos["renda"]["tentativas"] == 3
+    assert campos["publico"]["status"] == "pending" and campos["renda"]["status"] == "pending"
+    assert estado["jogos"]["1"]["esgotado"] is False
+    assert estado["esgotados"] == [], "schema v2 nunca abandona definitivamente a partida"
 
-    estado = atualizar_estado(estado, pend, [{"event_id": "1"}], [], max_tentativas=3, erro="", agora=agora)
-    assert "1" not in estado["jogos"], "jogo resolvido deve sair do estado de tentativas"
+    # Resolver só público não pode encerrar a renda.
+    so_publico_aceito = [{"event_id": "1", "registro": {"publico": 41234, "tipo": "presente", "fonte": URL}}]
+    estado = atualizar_estado(estado, pend, so_publico_aceito, [], max_tentativas=3, erro="", agora=agora + timedelta(hours=24))
+    campos = estado["jogos"]["1"]["campos"]
+    assert campos["publico"]["status"] == "resolved"
+    assert campos["renda"]["status"] == "pending", "renda precisa continuar independente do público"
+
+    # Estado legado esgotado é automaticamente reaberto para o campo faltante.
+    legado = {"tentativas": 8, "ultima_tentativa": "2026-08-23T01:00:00-03:00", "esgotado": True}
+    migrated = _legacy_field_state(legado, "publico")
+    assert migrated["status"] == "pending" and migrated["tentativas"] == 8
 
     payload = montar_payload(pend, DEFAULT_MODEL, 4)
     assert payload["tools"][0]["filters"]["allowed_domains"] == list(ALLOWED_WEB_DOMAINS)
@@ -729,9 +873,8 @@ def main() -> int:
         "--reabrir-esgotados",
         action="store_true",
         help=(
-            "Zera o marcador de esgotado e o contador de tentativas. Use quando a causa "
-            "das falhas anteriores foi corrigida (por exemplo, ampliação da allowlist de "
-            "fontes): sem isto, jogos abandonados por um defeito antigo nunca voltam a ser tentados."
+            "Compatibilidade com operação antiga: zera o estado de backoff. O schema v2 "
+            "não possui mais esgotamento definitivo e reabre automaticamente estados legados."
         ),
     )
     args = parser.parse_args()
@@ -744,13 +887,12 @@ def main() -> int:
     if args.reabrir_esgotados and not args.dry_run:
         estado_atual = carregar_json(ESTADO, {})
         jogos_estado = estado_atual.get("jogos") if isinstance(estado_atual.get("jogos"), dict) else {}
-        reabertos = [k for k, v in jogos_estado.items() if isinstance(v, Mapping) and v.get("esgotado")]
-        if reabertos or jogos_estado:
+        if jogos_estado:
             estado_atual["jogos"] = {}
             estado_atual["esgotados"] = []
             estado_atual["reaberto_em"] = agora.isoformat()
             salvar_json(ESTADO, estado_atual)
-            print(f"Reabertos {len(reabertos)} jogo(s) esgotado(s); contadores zerados.")
+            print(f"Backoff zerado manualmente para {len(jogos_estado)} jogo(s).")
 
     pendentes, estado = pendencias(
         grace_horas=args.grace_horas,
@@ -770,6 +912,11 @@ def main() -> int:
         else:
             novo_estado = dict(estado)
             novo_estado.setdefault("jogos", estado.get("jogos") or {})
+            novo_estado["schema_version"] = 2
+            novo_estado["_comentario"] = (
+                "Estado por campo da camada IA de público/renda. Não há esgotamento definitivo: "
+                "lacunas permanecem em backoff até serem resolvidas documentalmente."
+            )
             novo_estado["gerado_em"] = agora.isoformat()
             novo_estado["ultima_execucao"] = {
                 "pendentes_avaliados": len(pendentes),
@@ -778,31 +925,17 @@ def main() -> int:
                 "nao_encontrados": 0,
                 "erro": motivo,
             }
-            novo_estado["esgotados"] = sorted(
-                k for k, v in (novo_estado.get("jogos") or {}).items()
-                if isinstance(v, Mapping) and v.get("esgotado")
-            )
+            novo_estado["esgotados"] = []
         salvar_json(ESTADO, novo_estado)
         print(motivo)
         print("novos=false")
         return 0
 
     if not pendentes:
-        # "Nenhuma elegível" é ambíguo e já escondeu um defeito: pode ser que
-        # nada esteja faltando, ou que tudo tenha sido marcado como esgotado.
-        # O log precisa dizer qual dos dois.
-        jogos_estado = estado.get("jogos") if isinstance(estado.get("jogos"), dict) else {}
-        esgotados = [k for k, v in jogos_estado.items() if isinstance(v, Mapping) and v.get("esgotado")]
-        if esgotados:
-            print(f"::warning::{len(esgotados)} partida(s) marcada(s) como esgotada(s) e fora da fila: "
-                  f"{', '.join(sorted(esgotados)[:6])}. Se a causa das falhas foi corrigida, "
-                  f"rode com --reabrir-esgotados.")
-            return encerrar(
-                f"Nenhuma partida elegível: {len(esgotados)} esgotada(s), o resto já tem público.",
-                contar_tentativa=False,
-            )
-        return encerrar("Nenhuma partida elegível: todas as partidas finalizadas já têm público.",
-                        contar_tentativa=False)
+        return encerrar(
+            "Nenhuma lacuna elegível agora: público/renda já resolvidos ou aguardando o próximo backoff.",
+            contar_tentativa=False,
+        )
 
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not api_key:
@@ -814,9 +947,9 @@ def main() -> int:
     model = os.environ.get("OPENAI_PUBLICOS_MODEL", os.environ.get("OPENAI_MODEL", DEFAULT_MODEL)).strip() or DEFAULT_MODEL
     max_tool_calls = min(20, max(4, len(pendentes) * 4))
 
-    print(f"Consultando {len(pendentes)} partida(s) sem público (modelo {model}, até {max_tool_calls} buscas).")
+    print(f"Consultando {len(pendentes)} partida(s) com lacuna de público/renda (modelo {model}, até {max_tool_calls} buscas).")
     for p in pendentes:
-        print(f"  - {p['event_id']} R{p['rodada']} {p['mandante']} x {p['visitante']} ({p['horas_desde_inicio']}h)")
+        print(f"  - {p['event_id']} R{p['rodada']} {p['mandante']} x {p['visitante']} ({p['horas_desde_final']}h pós-FINAL; faltando={','.join(p['faltando'])})")
 
     erro = ""
     aceitos: list[dict[str, Any]] = []
@@ -835,7 +968,13 @@ def main() -> int:
         gravados = aplicar(aceitos)
 
     for item in aceitos:
-        print(f"  ACEITO  {item['event_id']}: {item['registro']['publico']} ({item['registro']['tipo']}) — {item['registro']['fonte']}")
+        reg = item.get("registro") or {}
+        partes = []
+        if numero_publico(reg.get("publico")) is not None:
+            partes.append(f"público={reg.get('publico')}")
+        if numero_renda(reg.get("renda")) is not None:
+            partes.append(f"renda={reg.get('renda')}")
+        print(f"  ACEITO  {item['event_id']}: {', '.join(partes) or 'complemento'} — {reg.get('fonte') or reg.get('fonte_renda') or ''}")
     for item in rejeitados:
         rotulo = "sem fonte" if item.get("nao_e_erro") else "REJEITADO"
         print(f"  {rotulo} {item.get('event_id')}: {'; '.join(item.get('motivos') or [])}")

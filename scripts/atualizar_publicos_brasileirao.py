@@ -903,6 +903,7 @@ def executar_coleta(
 
     jogos_com_pagantes = 0
     jogos_com_renda = 0
+    sem_renda: list[dict[str, Any]] = []
     for jogo in finalizados:
         eid = str(jogo.get("event_id") or "")
         d = detalhes_jogos.get(eid) or {}
@@ -911,8 +912,18 @@ def executar_coleta(
         pag = numero_publico(d.get("publico_pagante")) or numero_publico(comp.get("pagantes"))
         if pag is not None and publico_base is not None and pag <= publico_base:
             jogos_com_pagantes += 1
-        if numero_renda(d.get("renda")) is not None or numero_renda(comp.get("renda")) is not None:
+        renda = numero_renda(d.get("renda")) or numero_renda(comp.get("renda"))
+        if renda is not None:
             jogos_com_renda += 1
+        else:
+            sem_renda.append({
+                "event_id": eid,
+                "rodada": int(jogo.get("rodada") or 0),
+                "data_iso": str(jogo.get("data_iso") or ""),
+                "mandante": str((jogo.get("mandante") or {}).get("nome") or ""),
+                "visitante": str((jogo.get("visitante") or {}).get("nome") or ""),
+                "placar": f"{jogo.get('placar_mandante')} x {jogo.get('placar_visitante')}",
+            })
 
     audit = {
         "gerado_em": iso_agora_brt(),
@@ -925,6 +936,7 @@ def executar_coleta(
         "total_sem_publico_pagante": len(finalizados) - jogos_com_pagantes,
         "total_com_renda": jogos_com_renda,
         "total_sem_renda": len(finalizados) - jogos_com_renda,
+        "sem_renda": sem_renda,
         "total_partidas_fisicas": len(grupos_fisicos),
         "total_partidas_fisicas_com_publico": len(grupos_fisicos) - len(partidas_fisicas_sem_publico),
         "total_partidas_fisicas_sem_publico": len(partidas_fisicas_sem_publico),

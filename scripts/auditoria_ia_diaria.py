@@ -70,10 +70,11 @@ CALENDAR_AUDIT_PATH = ROOT / "dados-br" / "auditoria-calendario.json"
 COVERAGE_AUDIT_PATH = ROOT / "dados-br" / "auditoria-cobertura-resultados.json"
 STATUS_PATH = ROOT / "dados-br" / "status-atualizacao.json"
 
-DEFAULT_MODEL = "gpt-5.6-terra"
+DEFAULT_MODEL = "gpt-5.6-sol"
 MIN_PUBLIC_CONFIDENCE = 0.97
 MIN_TRANSMISSION_CONFIDENCE = 0.97
-PUBLIC_RESEARCH_GRACE_HOURS = 6.0
+PUBLIC_RESEARCH_GRACE_HOURS = 2.0
+PUBLIC_CRITICAL_HOURS = 24.0
 HIGHLIGHTS_AI_GRACE_HOURS = 24.0
 HIGHLIGHTS_CRITICAL_HOURS = 48.0
 REPEAT_ALERT_HOURS = 72.0
@@ -82,12 +83,20 @@ MAX_PUBLIC = 100_000
 # Busca restrita a fontes esportivas/editoriais reconhecidas. A camada de IA não
 # recebe acesso irrestrito à web.
 ALLOWED_WEB_DOMAINS = (
-    "cbf.com.br",
-    "ge.globo.com",
-    "globoesporte.globo.com",
-    "espn.com.br",
-    "uol.com.br",
-    "itatiaia.com.br",
+    "cbf.com.br", "ge.globo.com", "globoesporte.globo.com", "sportv.globo.com",
+    "oglobo.globo.com", "espn.com.br", "uol.com.br", "folha.uol.com.br",
+    "band.uol.com.br", "lance.com.br", "gazetaesportiva.com", "terra.com.br",
+    "r7.com", "estadao.com.br", "metropoles.com", "cnnbrasil.com.br",
+    "bahianoticias.com.br", "itatiaia.com.br", "otempo.com.br", "em.com.br",
+    "gauchazh.clicrbs.com.br", "nsctotal.com.br",
+    "diariodonordeste.verdesmares.com.br", "opovo.com.br",
+    "correiobraziliense.com.br", "gp1.com.br", "oliberal.com", "acritica.com",
+    "santosfc.com.br", "palmeiras.com.br", "flamengo.com.br", "corinthians.com.br",
+    "saopaulofc.net", "fluminense.com.br", "vasco.com.br", "botafogo.com.br",
+    "cruzeiro.com.br", "atletico.com.br", "internacional.com.br", "gremio.net",
+    "esporteclubebahia.com.br", "ecvitoria.com.br", "athleticoparanaense.com",
+    "coritiba.com.br", "chapecoense.com", "redbullbragantino.com.br",
+    "mirassolfc.com.br", "remo.com.br",
     "youtube.com",
 )
 
@@ -201,6 +210,24 @@ def _public_value(value: Any) -> int | None:
     return number if 0 < number <= MAX_PUBLIC else None
 
 
+def _money_value(value: Any) -> float | None:
+    if value is None or isinstance(value, bool):
+        return None
+    try:
+        if isinstance(value, (int, float)):
+            number = float(value)
+        else:
+            text = str(value).strip().replace("R$", "").replace(" ", "")
+            if not text:
+                return None
+            if "," in text:
+                text = text.replace(".", "").replace(",", ".")
+            number = float(text)
+    except ValueError:
+        return None
+    return number if number > 0 else None
+
+
 def public_gaps_from_sources(
     moment: datetime,
     results: Mapping[str, Mapping[str, Any]],
@@ -218,9 +245,16 @@ def public_gaps_from_sources(
     for event_id, result in results.items():
         detail = detail_games.get(event_id) if isinstance(detail_games, Mapping) else None
         complement = complements.get(event_id) if isinstance(complements, Mapping) else None
-        if _public_value((detail or {}).get("publico")) is not None:
-            continue
-        if _public_value((complement or {}).get("publico")) is not None:
+        tem_publico = (
+            _public_value((detail or {}).get("publico")) is not None
+            or _public_value((complement or {}).get("publico")) is not None
+        )
+        tem_renda = (
+            _money_value((detail or {}).get("renda")) is not None
+            or _money_value((complement or {}).get("renda")) is not None
+        )
+        faltando = [campo for campo, presente in (("publico", tem_publico), ("renda", tem_renda)) if not presente]
+        if not faltando:
             continue
         age = hours_since_game(result, moment)
         if age is None or age < PUBLIC_RESEARCH_GRACE_HOURS:
@@ -232,6 +266,7 @@ def public_gaps_from_sources(
             "mandante": (result.get("mandante") or {}).get("nome") or "",
             "visitante": (result.get("visitante") or {}).get("nome") or "",
             "horas_desde_fim": round(age, 1),
+            "faltando": faltando,
         })
     rows.sort(key=lambda item: (int(item.get("rodada") or 0), str(item.get("data_iso") or ""), str(item.get("event_id") or "")))
     return rows
@@ -363,7 +398,7 @@ def core_health(moment: datetime, pub_gaps: Sequence[Mapping[str, Any]], trans_g
     detail_failures = int(details.get("total_falhas") or 0)
     coverage_no_stats = int((coverage.get("resumo") or {}).get("jogos_sem_estatisticas") or 0)
     critical_trans = sum(1 for item in trans_gaps if item.get("nivel") == "critico")
-    old_public = sum(1 for item in pub_gaps if float(item.get("horas_desde_fim") or 0) >= 12)
+    old_public = sum(1 for item in pub_gaps if float(item.get("horas_desde_fim") or 0) >= PUBLIC_CRITICAL_HOURS)
     old_highlights = sum(1 for item in highlight_gaps_ if float(item.get("horas_desde_fim") or 0) >= HIGHLIGHTS_CRITICAL_HOURS)
 
     if stats_critical:
@@ -470,13 +505,15 @@ def audit_schema() -> dict[str, Any]:
                     "type": "object", "additionalProperties": False,
                     "properties": {
                         "event_id": {"type": "string", "minLength": 1, "maxLength": 40},
-                        "publico": {"type": "integer", "minimum": 1, "maximum": MAX_PUBLIC},
-                        "tipo": {"type": "string", "enum": ["presente", "total"]},
-                        "fonte_url": {"type": "string", "minLength": 1, "maxLength": 1200},
+                        "publico": {"anyOf": [{"type": "integer", "minimum": 1, "maximum": MAX_PUBLIC}, {"type": "null"}]},
+                        "tipo": {"type": "string", "enum": ["presente", "total", "indefinido"]},
+                        "renda": {"anyOf": [{"type": "number", "minimum": 0}, {"type": "null"}]},
+                        "fonte_url": {"type": "string", "maxLength": 1200},
+                        "fonte_url_renda": {"type": "string", "maxLength": 1200},
                         "confianca": {"type": "number", "minimum": 0, "maximum": 1},
                         "justificativa": {"type": "string", "minLength": 3, "maxLength": 500},
                     },
-                    "required": ["event_id", "publico", "tipo", "fonte_url", "confianca", "justificativa"],
+                    "required": ["event_id", "publico", "tipo", "renda", "fonte_url", "fonte_url_renda", "confianca", "justificativa"],
                 },
             },
             "correcoes_transmissao": {
@@ -521,11 +558,12 @@ def build_openai_payload(triage: Mapping[str, Any], model: str) -> dict[str, Any
     instruction = (
         "Você é a camada diária de controle de qualidade do site Fórmula do Gol. Trabalhe DEPOIS dos coletores determinísticos. "
         "A resposta deve obedecer exatamente ao JSON Schema. Não altere nem proponha alterar placares, classificação, cartões, gols, "
-        "estatísticas quantitativas ou cálculos. Para público e transmissão, proponha correção somente quando o event_id constar na "
-        "lista de pendências, a evidência for inequívoca e a fonte consultada declarar diretamente o dado. Público deve ser PRESENTE "
-        "ou TOTAL; nunca converta público pagante em presente. Não sobrescreva dados existentes. Para melhores momentos, nunca proponha "
+        "estatísticas quantitativas ou cálculos. Para público/renda e transmissão, proponha correção somente quando o event_id constar na "
+        "lista de pendências, a evidência for inequívoca e a fonte consultada declarar diretamente o dado. O campo `faltando` informa se "
+        "a lacuna é público, renda ou ambos: procure TODOS os campos faltantes. Público deve ser PRESENTE ou TOTAL; nunca converta público "
+        "pagante em presente. Renda deve ser valor bruto/documental declarado para a partida; nunca estime. Não sobrescreva dados existentes. Para melhores momentos, nunca proponha "
         "vínculo automático: apenas classifique a pendência; jogos com menos de vinte e quatro horas nem aparecem no dossiê. "
-        "Se web_search estiver disponível, use-o apenas para lacunas factuais; prefira UMA única busca que cubra as pendências. "
+        "Se houver qualquer lacuna factual no dossiê, a web_search é OBRIGATÓRIA: pesquise as páginas necessárias até o limite físico de chamadas. "
         "Esta auditoria NÃO produz nem reescreve editoriais: a redação jornalística pertence aos workflows de fechamento de rodada e copas, "
         "que usam uma camada OpenAI dedicada somente quando existe matéria elegível. Não transforme avisos isolados de fonte em incidente crítico "
         "quando os dados finais estão íntegros."
@@ -554,12 +592,18 @@ def build_openai_payload(triage: Mapping[str, Any], model: str) -> dict[str, Any
             "search_context_size": "low",
             "filters": {"allowed_domains": list(ALLOWED_WEB_DOMAINS)},
         }]
-        # Limite físico: ainda que o modelo queira investigar mais, esta única
-        # requisição diária pode executar no máximo UMA chamada de ferramenta web.
-        # Uma ação de busca pode agrupar consultas; se não bastar, a lacuna fica
-        # pendente para o dia seguinte em vez de aumentar custo/complexidade.
-        payload["tool_choice"] = "auto"
-        payload["max_tool_calls"] = 1
+        # Continua existindo UMA única Responses API por dia, porém a própria
+        # chamada pode fazer várias pesquisas dirigidas. Antes havia 1 tool call
+        # e o modelo conseguia encerrar sem pesquisar; isso deixava as lacunas
+        # apenas diagnosticadas. Agora a busca é obrigatória quando há pendência.
+        pending = triage.get("pendencias") or {}
+        factual_count = (
+            len(pending.get("publicos") or [])
+            + len(pending.get("transmissoes") or [])
+            + len(pending.get("melhores_momentos_apos_24h") or [])
+        )
+        payload["tool_choice"] = "required"
+        payload["max_tool_calls"] = min(20, max(2, factual_count * 2))
         payload["include"] = ["web_search_call.action.sources"]
     return payload
 
@@ -650,41 +694,70 @@ def source_proven(source_url: Any, source_urls: set[str]) -> bool:
 def validate_public_corrections(
     proposed: Sequence[Mapping[str, Any]], triage: Mapping[str, Any], details: Mapping[str, Any], source_urls: set[str]
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    pending_ids = {str(item.get("event_id") or "") for item in (triage.get("pendencias") or {}).get("publicos") or []}
+    pending_rows = {
+        str(item.get("event_id") or ""): item
+        for item in (triage.get("pendencias") or {}).get("publicos") or []
+        if str(item.get("event_id") or "")
+    }
     detail_games = details.get("jogos") or {}
     accepted: list[dict[str, Any]] = []
     rejected: list[dict[str, Any]] = []
     for raw in proposed:
         item = dict(raw)
         event_id = str(item.get("event_id") or "")
-        reasons: list[str] = []
-        if event_id not in pending_ids:
-            reasons.append("event_id não está na pendência diária")
-        if (detail_games.get(event_id) or {}).get("publico"):
-            reasons.append("jogo já possui público")
-        try:
-            public = int(item.get("publico") or 0)
-        except (TypeError, ValueError):
-            public = 0
-        if public < 1 or public > MAX_PUBLIC:
-            reasons.append("público fora da faixa de sanidade")
-        if item.get("tipo") not in {"presente", "total"}:
-            reasons.append("tipo não é presente/total")
+        pending = pending_rows.get(event_id)
+        if not pending:
+            rejected.append({"tipo": "publico_renda", "event_id": event_id, "motivos": ["event_id não está na pendência diária"], "proposta": item})
+            continue
+        faltando = set(pending.get("faltando") or ["publico"])
+        detail = detail_games.get(event_id) if isinstance(detail_games, Mapping) else {}
         try:
             confidence = float(item.get("confianca") or 0)
         except (TypeError, ValueError):
-            confidence = 0
+            confidence = 0.0
         if confidence < MIN_PUBLIC_CONFIDENCE:
-            reasons.append("confiança abaixo do limiar")
-        if not source_proven(item.get("fonte_url"), source_urls):
-            reasons.append("fonte não consta nas fontes web efetivamente retornadas")
-        if reasons:
-            rejected.append({"tipo": "publico", "event_id": event_id, "motivos": reasons, "proposta": item})
-        else:
-            item["publico"] = public
-            item["confianca"] = confidence
-            item["fonte_url"] = normalize_url(item.get("fonte_url"))
-            accepted.append(item)
+            rejected.append({"tipo": "publico_renda", "event_id": event_id, "motivos": ["confiança abaixo do limiar"], "proposta": item})
+            continue
+
+        out: dict[str, Any] = {
+            "event_id": event_id,
+            "confianca": confidence,
+            "justificativa": str(item.get("justificativa") or ""),
+        }
+        field_errors: list[str] = []
+
+        if "publico" in faltando and _public_value((detail or {}).get("publico")) is None:
+            public = _public_value(item.get("publico"))
+            if public is not None and item.get("tipo") in {"presente", "total"} and source_proven(item.get("fonte_url"), source_urls):
+                out.update({
+                    "publico": public,
+                    "tipo": str(item.get("tipo")),
+                    "fonte_url": normalize_url(item.get("fonte_url")),
+                })
+            elif item.get("publico") is not None:
+                field_errors.append("público proposto sem tipo/fonte válida")
+
+        if "renda" in faltando and _money_value((detail or {}).get("renda")) is None:
+            renda = _money_value(item.get("renda"))
+            renda_url = item.get("fonte_url_renda") or item.get("fonte_url")
+            if renda is not None and source_proven(renda_url, source_urls):
+                out.update({
+                    "renda": renda,
+                    "fonte_url_renda": normalize_url(renda_url),
+                })
+            elif item.get("renda") is not None:
+                field_errors.append("renda proposta sem fonte válida")
+
+        if "publico" not in out and "renda" not in out:
+            rejected.append({
+                "tipo": "publico_renda", "event_id": event_id,
+                "motivos": field_errors or ["nenhum campo faltante foi comprovado por fonte web"],
+                "proposta": item,
+            })
+            continue
+        if field_errors:
+            rejected.append({"tipo": "publico_renda_parcial", "event_id": event_id, "motivos": field_errors, "proposta": item})
+        accepted.append(out)
     return accepted, rejected
 
 
@@ -728,30 +801,39 @@ def apply_public_corrections(items: Sequence[Mapping[str, Any]], moment: datetim
     if not items:
         return []
     complements = load_json(PUBLIC_PATH, {}) or {"schema_version": 1, "jogos": {}}
-    details = load_json(DETAILS_PATH, {}) or {"jogos": {}}
     complements.setdefault("jogos", {})
-    details.setdefault("jogos", {})
     applied: list[str] = []
     for item in items:
         event_id = str(item["event_id"])
-        if event_id in complements["jogos"] and (complements["jogos"].get(event_id) or {}).get("publico"):
-            continue
-        detail = details["jogos"].get(event_id)
-        if not isinstance(detail, dict) or detail.get("publico"):
-            continue
-        complements["jogos"][event_id] = {
-            "publico": int(item["publico"]),
-            "tipo": str(item["tipo"]),
-            "fonte": str(item["fonte_url"]),
-        }
-        detail["publico"] = int(item["publico"])
-        detail["publico_tipo"] = str(item["tipo"])
-        detail["publico_fonte"] = str(item["fonte_url"])
-        applied.append(event_id)
+        current = dict(complements["jogos"].get(event_id) or {}) if isinstance(complements["jogos"].get(event_id), Mapping) else {}
+        changed = False
+        if _public_value(item.get("publico")) is not None and _public_value(current.get("publico")) is None:
+            current.update({
+                "publico": int(item["publico"]),
+                "tipo": str(item.get("tipo") or "presente"),
+                "fonte": str(item.get("fonte_url") or ""),
+                "publico_status": "divulgado",
+            })
+            changed = True
+        if _money_value(item.get("renda")) is not None and _money_value(current.get("renda")) is None:
+            current.update({
+                "renda": float(item["renda"]),
+                "renda_status": "divulgado",
+                "fonte_renda": str(item.get("fonte_url_renda") or item.get("fonte_url") or ""),
+            })
+            changed = True
+        if changed:
+            current["origem"] = "openai:web_search:auditoria-diaria"
+            current["fonte_adicional"] = "Auditoria diária de público/renda com fonte documental validada"
+            current["confianca"] = round(float(item.get("confianca") or 0), 3)
+            complements["jogos"][event_id] = current
+            applied.append(event_id)
     if applied and not dry_run:
         complements["atualizado_em"] = moment.isoformat()
         save_json(PUBLIC_PATH, complements)
-        save_json(DETAILS_PATH, details)
+        # Um único consolidador offline propaga para jogos-detalhes e reescreve
+        # auditoria-publicos (inclusive sem_renda) sem nova consulta à rede.
+        subprocess.run([sys.executable, "scripts/atualizar_publicos_brasileirao.py", "--sem-rede"], cwd=ROOT, check=True)
         subprocess.run([sys.executable, "scripts/gerar_estatisticas_competicao_brasileirao.py"], cwd=ROOT, check=True)
     return applied
 
@@ -882,7 +964,7 @@ def final_status(triage: Mapping[str, Any], parsed: Mapping[str, Any], applied_p
 
     unresolved_old_public = [
         item for item in public_pending
-        if item.get("event_id") not in applied_public_ids and float(item.get("horas_desde_fim") or 0) >= 12
+        if item.get("event_id") not in applied_public_ids and float(item.get("horas_desde_fim") or 0) >= PUBLIC_CRITICAL_HOURS
     ]
     unresolved_critical_trans = [
         item for item in transmission_pending
@@ -1014,6 +1096,8 @@ def run(*, dry_run: bool = False, moment: datetime | None = None) -> dict[str, A
             response = call_openai_once(build_openai_payload(triage, model), api_key)
             parsed = dict(response.get("_parsed_output") or {})
             search_count, tool_count, source_urls, web_actions = collect_web_metadata(response)
+            if needs_web(triage) and tool_count == 0:
+                raise DailyAuditError("há lacunas factuais elegíveis, mas a chamada não executou web_search")
         except Exception as exc:
             ai_error = str(exc)[:1000]
 
@@ -1138,9 +1222,10 @@ def self_test() -> int:
         datetime.fromisoformat("2026-08-02T05:30:00-03:00"), gap_result, {"1": {"publico": None}}, {}
     )
     assert [item["event_id"] for item in gaps] == ["1"]
-    assert public_gaps_from_sources(
+    only_rent = public_gaps_from_sources(
         datetime.fromisoformat("2026-08-02T05:30:00-03:00"), gap_result, {"1": {"publico": None}}, {"1": {"publico": 12345}}
-    ) == []
+    )
+    assert len(only_rent) == 1 and only_rent[0]["faltando"] == ["renda"]
     assert allowed_source_url("https://ge.globo.com/futebol/noticia/teste.ghtml")
     assert not allowed_source_url("https://example.com/noticia")
     assert normalize_url("https://GE.GLOBO.COM/a/?utm=x#z") == "https://ge.globo.com/a"
@@ -1149,15 +1234,15 @@ def self_test() -> int:
 
     triage = {
         "pendencias": {
-            "publicos": [{"event_id": "1", "horas_desde_fim": 30}],
+            "publicos": [{"event_id": "1", "horas_desde_fim": 30, "faltando": ["publico", "renda"]}],
             "transmissoes": [{"event_id": "2", "nivel": "critico"}],
             "melhores_momentos_apos_24h": [{"event_id": "3", "horas_desde_fim": 25}],
         },
         "saude": {"status_deterministico": "atencao", "criticos": []},
     }
     payload = build_openai_payload(triage, DEFAULT_MODEL)
-    assert payload["tools"][0]["type"] == "web_search" and payload["tool_choice"] == "auto"
-    assert payload["max_tool_calls"] == 1, "web_search deve estar fisicamente limitada a uma chamada"
+    assert payload["tools"][0]["type"] == "web_search" and payload["tool_choice"] == "required"
+    assert payload["max_tool_calls"] >= 2, "uma única Responses API pode usar múltiplas buscas factuais"
     no_web = copy.deepcopy(triage)
     no_web["pendencias"] = {"publicos": [], "transmissoes": [], "melhores_momentos_apos_24h": []}
     assert "tools" not in build_openai_payload(no_web, DEFAULT_MODEL)
@@ -1165,23 +1250,23 @@ def self_test() -> int:
     details = {"jogos": {"1": {"publico": None}}}
     source = normalize_url("https://ge.globo.com/futebol/noticia/a.ghtml")
     accepted, rejected = validate_public_corrections([
-        {"event_id": "1", "publico": 12345, "tipo": "presente", "fonte_url": source, "confianca": 0.99, "justificativa": "fonte declara público presente"}
+        {"event_id": "1", "publico": 12345, "tipo": "presente", "renda": 800000.0, "fonte_url": source, "fonte_url_renda": source, "confianca": 0.99, "justificativa": "fonte declara público e renda"}
     ], triage, details, {source})
     assert len(accepted) == 1 and not rejected
     accepted, rejected = validate_public_corrections([
-        {"event_id": "1", "publico": 12345, "tipo": "presente", "fonte_url": "https://example.com/a", "confianca": 0.99, "justificativa": "x"}
+        {"event_id": "1", "publico": 12345, "tipo": "presente", "renda": None, "fonte_url": "https://example.com/a", "fonte_url_renda": "", "confianca": 0.99, "justificativa": "x"}
     ], triage, details, {normalize_url("https://example.com/a")})
     assert not accepted and rejected
     accepted, rejected = validate_public_corrections([
-        {"event_id": "1", "publico": 12345, "tipo": "pagante", "fonte_url": source, "confianca": 0.99, "justificativa": "x"}
-    ], triage, details, {source})
-    assert not accepted and any("presente/total" in reason for reason in rejected[0]["motivos"])
-    accepted, rejected = validate_public_corrections([
-        {"event_id": "1", "publico": 12345, "tipo": "presente", "fonte_url": source, "confianca": 0.96, "justificativa": "x"}
+        {"event_id": "1", "publico": 12345, "tipo": "indefinido", "renda": None, "fonte_url": source, "fonte_url_renda": "", "confianca": 0.99, "justificativa": "x"}
     ], triage, details, {source})
     assert not accepted and rejected
     accepted, rejected = validate_public_corrections([
-        {"event_id": "1", "publico": 12345, "tipo": "presente", "fonte_url": source, "confianca": 0.99, "justificativa": "x"}
+        {"event_id": "1", "publico": 12345, "tipo": "presente", "renda": None, "fonte_url": source, "fonte_url_renda": "", "confianca": 0.96, "justificativa": "x"}
+    ], triage, details, {source})
+    assert not accepted and rejected
+    accepted, rejected = validate_public_corrections([
+        {"event_id": "1", "publico": 12345, "tipo": "presente", "renda": None, "fonte_url": source, "fonte_url_renda": "", "confianca": 0.99, "justificativa": "x"}
     ], triage, {"jogos": {"1": {"publico": 9999}}}, {source})
     assert not accepted and rejected
 
