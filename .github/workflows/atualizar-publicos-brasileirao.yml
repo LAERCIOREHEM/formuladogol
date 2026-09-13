@@ -69,12 +69,9 @@ jobs:
           set -euo pipefail
           cp dados-br/publicos-complementares.json /tmp/publicos-antes.json
 
-          # ORDEM INVERTIDA: a camada de IA vem PRIMEIRO.
-          # O coletor determinístico varre o sitemap do ge e, na prática, gasta
-          # ~90s em ge_artigos + ~8s na CBF para achar zero público, porque a
-          # matéria consolidada da rodada só sai quando a rodada inteira termina.
-          # A busca por partida acha a ficha técnica poucas horas após o apito.
-          # Rodando a IA antes, o determinístico só precisa varrer o que sobrou.
+          # Fluxo correto: coletor determinístico PRIMEIRO; IA somente como fallback
+          # para o que continuar faltando. A IA usa web_search amplo e obrigatório,
+          # validando a URL efetivamente lida sem se limitar a uma lista fixa de domínios.
           if [[ "${REABRIR:-false}" == "true" ]]; then
             python scripts/completar_publicos_ia.py --reabrir-esgotados --dry-run >/dev/null 2>&1 || true
             python - <<'PY'
@@ -91,14 +88,17 @@ jobs:
           PY
           fi
 
+          # Fonte documental determinística/primária. Se preencher tudo, a IA
+          # detectará zero pendências e não consumirá chamada OpenAI.
+          python scripts/atualizar_publicos_brasileirao.py --max-rodadas 3
+
           set +e
           python scripts/completar_publicos_ia.py \
-            --grace-horas 2 \
+            --grace-horas 0.5 \
             --max-jogos 10 2>&1 | tee /tmp/camada-ia.log
           IA_RC=${PIPESTATUS[0]}
           set -e
 
-          python scripts/atualizar_publicos_brasileirao.py --max-rodadas 3
           if [[ "$IA_RC" != "0" ]]; then
             echo "Camada de IA terminou com codigo $IA_RC; seguindo com o deterministico."
           fi
