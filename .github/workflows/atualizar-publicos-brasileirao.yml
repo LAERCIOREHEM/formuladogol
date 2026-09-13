@@ -3,11 +3,11 @@ run-name: Públicos · incremental
 
 on:
   # Sem schedule próprio. O orquestrador dispara somente quando existe partida
-  # FINAL sem público e o backoff da pendência venceu.
+  # FINAL com lacuna de público/renda e o backoff da pendência venceu.
   workflow_dispatch:
     inputs:
       reabrir_esgotados:
-        description: "Zerar o marcador de esgotado (use após corrigir a causa das falhas, ex.: allowlist de fontes)"
+        description: "Compatibilidade: zerar manualmente o backoff de público/renda (normalmente desnecessário no schema v2)"
         type: boolean
         default: false
       dry_run:
@@ -26,7 +26,7 @@ concurrency:
 
 jobs:
   atualizar:
-    name: Completar públicos pendentes
+    name: Completar público/renda pendentes
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -58,11 +58,12 @@ jobs:
           python -m json.tool dados-br/publicos-complementares.json >/dev/null
           python -m json.tool dados-br/auditoria-publicos.json >/dev/null
 
-      - name: Buscar somente públicos ainda ausentes
+      - name: Buscar lacunas de público e renda
         id: coleta
         shell: bash
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_PUBLICOS_MODEL: ${{ vars.OPENAI_PUBLICOS_MODEL || vars.OPENAI_MODEL || 'gpt-5.6-sol' }}
           REABRIR: ${{ inputs.reabrir_esgotados }}
         run: |
           set -euo pipefail
@@ -93,8 +94,7 @@ jobs:
           set +e
           python scripts/completar_publicos_ia.py \
             --grace-horas 2 \
-            --max-jogos 10 \
-            --max-tentativas 8 2>&1 | tee /tmp/camada-ia.log
+            --max-jogos 10 2>&1 | tee /tmp/camada-ia.log
           IA_RC=${PIPESTATUS[0]}
           set -e
 
@@ -142,6 +142,7 @@ jobs:
           det = json.loads(Path('dados-br/jogos-detalhes.json').read_text(encoding='utf-8'))
           est = json.loads(Path('dados-br/estatisticas-competicao.json').read_text(encoding='utf-8'))
           assert isinstance(aud.get('partidas_fisicas_sem_publico'), list)
+          assert isinstance(aud.get('sem_renda'), list), 'auditoria-publicos.sem_renda ausente'
           assert isinstance(det.get('jogos'), dict)
           publico = est.get('publico') or {}
           resumo = est.get('resumo') or {}
@@ -188,9 +189,9 @@ jobs:
         id: publish
         env:
           NOVOS_PUBLICOS: ${{ steps.coleta.outputs.novos }}
-        # Commita também quando NÃO houve público novo: o contador de tentativas
-        # da camada de IA precisa persistir, senão o marcador de "esgotado" nunca
-        # avança e o orquestrador redispara este workflow para sempre.
+        # Commita também quando NÃO houve dado novo: o estado por campo contém o
+        # próximo backoff de público/renda e evita consultas em loop, sem abandonar
+        # definitivamente nenhuma lacuna documental.
         if: ${{ inputs.dry_run != true }}
         shell: bash
         run: |

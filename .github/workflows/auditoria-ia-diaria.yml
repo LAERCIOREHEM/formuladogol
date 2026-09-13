@@ -45,6 +45,7 @@ jobs:
           set -euo pipefail
           python -m py_compile \
             scripts/auditoria_ia_diaria.py \
+            scripts/atualizar_publicos_brasileirao.py \
             scripts/gerar_analise_rodada.py \
             scripts/gerar_marcos_af_previsao.py \
             scripts/gerar_analise_copa_do_brasil.py \
@@ -143,7 +144,7 @@ jobs:
         if: steps.ai_gate.outputs.run_daily == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_AUDIT_MODEL: ${{ vars.OPENAI_AUDIT_MODEL || vars.OPENAI_MODEL || 'gpt-5.6-terra' }}
+          OPENAI_AUDIT_MODEL: ${{ vars.OPENAI_AUDIT_MODEL || vars.OPENAI_MODEL || 'gpt-5.6-sol' }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
           EMAIL_REMETENTE: ${{ secrets.EMAIL_REMETENTE }}
@@ -156,6 +157,7 @@ jobs:
           set -euo pipefail
           python -m json.tool dados-br/auditoria-ia.json >/dev/null
           python -m json.tool dados-br/publicos-complementares.json >/dev/null
+          python -m json.tool dados-br/auditoria-publicos.json >/dev/null
           python -m json.tool dados-br/jogos-detalhes.json >/dev/null
           python -m json.tool dados-br/estatisticas-competicao.json >/dev/null
           python -m json.tool dados-br/transmissoes-tv.json >/dev/null
@@ -176,12 +178,14 @@ jobs:
           FILES=(
             dados-br/auditoria-ia.json
             dados-br/publicos-complementares.json
+            dados-br/auditoria-publicos.json
             dados-br/jogos-detalhes.json
             dados-br/estatisticas-competicao.json
             dados-br/transmissoes-tv.json
           )
           SITE_FILES=(
             dados-br/publicos-complementares.json
+            dados-br/auditoria-publicos.json
             dados-br/jogos-detalhes.json
             dados-br/estatisticas-competicao.json
             dados-br/transmissoes-tv.json
