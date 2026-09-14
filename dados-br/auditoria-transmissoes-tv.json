@@ -7,9 +7,9 @@
     "jogos_sem_transmissao_14d": 1,
     "jogos_sem_transmissao_fora_14d": 7,
     "jogos_criticos_sem_transmissao_72h": 1,
-    "registros_preservados": 22,
+    "registros_preservados": 20,
     "jogos_guardiao_ia": 1,
-    "jogos_estaveis_sem_reconsulta_editorial": 6,
+    "jogos_estaveis_sem_reconsulta_editorial": 12,
     "fontes_com_falha": 0
   },
   "fontes": {
@@ -27,7 +27,7 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 3331
+      "duracao_ms": 2735
     },
     "espn": {
       "ok": true,
@@ -39,7 +39,7 @@
     },
     "youtube_oficial": {
       "ok": true,
-      "jogos_com_canal": 4
+      "jogos_com_canal": 6
     }
   },
   "sem_transmissao": [
@@ -48,7 +48,7 @@
       "rodada": 0,
       "jogo": "Vasco da Gama x Independiente Santa Fe",
       "data_iso": "2026-09-15T19:00:00-03:00",
-      "faltam_horas": 28.9,
+      "faltam_horas": 24.4,
       "nivel": "critico"
     }
   ],
@@ -58,7 +58,7 @@
       "rodada": 0,
       "jogo": "Vasco da Gama x Independiente Santa Fe",
       "data_iso": "2026-09-15T19:00:00-03:00",
-      "faltam_horas": 28.9,
+      "faltam_horas": 24.4,
       "nivel": "critico"
     },
     {
@@ -66,7 +66,7 @@
       "rodada": 29,
       "jogo": "Remo x Grêmio",
       "data_iso": "2026-10-07T19:30:00-03:00",
-      "faltam_horas": 557.4,
+      "faltam_horas": 552.9,
       "nivel": "futuro"
     },
     {
@@ -74,7 +74,7 @@
       "rodada": 29,
       "jogo": "Vitória x Chapecoense",
       "data_iso": "2026-10-07T20:00:00-03:00",
-      "faltam_horas": 557.9,
+      "faltam_horas": 553.4,
       "nivel": "futuro"
     },
     {
@@ -82,7 +82,7 @@
       "rodada": 29,
       "jogo": "Fluminense x Coritiba",
       "data_iso": "2026-10-08T21:30:00-03:00",
-      "faltam_horas": 583.4,
+      "faltam_horas": 578.9,
       "nivel": "futuro"
     },
     {
@@ -90,7 +90,7 @@
       "rodada": 30,
       "jogo": "São Paulo x Vitória",
       "data_iso": "2026-10-10T21:00:00-03:00",
-      "faltam_horas": 630.9,
+      "faltam_horas": 626.4,
       "nivel": "futuro"
     },
     {
@@ -98,7 +98,7 @@
       "rodada": 30,
       "jogo": "Coritiba x Botafogo",
       "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 653.4,
+      "faltam_horas": 648.9,
       "nivel": "futuro"
     },
     {
@@ -106,7 +106,7 @@
       "rodada": 30,
       "jogo": "Bahia x Mirassol",
       "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 653.4,
+      "faltam_horas": 648.9,
       "nivel": "futuro"
     },
     {
@@ -114,7 +114,7 @@
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 677.4,
+      "faltam_horas": 672.9,
       "nivel": "futuro"
     }
   ],
@@ -169,15 +169,6 @@
       ]
     },
     {
-      "event_id": "401841243",
-      "jogo": "São Paulo x Internacional",
-      "canais": [
-        "Premiere",
-        "SporTV",
-        "Prime Video"
-      ]
-    },
-    {
       "event_id": "401841246",
       "jogo": "Grêmio x Palmeiras",
       "canais": [
@@ -193,19 +184,6 @@
       "canais": [
         "Premiere",
         "SporTV",
-        "Prime Video",
-        "Paramount+",
-        "Disney+ / ESPN"
-      ]
-    },
-    {
-      "event_id": "401841241",
-      "jogo": "Flamengo x Bragantino",
-      "canais": [
-        "GE TV",
-        "Premiere",
-        "SporTV",
-        "Globo",
         "Prime Video",
         "Paramount+",
         "Disney+ / ESPN"
@@ -337,5 +315,5 @@
     "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
   "artigos_ge_descobertos": [],
-  "atualizado_em": "2026-09-14T14:04:35-03:00"
+  "atualizado_em": "2026-09-14T18:34:25-03:00"
 }

@@ -15,13 +15,13 @@
   "resumo": {
     "jogos_na_janela": 39,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 4,
+    "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 31,
+    "candidatos_oficiais_encontrados": 40,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 0,
     "search_api_jogos_pulados_grade_estavel": 1,
-    "transmissoes_publicadas": 4,
+    "transmissoes_publicadas": 6,
     "sem_transmissao": 1,
     "erros": 0
   },
@@ -95,12 +95,40 @@
       "descoberta_antecipada": true
     },
     {
+      "event_id": "401841243",
+      "rodada": 28,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "São Paulo x Internacional",
+      "data_iso": "2026-09-19T21:00:00-03:00",
+      "principal": "GE TV",
+      "fontes_encontradas": [
+        "GE TV"
+      ],
+      "manual": false,
+      "descoberta_antecipada": true
+    },
+    {
       "event_id": "401841242",
       "rodada": 28,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
       "jogo": "Vitória x Cruzeiro",
       "data_iso": "2026-09-20T16:00:00-03:00",
+      "principal": "GE TV",
+      "fontes_encontradas": [
+        "GE TV"
+      ],
+      "manual": false,
+      "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401841241",
+      "rodada": 28,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Flamengo x Bragantino",
+      "data_iso": "2026-09-20T18:30:00-03:00",
       "principal": "GE TV",
       "fontes_encontradas": [
         "GE TV"
@@ -139,6 +167,38 @@
   ],
   "aceitos": [
     {
+      "event_id": "401841241",
+      "jogo": "Flamengo x Bragantino",
+      "fonte": "getv",
+      "video_id": "_U7JS7cgsBg",
+      "url": "https://www.youtube.com/watch?v=_U7JS7cgsBg",
+      "titulo": "FLAMENGO X BRAGANTINO | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+      "status": "upcoming",
+      "confianca": 0.9,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "horário compatível (60 min de diferença)"
+      ]
+    },
+    {
+      "event_id": "401841243",
+      "jogo": "São Paulo x Internacional",
+      "fonte": "getv",
+      "video_id": "hGl4EL9HSvE",
+      "url": "https://www.youtube.com/watch?v=hGl4EL9HSvE",
+      "titulo": "SÃO PAULO X INTERNACIONAL | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+      "status": "upcoming",
+      "confianca": 0.9,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "horário compatível (60 min de diferença)"
+      ]
+    },
+    {
       "event_id": "401841242",
       "jogo": "Vitória x Cruzeiro",
       "fonte": "getv",
@@ -162,12 +222,12 @@
       "url": "https://www.youtube.com/watch?v=5tuFjljf3OA",
       "titulo": "AO VIVO: MIRASSOL X BOTAFOGO | BRASILEIRÃO 2026 | 28ª RODADA",
       "status": "upcoming",
-      "confianca": 0.95,
+      "confianca": 0.875,
       "motivos": [
         "os dois clubes aparecem no título",
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
-        "horário compatível (0 min de diferença)"
+        "horário compatível (90 min de diferença)"
       ]
     },
     {
@@ -205,6 +265,26 @@
   ],
   "rejeitados": [
     {
+      "video_id": "4Xf3nv2EkrQ",
+      "url": "https://www.youtube.com/watch?v=4Xf3nv2EkrQ",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "INDIANAPOLIS COLTS X KANSAS CITY CHIEFS | AQUECIMENTO AO VIVO | NFL | #live | sportv",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-20T20:20:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "sU9v-nU8Sr4",
+      "url": "https://www.youtube.com/watch?v=sU9v-nU8Sr4",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! FLAMENGO E PALMEIRAS BRIGAM PELO BRASILEIRO E CORINTHIANS FOCA NA LIBERTA! | Panela Sportv",
+      "status": "live",
+      "inicio_programado": "2026-09-14T17:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "LLpNUqHVam8",
       "url": "https://www.youtube.com/watch?v=LLpNUqHVam8",
       "fonte": "sbt",
@@ -219,7 +299,7 @@
       "url": "https://www.youtube.com/watch?v=PLyeBAURPag",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "LEVANTE X BARCELONA | LALIGA 26/27 | 5ª RODADA | REPRISE",
+      "titulo": "AO VIVO: FLAMENGO SE MANTÉM NA LIDERANÇA COM GOL NA RETA FINAL DE BRUNO HENRIQUE | GERAL CAZÉTV",
       "status": "live",
       "inicio_programado": "2026-09-14T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -345,16 +425,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "sU9v-nU8Sr4",
-      "url": "https://www.youtube.com/watch?v=sU9v-nU8Sr4",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO! BH DECIDE PARA O FLAMENGO, PALMEIRAS VENCE O SÃO PAULO E LIBERTADORES! | Panela Sportv",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-21T17:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "verbHGpaju4",
       "url": "https://www.youtube.com/watch?v=verbHGpaju4",
       "fonte": "getv",
@@ -362,6 +432,16 @@
       "titulo": "AO VIVO! NA PONTA DOS DEDOS: TUDO SOBRE A ESTREIA DO GP DA ESPANHA | #podcast | ge.globo",
       "status": "upcoming",
       "inicio_programado": "2026-09-15T14:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "bHDlmFV21IE",
+      "url": "https://www.youtube.com/watch?v=bHDlmFV21IE",
+      "fonte": "sbt",
+      "canal": "SBT",
+      "titulo": "Sessão +SBT Show | Programa de 12/09/2026",
+      "status": "live",
+      "inicio_programado": "2026-09-14T17:05:37-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -379,9 +459,39 @@
       "url": "https://www.youtube.com/watch?v=30wBl9ZJTRA",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: BARCELONA X RACING CLUB | LA LIGA 26/27 | 6ª RODADA",
+      "titulo": "AO VIVO: BARCELONA X RACING CLUB | LALIGA 26/27 | 6ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-09-16T15:50:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "5VTY1Pp43Ks",
+      "url": "https://www.youtube.com/watch?v=5VTY1Pp43Ks",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: BEŞIKTAŞ X OLYMPIQUE MARSEILLE | EUROPA LEAGUE 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-17T15:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "6UKjXIVHQDg",
+      "url": "https://www.youtube.com/watch?v=6UKjXIVHQDg",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: SUNDERLAND X AZ-ALKMAAR | EUROPA LEAGUE 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-16T15:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "BdTU64EwnxU",
+      "url": "https://www.youtube.com/watch?v=BdTU64EwnxU",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): CELTIC X FERENCVÁROSI | EUROPA LEAGUE 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-17T15:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -435,6 +545,26 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "hy1RIIN7q7Q",
+      "url": "https://www.youtube.com/watch?v=hy1RIIN7q7Q",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: JUVENTUS X NEC NIJMEGEN | EUROPA LEAGUE 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-17T15:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "mJRl1XVq4Fo",
+      "url": "https://www.youtube.com/watch?v=mJRl1XVq4Fo",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: REAL SOCIEDAD X BOURNEMOUTH | EUROPA LEAGUE 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-17T15:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "nX1Tz7Ptrq8",
       "url": "https://www.youtube.com/watch?v=nX1Tz7Ptrq8",
       "fonte": "cazetv",
@@ -455,13 +585,13 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "vKCK5z84a5w",
-      "url": "https://www.youtube.com/watch?v=vKCK5z84a5w",
+      "video_id": "wAce0KbmUNo",
+      "url": "https://www.youtube.com/watch?v=wAce0KbmUNo",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: FLAMENGO SE MANTÉM NA LIDERANÇA COM GOL NA RETA FINAL DE BRUNO HENRIQUE | GERAL CAZÉTV",
+      "titulo": "AO VIVO: MILAN X BENFICA | EUROPA LEAGUE 26/27 | 1ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-14T17:50:00-03:00",
+      "inicio_programado": "2026-09-16T15:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -503,5 +633,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-14T14:02:10-03:00"
+  "atualizado_em": "2026-09-14T18:31:41-03:00"
 }
