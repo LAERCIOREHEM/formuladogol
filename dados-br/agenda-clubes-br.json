@@ -3,7 +3,7 @@
   "projeto": "Fórmula do Gol",
   "tipo": "agenda_clubes_brasileirao",
   "descricao": "Agenda do Brasileirão e dos clubes da Série A 2026 na Copa do Brasil, Libertadores e Sul-Americana.",
-  "gerado_em": "2026-09-15T05:13:44-03:00",
+  "gerado_em": "2026-09-15T17:32:20-03:00",
   "periodo": {
     "inicio": "2026-09-15T00:00:00-03:00",
     "fim": "2026-10-31T23:59:59.999999-03:00",
@@ -15,11 +15,11 @@
     "probabilidades": "disponíveis apenas para partidas do Brasileirão com saída AF-Previsão publicada"
   },
   "resumo": {
-    "total_jogos": 38,
+    "total_jogos": 39,
     "por_competicao": {
       "libertadores": 4,
       "sul_americana": 3,
-      "brasileirao": 31
+      "brasileirao": 32
     }
   },
   "jogos": [
@@ -781,6 +781,47 @@
       "fonte_calendario": "CBF oficial — agenda de credenciamento",
       "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
       "data_fonte_anterior": ""
+    },
+    {
+      "event_id": "401841169",
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Campeonato Brasileiro Série A",
+      "competicao_nome_curto": "Brasileirão",
+      "espn_league": "bra.1",
+      "data_iso": "2026-10-02T20:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "pré-jogo",
+      "rodada": 21,
+      "fase": "",
+      "perna": null,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "",
+        "nome": "São Paulo",
+        "sigla": "SAO",
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/sao-paulo.svg",
+        "pais": "BRA",
+        "serie_a_2026": true
+      },
+      "visitante": {
+        "espn_id": "",
+        "nome": "Santos",
+        "sigla": "SAN",
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/12/santos.svg",
+        "pais": "BRA",
+        "serie_a_2026": true
+      },
+      "placar_mandante": null,
+      "placar_visitante": null,
+      "adiado": true,
+      "data_definir": false,
+      "possui_clube_serie_a_2026": true,
+      "probabilidades_disponiveis": true,
+      "fonte": "dados-br/calendario-completo.json (fallback canônico)",
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
+      "data_fonte_anterior": "2026-07-29T15:00"
     },
     {
       "event_id": "401841253",

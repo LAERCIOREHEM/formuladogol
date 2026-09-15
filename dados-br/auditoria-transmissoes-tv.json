@@ -1,16 +1,16 @@
 {
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
-    "jogos_na_janela": 38,
+    "jogos_na_janela": 39,
     "jogos_com_transmissao": 31,
-    "jogos_sem_transmissao_na_janela": 7,
+    "jogos_sem_transmissao_na_janela": 8,
     "jogos_sem_transmissao_14d": 0,
-    "jogos_sem_transmissao_fora_14d": 7,
+    "jogos_sem_transmissao_fora_14d": 8,
     "jogos_criticos_sem_transmissao_72h": 0,
     "registros_preservados": 20,
     "jogos_guardiao_ia": 2,
-    "jogos_estaveis_sem_reconsulta_editorial": 5,
-    "fontes_com_falha": 0
+    "jogos_estaveis_sem_reconsulta_editorial": 6,
+    "fontes_com_falha": 2
   },
   "fontes": {
     "guardiao_ia": {
@@ -18,24 +18,30 @@
       "jogos_com_canal": 2
     },
     "cbf": {
-      "ok": true,
-      "competicoes_ok": [
-        "brasileirao"
-      ],
+      "ok": false,
+      "competicoes_ok": [],
       "registros": 0,
       "erros": [
+        "Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 5568
+      "duracao_ms": 10452
+    },
+    "ge_agenda": {
+      "ok": true,
+      "jogos_com_canal": 0,
+      "duracao_ms": 5666
+    },
+    "ge_artigos": {
+      "ok": true,
+      "artigos_consultados": 2,
+      "jogos_com_canal": 0,
+      "duracao_ms": 30965
     },
     "espn": {
-      "ok": true,
-      "competicoes_consultadas": 2,
-      "eventos_na_janela": 0,
-      "scoreboard_com_canal": 0,
-      "summary_com_canal": 0,
-      "duracao_ms": 0
+      "ok": false,
+      "erro": "RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20260913-20261116&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden"
     },
     "youtube_oficial": {
       "ok": true,
@@ -45,11 +51,19 @@
   "sem_transmissao": [],
   "sem_transmissao_futura": [
     {
+      "event_id": "401841169",
+      "rodada": 21,
+      "jogo": "São Paulo x Santos",
+      "data_iso": "2026-10-02T20:00:00-03:00",
+      "faltam_horas": 410.4,
+      "nivel": "futuro"
+    },
+    {
       "event_id": "401841252",
       "rodada": 29,
       "jogo": "Remo x Grêmio",
       "data_iso": "2026-10-07T19:30:00-03:00",
-      "faltam_horas": 531.9,
+      "faltam_horas": 529.9,
       "nivel": "futuro"
     },
     {
@@ -57,7 +71,7 @@
       "rodada": 29,
       "jogo": "Vitória x Chapecoense",
       "data_iso": "2026-10-07T20:00:00-03:00",
-      "faltam_horas": 532.4,
+      "faltam_horas": 530.4,
       "nivel": "futuro"
     },
     {
@@ -65,7 +79,7 @@
       "rodada": 29,
       "jogo": "Fluminense x Coritiba",
       "data_iso": "2026-10-08T21:30:00-03:00",
-      "faltam_horas": 557.9,
+      "faltam_horas": 555.9,
       "nivel": "futuro"
     },
     {
@@ -73,7 +87,7 @@
       "rodada": 30,
       "jogo": "São Paulo x Vitória",
       "data_iso": "2026-10-10T21:00:00-03:00",
-      "faltam_horas": 605.4,
+      "faltam_horas": 603.4,
       "nivel": "futuro"
     },
     {
@@ -81,7 +95,7 @@
       "rodada": 30,
       "jogo": "Coritiba x Botafogo",
       "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 627.9,
+      "faltam_horas": 625.9,
       "nivel": "futuro"
     },
     {
@@ -89,7 +103,7 @@
       "rodada": 30,
       "jogo": "Bahia x Mirassol",
       "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 627.9,
+      "faltam_horas": 625.9,
       "nivel": "futuro"
     },
     {
@@ -97,7 +111,7 @@
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 651.9,
+      "faltam_horas": 649.9,
       "nivel": "futuro"
     }
   ],
@@ -290,9 +304,14 @@
     }
   ],
   "erros": [
+    "CBF: Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
     "CBF: Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
-    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
+    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
+    "ESPN: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20260913-20261116&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden"
   ],
-  "artigos_ge_descobertos": [],
-  "atualizado_em": "2026-09-15T15:33:57-03:00"
+  "artigos_ge_descobertos": [
+    "https://ge.globo.com/gato-mestre/noticia/2026/09/15/palpite-ge-2026-tropa-ge-leva-a-melhor-na-27a-rodada-veja-acertos-e-erros.ghtml",
+    "https://ge.globo.com/cartola/craque-da-rodada/noticia/2026/09/15/cartola-2026-rene-do-vitoria-brilha-contra-o-mirassol-e-e-o-craque-da-rodada-27.ghtml"
+  ],
+  "atualizado_em": "2026-09-15T17:33:02-03:00"
 }
