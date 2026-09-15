@@ -2808,54 +2808,121 @@
         "grade vazia"
       ],
       "resumo": "Partida confirmada: Botafogo x Grêmio, Campeonato Brasileiro Série A 2026, fase única, jogo atrasado da rodada 21, quarta-feira, 16/09/2026, às 19h30 (horário de Brasília), no Nilton Santos, no Rio de Janeiro. A consulta às fontes oficiais e editoriais disponíveis confirmou o evento, mas não trouxe confirmação atual e específica de emissora/plataforma para esta partida. Portanto, o snapshot anterior de Premiere não foi promovido a grade oficial. Não há evidência suficiente para listar canais."
+    },
+    {
+      "event_id": "401912524",
+      "jogo": "São Paulo x Boca Juniors",
+      "data_iso": "2026-09-15T21:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-09-15T20:09:04-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "SBT",
+        "Disney+ / ESPN"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cdn.conmebol.com/wp-content/uploads/2019/01/manual-broadcasting-2019-por.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2026/03/27_3_2026-Planilla-Sudamericana-Semana-15-Fase-Grupos-Fecha-1.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2026/04/11_4_2026-Planilla-Sudamericana-Semana-16-Fase-Grupos-Fecha-2.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2026/05/1_5_2026-Planilla-Sudamericana-Semana-19-Fase-Grupos-Fecha-4.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2026/05/22_5_2026-Planilla-Libertadores-Semana-22-Fase-Grupos-Fecha-6-vf.pdf",
+        "https://ge.globo.com/futebol/times/sao-paulo/noticia/2026/09/15/sao-paulo-x-boca-juniors-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sp/futebol/copa-sul-americana/jogo/15-09-2026/sao-paulo-boca-juniors.ghtml",
+        "https://gol.conmebol.com/sudamericana/en/news/sao-paulo-v-boca-juniors-second-leg-conmebol-sudamericana-quarter-finals-kick-time-teams-and",
+        "https://gol.conmebol.com/sudamericana/es/news/los-locales-pisaron-fuerte-asi-fueron-las-idas-de-los-cuartos-de-final",
+        "https://gol.conmebol.com/sudamericana/es/news/mano-mano-asi-se-definiran-los-semifinalistas-de-la-conmebol-sudamericana",
+        "https://gol.conmebol.com/sudamericana/pt-br/fixture/view/1686",
+        "https://gol.conmebol.com/sudamericana/pt-br/news/frente-frente-assim-serao-definidos-os-semifinalistas-da-conmebol-sudamericana",
+        "https://gol.conmebol.com/sudamericana/pt-br/news/os-mandantes-fizeram-valer-forca-de-casa-assim-foram-os-jogos-de-ida-das-quartas-de-final",
+        "https://gol.conmebol.com/sudamericana/pt-br/news/sao-paulo-x-boca-juniors-pela-volta-das-quartas-de-final-da-conmebol-sudamericana-horario",
+        "https://gol.conmebol.com/sudamericana/pt-br/news/vantagem-do-boca-venceu-na-la-bombonera-e-decidira-no-brasil-contra-o-sao-paulo",
+        "https://sports.sbt.com.br/noticia/sul-americana/sao-paulo-x-boca-jrs-sbt-transmite-as-quartas-da-sula",
+        "https://sports.sbt.com.br/noticia/sul-americana/sbt-transmite-sao-paulo-x-boca-juniors-pela-sul-americana"
+      ],
+      "canais_depois": [
+        "SBT",
+        "Disney+ / ESPN"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/futebol/times/sao-paulo/noticia/2026/09/15/sao-paulo-x-boca-juniors-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://sports.sbt.com.br/noticia/sul-americana/sbt-transmite-sao-paulo-x-boca-juniors-pela-sul-americana",
+        "https://gol.conmebol.com/sudamericana/pt-br/news/sao-paulo-x-boca-juniors-pela-volta-das-quartas-de-final-da-conmebol-sudamericana-horario"
+      ],
+      "youtube": [
+        {
+          "url": "https://youtu.be/-ZM__9jDLno",
+          "scope": "match",
+          "valid_for_match": true,
+          "reason": "O título informa \"AO VIVO E COM IMAGENS\" para São Paulo x Boca Juniors, e a página oficial do SBT Sports confirma transmissão alternativa do confronto no YouTube do SBT Sports; portanto, trata-se de sinal da partida, não apenas pré-jogo, pós-jogo ou watchalong."
+        }
+      ],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: São Paulo x Boca Juniors, jogo de volta das quartas de final da CONMEBOL Sul-Americana, nesta terça-feira, 15/09/2026, às 21h30 (BRT), no MorumBIS. A transmissão integral será em SBT, ESPN e Disney+; no schema, ESPN e Disney+ foram consolidados como \"Disney+ / ESPN\". O SBT também terá sinal no +SBT e transmissão alternativa integral no YouTube do SBT Sports. GE em tempo real não foi contabilizado como canal de transmissão."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841176",
-    "jogo": "Botafogo x Grêmio",
-    "data_iso": "2026-09-16T19:30:00-03:00",
-    "checkpoint": -1440,
-    "executado_em": "2026-09-15T19:33:53-03:00",
+    "event_id": "401912524",
+    "jogo": "São Paulo x Boca Juniors",
+    "data_iso": "2026-09-15T21:30:00-03:00",
+    "checkpoint": -90,
+    "executado_em": "2026-09-15T20:09:04-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "Premiere"
+      "SBT",
+      "Disney+ / ESPN"
     ],
-    "status": "nao_resolvido",
+    "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/05/17/bahia-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/02/11/sao-paulo-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/08/24/botafogo-x-athletico-pr-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/futebol/times/botafogo/noticia/2026/07/29/por-que-botafogo-x-gremio-foi-adiado-veja-como-clube-carioca-ganhou-periodo-de-descanso.ghtml",
-      "https://ge.globo.com/futebol/times/botafogo/noticia/2026/09/12/bellao-resume-atuacao-do-botafogo-apos-empate-a-gente-pecou-muito.ghtml",
-      "https://ge.globo.com/futebol/times/botafogo/noticia/2026/09/14/dois-jogos-duas-finais-por-que-novo-comando-tecnico-e-prioridade-no-botafogo-ate-a-data-fifa.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/09/07/vitoria-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2025/11/22/botafogo-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/futebol/times/botafogo/noticia/2026/09/14/e-o-matheus-martins-entenda-por-que-atacante-ainda-nao-voltou-a-jogar-pelo-botafogo.ghtml",
-      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/google/amp/rs/futebol/copa-do-brasil/noticia/2026/08/27/internacional-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/08/23/bragantino-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/04/18/cruzeiro-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/08/16/atletico-mg-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2024/09/28/botafogo-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/04/11/internacional-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/09/12/gremio-x-vasco-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/09/12/gremio-inicia-contra-o-vasco-o-primeiro-de-sete-desafios-em-casa-para-se-livrar-do-rebaixamento.ghtml",
-      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/03/16/chapecoense-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/se/futebol/copa-do-brasil/noticia/2026/05/14/confianca-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/botafogo-x-gremio/832091",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/gremio-x-vasco-da-gama-saf/832157",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/bahia-entra-no-g-4-do-brasileirao-com-triunfo-sobre-o-remo",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/botafogo-segura-palmeiras-e-ajuda-fla-a-tomar-a-lideranca-do-brasileirao",
-      "https://www.youtube.com/watch?v=3Q7Mj4Qsd4M",
-      "https://www.youtube.com/watch?v=kbyqYxcoGIM"
+      "https://cdn.conmebol.com/wp-content/uploads/2019/01/manual-broadcasting-2019-por.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2026/03/27_3_2026-Planilla-Sudamericana-Semana-15-Fase-Grupos-Fecha-1.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2026/04/11_4_2026-Planilla-Sudamericana-Semana-16-Fase-Grupos-Fecha-2.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2026/05/1_5_2026-Planilla-Sudamericana-Semana-19-Fase-Grupos-Fecha-4.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2026/05/22_5_2026-Planilla-Libertadores-Semana-22-Fase-Grupos-Fecha-6-vf.pdf",
+      "https://ge.globo.com/futebol/times/sao-paulo/noticia/2026/09/15/sao-paulo-x-boca-juniors-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sp/futebol/copa-sul-americana/jogo/15-09-2026/sao-paulo-boca-juniors.ghtml",
+      "https://gol.conmebol.com/sudamericana/en/news/sao-paulo-v-boca-juniors-second-leg-conmebol-sudamericana-quarter-finals-kick-time-teams-and",
+      "https://gol.conmebol.com/sudamericana/es/news/los-locales-pisaron-fuerte-asi-fueron-las-idas-de-los-cuartos-de-final",
+      "https://gol.conmebol.com/sudamericana/es/news/mano-mano-asi-se-definiran-los-semifinalistas-de-la-conmebol-sudamericana",
+      "https://gol.conmebol.com/sudamericana/pt-br/fixture/view/1686",
+      "https://gol.conmebol.com/sudamericana/pt-br/news/frente-frente-assim-serao-definidos-os-semifinalistas-da-conmebol-sudamericana",
+      "https://gol.conmebol.com/sudamericana/pt-br/news/os-mandantes-fizeram-valer-forca-de-casa-assim-foram-os-jogos-de-ida-das-quartas-de-final",
+      "https://gol.conmebol.com/sudamericana/pt-br/news/sao-paulo-x-boca-juniors-pela-volta-das-quartas-de-final-da-conmebol-sudamericana-horario",
+      "https://gol.conmebol.com/sudamericana/pt-br/news/vantagem-do-boca-venceu-na-la-bombonera-e-decidira-no-brasil-contra-o-sao-paulo",
+      "https://sports.sbt.com.br/noticia/sul-americana/sao-paulo-x-boca-jrs-sbt-transmite-as-quartas-da-sula",
+      "https://sports.sbt.com.br/noticia/sul-americana/sbt-transmite-sao-paulo-x-boca-juniors-pela-sul-americana"
     ],
-    "rejeicoes": [
-      "modelo não conseguiu confirmar a grade",
-      "grade vazia"
+    "canais_depois": [
+      "SBT",
+      "Disney+ / ESPN"
     ],
-    "resumo": "Partida confirmada: Botafogo x Grêmio, Campeonato Brasileiro Série A 2026, fase única, jogo atrasado da rodada 21, quarta-feira, 16/09/2026, às 19h30 (horário de Brasília), no Nilton Santos, no Rio de Janeiro. A consulta às fontes oficiais e editoriais disponíveis confirmou o evento, mas não trouxe confirmação atual e específica de emissora/plataforma para esta partida. Portanto, o snapshot anterior de Premiere não foi promovido a grade oficial. Não há evidência suficiente para listar canais."
+    "exclusivo": false,
+    "confianca": 0.99,
+    "fontes_aceitas": [
+      "https://ge.globo.com/futebol/times/sao-paulo/noticia/2026/09/15/sao-paulo-x-boca-juniors-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://sports.sbt.com.br/noticia/sul-americana/sbt-transmite-sao-paulo-x-boca-juniors-pela-sul-americana",
+      "https://gol.conmebol.com/sudamericana/pt-br/news/sao-paulo-x-boca-juniors-pela-volta-das-quartas-de-final-da-conmebol-sudamericana-horario"
+    ],
+    "youtube": [
+      {
+        "url": "https://youtu.be/-ZM__9jDLno",
+        "scope": "match",
+        "valid_for_match": true,
+        "reason": "O título informa \"AO VIVO E COM IMAGENS\" para São Paulo x Boca Juniors, e a página oficial do SBT Sports confirma transmissão alternativa do confronto no YouTube do SBT Sports; portanto, trata-se de sinal da partida, não apenas pré-jogo, pós-jogo ou watchalong."
+      }
+    ],
+    "youtube_removidos": [],
+    "overlay_alterado": true,
+    "resumo": "Confirmado para o Brasil: São Paulo x Boca Juniors, jogo de volta das quartas de final da CONMEBOL Sul-Americana, nesta terça-feira, 15/09/2026, às 21h30 (BRT), no MorumBIS. A transmissão integral será em SBT, ESPN e Disney+; no schema, ESPN e Disney+ foram consolidados como \"Disney+ / ESPN\". O SBT também terá sinal no +SBT e transmissão alternativa integral no YouTube do SBT Sports. GE em tempo real não foi contabilizado como canal de transmissão."
   },
-  "atualizado_em": "2026-09-15T19:33:53-03:00"
+  "atualizado_em": "2026-09-15T20:09:04-03:00"
 }
