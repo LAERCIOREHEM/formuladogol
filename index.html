@@ -2025,39 +2025,15 @@
     background: linear-gradient(135deg, rgba(15,27,33,.96), rgba(7,16,21,.96));
     box-shadow: var(--shadow-soft);
   }
-  .returno-details > summary {
-    position: relative;
+  .returno-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 14px;
     min-height: 68px;
-    padding: 14px 54px 14px 18px;
-    cursor: pointer;
-    list-style: none;
-    user-select: none;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(148,163,184,.14);
   }
-  .returno-details > summary::-webkit-details-marker { display: none; }
-  .returno-details > summary::after {
-    content: '+';
-    position: absolute;
-    right: 18px;
-    top: 50%;
-    width: 28px;
-    height: 28px;
-    display: grid;
-    place-items: center;
-    transform: translateY(-50%);
-    border: 1px solid rgba(163,230,53,.3);
-    border-radius: 9px;
-    color: #d9ff76;
-    background: rgba(163,230,53,.08);
-    font-size: 20px;
-    font-weight: 900;
-    line-height: 1;
-  }
-  .returno-details[open] > summary::after { content: '−'; }
-  .returno-details[open] > summary { border-bottom: 1px solid rgba(148,163,184,.14); }
   .returno-summary-copy { min-width: 0; }
   .returno-summary-copy strong {
     display: block;
@@ -2230,13 +2206,67 @@
     .tabela-time-cel span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .legenda { gap: 8px; font-size: 10px; }
     .returno-details { border-radius: 16px; }
-    .returno-details > summary { align-items: flex-start; min-height: 74px; padding: 13px 48px 13px 13px; }
-    .returno-details > summary::after { right: 12px; }
+    .returno-header { align-items: flex-start; min-height: 0; padding: 13px; }
     .returno-summary-copy strong { font-size: 13px; }
     .returno-summary-copy small { font-size: 10px; }
     .returno-summary-badge { display: none; }
     .returno-content { padding: 10px; }
-    .returno-table th, .returno-table td { padding: 8px 7px; font-size: 11px; }
+    .returno-table {
+      width: 100%;
+      min-width: 566px;
+      table-layout: fixed;
+    }
+    .returno-table th,
+    .returno-table td {
+      padding: 8px 4px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .returno-table th:first-child,
+    .returno-table td:first-child {
+      width: 40px;
+      min-width: 40px;
+      max-width: 40px;
+    }
+    .returno-table th:nth-child(2),
+    .returno-table td:nth-child(2) {
+      width: 118px;
+      min-width: 118px;
+      max-width: 118px;
+      overflow: hidden;
+    }
+    .returno-table th:nth-child(n+3),
+    .returno-table td:nth-child(n+3) {
+      width: 40px;
+      min-width: 40px;
+    }
+    .returno-position {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      font-size: 10px;
+    }
+    .returno-team-link {
+      min-width: 0;
+      overflow: hidden;
+    }
+    .returno-team-link .returno-team {
+      min-width: 0;
+      width: 100%;
+      gap: 5px;
+      padding: 3px !important;
+      overflow: hidden;
+    }
+    .returno-team img {
+      width: 20px;
+      height: 20px;
+    }
+    .returno-team > span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
     .podio { gap: 6px; }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -4851,9 +4881,9 @@ function htmlTabelaReturno() {
     ? 'Carregando resultados finalizados…'
     : `${coberturaJogosBr(jogos, disputados || jogos)} jogos disputados${rodada ? ` · até a R${rodada}` : ''}`;
 
-  let html = '<details class="returno-details">';
-  html += '<summary><span class="returno-summary-copy"><strong>TABELA DO RETURNO</strong><small>Recorte exclusivo das rodadas oficiais 20 a 38</small></span>';
-  html += `<span class="returno-summary-badge">${brEscapeHtml(resumo)}</span></summary>`;
+  let html = '<section class="returno-details">';
+  html += '<div class="returno-header"><span class="returno-summary-copy"><strong>TABELA DO RETURNO</strong><small>Recorte exclusivo das rodadas oficiais 20 a 38</small></span>';
+  html += `<span class="returno-summary-badge">${brEscapeHtml(resumo)}</span></div>`;
   html += '<div class="returno-content">';
   if (carregando) {
     html += '<p class="returno-note">Os resultados estão sendo carregados. A tabela aparecerá automaticamente.</p>';
@@ -4877,7 +4907,7 @@ function htmlTabelaReturno() {
     }
     html += '</tbody></table></div>';
   }
-  html += '</div></details>';
+  html += '</div></section>';
   return html;
 }
 
