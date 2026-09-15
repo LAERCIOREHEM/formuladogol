@@ -17,7 +17,7 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 7,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 41,
+    "candidatos_oficiais_encontrados": 44,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
@@ -83,12 +83,12 @@
       "descoberta_antecipada": true
     },
     {
-      "event_id": "401913071",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Atlético-MG x Santos",
-      "data_iso": "2026-09-16T19:00:00-03:00",
+      "event_id": "401841176",
+      "rodada": 21,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Botafogo x Grêmio",
+      "data_iso": "2026-09-16T19:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -329,13 +329,13 @@
       "motivo": "conteúdo rejeitado: narracao"
     },
     {
-      "video_id": "R0ZJ4uevOd4",
-      "url": "https://www.youtube.com/watch?v=R0ZJ4uevOd4",
+      "video_id": "sdV7BXEczkE",
+      "url": "https://www.youtube.com/watch?v=sdV7BXEczkE",
       "fonte": "sbt",
       "canal": "SBT",
       "titulo": "SBT Ao Vivo",
       "status": "live",
-      "inicio_programado": "2026-09-15T10:40:00-03:00",
+      "inicio_programado": "2026-09-15T19:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -439,6 +439,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "b1-F1G5HqcI",
+      "url": "https://www.youtube.com/watch?v=b1-F1G5HqcI",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "SELEÇÃO BRASILEIRA: ARTHUR DIAS FALA SOBRE CONVOCAÇÃO! | Panela sportv",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-15T20:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "fEI_DJ6UcVs",
       "url": "https://www.youtube.com/watch?v=fEI_DJ6UcVs",
       "fonte": "getv",
@@ -484,6 +494,16 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: BARCELONA X RACING CLUB | LALIGA 26/27 | 6ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-16T15:50:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "3Y2o08-E6w4",
+      "url": "https://www.youtube.com/watch?v=3Y2o08-E6w4",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): HAPOEL BEER SHEVA X DINAMO ZAGREB | EUROPA LEAGUE 26/27 | 1ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-09-16T15:50:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -569,6 +589,16 @@
       "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
     },
     {
+      "video_id": "J9WOSCUhin4",
+      "url": "https://www.youtube.com/watch?v=J9WOSCUhin4",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): ARARAT-ARMENIA X SPARTA PRAHA | EUROPA LEAGUE 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-16T13:35:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "KcLk5648vnU",
       "url": "https://www.youtube.com/watch?v=KcLk5648vnU",
       "fonte": "cazetv",
@@ -642,12 +672,12 @@
   "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401913071",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Atlético-MG x Santos",
-      "data_iso": "2026-09-16T19:00:00-03:00",
+      "event_id": "401841176",
+      "rodada": 21,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Botafogo x Grêmio",
+      "data_iso": "2026-09-16T19:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -661,5 +691,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-15T19:07:00-03:00"
+  "atualizado_em": "2026-09-15T19:31:37-03:00"
 }
