@@ -7,45 +7,35 @@
     "jogos_sem_transmissao_14d": 0,
     "jogos_sem_transmissao_fora_14d": 7,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 21,
-    "jogos_guardiao_ia": 1,
+    "registros_preservados": 20,
+    "jogos_guardiao_ia": 2,
     "jogos_estaveis_sem_reconsulta_editorial": 5,
-    "fontes_com_falha": 1
+    "fontes_com_falha": 0
   },
   "fontes": {
     "guardiao_ia": {
       "ok": true,
-      "jogos_com_canal": 1
+      "jogos_com_canal": 2
     },
     "cbf": {
-      "ok": false,
-      "competicoes_ok": [],
+      "ok": true,
+      "competicoes_ok": [
+        "brasileirao"
+      ],
       "registros": 0,
       "erros": [
-        "Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 10370
-    },
-    "ge_agenda": {
-      "ok": true,
-      "jogos_com_canal": 0,
-      "duracao_ms": 6143
-    },
-    "ge_artigos": {
-      "ok": true,
-      "artigos_consultados": 3,
-      "jogos_com_canal": 0,
-      "duracao_ms": 46475
+      "duracao_ms": 5568
     },
     "espn": {
       "ok": true,
       "competicoes_consultadas": 2,
-      "eventos_na_janela": 33,
+      "eventos_na_janela": 0,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 8224
+      "duracao_ms": 0
     },
     "youtube_oficial": {
       "ok": true,
@@ -59,7 +49,7 @@
       "rodada": 29,
       "jogo": "Remo x Grêmio",
       "data_iso": "2026-10-07T19:30:00-03:00",
-      "faltam_horas": 534.5,
+      "faltam_horas": 531.9,
       "nivel": "futuro"
     },
     {
@@ -67,7 +57,7 @@
       "rodada": 29,
       "jogo": "Vitória x Chapecoense",
       "data_iso": "2026-10-07T20:00:00-03:00",
-      "faltam_horas": 535.0,
+      "faltam_horas": 532.4,
       "nivel": "futuro"
     },
     {
@@ -75,7 +65,7 @@
       "rodada": 29,
       "jogo": "Fluminense x Coritiba",
       "data_iso": "2026-10-08T21:30:00-03:00",
-      "faltam_horas": 560.5,
+      "faltam_horas": 557.9,
       "nivel": "futuro"
     },
     {
@@ -83,7 +73,7 @@
       "rodada": 30,
       "jogo": "São Paulo x Vitória",
       "data_iso": "2026-10-10T21:00:00-03:00",
-      "faltam_horas": 608.0,
+      "faltam_horas": 605.4,
       "nivel": "futuro"
     },
     {
@@ -91,7 +81,7 @@
       "rodada": 30,
       "jogo": "Coritiba x Botafogo",
       "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 630.5,
+      "faltam_horas": 627.9,
       "nivel": "futuro"
     },
     {
@@ -99,7 +89,7 @@
       "rodada": 30,
       "jogo": "Bahia x Mirassol",
       "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 630.5,
+      "faltam_horas": 627.9,
       "nivel": "futuro"
     },
     {
@@ -107,7 +97,7 @@
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 654.5,
+      "faltam_horas": 651.9,
       "nivel": "futuro"
     }
   ],
@@ -117,13 +107,6 @@
       "jogo": "Vasco da Gama x Independiente Santa Fe",
       "canais": [
         "Paramount+"
-      ]
-    },
-    {
-      "event_id": "401912524",
-      "jogo": "São Paulo x Boca Juniors",
-      "canais": [
-        "Disney+ / ESPN"
       ]
     },
     {
@@ -307,14 +290,9 @@
     }
   ],
   "erros": [
-    "CBF: Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
     "CBF: Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
     "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
-  "artigos_ge_descobertos": [
-    "https://ge.globo.com/gato-mestre/noticia/2026/09/15/leo-conde-e-o-17o-tecnico-demitido-no-brasileirao-2026-veja-a-lista.ghtml",
-    "https://ge.globo.com/gato-mestre/noticia/2026/09/15/palpite-ge-2026-tropa-ge-leva-a-melhor-na-27a-rodada-veja-acertos-e-erros.ghtml",
-    "https://ge.globo.com/cartola/craque-da-rodada/noticia/2026/09/15/cartola-2026-rene-do-vitoria-brilha-contra-o-mirassol-e-e-o-craque-da-rodada-27.ghtml"
-  ],
-  "atualizado_em": "2026-09-15T13:02:10-03:00"
+  "artigos_ge_descobertos": [],
+  "atualizado_em": "2026-09-15T15:33:57-03:00"
 }
