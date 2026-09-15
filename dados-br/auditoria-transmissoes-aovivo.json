@@ -17,7 +17,7 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 7,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 40,
+    "candidatos_oficiais_encontrados": 41,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 0,
     "search_api_jogos_pulados_grade_estavel": 1,
@@ -69,18 +69,6 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401913959",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Vasco da Gama x Independiente Santa Fe",
-      "data_iso": "2026-09-15T19:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
       "event_id": "401912524",
       "rodada": 0,
       "competicao_chave": "sul_americana",
@@ -93,6 +81,18 @@
       ],
       "manual": false,
       "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401912525",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Liga de Quito x Palmeiras",
+      "data_iso": "2026-09-16T19:00:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841245",
@@ -234,6 +234,21 @@
       "fonte": "sbt_sports",
       "video_id": "-ZM__9jDLno",
       "url": "https://www.youtube.com/watch?v=-ZM__9jDLno",
+      "titulo": "SÃO PAULO X BOCA JUNIORS - AO VIVO E COM IMAGENS | SULAMERICANA 2026",
+      "status": "upcoming",
+      "confianca": 0.845,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica transmissão ao vivo",
+        "horário compatível (30 min de diferença)"
+      ]
+    },
+    {
+      "event_id": "401912524",
+      "jogo": "São Paulo x Boca Juniors",
+      "fonte": "sbt",
+      "video_id": "Vq8frR-m5a8",
+      "url": "https://www.youtube.com/watch?v=Vq8frR-m5a8",
       "titulo": "SÃO PAULO X BOCA JUNIORS - AO VIVO E COM IMAGENS | SULAMERICANA 2026",
       "status": "upcoming",
       "confianca": 0.845,
@@ -626,19 +641,19 @@
   ],
   "search_api_pulados": [
     {
-      "event_id": "401913959",
-      "jogo": "Vasco da Gama x Independiente Santa Fe",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
+      "event_id": "401912525",
+      "jogo": "Liga de Quito x Palmeiras",
+      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
     }
   ],
   "sem_transmissao": [
     {
-      "event_id": "401913959",
+      "event_id": "401912525",
       "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Vasco da Gama x Independiente Santa Fe",
-      "data_iso": "2026-09-15T19:00:00-03:00",
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Liga de Quito x Palmeiras",
+      "data_iso": "2026-09-16T19:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -652,5 +667,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-15T18:55:02-03:00"
+  "atualizado_em": "2026-09-15T19:01:55-03:00"
 }
