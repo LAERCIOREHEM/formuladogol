@@ -2598,55 +2598,101 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: Platense x Fluminense, jogo de volta das quartas de final da Libertadores, em 15/09/2026 às 19h (horário de Brasília), terá transmissão integral de ESPN e Disney+. Não há evidência consultada de transmissão da partida por Globo, GE TV, Paramount+, Prime Video, SBT, Record, SporTV, Premiere ou CazéTV."
+    },
+    {
+      "event_id": "401913959",
+      "jogo": "Vasco da Gama x Independiente Santa Fe",
+      "data_iso": "2026-09-15T19:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-09-15T17:39:18-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Paramount+"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/Ranking-de-Clubes-CONMEBOL-2026-1.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2026/03/27_3_2026-Planilla-Sudamericana-Semana-15-Fase-Grupos-Fecha-1.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2026/04/11_4_2026-Planilla-Sudamericana-Semana-16-Fase-Grupos-Fecha-2.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2026/04/Boletin-Aperturas_13_04_2026.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2026/04/Copia-de-25_4_2026-Planilla-Sudamericana-Semana-18-Fase-Grupos-Fecha-3.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2026/05/1_5_2026-Planilla-Sudamericana-Semana-19-Fase-Grupos-Fecha-4.pdf",
+        "https://ge.globo.com/futebol/copa-sul-americana/jogo/15-09-2026/vasco-independiente-santa-fe.ghtml",
+        "https://ge.globo.com/futebol/times/vasco/noticia/2026/09/14/vasco-recebe-parte-de-emprestimo-e-acerta-contas-antes-de-duelo-decisivo-na-sul-americana.ghtml",
+        "https://ge.globo.com/google/amp/futebol/copa-sul-americana/noticia/2026/08/27/quartas-de-final-da-sul-americana-2026-veja-datas-e-horarios-dos-confrontos.ghtml",
+        "https://ge.globo.com/google/amp/futebol/times/vasco/noticia/2026/09/15/vasco-x-santa-fe-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://gol.conmebol.com/libertadores/es/fixture/view/1712",
+        "https://gol.conmebol.com/sudamericana/en/news/home-sides-make-their-mark-how-quarter-final-first-legs-unfolded",
+        "https://gol.conmebol.com/sudamericana/en/news/vasco-da-gama-v-independiente-santa-fe-second-leg-conmebol-sudamericana-quarter-finals-kick",
+        "https://gol.conmebol.com/sudamericana/es",
+        "https://gol.conmebol.com/sudamericana/es/news/vasco-da-gama-vs-independiente-santa-fe-por-la-vuelta-de-los-cuartos-de-final-de-la-conmebol",
+        "https://gol.conmebol.com/sudamericana/pt-br/news/frente-frente-assim-serao-definidos-os-semifinalistas-da-conmebol-sudamericana",
+        "https://gol.conmebol.com/sudamericana/pt-br/news/os-onze-destaques-selecao-da-semana-da-conmebol-sudamericana",
+        "https://gol.conmebol.com/sudamericana/pt-br/news/vasco-da-gama-x-independiente-santa-fe-pela-volta-das-quartas-de-final-da-conmebol"
+      ],
+      "canais_depois": [
+        "Paramount+"
+      ],
+      "exclusivo": false,
+      "confianca": 0.98,
+      "fontes_aceitas": [
+        "https://ge.globo.com/google/amp/futebol/times/vasco/noticia/2026/09/15/vasco-x-santa-fe-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://gol.conmebol.com/sudamericana/pt-br/news/vasco-da-gama-x-independiente-santa-fe-pela-volta-das-quartas-de-final-da-conmebol"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Vasco da Gama x Independiente Santa Fe, jogo de volta das quartas de final da CONMEBOL Sul-Americana, em 15/09/2026 às 19h (horário de Brasília), em São Januário. A transmissão integral indicada é exclusiva na grade apurada: Paramount+. A fonte não declara formalmente exclusividade; por isso, exclusive=false."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401912517",
-    "jogo": "Platense x Fluminense",
+    "event_id": "401913959",
+    "jogo": "Vasco da Gama x Independiente Santa Fe",
     "data_iso": "2026-09-15T19:00:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-09-15T17:33:56-03:00",
+    "executado_em": "2026-09-15T17:39:18-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "Disney+ / ESPN"
+      "Paramount+"
     ],
     "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR-Fev26.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/03/27_3_2026-Planilla-Libertadores-Semana-15-Fase-Grupos-Fecha-1_vf.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/04/10_4_2026-Planilla-Libertadores-Semana-16-Fase-Grupos-Fecha-2-vf.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/04/Copia-de-25_4_2026-Planilla-Libertadores-Semana-18-Fase-Grupos-Fecha-3.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/05/22_5_2026-Planilla-Libertadores-Semana-22-Fase-Grupos-Fecha-6-vf.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/05/Copia-de-13_5_2026-Planilla-Libertadores-Semana-21-Fase-Grupos-Fecha-5.pdf",
-      "https://ge.globo.com/futebol/libertadores",
-      "https://ge.globo.com/futebol/libertadores/noticia/2025/12/10/globo-garante-a-exibicao-da-conmebol-libertadores-ate-2030.ghtml",
-      "https://ge.globo.com/futebol/libertadores/noticia/2026/06/03/oitavas-da-libertadores-2026-veja-data-hora-e-onde-assistir-aos-jogos.ghtml",
-      "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml",
-      "https://ge.globo.com/futebol/times/fluminense/noticia/2026/09/07/escalacao-do-fluminense-marcao-tem-desfalque-no-ataque-em-decisao-na-libertadores.ghtml",
-      "https://ge.globo.com/futebol/times/fluminense/noticia/2026/09/12/marcao-celebra-resposta-do-jogadores-e-sonha-alto-no-fluminense-elenco-muito-forte-e-capaz.ghtml",
-      "https://ge.globo.com/futebol/times/fluminense/noticia/2026/09/14/escalacao-do-fluminense-marcao-promove-retorno-de-titulares-contra-o-platense.ghtml",
-      "https://ge.globo.com/futebol/times/fluminense/noticia/2026/09/15/platense-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/futebol/times/fluminense/noticia/2026/09/15/torcida-do-fluminense-prepara-festa-como-visitante-para-jogo-da-libertadores-veja-detalhes.ghtml",
-      "https://ge.globo.com/google/amp/sportv/programas/ta-na-area/video/veja-como-o-fluminense-chega-para-o-duelo-decisivo-contra-o-platense-14960644.ghtml",
-      "https://ge.globo.com/rj/futebol/libertadores/jogo/15-09-2026/platense-fluminense.ghtml",
-      "https://gol.conmebol.com/libertadores/es/news/platense-vs-fluminense-por-la-vuelta-de-los-cuartos-de-final-de-la-conmebol-libertadores"
+      "https://cdn.conmebol.com/wp-content/uploads/2025/12/Ranking-de-Clubes-CONMEBOL-2026-1.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2026/03/27_3_2026-Planilla-Sudamericana-Semana-15-Fase-Grupos-Fecha-1.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2026/04/11_4_2026-Planilla-Sudamericana-Semana-16-Fase-Grupos-Fecha-2.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2026/04/Boletin-Aperturas_13_04_2026.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2026/04/Copia-de-25_4_2026-Planilla-Sudamericana-Semana-18-Fase-Grupos-Fecha-3.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2026/05/1_5_2026-Planilla-Sudamericana-Semana-19-Fase-Grupos-Fecha-4.pdf",
+      "https://ge.globo.com/futebol/copa-sul-americana/jogo/15-09-2026/vasco-independiente-santa-fe.ghtml",
+      "https://ge.globo.com/futebol/times/vasco/noticia/2026/09/14/vasco-recebe-parte-de-emprestimo-e-acerta-contas-antes-de-duelo-decisivo-na-sul-americana.ghtml",
+      "https://ge.globo.com/google/amp/futebol/copa-sul-americana/noticia/2026/08/27/quartas-de-final-da-sul-americana-2026-veja-datas-e-horarios-dos-confrontos.ghtml",
+      "https://ge.globo.com/google/amp/futebol/times/vasco/noticia/2026/09/15/vasco-x-santa-fe-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://gol.conmebol.com/libertadores/es/fixture/view/1712",
+      "https://gol.conmebol.com/sudamericana/en/news/home-sides-make-their-mark-how-quarter-final-first-legs-unfolded",
+      "https://gol.conmebol.com/sudamericana/en/news/vasco-da-gama-v-independiente-santa-fe-second-leg-conmebol-sudamericana-quarter-finals-kick",
+      "https://gol.conmebol.com/sudamericana/es",
+      "https://gol.conmebol.com/sudamericana/es/news/vasco-da-gama-vs-independiente-santa-fe-por-la-vuelta-de-los-cuartos-de-final-de-la-conmebol",
+      "https://gol.conmebol.com/sudamericana/pt-br/news/frente-frente-assim-serao-definidos-os-semifinalistas-da-conmebol-sudamericana",
+      "https://gol.conmebol.com/sudamericana/pt-br/news/os-onze-destaques-selecao-da-semana-da-conmebol-sudamericana",
+      "https://gol.conmebol.com/sudamericana/pt-br/news/vasco-da-gama-x-independiente-santa-fe-pela-volta-das-quartas-de-final-da-conmebol"
     ],
     "canais_depois": [
-      "Disney+ / ESPN"
+      "Paramount+"
     ],
     "exclusivo": false,
-    "confianca": 0.99,
+    "confianca": 0.98,
     "fontes_aceitas": [
-      "https://ge.globo.com/futebol/times/fluminense/noticia/2026/09/15/platense-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml",
-      "https://ge.globo.com/rj/futebol/libertadores/jogo/15-09-2026/platense-fluminense.ghtml"
+      "https://ge.globo.com/google/amp/futebol/times/vasco/noticia/2026/09/15/vasco-x-santa-fe-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://gol.conmebol.com/sudamericana/pt-br/news/vasco-da-gama-x-independiente-santa-fe-pela-volta-das-quartas-de-final-da-conmebol"
     ],
     "youtube": [],
     "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: Platense x Fluminense, jogo de volta das quartas de final da Libertadores, em 15/09/2026 às 19h (horário de Brasília), terá transmissão integral de ESPN e Disney+. Não há evidência consultada de transmissão da partida por Globo, GE TV, Paramount+, Prime Video, SBT, Record, SporTV, Premiere ou CazéTV."
+    "resumo": "Confirmado para o Brasil: Vasco da Gama x Independiente Santa Fe, jogo de volta das quartas de final da CONMEBOL Sul-Americana, em 15/09/2026 às 19h (horário de Brasília), em São Januário. A transmissão integral indicada é exclusiva na grade apurada: Paramount+. A fonte não declara formalmente exclusividade; por isso, exclusive=false."
   },
-  "atualizado_em": "2026-09-15T17:33:56-03:00"
+  "atualizado_em": "2026-09-15T17:39:18-03:00"
 }
