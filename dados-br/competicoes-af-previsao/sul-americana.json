@@ -9,20 +9,20 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-09-15T05:13:44-03:00",
+  "gerado_em": "2026-09-15T22:41:55-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
     "status": "em_andamento",
     "ordem": 700,
     "nome": "Quartas de final",
-    "eventos": 8,
-    "eventos_pendentes": 4
+    "eventos": 6,
+    "eventos_pendentes": 2
   },
   "resumo": {
     "eventos": 152,
-    "finalizados": 148,
-    "pendentes": 4,
+    "finalizados": 149,
+    "pendentes": 3,
     "equipes": 56,
     "equipes_serie_a_2026": 7
   },
@@ -32,7 +32,19 @@
     "janela_fim": "2027-01-13T23:59:59-03:00",
     "requisicoes": 4,
     "ultima_completa_em": "2026-09-12T05:15:07-03:00",
-    "ajustes_editoriais_aplicados": 0
+    "ajustes_editoriais_aplicados": 0,
+    "summary_partidas_iniciadas": {
+      "consultados": 2,
+      "confirmados": 2,
+      "atualizados": 2,
+      "ao_vivo": [
+        "401912524"
+      ],
+      "finalizados": [
+        "401913959"
+      ],
+      "erros": []
+    }
   },
   "equipes": [
     {
@@ -5872,14 +5884,14 @@
     {
       "event_id": "401913959",
       "data_iso": "2026-09-15T19:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Ter., Setembro 15º at 6:00 PM EDT",
-      "fase": "Quartas de final",
-      "fase_ordem": 700,
+      "estado": "post",
+      "concluido": true,
+      "status": "FT",
+      "fase": "2026 CONMEBOL Sudamericana, Quarterfinals",
+      "fase_ordem": 900,
       "semana": null,
       "perna": 2,
-      "estadio": "Estádio São Januário",
+      "estadio": "",
       "mandante": {
         "espn_id": "3454",
         "nome": "Vasco da Gama",
@@ -5888,8 +5900,8 @@
         "pais": null,
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 2
       },
       "visitante": {
         "espn_id": "5488",
@@ -5902,7 +5914,7 @@
         "vencedor": false,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Vasco da Gama",
       "penaltis": false
     },
     {
@@ -5911,11 +5923,11 @@
       "estado": "pre",
       "concluido": false,
       "status": "Ter., Setembro 15º at 8:30 PM EDT",
-      "fase": "Quartas de final",
-      "fase_ordem": 700,
+      "fase": "2026 CONMEBOL Sudamericana, Quarterfinals",
+      "fase_ordem": 900,
       "semana": null,
       "perna": 2,
-      "estadio": "Estádio Cícero Pompeu de Toledo",
+      "estadio": "",
       "mandante": {
         "espn_id": "2026",
         "nome": "São Paulo",
@@ -6016,9 +6028,9 @@
   ],
   "validacao_af": {
     "status": "pronto",
-    "fase": "Quartas de final",
-    "fase_ordem": 700,
-    "chaves": 4,
-    "equipes_ativas": 8
+    "fase": "Final",
+    "fase_ordem": 900,
+    "chaves": 1,
+    "equipes_ativas": 1
   }
 }

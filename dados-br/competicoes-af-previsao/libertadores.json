@@ -9,20 +9,20 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-09-15T05:13:36-03:00",
+  "gerado_em": "2026-09-15T22:41:47-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
     "status": "em_andamento",
     "ordem": 700,
     "nome": "Quartas de final",
-    "eventos": 8,
-    "eventos_pendentes": 4
+    "eventos": 7,
+    "eventos_pendentes": 3
   },
   "resumo": {
     "eventos": 155,
-    "finalizados": 146,
-    "pendentes": 9,
+    "finalizados": 147,
+    "pendentes": 8,
     "equipes": 49,
     "equipes_serie_a_2026": 8
   },
@@ -32,7 +32,17 @@
     "janela_fim": "2027-01-13T23:59:59-03:00",
     "requisicoes": 4,
     "ultima_completa_em": "2026-09-13T05:13:02-03:00",
-    "ajustes_editoriais_aplicados": 7
+    "ajustes_editoriais_aplicados": 1,
+    "summary_partidas_iniciadas": {
+      "consultados": 1,
+      "confirmados": 1,
+      "atualizados": 1,
+      "ao_vivo": [],
+      "finalizados": [
+        "401912517"
+      ],
+      "erros": []
+    }
   },
   "equipes": [
     {
@@ -5753,11 +5763,11 @@
     {
       "event_id": "401912517",
       "data_iso": "2026-09-15T19:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Ter., Setembro 15º at 6:00 PM EDT",
-      "fase": "Quartas de final",
-      "fase_ordem": 700,
+      "estado": "post",
+      "concluido": true,
+      "status": "FT",
+      "fase": "2026 CONMEBOL Libertadores, Quarterfinals",
+      "fase_ordem": 900,
       "semana": null,
       "perna": 2,
       "estadio": "Ciudad de Vicente López",
@@ -5769,8 +5779,8 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 2
       },
       "visitante": {
         "espn_id": "3445",
@@ -5781,9 +5791,9 @@
         "serie_a_2026": true,
         "mandante": false,
         "vencedor": false,
-        "placar": 0
+        "placar": 1
       },
-      "vencedor": null,
+      "vencedor": "Platense",
       "penaltis": false,
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
@@ -6093,9 +6103,9 @@
   ],
   "validacao_af": {
     "status": "pronto",
-    "fase": "Quartas de final",
-    "fase_ordem": 700,
-    "chaves": 4,
-    "equipes_ativas": 8
+    "fase": "Final",
+    "fase_ordem": 900,
+    "chaves": 1,
+    "equipes_ativas": 1
   }
 }
