@@ -713,6 +713,11 @@
       if (!envelope || envelope.ok !== true || !envelope.data || typeof envelope.data !== "object") {
         throw new Error("Gateway de summary retornou payload inválido");
       }
+      envelope.data.__fdgLiveMeta = {
+        statsProvider: String(envelope.statsProvider || "espn"),
+        statsCoverage: envelope.statsCoverage || null,
+        statsFallback: envelope.statsFallback || null
+      };
       return envelope.data;
     } catch (error) {
       if (isAbortError(error)) throw error;
@@ -721,10 +726,12 @@
 
     try {
       const directUrl = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/summary?event=" + encodeURIComponent(eventId) + "&_=" + Date.now();
-      return await fetchJson(directUrl, {
+      const direct = await fetchJson(directUrl, {
         timeoutMs: DIRECT_ESPN_FALLBACK_TIMEOUT_MS,
         signal: options.signal || undefined
       });
+      if (direct && typeof direct === "object") direct.__fdgLiveMeta = { statsProvider: "espn-direct" };
+      return direct;
     } catch (directError) {
       if (isAbortError(directError)) throw directError;
       const parts = [];
@@ -2452,15 +2459,30 @@
     });
   }
 
+  function statsSourceMeta(summary) {
+    const provider = String(summary && summary.__fdgLiveMeta && summary.__fdgLiveMeta.statsProvider || "espn");
+    if (provider === "espn+api-football") {
+      return {
+        badge: "ESPN + API-FOOTBALL",
+        note: "A ESPN é a fonte principal. Quando o feed ao vivo vem incompleto, métricas factuais são complementadas pela API-Football. O site não estima dados ausentes."
+      };
+    }
+    return {
+      badge: "ESPN SUMMARY",
+      note: "Mostramos somente métricas disponibilizadas pela ESPN. O site não inventa dados ausentes."
+    };
+  }
+
   function renderStats(g, summary) {
     const rows = collectStats(g, summary);
     if (!rows.length) return '<div class="live-empty">As estatísticas serão exibidas quando estiverem disponíveis para esta partida.</div>';
     const names = '<div class="live-stats-head"><div>' + esc(g.home.nome) + '</div><div>comparativo</div><div>' + esc(g.away.nome) + '</div></div>';
+    const sourceMeta = statsSourceMeta(summary);
     return '<div class="live-stats live-stats-complete">' + names + rows.map((r) => '<div class="live-stat-row">' +
       '<div class="live-stat-value"><strong>' + esc(r.home) + '</strong><div class="live-stat-mini"><span style="width:' + r.pct.toFixed(1) + '%"></span></div></div>' +
       '<div class="live-stat-label">' + esc(r.label) + (r.label === "Aproveitamento dos chutes" ? ' <small title="Chutes no gol ÷ finalizações">ⓘ</small>' : '') + '</div>' +
       '<div class="live-stat-value right"><strong>' + esc(r.away) + '</strong><div class="live-stat-mini"><span style="width:' + (100-r.pct).toFixed(1) + '%"></span></div></div>' +
-      '</div>').join("") + '<div class="live-stats-note">Mostramos somente métricas disponibilizadas pela ESPN. O site não inventa dados ausentes.</div></div>';
+      '</div>').join("") + '<div class="live-stats-note">' + esc(sourceMeta.note) + '</div></div>';
   }
 
   function renderNextList(all, selected) {
@@ -2530,7 +2552,7 @@
       '<div class="live-meta">' + venue + transmission + '</div>' +
       renderTransmission(g) +
       '<div class="live-message">' + esc(simpleMessage(g)) + '</div></div></section>' +
-      '<section class="panel live-subpanel live-stats-panel"><div class="panel-inner"><div class="live-section-head"><h2>📊 Estatísticas</h2><span class="live-section-note">ESPN summary</span></div>' + renderStats(g, summary) + '</div></section>' +
+      '<section class="panel live-subpanel live-stats-panel"><div class="panel-inner"><div class="live-section-head"><h2>📊 Estatísticas</h2><span class="live-section-note">' + esc(statsSourceMeta(summary).badge) + '</span></div>' + renderStats(g, summary) + '</div></section>' +
       renderLineups(g, summary) +
       renderNextList(all, g);
     document.dispatchEvent(new CustomEvent('fdg:live-game-changed', { detail: { eventId: app.dataset.eventId || '' } }));

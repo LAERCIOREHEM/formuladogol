@@ -572,6 +572,8 @@ export default {
         version: 7,
         revision: '6-R10R4',
         liveGatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
+        liveStatsFallbackVersion: 1,
+        apiFootballStatsReady: Boolean(env.API_FOOTBALL_KEY),
         sportsMonitorReady: Boolean(monitor?.ok),
         operationalState: operational?.state || 'unknown',
         sports: {
@@ -593,12 +595,12 @@ export default {
         const result = await resolveLiveScoreboard(url, {
           fallbackScoreboard: ({ league, now }) => monitorLiveScoreboardFallback(env, league, now)
         });
-        return json(request, result.body, result.status, { 'Cache-Control': 'no-store', 'X-FDG-Live-Gateway': '1' });
+        return json(request, result.body, result.status, { 'Cache-Control': 'no-store', 'X-FDG-Live-Gateway': LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION });
       }
       if (url.pathname === '/v1/live/summary' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'live-summary'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
-        const result = await resolveLiveSummary(url);
-        return json(request, result.body, result.status, { 'Cache-Control': 'no-store', 'X-FDG-Live-Gateway': '1' });
+        const result = await resolveLiveSummary(url, { apiFootballKey: env.API_FOOTBALL_KEY });
+        return json(request, result.body, result.status, { 'Cache-Control': 'no-store', 'X-FDG-Live-Gateway': LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION });
       }
       if (url.pathname === '/v1/config' && request.method === 'GET') return handleConfig(request, env);
       if (url.pathname === '/v1/subscribe' && request.method === 'POST') return handleSubscribe(request, env);

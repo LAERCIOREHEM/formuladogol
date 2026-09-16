@@ -851,6 +851,29 @@ function summaryTeamStatCount(data) {
   return { unique: unique.size, valued };
 }
 
+export function summaryTeamMetricCoverage(data) {
+  const byTeam = new Map();
+  for (const entry of summaryTeamStatContainers(data)) {
+    const team = teamToken(entry) || `unknown:${byTeam.size}`;
+    let row = byTeam.get(team);
+    if (!row) {
+      row = new Set();
+      byTeam.set(team, row);
+    }
+    for (const stat of entry.statistics || []) {
+      const key = statToken(stat);
+      if (key && statValuePresent(stat)) row.add(key);
+    }
+  }
+  const counts = [...byTeam.values()].map((row) => row.size);
+  return {
+    teams: counts.length,
+    minPerTeam: counts.length ? Math.min(...counts) : 0,
+    maxPerTeam: counts.length ? Math.max(...counts) : 0,
+    totalUnique: counts.reduce((sum, count) => sum + count, 0)
+  };
+}
+
 function mergeTeamStatisticsForPresentation(baseBoxscore, successful) {
   const base = baseBoxscore && typeof baseBoxscore === 'object' ? { ...baseBoxscore } : {};
   const teams = Array.isArray(baseBoxscore?.teams)
@@ -909,6 +932,15 @@ function summaryPresentationScore(data) {
   return score;
 }
 
+export function mergeExternalStatisticsIntoSummary(summary, externalData) {
+  const merged = { ...(summary || {}) };
+  merged.boxscore = mergeTeamStatisticsForPresentation(merged.boxscore, [{
+    source: 'external_statistics',
+    data: externalData || {}
+  }]);
+  return merged;
+}
+
 function mergeSummaryForPresentation(successful) {
   if (!Array.isArray(successful) || !successful.length) return {};
   const playBest = successful[0];
@@ -925,6 +957,18 @@ function mergeSummaryForPresentation(successful) {
   if (!merged.gameInfo && playData.gameInfo) merged.gameInfo = playData.gameInfo;
   if (!merged.rosters && playData.rosters) merged.rosters = playData.rosters;
   if (!merged.lineups && playData.lineups) merged.lineups = playData.lineups;
+
+  // A identidade da partida (times/data/status) é necessária também para o
+  // fallback estatístico. Se a variante mais rica for um boxscore puro, busca
+  // o header em qualquer outra superfície ESPN bem-sucedida.
+  if (!merged.header) {
+    const withHeader = successful.find((item) => item?.data?.header);
+    if (withHeader) merged.header = withHeader.data.header;
+  }
+  if (!merged.gameInfo) {
+    const withGameInfo = successful.find((item) => item?.data?.gameInfo);
+    if (withGameInfo) merged.gameInfo = withGameInfo.data.gameInfo;
+  }
 
   // Estatísticas não pertencem a uma única superfície ESPN. O CDN de "game",
   // o endpoint dedicado de boxscore e o Site API podem ficar defasados entre si

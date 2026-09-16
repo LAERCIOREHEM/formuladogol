@@ -2,18 +2,35 @@ import {
   ESPN_SOURCE_CONSTANTS,
   fetchEspnScoreboardGateway,
   fetchEspnSummaryGateway,
-  summaryGoalCount
+  mergeExternalStatisticsIntoSummary,
+  summaryGoalCount,
+  summaryTeamMetricCoverage
 } from './espn-source.js';
+import { fetchApiFootballStatsFallback } from './api-football-source.js';
 
-const LIVE_GATEWAY_VERSION = '1';
+const LIVE_GATEWAY_VERSION = '2';
 const SCOREBOARD_HOT_TTL_SECONDS = 8;
 const SCOREBOARD_FALLBACK_TTL_SECONDS = 600;
 const SUMMARY_HOT_TTL_SECONDS = 8;
 const SUMMARY_FALLBACK_TTL_SECONDS = 900;
+const STATS_FALLBACK_TTL_SECONDS = 65;
+const STATS_FIXTURE_MAP_TTL_SECONDS = 21_600;
+const STATS_FALLBACK_THRESHOLD = 10;
 const INTERNAL_CACHE_ORIGIN = 'https://push.formuladogol.com.br/__fdg_live_cache';
 const ALLOWED_LEAGUES = new Set(ESPN_SOURCE_CONSTANTS.ALLOWED_LEAGUES);
 
 function text(value) { return String(value == null ? '' : value).trim(); }
+
+function summaryState(data) {
+  const competition = data?.header?.competitions?.[0] || data?.competitions?.[0] || data?.competition || {};
+  const status = competition?.status || data?.header?.status || {};
+  const type = status?.type || status || {};
+  const state = text(type?.state).toLowerCase();
+  if (type?.completed === true || state === 'post') return 'post';
+  if (state === 'in') return 'in';
+  if (state === 'pre') return 'pre';
+  return '';
+}
 
 function parseCompactDate(value) {
   const raw = text(value);
@@ -209,12 +226,74 @@ export async function resolveLiveSummary(url, deps = {}) {
 
   try {
     const result = await fetchEspnSummaryGateway(league, eventId, fetchImpl, expectedGoals);
-    const envelope = publicEnvelope(result, now, {
+    let data = result.data || {};
+    const beforeCoverage = summaryTeamMetricCoverage(data);
+    let statsProvider = 'espn';
+    let statsFallback = null;
+    let statsFallbackError = '';
+
+    const apiFootballKey = text(deps.apiFootballKey);
+    const gameState = summaryState(data);
+    const shouldTryStatsFallback = Boolean(apiFootballKey)
+      && beforeCoverage.maxPerTeam < STATS_FALLBACK_THRESHOLD
+      && (beforeCoverage.maxPerTeam > 0 || expectedGoals > 0 || gameState === 'in' || gameState === 'post');
+
+    if (shouldTryStatsFallback) {
+      const statsKey = cacheKey('summary-stats', [league, eventId], 'api-football');
+      const mapKey = cacheKey('summary-stats-map', [league, eventId], 'api-football');
+      const cachedStats = await readCached(cache, statsKey);
+      if (cachedStats?.unavailable === true) {
+        statsFallbackError = text(cachedStats.error).slice(0, 500);
+      } else {
+        statsFallback = cachedStats?.data ? cachedStats : null;
+      }
+
+      if (!statsFallback && !statsFallbackError) {
+        const fixtureMap = await readCached(cache, mapKey);
+        try {
+          statsFallback = await fetchApiFootballStatsFallback(data, {
+            apiKey: apiFootballKey,
+            fetchImpl,
+            now,
+            fixtureId: Number(fixtureMap?.fixtureId || 0) || undefined
+          });
+          await Promise.all([
+            writeCached(cache, statsKey, statsFallback, STATS_FALLBACK_TTL_SECONDS),
+            writeCached(cache, mapKey, { fixtureId: statsFallback.fixtureId }, STATS_FIXTURE_MAP_TTL_SECONDS)
+          ]);
+        } catch (fallbackError) {
+          statsFallbackError = text(fallbackError?.message || fallbackError).slice(0, 500);
+          await writeCached(cache, statsKey, { unavailable: true, error: statsFallbackError }, STATS_FALLBACK_TTL_SECONDS);
+          statsFallback = null;
+        }
+      }
+
+      if (statsFallback?.data) {
+        const enriched = mergeExternalStatisticsIntoSummary(data, statsFallback.data);
+        const afterCoverage = summaryTeamMetricCoverage(enriched);
+        if (afterCoverage.totalUnique > beforeCoverage.totalUnique) {
+          data = enriched;
+          statsProvider = 'espn+api-football';
+        }
+      }
+    }
+
+    const mergedResult = { ...result, data };
+    const finalCoverage = summaryTeamMetricCoverage(data);
+    const envelope = publicEnvelope(mergedResult, now, {
       cacheStatus: 'miss',
       expectedGoals,
       goalCount: Number(result.goalCount || 0),
       complete: result.complete !== false,
-      attempts: result.attempts || []
+      attempts: result.attempts || [],
+      statsProvider,
+      statsCoverage: finalCoverage,
+      statsFallback: statsFallback ? {
+        source: statsFallback.source || 'api-football',
+        fixtureId: Number(statsFallback.fixtureId || 0) || null,
+        metricNames: Array.isArray(statsFallback.metricNames) ? statsFallback.metricNames : []
+      } : null,
+      statsFallbackError
     });
     await Promise.all([
       writeCached(cache, hotKey, envelope, SUMMARY_HOT_TTL_SECONDS),
@@ -243,5 +322,8 @@ export const LIVE_API_CONSTANTS = Object.freeze({
   SCOREBOARD_HOT_TTL_SECONDS,
   SCOREBOARD_FALLBACK_TTL_SECONDS,
   SUMMARY_HOT_TTL_SECONDS,
-  SUMMARY_FALLBACK_TTL_SECONDS
+  SUMMARY_FALLBACK_TTL_SECONDS,
+  STATS_FALLBACK_TTL_SECONDS,
+  STATS_FIXTURE_MAP_TTL_SECONDS,
+  STATS_FALLBACK_THRESHOLD
 });
