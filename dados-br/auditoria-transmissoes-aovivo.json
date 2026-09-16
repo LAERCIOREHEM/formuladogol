@@ -17,10 +17,10 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 42,
-    "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 0,
-    "search_api_jogos_pulados_grade_estavel": 1,
+    "candidatos_oficiais_encontrados": 41,
+    "search_api_fallback_chamadas": 4,
+    "search_api_jogos_elegiveis": 1,
+    "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 6,
     "sem_transmissao": 1,
     "erros": 0
@@ -69,12 +69,12 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841176",
-      "rodada": 21,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Botafogo x Grêmio",
-      "data_iso": "2026-09-16T19:30:00-03:00",
+      "event_id": "401912540",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Corinthians x Estudiantes de La Plata",
+      "data_iso": "2026-09-16T21:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -259,14 +259,14 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "5KDhDlchdFI",
-      "url": "https://www.youtube.com/watch?v=5KDhDlchdFI",
+      "video_id": "NiqY3agWAQM",
+      "url": "https://www.youtube.com/watch?v=NiqY3agWAQM",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: SUPER PRÉ-JOGO DE CORINTHIANS X ESTUDIANTES | QUARTAS DE FINAL | LIBERTADORES 2026 | ge tv",
+      "titulo": "AO VIVO: CORINTHIANS X ESTUDIANTES | QUARTAS DE FINAL | LIBERTADORES 2026 | ge tv",
       "status": "live",
-      "inicio_programado": "2026-09-16T17:30:00-03:00",
-      "motivo": "conteúdo rejeitado: pre jogo"
+      "inicio_programado": "2026-09-16T19:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "lHXt6D_tO8E",
@@ -326,16 +326,6 @@
       "titulo": "AO VIVO: REPÚBLICA TCHECA X CROÁCIA | UEFA NATIONS LEAGUE 2026 | FASE DE GRUPOS |  ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-09-26T15:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "NiqY3agWAQM",
-      "url": "https://www.youtube.com/watch?v=NiqY3agWAQM",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: CORINTHIANS X ESTUDIANTES | QUARTAS DE FINAL | LIBERTADORES 2026 | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-16T19:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -495,7 +485,7 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): VIKTORIA PLZEŇ X UNION SAINT-GILLOISE | EUROPA LEAGUE 26/27 | 1ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-17T15:45:00-03:00",
+      "inicio_programado": "2026-09-17T15:55:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -619,33 +609,28 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [
-    {
-      "event_id": "401841176",
-      "jogo": "Botafogo x Grêmio",
-      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
-    }
-  ],
+  "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401841176",
-      "rodada": 21,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Botafogo x Grêmio",
-      "data_iso": "2026-09-16T19:30:00-03:00",
+      "event_id": "401912540",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Corinthians x Estudiantes de La Plata",
+      "data_iso": "2026-09-16T21:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 88,
+    "unidades": 489,
     "requisicoes": {
       "channels": 4,
-      "videos": 44,
-      "playlistItems": 40
+      "videos": 45,
+      "playlistItems": 40,
+      "search": 4
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-16T19:18:49-03:00"
+  "atualizado_em": "2026-09-16T20:01:43-03:00"
 }
