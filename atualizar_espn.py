@@ -60,6 +60,10 @@ URLS_STANDINGS = [
     f"https://site.web.api.espn.com/apis/v2/sports/soccer/bra.1/standings?season={TEMPORADA}",
 ]
 URL_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard"
+SCOREBOARD_SITE_WEB_ROOT = "https://site.web.api.espn.com/apis/site/v2/sports/soccer"
+SCOREBOARD_CDN_ROOT = "https://cdn.espn.com/core"
+SCOREBOARD_LEAGUE = "bra.1"
+SCOREBOARD_SOURCE_USAGE: set[str] = set()
 URL_RESUMO_EVENTO = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary"
 ARQ_AJUSTES_CALENDARIO = Path("dados-br/ajustes-calendario.json")
 ARQ_CALENDARIO_CANONICO = Path("dados-br/calendario-completo.json")
@@ -186,6 +190,98 @@ def info_time(nome: str) -> dict[str, str]:
         "escudo": base.get("escudo", ""),
         "sigla": base.get("sigla", normalizar(canonico)[:3].upper()),
     }
+
+
+class ScoreboardUnavailableError(RuntimeError):
+    """Todas as superfícies conhecidas do scoreboard ESPN ficaram indisponíveis."""
+
+    def __init__(self, message: str, *, persistent: bool = False) -> None:
+        super().__init__(message)
+        self.persistent = bool(persistent)
+
+
+def _walk_objects(root: Any, max_depth: int = 4) -> list[Any]:
+    out: list[Any] = []
+    queue: list[tuple[Any, int]] = [(root, 0)]
+    seen: set[int] = set()
+    while queue:
+        value, depth = queue.pop(0)
+        if not isinstance(value, (dict, list)):
+            continue
+        ident = id(value)
+        if ident in seen:
+            continue
+        seen.add(ident)
+        out.append(value)
+        if depth >= max_depth:
+            continue
+        children = value.values() if isinstance(value, dict) else value[:50]
+        for child in children:
+            if isinstance(child, (dict, list)):
+                queue.append((child, depth + 1))
+    return out
+
+
+def unwrap_scoreboard_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    if isinstance(payload.get("events"), list):
+        return {"events": payload.get("events") or []}
+    preferred = [
+        payload.get("content"),
+        payload.get("scoreboard"),
+        payload.get("gamepackageJSON"),
+        (payload.get("content") or {}).get("scoreboard") if isinstance(payload.get("content"), dict) else None,
+    ]
+    for candidate in preferred:
+        if isinstance(candidate, dict) and isinstance(candidate.get("events"), list):
+            return {"events": candidate.get("events") or []}
+    for candidate in _walk_objects(payload, 4):
+        if isinstance(candidate, dict) and isinstance(candidate.get("events"), list):
+            return {"events": candidate.get("events") or []}
+    raise ValueError("payload de scoreboard sem events[]")
+
+
+def _hard_http_failure(message: str) -> bool:
+    codes = {int(x) for x in re.findall(r"(?:HTTP(?: Error)?)[ :]+(\d{3})", str(message), flags=re.I)}
+    return bool(codes) and codes.issubset({400, 401, 403, 404})
+
+
+def _scoreboard_candidates(dates: str, *, limit: int) -> list[tuple[str, str]]:
+    league = urllib.parse.quote(SCOREBOARD_LEAGUE, safe=".")
+    q_dates = urllib.parse.quote(dates, safe="-")
+    return [
+        ("espn_cdn_league", f"{SCOREBOARD_CDN_ROOT}/{league}/scoreboard?xhr=1&dates={q_dates}&limit={limit}"),
+        ("espn_cdn_soccer", f"{SCOREBOARD_CDN_ROOT}/soccer/scoreboard?xhr=1&league={league}&dates={q_dates}&limit={limit}"),
+        ("espn_site_web_api", f"{SCOREBOARD_SITE_WEB_ROOT}/{league}/scoreboard?dates={q_dates}&limit={limit}&lang=pt&region=br"),
+        ("espn_site_api", f"{URL_SCOREBOARD}?dates={q_dates}&limit={limit}&lang=pt&region=br"),
+    ]
+
+
+def fetch_scoreboard_gateway(dates: str, *, limit: int = 250) -> dict[str, Any]:
+    """Consulta superfícies ESPN independentes, sem martelar o mesmo endpoint.
+
+    Cada superfície recebe uma única tentativa. 400/403 persistentes em todas as
+    superfícies são classificados para o circuit breaker e não justificam nova
+    coleta completa 45/90 segundos depois.
+    """
+    errors: list[tuple[str, str]] = []
+    for name, url in _scoreboard_candidates(dates, limit=limit):
+        try:
+            payload = fetch_json(url, timeout=20, tentativas=1)
+            data = unwrap_scoreboard_payload(payload)
+            SCOREBOARD_SOURCE_USAGE.add(name)
+            print(f"Scoreboard gateway OK: {name} ({len(data.get('events') or [])} eventos)")
+            return data
+        except Exception as exc:  # noqa: BLE001
+            detail = f"{type(exc).__name__}: {exc}"
+            errors.append((name, detail))
+            print(f"  gateway {name} indisponível: {detail}")
+
+    persistent = bool(errors) and all(_hard_http_failure(detail) for _, detail in errors)
+    summary = " | ".join(f"{name}={detail}" for name, detail in errors)
+    raise ScoreboardUnavailableError(
+        f"scoreboard ESPN indisponível em todas as superfícies: {summary}",
+        persistent=persistent,
+    )
 
 
 def fetch_json(url: str, timeout: int = 25, tentativas: int = 3) -> dict[str, Any]:
@@ -414,12 +510,9 @@ def datas_url(inicio: datetime, fim: datetime) -> str:
 
 
 def _scoreboard_range(inicio: datetime, fim: datetime, *, tentativas: int = 2) -> list[dict[str, Any]]:
-    url = (
-        f"{URL_SCOREBOARD}?dates={datas_url(inicio, fim)}&limit=250"
-        "&lang=pt&region=br"
-    )
-    print(f"Fonte: {url}")
-    payload = fetch_json(url, timeout=25, tentativas=tentativas)
+    dates = datas_url(inicio, fim)
+    print(f"Scoreboard resiliente: {dates} (gateway ESPN multissuperfície)")
+    payload = fetch_scoreboard_gateway(dates, limit=250)
     return [item for item in (payload.get("events") or []) if isinstance(item, dict)]
 
 
@@ -531,13 +624,10 @@ def buscar_eventos_scoreboard() -> list[dict[str, Any]]:
 
     season_start = datetime(TEMPORADA, 1, 1, tzinfo=timezone.utc)
     season_end = datetime(TEMPORADA, 12, 31, 23, 59, tzinfo=timezone.utc)
-    annual_url = (
-        f"{URL_SCOREBOARD}?dates={datas_url(season_start, season_end)}"
-        "&limit=500&lang=pt&region=br"
-    )
+    annual_dates = datas_url(season_start, season_end)
     try:
-        print(f"Fonte anual prioritária: {annual_url}")
-        annual_payload = fetch_json(annual_url, timeout=30, tentativas=2)
+        print(f"Fonte anual prioritária via gateway resiliente: {annual_dates}")
+        annual_payload = fetch_scoreboard_gateway(annual_dates, limit=500)
         annual_raw = [item for item in (annual_payload.get("events") or []) if isinstance(item, dict)]
         annual = normalizar_eventos_scoreboard(annual_raw)
         usable, reason = _scoreboard_anual_util(annual, anteriores)
@@ -2387,6 +2477,9 @@ def escrever_outputs_github(
     tentativas: int,
     status: str | None = None,
     fallbacks: list[dict[str, Any]] | None = None,
+    source_state: str | None = None,
+    source_reason: str = "",
+    snapshot_preserved: bool | None = None,
 ) -> None:
     caminho = os.environ.get("GITHUB_OUTPUT")
     if not caminho:
@@ -2394,13 +2487,21 @@ def escrever_outputs_github(
     texto = " ".join(str(motivo).splitlines())
     fallbacks = fallbacks or []
     status_final = status or ("ok" if sincronizado else "preservado")
+    state_final = source_state or ("available" if sincronizado else "degraded")
+    reason_final = source_reason or ("ESPN_SCOREBOARD_OK" if sincronizado else "ESPN_SOURCE_DEGRADED")
+    preserved_final = (status_final == "preservado" and not sincronizado) if snapshot_preserved is None else bool(snapshot_preserved)
     fallbacks_json = json.dumps(fallbacks, ensure_ascii=False, separators=(",", ":"))
+    surfaces_json = json.dumps(sorted(SCOREBOARD_SOURCE_USAGE), ensure_ascii=False, separators=(",", ":"))
     with open(caminho, "a", encoding="utf-8") as output:
         output.write(f"sincronizado={str(sincronizado).lower()}\n")
         output.write(f"status={status_final}\n")
         output.write(f"tentativas={tentativas}\n")
         output.write(f"motivo={texto}\n")
         output.write(f"fallbacks={fallbacks_json}\n")
+        output.write(f"source_state={state_final}\n")
+        output.write(f"source_reason={reason_final}\n")
+        output.write(f"snapshot_preserved={str(preserved_final).lower()}\n")
+        output.write(f"source_surfaces={surfaces_json}\n")
 
 
 def erro_transitorio_de_fonte(exc: Exception) -> bool:
@@ -2701,12 +2802,37 @@ def selftest_execucao_6() -> None:
     assert merged_map["B"]["concluido"] is True and merged_map["B"]["placar_mandante"] == 2
     usable, _ = _scoreboard_anual_util([antigo, encerrado] * 10, [antigo])
     assert usable is True
-    print("Selftest Execução 6, HTTP resiliente e coleta incremental OK")
+    # Circuit breaker local: 400/403 em todas as superfícies é persistente;
+    # timeout/5xx continua elegível para uma retentativa temporizada.
+    assert _hard_http_failure("HTTP Error 400 | HTTP Error 403: Forbidden") is True
+    assert _hard_http_failure("HTTP 503") is False
+    wrapped = unwrap_scoreboard_payload({"content": {"scoreboard": {"events": [{"id": "x"}]}}})
+    assert wrapped["events"][0]["id"] == "x"
+
+    original_fetch_json = globals()["fetch_json"]
+    try:
+        def _blocked(*_args: Any, **_kwargs: Any) -> dict[str, Any]:
+            raise RuntimeError("HTTPError: HTTP Error 400 | urllib=HTTPError: HTTP Error 403: Forbidden")
+
+        globals()["fetch_json"] = _blocked
+        try:
+            fetch_scoreboard_gateway("20260916", limit=100)
+        except ScoreboardUnavailableError as exc:
+            assert exc.persistent is True
+        else:
+            raise AssertionError("gateway deveria classificar 400/403 persistente")
+    finally:
+        globals()["fetch_json"] = original_fetch_json
+
+    print("Selftest Execução 6, gateway ESPN, circuit breaker e coleta incremental OK")
 
 
 def main() -> None:
+    SCOREBOARD_SOURCE_USAGE.clear()
     anteriores, snapshot_anterior_em = carregar_snapshot_eventos_anterior()
     ultima_falha = ""
+    source_unavailable = False
+    source_reason = ""
     agenda_cbf: list[Any] = []
     try:
         agenda_cbf = buscar_agenda_cbf(resolver=para_canonico)
@@ -2896,10 +3022,18 @@ def main() -> None:
                     motivo=str(exc),
                     tentativas=tentativa,
                     status="erro",
+                    source_state="error",
+                    source_reason="COLLECTOR_FATAL_ERROR",
+                    snapshot_preserved=False,
                 )
                 sys.exit(1)
+            source_unavailable = True
+            source_reason = "ESPN_SCOREBOARD_UNAVAILABLE" if isinstance(exc, ScoreboardUnavailableError) else "ESPN_SOURCE_UNAVAILABLE"
             ultima_falha = f"fonte temporariamente indisponível: {type(exc).__name__}: {exc}"
             print(f"::warning::{ultima_falha}")
+            if isinstance(exc, ScoreboardUnavailableError) and exc.persistent:
+                print("::warning::Circuit breaker local: 400/403 persistente nas superfícies do scoreboard; não haverá coleta completa 2/3 ou 3/3.")
+                break
 
         if tentativa < MAX_TENTATIVAS_SINCRONIA:
             espera = ESPERA_SINCRONIA_SEGUNDOS * tentativa
@@ -2912,8 +3046,11 @@ def main() -> None:
         escrever_outputs_github(
             sincronizado=False,
             motivo=motivo,
-            tentativas=MAX_TENTATIVAS_SINCRONIA,
+            tentativas=tentativa,
             status="preservado",
+            source_state="unavailable" if source_unavailable else "degraded",
+            source_reason=source_reason or "ESPN_SNAPSHOT_OUT_OF_SYNC",
+            snapshot_preserved=True,
         )
         print(f"::warning::{motivo}")
         print("Coleta encerrada com segurança: último snapshot íntegro preservado.")
@@ -2923,8 +3060,11 @@ def main() -> None:
     escrever_outputs_github(
         sincronizado=False,
         motivo=motivo,
-        tentativas=MAX_TENTATIVAS_SINCRONIA,
+        tentativas=tentativa,
         status="erro",
+        source_state="unavailable" if source_unavailable else "error",
+        source_reason=source_reason or "SNAPSHOT_PRESERVATION_FAILED",
+        snapshot_preserved=False,
     )
     print(f"ERRO FATAL: {motivo}")
     sys.exit(1)

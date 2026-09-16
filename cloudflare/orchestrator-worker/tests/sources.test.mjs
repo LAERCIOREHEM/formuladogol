@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { fetchRepositoryJson, fetchSiteBundle, repositoryFallbacks } from '../src/sources.js';
+import { fetchRepositoryJson, fetchSiteBundle, probeEspn, probeEspnAvailability, repositoryFallbacks } from '../src/sources.js';
 
 function env() {
   return {
@@ -107,4 +107,64 @@ test('continental circuit-breaker state is always read from repository, never st
   assert.equal(calls.length, 1);
   assert.match(calls[0].url, /api\.github\.com/);
   assert.deepEqual(repositoryFallbacks(bundle), []);
+});
+
+
+test('Brasileirão operational status is authoritative from main, never stale Pages', async (t) => {
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url, options = {}) => {
+    calls.push(String(url));
+    assert.match(String(url), /api\.github\.com/);
+    assert.equal(options.headers.Authorization, 'Bearer test-token');
+    return jsonResponse({ status: 'preservado', fonte_estado: 'unavailable' });
+  };
+  t.after(() => { globalThis.fetch = originalFetch; });
+
+  const path = 'dados-br/status-atualizacao.json';
+  const bundle = await fetchSiteBundle(env(), [path]);
+  assert.equal(bundle[path].origin, 'github_authoritative');
+  assert.equal(bundle[path].data.fonte_estado, 'unavailable');
+  assert.equal(calls.length, 1);
+});
+
+test('ESPN resilient probe falls from blocked CDN to site web without failing the game', async (t) => {
+  const originalFetch = globalThis.fetch;
+  const event = {
+    id: '401999001', status: { type: { state: 'post', completed: true, shortDetail: 'Final' } },
+    competitions: [{ competitors: [
+      { homeAway: 'home', score: '2' }, { homeAway: 'away', score: '1' },
+    ] }],
+  };
+  const calls = [];
+  globalThis.fetch = async (url) => {
+    const href = String(url);
+    calls.push(href);
+    if (href.includes('cdn.espn.com')) return new Response('blocked', { status: 403, headers: { 'content-type': 'text/plain' } });
+    if (href.includes('site.web.api.espn.com')) return jsonResponse({ events: [event] });
+    return new Response('unexpected', { status: 500 });
+  };
+  t.after(() => { globalThis.fetch = originalFetch; });
+
+  const result = await probeEspn([{
+    eventId: '401999001', league: 'bra.1', kickoff: new Date('2026-09-16T22:00:00Z'),
+  }]);
+  assert.equal(result.errors.length, 0);
+  assert.equal(result.states.get('401999001').state, 'post');
+  assert.equal(result.states.get('401999001').source, 'espn_site_web_api');
+  assert.ok(calls.some((url) => url.includes('cdn.espn.com')));
+  assert.ok(calls.some((url) => url.includes('site.web.api.espn.com')));
+});
+
+test('cheap ESPN availability probe accepts an empty healthy scoreboard', async (t) => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    if (String(url).includes('cdn.espn.com')) return jsonResponse({ content: { events: [] } });
+    return new Response('unexpected', { status: 500 });
+  };
+  t.after(() => { globalThis.fetch = originalFetch; });
+
+  const probe = await probeEspnAvailability({ league: 'bra.1', day: '20260916' });
+  assert.equal(probe.ok, true);
+  assert.equal(probe.source, 'espn_cdn_league');
 });

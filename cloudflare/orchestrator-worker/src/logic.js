@@ -8,6 +8,7 @@ export const POLICY = Object.freeze({
     finalRetryMinutes: 15,
     dailyAfter: '05:10',
     dailyRetryMinutes: 360,
+    sourceProbeMinutes: 5,
   },
   slowEvalMinutes: 5,
   publicos: {
@@ -85,6 +86,27 @@ export function timeReached(date, hhmm) {
 export function espnDay(date) {
   const p = brParts(date);
   return `${p.year}${p.month}${p.day}`;
+}
+
+export function brasileiraoSourceGate(status = {}) {
+  const explicitState = String(status?.fonte_estado || '').trim().toLowerCase();
+  const explicitReason = String(status?.fonte_codigo || '').trim();
+  const operationalStatus = String(status?.status || '').trim().toLowerCase();
+  const message = String(status?.mensagem_admin || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const legacyUnavailable = operationalStatus === 'preservado'
+    && /(scoreboard|fonte)/.test(message)
+    && /(indispon|http(?: error)? 400|http(?: error)? 403|forbidden)/.test(message);
+  const structuredUnavailable = explicitState === 'unavailable';
+  const open = structuredUnavailable || legacyUnavailable;
+  const fingerprint = String(status?.fingerprint || [operationalStatus, explicitState, explicitReason, status?.snapshot_hash || '', message].join('|'));
+  return {
+    open,
+    state: open ? 'open' : 'closed',
+    reason: explicitReason || (legacyUnavailable ? 'ESPN_SCOREBOARD_UNAVAILABLE_LEGACY' : ''),
+    fingerprint,
+    legacy: !structuredUnavailable && legacyUnavailable,
+    snapshotPreserved: status?.snapshot_preservado === true || operationalStatus === 'preservado',
+  };
 }
 
 export function teamName(value) {

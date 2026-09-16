@@ -3,6 +3,7 @@ import { espnDay } from './logic.js';
 const DEFAULT_TIMEOUT_MS = 8000;
 const REPOSITORY_AUTHORITATIVE_PATHS = new Set([
   'dados-br/estado-editorial-continentais.json',
+  'dados-br/status-atualizacao.json',
 ]);
 
 async function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
@@ -125,6 +126,103 @@ function scoreValue(value) {
   return Number.isFinite(n) ? Math.trunc(n) : null;
 }
 
+function requestHeaders() {
+  return {
+    'Accept': 'application/json,text/plain,*/*',
+    'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache',
+    'Referer': 'https://www.espn.com/',
+    'User-Agent': 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  };
+}
+
+function walkObjects(root, maxDepth = 4) {
+  const out = [];
+  const queue = [{ value: root, depth: 0 }];
+  const seen = new Set();
+  while (queue.length) {
+    const { value, depth } = queue.shift();
+    if (!value || typeof value !== 'object' || seen.has(value)) continue;
+    seen.add(value);
+    out.push(value);
+    if (depth >= maxDepth) continue;
+    const children = Array.isArray(value) ? value.slice(0, 50) : Object.values(value);
+    for (const child of children) if (child && typeof child === 'object') queue.push({ value: child, depth: depth + 1 });
+  }
+  return out;
+}
+
+export function unwrapScoreboard(payload) {
+  if (Array.isArray(payload?.events)) return { events: payload.events };
+  const preferred = [payload?.content, payload?.scoreboard, payload?.gamepackageJSON, payload?.content?.scoreboard];
+  for (const candidate of preferred) {
+    if (Array.isArray(candidate?.events)) return { ...candidate, events: candidate.events };
+  }
+  for (const candidate of walkObjects(payload, 4)) {
+    if (Array.isArray(candidate?.events)) return { ...candidate, events: candidate.events };
+  }
+  throw new Error('payload de scoreboard sem events[]');
+}
+
+function scoreboardCandidates(league, day) {
+  const qLeague = encodeURIComponent(league).replaceAll('%2E', '.');
+  const qDay = encodeURIComponent(day);
+  return [
+    { name: 'espn_cdn_league', url: `https://cdn.espn.com/core/${qLeague}/scoreboard?xhr=1&dates=${qDay}&limit=100` },
+    { name: 'espn_cdn_soccer', url: `https://cdn.espn.com/core/soccer/scoreboard?xhr=1&league=${qLeague}&dates=${qDay}&limit=100` },
+    { name: 'espn_site_web_api', url: `https://site.web.api.espn.com/apis/site/v2/sports/soccer/${qLeague}/scoreboard?dates=${qDay}&limit=100` },
+    { name: 'espn_site_api', url: `https://site.api.espn.com/apis/site/v2/sports/soccer/${qLeague}/scoreboard?dates=${qDay}&limit=100` },
+  ];
+}
+
+async function fetchScoreboardCandidate(candidate) {
+  const sep = candidate.url.includes('?') ? '&' : '?';
+  const url = `${candidate.url}${sep}_fdg=${Date.now()}`;
+  const response = await fetchWithTimeout(url, {
+    headers: requestHeaders(),
+    cf: { cacheTtl: 0, cacheEverything: false },
+  }, 5000);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const payload = await response.json();
+  return unwrapScoreboard(payload);
+}
+
+async function fetchScoreboardGateway(league, day, wantedIds = new Set()) {
+  const attempts = [];
+  let best = null;
+  for (const candidate of scoreboardCandidates(league, day)) {
+    const started = Date.now();
+    try {
+      const data = await fetchScoreboardCandidate(candidate);
+      const ids = new Set((data?.events || []).map((event) => String(event?.id || '')).filter(Boolean));
+      const missing = [...wantedIds].filter((id) => !ids.has(id));
+      attempts.push({ source: candidate.name, ok: true, durationMs: Date.now() - started, missing });
+      if (!best || (data?.events || []).length > (best.data?.events || []).length) best = { source: candidate.name, data };
+      if (!missing.length) return { ok: true, source: candidate.name, data, attempts };
+    } catch (error) {
+      attempts.push({ source: candidate.name, ok: false, durationMs: Date.now() - started, error: `${error?.name || 'Error'}: ${error?.message || error}` });
+    }
+  }
+  if (best && !wantedIds.size) return { ok: true, ...best, attempts };
+  const missing = best ? [...wantedIds].filter((id) => !(best.data?.events || []).some((event) => String(event?.id || '') === id)) : [...wantedIds];
+  const detail = attempts.map((item) => `${item.source}:${item.ok ? (item.missing?.length ? `missing=${item.missing.join(',')}` : 'ok') : item.error}`).join(' | ');
+  const error = new Error(`${missing.length ? `event_id ausente no gateway: ${missing.join(',')} | ` : ''}${detail || 'scoreboard ESPN indisponível'}`);
+  error.attempts = attempts;
+  throw error;
+}
+
+export async function probeEspnAvailability({ league = 'bra.1', day } = {}) {
+  const targetDay = String(day || '').trim();
+  if (!targetDay) throw new Error('day obrigatório no probe ESPN');
+  try {
+    const result = await fetchScoreboardGateway(league, targetDay, new Set());
+    return { ok: true, source: result.source, attempts: result.attempts, error: '' };
+  } catch (error) {
+    return { ok: false, source: '', attempts: error?.attempts || [], error: `${error?.name || 'Error'}: ${error?.message || error}` };
+  }
+}
+
 export async function probeEspn(games) {
   const groups = new Map();
   for (const game of games) {
@@ -134,26 +232,18 @@ export async function probeEspn(games) {
   }
   const states = new Map();
   const errors = [];
+  const sources = {};
+  const attempts = [];
   await Promise.all([...groups.entries()].map(async ([key, group]) => {
     const [league, day] = key.split('|');
-    const url = `https://site.api.espn.com/apis/site/v2/sports/soccer/${encodeURIComponent(league).replaceAll('%2E', '.')}/scoreboard?dates=${day}&limit=100`;
+    const wanted = new Set(group.map((g) => g.eventId));
     try {
-      const response = await fetchWithTimeout(url, {
-        headers: {
-          'Accept': 'application/json,text/plain,*/*',
-          'Cache-Control': 'no-cache',
-          'User-Agent': 'Mozilla/5.0 (compatible; FormulaDoGol-Orchestrator/1.0)',
-        },
-        cf: { cacheTtl: 0, cacheEverything: false },
-      });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const payload = await response.json();
-      const wanted = new Set(group.map((g) => g.eventId));
-      const seen = new Set();
-      for (const event of payload?.events || []) {
+      const gateway = await fetchScoreboardGateway(league, day, wanted);
+      sources[key] = gateway.source;
+      attempts.push(...gateway.attempts.map((item) => ({ group: key, ...item })));
+      for (const event of gateway.data?.events || []) {
         const eventId = String(event?.id || '');
         if (!wanted.has(eventId)) continue;
-        seen.add(eventId);
         const statusType = event?.status?.type || {};
         let state = String(statusType?.state || '').toLowerCase();
         if (statusType?.completed === true) state = 'post';
@@ -170,13 +260,15 @@ export async function probeEspn(games) {
           homeScore,
           awayScore,
           detail: String(statusType?.shortDetail || statusType?.detail || ''),
+          source: gateway.source,
         });
       }
-      const missing = [...wanted].filter((id) => !seen.has(id));
-      if (missing.length) errors.push(`${league}/${day}: event_id ausente no scoreboard: ${missing.join(',')}`);
+      const missing = [...wanted].filter((id) => !states.has(id));
+      if (missing.length) errors.push(`${league}/${day}: event_id ausente no scoreboard resiliente: ${missing.join(',')}`);
     } catch (error) {
       errors.push(`${league}/${day}: ${error?.name || 'Error'}: ${error?.message || error}`);
     }
   }));
-  return { states, errors };
+  return { states, errors, sources, attempts };
 }
+

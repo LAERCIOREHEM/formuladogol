@@ -48,9 +48,9 @@ export default {
       return json({
         ok: true,
         service: 'formula-do-gol-orchestrator',
-        version: String(env.ORCHESTRATOR_VERSION || '1.2.0'),
+        version: String(env.ORCHESTRATOR_VERSION || '1.3.0'),
         mode: String(env.ORCHESTRATOR_MODE || 'shadow'),
-        cron: '* * * * *',
+        cron: '*/5 * * * *',
         liveBrowserUntouched: true,
         liveBrowserRefreshSeconds: 30,
         githubHeartbeatRemoved: true,
@@ -59,6 +59,9 @@ export default {
         continentalAgendaAware: true,
         continentalStateIdempotency: true,
         continentalDailyFallbackMinutes: 1440,
+        brasileiraoSourceCircuitBreaker: true,
+        brasileiraoSourceProbeMinutes: 5,
+        espnScoreboardGateway: true,
       });
     }
     if (url.pathname === '/status' || url.pathname === '/v1/status') {

@@ -89,6 +89,16 @@ def parse_fallbacks(value: str) -> list[dict[str, Any]]:
     return [dict(item) for item in parsed if isinstance(item, dict)] if isinstance(parsed, list) else []
 
 
+def parse_string_list(value: str) -> list[str]:
+    try:
+        parsed = json.loads(value or "[]")
+    except json.JSONDecodeError:
+        return []
+    if not isinstance(parsed, list):
+        return []
+    return sorted({str(item).strip() for item in parsed if str(item).strip()})
+
+
 def status_from_env(previous: dict[str, Any], *, force_error: bool = False) -> dict[str, Any]:
     current = now_brt()
     raw_status = "erro" if force_error else os.environ.get("BR_STATUS", "ok").strip().lower()
@@ -98,6 +108,14 @@ def status_from_env(previous: dict[str, Any], *, force_error: bool = False) -> d
     fallbacks = parse_fallbacks(os.environ.get("BR_FALLBACKS", "[]"))
     tentativas = int(os.environ.get("BR_TENTATIVAS", "0") or 0)
     sincronizado = os.environ.get("BR_SINCRONIZADO", "false").strip().lower() == "true"
+    source_state = os.environ.get("BR_SOURCE_STATE", "").strip().lower()
+    if source_state not in {"available", "degraded", "unavailable", "error"}:
+        source_state = "available" if sincronizado else ("unavailable" if raw_status == "preservado" else "error")
+    source_reason = os.environ.get("BR_SOURCE_REASON", "").strip() or (
+        "ESPN_SCOREBOARD_OK" if source_state == "available" else "ESPN_SOURCE_STATE_UNKNOWN"
+    )
+    snapshot_preserved = os.environ.get("BR_SNAPSHOT_PRESERVED", "false").strip().lower() == "true"
+    source_surfaces = parse_string_list(os.environ.get("BR_SOURCE_SURFACES", "[]"))
     current_snapshot_hash = snapshot_hash()
 
     # Uma verificação normal sem mudança esportiva não precisa gerar commit e
@@ -107,7 +125,7 @@ def status_from_env(previous: dict[str, Any], *, force_error: bool = False) -> d
         raw_status == "ok"
         and str(previous.get("status") or "") == "ok"
         and str(previous.get("snapshot_hash") or "") == current_snapshot_hash
-        and int(previous.get("schema_version") or 0) == 1
+        and int(previous.get("schema_version") or 0) >= 2
     ):
         return dict(previous)
 
@@ -150,7 +168,7 @@ def status_from_env(previous: dict[str, Any], *, force_error: bool = False) -> d
     workflow_name = os.environ.get("BR_WORKFLOW", "Atualizar Brasileirao (ESPN)").strip() or "Atualizar Brasileirao (ESPN)"
     site_name = os.environ.get("BR_SITE", "Fórmula do Gol").strip() or "Fórmula do Gol"
     payload: dict[str, Any] = {
-        "schema_version": 1,
+        "schema_version": 2,
         "site": site_name,
         "workflow": workflow_name,
         "status": raw_status,
@@ -161,6 +179,10 @@ def status_from_env(previous: dict[str, Any], *, force_error: bool = False) -> d
         "ultimo_snapshot_valido": last_success or previous.get("ultimo_snapshot_valido") or "",
         "snapshot_hash": current_snapshot_hash,
         "fonte_principal": "ESPN",
+        "fonte_estado": source_state,
+        "fonte_codigo": source_reason,
+        "fonte_superficies": source_surfaces,
+        "snapshot_preservado": snapshot_preserved,
         "fontes_complementares": sorted({str(item.get("fonte") or "") for item in fallbacks if item.get("fonte")}),
         "fallbacks": fallbacks,
         "tentativas": tentativas,
@@ -177,6 +199,9 @@ def status_from_env(previous: dict[str, Any], *, force_error: bool = False) -> d
         {
             "status": raw_status,
             "mensagem": admin,
+            "fonte_estado": source_state,
+            "fonte_codigo": source_reason,
+            "snapshot_preservado": snapshot_preserved,
             "fallbacks": [(x.get("event_id"), x.get("fonte"), x.get("placar")) for x in fallbacks],
         },
         ensure_ascii=False,
@@ -236,7 +261,8 @@ def email_html(payload: dict[str, Any]) -> str:
       <p><strong>{html.escape(str(payload.get('mensagem_admin') or ''))}</strong></p>
       <p>Última tentativa: {html.escape(str(payload.get('ultima_tentativa') or ''))}<br>
          Último sucesso: {html.escape(str(payload.get('ultimo_sucesso') or 'não registrado'))}<br>
-         Tentativas da fonte: {int(payload.get('tentativas') or 0)}</p>
+         Tentativas da fonte: {int(payload.get('tentativas') or 0)}<br>
+         Estado da fonte: {html.escape(str(payload.get('fonte_estado') or 'desconhecido'))} — {html.escape(str(payload.get('fonte_codigo') or ''))}</p>
       {fallbacks}
       {run_link}
       <p style="font-size:12px;color:#667085">O último snapshot íntegro é preservado quando a auditoria não fecha.</p>
@@ -326,18 +352,29 @@ def selftest() -> None:
             "BR_SINCRONIZADO": "true",
             "BR_TENTATIVAS": "1",
             "BR_FALLBACKS": "[]",
+            "BR_SOURCE_STATE": "available",
+            "BR_SOURCE_REASON": "ESPN_SCOREBOARD_OK",
+            "BR_SNAPSHOT_PRESERVED": "false",
+            "BR_SOURCE_SURFACES": '["espn_cdn_league"]',
         })
         ok = run()
         assert ok["status"] == "ok" and ok["ultimo_sucesso"] and not ok["mostrar_publico"]
+        assert ok["schema_version"] == 2 and ok["fonte_estado"] == "available"
+        assert ok["fonte_superficies"] == ["espn_cdn_league"] and ok["snapshot_preservado"] is False
         unchanged = run()
         assert unchanged == ok, "status normal sem mudança deveria ser idempotente"
         os.environ.update({
             "BR_STATUS": "preservado",
             "BR_MOTIVO": "Fonte fora de sincronia",
             "BR_SINCRONIZADO": "false",
+            "BR_SOURCE_STATE": "unavailable",
+            "BR_SOURCE_REASON": "ESPN_SCOREBOARD_UNAVAILABLE",
+            "BR_SNAPSHOT_PRESERVED": "true",
+            "BR_SOURCE_SURFACES": "[]",
         })
         preserved = run()
         assert preserved["status"] == "preservado" and preserved["mostrar_publico"]
+        assert preserved["fonte_estado"] == "unavailable" and preserved["snapshot_preservado"] is True
         assert preserved["ultimo_sucesso"] == ok["ultimo_sucesso"]
         assert should_notify(preserved)
         repeated_preserved = run()
@@ -346,6 +383,10 @@ def selftest() -> None:
             "BR_STATUS": "ok",
             "BR_MOTIVO": "Fonte normalizada",
             "BR_SINCRONIZADO": "true",
+            "BR_SOURCE_STATE": "available",
+            "BR_SOURCE_REASON": "ESPN_SCOREBOARD_OK",
+            "BR_SNAPSHOT_PRESERVED": "false",
+            "BR_SOURCE_SURFACES": '["espn_site_web_api"]',
         })
         recovered = run()
         assert recovered["status_anterior"] == "preservado" and should_notify(recovered)

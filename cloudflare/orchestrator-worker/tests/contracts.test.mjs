@@ -69,10 +69,11 @@ test('AI audit documentation and schedule agree on 08:45 BRT', async () => {
 });
 
 
-test('one-minute path fetches only the compact agenda; multi-megabyte details stay out of Worker', async () => {
+test('five-minute fast path fetches compact agenda plus authoritative source status', async () => {
   const state = await read('cloudflare/orchestrator-worker/src/orchestrator-state.js');
   const fastBlock = state.match(/const FAST_PATHS = \[([\s\S]*?)\];/)?.[1] || '';
   assert.match(fastBlock, /agenda-clubes-br\.json/);
+  assert.match(fastBlock, /status-atualizacao\.json/);
   assert.doesNotMatch(fastBlock, /resultados\.json|competicoes-af-previsao|jogos-detalhes/);
   assert.doesNotMatch(state, /dados-br\/jogos-detalhes\.json/);
   assert.match(state, /pendingPublicsFromAudit/);
@@ -82,11 +83,11 @@ test('successful ESPN scoreboard that omits a wanted event is treated as degrade
   const src = await read('cloudflare/orchestrator-worker/src/sources.js');
   assert.match(src, /event_id ausente no scoreboard/);
 });
-test('Wrangler contract uses independent SQLite Durable Object and one-minute cron', async () => {
+test('Wrangler contract uses independent SQLite Durable Object and five-minute cron', async () => {
   const wrangler = await read('cloudflare/orchestrator-worker/wrangler.template.jsonc');
   assert.match(wrangler, /formula-do-gol-orchestrator/);
   assert.match(wrangler, /orchestrator\.formuladogol\.com\.br/);
-  assert.match(wrangler, /"\* \* \* \* \*"/);
+  assert.match(wrangler, /"\*\/5 \* \* \* \*"/);
   assert.match(wrangler, /"new_sqlite_classes"/);
   assert.match(wrangler, /"OrchestratorState"/);
   assert.doesNotMatch(wrangler, /formula-do-gol-push/);
@@ -120,9 +121,11 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(state, /transmissoes_guardian/);
   const index = await read('cloudflare/orchestrator-worker/src/index.js');
   assert.match(index, /transmissionGuardian:\s*true/);
-  assert.match(index, /1\.2\.0/);
+  assert.match(index, /1\.3\.0/);
   assert.match(index, /continentalAgendaAware:\s*true/);
   assert.match(index, /continentalStateIdempotency:\s*true/);
+  assert.match(index, /brasileiraoSourceCircuitBreaker:\s*true/);
+  assert.match(index, /espnScoreboardGateway:\s*true/);
 });
 
 test('live player state never inherits match live state', async () => {
@@ -147,4 +150,31 @@ test('continental orchestrator has agenda sleep, state idempotency and circuit-b
   assert.match(state, /CONTINENTAL_GUARD_FINGERPRINT/);
   assert.match(deploy, /editorial_continental_guard_fingerprint/);
   assert.match(wrangler, /__CONTINENTAL_GUARD_FINGERPRINT__/);
+});
+
+
+test('Brasileirão source breaker blocks heavy retries and uses structured collector status', async () => {
+  const logic = await read('cloudflare/orchestrator-worker/src/logic.js');
+  const state = await read('cloudflare/orchestrator-worker/src/orchestrator-state.js');
+  const sources = await read('cloudflare/orchestrator-worker/src/sources.js');
+  const collector = await read('atualizar_espn.py');
+  const status = await read('scripts/gerenciar_status_brasileirao.py');
+  const workflow = await read('.github/workflows/atualizar-brasileirao.yml');
+  assert.match(logic, /brasileiraoSourceGate/);
+  assert.match(logic, /sourceProbeMinutes:\s*5/);
+  assert.match(state, /br:sourceBreaker/);
+  assert.match(state, /half_open/);
+  assert.match(state, /probeEspnAvailability/);
+  assert.match(state, /!candidate && brSource\.externalOpen && brSource\.recoveryEligible/);
+  assert.match(state, /uma única atualização de recuperação/);
+  assert.match(sources, /espn_cdn_league/);
+  assert.match(sources, /espn_site_web_api/);
+  assert.match(sources, /status-atualizacao\.json/);
+  assert.match(collector, /ScoreboardUnavailableError/);
+  assert.match(collector, /Circuit breaker local/);
+  assert.match(collector, /source_state=/);
+  assert.match(status, /"schema_version": 2/);
+  assert.match(status, /"fonte_estado"/);
+  assert.match(workflow, /BR_SOURCE_STATE/);
+  assert.match(workflow, /BR_SNAPSHOT_PRESERVED/);
 });

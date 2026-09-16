@@ -4,7 +4,7 @@ Controlador operacional determinístico do Fórmula do Gol.
 
 ## Princípio
 
-- Cloudflare acorda a cada minuto; o caminho rápido lê somente a agenda compacta e sonda a ESPN perto dos jogos.
+- Cloudflare acorda a cada 5 minutos; o caminho rápido lê agenda compacta + status operacional e só sonda fontes esportivas quando há motivo.
 - GitHub Actions só nasce quando existe uma ação factual elegível.
 - O modo `shadow` registra a decisão sem chamar GitHub.
 - O modo `active` usa `workflow_dispatch` via GitHub REST API.
@@ -23,7 +23,7 @@ A interface AO VIVO permanece independente: `js/br-aovivo.js`, `js/br-classifica
 
 ## Política resumida
 
-- FINAL ESPN não publicado: detectado no ciclo seguinte de 1 minuto, com idempotência por `event_id`.
+- FINAL ESPN não publicado: detectado no ciclo seguinte de 5 minutos, com idempotência por `event_id`.
 - manutenção completa: uma vez ao dia, se ainda não houve sucesso naquele dia.
 - públicos: primeira tentativa +15 min; backoff progressivo.
 - melhores momentos: primeira tentativa +20 min e backoff esparso; Brasileirão usa `event_id` direcionado.
@@ -31,6 +31,7 @@ A interface AO VIVO permanece independente: `js/br-aovivo.js`, `js/br-classifica
 - TV: 6 h se lacuna <72 h; 24 h em até 14 dias; 72 h em 15–30 dias; 168 h se o mês estiver completo.
 - editoriais: fechamento factual da rodada/fase, sem decisão por horário arbitrário.
 - continental: agenda orienta `nextCheckAt`; a mesma assinatura factual só pode ser despachada uma vez; agenda incompleta cai para uma única verificação diária; o circuit breaker é respeitado antes do dispatch.
+- Brasileirão/ESPN: `status-atualizacao.json` da `main` abre o circuit breaker quando o scoreboard fica indisponível; o Worker continua acordando, faz apenas probe multissuperfície (CDN / Site Web / Site API) e só libera uma tentativa pesada em `HALF_OPEN`.
 
 ## Deploy
 
@@ -39,18 +40,19 @@ Primeiro publique em `shadow`; só depois publique em `active`.
 
 ## Custo operacional do ciclo
 
-O tick de 1 minuto não baixa `jogos-detalhes.json` nem executa processamento pesado.
-A cada minuto ele lê apenas `agenda-clubes-br.json` e, somente quando há jogo na janela, consulta o scoreboard ESPN.
-A avaliação de tarefas lentas roda no máximo a cada 5 minutos e usa artefatos públicos menores. O módulo continental, porém, não transforma essas avaliações em polling de workflow: ele dorme até a janela esportiva calculada pela agenda ou até detectar mudança factual na própria agenda.
+O tick de 5 minutos não baixa `jogos-detalhes.json` nem executa processamento pesado.
+A cada ciclo ele lê `agenda-clubes-br.json` e o estado operacional do Brasileirão. Se a última coleta preservou snapshot por indisponibilidade da ESPN, nenhum GitHub Action pesado é criado: somente um probe barato tenta CDN ESPN, Site Web API e Site API.
+Quando o probe volta saudável, o breaker passa de `OPEN` para `HALF_OPEN` e permite uma única tentativa de recuperação. Só uma publicação sincronizada fecha o estado em `CLOSED`; uma nova falha volta a `OPEN`.
+A avaliação das demais tarefas continua no mesmo ciclo de 5 minutos. O módulo continental não transforma essas avaliações em polling de workflow: ele dorme até a janela esportiva calculada pela agenda ou até detectar mudança factual na própria agenda.
 
 ## Rollback imediato
 
 Se houver qualquer dúvida após a ativação, execute novamente **Deploy Orchestrator Worker** escolhendo `shadow`.
 O Worker continua observando, mas para de criar `workflow_dispatch` no GitHub.
 
-## Fontes do repositório (v1.2.0)
+## Fontes do repositório (v1.3.0)
 
-O Worker tenta cada JSON primeiro em `SITE_BASE`. Se o artefato não estiver publicado no Pages ou a fonte pública estiver temporariamente indisponível, ele faz fallback autenticado para o mesmo caminho no branch configurado do GitHub via Contents API. Isso evita publicar no site arquivos puramente operacionais como auditorias e configurações.
+O Worker tenta cada JSON primeiro em `SITE_BASE`. Se o artefato não estiver publicado no Pages ou a fonte pública estiver temporariamente indisponível, ele faz fallback autenticado para o mesmo caminho no branch configurado do GitHub via Contents API. Locks e estados operacionais críticos (`estado-editorial-continentais.json` e `status-atualizacao.json`) são lidos diretamente da `main`, evitando decisões com uma cópia atrasada do Pages.
 
 O Fine-grained PAT `FDG_ORCHESTRATOR_GITHUB_TOKEN` precisa de:
 

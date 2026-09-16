@@ -2,6 +2,7 @@ import {
   POLICY,
   actionKey,
   brDateKey,
+  brasileiraoSourceGate,
   continentalAgendaSignature,
   continentalDecision,
   continentalEligibility,
@@ -22,18 +23,20 @@ import {
   publicRetryInterval,
   relevantSportsGames,
   resultFinalTime,
+  espnDay,
   timeReached,
   tvCoverage,
   tvIntervalHours,
 } from './logic.js';
 import { activeWriter, dispatchSpec, dispatchWorkflow } from './github.js';
-import { fetchSiteBundle, probeEspn, repositoryFallbacks } from './sources.js';
+import { fetchSiteBundle, probeEspn, probeEspnAvailability, repositoryFallbacks } from './sources.js';
 
-// O caminho rápido roda a cada minuto e precisa ser extremamente barato:
-// a agenda já contém event_id, competição, horário e o estado local concluído.
-// Os snapshots pesados ficam para a avaliação lenta (5 min).
+// O Worker acorda a cada 5 minutos. O caminho rápido continua compacto:
+// agenda + status operacional autoritativo. O status permite interromper
+// imediatamente novos dispatches pesados quando a ESPN preservou snapshot.
 const FAST_PATHS = [
   'dados-br/agenda-clubes-br.json',
+  'dados-br/status-atualizacao.json',
 ];
 
 const SLOW_PATHS = [
@@ -136,7 +139,7 @@ export class OrchestratorState {
     return {
       ok: true,
       engine: 'fdg-cloudflare-orchestrator',
-      version: String(this.env.ORCHESTRATOR_VERSION || '1.2.0'),
+      version: String(this.env.ORCHESTRATOR_VERSION || '1.3.0'),
       mode: String(this.env.ORCHESTRATOR_MODE || 'shadow'),
       ...status,
       recentDecisions: history.slice(-10).reverse(),
@@ -201,6 +204,53 @@ export class OrchestratorState {
     return { result: 'dispatched', reason: `${spec.workflow} solicitado ao GitHub`, candidate, workflow: spec.workflow };
   }
 
+  async brasileiraoSourceRuntime(statusUpdate, now) {
+    const external = brasileiraoSourceGate(statusUpdate);
+    const key = 'br:sourceBreaker';
+    const stored = (await this.state.storage.get(key)) || {};
+
+    if (!external.open) {
+      const closed = {
+        state: 'closed', externalOpen: false, reason: '', fingerprint: external.fingerprint,
+        lastProbeAt: stored.lastProbeAt || '', lastProbeOk: true, halfOpenDispatched: false,
+      };
+      await this.state.storage.put(key, closed);
+      return { ...closed, blocked: false, recoveryEligible: false, legacy: external.legacy };
+    }
+
+    let runtime = stored?.fingerprint === external.fingerprint
+      ? { ...stored }
+      : { state: 'open', halfOpenDispatched: false, lastProbeAt: '', lastProbeOk: false };
+    runtime.externalOpen = true;
+    runtime.reason = external.reason;
+    runtime.fingerprint = external.fingerprint;
+    runtime.legacy = external.legacy;
+
+    const lastProbe = parseDate(runtime.lastProbeAt);
+    const due = !lastProbe || minutesBetween(lastProbe, now) >= POLICY.sports.sourceProbeMinutes;
+    if (due) {
+      const probe = await probeEspnAvailability({ league: 'bra.1', day: espnDay(now) });
+      runtime.lastProbeAt = now.toISOString();
+      runtime.lastProbeOk = probe.ok;
+      runtime.lastProbeSource = probe.source || '';
+      runtime.lastProbeError = probe.error || '';
+      if (probe.ok) {
+        if (!(runtime.state === 'half_open' && runtime.halfOpenDispatched === true)) {
+          runtime.state = 'half_open';
+          runtime.halfOpenDispatched = false;
+        }
+      } else {
+        runtime.state = 'open';
+        runtime.halfOpenDispatched = false;
+      }
+    }
+
+    const blocked = runtime.state === 'open' || (runtime.state === 'half_open' && runtime.halfOpenDispatched === true);
+    const recoveryEligible = runtime.state === 'half_open' && runtime.halfOpenDispatched !== true;
+    await this.state.storage.put(key, runtime);
+    return { ...runtime, blocked, recoveryEligible };
+  }
+
   async tick() {
     if (this.busy) return { ok: true, skipped: 'busy' };
     this.busy = true;
@@ -217,21 +267,26 @@ export class OrchestratorState {
       const fastBundle = await fetchSiteBundle(this.env, FAST_PATHS);
       errors.push(...bundleErrors(fastBundle));
       const agendaPayload = data(fastBundle, 'dados-br/agenda-clubes-br.json', { jogos: [] });
+      const statusUpdateFast = data(fastBundle, 'dados-br/status-atualizacao.json', {});
       const games = normalizeAgenda(agendaPayload);
       const relevant = relevantSportsGames(games, now);
       relevantCount = relevant.length;
-      const espn = relevant.length ? await probeEspn(relevant) : { states: new Map(), errors: [] };
+      const brSource = await this.brasileiraoSourceRuntime(statusUpdateFast, now);
+      const probeGames = relevant.filter((game) => !(game.league === 'bra.1' && brSource.blocked));
+      const espn = probeGames.length ? await probeEspn(probeGames) : { states: new Map(), errors: [], sources: {} };
       errors.push(...espn.errors);
 
       for (const game of relevant) {
         // Fail closed: só existe candidato quando a agenda pública foi lida e
         // ainda marca o jogo como não concluído.
         if (!bundleReady(fastBundle, ['dados-br/agenda-clubes-br.json'])) continue;
+        if (game.league === 'bra.1' && brSource.blocked) continue;
         if (espn.states.get(game.eventId)?.state !== 'post' || game.concluded) continue;
         candidate = {
           action: 'atualizar_brasileirao', eventId: game.eventId,
           reason: `ESPN marcou FINAL ainda não incorporado: ${gameLabel(game)}.`,
           retryMinutes: POLICY.sports.finalRetryMinutes,
+          brSourceSensitive: game.league === 'bra.1',
         };
         break;
       }
@@ -239,6 +294,7 @@ export class OrchestratorState {
       if (!candidate && espn.errors.length) {
         for (const game of relevant) {
           if (!bundleReady(fastBundle, ['dados-br/agenda-clubes-br.json'])) continue;
+          if (game.league === 'bra.1' && brSource.blocked) continue;
           if (game.concluded || espn.states.has(game.eventId)) continue;
           const elapsed = (now.getTime() - game.kickoff.getTime()) / 60000;
           const cupLike = /copa|libert|sul/i.test(game.competition);
@@ -248,6 +304,7 @@ export class OrchestratorState {
             action: 'atualizar_brasileirao', eventId: game.eventId,
             reason: `Contingência pós-jogo: ESPN indisponível e ${gameLabel(game)} ultrapassou ${fallback} min sem FINAL publicado.`,
             retryMinutes: POLICY.sports.finalRetryMinutes,
+            brSourceSensitive: game.league === 'bra.1',
           };
           break;
         }
@@ -259,7 +316,7 @@ export class OrchestratorState {
           slowEvaluated = true;
           const slowBundle = await fetchSiteBundle(this.env, SLOW_PATHS);
           errors.push(...bundleErrors(slowBundle));
-          const slow = await this.slowDecision({ now, games, bundle: slowBundle, fastBundle });
+          const slow = await this.slowDecision({ now, games, bundle: slowBundle, fastBundle, brSource });
           hints = slow?.hints || (await this.state.storage.get('meta:lastHints')) || {};
           candidate = slow?.action && slow.action !== 'none' ? slow : null;
           if (candidate?.hints) delete candidate.hints;
@@ -270,7 +327,51 @@ export class OrchestratorState {
         }
       }
 
-      if (candidate) dispatchResult = await this.dispatchCandidate(candidate, now);
+      // OPEN -> HALF_OPEN precisa de uma única execução pesada mesmo que a
+      // janela esportiva que causou a falha já tenha saído do fast path. O
+      // próprio status OPEN comprova que uma atualização anterior ficou
+      // incompleta; o probe saudável autoriza exatamente uma recuperação.
+      if (!candidate && brSource.externalOpen && brSource.recoveryEligible) {
+        candidate = {
+          action: 'atualizar_brasileirao',
+          reason: 'Probe resiliente da ESPN voltou saudável; fechar circuit breaker com uma única atualização de recuperação.',
+          retryMinutes: POLICY.sports.finalRetryMinutes,
+          brSourceSensitive: true,
+        };
+      }
+
+      if (candidate?.action === 'atualizar_brasileirao' && candidate.brSourceSensitive !== false && brSource.externalOpen) {
+        if (brSource.blocked) {
+          hints.brasileiraoSourceBreaker = {
+            state: brSource.state, reason: brSource.reason, lastProbeAt: brSource.lastProbeAt || '',
+            lastProbeOk: brSource.lastProbeOk === true, lastProbeSource: brSource.lastProbeSource || '',
+            action: 'blocked',
+          };
+          candidate = null;
+          dispatchResult = { result: 'source_breaker_open', reason: 'ESPN do Brasileirão indisponível; GitHub Action pesada bloqueada até probe saudável.' };
+        } else if (brSource.recoveryEligible) {
+          candidate.sourceRecovery = true;
+          candidate.reason = `HALF_OPEN ESPN: probe resiliente voltou saudável; tentativa única de recuperação. ${candidate.reason}`;
+        }
+      }
+
+      if (candidate) {
+        dispatchResult = await this.dispatchCandidate(candidate, now);
+        if (candidate.sourceRecovery && dispatchResult.result === 'dispatched') {
+          const updatedBreaker = { ...brSource, state: 'half_open', halfOpenDispatched: true, lastHeavyAttemptAt: now.toISOString() };
+          await this.state.storage.put('br:sourceBreaker', updatedBreaker);
+          brSource.state = 'half_open';
+          brSource.halfOpenDispatched = true;
+          brSource.blocked = true;
+          brSource.recoveryEligible = false;
+        }
+      }
+
+      hints.brasileiraoSourceBreaker = hints.brasileiraoSourceBreaker || {
+        state: brSource.state, externalOpen: brSource.externalOpen === true, reason: brSource.reason || '',
+        lastProbeAt: brSource.lastProbeAt || '', lastProbeOk: brSource.lastProbeOk === true,
+        lastProbeSource: brSource.lastProbeSource || '', halfOpenDispatched: brSource.halfOpenDispatched === true,
+      };
 
       const status = {
         lastTickAt: now.toISOString(),
@@ -286,6 +387,7 @@ export class OrchestratorState {
         } : null,
         result: dispatchResult.result,
         resultReason: dispatchResult.reason,
+        brasileiraoSource: hints.brasileiraoSourceBreaker,
         errors: errors.slice(0, 12),
         hints,
       };
@@ -309,7 +411,7 @@ export class OrchestratorState {
     }
   }
 
-  async slowDecision({ now, games, bundle, fastBundle }) {
+  async slowDecision({ now, games, bundle, fastBundle, brSource = {} }) {
     const results = data(bundle, 'resultados.json', { resultados: [] });
     const cup = data(bundle, 'dados-br/competicoes-af-previsao/copa-do-brasil.json', { eventos: [] });
     const lib = data(bundle, 'dados-br/competicoes-af-previsao/libertadores.json', { eventos: [] });
@@ -343,13 +445,14 @@ export class OrchestratorState {
     // 1) Manutenção diária: apenas se o snapshot publicado ainda não registra sucesso hoje.
     const lastMainSuccess = parseDate(statusUpdate?.ultimo_sucesso || statusUpdate?.atualizado_em);
     const today = brDateKey(now);
-    if (ready('dados-br/status-atualizacao.json') && timeReached(now, POLICY.sports.dailyAfter) && (!lastMainSuccess || brDateKey(lastMainSuccess) !== today)) {
+    if (ready('dados-br/status-atualizacao.json') && !brSource.blocked && timeReached(now, POLICY.sports.dailyAfter) && (!lastMainSuccess || brDateKey(lastMainSuccess) !== today)) {
       const key = `daily-main:${today}`;
       const last = await this.storageDate(key);
       if (!last || minutesBetween(last, now) >= POLICY.sports.dailyRetryMinutes) {
         return {
           action: 'atualizar_brasileirao', reason: 'Manutenção diária: ainda não há atualização completa bem-sucedida hoje.',
           retryMinutes: POLICY.sports.dailyRetryMinutes,
+          brSourceSensitive: true,
           stateUpdates: { [key]: now.toISOString() }, hints,
         };
       }

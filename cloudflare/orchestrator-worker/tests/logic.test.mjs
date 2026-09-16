@@ -4,6 +4,7 @@ import {
   POLICY,
   actionKey,
   brDateKey,
+  brasileiraoSourceGate,
   continentalAgendaSignature,
   continentalBaselineReady,
   continentalDecision,
@@ -33,6 +34,27 @@ test('timezone BRT and daily gate are deterministic', () => {
   assert.equal(brDateKey(d('2026-09-03T14:30:00Z')), '2026-09-03');
   assert.equal(timeReached(d('2026-09-03T08:09:00Z'), '05:10'), false); // 05:09 BRT
   assert.equal(timeReached(d('2026-09-03T08:10:00Z'), '05:10'), true);
+});
+
+
+test('Brasileirão source gate recognizes structured and legacy preserved outages', () => {
+  const structured = brasileiraoSourceGate({
+    status: 'preservado', fonte_estado: 'unavailable', fonte_codigo: 'ESPN_SCOREBOARD_UNAVAILABLE',
+    fingerprint: 'fp-1', snapshot_preservado: true,
+  });
+  assert.equal(structured.open, true);
+  assert.equal(structured.reason, 'ESPN_SCOREBOARD_UNAVAILABLE');
+  assert.equal(structured.legacy, false);
+
+  const legacy = brasileiraoSourceGate({
+    status: 'preservado', fingerprint: 'fp-old',
+    mensagem_admin: 'fonte temporariamente indisponível: scoreboard HTTP Error 400 / HTTP Error 403 Forbidden',
+  });
+  assert.equal(legacy.open, true);
+  assert.equal(legacy.legacy, true);
+  assert.equal(legacy.reason, 'ESPN_SCOREBOARD_UNAVAILABLE_LEGACY');
+
+  assert.equal(brasileiraoSourceGate({ status: 'ok', fonte_estado: 'available' }).open, false);
 });
 
 test('agenda normalization and sports probe window', () => {
@@ -242,7 +264,7 @@ test('state idempotency key changes only when continental factual signature chan
   assert.notEqual(a, changed);
 });
 
-test('agenda concluded state is enough for the one-minute FINAL gate', () => {
+test('agenda concluded state is enough for the five-minute FINAL gate', () => {
   const games = normalizeAgenda({ jogos: [{
     event_id: '401', espn_league: 'bra.copa_do_brazil', competicao_chave: 'copa_do_brasil',
     data_iso: '2026-09-03T20:00:00-03:00', estado: 'post', concluido: true,
