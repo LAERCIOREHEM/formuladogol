@@ -164,4 +164,78 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
   assert.equal(result.body.complete, true);
 }
 
+// Estatísticas: o gateway deve fundir a cobertura das várias superfícies ESPN.
+// Um payload com rosters não pode vencer e apagar um boxscore mais rico; métricas
+// adicionais presentes apenas no endpoint dedicado/header também precisam entrar.
+{
+  const cache = new MemoryCache();
+  const team = (id, name) => ({ id, displayName: name });
+  const stat = (name, value) => ({ name, displayValue: String(value) });
+  const sparse = [
+    stat('possessionPct', '56.9%'), stat('totalShots', 1), stat('shotsOnTarget', 1),
+    stat('foulsCommitted', 2), stat('wonCorners', 1), stat('saves', 0)
+  ];
+  const sparseAway = [
+    stat('possessionPct', '43.1%'), stat('totalShots', 1), stat('shotsOnTarget', 0),
+    stat('foulsCommitted', 5), stat('wonCorners', 0), stat('saves', 1)
+  ];
+  const boxExtraHome = [stat('yellowCards', 1), stat('redCards', 0), stat('offsides', 2), stat('totalPasses', 88)];
+  const boxExtraAway = [stat('yellowCards', 0), stat('redCards', 0), stat('offsides', 1), stat('totalPasses', 73)];
+
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('/core/conmebol.sudamericana/game')) {
+      return Response.json({ gamepackageJSON: {
+        plays: [{ id: 'p1', text: 'Kickoff' }],
+        rosters: [{ team: team('1', 'São Paulo'), roster: [] }, { team: team('2', 'Boca Juniors'), roster: [] }],
+        boxscore: { teams: [
+          { team: team('1', 'São Paulo'), statistics: sparse },
+          { team: team('2', 'Boca Juniors'), statistics: sparseAway }
+        ] }
+      } });
+    }
+    if (href.includes('/core/conmebol.sudamericana/boxscore')) {
+      return Response.json({ gamepackageJSON: { boxscore: { teams: [
+        { team: team('1', 'São Paulo'), statistics: [...sparse, ...boxExtraHome] },
+        { team: team('2', 'Boca Juniors'), statistics: [...sparseAway, ...boxExtraAway] }
+      ] } } });
+    }
+    if (href.includes('/apis/site/v3/')) {
+      return Response.json({ header: { competitions: [{ competitors: [
+        { team: team('1', 'São Paulo'), statistics: [stat('passCompletionPct', '81.8%'), stat('clearances', 3), stat('cornerKicks', 99)] },
+        { team: team('2', 'Boca Juniors'), statistics: [stat('passCompletionPct', '78.1%'), stat('clearances', 5), stat('cornerKicks', 99)] }
+      ] }] } });
+    }
+    if (href.includes('site.api.espn.com')) {
+      return Response.json({
+        header: { id: '401999003' },
+        boxscore: { teams: [
+          { team: team('1', 'São Paulo'), statistics: sparse },
+          { team: team('2', 'Boca Juniors'), statistics: sparseAway }
+        ] }
+      });
+    }
+    if (href.includes('/playbyplay') || href.includes('/core/soccer/boxscore') || href.includes('/core/soccer/game') || href.includes('sports.core.api.espn.com')) {
+      return new Response('offline', { status: 503, headers: { 'content-type': 'text/plain' } });
+    }
+    throw new Error(`URL inesperada ${href}`);
+  };
+
+  const url = new URL('https://x/v1/live/summary?league=conmebol.sudamericana&event=401999003&expectedGoals=0&fresh=1');
+  const result = await resolveLiveSummary(url, { cache, fetchImpl: fakeFetch, now: () => 5_000_000 });
+  assert.equal(result.status, 200);
+  const teams = result.body.data.boxscore.teams;
+  assert.equal(teams.length, 2);
+  const homeStats = new Map(teams.find((row) => row.team.id === '1').statistics.map((row) => [row.name, row.displayValue]));
+  const awayStats = new Map(teams.find((row) => row.team.id === '2').statistics.map((row) => [row.name, row.displayValue]));
+  for (const key of ['possessionPct', 'totalShots', 'shotsOnTarget', 'foulsCommitted', 'wonCorners', 'saves', 'yellowCards', 'redCards', 'offsides', 'totalPasses', 'passCompletionPct', 'clearances']) {
+    assert.ok(homeStats.has(key), `métrica ${key} ausente no mandante`);
+    assert.ok(awayStats.has(key), `métrica ${key} ausente no visitante`);
+  }
+  assert.equal(homeStats.get('yellowCards'), '1');
+  assert.equal(awayStats.get('saves'), '1');
+  assert.equal(homeStats.get('passCompletionPct'), '81.8%');
+  assert.equal(homeStats.get('wonCorners'), '1', 'alias cornerKicks mais pobre não pode sobrescrever wonCorners da fonte rica');
+}
+
 console.log('live-api tests: ok');

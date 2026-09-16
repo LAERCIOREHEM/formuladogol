@@ -1,4 +1,5 @@
 const SITE_ROOT = 'https://site.api.espn.com/apis/site/v2/sports/soccer';
+const SITE_V3_ROOT = 'https://site.api.espn.com/apis/site/v3/sports/soccer';
 const SITE_WEB_ROOT = 'https://site.web.api.espn.com/apis/site/v2/sports/soccer';
 const CDN_ROOT = 'https://cdn.espn.com/core';
 const CORE_ROOT = 'https://sports.core.api.espn.com/v2/sports/soccer/leagues';
@@ -330,6 +331,11 @@ function summaryGatewayCandidates(league, eventId) {
       transform: unwrapSummaryLoose
     },
     {
+      name: 'espn_cdn_league_boxscore',
+      url: `${CDN_ROOT}/${qLeague}/boxscore?xhr=1&gameId=${qEvent}`,
+      transform: unwrapSummaryLoose
+    },
+    {
       name: 'espn_cdn_league_playbyplay',
       url: `${CDN_ROOT}/${qLeague}/playbyplay?xhr=1&gameId=${qEvent}`,
       transform: unwrapSummary
@@ -340,6 +346,11 @@ function summaryGatewayCandidates(league, eventId) {
       transform: unwrapSummaryLoose
     },
     {
+      name: 'espn_cdn_soccer_boxscore',
+      url: `${CDN_ROOT}/soccer/boxscore?xhr=1&league=${qLeague}&gameId=${qEvent}`,
+      transform: unwrapSummaryLoose
+    },
+    {
       name: 'espn_cdn_soccer_playbyplay',
       url: `${CDN_ROOT}/soccer/playbyplay?xhr=1&league=${qLeague}&gameId=${qEvent}`,
       transform: unwrapSummary
@@ -347,6 +358,11 @@ function summaryGatewayCandidates(league, eventId) {
     {
       name: 'espn_site_api_summary',
       url: `${SITE_ROOT}/${qLeague}/summary?event=${qEvent}`,
+      transform: unwrapSummaryLoose
+    },
+    {
+      name: 'espn_site_api_v3_summary',
+      url: `${SITE_V3_ROOT}/${qLeague}/summary?event=${qEvent}`,
       transform: unwrapSummaryLoose
     },
     {
@@ -743,6 +759,130 @@ export async function fetchEspnSummary(league, eventId, fetchImpl = globalThis.f
 }
 
 
+function normalizeStatToken(value) {
+  return text(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+const STAT_TOKEN_ALIASES = new Map([
+  ['possessionpct', 'possessionpct'], ['possessionpercent', 'possessionpct'], ['possessionpercentage', 'possessionpct'],
+  ['totalshots', 'totalshots'], ['shots', 'totalshots'], ['shotattempts', 'totalshots'],
+  ['shotsontarget', 'shotsontarget'], ['shotsongoal', 'shotsontarget'],
+  ['blockedshots', 'blockedshots'],
+  ['foulscommitted', 'foulscommitted'], ['fouls', 'foulscommitted'],
+  ['saves', 'saves'], ['goalkeepersaves', 'saves'],
+  ['woncorners', 'corners'], ['cornerkicks', 'corners'], ['corners', 'corners'],
+  ['yellowcards', 'yellowcards'], ['redcards', 'redcards'], ['offsides', 'offsides'], ['offside', 'offsides'],
+  ['totalpasses', 'totalpasses'], ['passes', 'totalpasses'],
+  ['accuratepasses', 'accuratepasses'], ['completedpasses', 'accuratepasses'],
+  ['passcompletionpct', 'passcompletionpct'], ['passpct', 'passcompletionpct'], ['passaccuracy', 'passcompletionpct'],
+  ['clearances', 'clearances'], ['clearance', 'clearances'],
+  ['tackleswon', 'tackleswon'], ['tackles', 'tackleswon'],
+  ['interceptions', 'interceptions'], ['crosses', 'crosses'], ['totalcrosses', 'crosses']
+]);
+
+function statToken(stat) {
+  const raw = normalizeStatToken(stat?.name || stat?.label || stat?.displayName || stat?.shortDisplayName || stat?.abbreviation);
+  return STAT_TOKEN_ALIASES.get(raw) || raw;
+}
+
+function teamToken(entry) {
+  const team = entry?.team || entry || {};
+  const id = text(team?.id || entry?.teamId || entry?.id);
+  if (id) return `id:${id}`;
+  const name = normalizeStatToken(team?.displayName || team?.shortDisplayName || team?.name || team?.abbreviation || entry?.displayName || entry?.name);
+  return name ? `name:${name}` : '';
+}
+
+function statValuePresent(stat) {
+  return stat && (stat.displayValue != null || stat.value != null || stat.rawValue != null);
+}
+
+function mergeStatLists(primary = [], extras = []) {
+  const out = [];
+  const byKey = new Map();
+  const absorb = (stat) => {
+    if (!stat || typeof stat !== 'object') return;
+    const key = statToken(stat);
+    if (!key) return;
+    const current = byKey.get(key);
+    if (!current) {
+      const copy = { ...stat };
+      byKey.set(key, copy);
+      out.push(copy);
+      return;
+    }
+    if (!statValuePresent(current) && statValuePresent(stat)) Object.assign(current, stat);
+  };
+  for (const stat of Array.isArray(primary) ? primary : []) absorb(stat);
+  for (const stat of Array.isArray(extras) ? extras : []) absorb(stat);
+  return out;
+}
+
+function summaryTeamStatContainers(data) {
+  const rows = [];
+  const add = (entry) => {
+    if (!entry || typeof entry !== 'object') return;
+    const statistics = Array.isArray(entry.statistics) ? entry.statistics : Array.isArray(entry.stats) ? entry.stats : [];
+    if (!statistics.length) return;
+    rows.push({ ...entry, statistics });
+  };
+  for (const entry of (Array.isArray(data?.boxscore?.teams) ? data.boxscore.teams : [])) add(entry);
+  for (const competition of (Array.isArray(data?.header?.competitions) ? data.header.competitions : [])) {
+    for (const competitor of (Array.isArray(competition?.competitors) ? competition.competitors : [])) add(competitor);
+  }
+  for (const competition of (Array.isArray(data?.competitions) ? data.competitions : [])) {
+    for (const competitor of (Array.isArray(competition?.competitors) ? competition.competitors : [])) add(competitor);
+  }
+  return rows;
+}
+
+function summaryTeamStatCount(data) {
+  const unique = new Set();
+  let valued = 0;
+  for (const entry of summaryTeamStatContainers(data)) {
+    const team = teamToken(entry) || 'unknown';
+    for (const stat of entry.statistics || []) {
+      const key = statToken(stat);
+      if (!key) continue;
+      unique.add(`${team}:${key}`);
+      if (statValuePresent(stat)) valued += 1;
+    }
+  }
+  return { unique: unique.size, valued };
+}
+
+function mergeTeamStatisticsForPresentation(baseBoxscore, successful) {
+  const base = baseBoxscore && typeof baseBoxscore === 'object' ? { ...baseBoxscore } : {};
+  const teams = Array.isArray(baseBoxscore?.teams)
+    ? baseBoxscore.teams.map((entry) => ({ ...entry, statistics: mergeStatLists(entry?.statistics || entry?.stats || [], []) }))
+    : [];
+  const byTeam = new Map();
+  for (const entry of teams) {
+    const key = teamToken(entry);
+    if (key) byTeam.set(key, entry);
+  }
+
+  const ranked = [...successful].sort((a, b) => summaryPresentationScore(b.data) - summaryPresentationScore(a.data));
+  for (const variant of ranked) {
+    for (const entry of summaryTeamStatContainers(variant.data)) {
+      const key = teamToken(entry);
+      if (!key) continue;
+      let target = byTeam.get(key);
+      if (!target) {
+        target = { ...entry, statistics: [] };
+        delete target.stats;
+        teams.push(target);
+        byTeam.set(key, target);
+      }
+      target.statistics = mergeStatLists(target.statistics || target.stats || [], entry.statistics || entry.stats || []);
+      if (!target.team && entry.team) target.team = entry.team;
+      if (!target.homeAway && entry.homeAway) target.homeAway = entry.homeAway;
+    }
+  }
+  if (teams.length) base.teams = teams;
+  return base;
+}
+
 function summaryPresentationScore(data) {
   if (!data || typeof data !== 'object') return 0;
   let score = 0;
@@ -752,12 +892,18 @@ function summaryPresentationScore(data) {
   const lineups = Array.isArray(data?.lineups) ? data.lineups.length : 0;
   const plays = Array.isArray(data?.plays) ? data.plays.length : 0;
   const scoring = Array.isArray(data?.scoringPlays) ? data.scoringPlays.length : 0;
+  const statCoverage = summaryTeamStatCount(data);
   if (data.header && typeof data.header === 'object') score += 80;
   if (data.gameInfo && typeof data.gameInfo === 'object') score += 60;
   score += boxscoreTeams * 120;
   score += boxscorePlayers * 80;
   score += rosters * 80;
   score += lineups * 80;
+  // A cardinalidade de estatísticas precisa pesar mais que a mera presença de
+  // boxscore/rosters. Sem isso, um feed com escalações + 6 métricas podia vencer
+  // outro feed ESPN com o boxscore estatístico muito mais completo.
+  score += statCoverage.unique * 35;
+  score += statCoverage.valued * 5;
   score += Math.min(plays, 200);
   score += Math.min(scoring * 4, 80);
   return score;
@@ -771,16 +917,20 @@ function mergeSummaryForPresentation(successful) {
   const playData = playBest.data || {};
 
   // O feed mais rápido/avançado de play-by-play é usado apenas para campos de
-  // eventos. Boxscore, rosters, header e gameInfo permanecem do payload mais
-  // completo, evitando que o gateway melhore gols/relógio e piore escalações.
+  // eventos. As demais seções partem do payload mais rico.
   for (const key of ['plays', 'scoringPlays', 'commentary', 'keyEvents']) {
     if (Array.isArray(playData[key]) && playData[key].length) merged[key] = playData[key];
   }
   if (!merged.header && playData.header) merged.header = playData.header;
   if (!merged.gameInfo && playData.gameInfo) merged.gameInfo = playData.gameInfo;
-  if (!merged.boxscore && playData.boxscore) merged.boxscore = playData.boxscore;
   if (!merged.rosters && playData.rosters) merged.rosters = playData.rosters;
   if (!merged.lineups && playData.lineups) merged.lineups = playData.lineups;
+
+  // Estatísticas não pertencem a uma única superfície ESPN. O CDN de "game",
+  // o endpoint dedicado de boxscore e o Site API podem ficar defasados entre si
+  // durante a partida. Fundimos por time + nome canônico da métrica, sem inventar
+  // valores e sem apagar uma estatística válida só porque outra fonte veio menor.
+  merged.boxscore = mergeTeamStatisticsForPresentation(merged.boxscore, successful);
   return merged;
 }
 
