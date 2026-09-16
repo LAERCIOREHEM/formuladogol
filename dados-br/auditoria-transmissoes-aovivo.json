@@ -17,10 +17,10 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 41,
+    "candidatos_oficiais_encontrados": 42,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
     "transmissoes_publicadas": 6,
     "sem_transmissao": 1,
     "erros": 0
@@ -69,12 +69,12 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401913071",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Atlético-MG x Santos",
-      "data_iso": "2026-09-16T19:00:00-03:00",
+      "event_id": "401841176",
+      "rodada": 21,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Botafogo x Grêmio",
+      "data_iso": "2026-09-16T19:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -389,6 +389,16 @@
       "motivo": "conteúdo rejeitado: narracao"
     },
     {
+      "video_id": "yl6KRNRY9Io",
+      "url": "https://www.youtube.com/watch?v=yl6KRNRY9Io",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "PELÉ ENGANOU NOSSO ELENCO NO JOGO DO IMPOSTOR DA LIBERTADORES! | Panela sportv",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-17T00:33:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "5CLMmnTHolc",
       "url": "https://www.youtube.com/watch?v=5CLMmnTHolc",
       "fonte": "cazetv",
@@ -543,7 +553,7 @@
       "url": "https://www.youtube.com/watch?v=dTnAnbIOwOI",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: PÓS-LIBERTADORES E SUL-AMERICANA | GERAL CAZÉTV",
+      "titulo": "AO VIVO: CORINTHIANS E PALMEIRAS ENTRAM EM CAMPO POR SUAS VAGAS NA SEMIFINAL! | GERAL CAZÉTV",
       "status": "upcoming",
       "inicio_programado": "2026-09-16T20:50:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -609,15 +619,21 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401841176",
+      "jogo": "Botafogo x Grêmio",
+      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
+    }
+  ],
   "sem_transmissao": [
     {
-      "event_id": "401913071",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Atlético-MG x Santos",
-      "data_iso": "2026-09-16T19:00:00-03:00",
+      "event_id": "401841176",
+      "rodada": 21,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Botafogo x Grêmio",
+      "data_iso": "2026-09-16T19:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -631,5 +647,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-16T19:00:50-03:00"
+  "atualizado_em": "2026-09-16T19:18:49-03:00"
 }
