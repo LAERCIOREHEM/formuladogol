@@ -2865,16 +2865,77 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: São Paulo x Boca Juniors, jogo de volta das quartas de final da CONMEBOL Sul-Americana, nesta terça-feira, 15/09/2026, às 21h30 (BRT), no MorumBIS. A transmissão integral será em SBT, ESPN e Disney+; no schema, ESPN e Disney+ foram consolidados como \"Disney+ / ESPN\". O SBT também terá sinal no +SBT e transmissão alternativa integral no YouTube do SBT Sports. GE em tempo real não foi contabilizado como canal de transmissão."
+    },
+    {
+      "event_id": "401912524",
+      "jogo": "São Paulo x Boca Juniors",
+      "data_iso": "2026-09-15T21:30:00-03:00",
+      "checkpoint": -15,
+      "executado_em": "2026-09-15T21:20:45-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+      "canais_antes": [
+        "SBT",
+        "Disney+ / ESPN"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cdn.conmebol.com/wp-content/uploads/2021/03/Memoria-2020-pt.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2021/04/manual-de-clubes-sudamericana-2021-pt.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/08/Fixture_Cuartos-de-Final_CONMEBOL-Sudamericana-2025_v8.09.2025.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2026/03/27_3_2026-Planilla-Sudamericana-Semana-15-Fase-Grupos-Fecha-1.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2026/04/11_4_2026-Planilla-Sudamericana-Semana-16-Fase-Grupos-Fecha-2.pdf",
+        "https://ge.globo.com/futebol/times/sao-paulo/noticia/2026/09/15/sao-paulo-x-boca-juniors-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sp/futebol/copa-sul-americana/jogo/15-09-2026/sao-paulo-boca-juniors.ghtml",
+        "https://gol.conmebol.com/sudamericana/es/news/los-locales-pisaron-fuerte-asi-fueron-las-idas-de-los-cuartos-de-final",
+        "https://gol.conmebol.com/sudamericana/es/news/mano-mano-asi-se-definiran-los-semifinalistas-de-la-conmebol-sudamericana",
+        "https://gol.conmebol.com/sudamericana/es/news/ventaja-boca-gano-en-la-bombonera-y-definira-en-brasil-ante-sao-paulo",
+        "https://gol.conmebol.com/sudamericana/pt-br/fixture/view/1686",
+        "https://gol.conmebol.com/sudamericana/pt-br/news/frente-frente-assim-serao-definidos-os-semifinalistas-da-conmebol-sudamericana",
+        "https://gol.conmebol.com/sudamericana/pt-br/news/os-mandantes-fizeram-valer-forca-de-casa-assim-foram-os-jogos-de-ida-das-quartas-de-final",
+        "https://gol.conmebol.com/sudamericana/pt-br/news/sao-paulo-x-boca-juniors-pela-volta-das-quartas-de-final-da-conmebol-sudamericana-horario",
+        "https://gol.conmebol.com/sudamericana/pt-br/news/vantagem-do-boca-venceu-na-la-bombonera-e-decidira-no-brasil-contra-o-sao-paulo",
+        "https://sports.sbt.com.br/noticia/sul-americana/sao-paulo-x-boca-jrs-sbt-transmite-as-quartas-da-sula",
+        "https://sports.sbt.com.br/noticia/sul-americana/sbt-transmite-sao-paulo-x-boca-juniors-pela-sul-americana",
+        "https://www.youtube.com/watch?v=9ADlaZ_532Y",
+        "https://www.youtube.com/watch?v=YbTz60eI3IQ"
+      ],
+      "canais_depois": [
+        "SBT",
+        "Disney+ / ESPN"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/futebol/times/sao-paulo/noticia/2026/09/15/sao-paulo-x-boca-juniors-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://sports.sbt.com.br/noticia/sul-americana/sbt-transmite-sao-paulo-x-boca-juniors-pela-sul-americana",
+        "https://gol.conmebol.com/sudamericana/pt-br/news/sao-paulo-x-boca-juniors-pela-volta-das-quartas-de-final-da-conmebol-sudamericana-horario"
+      ],
+      "youtube": [
+        {
+          "url": "https://youtu.be/-ZM__9jDLno",
+          "scope": "unknown",
+          "valid_for_match": false,
+          "reason": "O URL específico não pôde ser aberto/confirmado na consulta. Embora o SBT Sports confirme que haverá transmissão alternativa da partida em seu YouTube, não houve evidência acessível ligando este identificador de vídeo específico à transmissão integral; portanto, não foi validado individualmente."
+        }
+      ],
+      "youtube_removidos": [
+        "https://youtu.be/-ZM__9jDLno"
+      ],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: São Paulo x Boca Juniors, jogo de volta das quartas de final da CONMEBOL Sul-Americana, nesta terça-feira, 15/09/2026, às 21h30 (horário de Brasília), no MorumBIS. A transmissão integral é de SBT, ESPN e Disney+; no schema, ESPN e Disney+ correspondem a “Disney+ / ESPN”. Não é exclusiva. O ge informa explicitamente SBT, ESPN e Disney+; o SBT confirma a exibição em TV e +SBT e menciona uma transmissão alternativa no YouTube do SBT Sports."
     }
   ],
   "ultima_execucao": {
     "event_id": "401912524",
     "jogo": "São Paulo x Boca Juniors",
     "data_iso": "2026-09-15T21:30:00-03:00",
-    "checkpoint": -90,
-    "executado_em": "2026-09-15T20:09:04-03:00",
+    "checkpoint": -15,
+    "executado_em": "2026-09-15T21:20:45-03:00",
     "chamada_openai": true,
-    "motivo_chamada": "checkpoint de auditoria completa",
+    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
     "canais_antes": [
       "SBT",
       "Disney+ / ESPN"
@@ -2882,24 +2943,26 @@
     "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://cdn.conmebol.com/wp-content/uploads/2019/01/manual-broadcasting-2019-por.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2021/03/Memoria-2020-pt.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2021/04/manual-de-clubes-sudamericana-2021-pt.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2025/08/Fixture_Cuartos-de-Final_CONMEBOL-Sudamericana-2025_v8.09.2025.pdf",
       "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR.pdf",
       "https://cdn.conmebol.com/wp-content/uploads/2026/03/27_3_2026-Planilla-Sudamericana-Semana-15-Fase-Grupos-Fecha-1.pdf",
       "https://cdn.conmebol.com/wp-content/uploads/2026/04/11_4_2026-Planilla-Sudamericana-Semana-16-Fase-Grupos-Fecha-2.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/05/1_5_2026-Planilla-Sudamericana-Semana-19-Fase-Grupos-Fecha-4.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/05/22_5_2026-Planilla-Libertadores-Semana-22-Fase-Grupos-Fecha-6-vf.pdf",
       "https://ge.globo.com/futebol/times/sao-paulo/noticia/2026/09/15/sao-paulo-x-boca-juniors-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
       "https://ge.globo.com/sp/futebol/copa-sul-americana/jogo/15-09-2026/sao-paulo-boca-juniors.ghtml",
-      "https://gol.conmebol.com/sudamericana/en/news/sao-paulo-v-boca-juniors-second-leg-conmebol-sudamericana-quarter-finals-kick-time-teams-and",
       "https://gol.conmebol.com/sudamericana/es/news/los-locales-pisaron-fuerte-asi-fueron-las-idas-de-los-cuartos-de-final",
       "https://gol.conmebol.com/sudamericana/es/news/mano-mano-asi-se-definiran-los-semifinalistas-de-la-conmebol-sudamericana",
+      "https://gol.conmebol.com/sudamericana/es/news/ventaja-boca-gano-en-la-bombonera-y-definira-en-brasil-ante-sao-paulo",
       "https://gol.conmebol.com/sudamericana/pt-br/fixture/view/1686",
       "https://gol.conmebol.com/sudamericana/pt-br/news/frente-frente-assim-serao-definidos-os-semifinalistas-da-conmebol-sudamericana",
       "https://gol.conmebol.com/sudamericana/pt-br/news/os-mandantes-fizeram-valer-forca-de-casa-assim-foram-os-jogos-de-ida-das-quartas-de-final",
       "https://gol.conmebol.com/sudamericana/pt-br/news/sao-paulo-x-boca-juniors-pela-volta-das-quartas-de-final-da-conmebol-sudamericana-horario",
       "https://gol.conmebol.com/sudamericana/pt-br/news/vantagem-do-boca-venceu-na-la-bombonera-e-decidira-no-brasil-contra-o-sao-paulo",
       "https://sports.sbt.com.br/noticia/sul-americana/sao-paulo-x-boca-jrs-sbt-transmite-as-quartas-da-sula",
-      "https://sports.sbt.com.br/noticia/sul-americana/sbt-transmite-sao-paulo-x-boca-juniors-pela-sul-americana"
+      "https://sports.sbt.com.br/noticia/sul-americana/sbt-transmite-sao-paulo-x-boca-juniors-pela-sul-americana",
+      "https://www.youtube.com/watch?v=9ADlaZ_532Y",
+      "https://www.youtube.com/watch?v=YbTz60eI3IQ"
     ],
     "canais_depois": [
       "SBT",
@@ -2915,14 +2978,16 @@
     "youtube": [
       {
         "url": "https://youtu.be/-ZM__9jDLno",
-        "scope": "match",
-        "valid_for_match": true,
-        "reason": "O título informa \"AO VIVO E COM IMAGENS\" para São Paulo x Boca Juniors, e a página oficial do SBT Sports confirma transmissão alternativa do confronto no YouTube do SBT Sports; portanto, trata-se de sinal da partida, não apenas pré-jogo, pós-jogo ou watchalong."
+        "scope": "unknown",
+        "valid_for_match": false,
+        "reason": "O URL específico não pôde ser aberto/confirmado na consulta. Embora o SBT Sports confirme que haverá transmissão alternativa da partida em seu YouTube, não houve evidência acessível ligando este identificador de vídeo específico à transmissão integral; portanto, não foi validado individualmente."
       }
     ],
-    "youtube_removidos": [],
+    "youtube_removidos": [
+      "https://youtu.be/-ZM__9jDLno"
+    ],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: São Paulo x Boca Juniors, jogo de volta das quartas de final da CONMEBOL Sul-Americana, nesta terça-feira, 15/09/2026, às 21h30 (BRT), no MorumBIS. A transmissão integral será em SBT, ESPN e Disney+; no schema, ESPN e Disney+ foram consolidados como \"Disney+ / ESPN\". O SBT também terá sinal no +SBT e transmissão alternativa integral no YouTube do SBT Sports. GE em tempo real não foi contabilizado como canal de transmissão."
+    "resumo": "Confirmado para o Brasil: São Paulo x Boca Juniors, jogo de volta das quartas de final da CONMEBOL Sul-Americana, nesta terça-feira, 15/09/2026, às 21h30 (horário de Brasília), no MorumBIS. A transmissão integral é de SBT, ESPN e Disney+; no schema, ESPN e Disney+ correspondem a “Disney+ / ESPN”. Não é exclusiva. O ge informa explicitamente SBT, ESPN e Disney+; o SBT confirma a exibição em TV e +SBT e menciona uma transmissão alternativa no YouTube do SBT Sports."
   },
-  "atualizado_em": "2026-09-15T20:09:04-03:00"
+  "atualizado_em": "2026-09-15T21:20:45-03:00"
 }
