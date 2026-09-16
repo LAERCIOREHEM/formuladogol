@@ -73,6 +73,25 @@ jobs:
       - name: Validar código e contratos
         run: npm run validate
 
+      - name: Calcular identidade da governança continental
+        shell: bash
+        run: |
+          set -euo pipefail
+          FP="$(python3 - <<'PY'
+          import sys
+          from pathlib import Path
+
+          root = Path.cwd().resolve().parents[1]
+          sys.path.insert(0, str(root / 'scripts'))
+          from orquestrar_workflows import editorial_continental_guard_fingerprint
+
+          print(editorial_continental_guard_fingerprint())
+          PY
+          )"
+          [[ "$FP" =~ ^[0-9a-f]{64}$ ]] || { echo 'ERRO: fingerprint continental inválido.'; exit 1; }
+          echo "FDG_CONTINENTAL_GUARD_FINGERPRINT=$FP" >> "$GITHUB_ENV"
+          echo "Governança continental: ${FP:0:12}…"
+
       # Primeiro publica SHADOW em qualquer situação. Assim uma primeira
       # instalação jamais consegue disparar Actions antes de o secret GitHub
       # estar gravado no Worker.
@@ -111,7 +130,9 @@ jobs:
             if printf '%s' "$BODY" | grep -q '"service":"formula-do-gol-orchestrator"' \
               && printf '%s' "$BODY" | grep -q "\"mode\":\"$EXPECTED\"" \
               && printf '%s' "$BODY" | grep -q '"liveBrowserUntouched":true' \
-              && printf '%s' "$BODY" | grep -q '"transmissionGuardian":true'; then
+              && printf '%s' "$BODY" | grep -q '"transmissionGuardian":true' \
+              && printf '%s' "$BODY" | grep -q '"continentalAgendaAware":true' \
+              && printf '%s' "$BODY" | grep -q '"continentalStateIdempotency":true'; then
               echo "Health OK em modo $EXPECTED."
               printf '%s\n' "$BODY"
               exit 0
