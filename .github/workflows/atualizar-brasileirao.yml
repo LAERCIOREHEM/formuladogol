@@ -246,7 +246,7 @@ jobs:
           fi
           python scripts/atualizar_competicoes_af_previsao.py "${ARGS[@]}"
 
-      - name: Impedir publicação com resultado continental vencido e não incorporado
+      - name: Isolar pendência continental sem derrubar o Brasileirão
         if: ${{ always() && steps.continental.outcome == 'success' }}
         run: |
           python - <<'PY'
@@ -256,11 +256,15 @@ jobs:
               audit = json.load(handle)
           blocking = list(audit.get('falhas_bloqueantes') or [])
           if blocking:
-              raise SystemExit(
-                  'ERRO: atualização continental possui pendência factual bloqueante; '
-                  'o site não será publicado com probabilidades antigas. ' + ' | '.join(blocking)
+              print(
+                  '::warning title=AF continental preservado::'
+                  'Há resultado continental provavelmente encerrado ainda sem confirmação. '
+                  'O AF não será recalculado nem os novos snapshots das copas serão publicados '
+                  'até a fonte fechar, mas tabela/resultados/estatísticas do Brasileirão seguem normalmente. '
+                  + ' | '.join(blocking)
               )
-          print('Coleta continental sem pendência factual bloqueante.')
+          else:
+              print('Coleta continental sem pendência factual bloqueante.')
           PY
 
       - name: Gerar agenda dos clubes do Brasileirão
@@ -342,7 +346,13 @@ jobs:
           )
           desatualizado = not bool(vigencia.get('atualizado'))
           continental_changed = str(os.environ.get('CONTINENTAL_CHANGED', '')).lower() == 'true'
-          solicitado = forcar or faltando or continental_changed or antes != depois or desatualizado
+          # Se a coleta continental estiver bloqueada por um resultado provavelmente
+          # encerrado ainda não confirmado, o AF precisa de nova tentativa, mas
+          # somente ele fica congelado. O restante do Brasileirão segue publicável.
+          solicitado = (
+              forcar or faltando or continental_changed or antes != depois
+              or desatualizado or not continental_pronto
+          )
           executar = solicitado and base_valida and continental_pronto
           motivos_vigencia = '; '.join(vigencia.get('motivos') or [])
           motivos_coleta = '; '.join(coleta.get('motivos') or [])
