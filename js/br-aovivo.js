@@ -2,6 +2,9 @@
   "use strict";
 
   const ESPN_API_ROOT = "https://site.api.espn.com/apis/site/v2/sports/soccer";
+  const LIVE_GATEWAY_ROOT = "https://push.formuladogol.com.br/v1/live";
+  const LIVE_GATEWAY_TIMEOUT_MS = 5500;
+  const DIRECT_ESPN_FALLBACK_TIMEOUT_MS = 5000;
   const DEFAULT_LEAGUE = "bra.1";
   const LEAGUE_META = {
     "bra.1": { competitionKey: "brasileirao", competitionName: "Campeonato Brasileiro Série A", competitionShort: "Brasileirão" },
@@ -639,6 +642,98 @@
     }
   }
 
+  async function fetchScoreboardPayload(league, dates) {
+    const params = new URLSearchParams({ league: String(league || DEFAULT_LEAGUE), dates: String(dates || "") });
+    let gatewayError = null;
+
+    try {
+      const envelope = await fetchJson(LIVE_GATEWAY_ROOT + "/scoreboard?" + params.toString() + "&_=" + Date.now(), {
+        timeoutMs: LIVE_GATEWAY_TIMEOUT_MS,
+        mode: "cors"
+      });
+      if (!envelope || envelope.ok !== true || !envelope.data || !Array.isArray(envelope.data.events)) {
+        throw new Error("Gateway ao vivo retornou payload inválido");
+      }
+      return {
+        data: envelope.data,
+        fetchedAt: Number(envelope.fetchedAt || Date.now()),
+        stale: envelope.stale === true,
+        source: String(envelope.source || "espn_gateway"),
+        transport: "gateway",
+        cacheStatus: String(envelope.cacheStatus || ""),
+        detail: String(envelope.upstreamError || "")
+      };
+    } catch (error) {
+      gatewayError = error;
+    }
+
+    try {
+      const directUrl = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/scoreboard?dates=" + encodeURIComponent(dates) + "&limit=100&_=" + Date.now();
+      const data = await fetchJson(directUrl, { timeoutMs: DIRECT_ESPN_FALLBACK_TIMEOUT_MS });
+      if (!data || !Array.isArray(data.events)) throw new Error("ESPN direta retornou payload inválido");
+      return {
+        data,
+        fetchedAt: Date.now(),
+        stale: false,
+        source: "espn_site_api_direct",
+        transport: "direct",
+        cacheStatus: "",
+        detail: gatewayError && gatewayError.message ? gatewayError.message : ""
+      };
+    } catch (directError) {
+      const parts = [];
+      if (gatewayError) parts.push("gateway: " + (gatewayError.message || String(gatewayError)));
+      parts.push("direta: " + (directError && directError.message ? directError.message : String(directError)));
+      const combined = new Error("ESPN indisponível após gateway e fallback direto (" + parts.join(" | ") + ")");
+      combined.gatewayError = gatewayError;
+      combined.directError = directError;
+      throw combined;
+    }
+  }
+
+  async function fetchSummaryPayload(game, options = {}) {
+    if (!game || !game.id) throw new Error("Jogo sem eventId para summary");
+    const league = game.espnLeague || DEFAULT_LEAGUE;
+    const eventId = String(game.id);
+    const expectedGoals = Math.max(0, Number(numericScore(game.home && game.home.score) || 0) + Number(numericScore(game.away && game.away.score) || 0));
+    const params = new URLSearchParams({
+      league: String(league),
+      event: eventId,
+      expectedGoals: String(expectedGoals)
+    });
+    if (options.forceFresh) params.set("fresh", "1");
+    let gatewayError = null;
+
+    try {
+      const envelope = await fetchJson(LIVE_GATEWAY_ROOT + "/summary?" + params.toString() + "&_=" + Date.now(), {
+        timeoutMs: LIVE_GATEWAY_TIMEOUT_MS,
+        mode: "cors",
+        signal: options.signal || undefined
+      });
+      if (!envelope || envelope.ok !== true || !envelope.data || typeof envelope.data !== "object") {
+        throw new Error("Gateway de summary retornou payload inválido");
+      }
+      return envelope.data;
+    } catch (error) {
+      if (isAbortError(error)) throw error;
+      gatewayError = error;
+    }
+
+    try {
+      const directUrl = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/summary?event=" + encodeURIComponent(eventId) + "&_=" + Date.now();
+      return await fetchJson(directUrl, {
+        timeoutMs: DIRECT_ESPN_FALLBACK_TIMEOUT_MS,
+        signal: options.signal || undefined
+      });
+    } catch (directError) {
+      if (isAbortError(directError)) throw directError;
+      const parts = [];
+      if (gatewayError) parts.push("gateway: " + (gatewayError.message || String(gatewayError)));
+      parts.push("direta: " + (directError && directError.message ? directError.message : String(directError)));
+      throw new Error("Summary ESPN indisponível após gateway e fallback direto (" + parts.join(" | ") + ")");
+    }
+  }
+
   function youtubeVideoId(value) {
     try {
       const raw = String(value || "").trim();
@@ -1055,9 +1150,9 @@
 
     const leagueEntries = Array.from(leagues.entries());
     const requests = leagueEntries.map(async ([league, localGames]) => {
-      const url = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/scoreboard?dates=" + ini + "-" + fim + "&limit=100&_=" + Date.now();
-      const data = await fetchJson(url);
-      const fetchedAt = Date.now();
+      const result = await fetchScoreboardPayload(league, ini + "-" + fim);
+      const data = result.data || { events: [] };
+      const fetchedAt = Number(result.fetchedAt || Date.now());
       const games = (data.events || []).map((event) => {
         const eventId = String(event && event.id || "");
         const local = localGames.find((game) => String(game.id || "") === eventId) || null;
@@ -1071,7 +1166,16 @@
         };
         return normalizeEvent(event, Object.assign({}, baseMeta, { sourceFetchedAt: fetchedAt }));
       }).filter(Boolean);
-      return { league, fetchedAt, games };
+      return {
+        league,
+        fetchedAt,
+        games,
+        degraded: result.stale === true,
+        source: result.source || "",
+        transport: result.transport || "",
+        cacheStatus: result.cacheStatus || "",
+        detail: result.detail || ""
+      };
     });
 
     const settled = await Promise.allSettled(requests);
@@ -1088,7 +1192,16 @@
         successfulLeagues.add(league);
         latestSuccessAt = Math.max(latestSuccessAt, Number(result.value.fetchedAt || 0));
         state.espnSuccessByLeague[league] = Number(result.value.fetchedAt || Date.now());
-        delete state.espnFailureByLeague[league];
+        if (result.value.degraded) {
+          state.espnFailureByLeague[league] = {
+            at: Date.now(),
+            message: result.value.detail || "Gateway ESPN usando último snapshot válido",
+            stale: true,
+            transport: result.value.transport || "gateway"
+          };
+        } else {
+          delete state.espnFailureByLeague[league];
+        }
         freshNormalized.push(...(result.value.games || []));
       } else {
         failedLeagues.add(league);
@@ -2273,9 +2386,7 @@
     const signal = controller && controller.signal;
 
     try {
-      const league = g.espnLeague || DEFAULT_LEAGUE;
-      const makeUrl = (suffix) => ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/summary?event=" + encodeURIComponent(eventId) + "&_=" + Date.now() + (suffix || "");
-      let data = await fetchJson(makeUrl(""), signal ? { signal } : {});
+      let data = await fetchSummaryPayload(g, { signal });
       let rows = extractStatsRows(g, data);
       const previousCount = cachedStatsCount(g);
       const now = Date.now();
@@ -2290,7 +2401,7 @@
         state.statsRetryAt[eventId] = now;
         try {
           await waitWithSignal(PARTIAL_STATS_RETRY_DELAY_MS, signal);
-          const retryData = await fetchJson(makeUrl("&retry=1"), signal ? { signal } : {});
+          const retryData = await fetchSummaryPayload(g, { signal, forceFresh: true });
           const retryRows = extractStatsRows(g, retryData);
           if (retryRows.length >= rows.length) {
             data = retryData;

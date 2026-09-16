@@ -4,6 +4,7 @@ import { SportsMonitor } from './sports-monitor.js';
 import { dispatchStatus, enqueueSportsEvent, handleQueueBatch } from './push-dispatch.js';
 import { opsStatus, runOperationalMaintenance } from './ops.js';
 import { probeEspnSources } from './espn-source.js';
+import { LIVE_API_CONSTANTS, resolveLiveScoreboard, resolveLiveSummary } from './live-api.js';
 
 export { PushState, SportsMonitor };
 
@@ -80,6 +81,53 @@ function singletonState(env) {
 function singletonMonitor(env) {
   const id = env.SPORTS_MONITOR.idFromName('global');
   return env.SPORTS_MONITOR.get(id);
+}
+
+function monitorScoreParts(value) {
+  const match = String(value || '').match(/^\s*(\d+)\s*-\s*(\d+)\s*$/);
+  return match ? [Number(match[1]), Number(match[2])] : [0, 0];
+}
+
+async function monitorLiveScoreboardFallback(env, league, now = Date.now()) {
+  const response = await singletonMonitor(env).fetch('https://internal/status');
+  if (!response.ok) return null;
+  const status = await response.json();
+  const matches = Array.isArray(status?.matches) ? status.matches.filter((row) => row?.league === league) : [];
+  if (!matches.length) return null;
+
+  const freshestMatchAt = matches.reduce((max, row) => Math.max(max, Number(row?.lastObservedAt || 0)), 0);
+  const fetchedAt = Math.max(Number(status?.lastPollSuccessAt || 0), freshestMatchAt);
+  if (!(fetchedAt > 0) || now - fetchedAt > 10 * 60_000) return null;
+
+  const events = matches.map((row) => {
+    const [homeScore, awayScore] = monitorScoreParts(row?.score);
+    const state = String(row?.state || 'pre').toLowerCase();
+    const completed = state === 'post';
+    const clock = String(row?.clock || '');
+    return {
+      id: String(row?.eventId || ''),
+      date: String(row?.kickoff || ''),
+      status: {
+        type: { state, completed, shortDetail: clock, detail: clock },
+        displayClock: clock
+      },
+      competitions: [{
+        id: String(row?.eventId || ''),
+        date: String(row?.kickoff || ''),
+        competitors: [
+          { homeAway: 'home', score: String(homeScore), team: { displayName: String(row?.home || '') } },
+          { homeAway: 'away', score: String(awayScore), team: { displayName: String(row?.away || '') } }
+        ]
+      }]
+    };
+  }).filter((event) => event.id && event.competitions[0].competitors.every((item) => item.team.displayName));
+
+  if (!events.length) return null;
+  return {
+    source: 'sports_monitor_snapshot',
+    fetchedAt,
+    data: { events }
+  };
 }
 
 async function vapidKeys(env) {
@@ -523,6 +571,7 @@ export default {
         service: 'formula-do-gol-push',
         version: 7,
         revision: '6-R10R4',
+        liveGatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
         sportsMonitorReady: Boolean(monitor?.ok),
         operationalState: operational?.state || 'unknown',
         sports: {
@@ -539,6 +588,18 @@ export default {
     if (origin && !ALLOWED_ORIGINS.has(origin)) return json(request, { ok: false, error: 'origin_not_allowed' }, 403);
 
     try {
+      if (url.pathname === '/v1/live/scoreboard' && request.method === 'GET') {
+        if (!(await allowStatusRead(request, env, 'live-scoreboard'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
+        const result = await resolveLiveScoreboard(url, {
+          fallbackScoreboard: ({ league, now }) => monitorLiveScoreboardFallback(env, league, now)
+        });
+        return json(request, result.body, result.status, { 'Cache-Control': 'no-store', 'X-FDG-Live-Gateway': '1' });
+      }
+      if (url.pathname === '/v1/live/summary' && request.method === 'GET') {
+        if (!(await allowStatusRead(request, env, 'live-summary'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
+        const result = await resolveLiveSummary(url);
+        return json(request, result.body, result.status, { 'Cache-Control': 'no-store', 'X-FDG-Live-Gateway': '1' });
+      }
       if (url.pathname === '/v1/config' && request.method === 'GET') return handleConfig(request, env);
       if (url.pathname === '/v1/subscribe' && request.method === 'POST') return handleSubscribe(request, env);
       if (url.pathname === '/v1/unsubscribe' && request.method === 'POST') return handleUnsubscribe(request, env);

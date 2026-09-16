@@ -302,6 +302,65 @@ function summaryCandidates(league, eventId) {
   ];
 }
 
+function unwrapSummaryLoose(payload) {
+  const candidates = [
+    payload?.gamepackageJSON,
+    payload?.content?.gamepackageJSON,
+    payload?.content,
+    payload
+  ].filter(Boolean);
+  const useful = (candidate) => Boolean(
+    candidate && typeof candidate === 'object' && (
+      candidate.header || candidate.gameInfo || candidate.boxscore || candidate.rosters || candidate.lineups ||
+      Array.isArray(candidate.plays) || Array.isArray(candidate.scoringPlays)
+    )
+  );
+  for (const candidate of candidates) if (useful(candidate)) return candidate;
+  for (const candidate of walkObjects(payload, 5)) if (useful(candidate)) return candidate;
+  throw new Error('payload de jogo sem conteúdo útil');
+}
+
+function summaryGatewayCandidates(league, eventId) {
+  const qLeague = encodeURIComponent(league);
+  const qEvent = encodeURIComponent(eventId);
+  return [
+    {
+      name: 'espn_cdn_league_game',
+      url: `${CDN_ROOT}/${qLeague}/game?xhr=1&gameId=${qEvent}`,
+      transform: unwrapSummaryLoose
+    },
+    {
+      name: 'espn_cdn_league_playbyplay',
+      url: `${CDN_ROOT}/${qLeague}/playbyplay?xhr=1&gameId=${qEvent}`,
+      transform: unwrapSummary
+    },
+    {
+      name: 'espn_cdn_soccer_game',
+      url: `${CDN_ROOT}/soccer/game?xhr=1&league=${qLeague}&gameId=${qEvent}`,
+      transform: unwrapSummaryLoose
+    },
+    {
+      name: 'espn_cdn_soccer_playbyplay',
+      url: `${CDN_ROOT}/soccer/playbyplay?xhr=1&league=${qLeague}&gameId=${qEvent}`,
+      transform: unwrapSummary
+    },
+    {
+      name: 'espn_site_api_summary',
+      url: `${SITE_ROOT}/${qLeague}/summary?event=${qEvent}`,
+      transform: unwrapSummaryLoose
+    },
+    {
+      name: 'espn_core_plays',
+      url: `${CORE_ROOT}/${qLeague}/events/${qEvent}/competitions/${qEvent}/plays?limit=300&lang=pt&region=br`,
+      transform: (payload) => {
+        const plays = Array.isArray(payload?.items) ? payload.items : Array.isArray(payload?.plays) ? payload.plays : [];
+        if (!plays.length) throw new Error('core plays sem itens');
+        return { plays };
+      }
+    }
+  ];
+}
+
 function scorerEnrichmentCandidates(league, eventId) {
   const qLeague = encodeURIComponent(league);
   const qEvent = encodeURIComponent(eventId);
@@ -436,6 +495,69 @@ export async function fetchEspnScoreboardFresh(league, dates, fetchImpl = global
   return {
     ok: true,
     source: successful.length > 1 ? 'espn_freshest_merge' : successful[0].source,
+    sources: successful.map((item) => item.source),
+    selectedSources,
+    data: { events: [...merged.values()] },
+    attempts
+  };
+}
+
+
+export async function fetchEspnScoreboardGateway(league, dates, fetchImpl = globalThis.fetch) {
+  if (!ALLOWED_LEAGUES.includes(league)) throw new Error(`liga ESPN não permitida: ${league}`);
+  const qLeague = encodeURIComponent(league);
+  const qDates = encodeURIComponent(dates);
+  const candidates = [
+    ...scoreboardFreshCandidates(league, dates),
+    {
+      name: 'espn_site_api',
+      url: `${SITE_ROOT}/${qLeague}/scoreboard?dates=${qDates}&limit=100`
+    }
+  ];
+  const attempts = [];
+  const successful = [];
+
+  await Promise.all(candidates.map(async (candidate) => {
+    const startedAt = Date.now();
+    try {
+      const raw = await fetchJson(withBust(candidate.url), fetchImpl, LIVE_FETCH_TIMEOUT_MS);
+      const data = unwrapScoreboard(raw);
+      successful.push({ source: candidate.name, data });
+      attempts.push({ source: candidate.name, ok: true, durationMs: Date.now() - startedAt });
+    } catch (error) {
+      attempts.push({
+        source: candidate.name,
+        ok: false,
+        durationMs: Date.now() - startedAt,
+        error: text(error?.message || error).slice(0, 240)
+      });
+    }
+  }));
+
+  attempts.sort((a, b) => candidates.findIndex((c) => c.name === a.source) - candidates.findIndex((c) => c.name === b.source));
+  if (!successful.length) {
+    const error = new Error(attempts.map((item) => `${item.source}: ${item.error}`).join(' | ') || 'scoreboard ESPN indisponível');
+    error.attempts = attempts;
+    throw error;
+  }
+
+  const merged = new Map();
+  const selectedSources = {};
+  for (const result of successful) {
+    for (const event of result.data?.events || []) {
+      const id = eventIdOf(event);
+      if (!id) continue;
+      const current = merged.get(id);
+      if (fresherEvent(event, current)) {
+        merged.set(id, event);
+        selectedSources[id] = result.source;
+      }
+    }
+  }
+
+  return {
+    ok: true,
+    source: successful.length > 1 ? 'espn_gateway_merge' : successful[0].source,
     sources: successful.map((item) => item.source),
     selectedSources,
     data: { events: [...merged.values()] },
@@ -618,6 +740,75 @@ export async function fetchEspnSummary(league, eventId, fetchImpl = globalThis.f
       if (found < minimumGoals) throw new Error(`${source}: summary incompleto (${found}/${minimumGoals} gols)`);
     }
   );
+}
+
+
+function summaryPresentationScore(data) {
+  if (!data || typeof data !== 'object') return 0;
+  let score = 0;
+  const boxscoreTeams = Array.isArray(data?.boxscore?.teams) ? data.boxscore.teams.length : 0;
+  const boxscorePlayers = Array.isArray(data?.boxscore?.players) ? data.boxscore.players.length : 0;
+  const rosters = Array.isArray(data?.rosters) ? data.rosters.length : 0;
+  const lineups = Array.isArray(data?.lineups) ? data.lineups.length : 0;
+  const plays = Array.isArray(data?.plays) ? data.plays.length : 0;
+  const scoring = Array.isArray(data?.scoringPlays) ? data.scoringPlays.length : 0;
+  if (data.header && typeof data.header === 'object') score += 80;
+  if (data.gameInfo && typeof data.gameInfo === 'object') score += 60;
+  score += boxscoreTeams * 120;
+  score += boxscorePlayers * 80;
+  score += rosters * 80;
+  score += lineups * 80;
+  score += Math.min(plays, 200);
+  score += Math.min(scoring * 4, 80);
+  return score;
+}
+
+function mergeSummaryForPresentation(successful) {
+  if (!Array.isArray(successful) || !successful.length) return {};
+  const playBest = successful[0];
+  const richBest = [...successful].sort((a, b) => summaryPresentationScore(b.data) - summaryPresentationScore(a.data))[0] || playBest;
+  const merged = { ...(richBest.data || {}) };
+  const playData = playBest.data || {};
+
+  // O feed mais rápido/avançado de play-by-play é usado apenas para campos de
+  // eventos. Boxscore, rosters, header e gameInfo permanecem do payload mais
+  // completo, evitando que o gateway melhore gols/relógio e piore escalações.
+  for (const key of ['plays', 'scoringPlays', 'commentary', 'keyEvents']) {
+    if (Array.isArray(playData[key]) && playData[key].length) merged[key] = playData[key];
+  }
+  if (!merged.header && playData.header) merged.header = playData.header;
+  if (!merged.gameInfo && playData.gameInfo) merged.gameInfo = playData.gameInfo;
+  if (!merged.boxscore && playData.boxscore) merged.boxscore = playData.boxscore;
+  if (!merged.rosters && playData.rosters) merged.rosters = playData.rosters;
+  if (!merged.lineups && playData.lineups) merged.lineups = playData.lineups;
+  return merged;
+}
+
+export async function fetchEspnSummaryGateway(league, eventId, fetchImpl = globalThis.fetch, expectedGoals = 0) {
+  if (!ALLOWED_LEAGUES.includes(league)) throw new Error(`liga ESPN não permitida: ${league}`);
+  if (!text(eventId)) throw new Error('eventId ausente');
+  const minimumGoals = Math.max(0, Number(expectedGoals) || 0);
+  const candidates = summaryGatewayCandidates(league, eventId);
+  const { successful, attempts } = await parallelSuccessful(candidates, fetchImpl, LIVE_FETCH_TIMEOUT_MS);
+  if (!successful.length) {
+    const error = new Error(attempts.map((item) => `${item.source}: ${item.error}`).join(' | ') || 'summary ESPN indisponível');
+    error.attempts = attempts;
+    throw error;
+  }
+  const best = successful[0];
+  const data = mergeSummaryForPresentation(successful);
+  const goals = summaryGoalCount(data);
+  return {
+    ok: true,
+    source: best.source,
+    sources: successful.map((item) => item.source),
+    data,
+    variants: successful.map((item) => ({ source: item.source, data: item.data })),
+    attempts,
+    expectedGoals: minimumGoals,
+    goalCount: goals,
+    complete: minimumGoals <= 0 || goals >= minimumGoals
+  };
 }
 
 export async function probeEspnSources(fetchImpl = globalThis.fetch, dateKey = '') {

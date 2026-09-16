@@ -1314,6 +1314,7 @@ export function summarizeMatch(match) {
     leg: match?.leg ?? null,
     state: match?.state || '',
     clock: match?.clock || '',
+    kickoff: match?.kickoff || '',
     shootoutActive: Boolean(match?.shootoutActive),
     score: `${num(match?.home?.score, 0)}-${num(match?.away?.score, 0)}`,
     home: match?.home?.name || '',
