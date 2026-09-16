@@ -2,7 +2,7 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-09-16T11:18:24-03:00",
+  "gerado_em": "2026-09-16T17:22:56-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "mudanca_esportiva": false,
@@ -21,7 +21,7 @@
       "fallback_seguro_para_af": true,
       "motivos_fallback": [],
       "alertas_fallback": [
-        "snapshot anterior tem 30.1h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
+        "snapshot anterior tem 36.2h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
       ],
       "summary_partidas_iniciadas": {
         "consultados": 0,
@@ -39,7 +39,7 @@
       "status": "preservado_apos_falha_seguro",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
       "gerado_em": "2026-09-15T22:41:47-03:00",
-      "cache_efetivo_minutos": 45,
+      "cache_efetivo_minutos": 5,
       "erro": "libertadores: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=20260826-20261006&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
       "fallback_seguro_para_af": true,
       "motivos_fallback": [],
@@ -60,7 +60,7 @@
       "status": "preservado_apos_falha_seguro",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
       "gerado_em": "2026-09-16T00:14:21-03:00",
-      "cache_efetivo_minutos": 45,
+      "cache_efetivo_minutos": 5,
       "erro": "sul_americana: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard?dates=20260826-20261006&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
       "fallback_seguro_para_af": true,
       "motivos_fallback": [],
