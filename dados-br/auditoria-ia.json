@@ -1,14 +1,16 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-15",
-  "executado_em": "2026-09-15T12:41:00-03:00",
-  "status": "atencao",
-  "resumo": "Os dados finais estão íntegros. Há avisos de falha em 2 fontes de transmissão, sem perda crítica de cobertura e sem pendências elegíveis para correção.",
+  "data_brt": "2026-09-16",
+  "executado_em": "2026-09-16T12:33:16-03:00",
+  "status": "critico",
+  "resumo": "Os dados finais auditáveis estão íntegros e não há pendências de público, renda, transmissão ou melhores momentos. O status determinístico crítico decorre de snapshot não sincronizado e requer verificação operacional, mas os indicadores não apontam perda factual crítica de cobertura.",
   "triagem": {
-    "data_hora_brt": "2026-09-15T12:41:00-03:00",
+    "data_hora_brt": "2026-09-16T12:33:16-03:00",
     "saude": {
-      "status_deterministico": "atencao",
-      "criticos": [],
+      "status_deterministico": "critico",
+      "criticos": [
+        "status principal informa snapshot não sincronizado"
+      ],
       "avisos": [
         "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura"
       ],
@@ -21,7 +23,7 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 7.5
+        "ultimo_sucesso_horas": 31.3
       }
     },
     "pendencias": {
@@ -59,12 +61,19 @@
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "Os dados finais estão íntegros. Há avisos de falha em 2 fontes de transmissão, sem perda crítica de cobertura e sem pendências elegíveis para correção.",
+    "resumo": "Os dados finais auditáveis estão íntegros e não há pendências de público, renda, transmissão ou melhores momentos. O status determinístico crítico decorre de snapshot não sincronizado e requer verificação operacional, mas os indicadores não apontam perda factual crítica de cobertura.",
     "problemas": [
       {
         "categoria": "fonte",
         "severidade": "atencao",
-        "mensagem": "2 fontes de transmissão falharam, sem perda crítica de cobertura.",
+        "mensagem": "O status principal informa snapshot não sincronizado; verificar a sincronização operacional, embora não haja falhas críticas nos dados finais do dossiê.",
+        "event_id": "",
+        "requer_intervencao": true
+      },
+      {
+        "categoria": "transmissao",
+        "severidade": "info",
+        "mensagem": "Duas fontes de transmissão falharam, sem perda crítica de cobertura e sem pendências de jogos para correção.",
         "event_id": "",
         "requer_intervencao": false
       }
@@ -81,12 +90,14 @@
     "transmissoes_aplicadas": [],
     "editoriais_aplicados": []
   },
-  "criticos_nao_resolvidos": [],
+  "criticos_nao_resolvidos": [
+    "status principal informa snapshot não sincronizado"
+  ],
   "alerta": {
     "ultimo_fingerprint": "",
     "ultimo_enviado_em": "",
     "envio_nesta_execucao": false,
-    "detalhe": "não necessário"
+    "detalhe": "RESEND_API_KEY/EMAIL_DESTINO não configurados"
   },
   "historico": [
     {
@@ -549,6 +560,21 @@
       "transmissoes_aplicadas": 0,
       "editoriais_aplicados": [],
       "criticos": [],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-16",
+      "executado_em": "2026-09-16T12:33:16-03:00",
+      "status": "critico",
+      "resumo": "Os dados finais auditáveis estão íntegros e não há pendências de público, renda, transmissão ou melhores momentos. O status determinístico crítico decorre de snapshot não sincronizado e requer verificação operacional, mas os indicadores não apontam perda factual crítica de cobertura.",
+      "chamadas_openai": 1,
+      "web_searches": 0,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [
+        "status principal informa snapshot não sincronizado"
+      ],
       "email_enviado": false
     }
   ]
