@@ -13,15 +13,15 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 39,
+    "jogos_na_janela": 36,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 7,
+    "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 48,
+    "candidatos_oficiais_encontrados": 50,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
-    "transmissoes_publicadas": 7,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
+    "transmissoes_publicadas": 6,
     "sem_transmissao": 1,
     "erros": 0
   },
@@ -69,26 +69,12 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401912524",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "São Paulo x Boca Juniors",
-      "data_iso": "2026-09-15T21:30:00-03:00",
-      "principal": "SBT",
-      "fontes_encontradas": [
-        "SBT"
-      ],
-      "manual": false,
-      "descoberta_antecipada": true
-    },
-    {
-      "event_id": "401912540",
+      "event_id": "401912525",
       "rodada": 0,
       "competicao_chave": "libertadores",
       "competicao_nome": "Libertadores",
-      "jogo": "Corinthians x Estudiantes de La Plata",
-      "data_iso": "2026-09-16T21:30:00-03:00",
+      "jogo": "Liga de Quito x Palmeiras",
+      "data_iso": "2026-09-16T19:00:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -213,38 +199,6 @@
       ]
     },
     {
-      "event_id": "401912524",
-      "jogo": "São Paulo x Boca Juniors",
-      "fonte": "sbt_sports",
-      "video_id": "-ZM__9jDLno",
-      "url": "https://www.youtube.com/watch?v=-ZM__9jDLno",
-      "titulo": "SÃO PAULO X BOCA JUNIORS - AO VIVO E COM IMAGENS | SULAMERICANA 2026",
-      "status": "live",
-      "confianca": 0.895,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (30 min de diferença)"
-      ]
-    },
-    {
-      "event_id": "401912524",
-      "jogo": "São Paulo x Boca Juniors",
-      "fonte": "sbt",
-      "video_id": "Vq8frR-m5a8",
-      "url": "https://www.youtube.com/watch?v=Vq8frR-m5a8",
-      "titulo": "SÃO PAULO X BOCA JUNIORS - AO VIVO E COM IMAGENS | SULAMERICANA 2026",
-      "status": "live",
-      "confianca": 0.895,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (30 min de diferença)"
-      ]
-    },
-    {
       "event_id": "401841242",
       "jogo": "Vitória x Cruzeiro",
       "fonte": "getv",
@@ -321,13 +275,23 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "uVlxW23xZLo",
-      "url": "https://www.youtube.com/watch?v=uVlxW23xZLo",
+      "video_id": "lHXt6D_tO8E",
+      "url": "https://www.youtube.com/watch?v=lHXt6D_tO8E",
+      "fonte": "sbt",
+      "canal": "SBT",
+      "titulo": "SBT Ao Vivo",
+      "status": "live",
+      "inicio_programado": "2026-09-15T19:20:50-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "7QWgeSfwbCE",
+      "url": "https://www.youtube.com/watch?v=7QWgeSfwbCE",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: FLUMINENSE SOFRE, MAS AVANÇA NA LIBERTA E VASCO ELIMINA O SANTA FÉ NA SULA | GERAL CAZÉTV",
+      "titulo": "AO VIVO: BRASIL X ESTADOS UNIDOS | COPA DO MUNDO FEMININA SUB-20 FIFA 2026 | OITAVAS DE FINAL",
       "status": "live",
-      "inicio_programado": "2026-09-15T15:30:00-03:00",
+      "inicio_programado": "2026-09-16T09:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -441,16 +405,6 @@
       "motivo": "conteúdo rejeitado: narracao"
     },
     {
-      "video_id": "lHXt6D_tO8E",
-      "url": "https://www.youtube.com/watch?v=lHXt6D_tO8E",
-      "fonte": "sbt",
-      "canal": "SBT",
-      "titulo": "SBT Ao Vivo",
-      "status": "live",
-      "inicio_programado": "2026-09-15T19:20:50-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "1QMyDw_DwkQ",
       "url": "https://www.youtube.com/watch?v=1QMyDw_DwkQ",
       "fonte": "cazetv",
@@ -521,16 +475,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "7QWgeSfwbCE",
-      "url": "https://www.youtube.com/watch?v=7QWgeSfwbCE",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: BRASIL X ESTADOS UNIDOS | COPA DO MUNDO FEMININA SUB-20 FIFA 2026 | OITAVAS DE FINAL",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-16T09:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "B-HPksUoZYI",
       "url": "https://www.youtube.com/watch?v=B-HPksUoZYI",
       "fonte": "cazetv",
@@ -561,6 +505,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "DxSeX9bM9S0",
+      "url": "https://www.youtube.com/watch?v=DxSeX9bM9S0",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: BAYERN DE MUNIQUE X UNION BERLIN | BUNDESLIGA 26/27 | 4ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-18T14:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "E4Ilm886VgI",
       "url": "https://www.youtube.com/watch?v=E4Ilm886VgI",
       "fonte": "cazetv",
@@ -586,6 +540,16 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): LILLESTROM X TORREENSE | EUROPA LEAGUE 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-17T15:55:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "HVzaY_ht_PQ",
+      "url": "https://www.youtube.com/watch?v=HVzaY_ht_PQ",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): VIKTORIA PLZEŇ X UNION SAINT-GILLOISE | EUROPA LEAGUE 26/27 | 1ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-09-17T15:55:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -651,6 +615,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "dTnAnbIOwOI",
+      "url": "https://www.youtube.com/watch?v=dTnAnbIOwOI",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: PÓS-LIBERTADORES E SUL-AMERICANA | GERAL CAZÉTV",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-16T20:50:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "htjHXQkNjX4",
       "url": "https://www.youtube.com/watch?v=htjHXQkNjX4",
       "fonte": "cazetv",
@@ -668,6 +642,16 @@
       "titulo": "AO VIVO: JUVENTUS X NEC NIJMEGEN | EUROPA LEAGUE 26/27 | 1ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-09-17T15:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "jEjVOYt-32Y",
+      "url": "https://www.youtube.com/watch?v=jEjVOYt-32Y",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: SORTEIO DA COPA DAVIS | QUADRA ABERTA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-17T11:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -691,6 +675,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "ukN6dbIMZ6U",
+      "url": "https://www.youtube.com/watch?v=ukN6dbIMZ6U",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): OMONIA X CELTA | EUROPA LEAGUE 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-16T13:35:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "wAce0KbmUNo",
       "url": "https://www.youtube.com/watch?v=wAce0KbmUNo",
       "fonte": "cazetv",
@@ -711,27 +705,33 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401912525",
+      "jogo": "Liga de Quito x Palmeiras",
+      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
+    }
+  ],
   "sem_transmissao": [
     {
-      "event_id": "401912540",
+      "event_id": "401912525",
       "rodada": 0,
       "competicao_chave": "libertadores",
       "competicao_nome": "Libertadores",
-      "jogo": "Corinthians x Estudiantes de La Plata",
-      "data_iso": "2026-09-16T21:30:00-03:00",
+      "jogo": "Liga de Quito x Palmeiras",
+      "data_iso": "2026-09-16T19:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 89,
+    "unidades": 88,
     "requisicoes": {
       "channels": 4,
-      "videos": 45,
+      "videos": 44,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-15T21:37:08-03:00"
+  "atualizado_em": "2026-09-16T13:02:48-03:00"
 }
