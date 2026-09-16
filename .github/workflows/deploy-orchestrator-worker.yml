@@ -132,7 +132,10 @@ jobs:
               && printf '%s' "$BODY" | grep -q '"liveBrowserUntouched":true' \
               && printf '%s' "$BODY" | grep -q '"transmissionGuardian":true' \
               && printf '%s' "$BODY" | grep -q '"continentalAgendaAware":true' \
-              && printf '%s' "$BODY" | grep -q '"continentalStateIdempotency":true'; then
+              && printf '%s' "$BODY" | grep -q '"continentalStateIdempotency":true' \
+              && printf '%s' "$BODY" | grep -q '"brasileiraoSourceCircuitBreaker":true' \
+              && printf '%s' "$BODY" | grep -q '"espnScoreboardGateway":true' \
+              && printf '%s' "$BODY" | grep -q '"cron":"\*/5 \* \* \* \*"'; then
               echo "Health OK em modo $EXPECTED."
               printf '%s\n' "$BODY"
               exit 0
@@ -162,7 +165,7 @@ jobs:
             echo ''
             echo "- **Modo:** \`${REQUESTED_MODE}\`"
             echo '- **Worker:** `formula-do-gol-orchestrator`'
-            echo '- **Cron:** `* * * * *` (1 minuto)'
+            echo '- **Cron:** `*/5 * * * *` (5 minutos; apenas decisão, sem Action quando não há trabalho)'
             echo '- **Estado:** Durable Object SQLite `OrchestratorState`'
             echo '- **Health:** https://orchestrator.formuladogol.com.br/health'
             echo '- **Status:** https://orchestrator.formuladogol.com.br/status'

@@ -186,8 +186,11 @@ jobs:
         env:
           ESPN_TENTATIVAS: ${{ steps.espn.outputs.tentativas }}
           ESPN_MOTIVO: ${{ steps.espn.outputs.motivo }}
+          ESPN_SOURCE_STATE: ${{ steps.espn.outputs.source_state }}
+          ESPN_SOURCE_REASON: ${{ steps.espn.outputs.source_reason }}
         run: |
           printf '::warning::A ESPN não sincronizou standings e scoreboard após %s tentativa(s).\n' "${ESPN_TENTATIVAS:-0}"
+          printf '::warning::Estado estruturado da fonte: %s / %s\n' "${ESPN_SOURCE_STATE:-unknown}" "${ESPN_SOURCE_REASON:-unknown}"
           printf '::warning::%s\n' "${ESPN_MOTIVO:-Motivo não informado pelo coletor.}"
           echo "A base do Brasileirão será preservada; as copas e o AF-Previsão continuarão pela rota independente."
 
@@ -199,6 +202,10 @@ jobs:
           BR_FALLBACKS: ${{ steps.espn.outputs.fallbacks }}
           BR_TENTATIVAS: ${{ steps.espn.outputs.tentativas }}
           BR_SINCRONIZADO: ${{ steps.espn.outputs.sincronizado }}
+          BR_SOURCE_STATE: ${{ steps.espn.outputs.source_state }}
+          BR_SOURCE_REASON: ${{ steps.espn.outputs.source_reason }}
+          BR_SNAPSHOT_PRESERVED: ${{ steps.espn.outputs.snapshot_preserved }}
+          BR_SOURCE_SURFACES: ${{ steps.espn.outputs.source_surfaces }}
           BR_WORKFLOW: Atualizar Brasileirao (ESPN)
           BR_SITE: Fórmula do Gol
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
@@ -502,6 +509,10 @@ jobs:
           BR_FALLBACKS: ${{ steps.espn.outputs.fallbacks }}
           BR_TENTATIVAS: ${{ steps.espn.outputs.tentativas }}
           BR_SINCRONIZADO: ${{ steps.espn.outputs.sincronizado }}
+          BR_SOURCE_STATE: ${{ steps.espn.outputs.source_state }}
+          BR_SOURCE_REASON: ${{ steps.espn.outputs.source_reason }}
+          BR_SNAPSHOT_PRESERVED: ${{ steps.espn.outputs.snapshot_preserved }}
+          BR_SOURCE_SURFACES: ${{ steps.espn.outputs.source_surfaces }}
           BR_WORKFLOW: Atualizar Brasileirao (ESPN)
           BR_SITE: Fórmula do Gol
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
@@ -1325,6 +1336,10 @@ jobs:
           BR_FALLBACKS: '[]'
           BR_TENTATIVAS: '0'
           BR_SINCRONIZADO: 'false'
+          BR_SOURCE_STATE: error
+          BR_SOURCE_REASON: WORKFLOW_JOB_FAILED
+          BR_SNAPSHOT_PRESERVED: 'true'
+          BR_SOURCE_SURFACES: '[]'
           BR_WORKFLOW: Atualizar Brasileirao (ESPN)
           BR_SITE: Fórmula do Gol
           BR_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
