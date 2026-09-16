@@ -28,7 +28,70 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Respeitar circuit breaker persistente
+        id: breaker
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          import sys
+          from pathlib import Path
+
+          root = Path.cwd()
+          sys.path.insert(0, str(root / 'scripts'))
+          from orquestrar_workflows import editorial_continental_lock_active
+
+          blocked, state = editorial_continental_lock_active()
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as handle:
+              handle.write(f"blocked={'true' if blocked else 'false'}\n")
+          if blocked:
+              print('Editorial continental PAUSADO por circuit breaker persistente.')
+              print(f"Falha original: {state.get('run_url') or 'URL não registrada'}")
+              print('Somente uma correção nos arquivos de governança editorial destrava uma nova tentativa automática.')
+          else:
+              print('Circuit breaker continental: livre.')
+          PY
+
+      - name: Verificar elegibilidade factual da fase continental
+        id: readiness
+        if: steps.breaker.outputs.blocked != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/gerar_analise_continental.py --eligibility > /tmp/continental-eligibility.json
+          cat /tmp/continental-eligibility.json
+          python - <<'PY'
+          import json
+          import os
+
+          data = json.load(open('/tmp/continental-eligibility.json', encoding='utf-8'))
+          action = str(data.get('action') or 'none')
+          if action not in {'none', 'baseline', 'publish'}:
+              raise SystemExit(f'ação de elegibilidade inválida: {action}')
+          output = os.environ['GITHUB_OUTPUT']
+          with open(output, 'a', encoding='utf-8') as handle:
+              handle.write(f'action={action}\n')
+              handle.write(f'rank={int(data.get("rank") or 0)}\n')
+          reason = str(data.get('reason') or '')
+          pending = ', '.join(str(item) for item in (data.get('pendentes') or []))
+          print(f'Elegibilidade continental: action={action}; rank={data.get("rank")}; motivo={reason}')
+          if pending:
+              print(f'Jogos brasileiros pendentes: {pending}')
+          PY
+
+      - name: Encerrar sem trabalho enquanto a fase estiver em andamento
+        if: steps.breaker.outputs.blocked == 'true' || steps.readiness.outputs.action == 'none'
+        run: |
+          if [[ "${{ steps.breaker.outputs.blocked }}" == "true" ]]; then
+            echo "Editorial continental permanece pausado após falha anterior. Nada será executado."
+          else
+            echo "Nenhum editorial continental elegível nesta execução."
+            echo "A fase dos brasileiros ainda não terminou por completo; não é erro e não haverá retry."
+          fi
+
       - name: Validar geradores offline
+        if: steps.breaker.outputs.blocked != 'true' && steps.readiness.outputs.action != 'none'
         run: |
           set -euo pipefail
           python -m py_compile scripts/editorial_ia.py scripts/gerar_analise_continental.py scripts/buscar_melhores_momentos_continentais.py
@@ -37,6 +100,7 @@ jobs:
           python scripts/buscar_melhores_momentos_continentais.py --self-test
 
       - name: Buscar melhores momentos oficiais da CONMEBOL
+        if: steps.breaker.outputs.blocked != 'true' && steps.readiness.outputs.action == 'publish'
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         shell: bash
@@ -49,6 +113,7 @@ jobs:
           fi
 
       - name: Gerar editorial continental quando elegível
+        if: steps.breaker.outputs.blocked != 'true' && steps.readiness.outputs.action != 'none'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_EDITORIAL_MODEL: ${{ vars.OPENAI_EDITORIAL_MODEL || 'gpt-5.6-sol' }}
@@ -56,6 +121,7 @@ jobs:
         run: python scripts/gerar_analise_continental.py --usar-ia
 
       - name: Validar artefatos editoriais
+        if: steps.breaker.outputs.blocked != 'true' && steps.readiness.outputs.action != 'none'
         run: |
           set -euo pipefail
           python -m json.tool dados-br/analises.json >/dev/null
@@ -63,6 +129,7 @@ jobs:
           python scripts/validar_artefatos_analises.py
 
       - name: Publicar alterações
+        if: steps.breaker.outputs.blocked != 'true' && steps.readiness.outputs.action != 'none'
         id: publish
         shell: bash
         run: |
@@ -82,7 +149,135 @@ jobs:
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Disparar deploy
-        if: steps.publish.outputs.changed == 'true'
+        if: steps.breaker.outputs.blocked != 'true' && steps.readiness.outputs.action == 'publish' && steps.publish.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run deploy.yml --ref main
+
+      - name: Travar novas tentativas automáticas após falha
+        if: ${{ failure() }}
+        id: failure_lock
+        env:
+          RUN_ID: ${{ github.run_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COMMIT_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set +e
+          echo "Registrando circuit breaker persistente para impedir novas tentativas automáticas."
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Descarta qualquer HTML/JSON parcialmente gerado pela execução que
+          # falhou. O único arquivo que pode ser publicado daqui é o lock.
+          git fetch origin main
+          if [[ $? -ne 0 ]]; then
+            echo "::warning title=Circuit breaker não persistido::Falha ao atualizar origin/main. O e-mail de incidente ainda será tentado."
+            exit 0
+          fi
+          git reset --hard origin/main
+
+          python - <<'PY'
+          import json
+          import os
+          import sys
+          from datetime import datetime
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+
+          root = Path.cwd()
+          sys.path.insert(0, str(root / 'scripts'))
+          from orquestrar_workflows import (
+              CONTINENTAL_EDITORIAL_LOCK_PATH,
+              editorial_continental_guard_fingerprint,
+          )
+
+          state = {
+              'schema_version': 1,
+              'bloqueado': True,
+              'workflow': 'Publicar análise editorial continental',
+              'motivo': 'workflow_failure',
+              'bloqueado_em': datetime.now(ZoneInfo('America/Sao_Paulo')).replace(microsecond=0).isoformat(),
+              'guard_fingerprint': editorial_continental_guard_fingerprint(),
+              'run_id': os.environ.get('RUN_ID', ''),
+              'run_url': os.environ.get('RUN_URL', ''),
+              'head_sha': os.environ.get('COMMIT_SHA', ''),
+              'regra_retomada': (
+                  'Pausa automática até mudança no código de governança editorial continental. '
+                  'Commits de dados esportivos não destravam o workflow.'
+              ),
+          }
+          CONTINENTAL_EDITORIAL_LOCK_PATH.parent.mkdir(parents=True, exist_ok=True)
+          CONTINENTAL_EDITORIAL_LOCK_PATH.write_text(
+              json.dumps(state, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8',
+          )
+          print(f"Lock gravado em {CONTINENTAL_EDITORIAL_LOCK_PATH}")
+          PY
+
+          git add -- dados-br/estado-editorial-continentais.json
+          if git diff --cached --quiet; then
+            echo "Circuit breaker já estava persistido."
+            exit 0
+          fi
+          git commit -m "Pausar editorial continental após falha [skip ci]"
+          git push origin HEAD:main
+          if [[ $? -eq 0 ]]; then
+            echo "Circuit breaker persistido em main. Novos ciclos automáticos ficarão bloqueados."
+            echo "persisted=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning title=Circuit breaker não persistido::Falha ao enviar o lock para main. A trava pelo run/commit ainda reduz o retry imediato."
+          fi
+
+      - name: Alertar falha e interromper retentativas automáticas
+        if: ${{ failure() }}
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
+          EMAIL_REMETENTE: ${{ secrets.EMAIL_REMETENTE }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COMMIT_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set +e
+          echo "::error title=Editorial continental pausado::A execução falhou. O circuit breaker impede novas tentativas automáticas até correção do código editorial."
+
+          if [[ -z "${RESEND_API_KEY:-}" || -z "${EMAIL_DESTINO:-}" ]]; then
+            echo "::warning title=Falha sem e-mail::RESEND_API_KEY/EMAIL_DESTINO não configurados; circuit breaker continua ativo."
+            exit 0
+          fi
+
+          BODY="$(python - <<'PY'
+          import html
+          import json
+          import os
+
+          run_url = os.environ.get('RUN_URL', '')
+          commit = os.environ.get('COMMIT_SHA', '')
+          body = f'''<h2>Fórmula do Gol — editorial continental pausado</h2>
+          <p>O workflow <strong>Publicar análise editorial continental</strong> falhou.</p>
+          <p>As novas tentativas automáticas ficam <strong>suspensas</strong> para impedir repetição infinita.</p>
+          <p>Atualizações normais de placares, tabelas e JSONs <strong>não destravam</strong> o editorial.</p>
+          <p><strong>Commit:</strong> <code>{html.escape(commit)}</code></p>
+          <p><a href="{html.escape(run_url, quote=True)}">Abrir execução com erro no GitHub Actions</a></p>
+          <p>Depois de corrigir e publicar uma alteração no código de governança do editorial continental, o orquestrador poderá tentar novamente.</p>'''
+          print(json.dumps({
+              'from': f'Fórmula do Gol <{os.environ.get("EMAIL_REMETENTE") or "onboarding@resend.dev"}>',
+              'to': [os.environ.get('EMAIL_DESTINO', '')],
+              'subject': 'Fórmula do Gol: editorial continental pausado após erro',
+              'html': body,
+          }, ensure_ascii=False))
+          PY
+          )"
+
+          HTTP_CODE="$(curl -sS -o /tmp/resend-editorial-continentais.json -w '%{http_code}' \
+            -X POST 'https://api.resend.com/emails' \
+            -H "Authorization: Bearer ${RESEND_API_KEY}" \
+            -H 'Content-Type: application/json' \
+            --data "$BODY")"
+          if [[ "$HTTP_CODE" =~ ^2 ]]; then
+            echo "E-mail de falha enviado e circuit breaker mantido."
+          else
+            echo "::warning title=Falha ao enviar e-mail::Resend HTTP ${HTTP_CODE}; $(head -c 500 /tmp/resend-editorial-continentais.json 2>/dev/null)"
+          fi
