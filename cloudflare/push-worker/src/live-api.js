@@ -7,6 +7,7 @@ import {
   summaryTeamMetricCoverage
 } from './espn-source.js';
 import { fetchApiFootballStatsFallback } from './api-football-source.js';
+import { fetchTheSportsDbStatsFallback } from './thesportsdb-source.js';
 
 const LIVE_GATEWAY_VERSION = '2';
 const SCOREBOARD_HOT_TTL_SECONDS = 8;
@@ -228,56 +229,114 @@ export async function resolveLiveSummary(url, deps = {}) {
     const result = await fetchEspnSummaryGateway(league, eventId, fetchImpl, expectedGoals);
     let data = result.data || {};
     const beforeCoverage = summaryTeamMetricCoverage(data);
-    let statsProvider = 'espn';
-    let statsFallback = null;
-    let statsFallbackError = '';
-
-    const apiFootballKey = text(deps.apiFootballKey);
+    const providers = ['espn'];
+    const statsFallbacks = [];
+    const statsFallbackErrors = {};
     const gameState = summaryState(data);
-    const shouldTryStatsFallback = Boolean(apiFootballKey)
-      && beforeCoverage.maxPerTeam < STATS_FALLBACK_THRESHOLD
+    const shouldTryStatsFallback = (beforeCoverage.teams < 2 || beforeCoverage.minPerTeam < STATS_FALLBACK_THRESHOLD)
       && (beforeCoverage.maxPerTeam > 0 || expectedGoals > 0 || gameState === 'in' || gameState === 'post');
 
+    // Fallback 1: TheSportsDB V1 usa a chave pública 123 e, portanto, não
+    // depende de secret do projeto. Ele entra antes do provedor opcional pago.
     if (shouldTryStatsFallback) {
-      const statsKey = cacheKey('summary-stats', [league, eventId], 'api-football');
-      const mapKey = cacheKey('summary-stats-map', [league, eventId], 'api-football');
+      const statsKey = cacheKey('summary-stats', [league, eventId], 'thesportsdb');
+      const mapKey = cacheKey('summary-stats-map', [league, eventId], 'thesportsdb');
+      let fallback = null;
+      let fallbackError = '';
       const cachedStats = await readCached(cache, statsKey);
-      if (cachedStats?.unavailable === true) {
-        statsFallbackError = text(cachedStats.error).slice(0, 500);
-      } else {
-        statsFallback = cachedStats?.data ? cachedStats : null;
+      if (cachedStats?.unavailable === true) fallbackError = text(cachedStats.error).slice(0, 500);
+      else if (cachedStats?.data) fallback = cachedStats;
+
+      if (!fallback && !fallbackError) {
+        const eventMap = await readCached(cache, mapKey);
+        try {
+          fallback = await fetchTheSportsDbStatsFallback(data, {
+            fetchImpl,
+            now,
+            eventId: Number(eventMap?.eventId || 0) || undefined
+          });
+          await Promise.all([
+            writeCached(cache, statsKey, fallback, STATS_FALLBACK_TTL_SECONDS),
+            writeCached(cache, mapKey, { eventId: fallback.eventId }, STATS_FIXTURE_MAP_TTL_SECONDS)
+          ]);
+        } catch (error) {
+          fallbackError = text(error?.message || error).slice(0, 500);
+          await writeCached(cache, statsKey, { unavailable: true, error: fallbackError }, STATS_FALLBACK_TTL_SECONDS);
+        }
       }
 
-      if (!statsFallback && !statsFallbackError) {
+      if (fallback?.data) {
+        const previous = summaryTeamMetricCoverage(data);
+        const enriched = mergeExternalStatisticsIntoSummary(data, fallback.data);
+        const after = summaryTeamMetricCoverage(enriched);
+        if (after.totalUnique > previous.totalUnique) {
+          data = enriched;
+          providers.push('thesportsdb');
+          statsFallbacks.push({
+            source: 'thesportsdb',
+            eventId: Number(fallback.eventId || 0) || null,
+            metricNames: Array.isArray(fallback.metricNames) ? fallback.metricNames : []
+          });
+        }
+      }
+      if (fallbackError) statsFallbackErrors.thesportsdb = fallbackError;
+    }
+
+    // Fallback 2: API-Football continua suportada, mas é opcional. Só é
+    // consultada quando a cobertura ainda estiver abaixo do alvo e a chave já
+    // existir no Worker. A ausência do secret jamais bloqueia o deploy/endpoint.
+    const apiFootballKey = text(deps.apiFootballKey);
+    const afterSportsDbCoverage = summaryTeamMetricCoverage(data);
+    const shouldTryApiFootball = shouldTryStatsFallback
+      && Boolean(apiFootballKey)
+      && (afterSportsDbCoverage.teams < 2 || afterSportsDbCoverage.minPerTeam < STATS_FALLBACK_THRESHOLD);
+
+    if (shouldTryApiFootball) {
+      const statsKey = cacheKey('summary-stats', [league, eventId], 'api-football');
+      const mapKey = cacheKey('summary-stats-map', [league, eventId], 'api-football');
+      let fallback = null;
+      let fallbackError = '';
+      const cachedStats = await readCached(cache, statsKey);
+      if (cachedStats?.unavailable === true) fallbackError = text(cachedStats.error).slice(0, 500);
+      else if (cachedStats?.data) fallback = cachedStats;
+
+      if (!fallback && !fallbackError) {
         const fixtureMap = await readCached(cache, mapKey);
         try {
-          statsFallback = await fetchApiFootballStatsFallback(data, {
+          fallback = await fetchApiFootballStatsFallback(data, {
             apiKey: apiFootballKey,
             fetchImpl,
             now,
             fixtureId: Number(fixtureMap?.fixtureId || 0) || undefined
           });
           await Promise.all([
-            writeCached(cache, statsKey, statsFallback, STATS_FALLBACK_TTL_SECONDS),
-            writeCached(cache, mapKey, { fixtureId: statsFallback.fixtureId }, STATS_FIXTURE_MAP_TTL_SECONDS)
+            writeCached(cache, statsKey, fallback, STATS_FALLBACK_TTL_SECONDS),
+            writeCached(cache, mapKey, { fixtureId: fallback.fixtureId }, STATS_FIXTURE_MAP_TTL_SECONDS)
           ]);
-        } catch (fallbackError) {
-          statsFallbackError = text(fallbackError?.message || fallbackError).slice(0, 500);
-          await writeCached(cache, statsKey, { unavailable: true, error: statsFallbackError }, STATS_FALLBACK_TTL_SECONDS);
-          statsFallback = null;
+        } catch (error) {
+          fallbackError = text(error?.message || error).slice(0, 500);
+          await writeCached(cache, statsKey, { unavailable: true, error: fallbackError }, STATS_FALLBACK_TTL_SECONDS);
         }
       }
 
-      if (statsFallback?.data) {
-        const enriched = mergeExternalStatisticsIntoSummary(data, statsFallback.data);
-        const afterCoverage = summaryTeamMetricCoverage(enriched);
-        if (afterCoverage.totalUnique > beforeCoverage.totalUnique) {
+      if (fallback?.data) {
+        const previous = summaryTeamMetricCoverage(data);
+        const enriched = mergeExternalStatisticsIntoSummary(data, fallback.data);
+        const after = summaryTeamMetricCoverage(enriched);
+        if (after.totalUnique > previous.totalUnique) {
           data = enriched;
-          statsProvider = 'espn+api-football';
+          providers.push('api-football');
+          statsFallbacks.push({
+            source: 'api-football',
+            fixtureId: Number(fallback.fixtureId || 0) || null,
+            metricNames: Array.isArray(fallback.metricNames) ? fallback.metricNames : []
+          });
         }
       }
+      if (fallbackError) statsFallbackErrors.apiFootball = fallbackError;
     }
 
+    const statsProvider = providers.join('+');
     const mergedResult = { ...result, data };
     const finalCoverage = summaryTeamMetricCoverage(data);
     const envelope = publicEnvelope(mergedResult, now, {
@@ -288,12 +347,10 @@ export async function resolveLiveSummary(url, deps = {}) {
       attempts: result.attempts || [],
       statsProvider,
       statsCoverage: finalCoverage,
-      statsFallback: statsFallback ? {
-        source: statsFallback.source || 'api-football',
-        fixtureId: Number(statsFallback.fixtureId || 0) || null,
-        metricNames: Array.isArray(statsFallback.metricNames) ? statsFallback.metricNames : []
-      } : null,
-      statsFallbackError
+      statsFallback: statsFallbacks.length ? statsFallbacks[statsFallbacks.length - 1] : null,
+      statsFallbacks,
+      statsFallbackError: Object.values(statsFallbackErrors).filter(Boolean).join(' | '),
+      statsFallbackErrors
     });
     await Promise.all([
       writeCached(cache, hotKey, envelope, SUMMARY_HOT_TTL_SECONDS),

@@ -2461,10 +2461,18 @@
 
   function statsSourceMeta(summary) {
     const provider = String(summary && summary.__fdgLiveMeta && summary.__fdgLiveMeta.statsProvider || "espn");
-    if (provider === "espn+api-football") {
+    const hasSportsDb = provider.includes("thesportsdb");
+    const hasApiFootball = provider.includes("api-football");
+    if (hasSportsDb || hasApiFootball) {
+      const parts = ["ESPN"];
+      if (hasSportsDb) parts.push("THESPORTSDB");
+      if (hasApiFootball) parts.push("API-FOOTBALL");
+      const complements = [];
+      if (hasSportsDb) complements.push("TheSportsDB");
+      if (hasApiFootball) complements.push("API-Football");
       return {
-        badge: "ESPN + API-FOOTBALL",
-        note: "A ESPN é a fonte principal. Quando o feed ao vivo vem incompleto, métricas factuais são complementadas pela API-Football. O site não estima dados ausentes."
+        badge: parts.join(" + "),
+        note: "A ESPN é a fonte principal. Quando o feed ao vivo vem incompleto, métricas factuais são complementadas por " + complements.join(" e ") + ". O site não estima dados ausentes."
       };
     }
     return {

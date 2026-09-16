@@ -572,8 +572,10 @@ export default {
         version: 7,
         revision: '6-R10R4',
         liveGatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
-        liveStatsFallbackVersion: 1,
+        liveStatsFallbackVersion: 2,
+        theSportsDbStatsReady: true,
         apiFootballStatsReady: Boolean(env.API_FOOTBALL_KEY),
+        statsFallbackProviders: ['thesportsdb', 'api-football-optional'],
         sportsMonitorReady: Boolean(monitor?.ok),
         operationalState: operational?.state || 'unknown',
         sports: {

@@ -267,6 +267,21 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
   let apiCalls = 0;
   const fakeFetch = async (url, options = {}) => {
     const href = String(url);
+    if (href.includes('thesportsdb.com/api/v1/json/123/searchevents.php')) {
+      return Response.json({ event: [{
+        idEvent: '2579902', strTimestamp: '2026-09-16T00:30:00', strSport: 'Soccer',
+        strHomeTeam: 'São Paulo', strAwayTeam: 'Boca Juniors'
+      }] });
+    }
+    if (href.includes('thesportsdb.com/api/v1/json/123/lookupeventstats.php?id=2579902')) {
+      return Response.json({ eventstats: [
+        { strEvent: 'São Paulo vs Boca Juniors', strStat: 'Shots on Goal', intHome: '2', intAway: '0' },
+        { strEvent: 'São Paulo vs Boca Juniors', strStat: 'Total Shots', intHome: '4', intAway: '3' },
+        { strEvent: 'São Paulo vs Boca Juniors', strStat: 'Blocked Shots', intHome: '2', intAway: '1' },
+        { strEvent: 'São Paulo vs Boca Juniors', strStat: 'Ball Possession', intHome: '57', intAway: '43' },
+        { strEvent: 'São Paulo vs Boca Juniors', strStat: 'Corner Kicks', intHome: '2', intAway: '0' }
+      ] });
+    }
     if (href.includes('v3.football.api-sports.io')) {
       apiCalls += 1;
       assert.equal(options?.headers?.['x-apisports-key'], 'api-key-test');
@@ -321,8 +336,10 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
     cache, fetchImpl: fakeFetch, apiFootballKey: 'api-key-test', now: () => 9_000_000
   });
   assert.equal(result.status, 200);
-  assert.equal(result.body.statsProvider, 'espn+api-football');
+  assert.equal(result.body.statsProvider, 'espn+thesportsdb+api-football');
   assert.equal(result.body.statsFallback.fixtureId, 880001);
+  assert.equal(result.body.statsFallbacks.length, 2);
+  assert.equal(result.body.statsFallbacks[0].source, 'thesportsdb');
   assert.ok(result.body.statsCoverage.minPerTeam >= 14, 'fallback deve elevar cobertura para muito além do feed ESPN reduzido');
   const home = result.body.data.boxscore.teams.find((row) => row.team.id === '1');
   const homeStats = new Map(home.statistics.map((row) => [row.name, row.displayValue]));
@@ -332,6 +349,72 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
   assert.equal(homeStats.get('tackles'), '6');
   assert.equal(homeStats.get('interceptions'), '2');
   assert.equal(apiCalls, 2, 'lookup live + details enriquecido devem bastar');
+}
+
+
+// Sem API_FOOTBALL_KEY, TheSportsDB precisa funcionar sozinho e a ausência do
+// secret opcional não pode derrubar o endpoint nem impedir enriquecimento.
+{
+  const cache = new MemoryCache();
+  const team = (id, name) => ({ id, displayName: name });
+  const stat = (name, value) => ({ name, displayValue: String(value) });
+  const espnSparse = {
+    header: { competitions: [{
+      date: '2026-09-16T00:30:00Z',
+      status: { type: { state: 'in', completed: false } },
+      competitors: [
+        { homeAway: 'home', team: team('1', 'São Paulo') },
+        { homeAway: 'away', team: team('2', 'Boca Juniors') }
+      ]
+    }] },
+    boxscore: { teams: [
+      { homeAway: 'home', team: team('1', 'São Paulo'), statistics: [
+        stat('possessionPct', '57.4%'), stat('totalShots', 4), stat('shotsOnTarget', 2), stat('foulsCommitted', 7), stat('wonCorners', 2)
+      ] },
+      { homeAway: 'away', team: team('2', 'Boca Juniors'), statistics: [
+        stat('possessionPct', '42.6%'), stat('totalShots', 3), stat('shotsOnTarget', 0), stat('foulsCommitted', 9), stat('wonCorners', 0)
+      ] }
+    ] },
+    plays: [{ id: 'p1', text: 'Kickoff' }]
+  };
+  let sportsDbCalls = 0;
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('thesportsdb.com/api/v1/json/123/searchevents.php')) {
+      sportsDbCalls += 1;
+      return Response.json({ event: [{
+        idEvent: '2579902', strTimestamp: '2026-09-16T00:30:00', strSport: 'Soccer',
+        strHomeTeam: 'São Paulo', strAwayTeam: 'Boca Juniors'
+      }] });
+    }
+    if (href.includes('thesportsdb.com/api/v1/json/123/lookupeventstats.php?id=2579902')) {
+      sportsDbCalls += 1;
+      return Response.json({ eventstats: [
+        { strEvent: 'São Paulo vs Boca Juniors', strStat: 'Shots on Goal', intHome: '2', intAway: '0' },
+        { strEvent: 'São Paulo vs Boca Juniors', strStat: 'Total Shots', intHome: '4', intAway: '3' },
+        { strEvent: 'São Paulo vs Boca Juniors', strStat: 'Blocked Shots', intHome: '2', intAway: '1' },
+        { strEvent: 'São Paulo vs Boca Juniors', strStat: 'Ball Possession', intHome: '57', intAway: '43' },
+        { strEvent: 'São Paulo vs Boca Juniors', strStat: 'Corner Kicks', intHome: '2', intAway: '0' }
+      ] });
+    }
+    if (href.includes('v3.football.api-sports.io')) throw new Error('API-Football não deve ser chamada sem chave');
+    if (href.includes('sports.core.api.espn.com')) return Response.json({ items: [{ id: 'p1', text: 'Kickoff' }] });
+    if (href.includes('/playbyplay')) return Response.json({ gamepackageJSON: espnSparse });
+    if (href.includes('/boxscore') || href.includes('/game') || href.includes('site.api.espn.com')) return Response.json({ gamepackageJSON: espnSparse });
+    throw new Error(`URL inesperada ${href}`);
+  };
+
+  const url = new URL('https://x/v1/live/summary?league=conmebol.sudamericana&event=401999778&expectedGoals=0&fresh=1');
+  const result = await resolveLiveSummary(url, { cache, fetchImpl: fakeFetch, now: () => Date.parse('2026-09-16T01:00:00Z') });
+  assert.equal(result.status, 200);
+  assert.equal(result.body.statsProvider, 'espn+thesportsdb');
+  assert.equal(result.body.statsFallbacks.length, 1);
+  assert.equal(result.body.statsFallbacks[0].eventId, 2579902);
+  const home = result.body.data.boxscore.teams.find((row) => row.team.id === '1');
+  const homeStats = new Map(home.statistics.map((row) => [row.name, row.displayValue]));
+  assert.equal(homeStats.get('possessionPct'), '57.4%', 'ESPN deve continuar com precedência');
+  assert.equal(homeStats.get('blockedShots'), '2', 'TheSportsDB deve preencher métrica ausente');
+  assert.equal(sportsDbCalls, 2);
 }
 
 console.log('live-api tests: ok');
