@@ -25,6 +25,7 @@ jobs:
       FDG_PUSH_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       FDG_PUSH_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       FDG_PUSH_EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
+      FDG_PUSH_API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
     defaults:
       run:
         working-directory: cloudflare/push-worker
@@ -44,6 +45,7 @@ jobs:
           test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo 'ERRO: secret CLOUDFLARE_API_TOKEN ausente.'; exit 1; }
           test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo 'ERRO: secret CLOUDFLARE_ACCOUNT_ID ausente.'; exit 1; }
           test -n "${FDG_PUSH_OPENAI_API_KEY:-}" || { echo 'ERRO: secret OPENAI_API_KEY ausente; o Guardião IA não pode operar.'; exit 1; }
+          test -n "${FDG_PUSH_API_FOOTBALL_KEY:-}" || { echo 'ERRO: secret API_FOOTBALL_KEY ausente; fallback de estatísticas do Ao Vivo não pode operar.'; exit 1; }
 
           # Resend é apenas o canal administrativo de contingência. A ausência
           # dele NÃO pode bloquear o deploy nem os seis alertas esportivos.
@@ -130,6 +132,7 @@ jobs:
         run: |
           set -euo pipefail
           printf '%s' "$FDG_PUSH_OPENAI_API_KEY" | npx wrangler secret put OPENAI_API_KEY --config wrangler.generated.jsonc
+          printf '%s' "$FDG_PUSH_API_FOOTBALL_KEY" | npx wrangler secret put API_FOOTBALL_KEY --config wrangler.generated.jsonc
 
           # E-mail administrativo é opcional. Se os secrets não existirem no
           # GitHub, não envia valor vazio e não apaga eventual secret já salvo
@@ -149,7 +152,9 @@ jobs:
           for i in 1 2 3 4 5 6 7 8 9 10; do
             if curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"revision":"6-R10R4"'; then
               echo 'Push Worker saudável.'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"liveGatewayVersion":"1"'
+              curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"liveGatewayVersion":"2"'
+              curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"liveStatsFallbackVersion":1'
+              curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"apiFootballStatsReady":true'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"engineVersion":5'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"overturnPolicyVersion":"6-R10R4"'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"livePolicyVersion":"6-R10"'
