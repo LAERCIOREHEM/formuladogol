@@ -37,6 +37,8 @@ export const POLICY = Object.freeze({
     roundWaitHours: 8,
     postponedDistanceHours: 72,
     retryMinutes: 30,
+    continentalSettleMinutes: 180,
+    continentalFallbackMinutes: 1440,
   },
 });
 
@@ -90,6 +92,17 @@ export function teamName(value) {
   return String(value || '').trim();
 }
 
+export function continentalPhaseRank(value) {
+  const label = String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  if (!label) return 0;
+  // A ordem é importante: "quarterfinals" e "semifinal" também contêm "final".
+  if (/oitav|round of 16/.test(label)) return 600;
+  if (/quart|quarterfinal/.test(label)) return 700;
+  if (/semi/.test(label)) return 800;
+  if (/final/.test(label)) return 900;
+  return 0;
+}
+
 export function normalizeAgenda(payload) {
   const rows = Array.isArray(payload?.jogos) ? payload.jogos : [];
   return rows.map((row) => ({
@@ -98,6 +111,9 @@ export function normalizeAgenda(payload) {
     league: String(row?.espn_league || '').trim(),
     kickoff: parseDate(row?.data_iso),
     round: Number(row?.rodada || 0),
+    phase: String(row?.fase || '').trim(),
+    phaseRank: Number(row?.fase_ordem || 0) || continentalPhaseRank(row?.fase),
+    leg: Number(row?.perna || 0),
     concluded: row?.concluido === true || String(row?.estado || '').toLowerCase() === 'post',
     home: teamName(row?.mandante),
     away: teamName(row?.visitante),
@@ -389,6 +405,10 @@ const CONT_PHASES = Object.freeze({
 
 function sideKey(side) { return String(side?.espn_id || side?.nome || ''); }
 function isBr(side) { return Boolean(side?.serie_a_2026); }
+function markIds(rank) {
+  const slug = CONT_PHASES[Number(rank)]?.[1] || '';
+  return [`continentais-2026-${slug}-antes-fechamento`, `continentais-2026-${slug}-depois-fechamento`];
+}
 
 export function phaseEvents(snapshot, rank) {
   return (snapshot?.eventos || []).filter((e) => Number(e?.fase_ordem || 0) === Number(rank) && (isBr(e?.mandante) || isBr(e?.visitante)));
@@ -436,13 +456,63 @@ export function phaseMaterializedForSurvivors(snaps, rank) {
   return true;
 }
 
+export function rankHasCompleteTwoLegTies(snaps, rank) {
+  if (Number(rank) === 900) return true;
+  let found = false;
+  for (const snap of Object.values(snaps || {})) {
+    const events = phaseEvents(snap, rank);
+    if (!events.length) continue;
+    found = true;
+    const ties = buildTies(snap, rank);
+    if (!ties.length) return false;
+    const eventIds = new Set(events.map((e) => String(e?.event_id || '')));
+    const tieIds = new Set(ties.flatMap((t) => t.legs).map((e) => String(e?.event_id || '')));
+    if (eventIds.size !== tieIds.size || [...eventIds].some((id) => !tieIds.has(id))) return false;
+    for (const tie of ties) {
+      const legs = tie.legs || [];
+      const legNumbers = new Set(legs.map((e) => Number(e?.perna || 0)));
+      if (legs.length !== 2 || legNumbers.size !== 2 || !legNumbers.has(1) || !legNumbers.has(2)) return false;
+      if (!legs.every((e) => Boolean(e?.concluido))) return false;
+    }
+  }
+  return found;
+}
+
+export function openEditorialRank(history) {
+  const marks = new Set((history?.marcos || []).map((m) => String(m?.id || '')));
+  const open = [];
+  for (const rank of Object.keys(CONT_PHASES).map(Number)) {
+    const [beforeId, afterId] = markIds(rank);
+    if (marks.has(beforeId) && !marks.has(afterId)) open.push(rank);
+  }
+  return open.length ? Math.max(...open) : null;
+}
+
+function lowerPhasePending(snaps, rank) {
+  for (const lower of Object.keys(CONT_PHASES).map(Number).filter((value) => value < Number(rank))) {
+    const events = Object.values(snaps || {}).flatMap((snap) => phaseEvents(snap, lower));
+    if (events.some((e) => !e?.concluido)) return true;
+  }
+  return false;
+}
+
+function editorialActiveRank(snaps) {
+  const ranks = ranksWithBrazilians(snaps);
+  if (!ranks.length) return 0;
+  const pending = ranks.filter((rank) => Object.values(snaps || {}).flatMap((snap) => phaseEvents(snap, rank)).some((e) => !e?.concluido));
+  return pending.length ? pending[0] : ranks.at(-1);
+}
+
 export function latestPublishableContinental(snaps) {
   const ranks = ranksWithBrazilians(snaps);
   if (!ranks.length) return null;
   const rank = ranks.at(-1);
   const events = Object.values(snaps || {}).flatMap((snap) => phaseEvents(snap, rank));
-  if (events.length && events.every((e) => Boolean(e?.concluido)) && phaseMaterializedForSurvivors(snaps, rank)) return rank;
-  return null;
+  if (!events.length || !events.every((e) => Boolean(e?.concluido))) return null;
+  if (lowerPhasePending(snaps, rank)) return null;
+  if (rank === 900 && events.some((e) => Number(e?.perna || 0) > 1)) return null;
+  if (rank !== 900 && !rankHasCompleteTwoLegTies(snaps, rank)) return null;
+  return phaseMaterializedForSurvivors(snaps, rank) ? rank : null;
 }
 
 export function continentalBaselineReady(snaps, rank) {
@@ -454,22 +524,150 @@ export function continentalBaselineReady(snaps, rank) {
   return Boolean(first.length && second.length && first.every((e) => Boolean(e?.concluido)));
 }
 
-export function continentalDecision(snaps, analyses, history) {
-  const rank = latestPublishableContinental(snaps);
-  if (rank) {
-    const slug = CONT_PHASES[rank][1];
-    const id = `continentais-2026-${slug}-brasileiros`;
-    const exists = (analyses?.artigos || []).some((a) => a?.id_editorial === id);
-    if (!exists) return { kind: 'publish', rank, reason: `fase continental ${rank} encerrada no recorte brasileiro` };
-    return null;
+export function continentalEligibility(snaps, history) {
+  const anchored = openEditorialRank(history);
+  if (anchored) {
+    const events = Object.values(snaps || {}).flatMap((snap) => phaseEvents(snap, anchored));
+    const pending = events.filter((e) => !e?.concluido).map((e) => String(e?.event_id || '')).filter(Boolean).sort();
+    if (pending.length) return {
+      action: 'none', rank: anchored, phase: CONT_PHASES[anchored][0], pending,
+      reason: 'fase continental ainda em andamento; aguardar todas as partidas dos brasileiros',
+    };
+    if (!rankHasCompleteTwoLegTies(snaps, anchored)) return {
+      action: 'none', rank: anchored, phase: CONT_PHASES[anchored][0], pending: [],
+      reason: 'fase encerrada sem estrutura completa de ida e volta; aguardar reconciliação factual',
+    };
+    if (!phaseMaterializedForSurvivors(snaps, anchored)) return {
+      action: 'none', rank: anchored, phase: CONT_PHASES[anchored][0], pending: [],
+      reason: 'fase encerrada, mas os sobreviventes ainda não estão materializados de forma consistente',
+    };
+    return {
+      action: 'publish', rank: anchored, phase: CONT_PHASES[anchored][0], pending: [],
+      reason: 'fase continental ancorada encerrada para todos os brasileiros',
+    };
   }
-  const ranks = ranksWithBrazilians(snaps);
-  const active = ranks.at(-1);
-  if (!active || !continentalBaselineReady(snaps, active)) return null;
-  const slug = CONT_PHASES[active][1];
-  const beforeId = `continentais-2026-${slug}-antes-fechamento`;
-  const exists = (history?.marcos || []).some((m) => m?.id === beforeId);
-  return exists ? null : { kind: 'baseline', rank: active, reason: `idas continentais ${active} encerradas; preservar fotografia anterior às voltas` };
+
+  const active = editorialActiveRank(snaps);
+  if (active && continentalBaselineReady(snaps, active)) {
+    const [beforeId] = markIds(active);
+    const exists = (history?.marcos || []).some((m) => String(m?.id || '') === beforeId);
+    if (!exists) return {
+      action: 'baseline', rank: active, phase: CONT_PHASES[active][0], pending: [],
+      reason: 'todas as partidas de ida terminaram; preservar marco anterior às voltas',
+    };
+  }
+
+  const publishable = latestPublishableContinental(snaps);
+  if (publishable) return {
+    action: 'publish', rank: publishable, phase: CONT_PHASES[publishable][0], pending: [],
+    reason: 'fase continental encerrada e estruturalmente consistente',
+  };
+  return {
+    action: 'none', rank: active, phase: CONT_PHASES[active]?.[0] || '', pending: [],
+    reason: 'nenhuma fase continental brasileira pronta para editorial',
+  };
+}
+
+function stateRowsForRank(snaps, rank) {
+  if (!rank) return [];
+  return Object.entries(snaps || {}).flatMap(([comp, snap]) => phaseEvents(snap, rank).map((e) => ({
+    comp,
+    id: String(e?.event_id || ''),
+    leg: Number(e?.perna || 0),
+    done: Boolean(e?.concluido),
+    when: String(e?.data_iso || ''),
+  }))).sort((a, b) => `${a.comp}:${a.id}`.localeCompare(`${b.comp}:${b.id}`));
+}
+
+export function continentalStateSignature(eligibility, snaps) {
+  const rows = stateRowsForRank(snaps, Number(eligibility?.rank || 0));
+  return [
+    String(eligibility?.action || 'none'),
+    String(eligibility?.rank || 0),
+    ...rows.map((row) => `${row.comp}:${row.id}:${row.leg}:${row.done ? 1 : 0}:${row.when}`),
+  ].join('|');
+}
+
+function isContinentalAgendaGame(game) {
+  return ['libertadores', 'sul_americana'].includes(String(game?.competition || '').toLowerCase())
+    || /conmebol\.(libertadores|sudamericana)/i.test(String(game?.league || ''));
+}
+
+export function continentalAgendaSignature(games) {
+  return (games || []).filter(isContinentalAgendaGame).map((g) => [
+    g.eventId, g.phaseRank || 0, g.leg || 0, g.kickoff?.toISOString?.() || '', g.concluded ? 1 : 0,
+  ].join(':')).sort().join('|');
+}
+
+export function continentalNextCheck(eligibility, games, now, {
+  settleMinutes = POLICY.editorial.continentalSettleMinutes,
+  fallbackMinutes = POLICY.editorial.continentalFallbackMinutes,
+} = {}) {
+  const current = parseDate(now) || new Date();
+  const fallback = (reason, degraded = true) => ({
+    nextCheckAt: new Date(current.getTime() + fallbackMinutes * 60000),
+    degraded,
+    reason,
+  });
+  if (['baseline', 'publish'].includes(String(eligibility?.action || ''))) {
+    return { nextCheckAt: current, degraded: false, reason: 'estado factual já elegível' };
+  }
+
+  const continentalGames = (games || []).filter(isContinentalAgendaGame);
+  const pending = new Set((eligibility?.pending || []).map(String).filter(Boolean));
+  if (pending.size) {
+    const matched = continentalGames.filter((g) => pending.has(String(g.eventId)));
+    if (matched.length !== pending.size || matched.some((g) => !g.kickoff)) {
+      return fallback('agenda incompleta para os jogos pendentes; usar verificação diária');
+    }
+    const latestKickoff = new Date(Math.max(...matched.map((g) => g.kickoff.getTime())));
+    const planned = new Date(latestKickoff.getTime() + settleMinutes * 60000);
+    if (planned.getTime() > current.getTime()) {
+      return { nextCheckAt: planned, degraded: false, reason: 'aguardar o fim previsto da última partida brasileira da fase' };
+    }
+    return fallback('janela prevista já passou, mas o snapshot ainda não fechou a fase; usar verificação diária');
+  }
+
+  const future = continentalGames.filter((g) => !g.concluded && g.kickoff && g.kickoff.getTime() > current.getTime() && CONT_PHASES[g.phaseRank]);
+  if (!future.length) return fallback('nenhuma próxima janela continental confiável na agenda; usar verificação diária');
+  future.sort((a, b) => a.kickoff - b.kickoff);
+  const first = future[0];
+  const targetRank = first.phaseRank;
+  const targetLeg = targetRank === 900 ? 0 : (first.leg || 0);
+  // Se o snapshot ainda está preso na mesma fase e a agenda já aponta apenas
+  // para as voltas, não podemos dormir até elas: falta preservar o baseline
+  // pós-idas. Nesse desalinhamento, fazemos no máximo a checagem diária.
+  if (targetRank !== 900 && targetLeg === 2 && Number(eligibility?.rank || 0) === targetRank) {
+    return fallback('agenda já avançou para as voltas, mas o baseline factual ainda não foi confirmado; usar verificação diária');
+  }
+  const sameWindow = future.filter((g) => g.phaseRank === targetRank && (targetRank === 900 || !targetLeg || g.leg === targetLeg));
+  if (!sameWindow.length) return fallback('agenda continental sem janela coerente; usar verificação diária');
+  const latestKickoff = new Date(Math.max(...sameWindow.map((g) => g.kickoff.getTime())));
+  return {
+    nextCheckAt: new Date(latestKickoff.getTime() + settleMinutes * 60000),
+    degraded: false,
+    reason: targetRank === 900
+      ? 'aguardar a final continental prevista na agenda'
+      : `aguardar o encerramento previsto da perna ${targetLeg || '?'} da fase ${targetRank}`,
+  };
+}
+
+export function continentalDecision(snaps, analyses, history) {
+  const eligibility = continentalEligibility(snaps, history);
+  const rank = Number(eligibility.rank || 0);
+  if (!rank || eligibility.action === 'none') return null;
+  if (eligibility.action === 'baseline') return {
+    kind: 'baseline', rank, reason: eligibility.reason,
+    signature: continentalStateSignature(eligibility, snaps),
+  };
+  const slug = CONT_PHASES[rank][1];
+  const id = `continentais-2026-${slug}-brasileiros`;
+  const exists = (analyses?.artigos || []).some((a) => a?.id_editorial === id);
+  if (exists) return null;
+  return {
+    kind: 'publish', rank, reason: eligibility.reason,
+    signature: continentalStateSignature(eligibility, snaps),
+  };
 }
 
 export function actionKey(decision) {
@@ -477,5 +675,6 @@ export function actionKey(decision) {
   if (decision?.eventId) bits.push(decision.eventId);
   if (decision?.round) bits.push(String(decision.round));
   if (decision?.checkpoint != null) bits.push(String(decision.checkpoint));
+  if (decision?.signature) bits.push(String(decision.signature));
   return bits.join(':');
 }

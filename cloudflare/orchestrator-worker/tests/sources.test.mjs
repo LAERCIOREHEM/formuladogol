@@ -83,3 +83,28 @@ test('repository path uses raw GitHub media type and configured branch', async (
 
   assert.deepEqual(await fetchRepositoryJson(env(), 'dados-br/competicoes-af-previsao/copa-do-brasil.json'), { ok: true });
 });
+
+test('continental circuit-breaker state is always read from repository, never stale Pages', async (t) => {
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url, options = {}) => {
+    calls.push({ url: String(url), options });
+    if (String(url).startsWith('https://formuladogol.com.br/')) {
+      throw new Error('Pages must not be consulted for the authoritative lock');
+    }
+    if (String(url).includes('/contents/dados-br/estado-editorial-continentais.json')) {
+      assert.equal(options.headers.Authorization, 'Bearer test-token');
+      return jsonResponse({ bloqueado: true, guard_fingerprint: 'abc' });
+    }
+    throw new Error(`URL inesperada ${url}`);
+  };
+  t.after(() => { globalThis.fetch = originalFetch; });
+
+  const path = 'dados-br/estado-editorial-continentais.json';
+  const bundle = await fetchSiteBundle(env(), [path]);
+  assert.equal(bundle[path].origin, 'github_authoritative');
+  assert.equal(bundle[path].data.bloqueado, true);
+  assert.equal(calls.length, 1);
+  assert.match(calls[0].url, /api\.github\.com/);
+  assert.deepEqual(repositoryFallbacks(bundle), []);
+});

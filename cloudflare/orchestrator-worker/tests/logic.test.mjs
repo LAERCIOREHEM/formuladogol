@@ -4,8 +4,11 @@ import {
   POLICY,
   actionKey,
   brDateKey,
+  continentalAgendaSignature,
   continentalBaselineReady,
   continentalDecision,
+  continentalEligibility,
+  continentalNextCheck,
   cupEditorialDecision,
   latestEligibleRound,
   liveCheckpointDue,
@@ -146,6 +149,98 @@ test('continental baseline only after all first legs and before all second legs'
   assert.equal(continentalDecision({ libertadores: snap, sul_americana: { eventos: [] } }, { artigos: [] }, { marcos: [] }).kind, 'baseline');
 });
 
+
+
+
+test('continental anchor defeats degraded false Final and waits for open quarterfinals', () => {
+  const br = (nome) => ({ nome, serie_a_2026: true });
+  const x = (nome) => ({ nome, serie_a_2026: false });
+  const snaps = {
+    libertadores: { eventos: [
+      { event_id: 'L1', fase_ordem: 700, perna: 1, concluido: true, mandante: br('Palmeiras'), visitante: x('LDU') },
+      { event_id: 'L2', fase_ordem: 700, perna: 2, concluido: false, mandante: x('LDU'), visitante: br('Palmeiras') },
+    ] },
+    sul_americana: { eventos: [
+      { event_id: 'S1', fase_ordem: 700, perna: 1, concluido: true, mandante: br('Vasco'), visitante: x('Santa Fe') },
+      // Reprodução da degradação real: a volta das quartas veio rotulada como 900.
+      { event_id: 'S2', fase_ordem: 900, perna: 2, concluido: true, vencedor: 'Vasco', mandante: br('Vasco'), visitante: x('Santa Fe') },
+    ] },
+  };
+  const history = { marcos: [{ id: 'continentais-2026-quartas-antes-fechamento' }] };
+  const eligibility = continentalEligibility(snaps, history);
+  assert.equal(eligibility.action, 'none');
+  assert.equal(eligibility.rank, 700);
+  assert.deepEqual(eligibility.pending, ['L2']);
+  assert.equal(continentalDecision(snaps, { artigos: [] }, history), null);
+  const unanchored = continentalEligibility(snaps, { marcos: [] });
+  assert.equal(unanchored.action, 'baseline');
+  assert.equal(unanchored.rank, 700);
+});
+
+test('continental calendar sleeps until the last pending Brazilian match plus settlement margin', () => {
+  const games = normalizeAgenda({ jogos: [
+    { event_id: 'A', espn_league: 'conmebol.libertadores', competicao_chave: 'libertadores', fase: 'Quartas de final', perna: 2, data_iso: '2026-09-16T19:00:00-03:00', mandante: { nome: 'A' }, visitante: { nome: 'X' } },
+    { event_id: 'B', espn_league: 'conmebol.libertadores', competicao_chave: 'libertadores', fase: 'Quartas de final', perna: 2, data_iso: '2026-09-17T21:30:00-03:00', mandante: { nome: 'B' }, visitante: { nome: 'Y' } },
+  ] });
+  const plan = continentalNextCheck(
+    { action: 'none', rank: 700, phase: 'Quartas de final', pending: ['A', 'B'] },
+    games,
+    d('2026-09-16T17:00:00Z'),
+  );
+  assert.equal(plan.degraded, false);
+  assert.equal(plan.nextCheckAt.toISOString(), '2026-09-18T03:30:00.000Z'); // 00:30 BRT
+});
+
+test('continental calendar falls back to one daily verification when agenda is incomplete', () => {
+  const games = normalizeAgenda({ jogos: [
+    { event_id: 'A', espn_league: 'conmebol.libertadores', competicao_chave: 'libertadores', fase: 'Quartas de final', perna: 2, data_iso: '2026-09-16T19:00:00-03:00', mandante: { nome: 'A' }, visitante: { nome: 'X' } },
+  ] });
+  const now = d('2026-09-16T17:00:00Z');
+  const plan = continentalNextCheck(
+    { action: 'none', rank: 700, phase: 'Quartas de final', pending: ['A', 'MISSING'] },
+    games,
+    now,
+  );
+  assert.equal(plan.degraded, true);
+  assert.equal(plan.nextCheckAt.toISOString(), '2026-09-17T17:00:00.000Z');
+  assert.match(plan.reason, /verificação diária/);
+});
+
+test('continental calendar never sleeps through the baseline window before second legs', () => {
+  const games = normalizeAgenda({ jogos: [{
+    event_id: 'V2', espn_league: 'conmebol.libertadores', competicao_chave: 'libertadores', fase: 'Semifinal', perna: 2,
+    data_iso: '2026-10-20T21:30:00-03:00', concluido: false, mandante: { nome: 'A' }, visitante: { nome: 'B' },
+  }] });
+  const now = d('2026-10-15T12:00:00Z');
+  const plan = continentalNextCheck(
+    { action: 'none', rank: 800, phase: 'Semifinal', pending: [] },
+    games,
+    now,
+  );
+  assert.equal(plan.degraded, true);
+  assert.equal(plan.nextCheckAt.toISOString(), '2026-10-16T12:00:00.000Z');
+  assert.match(plan.reason, /baseline factual/);
+});
+
+test('continental agenda signature changes on factual schedule/conclusion change', () => {
+  const pre = normalizeAgenda({ jogos: [{
+    event_id: 'A', espn_league: 'conmebol.sudamericana', competicao_chave: 'sul_americana', fase: 'Semifinal', perna: 1,
+    data_iso: '2026-10-13T19:00:00-03:00', concluido: false, mandante: { nome: 'A' }, visitante: { nome: 'B' },
+  }] });
+  const post = normalizeAgenda({ jogos: [{
+    event_id: 'A', espn_league: 'conmebol.sudamericana', competicao_chave: 'sul_americana', fase: 'Semifinal', perna: 1,
+    data_iso: '2026-10-13T19:00:00-03:00', concluido: true, mandante: { nome: 'A' }, visitante: { nome: 'B' },
+  }] });
+  assert.notEqual(continentalAgendaSignature(pre), continentalAgendaSignature(post));
+});
+
+test('state idempotency key changes only when continental factual signature changes', () => {
+  const a = actionKey({ action: 'editorial_continentais', signature: 'publish:700:A0:B0' });
+  const same = actionKey({ action: 'editorial_continentais', signature: 'publish:700:A0:B0' });
+  const changed = actionKey({ action: 'editorial_continentais', signature: 'publish:700:A1:B0' });
+  assert.equal(a, same);
+  assert.notEqual(a, changed);
+});
 
 test('agenda concluded state is enough for the one-minute FINAL gate', () => {
   const games = normalizeAgenda({ jogos: [{

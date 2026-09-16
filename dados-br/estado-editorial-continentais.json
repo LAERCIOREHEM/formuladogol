@@ -1,0 +1,7 @@
+{
+  "schema_version": 2,
+  "bloqueado": false,
+  "workflow": "Publicar análise editorial continental",
+  "motivo": "operacional",
+  "regra": "O Worker respeita o circuit breaker enquanto o guard_fingerprint do incidente coincidir com a governança continental implantada. Uma correção real de governança altera o fingerprint e torna o lock anterior obsoleto."
+}

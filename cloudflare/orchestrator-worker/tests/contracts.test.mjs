@@ -120,11 +120,31 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(state, /transmissoes_guardian/);
   const index = await read('cloudflare/orchestrator-worker/src/index.js');
   assert.match(index, /transmissionGuardian:\s*true/);
-  assert.match(index, /1\.1\.0/);
+  assert.match(index, /1\.2\.0/);
+  assert.match(index, /continentalAgendaAware:\s*true/);
+  assert.match(index, /continentalStateIdempotency:\s*true/);
 });
 
 test('live player state never inherits match live state', async () => {
   const live = await read('js/br-aovivo.js');
   assert.doesNotMatch(live, /principal\.status[^;]*\|\|\s*game\.state\s*===\s*["']in["']/);
   assert.match(live, /principal\.status[^;]*===\s*["']live["']/);
+});
+
+
+test('continental orchestrator has agenda sleep, state idempotency and circuit-breaker contracts', async () => {
+  const logic = await read('cloudflare/orchestrator-worker/src/logic.js');
+  const state = await read('cloudflare/orchestrator-worker/src/orchestrator-state.js');
+  const deploy = await read('.github/workflows/deploy-orchestrator-worker.yml');
+  const wrangler = await read('cloudflare/orchestrator-worker/wrangler.template.jsonc');
+  assert.match(logic, /openEditorialRank/);
+  assert.match(logic, /rankHasCompleteTwoLegTies/);
+  assert.match(logic, /continentalNextCheck/);
+  assert.match(logic, /continentalFallbackMinutes:\s*1440/);
+  assert.match(state, /idempotency:\s*'state'/);
+  assert.match(state, /continental:nextCheckAt/);
+  assert.match(state, /estado-editorial-continentais\.json/);
+  assert.match(state, /CONTINENTAL_GUARD_FINGERPRINT/);
+  assert.match(deploy, /editorial_continental_guard_fingerprint/);
+  assert.match(wrangler, /__CONTINENTAL_GUARD_FINGERPRINT__/);
 });

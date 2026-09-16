@@ -307,15 +307,30 @@ def editorial_eligibility(
     }
 
 
+def lower_phase_pending(snaps: Mapping[str, Mapping[str, Any]], rank: int) -> bool:
+    for lower in sorted(value for value in PHASES if value < rank):
+        events = [event for snapshot in snaps.values() for event in phase_events(snapshot, lower)]
+        if any(not bool(event.get('concluido')) for event in events):
+            return True
+    return False
+
+
 def latest_publishable(snaps: Mapping[str, Mapping[str, Any]]) -> int | None:
     ranks = ranks_with_brazilians(snaps)
     if not ranks:
         return None
-    # Só a fase brasileira mais avançada pode gerar uma nova edição. Se ela já
-    # começou e ainda está em disputa, não voltamos artificialmente à fase anterior.
+    # A fase mais alta só é publicável se nenhuma fase inferior do recorte
+    # brasileiro ainda estiver em disputa. Isso neutraliza promoções falsas da
+    # fonte (ex.: volta das quartas rotulada isoladamente como Final/900).
     rank = ranks[-1]
     events = [event for snapshot in snaps.values() for event in phase_events(snapshot, rank)]
     if not events or not all(bool(event.get('concluido')) for event in events):
+        return None
+    if lower_phase_pending(snaps, rank):
+        return None
+    # Libertadores/Sul-Americana usam final única: uma suposta Final como
+    # ``perna=2`` é estruturalmente incompatível e deve falhar fechada.
+    if rank == 900 and any(int(event.get('perna') or 0) > 1 for event in events):
         return None
     if rank != 900 and not rank_has_complete_two_leg_ties(snaps, rank):
         return None
@@ -326,7 +341,17 @@ def latest_publishable(snaps: Mapping[str, Mapping[str, Any]]) -> int | None:
 
 def active_rank(snaps: Mapping[str, Mapping[str, Any]]) -> int | None:
     ranks = ranks_with_brazilians(snaps)
-    return ranks[-1] if ranks else None
+    if not ranks:
+        return None
+    pending = [
+        rank for rank in ranks
+        if any(
+            not bool(event.get('concluido'))
+            for snapshot in snaps.values()
+            for event in phase_events(snapshot, rank)
+        )
+    ]
+    return pending[0] if pending else ranks[-1]
 
 
 def baseline_ready(snaps: Mapping[str, Mapping[str, Any]], rank: int) -> bool:
@@ -1108,6 +1133,12 @@ def self_test() -> None:
     }
     guard = editorial_eligibility(distorted, history)
     assert guard['action'] == 'none' and guard['rank'] == 700 and guard['pendentes'] == ['q2b']
+    # Mesmo sem o marco histórico, a fase inferior pendente vence a falsa
+    # promoção para 900 e mantém as quartas como fase operacional ativa.
+    assert latest_publishable(distorted) is None
+    assert active_rank(distorted) == 700
+    unanchored = editorial_eligibility(distorted, {'marcos': []})
+    assert unanchored['action'] == 'baseline' and unanchored['rank'] == 700
     context = continental_editorial_dossier(600, ties, {'comparacoes': []})
     validate_continental_editorial(editorial_copy(600, ties), context)
     print('OK: self-test editorial continental.')

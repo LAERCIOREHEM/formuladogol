@@ -1,6 +1,9 @@
 import { espnDay } from './logic.js';
 
 const DEFAULT_TIMEOUT_MS = 8000;
+const REPOSITORY_AUTHORITATIVE_PATHS = new Set([
+  'dados-br/estado-editorial-continentais.json',
+]);
 
 async function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
   const controller = new AbortController();
@@ -72,6 +75,19 @@ export async function fetchRepositoryJson(env, path, { timeoutMs = DEFAULT_TIMEO
 export async function fetchSiteBundle(env, paths) {
   const base = String(env.SITE_BASE || 'https://formuladogol.com.br');
   const entries = await Promise.all(paths.map(async (path) => {
+    // Locks operacionais precisam refletir o commit de main imediatamente.
+    // Pages pode continuar servindo uma cópia antiga após uma falha justamente
+    // porque o workflow interrompido não dispara deploy do site.
+    if (REPOSITORY_AUTHORITATIVE_PATHS.has(path)) {
+      try {
+        const payload = await fetchRepositoryJson(env, path);
+        return [path, { data: payload, error: '', origin: 'github_authoritative', siteError: '' }];
+      } catch (repoError) {
+        const githubError = `${repoError?.name || 'Error'}: ${repoError?.message || repoError}`;
+        return [path, { data: null, error: `github=[${githubError}]`, origin: 'none', siteError: '', githubError }];
+      }
+    }
+
     let siteError = '';
     try {
       const payload = await fetchJson(base, path);

@@ -2,7 +2,10 @@ import {
   POLICY,
   actionKey,
   brDateKey,
+  continentalAgendaSignature,
   continentalDecision,
+  continentalEligibility,
+  continentalNextCheck,
   cupEditorialDecision,
   latestEligibleRound,
   liveCheckpointDue,
@@ -53,6 +56,7 @@ const SLOW_PATHS = [
   'dados-br/config-analises.json',
   'dados-br/analises.json',
   'dados-br/historico-probabilidades-continentais.json',
+  'dados-br/estado-editorial-continentais.json',
 ];
 
 function data(bundle, path, fallback = {}) {
@@ -132,7 +136,7 @@ export class OrchestratorState {
     return {
       ok: true,
       engine: 'fdg-cloudflare-orchestrator',
-      version: String(this.env.ORCHESTRATOR_VERSION || '1.1.0'),
+      version: String(this.env.ORCHESTRATOR_VERSION || '1.2.0'),
       mode: String(this.env.ORCHESTRATOR_MODE || 'shadow'),
       ...status,
       recentDecisions: history.slice(-10).reverse(),
@@ -159,15 +163,22 @@ export class OrchestratorState {
   async candidateAllowedByRetry(candidate, now) {
     const key = `dispatch:${actionKey(candidate)}`;
     const last = await this.storageDate(key);
+    if (candidate?.idempotency === 'state') return { allowed: !last, key, last, permanent: true };
     const retry = Number(candidate.retryMinutes || 0);
-    return { allowed: dueFromLast(last, now, retry), key, last };
+    return { allowed: dueFromLast(last, now, retry), key, last, permanent: false };
   }
 
   async dispatchCandidate(candidate, now) {
     const mode = String(this.env.ORCHESTRATOR_MODE || 'shadow').toLowerCase();
     const retry = await this.candidateAllowedByRetry(candidate, now);
     if (!retry.allowed) {
-      return { result: 'cooldown', reason: `cooldown ${candidate.retryMinutes} min ainda ativo`, candidate };
+      return {
+        result: retry.permanent ? 'duplicate_state' : 'cooldown',
+        reason: retry.permanent
+          ? 'estado factual idêntico já foi despachado; aguardar mudança real de agenda/snapshot'
+          : `cooldown ${candidate.retryMinutes} min ainda ativo`,
+        candidate,
+      };
     }
     if (mode !== 'active') {
       return { result: 'shadow', reason: 'SHADOW: decisão registrada sem chamar GitHub', candidate };
@@ -319,6 +330,7 @@ export class OrchestratorState {
     const analysisConfig = data(bundle, 'dados-br/config-analises.json', {});
     const analyses = data(bundle, 'dados-br/analises.json', { artigos: [] });
     const contHistory = data(bundle, 'dados-br/historico-probabilidades-continentais.json', { marcos: [] });
+    const contLock = data(bundle, 'dados-br/estado-editorial-continentais.json', { bloqueado: false });
     const hints = {};
     const ready = (...paths) => bundleReady(bundle, paths);
     const fastReady = (...paths) => bundleReady(fastBundle, paths);
@@ -479,18 +491,80 @@ export class OrchestratorState {
       };
     }
 
-    const cont = ready(
+    // Editorial continental tem relógio próprio. O cron global continua em 1 min,
+    // mas este módulo só volta a decidir quando a agenda muda ou a janela
+    // esportiva prevista vence. Isso impede workflow no escuro entre fases.
+    const continentalPaths = [
       'dados-br/competicoes-af-previsao/libertadores.json',
       'dados-br/competicoes-af-previsao/sul-americana.json',
-      'dados-br/analises.json', 'dados-br/historico-probabilidades-continentais.json',
-    )
-      ? continentalDecision({ libertadores: lib, sul_americana: sula }, analyses, contHistory) : null;
-    if (cont) {
-      return {
-        action: 'editorial_continentais', reason: `Continental: ${cont.reason}.`,
-        retryMinutes: POLICY.editorial.retryMinutes,
-        stateUpdates: { [`editorial:continental:${cont.kind}:${cont.rank}`]: now.toISOString() }, hints,
-      };
+      'dados-br/analises.json',
+      'dados-br/historico-probabilidades-continentais.json',
+      'dados-br/estado-editorial-continentais.json',
+    ];
+    if (ready(...continentalPaths)) {
+      const guardStored = String(contLock?.guard_fingerprint || '').trim();
+      const guardCurrent = String(this.env.CONTINENTAL_GUARD_FINGERPRINT || '').trim();
+      const breakerActive = Boolean(contLock?.bloqueado) && (!guardStored || !guardCurrent || guardStored === guardCurrent);
+      if (breakerActive) {
+        hints.editorialContinental = {
+          state: 'circuit_breaker',
+          blocked: true,
+          runUrl: String(contLock?.run_url || ''),
+          reason: 'falha anterior ainda pertence à versão atual da governança; zero dispatch automático',
+        };
+      } else {
+        const snaps = { libertadores: lib, sul_americana: sula };
+        const agendaSignature = continentalAgendaSignature(games);
+        const storedAgendaSignature = String((await this.state.storage.get('continental:agendaSignature')) || '');
+        const nextCheckAt = await this.storageDate('continental:nextCheckAt');
+        const sleeping = storedAgendaSignature === agendaSignature && nextCheckAt && nextCheckAt.getTime() > now.getTime();
+
+        if (sleeping) {
+          hints.editorialContinental = {
+            state: 'sleeping',
+            nextCheckAt: nextCheckAt.toISOString(),
+            reason: 'agenda continental inalterada; aguardar próxima janela esportiva útil',
+          };
+        } else {
+          const eligibility = continentalEligibility(snaps, contHistory);
+          const cont = continentalDecision(snaps, analyses, contHistory);
+          if (cont) {
+            return {
+              action: 'editorial_continentais',
+              reason: `Continental: ${cont.reason}.`,
+              retryMinutes: POLICY.editorial.retryMinutes,
+              idempotency: 'state',
+              signature: cont.signature,
+              stateUpdates: {
+                [`editorial:continental:${cont.kind}:${cont.rank}`]: now.toISOString(),
+                'continental:agendaSignature': agendaSignature,
+                'continental:nextCheckAt': now.toISOString(),
+              },
+              hints,
+            };
+          }
+
+          const plan = continentalNextCheck(eligibility, games, now);
+          await this.state.storage.put('continental:agendaSignature', agendaSignature);
+          await this.state.storage.put('continental:nextCheckAt', plan.nextCheckAt.toISOString());
+          hints.editorialContinental = {
+            state: plan.degraded ? 'daily_fallback' : 'scheduled',
+            rank: Number(eligibility?.rank || 0),
+            phase: String(eligibility?.phase || ''),
+            pending: eligibility?.pending || [],
+            nextCheckAt: plan.nextCheckAt.toISOString(),
+            reason: `${eligibility?.reason || 'sem ação editorial'}; ${plan.reason}`,
+          };
+        }
+
+        if (Boolean(contLock?.bloqueado) && guardStored && guardCurrent && guardStored !== guardCurrent) {
+          hints.editorialContinental = {
+            ...(hints.editorialContinental || {}),
+            staleCircuitBreaker: true,
+            staleBreakerReason: 'fingerprint mudou após correção de governança; lock antigo não bloqueia a versão nova',
+          };
+        }
+      }
     }
 
     const round = ready(

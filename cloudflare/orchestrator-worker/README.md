@@ -30,6 +30,7 @@ A interface AO VIVO permanece independente: `js/br-aovivo.js`, `js/br-classifica
 - player oficial: checkpoints T-90, T-45, T-20, T-5, T+10 e T+30, somente quando a grade permitir.
 - TV: 6 h se lacuna <72 h; 24 h em até 14 dias; 72 h em 15–30 dias; 168 h se o mês estiver completo.
 - editoriais: fechamento factual da rodada/fase, sem decisão por horário arbitrário.
+- continental: agenda orienta `nextCheckAt`; a mesma assinatura factual só pode ser despachada uma vez; agenda incompleta cai para uma única verificação diária; o circuit breaker é respeitado antes do dispatch.
 
 ## Deploy
 
@@ -40,14 +41,14 @@ Primeiro publique em `shadow`; só depois publique em `active`.
 
 O tick de 1 minuto não baixa `jogos-detalhes.json` nem executa processamento pesado.
 A cada minuto ele lê apenas `agenda-clubes-br.json` e, somente quando há jogo na janela, consulta o scoreboard ESPN.
-A avaliação de tarefas lentas roda no máximo a cada 5 minutos e usa artefatos públicos menores.
+A avaliação de tarefas lentas roda no máximo a cada 5 minutos e usa artefatos públicos menores. O módulo continental, porém, não transforma essas avaliações em polling de workflow: ele dorme até a janela esportiva calculada pela agenda ou até detectar mudança factual na própria agenda.
 
 ## Rollback imediato
 
 Se houver qualquer dúvida após a ativação, execute novamente **Deploy Orchestrator Worker** escolhendo `shadow`.
 O Worker continua observando, mas para de criar `workflow_dispatch` no GitHub.
 
-## Fontes do repositório (v1.0.1)
+## Fontes do repositório (v1.2.0)
 
 O Worker tenta cada JSON primeiro em `SITE_BASE`. Se o artefato não estiver publicado no Pages ou a fonte pública estiver temporariamente indisponível, ele faz fallback autenticado para o mesmo caminho no branch configurado do GitHub via Contents API. Isso evita publicar no site arquivos puramente operacionais como auditorias e configurações.
 

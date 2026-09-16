@@ -95,6 +95,9 @@ CONTINENTAL_EDITORIAL_GUARD_FILES = (
     "scripts/orquestrar_workflows.py",
     "scripts/editorial_ia.py",
     "scripts/buscar_melhores_momentos_continentais.py",
+    "cloudflare/orchestrator-worker/src/logic.js",
+    "cloudflare/orchestrator-worker/src/orchestrator-state.js",
+    "cloudflare/orchestrator-worker/src/sources.js",
 )
 
 WORKFLOW_MAIN = "Atualizar Brasileirao (ESPN)"
