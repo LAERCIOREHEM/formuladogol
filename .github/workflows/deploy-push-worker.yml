@@ -45,7 +45,15 @@ jobs:
           test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo 'ERRO: secret CLOUDFLARE_API_TOKEN ausente.'; exit 1; }
           test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo 'ERRO: secret CLOUDFLARE_ACCOUNT_ID ausente.'; exit 1; }
           test -n "${FDG_PUSH_OPENAI_API_KEY:-}" || { echo 'ERRO: secret OPENAI_API_KEY ausente; o Guardião IA não pode operar.'; exit 1; }
-          test -n "${FDG_PUSH_API_FOOTBALL_KEY:-}" || { echo 'ERRO: secret API_FOOTBALL_KEY ausente; fallback de estatísticas do Ao Vivo não pode operar.'; exit 1; }
+
+          # API-Football é fallback opcional. TheSportsDB (V1/chave pública)
+          # permanece disponível mesmo sem qualquer secret adicional.
+          if [ -z "${FDG_PUSH_API_FOOTBALL_KEY:-}" ]; then
+            echo 'AVISO: API_FOOTBALL_KEY ausente; fallback API-Football desativado.'
+            echo 'TheSportsDB permanece ativo como fallback estatístico sem secret adicional.'
+          else
+            echo 'Fallback opcional API-Football configurado.'
+          fi
 
           # Resend é apenas o canal administrativo de contingência. A ausência
           # dele NÃO pode bloquear o deploy nem os seis alertas esportivos.
@@ -132,7 +140,15 @@ jobs:
         run: |
           set -euo pipefail
           printf '%s' "$FDG_PUSH_OPENAI_API_KEY" | npx wrangler secret put OPENAI_API_KEY --config wrangler.generated.jsonc
-          printf '%s' "$FDG_PUSH_API_FOOTBALL_KEY" | npx wrangler secret put API_FOOTBALL_KEY --config wrangler.generated.jsonc
+
+          # API-Football é opcional: não envia string vazia e não apaga eventual
+          # secret já configurado diretamente no Cloudflare Worker.
+          if [ -n "${FDG_PUSH_API_FOOTBALL_KEY:-}" ]; then
+            printf '%s' "$FDG_PUSH_API_FOOTBALL_KEY" | npx wrangler secret put API_FOOTBALL_KEY --config wrangler.generated.jsonc
+            echo 'Secret opcional API_FOOTBALL_KEY atualizado.'
+          else
+            echo 'API_FOOTBALL_KEY não informado; preservando eventual secret já existente no Worker.'
+          fi
 
           # E-mail administrativo é opcional. Se os secrets não existirem no
           # GitHub, não envia valor vazio e não apaga eventual secret já salvo
@@ -153,8 +169,8 @@ jobs:
             if curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"revision":"6-R10R4"'; then
               echo 'Push Worker saudável.'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"liveGatewayVersion":"2"'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"liveStatsFallbackVersion":1'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"apiFootballStatsReady":true'
+              curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"liveStatsFallbackVersion":2'
+              curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"theSportsDbStatsReady":true'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"engineVersion":5'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"overturnPolicyVersion":"6-R10R4"'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"livePolicyVersion":"6-R10"'
