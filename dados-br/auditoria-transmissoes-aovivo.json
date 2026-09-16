@@ -69,12 +69,12 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401913071",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Atlético-MG x Santos",
-      "data_iso": "2026-09-16T19:00:00-03:00",
+      "event_id": "401841176",
+      "rodada": 21,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Botafogo x Grêmio",
+      "data_iso": "2026-09-16T19:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -285,16 +285,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "7QWgeSfwbCE",
-      "url": "https://www.youtube.com/watch?v=7QWgeSfwbCE",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ESPANHA X PORTUGAL | COPA DO MUNDO FEMININA SUB-20 FIFA 2026 | OITAVAS DE FINAL",
-      "status": "live",
-      "inicio_programado": "2026-09-16T09:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "0YoG6mISrUc",
       "url": "https://www.youtube.com/watch?v=0YoG6mISrUc",
       "fonte": "getv",
@@ -410,7 +400,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: ATLÉTICO DE MADRID X OSASUNA | LALIGA 26/27 | 6ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-16T13:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -462,6 +452,16 @@
       "titulo": "AO VIVO: SUNDERLAND X AZ-ALKMAAR | EUROPA LEAGUE 26/27 | 1ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-09-16T14:20:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "7QWgeSfwbCE",
+      "url": "https://www.youtube.com/watch?v=7QWgeSfwbCE",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ESPANHA X PORTUGAL | COPA DO MUNDO FEMININA SUB-20 FIFA 2026 | OITAVAS DE FINAL",
+      "status": "live",
+      "inicio_programado": "2026-09-16T09:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -550,7 +550,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): ARARAT-ARMENIA X SPARTA PRAHA | EUROPA LEAGUE 26/27 | 1ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-16T13:35:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -670,7 +670,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): OMONIA X CELTA | EUROPA LEAGUE 26/27 | 1ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-16T13:35:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -698,24 +698,24 @@
   "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401913071",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Atlético-MG x Santos",
-      "data_iso": "2026-09-16T19:00:00-03:00",
+      "event_id": "401841176",
+      "rodada": 21,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Botafogo x Grêmio",
+      "data_iso": "2026-09-16T19:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 88,
+    "unidades": 87,
     "requisicoes": {
       "channels": 4,
-      "videos": 44,
+      "videos": 43,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-16T13:08:11-03:00"
+  "atualizado_em": "2026-09-16T13:32:05-03:00"
 }
