@@ -84,6 +84,18 @@ CONTINENTAL_PATHS = {
     "libertadores": ROOT / "dados-br" / "competicoes-af-previsao" / "libertadores.json",
     "sul_americana": ROOT / "dados-br" / "competicoes-af-previsao" / "sul-americana.json",
 }
+CONTINENTAL_EDITORIAL_LOCK_PATH = ROOT / "dados-br" / "estado-editorial-continentais.json"
+# Somente arquivos que governam a decisão/geração/validação editorial entram no
+# fingerprint. JSONs esportivos e outros artefatos mudam o tempo todo e NÃO
+# podem destravar um erro determinístico por acidente.
+CONTINENTAL_EDITORIAL_GUARD_FILES = (
+    ".github/workflows/publicar-analise-continentais.yml",
+    "scripts/gerar_analise_continental.py",
+    "scripts/validar_artefatos_analises.py",
+    "scripts/orquestrar_workflows.py",
+    "scripts/editorial_ia.py",
+    "scripts/buscar_melhores_momentos_continentais.py",
+)
 
 WORKFLOW_MAIN = "Atualizar Brasileirao (ESPN)"
 WORKFLOW_MM = "Buscar melhores momentos oficiais"
@@ -588,16 +600,54 @@ def backoff_por_falha(
     indefinidamente. Foi exatamente o que gerou ~1.370 execuções falhadas de
     'Publicar análise editorial da rodada'.
     """
+    alvo = ACAO_PARA_WORKFLOW.get(decision.action)
+    if not alvo:
+        return decision
+
+    # Editorial continental é uma publicação determinística e não pode entrar
+    # em retry automático infinito. O estado persistente é gravado pelo próprio
+    # workflow na primeira falha. Ele só fica obsoleto quando o CÓDIGO que
+    # governa o editorial muda; commits rotineiros de dados não o destravam.
+    if decision.action == "editorial_continentais":
+        locked, state = editorial_continental_lock_active()
+        if locked:
+            run_url = str(state.get("run_url") or "").strip()
+            suffix = f" Run com erro: {run_url}" if run_url else ""
+            return Decision(
+                "none",
+                (
+                    "Circuit breaker persistente: 'Publicar análise editorial continental' "
+                    "está pausado após a última falha. Atualizações esportivas/JSONs não "
+                    "reativam o workflow; é necessária correção no código de governança "
+                    f"editorial.{suffix}"
+                ),
+            )
+
+        # Fallback de segurança entre o instante da falha e o commit do arquivo
+        # de lock. Evita redespacho imediato mesmo se a persistência falhar.
+        current_sha = str(os.environ.get("GITHUB_SHA") or "").strip()
+        _last_when, last = last_run(runs, alvo, tz)
+        if last and str(last.get("status") or "") == "completed":
+            conclusion = str(last.get("conclusion") or "")
+            failed = conclusion in {"failure", "timed_out", "startup_failure"}
+            failed_sha = str(last.get("head_sha") or "").strip()
+            same_revision = bool(current_sha and failed_sha and current_sha == failed_sha)
+            if failed and same_revision:
+                return Decision(
+                    "none",
+                    (
+                        "Circuit breaker travado: 'Publicar análise editorial continental' falhou "
+                        "neste mesmo commit. Novas tentativas automáticas estão suspensas enquanto "
+                        "o lock persistente é registrado ou até o código editorial ser corrigido."
+                    ),
+                )
+
     cfg = config.get("backoff_falhas") or {}
     if not bool(cfg.get("ativo", True)):
         return decision
     limite = int(cfg.get("falhas_para_pausar", 3))
     escala = [int(v) for v in (cfg.get("espera_minutos") or [15, 60, 240, 720])]
     teto = int(cfg.get("teto_minutos", 1440))
-
-    alvo = ACAO_PARA_WORKFLOW.get(decision.action)
-    if not alvo:
-        return decision
 
     total, ultima = falhas_consecutivas(runs, alvo, tz)
     if total < limite or ultima is None:
@@ -1240,6 +1290,38 @@ def canonical_hash(value: Any) -> str:
     ).hexdigest()
 
 
+def editorial_continental_guard_fingerprint() -> str:
+    """Identidade do código que governa o editorial continental.
+
+    O fingerprint deliberadamente ignora snapshots/JSONs esportivos. Assim,
+    commits automáticos de placar, tabela ou probabilidades não rearmam um
+    workflow que falhou por defeito de código/contrato editorial.
+    """
+    digest = hashlib.sha256()
+    for relative in CONTINENTAL_EDITORIAL_GUARD_FILES:
+        path = ROOT / relative
+        digest.update(relative.encode("utf-8"))
+        digest.update(b"\0")
+        try:
+            digest.update(path.read_bytes())
+        except OSError:
+            digest.update(b"<missing>")
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def editorial_continental_lock_active() -> tuple[bool, Mapping[str, Any]]:
+    """Retorna se o circuit breaker persistente ainda vale para este código."""
+    state = load_json(CONTINENTAL_EDITORIAL_LOCK_PATH, {})
+    if not isinstance(state, Mapping) or not bool(state.get("bloqueado")):
+        return False, state if isinstance(state, Mapping) else {}
+    stored = str(state.get("guard_fingerprint") or "").strip()
+    if not stored:
+        # Estado antigo/corrompido: falha fechada para não voltar ao loop.
+        return True, state
+    return stored == editorial_continental_guard_fingerprint(), state
+
+
 def cup_editorial_decision() -> Decision | None:
     snapshot = load_json(CUP_SNAPSHOT_PATH, {})
     phase = snapshot.get("fase_atual") if isinstance(snapshot, Mapping) else {}
@@ -1275,24 +1357,25 @@ def cup_editorial_decision() -> Decision | None:
 def continental_editorial_decision() -> Decision | None:
     try:
         from gerar_analise_continental import (
-            SNAPS, MM_PATH, CONT_HISTORY_PATH, latest_publishable, active_rank, baseline_ready,
-            build_ties, build_article, load as continental_load, mark_ids, current_stats_marks, stats_dossier
+            SNAPS, MM_PATH, CONT_HISTORY_PATH, editorial_eligibility,
+            build_ties, build_article, load as continental_load, current_stats_marks, stats_dossier
         )
         snapshots = {key: continental_load(path, {}) for key, path in SNAPS.items()}
-        rank = latest_publishable(snapshots)
-        if not rank:
-            work_rank = active_rank(snapshots)
-            if work_rank and baseline_ready(snapshots, work_rank):
-                history = continental_load(CONT_HISTORY_PATH, {"marcos": []}) or {"marcos": []}
-                before_id, _ = mark_ids(work_rank)
-                if not any((mark or {}).get("id") == before_id for mark in (history.get("marcos") or [])):
-                    return Decision("editorial_continentais", "Partidas de ida continentais dos brasileiros encerradas; preservar fotografia estatística anterior às voltas.")
+        history = continental_load(CONT_HISTORY_PATH, {"marcos": []}) or {"marcos": []}
+        eligibility = editorial_eligibility(snapshots, history)
+        action = str(eligibility.get("action") or "none")
+        rank = int(eligibility.get("rank") or 0)
+        if action == "none" or not rank:
             return None
+        if action == "baseline":
+            return Decision(
+                "editorial_continentais",
+                f"{eligibility.get('reason') or 'Preservar fotografia estatística anterior às voltas.'}",
+            )
         ties = [tie for comp, snap in snapshots.items() for tie in build_ties(comp, snap, rank)]
         if not ties:
             return None
         highlights = continental_load(MM_PATH, {"jogos": {}}) or {"jogos": {}}
-        history = continental_load(CONT_HISTORY_PATH, {"marcos": []}) or {"marcos": []}
         before, after, _ = current_stats_marks(rank, ties, history)
         stats = stats_dossier(before, after) if before and after else {}
         expected = build_article(rank, ties, highlights, datetime.now(ZoneInfo("America/Sao_Paulo")).replace(microsecond=0), stats)
@@ -1465,6 +1548,63 @@ def self_test() -> int:
     assert mm_retry_interval(10.0, config) == 360
     assert mm_retry_interval(20.0, config) == 720
     assert mm_retry_interval(100.0, config) == 1440
+
+    # Editorial continental: uma única falha trava novas tentativas. O lock
+    # persistente continua ativo mesmo se main receber commits rotineiros de
+    # dados; somente mudança no código governante altera o fingerprint.
+    old_sha = os.environ.get("GITHUB_SHA")
+    original_lock_path = globals()["CONTINENTAL_EDITORIAL_LOCK_PATH"]
+    try:
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmpdir:
+            fake_lock = Path(tmpdir) / "estado-editorial-continentais.json"
+            globals()["CONTINENTAL_EDITORIAL_LOCK_PATH"] = fake_lock
+            os.environ["GITHUB_SHA"] = "abc123"
+            continental_target = Decision("editorial_continentais", "teste")
+            failed_same_sha = [{
+                "name": WORKFLOW_EDITORIAL_CONTINENTAIS,
+                "status": "completed",
+                "conclusion": "failure",
+                "head_sha": "abc123",
+                "created_at": (now - timedelta(minutes=2)).astimezone(timezone.utc).isoformat(),
+            }]
+            latched = backoff_por_falha(continental_target, config=config, runs=failed_same_sha, now=now, tz=tz)
+            assert latched.action == "none" and "Circuit breaker travado" in latched.reason
+
+            # Um run antigo em outro SHA não basta para travar se ainda não há
+            # lock persistido.
+            failed_old_sha = [dict(failed_same_sha[0], head_sha="old456")]
+            assert backoff_por_falha(continental_target, config=config, runs=failed_old_sha, now=now, tz=tz).action == "editorial_continentais"
+
+            current_fp = editorial_continental_guard_fingerprint()
+            fake_lock.write_text(json.dumps({
+                "schema_version": 1,
+                "bloqueado": True,
+                "guard_fingerprint": current_fp,
+                "run_url": "https://example.invalid/run/1",
+            }), encoding="utf-8")
+            locked, _ = editorial_continental_lock_active()
+            assert locked
+            persistent = backoff_por_falha(continental_target, config=config, runs=[], now=now, tz=tz)
+            assert persistent.action == "none" and "Circuit breaker persistente" in persistent.reason
+
+            # Uma correção real em arquivo de governança produz fingerprint
+            # diferente; o lock antigo deixa de valer. Commits de JSONs não
+            # entram no fingerprint e, portanto, não têm esse efeito.
+            fake_lock.write_text(json.dumps({
+                "schema_version": 1,
+                "bloqueado": True,
+                "guard_fingerprint": "0" * 64,
+            }), encoding="utf-8")
+            locked, _ = editorial_continental_lock_active()
+            assert not locked
+            assert backoff_por_falha(continental_target, config=config, runs=[], now=now, tz=tz).action == "editorial_continentais"
+    finally:
+        globals()["CONTINENTAL_EDITORIAL_LOCK_PATH"] = original_lock_path
+        if old_sha is None:
+            os.environ.pop("GITHUB_SHA", None)
+        else:
+            os.environ["GITHUB_SHA"] = old_sha
 
     # Último run e bloqueio de writer.
     runs = [

@@ -170,6 +170,143 @@ def phase_materialized_for_survivors(snaps: Mapping[str, Mapping[str, Any]], ran
     return True
 
 
+def rank_has_complete_two_leg_ties(snaps: Mapping[str, Mapping[str, Any]], rank: int) -> bool:
+    """Exige ida+volta completas para fases eliminatórias em dois jogos.
+
+    Esse guard evita que um rótulo degradado da ESPN (por exemplo, um jogo
+    recém-finalizado aparecer como ``Final``) seja interpretado como uma fase
+    inteira. Para oitavas/quartas/semifinais, todo confronto brasileiro precisa
+    ter exatamente as duas pernas materializadas e concluídas antes do editorial.
+    """
+    if rank == 900:
+        # As finais continentais são partida única e não pertencem a este guard.
+        return True
+    found = False
+    for comp, snapshot in snaps.items():
+        events = phase_events(snapshot, rank)
+        if not events:
+            continue
+        found = True
+        ties = build_ties(comp, snapshot, rank)
+        if not ties:
+            return False
+        event_ids = {str(event.get('event_id') or '') for event in events}
+        tie_event_ids = {
+            str(event.get('event_id') or '')
+            for tie in ties
+            for event in tie.get('pernas') or []
+        }
+        if event_ids != tie_event_ids:
+            return False
+        for tie in ties:
+            legs = list(tie.get('pernas') or [])
+            leg_numbers = {int(event.get('perna') or 0) for event in legs}
+            if len(legs) != 2 or leg_numbers != {1, 2}:
+                return False
+            if not all(bool(event.get('concluido')) for event in legs):
+                return False
+    return found
+
+
+def open_editorial_rank(history: Mapping[str, Any]) -> int | None:
+    """Retorna a fase cujo marco ANTES existe, mas o marco DEPOIS ainda não.
+
+    O marco anterior é criado após todas as idas. Ele passa a funcionar como
+    âncora imutável da edição seguinte. Assim, uma classificação errada de um
+    único evento não pode promover o editorial para semifinal/final enquanto a
+    fase ancorada ainda estiver em disputa.
+    """
+    marks = {str((item or {}).get('id') or '') for item in history.get('marcos') or []}
+    open_ranks: list[int] = []
+    for rank in PHASES:
+        before_id, after_id = mark_ids(rank)
+        if before_id in marks and after_id not in marks:
+            open_ranks.append(rank)
+    return max(open_ranks) if open_ranks else None
+
+
+def editorial_eligibility(
+    snaps: Mapping[str, Mapping[str, Any]],
+    history: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Decide se o workflow deve fazer algo sem gerar/publicar conteúdo.
+
+    A decisão é deliberadamente conservadora:
+      * ``baseline``: todas as idas terminaram e falta preservar o marco antes;
+      * ``publish``: a fase ancorada terminou integralmente para os brasileiros;
+      * ``none``: ainda há partida pendente ou a estrutura ida/volta está incompleta.
+    """
+    anchored_rank = open_editorial_rank(history)
+    if anchored_rank:
+        events = [
+            event
+            for snapshot in snaps.values()
+            for event in phase_events(snapshot, anchored_rank)
+        ]
+        pending = [str(event.get('event_id') or '') for event in events if not event.get('concluido')]
+        if pending:
+            return {
+                'action': 'none',
+                'rank': anchored_rank,
+                'fase': PHASES[anchored_rank][0],
+                'reason': 'fase continental ainda em andamento; aguardar todas as partidas dos brasileiros',
+                'pendentes': [event_id for event_id in pending if event_id],
+            }
+        if not rank_has_complete_two_leg_ties(snaps, anchored_rank):
+            return {
+                'action': 'none',
+                'rank': anchored_rank,
+                'fase': PHASES[anchored_rank][0],
+                'reason': 'fase encerrada sem estrutura completa de ida e volta; aguardar reconciliação factual',
+                'pendentes': [],
+            }
+        if not phase_materialized_for_survivors(snaps, anchored_rank):
+            return {
+                'action': 'none',
+                'rank': anchored_rank,
+                'fase': PHASES[anchored_rank][0],
+                'reason': 'fase encerrada, mas os sobreviventes ainda não estão materializados de forma consistente',
+                'pendentes': [],
+            }
+        return {
+            'action': 'publish',
+            'rank': anchored_rank,
+            'fase': PHASES[anchored_rank][0],
+            'reason': 'fase continental ancorada encerrada para todos os brasileiros',
+            'pendentes': [],
+        }
+
+    work_rank = active_rank(snaps)
+    if work_rank and baseline_ready(snaps, work_rank):
+        before_id, _ = mark_ids(work_rank)
+        marks = {str((item or {}).get('id') or '') for item in history.get('marcos') or []}
+        if before_id not in marks:
+            return {
+                'action': 'baseline',
+                'rank': work_rank,
+                'fase': PHASES[work_rank][0],
+                'reason': 'todas as partidas de ida terminaram; preservar marco anterior às voltas',
+                'pendentes': [],
+            }
+
+    rank = latest_publishable(snaps)
+    if rank:
+        return {
+            'action': 'publish',
+            'rank': rank,
+            'fase': PHASES[rank][0],
+            'reason': 'fase continental encerrada e estruturalmente consistente',
+            'pendentes': [],
+        }
+    return {
+        'action': 'none',
+        'rank': work_rank or 0,
+        'fase': PHASES.get(work_rank or 0, ('', '', ''))[0],
+        'reason': 'nenhuma fase continental brasileira pronta para editorial',
+        'pendentes': [],
+    }
+
+
 def latest_publishable(snaps: Mapping[str, Mapping[str, Any]]) -> int | None:
     ranks = ranks_with_brazilians(snaps)
     if not ranks:
@@ -178,7 +315,11 @@ def latest_publishable(snaps: Mapping[str, Mapping[str, Any]]) -> int | None:
     # começou e ainda está em disputa, não voltamos artificialmente à fase anterior.
     rank = ranks[-1]
     events = [event for snapshot in snaps.values() for event in phase_events(snapshot, rank)]
-    if events and all(bool(event.get('concluido')) for event in events) and phase_materialized_for_survivors(snaps, rank):
+    if not events or not all(bool(event.get('concluido')) for event in events):
+        return None
+    if rank != 900 and not rank_has_complete_two_leg_ties(snaps, rank):
+        return None
+    if phase_materialized_for_survivors(snaps, rank):
         return rank
     return None
 
@@ -841,11 +982,12 @@ def capture_baseline(rank: int, ties: Sequence[Mapping[str, Any]], history: dict
 def publish(dry: bool = False, force_rank: int = 0, usar_ia: bool = False, sem_ia: bool = False) -> int:
     snaps = {key: load(path, {}) or {} for key, path in SNAPS.items()}
     history = load_cont_history()
-    rank = force_rank or latest_publishable(snaps)
+    eligibility = editorial_eligibility(snaps, history)
+    rank = force_rank or (int(eligibility.get('rank') or 0) if eligibility.get('action') == 'publish' else 0)
 
     if not rank:
-        work_rank = active_rank(snaps)
-        if work_rank and baseline_ready(snaps, work_rank):
+        work_rank = int(eligibility.get('rank') or 0)
+        if eligibility.get('action') == 'baseline' and work_rank:
             ties = [tie for comp, snap in snaps.items() for tie in build_ties(comp, snap, work_rank)]
             changed = capture_baseline(work_rank, ties, history)
             if changed and not dry:
@@ -950,6 +1092,22 @@ def self_test() -> None:
         {'fase_ordem': 700, 'perna': 2, 'data_iso': '2026-09-08T21:30:00-03:00', 'mandante': dict(side_x), 'visitante': dict(side_br), 'concluido': False},
     ]}, 'sul_americana': {'eventos': []}}
     assert latest_publishable(future) is None and baseline_ready(future, 700) is True
+
+    # Regressão 2026-09-15: uma volta recém-finalizada não pode ser promovida
+    # artificialmente para "Final" enquanto outras quartas brasileiras seguem
+    # pendentes. O marco ANTES das quartas ancora a fase correta.
+    history = {'marcos': [{'id': mark_ids(700)[0]}]}
+    distorted = {
+        'libertadores': {'eventos': [
+            {'event_id': 'q1a', 'fase_ordem': 700, 'perna': 1, 'data_iso': '2026-09-08T19:00:00-03:00', 'mandante': dict(side_br), 'visitante': dict(side_x), 'concluido': True},
+            {'event_id': 'q1b', 'fase_ordem': 900, 'perna': 2, 'data_iso': '2026-09-15T19:00:00-03:00', 'mandante': dict(side_x), 'visitante': dict(side_br), 'concluido': True},
+            {'event_id': 'q2a', 'fase_ordem': 700, 'perna': 1, 'data_iso': '2026-09-09T19:00:00-03:00', 'mandante': {'espn_id': '3', 'nome': 'Brasileiro 2', 'serie_a_2026': True, 'placar': 1}, 'visitante': {'espn_id': '4', 'nome': 'Rival 2', 'serie_a_2026': False, 'placar': 0}, 'concluido': True},
+            {'event_id': 'q2b', 'fase_ordem': 700, 'perna': 2, 'data_iso': '2026-09-16T19:00:00-03:00', 'mandante': {'espn_id': '4', 'nome': 'Rival 2', 'serie_a_2026': False, 'placar': 0}, 'visitante': {'espn_id': '3', 'nome': 'Brasileiro 2', 'serie_a_2026': True, 'placar': 0}, 'concluido': False},
+        ]},
+        'sul_americana': {'eventos': []},
+    }
+    guard = editorial_eligibility(distorted, history)
+    assert guard['action'] == 'none' and guard['rank'] == 700 and guard['pendentes'] == ['q2b']
     context = continental_editorial_dossier(600, ties, {'comparacoes': []})
     validate_continental_editorial(editorial_copy(600, ties), context)
     print('OK: self-test editorial continental.')
@@ -962,9 +1120,15 @@ def main() -> int:
     parser.add_argument('--fase-ordem', type=int, default=0)
     parser.add_argument('--usar-ia', action='store_true', help='Usa OpenAI somente quando o fechamento continental estiver elegível')
     parser.add_argument('--sem-ia', action='store_true', help='Força o fallback jornalístico determinístico')
+    parser.add_argument('--eligibility', action='store_true', help='Imprime a decisão de elegibilidade sem gerar ou alterar arquivos')
     args = parser.parse_args()
     if args.self_test:
         self_test()
+        return 0
+    if args.eligibility:
+        snaps = {key: load(path, {}) or {} for key, path in SNAPS.items()}
+        history = load_cont_history()
+        print(json.dumps(editorial_eligibility(snaps, history), ensure_ascii=False, sort_keys=True))
         return 0
     return publish(args.dry_run, args.fase_ordem, args.usar_ia, args.sem_ia)
 
