@@ -474,21 +474,85 @@ def overdue_pending_events(
     return vencidos
 
 
-def refresh_overdue_pending_with_summaries(
+def started_pending_events(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
+    """Jogos pendentes cujo horário de início já chegou.
+
+    A lista inclui tanto partidas provavelmente ao vivo quanto partidas vencidas.
+    Ela é usada para acionar o ``summary`` individual antes de decidir se o
+    snapshot anterior pode ser preservado. Jogos futuros não geram requisição
+    adicional.
+    """
+    now = now_brt()
+    started: list[dict[str, Any]] = []
+    for event in snapshot.get("eventos") or []:
+        if event.get("concluido") or _evento_adiado_ou_cancelado(event):
+            continue
+        data = parse_datetime(event.get("data_iso"))
+        if data and data <= now:
+            started.append(event)
+    return started
+
+
+def stabilize_unfinished_events_for_af(
+    snapshot: dict[str, Any],
+    previous: dict[str, Any] | None,
+) -> dict[str, Any]:
+    """Evita que placar/status AO VIVO disparem Monte Carlo continental.
+
+    Os snapshots continentais alimentam o AF, não o placar ao vivo do site. Para
+    um evento que continua não concluído, alterações transitórias como ``pre`` →
+    ``in`` e 0x0 → 1x0 não mudam o universo probabilístico: o resultado ainda é
+    desconhecido. Preservamos esses campos efêmeros do snapshot anterior e só
+    deixamos o estado esportivo mudar quando a ESPN confirmar ``completed``.
+
+    Data, fase, estádio e identidade das equipes continuam vindo da coleta nova,
+    pois podem conter correções factuais úteis mesmo antes do apito final.
+    """
+    if not previous:
+        return snapshot
+    previous_by_id = {
+        str(item.get("event_id")): item
+        for item in (previous.get("eventos") or [])
+        if item.get("event_id")
+    }
+    for event in snapshot.get("eventos") or []:
+        event_id = str(event.get("event_id") or "")
+        old = previous_by_id.get(event_id)
+        if not old or event.get("concluido") or old.get("concluido"):
+            continue
+        for field in ("estado", "status", "vencedor", "penaltis"):
+            if field in old:
+                event[field] = copy.deepcopy(old.get(field))
+        for side in ("mandante", "visitante"):
+            fresh_team = event.get(side) or {}
+            old_team = old.get(side) or {}
+            for field in ("placar", "vencedor"):
+                if field in old_team:
+                    fresh_team[field] = copy.deepcopy(old_team.get(field))
+            event[side] = fresh_team
+    return snapshot
+
+
+def refresh_started_pending_with_summaries(
     spec: CompetitionSpec,
     snapshot: dict[str, Any],
     *,
     grace_hours: int,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Reconsulta individualmente jogos vencidos no endpoint summary da ESPN.
+    """Reconsulta individualmente toda partida iniciada ainda não concluída.
 
-    O scoreboard em janelas longas pode permanecer em cache após o apito final.
-    O summary individual é a segunda rota oficial já usada pelo projeto para o
-    Brasileirão e evita que uma fase encerrada permaneça artificialmente aberta.
+    O scoreboard amplo da ESPN pode falhar ou ficar em cache justamente durante
+    uma partida. O ``summary`` por ``event_id`` é consultado tanto na janela ao
+    vivo quanto depois dela. Se confirmar FINAL, o resultado entra imediatamente;
+    se confirmar LIVE, o AF continua usando o último estado pré-jogo até o apito
+    final.
     """
-    overdue = overdue_pending_events(snapshot, grace_hours=grace_hours)
-    if not overdue:
-        return snapshot, {"consultados": 0, "atualizados": 0, "pendentes": []}
+    targets = started_pending_events(snapshot)
+    if not targets:
+        return snapshot, {
+            "consultados": 0, "confirmados": 0, "atualizados": 0,
+            "ao_vivo": [], "finalizados": [], "pendentes": [], "pendentes_vencidos": [], "erros": [],
+        }
 
     normalized_by_id = {
         str(item.get("event_id")): copy.deepcopy(item)
@@ -496,9 +560,12 @@ def refresh_overdue_pending_with_summaries(
         if item.get("event_id")
     }
     consulted = 0
+    confirmed = 0
     updated = 0
+    live_ids: list[str] = []
+    final_ids: list[str] = []
     errors: list[str] = []
-    for original in overdue:
+    for original in targets:
         event_id = str(original.get("event_id") or "").strip()
         if not event_id:
             continue
@@ -519,17 +586,31 @@ def refresh_overdue_pending_with_summaries(
             if event_pair_key(parsed) != event_pair_key(original):
                 errors.append(f"{event_id}: summary retornou confronto divergente")
                 continue
+            # Campos editoriais/auditoria já anexados ao evento não existem no
+            # header do summary. Preserva-os sem deixar que sobrescrevam os
+            # campos esportivos recém-confirmados.
+            merged = copy.deepcopy(original)
+            merged.update(parsed)
+            parsed = merged
+            confirmed += 1
             before = normalized_by_id.get(event_id)
             normalized_by_id[event_id] = parsed
+            if parsed.get("concluido"):
+                final_ids.append(event_id)
+            else:
+                live_ids.append(event_id)
             if before != parsed:
                 updated += 1
         except Exception as exc:  # noqa: BLE001
             errors.append(f"{event_id}: {type(exc).__name__}: {exc}")
 
     collection = dict(snapshot.get("coleta") or {})
-    collection["summary_pendentes_vencidos"] = {
+    collection["summary_partidas_iniciadas"] = {
         "consultados": consulted,
+        "confirmados": confirmed,
         "atualizados": updated,
+        "ao_vivo": live_ids,
+        "finalizados": final_ids,
         "erros": errors,
     }
     refreshed = build_snapshot_from_normalized(
@@ -541,10 +622,26 @@ def refresh_overdue_pending_with_summaries(
     ]
     return refreshed, {
         "consultados": consulted,
+        "confirmados": confirmed,
         "atualizados": updated,
+        "ao_vivo": live_ids,
+        "finalizados": final_ids,
         "pendentes": still_overdue,
+        "pendentes_vencidos": still_overdue,
         "erros": errors,
     }
+
+
+def refresh_overdue_pending_with_summaries(
+    spec: CompetitionSpec,
+    snapshot: dict[str, Any],
+    *,
+    grace_hours: int,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Compatibilidade: agora o resgate cobre toda partida já iniciada."""
+    return refresh_started_pending_with_summaries(
+        spec, snapshot, grace_hours=grace_hours
+    )
 
 
 def assert_no_overdue_pending(snapshot: dict[str, Any], spec: CompetitionSpec, *, grace_hours: int) -> None:
@@ -1314,19 +1411,47 @@ def preserved_snapshot_age_warnings(
     return []
 
 
+def preserved_snapshot_live_warnings(
+    snapshot: dict[str, Any] | None,
+    *,
+    live_window_hours: int,
+) -> list[str]:
+    """Registra partidas em curso sem transformá-las em falha do AF.
+
+    Um placar parcial não é um novo fato para o modelo continental: enquanto a
+    partida não estiver concluída, o cenário probabilístico continua sendo o
+    mesmo do pré-jogo. O warning existe apenas para observabilidade.
+    """
+    if not snapshot:
+        return []
+    now = now_brt()
+    after = timedelta(hours=max(4, live_window_hours))
+    warnings: list[str] = []
+    for event in snapshot.get("eventos") or []:
+        if event.get("concluido") or _evento_adiado_ou_cancelado(event):
+            continue
+        event_time = parse_datetime(event.get("data_iso"))
+        if event_time and event_time <= now <= event_time + after:
+            warnings.append(
+                "jogo iniciado ainda sem FINAL confirmado; AF pré-jogo preservado: "
+                f"{event.get('event_id')}"
+            )
+    return warnings
+
+
 def preserved_snapshot_safe_for_af(
     snapshot: dict[str, Any] | None,
     *,
     live_window_hours: int,
     max_snapshot_age_hours: int = 24,
 ) -> tuple[bool, list[str]]:
-    """Aceita fallback apenas quando não existe risco factual esportivo.
+    """Aceita fallback enquanto não existir resultado provavelmente vencido.
 
-    A idade isolada do arquivo não torna uma fotografia factual insegura. Um
-    fallback é bloqueado se a estrutura não puder alimentar o AF, se houver
-    jogo na janela crítica sem confirmação ou se existir partida vencida ainda
-    marcada como pendente. A idade acima do limite é registrada separadamente
-    como alerta operacional.
+    A idade isolada do arquivo não torna uma fotografia factual insegura. Uma
+    partida AO VIVO também não invalida o AF: placar parcial não entra no modelo
+    continental. O fallback só é bloqueado quando a estrutura não pode alimentar
+    o AF ou quando uma partida já passou da janela máxima de duração e continua
+    sem resultado confirmado mesmo após a tentativa individual pelo ``summary``.
     """
     reasons: list[str] = []
     if not snapshot or snapshot.get("status") != "ok":
@@ -1342,19 +1467,13 @@ def preserved_snapshot_safe_for_af(
     _ = max_snapshot_age_hours
 
     now = now_brt()
-    before = timedelta(hours=2)
     after = timedelta(hours=max(4, live_window_hours))
     for event in snapshot.get("eventos") or []:
-        if event.get("concluido"):
+        if event.get("concluido") or _evento_adiado_ou_cancelado(event):
             continue
         event_time = parse_datetime(event.get("data_iso"))
         if not event_time:
             continue
-        if event_time - before <= now <= event_time + after:
-            reasons.append(
-                f"há jogo em janela crítica sem confirmação: {event.get('event_id')}"
-            )
-            break
         if event_time < now - after:
             reasons.append(
                 f"há jogo vencido sem resultado confirmado: {event.get('event_id')}"
@@ -1415,9 +1534,10 @@ def run_update(
                 past_days=past_days,
                 future_days=future_days,
             )
-            snapshot, summary_refresh = refresh_overdue_pending_with_summaries(
+            snapshot, summary_refresh = refresh_started_pending_with_summaries(
                 spec, snapshot, grace_hours=max(4, live_window_hours)
             )
+            snapshot = stabilize_unfinished_events_for_af(snapshot, previous)
             assert_no_overdue_pending(
                 snapshot, spec, grace_hours=max(4, live_window_hours)
             )
@@ -1448,7 +1568,7 @@ def run_update(
                     "finalizados": snapshot["resumo"]["finalizados"],
                     "pendentes": snapshot["resumo"]["pendentes"],
                     "fase_atual": snapshot.get("fase_atual"),
-                    "summary_pendentes_vencidos": summary_refresh,
+                    "summary_partidas_iniciadas": summary_refresh,
                     "coleta": snapshot.get("coleta") or {},
                 }
             )
@@ -1461,10 +1581,72 @@ def run_update(
             )
             if strict or not previous_compatible:
                 raise RuntimeError(message) from exc
+
+            # Se o scoreboard amplo falhar justamente durante/depois do jogo,
+            # tenta o summary individual antes de decidir preservar o snapshot.
+            # Um FINAL confirmado aqui é suficiente para atualizar a fotografia
+            # continental e liberar o recálculo do AF sem esperar o próximo run.
+            summary_rescue: dict[str, Any] = {
+                "consultados": 0, "confirmados": 0, "atualizados": 0,
+                "ao_vivo": [], "finalizados": [], "pendentes": [], "pendentes_vencidos": [], "erros": [],
+            }
+            rescued = previous
+            try:
+                rescued, summary_rescue = refresh_started_pending_with_summaries(
+                    spec, previous, grace_hours=max(4, live_window_hours)
+                )
+                rescued = stabilize_unfinished_events_for_af(rescued, previous)
+                assert_no_overdue_pending(
+                    rescued, spec, grace_hours=max(4, live_window_hours)
+                )
+                validate_snapshot(rescued, spec)
+                if rescued.get("status") == "ok":
+                    structural = validate_competition_snapshot_structure(rescued)
+                    rescued["validacao_af"] = {
+                        "status": "pronto",
+                        "fase": structural.get("fase"),
+                        "fase_ordem": structural.get("fase_ordem"),
+                        "chaves": structural.get("chaves"),
+                        "equipes_ativas": structural.get("equipes_ativas"),
+                    }
+            except Exception as rescue_exc:  # noqa: BLE001
+                summary_rescue = dict(summary_rescue)
+                summary_rescue.setdefault("erros", []).append(
+                    f"resgate: {type(rescue_exc).__name__}: {rescue_exc}"
+                )
+                rescued = previous
+
+            if snapshots_state_hash({spec.key: rescued}) != snapshots_state_hash({spec.key: previous}):
+                # A única mudança relevante permitida aqui é factual (por exemplo,
+                # LIVE -> FINAL). Publica o snapshot recuperado e deixa o gate do AF
+                # perceber a mudança esportiva normalmente.
+                write_json_atomic(path, rescued)
+                audit_rows.append(
+                    {
+                        "competicao": spec.key,
+                        "status": "atualizado",
+                        "arquivo": str(path.relative_to(ROOT)),
+                        "gerado_em": rescued.get("gerado_em"),
+                        "cache_efetivo_minutos": cache_minutes,
+                        "eventos": (rescued.get("resumo") or {}).get("eventos", 0),
+                        "finalizados": (rescued.get("resumo") or {}).get("finalizados", 0),
+                        "pendentes": (rescued.get("resumo") or {}).get("pendentes", 0),
+                        "fase_atual": rescued.get("fase_atual"),
+                        "recuperacao": "summary_individual_apos_falha_scoreboard",
+                        "erro_scoreboard": message,
+                        "summary_partidas_iniciadas": summary_rescue,
+                        "coleta": rescued.get("coleta") or {},
+                    }
+                )
+                continue
+
             safe_preserved, safe_reasons = preserved_snapshot_safe_for_af(
                 previous, live_window_hours=live_window_hours
             )
             age_warnings = preserved_snapshot_age_warnings(previous)
+            live_warnings = preserved_snapshot_live_warnings(
+                previous, live_window_hours=live_window_hours
+            )
             if not safe_preserved:
                 blocking_failures.append(
                     f"{spec.key}: snapshot preservado não é seguro para o AF: "
@@ -1483,7 +1665,8 @@ def run_update(
                     "erro": message,
                     "fallback_seguro_para_af": safe_preserved,
                     "motivos_fallback": safe_reasons,
-                    "alertas_fallback": age_warnings,
+                    "alertas_fallback": age_warnings + live_warnings,
+                    "summary_partidas_iniciadas": summary_rescue,
                 }
             )
     after_snapshots = load_existing_snapshots()
@@ -1795,6 +1978,46 @@ def self_test() -> None:
     assert safe and reasons == []
     age_alerts = preserved_snapshot_age_warnings(stale_but_factually_safe)
     assert age_alerts and "não bloqueante" in age_alerts[0]
+
+    # Regressão 2026-09-15: partida AO VIVO sem resposta do scoreboard não pode
+    # derrubar Atualizar Brasileirão nem forçar Monte Carlo por placar parcial.
+    live_preserved = copy.deepcopy(stale_but_factually_safe)
+    live_event = next(event for event in live_preserved["eventos"] if not event.get("concluido"))
+    live_event["data_iso"] = (now_brt() - timedelta(hours=1)).isoformat()
+    live_event["estado"] = "pre"
+    live_event["status"] = "Agendado"
+    safe, reasons = preserved_snapshot_safe_for_af(live_preserved, live_window_hours=4)
+    assert safe and reasons == []
+    live_alerts = preserved_snapshot_live_warnings(live_preserved, live_window_hours=4)
+    assert live_alerts and str(live_event.get("event_id")) in live_alerts[0]
+
+    live_scoreboard = copy.deepcopy(live_preserved)
+    live_score_event = next(
+        event for event in live_scoreboard["eventos"]
+        if event.get("event_id") == live_event.get("event_id")
+    )
+    live_score_event["estado"] = "in"
+    live_score_event["status"] = "67'"
+    live_score_event["mandante"]["placar"] = 1
+    live_score_event["visitante"]["placar"] = 0
+    stabilize_unfinished_events_for_af(live_scoreboard, live_preserved)
+    assert snapshots_state_hash({spec.key: live_scoreboard}) == snapshots_state_hash({spec.key: live_preserved})
+
+    final_scoreboard = copy.deepcopy(live_preserved)
+    final_event = next(
+        event for event in final_scoreboard["eventos"]
+        if event.get("event_id") == live_event.get("event_id")
+    )
+    final_event["estado"] = "post"
+    final_event["status"] = "Finalizado"
+    final_event["concluido"] = True
+    final_event["mandante"]["placar"] = 2
+    final_event["visitante"]["placar"] = 1
+    final_event["mandante"]["vencedor"] = True
+    final_event["visitante"]["vencedor"] = False
+    final_event["vencedor"] = final_event["mandante"]["nome"]
+    stabilize_unfinished_events_for_af(final_scoreboard, live_preserved)
+    assert snapshots_state_hash({spec.key: final_scoreboard}) != snapshots_state_hash({spec.key: live_preserved})
 
     # Continua fail-closed quando existe jogo vencido sem confirmação.
     overdue_preserved = copy.deepcopy(stale_but_factually_safe)
