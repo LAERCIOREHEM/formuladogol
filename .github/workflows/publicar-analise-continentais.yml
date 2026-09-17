@@ -112,7 +112,7 @@ jobs:
             echo "::warning title=YouTube API ausente::Preservando vínculos já publicados; o editorial não será bloqueado."
           fi
 
-      - name: Gerar editorial continental quando elegível
+      - name: Auditar fatos com IA e gerar editorial continental
         if: steps.breaker.outputs.blocked != 'true' && steps.readiness.outputs.action != 'none'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
