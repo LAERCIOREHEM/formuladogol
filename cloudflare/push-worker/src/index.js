@@ -5,6 +5,7 @@ import { dispatchStatus, enqueueSportsEvent, handleQueueBatch } from './push-dis
 import { opsStatus, runOperationalMaintenance } from './ops.js';
 import { probeEspnSources } from './espn-source.js';
 import { LIVE_API_CONSTANTS, resolveLiveScoreboard, resolveLiveSummary } from './live-api.js';
+import { createLiveStatsStore } from './live-stats-store.js';
 
 export { PushState, SportsMonitor };
 
@@ -572,10 +573,15 @@ export default {
         version: 7,
         revision: '6-R10R4',
         liveGatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
-        liveStatsFallbackVersion: 2,
+        liveStatsFallbackVersion: 3,
         theSportsDbStatsReady: true,
         apiFootballStatsReady: Boolean(env.API_FOOTBALL_KEY),
-        statsFallbackProviders: ['thesportsdb', 'api-football-optional'],
+        statsFallbackProviders: ['espn-primary', 'api-football-continental-budgeted', 'thesportsdb-contingency'],
+        apiFootballContinentalOnly: true,
+        apiFootballDailyBudgetPolicy: LIVE_API_CONSTANTS.API_FOOTBALL_DAILY_PLAN_BUDGET,
+        apiFootballBudgetReserve: LIVE_API_CONSTANTS.API_FOOTBALL_BUDGET_RESERVE,
+        continentalStatsTargetMinPerTeam: LIVE_API_CONSTANTS.CONTINENTAL_STATS_TARGET,
+        bestKnownStatsCache: true,
         sportsMonitorReady: Boolean(monitor?.ok),
         operationalState: operational?.state || 'unknown',
         sports: {
@@ -601,7 +607,10 @@ export default {
       }
       if (url.pathname === '/v1/live/summary' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'live-summary'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
-        const result = await resolveLiveSummary(url, { apiFootballKey: env.API_FOOTBALL_KEY });
+        const result = await resolveLiveSummary(url, {
+          apiFootballKey: env.API_FOOTBALL_KEY,
+          statsStore: createLiveStatsStore(env.DB)
+        });
         return json(request, result.body, result.status, { 'Cache-Control': 'no-store', 'X-FDG-Live-Gateway': LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION });
       }
       if (url.pathname === '/v1/config' && request.method === 'GET') return handleConfig(request, env);

@@ -3,6 +3,11 @@ const FETCH_TIMEOUT_MS = 4_500;
 const TIMEZONE = 'America/Sao_Paulo';
 
 function text(value) { return String(value == null ? '' : value).trim(); }
+function finiteNumber(value) {
+  if (value == null || String(value).trim() === '') return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
 
 function normalizeToken(value) {
   return text(value)
@@ -14,8 +19,6 @@ function normalizeToken(value) {
     .replace(/\s+/g, ' ')
     .trim();
 }
-
-function compactToken(value) { return normalizeToken(value).replace(/\s+/g, ''); }
 
 function nameSimilarity(left, right) {
   const a = normalizeToken(left);
@@ -86,9 +89,15 @@ function extractEspnIdentity(summary, now = Date.now()) {
 }
 
 function apiHeaders(apiKey) {
+  return { accept: 'application/json', 'x-apisports-key': text(apiKey) };
+}
+
+function rateLimitFromHeaders(headers) {
   return {
-    accept: 'application/json',
-    'x-apisports-key': text(apiKey)
+    dailyLimit: finiteNumber(headers?.get?.('x-ratelimit-requests-limit')),
+    dailyRemaining: finiteNumber(headers?.get?.('x-ratelimit-requests-remaining')),
+    minuteLimit: finiteNumber(headers?.get?.('x-ratelimit-limit')),
+    minuteRemaining: finiteNumber(headers?.get?.('x-ratelimit-remaining'))
   };
 }
 
@@ -109,10 +118,7 @@ async function fetchApiJson(path, apiKey, fetchImpl = globalThis.fetch, timeoutM
     if (errors && typeof errors === 'object' && Object.keys(errors).length) {
       throw new Error(`API-Football: ${Object.values(errors).join(' | ')}`);
     }
-    return {
-      payload,
-      remaining: text(response.headers?.get?.('x-ratelimit-requests-remaining'))
-    };
+    return { payload, rateLimit: rateLimitFromHeaders(response.headers) };
   } finally {
     clearTimeout(timer);
   }
@@ -141,28 +147,36 @@ function selectFixture(rows, identity) {
   return best.row;
 }
 
+function attemptRate(source, ok, rateLimit, extra = {}) {
+  return { source, ok, ...extra, rateLimit: rateLimit || null };
+}
+
 async function resolveApiFixture(identity, apiKey, fetchImpl) {
   const attempts = [];
-  const live = await fetchApiJson(`/fixtures?live=all&timezone=${encodeURIComponent(TIMEZONE)}`, apiKey, fetchImpl)
+
+  // A data da partida já vem da ESPN. Procurar primeiro pelo dia custa uma
+  // requisição e evita a antiga sequência live=all + detalhe do fixture.
+  const byDate = await fetchApiJson(`/fixtures?date=${encodeURIComponent(identity.date)}&timezone=${encodeURIComponent(TIMEZONE)}`, apiKey, fetchImpl)
     .then((result) => {
-      attempts.push({ source: 'api_football_live', ok: true, remaining: result.remaining });
+      attempts.push(attemptRate('api_football_date', true, result.rateLimit));
       return result.payload?.response || [];
     })
     .catch((error) => {
-      attempts.push({ source: 'api_football_live', ok: false, error: text(error?.message || error) });
+      attempts.push(attemptRate('api_football_date', false, null, { error: text(error?.message || error) }));
       return [];
     });
-  const liveMatch = selectFixture(live, identity);
-  if (liveMatch) return { fixture: liveMatch, attempts };
+  const dateMatch = selectFixture(byDate, identity);
+  if (dateMatch) return { fixture: dateMatch, attempts };
 
-  const byDate = await fetchApiJson(`/fixtures?date=${encodeURIComponent(identity.date)}&timezone=${encodeURIComponent(TIMEZONE)}`, apiKey, fetchImpl)
+  // Contingência para diferenças de timezone/data da fonte.
+  const live = await fetchApiJson(`/fixtures?live=all&timezone=${encodeURIComponent(TIMEZONE)}`, apiKey, fetchImpl)
     .then((result) => {
-      attempts.push({ source: 'api_football_date', ok: true, remaining: result.remaining });
+      attempts.push(attemptRate('api_football_live', true, result.rateLimit));
       return result.payload?.response || [];
     });
-  const dateMatch = selectFixture(byDate, identity);
-  if (!dateMatch) throw Object.assign(new Error(`API-Football não encontrou ${identity.home.name} x ${identity.away.name}`), { attempts });
-  return { fixture: dateMatch, attempts };
+  const liveMatch = selectFixture(live, identity);
+  if (!liveMatch) throw Object.assign(new Error(`API-Football não encontrou ${identity.home.name} x ${identity.away.name}`), { attempts });
+  return { fixture: liveMatch, attempts };
 }
 
 function normalizeStatType(value) {
@@ -196,7 +210,11 @@ const API_STAT_MAP = new Map([
 
 function apiStatToEspn(stat) {
   if (!stat || stat.value == null || stat.value === '') return null;
-  const name = API_STAT_MAP.get(normalizeStatType(stat.type));
+  const rawType = text(stat.type).toLowerCase();
+  const normalizedType = normalizeStatType(stat.type);
+  const name = (/pass(?:es)?\s*%/.test(rawType) || /pass.*(?:accuracy|percentage|percent)/.test(rawType))
+    ? 'passCompletionPct'
+    : API_STAT_MAP.get(normalizedType);
   if (!name) return null;
   return { name, displayValue: String(stat.value), source: 'api-football' };
 }
@@ -214,9 +232,7 @@ function normalizeApiStatistics(rows, identity) {
   for (const row of Array.isArray(rows) ? rows : []) {
     const side = espnSideForApiTeam(row?.team, identity);
     if (!side) continue;
-    const statistics = (Array.isArray(row?.statistics) ? row.statistics : [])
-      .map(apiStatToEspn)
-      .filter(Boolean);
+    const statistics = (Array.isArray(row?.statistics) ? row.statistics : []).map(apiStatToEspn).filter(Boolean);
     if (!statistics.length) continue;
     out.push({
       homeAway: side === identity.home ? 'home' : 'away',
@@ -244,10 +260,9 @@ function aggregatePlayerDefense(rows, identity) {
   for (const teamRow of Array.isArray(rows) ? rows : []) {
     const side = espnSideForApiTeam(teamRow?.team, identity);
     if (!side) continue;
-    const playerRows = Array.isArray(teamRow?.players) ? teamRow.players : [];
     const tackles = [];
     const interceptions = [];
-    for (const player of playerRows) {
+    for (const player of (Array.isArray(teamRow?.players) ? teamRow.players : [])) {
       for (const stat of (Array.isArray(player?.statistics) ? player.statistics : [])) {
         tackles.push(stat?.tackles?.total);
         interceptions.push(stat?.tackles?.interceptions);
@@ -268,34 +283,17 @@ function aggregatePlayerDefense(rows, identity) {
   return out;
 }
 
-function mergeNormalizedRows(primary, extra) {
-  const bySide = new Map();
-  const add = (entry) => {
-    const side = text(entry?.homeAway) || compactToken(entry?.team?.displayName);
-    if (!side) return;
-    let target = bySide.get(side);
-    if (!target) {
-      target = { ...entry, statistics: [] };
-      bySide.set(side, target);
-    }
-    const byName = new Map((target.statistics || []).map((stat) => [text(stat?.name), stat]));
-    for (const stat of (Array.isArray(entry?.statistics) ? entry.statistics : [])) {
-      const key = text(stat?.name);
-      if (!key || byName.has(key)) continue;
-      const copy = { ...stat };
-      target.statistics.push(copy);
-      byName.set(key, copy);
-    }
-  };
-  for (const row of Array.isArray(primary) ? primary : []) add(row);
-  for (const row of Array.isArray(extra) ? extra : []) add(row);
-  return [...bySide.values()];
-}
-
-function embeddedDetails(row) {
+function bestRateLimit(attempts) {
+  const successful = (attempts || []).filter((item) => item?.ok && item?.rateLimit);
+  const dailyRemaining = successful.map((item) => finiteNumber(item.rateLimit.dailyRemaining)).filter((v) => v != null);
+  const dailyLimit = successful.map((item) => finiteNumber(item.rateLimit.dailyLimit)).filter((v) => v != null);
+  const minuteRemaining = successful.map((item) => finiteNumber(item.rateLimit.minuteRemaining)).filter((v) => v != null);
+  const minuteLimit = successful.map((item) => finiteNumber(item.rateLimit.minuteLimit)).filter((v) => v != null);
   return {
-    statistics: Array.isArray(row?.statistics) ? row.statistics : [],
-    players: Array.isArray(row?.players) ? row.players : []
+    dailyRemaining: dailyRemaining.length ? Math.min(...dailyRemaining) : null,
+    dailyLimit: dailyLimit.length ? Math.max(...dailyLimit) : null,
+    minuteRemaining: minuteRemaining.length ? Math.min(...minuteRemaining) : null,
+    minuteLimit: minuteLimit.length ? Math.max(...minuteLimit) : null
   };
 }
 
@@ -309,42 +307,20 @@ export async function fetchApiFootballStatsFallback(summary, options = {}) {
 
   const providedFixtureId = Number(options.fixtureId || 0);
   const resolved = providedFixtureId > 0
-    ? { fixture: { fixture: { id: providedFixtureId } }, attempts: [{ source: 'api_football_fixture_cache', ok: true }] }
+    ? { fixture: { fixture: { id: providedFixtureId } }, attempts: [{ source: 'api_football_fixture_cache', ok: true, rateLimit: null }] }
     : await resolveApiFixture(identity, apiKey, fetchImpl);
   const fixtureId = Number(resolved.fixture?.fixture?.id);
   if (!Number.isFinite(fixtureId)) throw new Error('API-Football retornou fixture sem ID');
   const attempts = [...resolved.attempts];
 
-  let detailsRow = resolved.fixture;
-  try {
-    const detailed = await fetchApiJson(`/fixtures?ids=${fixtureId}`, apiKey, fetchImpl);
-    attempts.push({ source: 'api_football_fixture_detail', ok: true, remaining: detailed.remaining });
-    detailsRow = (detailed.payload?.response || [])[0] || detailsRow;
-  } catch (error) {
-    attempts.push({ source: 'api_football_fixture_detail', ok: false, error: text(error?.message || error) });
-  }
-
-  let { statistics, players } = embeddedDetails(detailsRow);
+  let statistics = Array.isArray(resolved.fixture?.statistics) ? resolved.fixture.statistics : [];
   if (!statistics.length) {
     const statsResult = await fetchApiJson(`/fixtures/statistics?fixture=${fixtureId}`, apiKey, fetchImpl);
-    attempts.push({ source: 'api_football_statistics', ok: true, remaining: statsResult.remaining });
+    attempts.push(attemptRate('api_football_statistics', true, statsResult.rateLimit));
     statistics = statsResult.payload?.response || [];
   }
 
-  let normalized = normalizeApiStatistics(statistics, identity);
-  const statNames = new Set(normalized.flatMap((row) => (row.statistics || []).map((stat) => stat.name)));
-  const needPlayerDefense = !statNames.has('tackles') || !statNames.has('interceptions');
-  if (needPlayerDefense && !players.length) {
-    try {
-      const playerResult = await fetchApiJson(`/fixtures/players?fixture=${fixtureId}`, apiKey, fetchImpl);
-      attempts.push({ source: 'api_football_players', ok: true, remaining: playerResult.remaining });
-      players = playerResult.payload?.response || [];
-    } catch (error) {
-      attempts.push({ source: 'api_football_players', ok: false, error: text(error?.message || error) });
-    }
-  }
-  if (players.length) normalized = mergeNormalizedRows(normalized, aggregatePlayerDefense(players, identity));
-
+  const normalized = normalizeApiStatistics(statistics, identity);
   const metricNames = new Set(normalized.flatMap((row) => (row.statistics || []).map((stat) => stat.name)));
   if (!normalized.length || metricNames.size < 2) {
     throw Object.assign(new Error('API-Football não forneceu estatísticas úteis para a partida'), { attempts });
@@ -356,6 +332,36 @@ export async function fetchApiFootballStatsFallback(summary, options = {}) {
     fixtureId,
     identity,
     attempts,
+    rateLimit: bestRateLimit(attempts),
+    metricNames: [...metricNames],
+    data: { boxscore: { teams: normalized } }
+  };
+}
+
+export async function fetchApiFootballPlayerDefenseFallback(summary, options = {}) {
+  const apiKey = text(options.apiKey);
+  if (!apiKey) throw new Error('API_FOOTBALL_KEY ausente');
+  const fixtureId = Number(options.fixtureId || 0);
+  if (!Number.isFinite(fixtureId) || fixtureId <= 0) throw new Error('fixtureId ausente para player defense');
+  const fetchImpl = options.fetchImpl || globalThis.fetch;
+  const now = Number(options.now || Date.now());
+  const identity = extractEspnIdentity(summary, now);
+  if (!identity) throw new Error('summary ESPN sem identidade suficiente para casar API-Football players');
+
+  const result = await fetchApiJson(`/fixtures/players?fixture=${fixtureId}`, apiKey, fetchImpl);
+  const attempts = [attemptRate('api_football_players', true, result.rateLimit)];
+  const normalized = aggregatePlayerDefense(result.payload?.response || [], identity);
+  const metricNames = new Set(normalized.flatMap((row) => (row.statistics || []).map((stat) => stat.name)));
+  if (!normalized.length || !metricNames.size) {
+    throw Object.assign(new Error('API-Football players ainda não forneceu desarmes/interceptações úteis'), { attempts });
+  }
+  return {
+    ok: true,
+    source: 'api-football-players',
+    fixtureId,
+    identity,
+    attempts,
+    rateLimit: bestRateLimit(attempts),
     metricNames: [...metricNames],
     data: { boxscore: { teams: normalized } }
   };

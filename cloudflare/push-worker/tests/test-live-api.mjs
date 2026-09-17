@@ -16,6 +16,34 @@ class MemoryCache {
   }
 }
 
+class SharedStatsStore {
+  constructor() { this.rows = new Map(); this.budgets = new Map(); }
+  async get(key) { return this.rows.get(String(key)) || null; }
+  async put(key, payload) { this.rows.set(String(key), structuredClone(payload)); return { ok: true }; }
+  async acquireLease() { return true; }
+  async getApiBudget(day) { return this.budgets.get(String(day)) || null; }
+  async reserveApiCalls(day, calls, maxReservedCalls) {
+    const key = String(day);
+    const current = this.budgets.get(key) || { reservedCalls: 0, remaining: null, limit: null };
+    const next = current.reservedCalls + Number(calls || 0);
+    if (next > Number(maxReservedCalls)) return { allowed: false, ...current };
+    const updated = { ...current, reservedCalls: next };
+    this.budgets.set(key, updated);
+    return { allowed: true, ...updated };
+  }
+  async updateApiBudget(day, rateLimit) {
+    const key = String(day);
+    const current = this.budgets.get(key) || { reservedCalls: 0, remaining: null, limit: null };
+    const updated = {
+      ...current,
+      remaining: Number.isFinite(Number(rateLimit?.dailyRemaining)) ? Number(rateLimit.dailyRemaining) : current.remaining,
+      limit: Number.isFinite(Number(rateLimit?.dailyLimit)) ? Number(rateLimit.dailyLimit) : current.limit
+    };
+    this.budgets.set(key, updated);
+    return updated;
+  }
+}
+
 function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, state = 'in' } = {}) {
   return {
     id,
@@ -243,6 +271,7 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
 // métricas factuais ausentes, preservando IDs/valores ESPN como autoridade principal.
 {
   const cache = new MemoryCache();
+  const statsStore = new SharedStatsStore();
   const team = (id, name) => ({ id, displayName: name });
   const stat = (name, value) => ({ name, displayValue: String(value) });
   const espnSparse = {
@@ -265,15 +294,18 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
     plays: [{ id: 'p1', text: 'Kickoff' }]
   };
   let apiCalls = 0;
+  let providersOnline = true;
   const fakeFetch = async (url, options = {}) => {
     const href = String(url);
     if (href.includes('thesportsdb.com/api/v1/json/123/searchevents.php')) {
+      if (!providersOnline) return new Response('offline', { status: 503 });
       return Response.json({ event: [{
         idEvent: '2579902', strTimestamp: '2026-09-16T00:30:00', strSport: 'Soccer',
         strHomeTeam: 'São Paulo', strAwayTeam: 'Boca Juniors'
       }] });
     }
     if (href.includes('thesportsdb.com/api/v1/json/123/lookupeventstats.php?id=2579902')) {
+      if (!providersOnline) return new Response('offline', { status: 503 });
       return Response.json({ eventstats: [
         { strEvent: 'São Paulo vs Boca Juniors', strStat: 'Shots on Goal', intHome: '2', intAway: '0' },
         { strEvent: 'São Paulo vs Boca Juniors', strStat: 'Total Shots', intHome: '4', intAway: '3' },
@@ -284,44 +316,40 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
     }
     if (href.includes('v3.football.api-sports.io')) {
       apiCalls += 1;
+      if (!providersOnline) return new Response('offline', { status: 503 });
       assert.equal(options?.headers?.['x-apisports-key'], 'api-key-test');
-      if (href.includes('/fixtures?live=all')) {
+      const headers = { 'x-ratelimit-requests-limit': '100', 'x-ratelimit-requests-remaining': String(100 - apiCalls) };
+      if (href.includes('/fixtures?date=')) {
         return Response.json({ errors: [], response: [{
           fixture: { id: 880001 },
           teams: { home: { id: 10, name: 'Sao Paulo' }, away: { id: 20, name: 'Boca Juniors' } }
-        }] });
+        }] }, { headers });
       }
-      if (href.includes('/fixtures?ids=880001')) {
-        return Response.json({ errors: [], response: [{
-          fixture: { id: 880001 },
-          teams: { home: { id: 10, name: 'Sao Paulo' }, away: { id: 20, name: 'Boca Juniors' } },
-          statistics: [
-            { team: { id: 10, name: 'Sao Paulo' }, statistics: [
-              { type: 'Ball Possession', value: '58%' }, { type: 'Total Shots', value: 8 },
-              { type: 'Shots on Goal', value: 3 }, { type: 'Blocked Shots', value: 2 },
-              { type: 'Fouls', value: 8 }, { type: 'Goalkeeper Saves', value: 1 },
-              { type: 'Total passes', value: 211 }, { type: 'Passes accurate', value: 181 },
-              { type: 'Passes %', value: '86%' }, { type: 'Corner Kicks', value: 4 },
-              { type: 'Yellow Cards', value: 1 }, { type: 'Red Cards', value: 0 }, { type: 'Offsides', value: 2 }
-            ] },
-            { team: { id: 20, name: 'Boca Juniors' }, statistics: [
-              { type: 'Ball Possession', value: '42%' }, { type: 'Total Shots', value: 5 },
-              { type: 'Shots on Goal', value: 1 }, { type: 'Blocked Shots', value: 1 },
-              { type: 'Fouls', value: 10 }, { type: 'Goalkeeper Saves', value: 2 },
-              { type: 'Total passes', value: 162 }, { type: 'Passes accurate', value: 129 },
-              { type: 'Passes %', value: '80%' }, { type: 'Corner Kicks', value: 2 },
-              { type: 'Yellow Cards', value: 2 }, { type: 'Red Cards', value: 0 }, { type: 'Offsides', value: 1 }
-            ] }
-          ],
-          players: [
-            { team: { id: 10, name: 'Sao Paulo' }, players: [
-              { player: { id: 100 }, statistics: [{ tackles: { total: 6, interceptions: 2 } }] }
-            ] },
-            { team: { id: 20, name: 'Boca Juniors' }, players: [
-              { player: { id: 200 }, statistics: [{ tackles: { total: 7, interceptions: 3 } }] }
-            ] }
-          ]
-        }] });
+      if (href.includes('/fixtures/statistics?fixture=880001')) {
+        return Response.json({ errors: [], response: [
+          { team: { id: 10, name: 'Sao Paulo' }, statistics: [
+            { type: 'Ball Possession', value: '58%' }, { type: 'Total Shots', value: 8 },
+            { type: 'Shots on Goal', value: 3 }, { type: 'Blocked Shots', value: 2 },
+            { type: 'Fouls', value: 8 }, { type: 'Goalkeeper Saves', value: 1 },
+            { type: 'Total passes', value: 211 }, { type: 'Passes accurate', value: 181 },
+            { type: 'Passes %', value: '86%' }, { type: 'Corner Kicks', value: 4 },
+            { type: 'Yellow Cards', value: 1 }, { type: 'Red Cards', value: 0 }, { type: 'Offsides', value: 2 }
+          ] },
+          { team: { id: 20, name: 'Boca Juniors' }, statistics: [
+            { type: 'Ball Possession', value: '42%' }, { type: 'Total Shots', value: 5 },
+            { type: 'Shots on Goal', value: 1 }, { type: 'Blocked Shots', value: 1 },
+            { type: 'Fouls', value: 10 }, { type: 'Goalkeeper Saves', value: 2 },
+            { type: 'Total passes', value: 162 }, { type: 'Passes accurate', value: 129 },
+            { type: 'Passes %', value: '80%' }, { type: 'Corner Kicks', value: 2 },
+            { type: 'Yellow Cards', value: 2 }, { type: 'Red Cards', value: 0 }, { type: 'Offsides', value: 1 }
+          ] }
+        ] }, { headers });
+      }
+      if (href.includes('/fixtures/players?fixture=880001')) {
+        return Response.json({ errors: [], response: [
+          { team: { id: 10, name: 'Sao Paulo' }, players: [{ statistics: [{ tackles: { total: 6, interceptions: 2 } }] }] },
+          { team: { id: 20, name: 'Boca Juniors' }, players: [{ statistics: [{ tackles: { total: 7, interceptions: 3 } }] }] }
+        ] }, { headers });
       }
       throw new Error(`API-Football URL inesperada ${href}`);
     }
@@ -333,14 +361,17 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
 
   const url = new URL('https://x/v1/live/summary?league=conmebol.sudamericana&event=401999777&expectedGoals=0&fresh=1');
   const result = await resolveLiveSummary(url, {
-    cache, fetchImpl: fakeFetch, apiFootballKey: 'api-key-test', now: () => 9_000_000
+    cache, statsStore, fetchImpl: fakeFetch, apiFootballKey: 'api-key-test', now: () => 9_000_000
   });
   assert.equal(result.status, 200);
-  assert.equal(result.body.statsProvider, 'espn+thesportsdb+api-football');
+  assert.equal(result.body.statsProvider, 'espn+api-football');
   assert.equal(result.body.statsFallback.fixtureId, 880001);
+  assert.equal(result.body.statsQuality, 'GOOD');
+  assert.equal(result.body.apiFootballBudget.knownRemaining, 97);
   assert.equal(result.body.statsFallbacks.length, 2);
-  assert.equal(result.body.statsFallbacks[0].source, 'thesportsdb');
-  assert.ok(result.body.statsCoverage.minPerTeam >= 14, 'fallback deve elevar cobertura para muito além do feed ESPN reduzido');
+  assert.equal(result.body.statsFallbacks[0].source, 'api-football');
+  assert.equal(result.body.statsFallbacks[1].source, 'api-football-players');
+  assert.ok(result.body.statsCoverage.minPerTeam >= 15, 'fallback continental deve chegar ao alvo GOOD quando a API fornece team stats + defense');
   const home = result.body.data.boxscore.teams.find((row) => row.team.id === '1');
   const homeStats = new Map(home.statistics.map((row) => [row.name, row.displayValue]));
   assert.equal(homeStats.get('possessionPct'), '57.4%', 'valor ESPN já presente deve ter precedência');
@@ -348,7 +379,31 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
   assert.equal(homeStats.get('totalPasses'), '211');
   assert.equal(homeStats.get('tackles'), '6');
   assert.equal(homeStats.get('interceptions'), '2');
-  assert.equal(apiCalls, 2, 'lookup live + details enriquecido devem bastar');
+  assert.equal(apiCalls, 3, 'primeiro uso: lookup por data + statistics + players; chamadas seguintes usam caches separados');
+
+  const secondCache = new MemoryCache();
+  const second = await resolveLiveSummary(url, {
+    cache: secondCache, statsStore, fetchImpl: fakeFetch, apiFootballKey: 'api-key-test', now: () => 9_060_000
+  });
+  assert.equal(second.status, 200);
+  assert.equal(second.body.statsProvider, 'espn+api-football');
+  assert.equal(apiCalls, 3, 'outro edge deve reutilizar o cache D1 global e não consumir nova chamada da API-Football');
+
+  // Derruba os provedores e apaga somente seus caches compartilhados. O best-known
+  // global precisa impedir regressão do painel para as cinco métricas da ESPN.
+  providersOnline = false;
+  for (const key of [...statsStore.rows.keys()]) {
+    if (key.startsWith('api:') || key.startsWith('api-map:') || key.startsWith('api-players:') || key.startsWith('tsdb:') || key.startsWith('tsdb-map:')) {
+      statsStore.rows.delete(key);
+    }
+  }
+  const third = await resolveLiveSummary(url, {
+    cache: new MemoryCache(), statsStore, fetchImpl: fakeFetch, apiFootballKey: 'api-key-test', now: () => 9_360_000
+  });
+  assert.equal(third.status, 200);
+  assert.equal(third.body.statsBestKnownApplied, true);
+  assert.ok(third.body.statsCoverage.minPerTeam >= 15, 'best-known global deve impedir regressão estatística durante falha temporária dos provedores');
+  assert.ok(third.body.statsProvider.includes('api-football'));
 }
 
 
@@ -415,6 +470,48 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
   assert.equal(homeStats.get('possessionPct'), '57.4%', 'ESPN deve continuar com precedência');
   assert.equal(homeStats.get('blockedShots'), '2', 'TheSportsDB deve preencher métrica ausente');
   assert.equal(sportsDbCalls, 2);
+}
+
+
+// O orçamento diário é global: chegando à reserva de segurança, um novo edge
+// continua servindo ESPN/TheSportsDB sem gastar mais API-Football.
+{
+  const cache = new MemoryCache();
+  const statsStore = new SharedStatsStore();
+  statsStore.budgets.set('2026-09-16', { reservedCalls: 70, remaining: 12, limit: 100 });
+  const team = (id, name) => ({ id, displayName: name });
+  const stat = (name, value) => ({ name, displayValue: String(value) });
+  const espnSparse = {
+    header: { competitions: [{
+      date: '2026-09-16T00:30:00Z', status: { type: { state: 'in', completed: false } },
+      competitors: [
+        { homeAway: 'home', team: team('1', 'São Paulo') },
+        { homeAway: 'away', team: team('2', 'Boca Juniors') }
+      ]
+    }] },
+    boxscore: { teams: [
+      { homeAway: 'home', team: team('1', 'São Paulo'), statistics: [stat('possessionPct', '55%'), stat('totalShots', 5), stat('shotsOnTarget', 2), stat('foulsCommitted', 6), stat('wonCorners', 2)] },
+      { homeAway: 'away', team: team('2', 'Boca Juniors'), statistics: [stat('possessionPct', '45%'), stat('totalShots', 4), stat('shotsOnTarget', 1), stat('foulsCommitted', 8), stat('wonCorners', 1)] }
+    ] }, plays: [{ id: 'p1', text: 'Kickoff' }]
+  };
+  let apiCalls = 0;
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('v3.football.api-sports.io')) { apiCalls += 1; throw new Error('não deveria chamar API-Football'); }
+    if (href.includes('thesportsdb.com/api/v1/json/123/searchevents.php')) return new Response('offline', { status: 503 });
+    if (href.includes('sports.core.api.espn.com')) return Response.json({ items: [{ id: 'p1', text: 'Kickoff' }] });
+    if (href.includes('/playbyplay')) return Response.json({ gamepackageJSON: espnSparse });
+    if (href.includes('/boxscore') || href.includes('/game') || href.includes('site.api.espn.com')) return Response.json({ gamepackageJSON: espnSparse });
+    throw new Error(`URL inesperada ${href}`);
+  };
+  const result = await resolveLiveSummary(
+    new URL('https://x/v1/live/summary?league=conmebol.libertadores&event=401999779&fresh=1'),
+    { cache, statsStore, fetchImpl: fakeFetch, apiFootballKey: 'api-key-test', now: () => Date.parse('2026-09-16T01:00:00Z') }
+  );
+  assert.equal(result.status, 200);
+  assert.equal(apiCalls, 0);
+  assert.equal(result.body.apiFootballBudget.protected, true);
+  assert.match(result.body.statsFallbackErrors.apiFootball, /orçamento diário protegido/);
 }
 
 console.log('live-api tests: ok');

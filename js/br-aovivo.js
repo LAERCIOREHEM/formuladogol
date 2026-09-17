@@ -153,6 +153,7 @@
   const LIVE_STATS_CACHE_KEY = "br2026_estatisticas_ao_vivo_v3";
   const LIVE_STATS_CACHE_MAX_AGE_MS = 6 * 3600000;
   const PARTIAL_STATS_THRESHOLD = 6;
+  const CONTINENTAL_PARTIAL_STATS_THRESHOLD = 14;
   const PARTIAL_STATS_RETRY_DELAY_MS = 1200;
   const PARTIAL_STATS_RETRY_COOLDOWN_MS = 60000;
 
@@ -716,7 +717,12 @@
       envelope.data.__fdgLiveMeta = {
         statsProvider: String(envelope.statsProvider || "espn"),
         statsCoverage: envelope.statsCoverage || null,
-        statsFallback: envelope.statsFallback || null
+        statsQuality: envelope.statsQuality || null,
+        statsTargetMinPerTeam: Number(envelope.statsTargetMinPerTeam || 0) || null,
+        statsBestKnownApplied: envelope.statsBestKnownApplied === true,
+        statsFallback: envelope.statsFallback || null,
+        statsFallbacks: Array.isArray(envelope.statsFallbacks) ? envelope.statsFallbacks : [],
+        apiFootballBudget: envelope.apiFootballBudget || null
       };
       return envelope.data;
     } catch (error) {
@@ -2398,7 +2404,10 @@
       const previousCount = cachedStatsCount(g);
       const now = Date.now();
       const lastRetry = Number(state.statsRetryAt[eventId] || 0);
-      const looksPartial = rows.length < previousCount || (rows.length > 0 && rows.length <= PARTIAL_STATS_THRESHOLD);
+      const partialThreshold = String(g.espnLeague || "").startsWith("conmebol.")
+        ? CONTINENTAL_PARTIAL_STATS_THRESHOLD
+        : PARTIAL_STATS_THRESHOLD;
+      const looksPartial = rows.length < previousCount || (rows.length > 0 && rows.length <= partialThreshold);
 
       // Uma segunda leitura curta resolve a janela em que o scoreboard já está
       // atualizado, mas o summary da ESPN ainda chegou apenas com as métricas
@@ -2465,14 +2474,16 @@
     const hasApiFootball = provider.includes("api-football");
     if (hasSportsDb || hasApiFootball) {
       const parts = ["ESPN"];
-      if (hasSportsDb) parts.push("THESPORTSDB");
       if (hasApiFootball) parts.push("API-FOOTBALL");
+      if (hasSportsDb) parts.push("THESPORTSDB");
       const complements = [];
-      if (hasSportsDb) complements.push("TheSportsDB");
       if (hasApiFootball) complements.push("API-Football");
+      if (hasSportsDb) complements.push("TheSportsDB");
+      const meta = summary && summary.__fdgLiveMeta || {};
+      const preserved = meta.statsBestKnownApplied ? " O melhor estado factual já observado para a partida foi preservado para evitar regressão temporária da fonte." : "";
       return {
         badge: parts.join(" + "),
-        note: "A ESPN é a fonte principal. Quando o feed ao vivo vem incompleto, métricas factuais são complementadas por " + complements.join(" e ") + ". O site não estima dados ausentes."
+        note: "A ESPN é a fonte principal. Quando o feed ao vivo vem incompleto, métricas factuais são complementadas por " + complements.join(" e ") + "." + preserved + " O site não estima dados ausentes."
       };
     }
     return {

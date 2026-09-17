@@ -6,7 +6,7 @@ import {
   summaryGoalCount,
   summaryTeamMetricCoverage
 } from './espn-source.js';
-import { fetchApiFootballStatsFallback } from './api-football-source.js';
+import { fetchApiFootballPlayerDefenseFallback, fetchApiFootballStatsFallback } from './api-football-source.js';
 import { fetchTheSportsDbStatsFallback } from './thesportsdb-source.js';
 
 const LIVE_GATEWAY_VERSION = '2';
@@ -14,13 +14,26 @@ const SCOREBOARD_HOT_TTL_SECONDS = 8;
 const SCOREBOARD_FALLBACK_TTL_SECONDS = 600;
 const SUMMARY_HOT_TTL_SECONDS = 8;
 const SUMMARY_FALLBACK_TTL_SECONDS = 900;
-const STATS_FALLBACK_TTL_SECONDS = 65;
-const STATS_FIXTURE_MAP_TTL_SECONDS = 21_600;
+const STATS_FALLBACK_TTL_SECONDS = 120;
+const API_FOOTBALL_STATS_TTL_SECONDS = 300;
+const API_FOOTBALL_PLAYER_TTL_SECONDS = 1_200;
+const STATS_FIXTURE_MAP_TTL_SECONDS = 86_400;
+const STATS_BEST_KNOWN_TTL_SECONDS = 28_800;
 const STATS_FALLBACK_THRESHOLD = 10;
+const CONTINENTAL_STATS_TARGET = 15;
+const CONTINENTAL_STATS_COMPLETE = 17;
+const API_FOOTBALL_DAILY_PLAN_BUDGET = 100;
+const API_FOOTBALL_BUDGET_RESERVE = 12;
+const CONTINENTAL_LEAGUES = new Set(['conmebol.libertadores', 'conmebol.sudamericana']);
 const INTERNAL_CACHE_ORIGIN = 'https://push.formuladogol.com.br/__fdg_live_cache';
 const ALLOWED_LEAGUES = new Set(ESPN_SOURCE_CONSTANTS.ALLOWED_LEAGUES);
 
 function text(value) { return String(value == null ? '' : value).trim(); }
+function optionalNumber(value) {
+  if (value == null || String(value).trim() === '') return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
 
 function summaryState(data) {
   const competition = data?.header?.competitions?.[0] || data?.competitions?.[0] || data?.competition || {};
@@ -31,6 +44,52 @@ function summaryState(data) {
   if (state === 'in') return 'in';
   if (state === 'pre') return 'pre';
   return '';
+}
+
+
+function coverageBelow(coverage, target) {
+  return !coverage || coverage.teams < 2 || coverage.minPerTeam < target;
+}
+
+function statsQuality(coverage) {
+  const min = Number(coverage?.minPerTeam || 0);
+  if (min >= CONTINENTAL_STATS_COMPLETE) return 'COMPLETE';
+  if (min >= CONTINENTAL_STATS_TARGET) return 'GOOD';
+  if (min >= STATS_FALLBACK_THRESHOLD) return 'DEGRADED';
+  return 'CRITICAL';
+}
+
+function utcDayKey(now) {
+  return new Date(Number(now) || Date.now()).toISOString().slice(0, 10);
+}
+
+function budgetAllows(state, reserve = API_FOOTBALL_BUDGET_RESERVE) {
+  const remaining = optionalNumber(state?.remaining);
+  const reserved = optionalNumber(state?.reservedCalls);
+  if (remaining != null && remaining <= reserve) return false;
+  if (reserved != null && reserved >= API_FOOTBALL_DAILY_PLAN_BUDGET - reserve) return false;
+  return true;
+}
+
+function quotaFromFallback(fallback, previous = null) {
+  const remaining = optionalNumber(fallback?.rateLimit?.dailyRemaining);
+  const limit = optionalNumber(fallback?.rateLimit?.dailyLimit);
+  return {
+    remaining: remaining != null ? remaining : optionalNumber(previous?.remaining),
+    limit: limit != null ? limit : (optionalNumber(previous?.limit) ?? API_FOOTBALL_DAILY_PLAN_BUDGET),
+    reservedCalls: optionalNumber(previous?.reservedCalls),
+    updatedAt: Date.now()
+  };
+}
+
+function statisticsSnapshot(data) {
+  const teams = Array.isArray(data?.boxscore?.teams) ? data.boxscore.teams : [];
+  return { boxscore: { teams } };
+}
+
+function pushProvider(providers, value) {
+  const provider = text(value);
+  if (provider && !providers.includes(provider)) providers.push(provider);
 }
 
 function parseCompactDate(value) {
@@ -94,6 +153,29 @@ async function writeCached(cache, key, value, ttlSeconds) {
   } catch (_) {
     // Cache é uma camada de resiliência; falha nele nunca bloqueia o dado fresco.
   }
+}
+
+
+async function readLayeredCache(cache, localKey, statsStore, sharedKey, ttlSeconds) {
+  const local = await readCached(cache, localKey);
+  if (local) return local;
+  if (!statsStore || typeof statsStore.get !== 'function') return null;
+  try {
+    const shared = await statsStore.get(sharedKey);
+    if (!shared) return null;
+    await writeCached(cache, localKey, shared, ttlSeconds);
+    return shared;
+  } catch (_) {
+    return null;
+  }
+}
+
+async function writeLayeredCache(cache, localKey, statsStore, sharedKey, value, ttlSeconds, now) {
+  const tasks = [writeCached(cache, localKey, value, ttlSeconds)];
+  if (statsStore && typeof statsStore.put === 'function') {
+    tasks.push(statsStore.put(sharedKey, value, ttlSeconds, now).catch(() => null));
+  }
+  await Promise.all(tasks);
 }
 
 function publicEnvelope(result, fetchedAt, extra = {}) {
@@ -210,6 +292,8 @@ export async function resolveLiveSummary(url, deps = {}) {
   const cache = cacheFromDeps(deps);
   const hotKey = cacheKey('summary', [league, eventId], 'hot');
   const fallbackKey = cacheKey('summary', [league, eventId], 'fallback');
+  const isContinental = CONTINENTAL_LEAGUES.has(league);
+  const target = isContinental ? CONTINENTAL_STATS_TARGET : STATS_FALLBACK_THRESHOLD;
 
   const acceptable = (entry) => {
     if (!entry || !entry.data || typeof entry.data !== 'object') return false;
@@ -233,35 +317,79 @@ export async function resolveLiveSummary(url, deps = {}) {
     const statsFallbacks = [];
     const statsFallbackErrors = {};
     const gameState = summaryState(data);
-    const shouldTryStatsFallback = (beforeCoverage.teams < 2 || beforeCoverage.minPerTeam < STATS_FALLBACK_THRESHOLD)
+    const shouldTryStatsFallback = coverageBelow(beforeCoverage, target)
       && (beforeCoverage.maxPerTeam > 0 || expectedGoals > 0 || gameState === 'in' || gameState === 'post');
 
-    // Fallback 1: TheSportsDB V1 usa a chave pública 123 e, portanto, não
-    // depende de secret do projeto. Ele entra antes do provedor opcional pago.
-    if (shouldTryStatsFallback) {
-      const statsKey = cacheKey('summary-stats', [league, eventId], 'thesportsdb');
-      const mapKey = cacheKey('summary-stats-map', [league, eventId], 'thesportsdb');
+    const statsStore = deps.statsStore || null;
+    const dayKey = utcDayKey(now);
+    const bestKey = isContinental ? cacheKey('summary-stats-best', [league, eventId], 'best') : null;
+    const bestSharedKey = `best:${league}:${eventId}`;
+    const previousBest = bestKey
+      ? await readLayeredCache(cache, bestKey, statsStore, bestSharedKey, STATS_BEST_KNOWN_TTL_SECONDS)
+      : null;
+    const apiFootballKey = text(deps.apiFootballKey);
+    const budgetKey = cacheKey('api-football-budget', [dayKey], 'daily');
+    let budgetState = isContinental
+      ? (statsStore?.getApiBudget ? await statsStore.getApiBudget(dayKey).catch(() => null) : await readCached(cache, budgetKey))
+      : null;
+    let apiFixtureId = 0;
+
+    // Nas competições continentais, API-Football tem prioridade sobre TheSportsDB,
+    // mas só quando a ESPN está abaixo do alvo e respeitando o orçamento de 100/dia.
+    if (isContinental && shouldTryStatsFallback && apiFootballKey && budgetAllows(budgetState)) {
+      const statsKey = cacheKey('summary-stats', [league, eventId], 'api-football');
+      const mapKey = cacheKey('summary-stats-map', [league, eventId], 'api-football');
+      const statsSharedKey = `api:${league}:${eventId}`;
+      const mapSharedKey = `api-map:${league}:${eventId}`;
       let fallback = null;
       let fallbackError = '';
-      const cachedStats = await readCached(cache, statsKey);
+      const cachedStats = await readLayeredCache(cache, statsKey, statsStore, statsSharedKey, API_FOOTBALL_STATS_TTL_SECONDS);
       if (cachedStats?.unavailable === true) fallbackError = text(cachedStats.error).slice(0, 500);
       else if (cachedStats?.data) fallback = cachedStats;
 
+      const fixtureMap = await readLayeredCache(cache, mapKey, statsStore, mapSharedKey, STATS_FIXTURE_MAP_TTL_SECONDS);
+      apiFixtureId = Number(fixtureMap?.fixtureId || fallback?.fixtureId || 0) || 0;
       if (!fallback && !fallbackError) {
-        const eventMap = await readCached(cache, mapKey);
-        try {
-          fallback = await fetchTheSportsDbStatsFallback(data, {
-            fetchImpl,
-            now,
-            eventId: Number(eventMap?.eventId || 0) || undefined
-          });
-          await Promise.all([
-            writeCached(cache, statsKey, fallback, STATS_FALLBACK_TTL_SECONDS),
-            writeCached(cache, mapKey, { eventId: fallback.eventId }, STATS_FIXTURE_MAP_TTL_SECONDS)
-          ]);
-        } catch (error) {
-          fallbackError = text(error?.message || error).slice(0, 500);
-          await writeCached(cache, statsKey, { unavailable: true, error: fallbackError }, STATS_FALLBACK_TTL_SECONDS);
+        let allowedToCall = true;
+        if (statsStore?.acquireLease) {
+          allowedToCall = await statsStore.acquireLease(`lease:${statsSharedKey}`, 30, now).catch(() => true);
+          if (!allowedToCall) fallbackError = 'atualização API-Football já em andamento em outro edge';
+        }
+        if (allowedToCall && statsStore?.reserveApiCalls) {
+          const estimate = apiFixtureId ? 1 : 3;
+          const reservation = await statsStore.reserveApiCalls(
+            dayKey, estimate, API_FOOTBALL_DAILY_PLAN_BUDGET - API_FOOTBALL_BUDGET_RESERVE, now
+          ).catch(() => ({ allowed: true }));
+          budgetState = reservation || budgetState;
+          allowedToCall = reservation?.allowed !== false && budgetAllows(budgetState);
+          if (!allowedToCall) fallbackError = 'orçamento diário global da API-Football protegido';
+        }
+        if (allowedToCall) {
+          try {
+            fallback = await fetchApiFootballStatsFallback(data, {
+              apiKey: apiFootballKey,
+              fetchImpl,
+              now,
+              fixtureId: apiFixtureId || undefined
+            });
+            apiFixtureId = Number(fallback.fixtureId || 0) || apiFixtureId;
+            if (statsStore?.updateApiBudget) {
+              budgetState = await statsStore.updateApiBudget(dayKey, fallback.rateLimit, now).catch(() => quotaFromFallback(fallback, budgetState));
+            } else {
+              budgetState = quotaFromFallback(fallback, budgetState);
+              await writeCached(cache, budgetKey, budgetState, 93_600);
+            }
+            await Promise.all([
+              writeLayeredCache(cache, statsKey, statsStore, statsSharedKey, fallback, API_FOOTBALL_STATS_TTL_SECONDS, now),
+              writeLayeredCache(cache, mapKey, statsStore, mapSharedKey, { fixtureId: apiFixtureId }, STATS_FIXTURE_MAP_TTL_SECONDS, now)
+            ]);
+          } catch (error) {
+            fallbackError = text(error?.message || error).slice(0, 500);
+            await writeLayeredCache(
+              cache, statsKey, statsStore, statsSharedKey,
+              { unavailable: true, error: fallbackError }, API_FOOTBALL_STATS_TTL_SECONDS, now
+            );
+          }
         }
       }
 
@@ -271,7 +399,64 @@ export async function resolveLiveSummary(url, deps = {}) {
         const after = summaryTeamMetricCoverage(enriched);
         if (after.totalUnique > previous.totalUnique) {
           data = enriched;
-          providers.push('thesportsdb');
+          pushProvider(providers, 'api-football');
+          statsFallbacks.push({
+            source: 'api-football',
+            fixtureId: Number(fallback.fixtureId || 0) || null,
+            metricNames: Array.isArray(fallback.metricNames) ? fallback.metricNames : [],
+            rateLimit: fallback.rateLimit || null
+          });
+        }
+      }
+      if (fallbackError) statsFallbackErrors.apiFootball = fallbackError;
+    } else if (isContinental && shouldTryStatsFallback && !apiFootballKey) {
+      statsFallbackErrors.apiFootball = 'API_FOOTBALL_KEY ausente';
+    } else if (isContinental && shouldTryStatsFallback && apiFootballKey && !budgetAllows(budgetState)) {
+      statsFallbackErrors.apiFootball = `orçamento diário protegido: ${Number(budgetState?.remaining)} requisições restantes`;
+    }
+
+    // TheSportsDB continua como contingência gratuita/complementar. Nas
+    // continentais ele entra depois da API-Football; nas demais ligas mantém o
+    // comportamento anterior sem consumir a cota da API-Football.
+    if (shouldTryStatsFallback && coverageBelow(summaryTeamMetricCoverage(data), target)) {
+      const statsKey = cacheKey('summary-stats', [league, eventId], 'thesportsdb');
+      const mapKey = cacheKey('summary-stats-map', [league, eventId], 'thesportsdb');
+      const statsSharedKey = `tsdb:${league}:${eventId}`;
+      const mapSharedKey = `tsdb-map:${league}:${eventId}`;
+      let fallback = null;
+      let fallbackError = '';
+      const cachedStats = await readLayeredCache(cache, statsKey, statsStore, statsSharedKey, STATS_FALLBACK_TTL_SECONDS);
+      if (cachedStats?.unavailable === true) fallbackError = text(cachedStats.error).slice(0, 500);
+      else if (cachedStats?.data) fallback = cachedStats;
+
+      if (!fallback && !fallbackError) {
+        const eventMap = await readLayeredCache(cache, mapKey, statsStore, mapSharedKey, STATS_FIXTURE_MAP_TTL_SECONDS);
+        try {
+          fallback = await fetchTheSportsDbStatsFallback(data, {
+            fetchImpl,
+            now,
+            eventId: Number(eventMap?.eventId || 0) || undefined
+          });
+          await Promise.all([
+            writeLayeredCache(cache, statsKey, statsStore, statsSharedKey, fallback, STATS_FALLBACK_TTL_SECONDS, now),
+            writeLayeredCache(cache, mapKey, statsStore, mapSharedKey, { eventId: fallback.eventId }, STATS_FIXTURE_MAP_TTL_SECONDS, now)
+          ]);
+        } catch (error) {
+          fallbackError = text(error?.message || error).slice(0, 500);
+          await writeLayeredCache(
+            cache, statsKey, statsStore, statsSharedKey,
+            { unavailable: true, error: fallbackError }, STATS_FALLBACK_TTL_SECONDS, now
+          );
+        }
+      }
+
+      if (fallback?.data) {
+        const previous = summaryTeamMetricCoverage(data);
+        const enriched = mergeExternalStatisticsIntoSummary(data, fallback.data);
+        const after = summaryTeamMetricCoverage(enriched);
+        if (after.totalUnique > previous.totalUnique) {
+          data = enriched;
+          pushProvider(providers, 'thesportsdb');
           statsFallbacks.push({
             source: 'thesportsdb',
             eventId: Number(fallback.eventId || 0) || null,
@@ -282,75 +467,125 @@ export async function resolveLiveSummary(url, deps = {}) {
       if (fallbackError) statsFallbackErrors.thesportsdb = fallbackError;
     }
 
-    // Fallback 2: API-Football continua suportada, mas é opcional. Só é
-    // consultada quando a cobertura ainda estiver abaixo do alvo e a chave já
-    // existir no Worker. A ausência do secret jamais bloqueia o deploy/endpoint.
-    const apiFootballKey = text(deps.apiFootballKey);
-    const afterSportsDbCoverage = summaryTeamMetricCoverage(data);
-    const shouldTryApiFootball = shouldTryStatsFallback
-      && Boolean(apiFootballKey)
-      && (afterSportsDbCoverage.teams < 2 || afterSportsDbCoverage.minPerTeam < STATS_FALLBACK_THRESHOLD);
+    // Desarmes/interceptações dependem do endpoint de jogadores. Para caber no
+    // plano Free, essa consulta tem TTL de 20 minutos e só ocorre se o painel
+    // continental ainda estiver abaixo do alvo depois das fontes de equipe.
+    if (isContinental && shouldTryStatsFallback && apiFootballKey && apiFixtureId
+        && coverageBelow(summaryTeamMetricCoverage(data), target) && budgetAllows(budgetState, API_FOOTBALL_BUDGET_RESERVE + 1)) {
+      const playersKey = cacheKey('summary-stats', [league, eventId], 'api-football-players');
+      const playersSharedKey = `api-players:${league}:${eventId}`;
+      let playerFallback = null;
+      let playerError = '';
+      const cachedPlayers = await readLayeredCache(
+        cache, playersKey, statsStore, playersSharedKey, API_FOOTBALL_PLAYER_TTL_SECONDS
+      );
+      if (cachedPlayers?.unavailable === true) playerError = text(cachedPlayers.error).slice(0, 500);
+      else if (cachedPlayers?.data) playerFallback = cachedPlayers;
 
-    if (shouldTryApiFootball) {
-      const statsKey = cacheKey('summary-stats', [league, eventId], 'api-football');
-      const mapKey = cacheKey('summary-stats-map', [league, eventId], 'api-football');
-      let fallback = null;
-      let fallbackError = '';
-      const cachedStats = await readCached(cache, statsKey);
-      if (cachedStats?.unavailable === true) fallbackError = text(cachedStats.error).slice(0, 500);
-      else if (cachedStats?.data) fallback = cachedStats;
-
-      if (!fallback && !fallbackError) {
-        const fixtureMap = await readCached(cache, mapKey);
-        try {
-          fallback = await fetchApiFootballStatsFallback(data, {
-            apiKey: apiFootballKey,
-            fetchImpl,
-            now,
-            fixtureId: Number(fixtureMap?.fixtureId || 0) || undefined
-          });
-          await Promise.all([
-            writeCached(cache, statsKey, fallback, STATS_FALLBACK_TTL_SECONDS),
-            writeCached(cache, mapKey, { fixtureId: fallback.fixtureId }, STATS_FIXTURE_MAP_TTL_SECONDS)
-          ]);
-        } catch (error) {
-          fallbackError = text(error?.message || error).slice(0, 500);
-          await writeCached(cache, statsKey, { unavailable: true, error: fallbackError }, STATS_FALLBACK_TTL_SECONDS);
+      if (!playerFallback && !playerError) {
+        let allowedToCall = true;
+        if (statsStore?.acquireLease) {
+          allowedToCall = await statsStore.acquireLease(`lease:${playersSharedKey}`, 30, now).catch(() => true);
+          if (!allowedToCall) playerError = 'atualização API-Football players já em andamento em outro edge';
+        }
+        if (allowedToCall && statsStore?.reserveApiCalls) {
+          const reservation = await statsStore.reserveApiCalls(
+            dayKey, 1, API_FOOTBALL_DAILY_PLAN_BUDGET - API_FOOTBALL_BUDGET_RESERVE, now
+          ).catch(() => ({ allowed: true }));
+          budgetState = reservation || budgetState;
+          allowedToCall = reservation?.allowed !== false && budgetAllows(budgetState, API_FOOTBALL_BUDGET_RESERVE + 1);
+          if (!allowedToCall) playerError = 'orçamento diário global protegido antes de consultar players';
+        }
+        if (allowedToCall) {
+          try {
+            playerFallback = await fetchApiFootballPlayerDefenseFallback(data, {
+              apiKey: apiFootballKey, fetchImpl, now, fixtureId: apiFixtureId
+            });
+            if (statsStore?.updateApiBudget) {
+              budgetState = await statsStore.updateApiBudget(dayKey, playerFallback.rateLimit, now)
+                .catch(() => quotaFromFallback(playerFallback, budgetState));
+            } else {
+              budgetState = quotaFromFallback(playerFallback, budgetState);
+              await writeCached(cache, budgetKey, budgetState, 93_600);
+            }
+            await writeLayeredCache(
+              cache, playersKey, statsStore, playersSharedKey,
+              playerFallback, API_FOOTBALL_PLAYER_TTL_SECONDS, now
+            );
+          } catch (error) {
+            playerError = text(error?.message || error).slice(0, 500);
+            await writeLayeredCache(
+              cache, playersKey, statsStore, playersSharedKey,
+              { unavailable: true, error: playerError }, API_FOOTBALL_PLAYER_TTL_SECONDS, now
+            );
+          }
         }
       }
 
-      if (fallback?.data) {
+      if (playerFallback?.data) {
         const previous = summaryTeamMetricCoverage(data);
-        const enriched = mergeExternalStatisticsIntoSummary(data, fallback.data);
+        const enriched = mergeExternalStatisticsIntoSummary(data, playerFallback.data);
         const after = summaryTeamMetricCoverage(enriched);
         if (after.totalUnique > previous.totalUnique) {
           data = enriched;
-          providers.push('api-football');
+          pushProvider(providers, 'api-football');
           statsFallbacks.push({
-            source: 'api-football',
-            fixtureId: Number(fallback.fixtureId || 0) || null,
-            metricNames: Array.isArray(fallback.metricNames) ? fallback.metricNames : []
+            source: 'api-football-players', fixtureId: apiFixtureId,
+            metricNames: Array.isArray(playerFallback.metricNames) ? playerFallback.metricNames : [],
+            rateLimit: playerFallback.rateLimit || null
           });
         }
       }
-      if (fallbackError) statsFallbackErrors.apiFootball = fallbackError;
+      if (playerError) statsFallbackErrors.apiFootballPlayers = playerError;
     }
 
-    const statsProvider = providers.join('+');
-    const mergedResult = { ...result, data };
+    // Best-known state no servidor: resposta temporariamente pobre nunca pode
+    // apagar métricas factuais já vistas para o mesmo jogo continental.
+    let bestKnownApplied = false;
+    if (isContinental && previousBest?.data) {
+      const previous = summaryTeamMetricCoverage(data);
+      const preserved = mergeExternalStatisticsIntoSummary(data, previousBest.data);
+      const after = summaryTeamMetricCoverage(preserved);
+      if (after.totalUnique > previous.totalUnique) {
+        data = preserved;
+        bestKnownApplied = true;
+        for (const provider of (Array.isArray(previousBest.providers) ? previousBest.providers : [])) pushProvider(providers, provider);
+      }
+    }
+
     const finalCoverage = summaryTeamMetricCoverage(data);
+    if (isContinental && bestKey && finalCoverage.maxPerTeam > 0) {
+      await writeLayeredCache(cache, bestKey, statsStore, bestSharedKey, {
+        data: statisticsSnapshot(data),
+        providers: providers.filter((provider) => provider !== 'espn'),
+        coverage: finalCoverage,
+        updatedAt: now
+      }, STATS_BEST_KNOWN_TTL_SECONDS, now);
+    }
+
+    const mergedResult = { ...result, data };
     const envelope = publicEnvelope(mergedResult, now, {
       cacheStatus: 'miss',
       expectedGoals,
       goalCount: Number(result.goalCount || 0),
       complete: result.complete !== false,
       attempts: result.attempts || [],
-      statsProvider,
+      statsProvider: providers.join('+'),
       statsCoverage: finalCoverage,
+      statsQuality: isContinental ? statsQuality(finalCoverage) : null,
+      statsTargetMinPerTeam: target,
+      statsBestKnownApplied: bestKnownApplied,
       statsFallback: statsFallbacks.length ? statsFallbacks[statsFallbacks.length - 1] : null,
       statsFallbacks,
       statsFallbackError: Object.values(statsFallbackErrors).filter(Boolean).join(' | '),
-      statsFallbackErrors
+      statsFallbackErrors,
+      apiFootballBudget: isContinental ? {
+        policyDailyBudget: API_FOOTBALL_DAILY_PLAN_BUDGET,
+        reserve: API_FOOTBALL_BUDGET_RESERVE,
+        knownRemaining: optionalNumber(budgetState?.remaining),
+        reservedCalls: optionalNumber(budgetState?.reservedCalls),
+        protected: !budgetAllows(budgetState)
+      } : null
     });
     await Promise.all([
       writeCached(cache, hotKey, envelope, SUMMARY_HOT_TTL_SECONDS),
@@ -381,6 +616,13 @@ export const LIVE_API_CONSTANTS = Object.freeze({
   SUMMARY_HOT_TTL_SECONDS,
   SUMMARY_FALLBACK_TTL_SECONDS,
   STATS_FALLBACK_TTL_SECONDS,
+  API_FOOTBALL_STATS_TTL_SECONDS,
+  API_FOOTBALL_PLAYER_TTL_SECONDS,
   STATS_FIXTURE_MAP_TTL_SECONDS,
-  STATS_FALLBACK_THRESHOLD
+  STATS_BEST_KNOWN_TTL_SECONDS,
+  STATS_FALLBACK_THRESHOLD,
+  CONTINENTAL_STATS_TARGET,
+  CONTINENTAL_STATS_COMPLETE,
+  API_FOOTBALL_DAILY_PLAN_BUDGET,
+  API_FOOTBALL_BUDGET_RESERVE
 });
