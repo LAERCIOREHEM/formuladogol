@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-16T21:40:56.017407-03:00",
+  "gerado_em": "2026-09-16T23:29:40.196513-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 267,
   "total_com_estatisticas": 267,
-  "total_com_publico": 266,
+  "total_com_publico": 267,
   "total_com_eventos": 267,
   "total_com_jogadores": 267,
   "total_eventos_validados": 267,
@@ -20,9 +20,9 @@
       "placar_mandante": 3,
       "placar_visitante": 2,
       "estadio": "Joao Havelange Stadium",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 9725,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/09/16/sob-olhares-de-tite-botafogo-quebra-o-jejum-e-vence-o-gremio-em-jogo-atrasado-do-brasileirao.htm",
       "arbitro": "Edina Alves Batista",
       "stats": [
         {
@@ -573,7 +573,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-16T21:40:55.934178-03:00"
+      "atualizado_em": "2026-09-16T21:40:55.934178-03:00",
+      "renda": 278407.5,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841230": {
       "event_id": "401841230",
@@ -2342,8 +2344,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-15T05:13:24.213813-03:00",
-      "renda": 111000,
-      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
+      "renda": 111020,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 4372
     },
     "401841233": {
       "event_id": "401841233",
@@ -2919,7 +2922,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-14T05:13:31.300451-03:00",
       "renda": 532475,
-      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 13857
     },
     "401841229": {
       "event_id": "401841229",
@@ -4072,7 +4076,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-14T05:13:32.225792-03:00",
       "renda": 3034285,
-      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 29842
     },
     "401841228": {
       "event_id": "401841228",
@@ -4664,7 +4669,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-14T05:13:32.892063-03:00",
       "renda": 1395250,
-      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 16385
     },
     "401841231": {
       "event_id": "401841231",
@@ -5237,7 +5243,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-14T05:13:33.478546-03:00",
       "renda": 1202952,
-      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 17566
     },
     "401841236": {
       "event_id": "401841236",
@@ -35958,7 +35965,7 @@
       "atualizado_em": "2026-08-01T22:44:14.261330-03:00",
       "publico_pagante": 18014,
       "renda": 597142,
-      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841174": {
       "event_id": "401841174",
@@ -36516,7 +36523,7 @@
       "atualizado_em": "2026-08-01T22:44:15.269666-03:00",
       "publico_pagante": 38828,
       "renda": 2606640,
-      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841172": {
       "event_id": "401841172",
@@ -37107,7 +37114,7 @@
       "atualizado_em": "2026-08-01T22:44:16.284275-03:00",
       "publico_pagante": 14660,
       "renda": 416546,
-      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841177": {
       "event_id": "401841177",
@@ -37630,7 +37637,7 @@
       "atualizado_em": "2026-08-01T22:44:15.887980-03:00",
       "publico_pagante": 11095,
       "renda": 523539,
-      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841170": {
       "event_id": "401841170",
@@ -38184,7 +38191,7 @@
       "atualizado_em": "2026-08-01T22:44:17.289696-03:00",
       "publico_pagante": 4499,
       "renda": 120900,
-      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841171": {
       "event_id": "401841171",
@@ -38737,8 +38744,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-01T22:44:16.909119-03:00",
       "publico_pagante": 15904,
-      "renda": 477627,
-      "dados_publico_fonte_adicional": "Internacional: público total, pagantes e renda"
+      "renda": 981877,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841162": {
       "event_id": "401841162",
@@ -150680,5 +150687,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 259,
+  "total_com_renda": 267
 }

@@ -1,15 +1,78 @@
 {
   "schema_version": 2,
   "_comentario": "Estado por campo da camada IA de público/renda. Não há esgotamento definitivo: lacunas permanecem em backoff até serem resolvidas documentalmente.",
-  "gerado_em": "2026-09-15T00:00:07-03:00",
-  "jogos": {},
+  "gerado_em": "2026-09-16T23:29:30-03:00",
+  "jogos": {
+    "401841176": {
+      "schema_version": 2,
+      "rodada": 21,
+      "partida": "Botafogo x Grêmio",
+      "campos": {
+        "publico": {
+          "status": "resolved",
+          "tentativas": 1,
+          "ultima_tentativa": "2026-09-16T23:29:30-03:00",
+          "resolvido_em": "2026-09-16T23:29:30-03:00",
+          "proxima_tentativa": ""
+        },
+        "renda": {
+          "status": "resolved",
+          "tentativas": 1,
+          "ultima_tentativa": "2026-09-16T23:29:30-03:00",
+          "resolvido_em": "2026-09-16T23:29:30-03:00",
+          "proxima_tentativa": ""
+        }
+      },
+      "esgotado": false,
+      "proxima_tentativa": ""
+    }
+  },
   "esgotados": [],
   "ultima_execucao": {
-    "pendentes_avaliados": 0,
-    "aceitos": 0,
+    "pendentes_avaliados": 1,
+    "aceitos": 1,
     "rejeitados": 0,
     "nao_encontrados": 0,
-    "erro": "Nenhuma lacuna elegível agora: público/renda já resolvidos ou aguardando o próximo backoff."
+    "erro": "",
+    "rejeicoes_detalhadas": [],
+    "fontes_consultadas": [
+      "https://botafogo.com.br/",
+      "https://botafogo.com.br/noticias/botafogo-x-gremio-niltonsantos",
+      "https://botafogo.com.br/noticias/categoria/futebol",
+      "https://cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/botafogo-x-gremio/832091",
+      "https://cnnbrasil.com.br/esportes/brasileirao/botafogo-vence-o-gremio-no-brasileirao-e-se-afasta-da-zona-de-rebaixamento",
+      "https://conteudo.fpf.org.br/Competicoes/2026/3973/boletins-financeiros/38/boletins/38.pdf",
+      "https://fgf.com.br/public/borderos/51804b.pdf",
+      "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/09/03/gre-nal-da-copa-do-brasil-quebra-recorde-e-vira-maior-publico-da-historia-da-arena-do-gremio.ghtml",
+      "https://grenal.net.br/lista-rendas-grenais.php",
+      "https://lnb.com.br/wp-content/uploads/2025/11/068-%E2%80%93-FRA-X-BOT-NBB-CAIXA-25-26-%E2%80%93-BOR.pdf",
+      "https://lnb.com.br/wp-content/uploads/2026/03/298-%E2%80%93-BOT-X-OSA-NBB-CAIXA-25-26-%E2%80%93-BOR.pdf",
+      "https://lnb.com.br/wp-content/uploads/2026/04/383-%E2%80%93-BOT-X-FRA-NBB-CAIXA-25-26-%E2%80%93-BOR.pdf",
+      "https://paraibaonline.com.br/esportes/noticias/sob-olhar-de-felipao-botafogo-vence-gremio-em-jogo-atrasado-do-brasileiro",
+      "https://pt.linkedin.com/posts/borderofc_rodada-26-activity-7504584587910557696-zjD2",
+      "https://pt.wikipedia.org/wiki/Arena_do_Gr%C3%AAmio",
+      "https://pt.wikipedia.org/wiki/Campeonato_Brasileiro_de_Futebol_de_2026_-_S%C3%A9rie_A",
+      "https://pt.wikipedia.org/wiki/Confrontos_entre_Botafogo_e_Gr%C3%AAmio_no_futebol",
+      "https://pt.wikipedia.org/wiki/Estat%C3%ADsticas_da_Neo_Qu%C3%ADmica_Arena",
+      "https://pt.wikipedia.org/wiki/Grenal",
+      "https://pt.wikipedia.org/wiki/Hist%C3%B3ria_do_Botafogo_de_Futebol_e_Regatas_no_Est%C3%A1dio_Nilton_Santos",
+      "https://publicoerenda.com.br/clubes/gremio",
+      "https://reddit.com/r/botafogo/comments/1p44sch/match_thread_campeonato_brasileiro_botafogo_x",
+      "https://reddit.com/r/botafogo/comments/1p48rw4/postmatch_thread_campeonato_brasileiro_botafogo_3",
+      "https://reddit.com/r/botafogo/comments/1wieu2t/postmatch_thread_campeonato_brasileiro_botafogo_3",
+      "https://reddit.com/r/futebol/comments/1t7dsuh/m%C3%A9dia_de_publico_presente_como_visitante_no",
+      "https://reddit.com/r/futebol/comments/1whbwxh/m%C3%A9dia_de_p%C3%BAblico_do_brasileir%C3%A3o_2026",
+      "https://reddit.com/r/futebol/comments/1whl7dp/match_hub_jogos_do_dia_16_de_setembro",
+      "https://reddit.com/r/futebol/comments/1wiahb7/match_thread_campeonato_brasileiro_botafogo_x",
+      "https://reddit.com/r/futebol/comments/1wieu1j/postmatch_thread_campeonato_brasileiro_botafogo_3",
+      "https://reddit.com/r/gremio/comments/1nponme",
+      "https://reddit.com/r/gremio/comments/1p44sem/match_thread_campeonato_brasileiro_botafogo_x",
+      "https://reddit.com/r/gremio/comments/1wiahg8/match_thread_campeonato_brasileiro_botafogo_x",
+      "https://reddit.com/r/gremio/comments/1wieu3o/postmatch_thread_campeonato_brasileiro_botafogo_3",
+      "https://static.botafogo.com.br/upload/downloads/279dd2a011a44089868b3b87739c330b.pdf",
+      "https://uol.com.br/esporte/futebol/ultimas-noticias/2026/09/16/botafogo-x-gremio---brasileirao.ghtm",
+      "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/09/16/sob-olhares-de-tite-botafogo-quebra-o-jejum-e-vence-o-gremio-em-jogo-atrasado-do-brasileirao.htm"
+    ]
   },
   "migracao_schema_2": "Estados legados esgotados foram reabertos; registros já resolvidos foram descartados.",
   "search_policy_version": 3
