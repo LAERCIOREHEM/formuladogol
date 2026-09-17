@@ -70,8 +70,11 @@ def _specific_instruction(kind: str) -> str:
         )
     if kind == "continentais":
         return (
-            "Para Libertadores/Sul-Americana: destaque quem avançou e quem caiu, use agregados e decisões por pênaltis quando constarem no dossiê, e conecte o resultado "
-            "ao impacto nas probabilidades dos clubes brasileiros. Não espere nem mencione jogos exclusivamente estrangeiros como lacuna se o dossiê disser que o recorte brasileiro encerrou."
+            "Para Libertadores/Sul-Americana: antes de redigir, audite o fechamento CONJUNTO do recorte brasileiro das duas competições. "
+            "A fase só está fechada quando todos os confrontos da fase que envolveram ao menos um clube brasileiro estão resolvidos; jogos exclusivamente estrangeiros não bloqueiam. "
+            "Preencha o objeto auditoria estritamente com os classificados e eliminados recebidos no dossiê. Se houver qualquer contradição factual, marque consistente=false e não tente conciliá-la por memória. "
+            "Depois, destaque quem avançou e quem caiu, use agregados e decisões por pênaltis quando constarem no dossiê, e conecte o resultado ao impacto nas probabilidades dos clubes brasileiros. "
+            "A IA não cria fatos, não decide placares e não transforma partida pendente em encerrada; ela apenas audita o pacote factual já fechado deterministicamente."
         )
     raise EditorialAIError(f"tipo editorial desconhecido: {kind}")
 
@@ -147,7 +150,7 @@ def generate_editorial(kind: str, dossier: Mapping[str, Any], schema: Mapping[st
     if not isinstance(parsed, dict):
         raise EditorialAIError("editorial OpenAI não é objeto JSON")
     model = str(response.get("model") or payload["model"])
-    return parsed, f"openai:{model}:editorial-dedicado-v2"
+    return parsed, f"openai:{model}:editorial-dedicado-v3"
 
 
 def self_test() -> int:

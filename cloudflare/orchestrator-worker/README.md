@@ -31,6 +31,9 @@ A interface AO VIVO permanece independente: `js/br-aovivo.js`, `js/br-classifica
 - TV: 6 h se lacuna <72 h; 24 h em até 14 dias; 72 h em 15–30 dias; 168 h se o mês estiver completo.
 - editoriais: fechamento factual da rodada/fase, sem decisão por horário arbitrário.
 - continental: agenda orienta `nextCheckAt`; a mesma assinatura factual só pode ser despachada uma vez; agenda incompleta cai para uma única verificação diária; o circuit breaker é respeitado antes do dispatch.
+- fechamento continental conjunto: Libertadores + Sul-Americana são avaliadas como um único ciclo editorial, mas apenas confrontos com brasileiros bloqueiam o fechamento; partidas exclusivamente estrangeiras não atrasam a publicação.
+- fases continentais: ida/volta do mesmo confronto são reconciliadas antes da decisão, impedindo um rótulo degradado de `Final/900` na volta de promover artificialmente a fase.
+- IA continental: depois do fechamento determinístico, OpenAI recebe o dossiê factual para auditar coerência e redigir; não pode converter jogo pendente em encerrado nem criar classificado/eliminado.
 - Brasileirão/ESPN: `status-atualizacao.json` da `main` abre o circuit breaker quando o scoreboard fica indisponível; o Worker continua acordando, faz apenas probe multissuperfície (CDN / Site Web / Site API) e só libera uma tentativa pesada em `HALF_OPEN`.
 
 ## Deploy
@@ -50,9 +53,9 @@ A avaliação das demais tarefas continua no mesmo ciclo de 5 minutos. O módulo
 Se houver qualquer dúvida após a ativação, execute novamente **Deploy Orchestrator Worker** escolhendo `shadow`.
 O Worker continua observando, mas para de criar `workflow_dispatch` no GitHub.
 
-## Fontes do repositório (v1.3.0)
+## Fontes do repositório (v1.4.0)
 
-O Worker tenta cada JSON primeiro em `SITE_BASE`. Se o artefato não estiver publicado no Pages ou a fonte pública estiver temporariamente indisponível, ele faz fallback autenticado para o mesmo caminho no branch configurado do GitHub via Contents API. Locks e estados operacionais críticos (`estado-editorial-continentais.json` e `status-atualizacao.json`) são lidos diretamente da `main`, evitando decisões com uma cópia atrasada do Pages.
+O Worker tenta cada JSON primeiro em `SITE_BASE`. Se o artefato não estiver publicado no Pages ou a fonte pública estiver temporariamente indisponível, ele faz fallback autenticado para o mesmo caminho no branch configurado do GitHub via Contents API. Locks, estados operacionais críticos e os insumos da decisão continental (`estado-editorial-continentais.json`, `status-atualizacao.json`, snapshots de Libertadores/Sul-Americana, histórico continental e `analises.json`) são lidos diretamente da `main`, evitando decisões com uma cópia atrasada do Pages logo após um resultado ou writer esportivo.
 
 O Fine-grained PAT `FDG_ORCHESTRATOR_GITHUB_TOKEN` precisa de:
 

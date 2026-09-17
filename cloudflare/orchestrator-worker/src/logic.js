@@ -127,7 +127,7 @@ export function continentalPhaseRank(value) {
 
 export function normalizeAgenda(payload) {
   const rows = Array.isArray(payload?.jogos) ? payload.jogos : [];
-  return rows.map((row) => ({
+  const games = rows.map((row) => ({
     eventId: String(row?.event_id || row?.id || '').trim(),
     competition: String(row?.competicao_chave || '').trim(),
     league: String(row?.espn_league || '').trim(),
@@ -140,6 +140,33 @@ export function normalizeAgenda(payload) {
     home: teamName(row?.mandante),
     away: teamName(row?.visitante),
   })).filter((g) => g.eventId && g.league && g.kickoff);
+
+  // A ESPN pode promover apenas a volta de quartas/semifinal para ``Final``.
+  // No calendário, reconcilia a perna 2 com a perna 1 do mesmo confronto.
+  // Uma final verdadeira continua intocada porque é jogo único.
+  const groups = new Map();
+  for (const game of games) {
+    const pair = [game.home.toLowerCase(), game.away.toLowerCase()].sort().join('|');
+    const key = `${game.competition || game.league}|${pair}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(game);
+  }
+  for (const group of groups.values()) {
+    for (const second of group) {
+      if (Number(second.leg || 0) !== 2) continue;
+      const candidates = group.filter((first) =>
+        Number(first.leg || 0) === 1
+        && [600, 700, 800].includes(Number(first.phaseRank || 0))
+        && first.kickoff < second.kickoff
+        && second.kickoff.getTime() - first.kickoff.getTime() <= 35 * 86400000
+      );
+      if (!candidates.length) continue;
+      candidates.sort((a, b) => b.kickoff - a.kickoff);
+      second.phaseRank = Number(candidates[0].phaseRank);
+      second.phase = CONT_PHASES[second.phaseRank]?.[0] || second.phase;
+    }
+  }
+  return games;
 }
 
 export function relevantSportsGames(games, now, beforeMinutes = POLICY.sports.beforeMinutes, afterMinutes = POLICY.sports.afterMinutes) {
@@ -432,14 +459,34 @@ function markIds(rank) {
   return [`continentais-2026-${slug}-antes-fechamento`, `continentais-2026-${slug}-depois-fechamento`];
 }
 
+function eventPairKey(event) {
+  return [sideKey(event?.mandante), sideKey(event?.visitante)].sort().join('|');
+}
+
+export function effectiveContinentalPhaseRank(snapshot, event) {
+  const rawRank = Number(event?.fase_ordem || 0);
+  if (Number(event?.perna || 0) !== 2) return rawRank;
+  const eventDate = parseDate(event?.data_iso);
+  if (!eventDate) return rawRank;
+  const key = eventPairKey(event);
+  const candidates = (snapshot?.eventos || []).filter((other) => {
+    if (other === event || eventPairKey(other) !== key || Number(other?.perna || 0) !== 1) return false;
+    const rank = Number(other?.fase_ordem || 0);
+    if (![600, 700, 800].includes(rank)) return false;
+    const when = parseDate(other?.data_iso);
+    return Boolean(when && when < eventDate && eventDate.getTime() - when.getTime() <= 35 * 86400000);
+  }).sort((a, b) => parseDate(b?.data_iso) - parseDate(a?.data_iso));
+  return candidates.length ? Number(candidates[0]?.fase_ordem || rawRank) : rawRank;
+}
+
 export function phaseEvents(snapshot, rank) {
-  return (snapshot?.eventos || []).filter((e) => Number(e?.fase_ordem || 0) === Number(rank) && (isBr(e?.mandante) || isBr(e?.visitante)));
+  return (snapshot?.eventos || []).filter((e) => effectiveContinentalPhaseRank(snapshot, e) === Number(rank) && (isBr(e?.mandante) || isBr(e?.visitante)));
 }
 
 export function ranksWithBrazilians(snaps) {
   const set = new Set();
   for (const snap of Object.values(snaps || {})) for (const e of snap?.eventos || []) {
-    const rank = Number(e?.fase_ordem || 0);
+    const rank = effectiveContinentalPhaseRank(snap, e);
     if (CONT_PHASES[rank] && (isBr(e?.mandante) || isBr(e?.visitante))) set.add(rank);
   }
   return [...set].sort((a, b) => a - b);
@@ -473,7 +520,10 @@ export function phaseMaterializedForSurvivors(snaps, rank) {
   for (const snap of Object.values(snaps || {})) {
     const current = phaseEvents(snap, rank);
     const prevWinners = new Set(buildTies(snap, prev).flatMap((t) => t.brWinners));
-    if (prevWinners.size && !current.length) return false;
+    if (!prevWinners.size) continue;
+    const currentBrTeams = new Set(current.flatMap((event) => [event?.mandante, event?.visitante])
+      .filter(isBr).map((side) => String(side?.nome || side?.nome_espn || '')).filter(Boolean));
+    if ([...prevWinners].some((name) => !currentBrTeams.has(name))) return false;
   }
   return true;
 }

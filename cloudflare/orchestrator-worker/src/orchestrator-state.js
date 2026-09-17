@@ -139,7 +139,7 @@ export class OrchestratorState {
     return {
       ok: true,
       engine: 'fdg-cloudflare-orchestrator',
-      version: String(this.env.ORCHESTRATOR_VERSION || '1.3.0'),
+      version: String(this.env.ORCHESTRATOR_VERSION || '1.4.0'),
       mode: String(this.env.ORCHESTRATOR_MODE || 'shadow'),
       ...status,
       recentDecisions: history.slice(-10).reverse(),
@@ -594,7 +594,7 @@ export class OrchestratorState {
       };
     }
 
-    // Editorial continental tem relógio próprio. O cron global continua em 1 min,
+    // Editorial continental tem relógio próprio. O cron global continua em 5 min,
     // mas este módulo só volta a decidir quando a agenda muda ou a janela
     // esportiva prevista vence. Isso impede workflow no escuro entre fases.
     const continentalPaths = [

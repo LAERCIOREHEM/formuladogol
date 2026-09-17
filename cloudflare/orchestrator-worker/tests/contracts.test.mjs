@@ -121,7 +121,7 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(state, /transmissoes_guardian/);
   const index = await read('cloudflare/orchestrator-worker/src/index.js');
   assert.match(index, /transmissionGuardian:\s*true/);
-  assert.match(index, /1\.3\.0/);
+  assert.match(index, /1\.4\.0/);
   assert.match(index, /continentalAgendaAware:\s*true/);
   assert.match(index, /continentalStateIdempotency:\s*true/);
   assert.match(index, /brasileiraoSourceCircuitBreaker:\s*true/);

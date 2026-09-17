@@ -682,6 +682,76 @@ def phase_metadata_is_specific(event: dict[str, Any]) -> bool:
     return int(event.get("fase_ordem") or 0) >= 200
 
 
+def _phase_label_from_rank(rank: int) -> str:
+    return {
+        600: "Oitavas de final",
+        700: "Quartas de final",
+        800: "Semifinal",
+        900: "Final",
+    }.get(int(rank or 0), "Fase eliminatória")
+
+
+def normalize_two_leg_pair_phase_consistency(events: list[dict[str, Any]]) -> int:
+    """Reconcilia a fase de uma volta usando a identidade do confronto.
+
+    A ESPN pode devolver a ida como ``Quartas de final`` (700) e, após o
+    término da volta, trocar apenas essa segunda partida para um rótulo que
+    ``round_rank`` interpreta como ``Final`` (900). Em Libertadores e
+    Sul-Americana isso é estruturalmente impossível quando o mesmo confronto
+    possui pernas 1 e 2: a final é partida única.
+
+    Para cada par de equipes com duas partidas em até 35 dias, a perna 1
+    específica em oitavas/quartas/semifinal funciona como âncora. A perna 2
+    recebe a mesma fase, inclusive quando veio com um rank específico porém
+    contraditório. A função nunca rebaixa uma final verdadeira de jogo único.
+    """
+    groups: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    for event in events:
+        pair = event_pair_key(event)
+        if not all(pair):
+            continue
+        groups.setdefault(pair, []).append(event)
+
+    changed = 0
+    for pair_events in groups.values():
+        ordered = sorted(
+            pair_events,
+            key=lambda item: (
+                parse_datetime(item.get("data_iso")) or datetime.min.replace(tzinfo=BRT),
+                str(item.get("event_id") or ""),
+            ),
+        )
+        for second in ordered:
+            if int(second.get("perna") or 0) != 2:
+                continue
+            second_date = parse_datetime(second.get("data_iso"))
+            if second_date is None:
+                continue
+            candidates: list[dict[str, Any]] = []
+            for first in ordered:
+                if first is second or int(first.get("perna") or 0) != 1:
+                    continue
+                first_date = parse_datetime(first.get("data_iso"))
+                if first_date is None or first_date >= second_date:
+                    continue
+                if second_date - first_date > timedelta(days=35):
+                    continue
+                first_rank = int(first.get("fase_ordem") or 0)
+                if first_rank not in {600, 700, 800}:
+                    continue
+                candidates.append(first)
+            if not candidates:
+                continue
+            first = max(candidates, key=lambda item: parse_datetime(item.get("data_iso")) or datetime.min.replace(tzinfo=BRT))
+            anchor_rank = int(first.get("fase_ordem") or 0)
+            if int(second.get("fase_ordem") or 0) == anchor_rank and str(second.get("fase") or "") == _phase_label_from_rank(anchor_rank):
+                continue
+            second["fase_ordem"] = anchor_rank
+            second["fase"] = _phase_label_from_rank(anchor_rank)
+            changed += 1
+    return changed
+
+
 def preserve_known_phase_metadata(
     fresh_events: list[dict[str, Any]],
     previous_events: list[dict[str, Any]],
@@ -1008,6 +1078,7 @@ def build_snapshot_from_normalized(
 ) -> dict[str, Any]:
     events = copy.deepcopy(normalized_events)
     overrides_applied = apply_confirmed_event_overrides(spec, events)
+    pair_phase_reconciliations = normalize_two_leg_pair_phase_consistency(events)
     events.sort(key=lambda item: (item.get("data_iso") or "", item.get("event_id") or ""))
     normalize_active_knockout_stage(events)
     normalize_completed_knockout_stage(events)
@@ -1032,6 +1103,9 @@ def build_snapshot_from_normalized(
             current["serie_a_2026"] = bool(current["serie_a_2026"] or team.get("serie_a_2026"))
     generated = now_brt().isoformat()
     current_stage = detect_current_stage(events)
+    collection_payload = dict(collection or {})
+    if pair_phase_reconciliations:
+        collection_payload["reconciliacoes_fase_por_confronto"] = pair_phase_reconciliations
     return {
         "schema_version": SNAPSHOT_SCHEMA_VERSION,
         "projeto": "AF-Previsão Continental",
@@ -2156,6 +2230,32 @@ def self_test() -> None:
     changed_timestamp["gerado_em"] = (now + timedelta(minutes=1)).isoformat()
     stable_b = snapshots_state_hash({spec.key: changed_timestamp})
     assert stable_a == stable_b
+
+    # Regressão 2026-09-17: a ESPN pode rotular SOMENTE a volta de uma
+    # eliminatória como Final/900. A identidade ida+volta do confronto é
+    # autoritativa e deve reconciliar a segunda perna para a fase da primeira.
+    pair_phase = [
+        normalized_test_event(
+            "pair-qf-1", "2026-09-10T21:30:00-03:00", "Independiente del Valle", "Flamengo",
+            rank=700, label="Quartas de final", completed=True, home_goals=0, away_goals=2,
+        ),
+        normalized_test_event(
+            "pair-qf-2", "2026-09-17T21:30:00-03:00", "Flamengo", "Independiente del Valle",
+            rank=900, label="Final", completed=True, home_goals=1, away_goals=0,
+        ),
+    ]
+    pair_phase[0]["perna"] = 1
+    pair_phase[1]["perna"] = 2
+    assert normalize_two_leg_pair_phase_consistency(pair_phase) == 1
+    assert pair_phase[1]["fase_ordem"] == 700 and pair_phase[1]["fase"] == "Quartas de final"
+    true_final = [normalized_test_event(
+        "true-final", "2026-11-28T17:00:00-03:00", "Finalista A", "Finalista B",
+        rank=900, label="Final", completed=True, home_goals=1, away_goals=0,
+    )]
+    true_final[0]["perna"] = 1
+    assert normalize_two_leg_pair_phase_consistency(true_final) == 0
+    assert true_final[0]["fase_ordem"] == 900
+
     print("Self-test coleta AF-Previsão Continental incremental: OK")
 
 

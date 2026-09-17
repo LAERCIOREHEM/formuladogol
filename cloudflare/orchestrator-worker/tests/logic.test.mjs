@@ -315,3 +315,52 @@ test('dispatch mapping is targeted and deterministic', () => {
   assert.equal(actionKey({ action: 'transmissao_aovivo', eventId: '401', checkpoint: -20 }), 'transmissao_aovivo:401:-20');
   assert.equal(actionKey({ action: 'transmissoes_guardian', eventId: '401', checkpoint: -90 }), 'transmissoes_guardian:401:-90');
 });
+
+test('continental joint gate reconciles false Final on leg 2 and ignores foreign-only pending matches', () => {
+  const br = (nome) => ({ nome, serie_a_2026: true });
+  const x = (nome) => ({ nome, serie_a_2026: false });
+  const snaps = {
+    libertadores: { eventos: [
+      { event_id: 'L1', data_iso: '2026-09-10T21:30:00-03:00', fase_ordem: 700, perna: 1, concluido: true, mandante: x('IDV'), visitante: br('Flamengo'), vencedor: 'Flamengo' },
+      { event_id: 'L2', data_iso: '2026-09-17T21:30:00-03:00', fase_ordem: 900, perna: 2, concluido: true, mandante: br('Flamengo'), visitante: x('IDV'), vencedor: 'Flamengo' },
+      // Jogo estrangeiro da mesma fase: não bloqueia o editorial brasileiro.
+      { event_id: 'LF', data_iso: '2026-09-18T21:30:00-03:00', fase_ordem: 700, perna: 2, concluido: false, mandante: x('River'), visitante: x('Racing') },
+    ] },
+    sul_americana: { eventos: [
+      { event_id: 'S1', data_iso: '2026-09-08T19:00:00-03:00', fase_ordem: 700, perna: 1, concluido: true, mandante: x('Santa Fe'), visitante: br('Vasco') },
+      { event_id: 'S2', data_iso: '2026-09-15T19:00:00-03:00', fase_ordem: 900, perna: 2, concluido: true, mandante: br('Vasco'), visitante: x('Santa Fe'), vencedor: 'Vasco' },
+    ] },
+  };
+  const history = { marcos: [{ id: 'continentais-2026-quartas-antes-fechamento' }] };
+  const eligibility = continentalEligibility(snaps, history);
+  assert.equal(eligibility.action, 'publish');
+  assert.equal(eligibility.rank, 700);
+  assert.deepEqual(eligibility.pending, []);
+  const decision = continentalDecision(snaps, { artigos: [] }, history);
+  assert.equal(decision.kind, 'publish');
+  assert.equal(decision.rank, 700);
+});
+
+test('continental agenda reconciles a false Final rank on a second leg', () => {
+  const games = normalizeAgenda({ jogos: [
+    { event_id: 'Q1', espn_league: 'conmebol.libertadores', competicao_chave: 'libertadores', fase: 'Quartas de final', fase_ordem: 700, perna: 1, data_iso: '2026-09-10T21:30:00-03:00', mandante: { nome: 'IDV' }, visitante: { nome: 'Flamengo' } },
+    { event_id: 'Q2', espn_league: 'conmebol.libertadores', competicao_chave: 'libertadores', fase: 'Final', fase_ordem: 900, perna: 2, data_iso: '2026-09-17T21:30:00-03:00', mandante: { nome: 'Flamengo' }, visitante: { nome: 'IDV' } },
+  ] });
+  assert.equal(games[1].phaseRank, 700);
+  assert.equal(games[1].phase, 'Quartas de final');
+});
+
+test('next continental phase waits until every surviving Brazilian is materialized', () => {
+  const br = (nome) => ({ nome, serie_a_2026: true });
+  const x = (nome) => ({ nome, serie_a_2026: false });
+  const snap = { eventos: [
+    { event_id: 'a1', data_iso: '2026-09-10T19:00:00-03:00', fase_ordem: 700, perna: 1, concluido: true, vencedor: 'A', mandante: br('A'), visitante: x('XA') },
+    { event_id: 'a2', data_iso: '2026-09-17T19:00:00-03:00', fase_ordem: 700, perna: 2, concluido: true, vencedor: 'A', mandante: x('XA'), visitante: br('A') },
+    { event_id: 'b1', data_iso: '2026-09-10T21:30:00-03:00', fase_ordem: 700, perna: 1, concluido: true, vencedor: 'B', mandante: br('B'), visitante: x('XB') },
+    { event_id: 'b2', data_iso: '2026-09-17T21:30:00-03:00', fase_ordem: 700, perna: 2, concluido: true, vencedor: 'B', mandante: x('XB'), visitante: br('B') },
+    // ESPN materializou apenas a semifinal de A; B ainda não aparece.
+    { event_id: 'sa1', data_iso: '2026-10-13T19:00:00-03:00', fase_ordem: 800, perna: 1, concluido: true, mandante: br('A'), visitante: x('YA') },
+    { event_id: 'sa2', data_iso: '2026-10-20T19:00:00-03:00', fase_ordem: 800, perna: 2, concluido: false, mandante: x('YA'), visitante: br('A') },
+  ] };
+  assert.equal(continentalBaselineReady({ libertadores: snap, sul_americana: { eventos: [] } }, 800), false);
+});

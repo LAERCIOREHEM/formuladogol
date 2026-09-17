@@ -91,6 +91,7 @@ CONTINENTAL_EDITORIAL_LOCK_PATH = ROOT / "dados-br" / "estado-editorial-continen
 CONTINENTAL_EDITORIAL_GUARD_FILES = (
     ".github/workflows/publicar-analise-continentais.yml",
     "scripts/gerar_analise_continental.py",
+    "scripts/atualizar_competicoes_af_previsao.py",
     "scripts/validar_artefatos_analises.py",
     "scripts/orquestrar_workflows.py",
     "scripts/editorial_ia.py",
@@ -1379,7 +1380,7 @@ def continental_editorial_decision() -> Decision | None:
         if not ties:
             return None
         highlights = continental_load(MM_PATH, {"jogos": {}}) or {"jogos": {}}
-        before, after, _ = current_stats_marks(rank, ties, history)
+        before, after, _ = current_stats_marks(rank, ties, history, snapshots)
         stats = stats_dossier(before, after) if before and after else {}
         expected = build_article(rank, ties, highlights, datetime.now(ZoneInfo("America/Sao_Paulo")).replace(microsecond=0), stats)
     except Exception:

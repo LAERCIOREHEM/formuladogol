@@ -7,7 +7,7 @@ import html
 import json
 import re
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -52,11 +52,15 @@ KNOWN_SHOOTOUTS = {
     '401874156': {'winner': 'Fluminense', 'winner_score': 5, 'loser_score': 4},
     '401874142': {'winner': 'Liga de Quito', 'winner_score': 5, 'loser_score': 4},
 }
-RENDER_VERSION = 8
+RENDER_VERSION = 9
 
 
 class ContinentalEditorialError(RuntimeError):
     pass
+
+
+class ContinentalEditorialVeto(ContinentalEditorialError):
+    """A IA detectou incoerência factual no pacote já fechado deterministicamente."""
 
 
 def load(path: Path, default=None):
@@ -92,20 +96,60 @@ def nm(side: Mapping[str, Any]) -> str:
     return str(side.get('nome') or side.get('nome_espn') or '').strip()
 
 
+def _event_dt(event: Mapping[str, Any]) -> datetime | None:
+    try:
+        value = str(event.get('data_iso') or '').strip()
+        return datetime.fromisoformat(value) if value else None
+    except Exception:
+        return None
+
+
+def effective_phase_rank(snapshot: Mapping[str, Any], event: Mapping[str, Any]) -> int:
+    """Rank editorial robusto à promoção falsa da volta para ``Final``.
+
+    A final de Libertadores/Sul-Americana é jogo único. Se uma partida marcada
+    como perna 2 pertence ao mesmo confronto de uma perna 1 recente já
+    identificada como oitavas/quartas/semi, a identidade do confronto prevalece
+    sobre o rótulo isolado da ESPN. A função é somente uma visão editorial; o
+    coletor também corrige o snapshot na origem.
+    """
+    raw_rank = int(event.get('fase_ordem') or 0)
+    if int(event.get('perna') or 0) != 2:
+        return raw_rank
+    event_when = _event_dt(event)
+    if event_when is None:
+        return raw_rank
+    key = tie_key(event)
+    candidates: list[tuple[datetime, int]] = []
+    for other in snapshot.get('eventos') or []:
+        if other is event or tie_key(other) != key or int(other.get('perna') or 0) != 1:
+            continue
+        rank = int(other.get('fase_ordem') or 0)
+        if rank not in {600, 700, 800}:
+            continue
+        when = _event_dt(other)
+        if when is None or when >= event_when or event_when - when > timedelta(days=35):
+            continue
+        candidates.append((when, rank))
+    if not candidates:
+        return raw_rank
+    return max(candidates, key=lambda item: item[0])[1]
+
+
 def phase_events(snapshot: Mapping[str, Any], rank: int) -> list[dict[str, Any]]:
     return [
         e for e in snapshot.get('eventos') or []
-        if int(e.get('fase_ordem') or 0) == rank
+        if effective_phase_rank(snapshot, e) == rank
         and (br(e.get('mandante') or {}) or br(e.get('visitante') or {}))
     ]
 
 
 def ranks_with_brazilians(snaps: Mapping[str, Mapping[str, Any]]) -> list[int]:
     return sorted({
-        int(e.get('fase_ordem') or 0)
+        effective_phase_rank(snapshot, e)
         for snapshot in snaps.values()
         for e in snapshot.get('eventos') or []
-        if int(e.get('fase_ordem') or 0) in PHASES
+        if effective_phase_rank(snapshot, e) in PHASES
         and (br(e.get('mandante') or {}) or br(e.get('visitante') or {}))
     })
 
@@ -165,7 +209,18 @@ def phase_materialized_for_survivors(snaps: Mapping[str, Mapping[str, Any]], ran
         current = phase_events(snapshot, rank)
         prev_ties = build_ties(comp, snapshot, prev)
         prev_br_winners = {winner for tie in prev_ties for winner in tie['br_classificados']}
-        if prev_br_winners and not current:
+        if not prev_br_winners:
+            continue
+        current_br_teams = {
+            nm(side)
+            for event in current
+            for side in (event.get('mandante') or {}, event.get('visitante') or {})
+            if br(side)
+        }
+        # A fase seguinte só está materializada quando TODOS os brasileiros que
+        # sobreviveram à fase anterior já aparecem em algum confronto atual.
+        # Isso evita baseline/publicação com uma semifinal parcialmente exposta.
+        if not prev_br_winners.issubset(current_br_teams):
             return False
     return True
 
@@ -445,12 +500,29 @@ def render_tie(tie: Mapping[str, Any], idx: int, mm: Mapping[str, Any]) -> str:
     )
 
 
+def deterministic_audit(rank: int, ties: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    qualified = sorted({winner for tie in ties for winner in tie['br_classificados']})
+    participants = sorted({club for tie in ties for club in tie['brasileiros']})
+    eliminated = sorted(set(participants) - set(qualified))
+    return {
+        'consistente': True,
+        'fase_fechada_recorte_brasileiro': True,
+        'classificados_brasileiros': qualified,
+        'eliminados_brasileiros': eliminated,
+        'observacao': (
+            f'Fechamento conjunto confirmado para {PHASES[rank][0]}: somente confrontos com brasileiros em '
+            'Libertadores e Sul-Americana são exigidos; partidas exclusivamente estrangeiras não bloqueiam.'
+        ),
+    }
+
+
 def editorial_copy(rank: int, ties: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     qualified = sorted({winner for tie in ties for winner in tie['br_classificados']})
     participants = sorted({club for tie in ties for club in tie['brasileiros']})
     eliminated = sorted(set(participants) - set(qualified))
     if rank == 600:
         return {
+            'auditoria': deterministic_audit(rank, ties),
             'titulo': 'Oitavas continentais: oito brasileiros avançam e quatro ficam pelo caminho',
             'linha_fina': 'Fluminense, Palmeiras, Flamengo e Corinthians seguem vivos na Libertadores; São Paulo, Atlético-MG, Santos e Vasco avançam na Sul-Americana.',
             'secoes': [
@@ -476,6 +548,7 @@ def editorial_copy(rank: int, ties: Sequence[Mapping[str, Any]]) -> dict[str, An
         }
     phase = PHASES[rank][0]
     return {
+        'auditoria': deterministic_audit(rank, ties),
         'titulo': f'{phase} continentais: brasileiros definem seus caminhos na Libertadores e Sul-Americana',
         'linha_fina': f'Fechamento dos confrontos de {phase.lower()} que envolveram clubes brasileiros nas duas competições continentais.',
         'secoes': [
@@ -500,6 +573,18 @@ def continental_editorial_schema() -> dict[str, Any]:
         'type': 'object',
         'additionalProperties': False,
         'properties': {
+            'auditoria': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'consistente': {'type': 'boolean'},
+                    'fase_fechada_recorte_brasileiro': {'type': 'boolean'},
+                    'classificados_brasileiros': {'type': 'array', 'items': {'type': 'string'}},
+                    'eliminados_brasileiros': {'type': 'array', 'items': {'type': 'string'}},
+                    'observacao': {'type': 'string', 'minLength': 20, 'maxLength': 320},
+                },
+                'required': ['consistente', 'fase_fechada_recorte_brasileiro', 'classificados_brasileiros', 'eliminados_brasileiros', 'observacao'],
+            },
             'titulo': {'type': 'string', 'minLength': 30, 'maxLength': 140},
             'linha_fina': {'type': 'string', 'minLength': 60, 'maxLength': 260},
             'secoes': {
@@ -514,7 +599,7 @@ def continental_editorial_schema() -> dict[str, Any]:
                 },
             },
         },
-        'required': ['titulo', 'linha_fina', 'secoes'],
+        'required': ['auditoria', 'titulo', 'linha_fina', 'secoes'],
     }
 
 
@@ -547,14 +632,32 @@ def continental_editorial_dossier(rank: int, ties: Sequence[Mapping[str, Any]], 
             ],
         })
     comparisons = sorted(list((stats or {}).get('comparacoes') or []), key=lambda row: (row.get('situacao') != 'classificado', -abs(float(row.get('lib_delta') or 0)), row.get('clube') or ''))
+    qualified_by_comp = {
+        COMP_NAMES[comp]: sorted({club for tie in ties if tie['competicao'] == comp for club in tie['br_classificados']})
+        for comp in COMP_NAMES
+    }
+    eliminated_by_comp = {
+        COMP_NAMES[comp]: sorted({
+            club for tie in ties if tie['competicao'] == comp for club in tie['brasileiros']
+            if club not in set(tie['br_classificados'])
+        })
+        for comp in COMP_NAMES
+    }
     return {
         'competicao': 'Libertadores + Sul-Americana',
         'fase_ordem': rank,
         'fase_encerrada': PHASES[rank][0],
         'fase_seguinte': PHASES.get(rank + 100, ('Encerramento', '', ''))[0],
+        'regra_fechamento': (
+            'Fechamento conjunto de Libertadores + Sul-Americana: todos os confrontos desta fase com ao menos um clube brasileiro '
+            'devem estar resolvidos. Partidas exclusivamente estrangeiras não bloqueiam o editorial.'
+        ),
+        'autoridade_factual': 'placares/snapshots/AF determinísticos; a OpenAI apenas audita coerência e redige',
         'classificados_brasileiros': qualified,
         'eliminados_brasileiros': eliminated,
         'participantes_brasileiros': participants,
+        'classificados_por_competicao': qualified_by_comp,
+        'eliminados_por_competicao': eliminated_by_comp,
         'confrontos': confrontos,
         'probabilidades_e_movimentos': comparisons,
         'simulacoes': 2_000_000,
@@ -562,8 +665,17 @@ def continental_editorial_dossier(rank: int, ties: Sequence[Mapping[str, Any]], 
 
 
 def validate_continental_editorial(editorial: Mapping[str, Any], dossier: Mapping[str, Any]) -> None:
-    if set(editorial) != {'titulo', 'linha_fina', 'secoes'}:
+    if set(editorial) != {'auditoria', 'titulo', 'linha_fina', 'secoes'}:
         raise ContinentalEditorialError('editorial continental fora do schema')
+    audit = editorial.get('auditoria') or {}
+    expected_qualified = sorted(dossier.get('classificados_brasileiros') or [])
+    expected_eliminated = sorted(dossier.get('eliminados_brasileiros') or [])
+    if audit.get('consistente') is not True or audit.get('fase_fechada_recorte_brasileiro') is not True:
+        raise ContinentalEditorialVeto('auditoria OpenAI vetou o fechamento continental')
+    if sorted(audit.get('classificados_brasileiros') or []) != expected_qualified:
+        raise ContinentalEditorialVeto('auditoria OpenAI divergiu dos classificados factuais')
+    if sorted(audit.get('eliminados_brasileiros') or []) != expected_eliminated:
+        raise ContinentalEditorialVeto('auditoria OpenAI divergiu dos eliminados factuais')
     sections = editorial.get('secoes') or []
     if not 2 <= len(sections) <= 4 or any(not 1 <= len(section.get('paragrafos') or []) <= 5 for section in sections):
         raise ContinentalEditorialError('editorial continental com estrutura inválida')
@@ -911,6 +1023,7 @@ def build_article(rank: int, ties: Sequence[Mapping[str, Any]], mm: Mapping[str,
         'hash_estatisticas': canon(stats or {}),
         'melhores_momentos_vinculados': linked,
         'editorial': content,
+        'auditoria_factual': content.get('auditoria') or {},
         'email_assunto': f'Fórmula do Gol: fechamento continental de {phase}',
         'email_chamada': f'{phase} encerradas para os brasileiros. Veja classificados, agregados, melhores momentos e o impacto nas probabilidades.',
         'origem_editorial': origin,
@@ -979,7 +1092,69 @@ def render_page(article: Mapping[str, Any], ties: Sequence[Mapping[str, Any]], m
 </html>'''
 
 
-def current_stats_marks(rank: int, ties: Sequence[Mapping[str, Any]], history: dict[str, Any]) -> tuple[dict[str, Any] | None, dict[str, Any] | None, bool]:
+def validate_probability_alignment(snaps: Mapping[str, Mapping[str, Any]], ties: Sequence[Mapping[str, Any]], probabilities: Mapping[str, Any]) -> None:
+    """Impede editorial com AF anterior ao último resultado continental."""
+    try:
+        from gerar_probabilidades_brasileirao import continental_snapshots_state_hash
+        from af_previsao_continental import load_snapshots as load_all_continental_snapshots
+    except Exception as exc:  # pragma: no cover - contrato de execução
+        raise ContinentalEditorialError(f'não foi possível carregar contrato de hash continental: {exc}') from exc
+    # O hash publicado pelo AF cobre o universo continental inteiro usado nas
+    # 2.000.000 de simulações (Copa do Brasil + Libertadores + Sul-Americana).
+    # O editorial recebe apenas Lib/Sula porque são as competições editoriais
+    # deste fluxo; comparar um hash parcial produziria falso desalinhamento.
+    try:
+        all_snaps = load_all_continental_snapshots()
+    except Exception as exc:
+        raise ContinentalEditorialError(f'não foi possível carregar todos os snapshots do AF-Previsão: {exc}') from exc
+    current_hash = continental_snapshots_state_hash(all_snaps)
+    af_hash = str((probabilities.get('integracao_continental') or {}).get('hash_snapshots') or '')
+    if not current_hash or af_hash != current_hash:
+        raise ContinentalEditorialError(
+            f'AF-Previsão ainda não incorporou os snapshots continentais atuais: af={af_hash or "ausente"} atual={current_hash}'
+        )
+    by_name = {str(item.get('clube') or ''): item for item in probabilities.get('clubes') or []}
+    for tie in ties:
+        comp = str(tie.get('competicao') or '')
+        qualified = set(tie.get('br_classificados') or [])
+        for club in tie.get('brasileiros') or []:
+            item = by_name.get(club)
+            if not item:
+                raise ContinentalEditorialError(f'AF-Previsão sem clube continental: {club}')
+            route = route_detail(item, comp)
+            possible = bool(route.get('possivel_estruturalmente'))
+            value = float(route.get('percentual_estimado') or 0)
+            if club in qualified:
+                if not possible:
+                    raise ContinentalEditorialError(f'AF-Previsão marcou classificado como estruturalmente eliminado: {club}')
+            else:
+                if possible or abs(value) > 1e-12:
+                    raise ContinentalEditorialError(f'AF-Previsão ainda mantém via continental para eliminado: {club}')
+
+
+def update_phase_cycle_state(history: dict[str, Any], rank: int, ties: Sequence[Mapping[str, Any]], *, status: str) -> bool:
+    survivors = sorted({winner for tie in ties for winner in tie.get('br_classificados') or []})
+    participants = sorted({club for tie in ties for club in tie.get('brasileiros') or []})
+    eliminated = sorted(set(participants) - set(survivors))
+    next_rank = rank + 100 if rank + 100 in PHASES else 0
+    state = {
+        'fase_ordem': rank,
+        'fase': PHASES[rank][0],
+        'status': status,
+        'brasileiros_participantes': participants,
+        'brasileiros_vivos': survivors,
+        'brasileiros_eliminados': eliminated,
+        'proxima_fase_ordem': next_rank,
+        'proxima_fase': PHASES[next_rank][0] if next_rank else None,
+        'regra_fechamento': 'Libertadores + Sul-Americana em conjunto; somente confrontos com brasileiros bloqueiam o fechamento.',
+    }
+    if history.get('estado_ciclo') == state:
+        return False
+    history['estado_ciclo'] = state
+    return True
+
+
+def current_stats_marks(rank: int, ties: Sequence[Mapping[str, Any]], history: dict[str, Any], snaps: Mapping[str, Mapping[str, Any]] | None = None) -> tuple[dict[str, Any] | None, dict[str, Any] | None, bool]:
     before_id, after_id = mark_ids(rank)
     before = find_mark(history, before_id)
     after = find_mark(history, after_id)
@@ -990,6 +1165,8 @@ def current_stats_marks(rank: int, ties: Sequence[Mapping[str, Any]], history: d
             changed |= update_mark(history, before)
     if after is None:
         probabilities = load(PROB_PATH, {}) or {}
+        if snaps is not None:
+            validate_probability_alignment(snaps, ties, probabilities)
         after = build_mark(rank, ties, probabilities, 'depois', 'primeira_fotografia_pos_fechamento')
         changed |= update_mark(history, after)
     return before, after, changed
@@ -1001,7 +1178,9 @@ def capture_baseline(rank: int, ties: Sequence[Mapping[str, Any]], history: dict
         return False
     probabilities = load(PROB_PATH, {}) or {}
     mark = build_mark(rank, ties, probabilities, 'antes', 'primeira_fotografia_apos_idas')
-    return update_mark(history, mark)
+    changed = update_mark(history, mark)
+    changed |= update_phase_cycle_state(history, rank, ties, status='aguardando_voltas')
+    return changed
 
 
 def publish(dry: bool = False, force_rank: int = 0, usar_ia: bool = False, sem_ia: bool = False) -> int:
@@ -1027,10 +1206,11 @@ def publish(dry: bool = False, force_rank: int = 0, usar_ia: bool = False, sem_i
         print('NONE: fase ainda não concluída no recorte brasileiro.')
         return 0
 
-    before, after, history_changed = current_stats_marks(rank, ties, history)
+    before, after, history_changed = current_stats_marks(rank, ties, history, snaps)
     if not before or not after:
         raise ContinentalEditorialError('não foi possível formar os marcos estatísticos anterior e posterior')
     stats = stats_dossier(before, after)
+    history_changed |= update_phase_cycle_state(history, rank, ties, status='aguardando_proxima_fase')
     mm = load(MM_PATH, {'jogos': {}}) or {'jogos': {}}
     now = agora_br().replace(microsecond=0)
     manifest = load(MANIFEST, {'schema_version': 2, 'site': 'Fórmula do Gol', 'artigos': []}) or {'schema_version': 2, 'site': 'Fórmula do Gol', 'artigos': []}
@@ -1044,7 +1224,8 @@ def publish(dry: bool = False, force_rank: int = 0, usar_ia: bool = False, sem_i
     content: Mapping[str, Any] = fallback
     origin = 'deterministico-jornalistico'
     if old and old.get('hash_editorial_contexto') == context_hash and str(old.get('origem_editorial') or '').startswith('openai:') and isinstance(old.get('editorial'), Mapping):
-        content = old['editorial']
+        content = dict(old['editorial'])
+        content.setdefault('auditoria', deterministic_audit(rank, ties))
         origin = str(old.get('origem_editorial'))
         validate_continental_editorial(content, editorial_context)
         print('Dossiê continental inalterado: editorial OpenAI preservado sem nova chamada.')
@@ -1054,8 +1235,14 @@ def publish(dry: bool = False, force_rank: int = 0, usar_ia: bool = False, sem_i
             validate_continental_editorial(generated, editorial_context)
             content = generated
             print(f'Editorial continental gerado pela camada dedicada ({origin}).')
-        except (EditorialAIError, ContinentalEditorialError) as exc:
+        except ContinentalEditorialVeto:
+            raise
+        except EditorialAIError as exc:
             print(f'::warning title=Editorial IA indisponível::Fallback continental determinístico aplicado. {exc}')
+            content = fallback
+            origin = 'deterministico-jornalistico-contingencia'
+        except ContinentalEditorialError as exc:
+            print(f'::warning title=Editorial IA inválido::Fallback continental determinístico aplicado. {exc}')
             content = fallback
             origin = 'deterministico-jornalistico-contingencia'
     validate_continental_editorial(content, editorial_context)
@@ -1139,8 +1326,49 @@ def self_test() -> None:
     assert active_rank(distorted) == 700
     unanchored = editorial_eligibility(distorted, {'marcos': []})
     assert unanchored['action'] == 'baseline' and unanchored['rank'] == 700
+
+    # Fechamento CONJUNTO: quando todos os confrontos com brasileiros terminam,
+    # uma volta degradada para 900 continua pertencendo às quartas e partida
+    # exclusivamente estrangeira não bloqueia o editorial.
+    closed_joint = {
+        'libertadores': {'eventos': [
+            {'event_id': 'jl1', 'fase_ordem': 700, 'perna': 1, 'data_iso': '2026-09-10T21:30:00-03:00', 'mandante': dict(side_x), 'visitante': dict(side_br), 'concluido': True, 'vencedor': 'Brasileiro'},
+            {'event_id': 'jl2', 'fase_ordem': 900, 'perna': 2, 'data_iso': '2026-09-17T21:30:00-03:00', 'mandante': dict(side_br), 'visitante': dict(side_x), 'concluido': True, 'vencedor': 'Brasileiro'},
+            {'event_id': 'foreign', 'fase_ordem': 700, 'perna': 2, 'data_iso': '2026-09-18T21:30:00-03:00', 'mandante': {'espn_id': 'f1', 'nome': 'Estrangeiro A', 'serie_a_2026': False}, 'visitante': {'espn_id': 'f2', 'nome': 'Estrangeiro B', 'serie_a_2026': False}, 'concluido': False},
+        ]},
+        'sul_americana': {'eventos': []},
+    }
+    closed = editorial_eligibility(closed_joint, history)
+    assert closed['action'] == 'publish' and closed['rank'] == 700 and closed['pendentes'] == []
+
     context = continental_editorial_dossier(600, ties, {'comparacoes': []})
-    validate_continental_editorial(editorial_copy(600, ties), context)
+    deterministic = editorial_copy(600, ties)
+    validate_continental_editorial(deterministic, context)
+    assert deterministic['auditoria']['consistente'] is True
+    assert sorted(deterministic['auditoria']['classificados_brasileiros']) == sorted(context['classificados_brasileiros'])
+    cycle_history: dict[str, Any] = {}
+    assert update_phase_cycle_state(cycle_history, 600, ties, status='aguardando_proxima_fase') is True
+    assert cycle_history['estado_ciclo']['proxima_fase_ordem'] == 700
+    assert set(cycle_history['estado_ciclo']['brasileiros_vivos']) == set(context['classificados_brasileiros'])
+
+    # A próxima fase não pode ser considerada materializada com apenas parte
+    # dos brasileiros sobreviventes já exposta pela fonte.
+    a = {'espn_id': 'a', 'nome': 'A', 'serie_a_2026': True, 'placar': 1}
+    b = {'espn_id': 'b', 'nome': 'B', 'serie_a_2026': True, 'placar': 1}
+    xa = {'espn_id': 'xa', 'nome': 'XA', 'serie_a_2026': False, 'placar': 0}
+    xb = {'espn_id': 'xb', 'nome': 'XB', 'serie_a_2026': False, 'placar': 0}
+    ya = {'espn_id': 'ya', 'nome': 'YA', 'serie_a_2026': False, 'placar': 0}
+    partial_next = {'libertadores': {'eventos': [
+        {'event_id': 'a1', 'fase_ordem': 700, 'perna': 1, 'data_iso': '2026-09-10T19:00:00-03:00', 'mandante': dict(a), 'visitante': dict(xa), 'concluido': True, 'vencedor': 'A'},
+        {'event_id': 'a2', 'fase_ordem': 700, 'perna': 2, 'data_iso': '2026-09-17T19:00:00-03:00', 'mandante': dict(xa), 'visitante': dict(a), 'concluido': True, 'vencedor': 'A'},
+        {'event_id': 'b1', 'fase_ordem': 700, 'perna': 1, 'data_iso': '2026-09-10T21:30:00-03:00', 'mandante': dict(b), 'visitante': dict(xb), 'concluido': True, 'vencedor': 'B'},
+        {'event_id': 'b2', 'fase_ordem': 700, 'perna': 2, 'data_iso': '2026-09-17T21:30:00-03:00', 'mandante': dict(xb), 'visitante': dict(b), 'concluido': True, 'vencedor': 'B'},
+        {'event_id': 'sa1', 'fase_ordem': 800, 'perna': 1, 'data_iso': '2026-10-13T19:00:00-03:00', 'mandante': dict(a), 'visitante': dict(ya), 'concluido': True},
+        {'event_id': 'sa2', 'fase_ordem': 800, 'perna': 2, 'data_iso': '2026-10-20T19:00:00-03:00', 'mandante': dict(ya), 'visitante': dict(a), 'concluido': False},
+    ]}, 'sul_americana': {'eventos': []}}
+    assert phase_materialized_for_survivors(partial_next, 800) is False
+    assert baseline_ready(partial_next, 800) is False
+
     print('OK: self-test editorial continental.')
 
 

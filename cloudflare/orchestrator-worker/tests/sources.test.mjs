@@ -128,6 +128,33 @@ test('Brasileirão operational status is authoritative from main, never stale Pa
   assert.equal(calls.length, 1);
 });
 
+
+
+test('continental decision inputs are authoritative from main immediately after a sports writer commit', async (t) => {
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url, options = {}) => {
+    const href = String(url);
+    calls.push(href);
+    assert.match(href, /api\.github\.com/);
+    assert.equal(options.headers.Authorization, 'Bearer test-token');
+    return jsonResponse({ atualizado_em: '2026-09-17T23:59:00-03:00', eventos: [] });
+  };
+  t.after(() => { globalThis.fetch = originalFetch; });
+
+  for (const path of [
+    'dados-br/competicoes-af-previsao/libertadores.json',
+    'dados-br/competicoes-af-previsao/sul-americana.json',
+    'dados-br/historico-probabilidades-continentais.json',
+    'dados-br/analises.json',
+  ]) {
+    const bundle = await fetchSiteBundle(env(), [path]);
+    assert.equal(bundle[path].origin, 'github_authoritative');
+  }
+  assert.equal(calls.length, 4);
+  assert.ok(calls.every((href) => !href.startsWith('https://formuladogol.com.br/')));
+});
+
 test('ESPN resilient probe falls from blocked CDN to site web without failing the game', async (t) => {
   const originalFetch = globalThis.fetch;
   const event = {
