@@ -1,11 +1,11 @@
 {
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
-    "jogos_na_janela": 42,
+    "jogos_na_janela": 43,
     "jogos_com_transmissao": 24,
-    "jogos_sem_transmissao_na_janela": 18,
+    "jogos_sem_transmissao_na_janela": 19,
     "jogos_sem_transmissao_14d": 0,
-    "jogos_sem_transmissao_fora_14d": 18,
+    "jogos_sem_transmissao_fora_14d": 19,
     "jogos_criticos_sem_transmissao_72h": 0,
     "registros_preservados": 17,
     "jogos_guardiao_ia": 1,
@@ -26,18 +26,18 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 11121
+      "duracao_ms": 11677
     },
     "ge_agenda": {
       "ok": true,
       "jogos_com_canal": 0,
-      "duracao_ms": 7223
+      "duracao_ms": 4714
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 3,
       "jogos_com_canal": 0,
-      "duracao_ms": 84089
+      "duracao_ms": 55896
     },
     "espn": {
       "ok": false,
@@ -55,7 +55,15 @@
       "rodada": 21,
       "jogo": "São Paulo x Santos",
       "data_iso": "2026-10-02T20:00:00-03:00",
-      "faltam_horas": 364.4,
+      "faltam_horas": 360.3,
+      "nivel": "futuro"
+    },
+    {
+      "event_id": "401841168",
+      "rodada": 21,
+      "jogo": "Atlético-MG x Bragantino",
+      "data_iso": "2026-10-03T18:30:00-03:00",
+      "faltam_horas": 382.8,
       "nivel": "futuro"
     },
     {
@@ -63,7 +71,7 @@
       "rodada": 29,
       "jogo": "Remo x Grêmio",
       "data_iso": "2026-10-07T19:30:00-03:00",
-      "faltam_horas": 483.9,
+      "faltam_horas": 479.8,
       "nivel": "futuro"
     },
     {
@@ -71,7 +79,7 @@
       "rodada": 29,
       "jogo": "Vitória x Chapecoense",
       "data_iso": "2026-10-07T20:00:00-03:00",
-      "faltam_horas": 484.4,
+      "faltam_horas": 480.3,
       "nivel": "futuro"
     },
     {
@@ -79,7 +87,7 @@
       "rodada": 29,
       "jogo": "Fluminense x Coritiba",
       "data_iso": "2026-10-08T21:30:00-03:00",
-      "faltam_horas": 509.9,
+      "faltam_horas": 505.8,
       "nivel": "futuro"
     },
     {
@@ -87,7 +95,7 @@
       "rodada": 30,
       "jogo": "São Paulo x Vitória",
       "data_iso": "2026-10-10T21:00:00-03:00",
-      "faltam_horas": 557.4,
+      "faltam_horas": 553.3,
       "nivel": "futuro"
     },
     {
@@ -95,7 +103,7 @@
       "rodada": 30,
       "jogo": "Coritiba x Botafogo",
       "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 579.9,
+      "faltam_horas": 575.8,
       "nivel": "futuro"
     },
     {
@@ -103,7 +111,7 @@
       "rodada": 30,
       "jogo": "Bahia x Mirassol",
       "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 579.9,
+      "faltam_horas": 575.8,
       "nivel": "futuro"
     },
     {
@@ -111,7 +119,7 @@
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 603.9,
+      "faltam_horas": 599.8,
       "nivel": "futuro"
     },
     {
@@ -119,7 +127,7 @@
       "rodada": 31,
       "jogo": "Botafogo x Chapecoense",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 719.4,
+      "faltam_horas": 715.3,
       "nivel": "futuro"
     },
     {
@@ -127,7 +135,7 @@
       "rodada": 31,
       "jogo": "Bahia x Flamengo",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 719.4,
+      "faltam_horas": 715.3,
       "nivel": "futuro"
     },
     {
@@ -135,7 +143,7 @@
       "rodada": 31,
       "jogo": "Atlético-MG x Coritiba",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 719.4,
+      "faltam_horas": 715.3,
       "nivel": "futuro"
     },
     {
@@ -143,7 +151,7 @@
       "rodada": 31,
       "jogo": "Athletico-PR x Palmeiras",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 719.4,
+      "faltam_horas": 715.3,
       "nivel": "futuro"
     },
     {
@@ -151,7 +159,7 @@
       "rodada": 31,
       "jogo": "Corinthians x Vitória",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 719.4,
+      "faltam_horas": 715.3,
       "nivel": "futuro"
     },
     {
@@ -159,7 +167,7 @@
       "rodada": 31,
       "jogo": "São Paulo x Vasco da Gama",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 719.4,
+      "faltam_horas": 715.3,
       "nivel": "futuro"
     },
     {
@@ -167,7 +175,7 @@
       "rodada": 31,
       "jogo": "Remo x Bragantino",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 719.4,
+      "faltam_horas": 715.3,
       "nivel": "futuro"
     },
     {
@@ -175,7 +183,7 @@
       "rodada": 31,
       "jogo": "Mirassol x Internacional",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 719.4,
+      "faltam_horas": 715.3,
       "nivel": "futuro"
     },
     {
@@ -183,7 +191,7 @@
       "rodada": 31,
       "jogo": "Grêmio x Cruzeiro",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 719.4,
+      "faltam_horas": 715.3,
       "nivel": "futuro"
     },
     {
@@ -191,7 +199,7 @@
       "rodada": 31,
       "jogo": "Fluminense x Santos",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 719.4,
+      "faltam_horas": 715.3,
       "nivel": "futuro"
     }
   ],
@@ -373,5 +381,5 @@
     "https://ge.globo.com/gato-mestre/analises/noticia/2026/09/16/cartola-veja-cinco-alternativas-de-ataque-a-viveros-e-samuel-lino-desfalques-para-rodada-28.ghtml",
     "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/09/16/ldu-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
   ],
-  "atualizado_em": "2026-09-17T15:35:52-03:00"
+  "atualizado_em": "2026-09-17T19:41:46-03:00"
 }
