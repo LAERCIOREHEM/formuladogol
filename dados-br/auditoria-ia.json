@@ -1,16 +1,14 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-16",
-  "executado_em": "2026-09-16T12:33:16-03:00",
-  "status": "critico",
-  "resumo": "Os dados finais auditáveis estão íntegros e não há pendências de público, renda, transmissão ou melhores momentos. O status determinístico crítico decorre de snapshot não sincronizado e requer verificação operacional, mas os indicadores não apontam perda factual crítica de cobertura.",
+  "data_brt": "2026-09-17",
+  "executado_em": "2026-09-17T12:39:21-03:00",
+  "status": "atencao",
+  "resumo": "A auditoria determinística aponta atenção por falha em 2 fontes de transmissão, sem perda crítica de cobertura. Não há pendências de público/renda, transmissão ou melhores momentos que exijam pesquisa ou correção.",
   "triagem": {
-    "data_hora_brt": "2026-09-16T12:33:16-03:00",
+    "data_hora_brt": "2026-09-17T12:39:21-03:00",
     "saude": {
-      "status_deterministico": "critico",
-      "criticos": [
-        "status principal informa snapshot não sincronizado"
-      ],
+      "status_deterministico": "atencao",
+      "criticos": [],
       "avisos": [
         "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura"
       ],
@@ -23,7 +21,7 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 31.3
+        "ultimo_sucesso_horas": 12.4
       }
     },
     "pendencias": {
@@ -61,19 +59,12 @@
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "Os dados finais auditáveis estão íntegros e não há pendências de público, renda, transmissão ou melhores momentos. O status determinístico crítico decorre de snapshot não sincronizado e requer verificação operacional, mas os indicadores não apontam perda factual crítica de cobertura.",
+    "resumo": "A auditoria determinística aponta atenção por falha em 2 fontes de transmissão, sem perda crítica de cobertura. Não há pendências de público/renda, transmissão ou melhores momentos que exijam pesquisa ou correção.",
     "problemas": [
       {
         "categoria": "fonte",
         "severidade": "atencao",
-        "mensagem": "O status principal informa snapshot não sincronizado; verificar a sincronização operacional, embora não haja falhas críticas nos dados finais do dossiê.",
-        "event_id": "",
-        "requer_intervencao": true
-      },
-      {
-        "categoria": "transmissao",
-        "severidade": "info",
-        "mensagem": "Duas fontes de transmissão falharam, sem perda crítica de cobertura e sem pendências de jogos para correção.",
+        "mensagem": "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura. Os dados finais de cobertura permanecem íntegros.",
         "event_id": "",
         "requer_intervencao": false
       }
@@ -90,14 +81,12 @@
     "transmissoes_aplicadas": [],
     "editoriais_aplicados": []
   },
-  "criticos_nao_resolvidos": [
-    "status principal informa snapshot não sincronizado"
-  ],
+  "criticos_nao_resolvidos": [],
   "alerta": {
     "ultimo_fingerprint": "",
     "ultimo_enviado_em": "",
     "envio_nesta_execucao": false,
-    "detalhe": "RESEND_API_KEY/EMAIL_DESTINO não configurados"
+    "detalhe": "não necessário"
   },
   "historico": [
     {
@@ -575,6 +564,19 @@
       "criticos": [
         "status principal informa snapshot não sincronizado"
       ],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-17",
+      "executado_em": "2026-09-17T12:39:21-03:00",
+      "status": "atencao",
+      "resumo": "A auditoria determinística aponta atenção por falha em 2 fontes de transmissão, sem perda crítica de cobertura. Não há pendências de público/renda, transmissão ou melhores momentos que exijam pesquisa ou correção.",
+      "chamadas_openai": 1,
+      "web_searches": 0,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [],
       "email_enviado": false
     }
   ]
