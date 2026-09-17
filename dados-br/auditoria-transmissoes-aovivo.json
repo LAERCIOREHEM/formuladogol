@@ -17,10 +17,10 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 40,
+    "candidatos_oficiais_encontrados": 41,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
     "transmissoes_publicadas": 6,
     "sem_transmissao": 1,
     "erros": 0
@@ -69,12 +69,12 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401912540",
+      "event_id": "401912526",
       "rodada": 0,
       "competicao_chave": "libertadores",
       "competicao_nome": "Libertadores",
-      "jogo": "Corinthians x Estudiantes de La Plata",
-      "data_iso": "2026-09-16T21:30:00-03:00",
+      "jogo": "Flamengo x Independiente del Valle",
+      "data_iso": "2026-09-17T21:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -326,6 +326,16 @@
       "titulo": "AO VIVO: REPÚBLICA TCHECA X CROÁCIA | UEFA NATIONS LEAGUE 2026 | FASE DE GRUPOS |  ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-09-26T15:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "PczeVOCh8h8",
+      "url": "https://www.youtube.com/watch?v=PczeVOCh8h8",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "FLAMENGO 2026: QUEM É O JOGADOR MAIS IMPORTANTE DO ELENCO? | Com Denilson é Show | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-17T00:41:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -599,15 +609,21 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401912526",
+      "jogo": "Flamengo x Independiente del Valle",
+      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
+    }
+  ],
   "sem_transmissao": [
     {
-      "event_id": "401912540",
+      "event_id": "401912526",
       "rodada": 0,
       "competicao_chave": "libertadores",
       "competicao_nome": "Libertadores",
-      "jogo": "Corinthians x Estudiantes de La Plata",
-      "data_iso": "2026-09-16T21:30:00-03:00",
+      "jogo": "Flamengo x Independiente del Valle",
+      "data_iso": "2026-09-17T21:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -621,5 +637,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-16T21:20:46-03:00"
+  "atualizado_em": "2026-09-16T21:31:45-03:00"
 }
