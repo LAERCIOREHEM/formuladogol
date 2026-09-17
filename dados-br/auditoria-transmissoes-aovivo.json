@@ -13,14 +13,14 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 43,
+    "jogos_na_janela": 42,
     "jogos_foco": 1,
     "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 41,
-    "search_api_fallback_chamadas": 4,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
+    "candidatos_oficiais_encontrados": 51,
+    "search_api_fallback_chamadas": 0,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
     "transmissoes_publicadas": 6,
     "sem_transmissao": 1,
     "erros": 0
@@ -69,12 +69,12 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401912540",
+      "event_id": "401912526",
       "rodada": 0,
       "competicao_chave": "libertadores",
       "competicao_nome": "Libertadores",
-      "jogo": "Corinthians x Estudiantes de La Plata",
-      "data_iso": "2026-09-16T21:30:00-03:00",
+      "jogo": "Flamengo x Independiente del Valle",
+      "data_iso": "2026-09-17T21:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -259,16 +259,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "NiqY3agWAQM",
-      "url": "https://www.youtube.com/watch?v=NiqY3agWAQM",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: CORINTHIANS X ESTUDIANTES | QUARTAS DE FINAL | LIBERTADORES 2026 | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-09-16T19:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "lHXt6D_tO8E",
       "url": "https://www.youtube.com/watch?v=lHXt6D_tO8E",
       "fonte": "sbt",
@@ -276,26 +266,6 @@
       "titulo": "SBT Ao Vivo",
       "status": "live",
       "inicio_programado": "2026-09-15T19:20:50-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "1QMyDw_DwkQ",
-      "url": "https://www.youtube.com/watch?v=1QMyDw_DwkQ",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: PALMEIRAS PASSA NOS PÊNALTIS CONTRA A LDU E CORINTHIANS ENTRA EM CAMPO JÁ JÁ | GERAL CAZÉTV",
-      "status": "live",
-      "inicio_programado": "2026-09-16T13:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "0YoG6mISrUc",
-      "url": "https://www.youtube.com/watch?v=0YoG6mISrUc",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: NFL RIO GAME 2026 | BALTIMORE RAVENS X DALLAS COWBOYS | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-27T16:25:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -329,16 +299,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "PczeVOCh8h8",
-      "url": "https://www.youtube.com/watch?v=PczeVOCh8h8",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "FLAMENGO 2026: QUEM É O JOGADOR MAIS IMPORTANTE DO ELENCO? | Com Denilson é Show | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-17T00:41:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "RBNVGCX3BkM",
       "url": "https://www.youtube.com/watch?v=RBNVGCX3BkM",
       "fonte": "getv",
@@ -356,6 +316,26 @@
       "titulo": "AO VIVO: BRASIL X AUSTRÁLIA | AMISTOSO DA SELEÇÃO | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-09-25T06:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "SO9KaWpK5HI",
+      "url": "https://www.youtube.com/watch?v=SO9KaWpK5HI",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "NFL: PRIMEIRA DESCIDA ANALISA A SEMANA 1! #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-17T19:13:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "dILd1qB6Lkw",
+      "url": "https://www.youtube.com/watch?v=dILd1qB6Lkw",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: SÃO PAULO X FLAMENGO | SEMIFINAL | BRASILEIRÃO FEMININO 2026 | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-19T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -389,13 +369,43 @@
       "motivo": "conteúdo rejeitado: narracao"
     },
     {
-      "video_id": "yl6KRNRY9Io",
-      "url": "https://www.youtube.com/watch?v=yl6KRNRY9Io",
+      "video_id": "ztGmnkkCUls",
+      "url": "https://www.youtube.com/watch?v=ztGmnkkCUls",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "PELÉ ENGANOU NOSSO ELENCO NO JOGO DO IMPOSTOR DA LIBERTADORES! | Panela sportv",
+      "titulo": "AO VIVO: BRASIL X COLÔMBIA | COPA DAS NAÇÕES DE FUTEBOL DE AREIA | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-09-17T00:33:00-03:00",
+      "inicio_programado": "2026-09-18T18:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "1T0F68d0Qms",
+      "url": "https://www.youtube.com/watch?v=1T0F68d0Qms",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: OSASUNA X RAYO VALLECANO | LALIGA 26/27 | 7ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-19T06:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "3j1Zfinx9Q0",
+      "url": "https://www.youtube.com/watch?v=3j1Zfinx9Q0",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: VILLARREAL X LEVANTE | LALIGA 26/27 | 7ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-20T13:15:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "4RwtDrpVoSs",
+      "url": "https://www.youtube.com/watch?v=4RwtDrpVoSs",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ATLÉTICO DE MADRID X REAL MADRID | LALIGA 26/27 | 7ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-20T10:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -414,8 +424,18 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: BEŞIKTAŞ X OLYMPIQUE MARSEILLE | EUROPA LEAGUE 26/27 | 1ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-17T14:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "8vPpyDKRrpc",
+      "url": "https://www.youtube.com/watch?v=8vPpyDKRrpc",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): ANGERS X ESTAC TROYES | LIGUE 1 26/27 | 5ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-20T15:40:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -433,8 +453,8 @@
       "url": "https://www.youtube.com/watch?v=B-HPksUoZYI",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: FRANÇA X CANADÁ | COPA DO MUNDO FEMININA SUB-20 FIFA 2026 | OITAVAS DE FINAL",
-      "status": "upcoming",
+      "titulo": "AO VIVO: REAL BETIS X GETAFE | LALIGA 26/27 | 6ª RODADA",
+      "status": "live",
       "inicio_programado": "2026-09-17T09:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -444,7 +464,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): CELTIC X FERENCVÁROSI | EUROPA LEAGUE 26/27 | 1ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-17T15:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -454,7 +474,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): OFI X HOFFENHEIM | EUROPA LEAGUE 26/27 | 1ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-17T13:40:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -479,12 +499,22 @@
       "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
     },
     {
+      "video_id": "GMcZMgBZbYA",
+      "url": "https://www.youtube.com/watch?v=GMcZMgBZbYA",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: MAMELODI SUNDOWNS X AL AHLI | MUNDIAL DE CLUBES FIFA 2026 | 2ª FASE",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-19T09:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "GcCcyu3ORIE",
       "url": "https://www.youtube.com/watch?v=GcCcyu3ORIE",
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): LILLESTROM X TORREENSE | EUROPA LEAGUE 26/27 | 1ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-17T15:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -494,8 +524,18 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): VIKTORIA PLZEŇ X UNION SAINT-GILLOISE | EUROPA LEAGUE 26/27 | 1ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-17T15:55:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "Hf0M2Lpami8",
+      "url": "https://www.youtube.com/watch?v=Hf0M2Lpami8",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ATHLETIC BILBAO X ALAVÉS | LALIGA 26/27 | 7ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-19T11:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -509,6 +549,26 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "MLK8nR630jo",
+      "url": "https://www.youtube.com/watch?v=MLK8nR630jo",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: GETAFE X MÁLAGA | LALIGA 26/27 | 7ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-20T08:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "MaNDNAu0Dz0",
+      "url": "https://www.youtube.com/watch?v=MaNDNAu0Dz0",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): PARIS FC X STRASBOURG | LIGUE 1 26/27 | 5ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-19T12:10:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "OYrVnOXHC9g",
       "url": "https://www.youtube.com/watch?v=OYrVnOXHC9g",
       "fonte": "cazetv",
@@ -519,13 +579,33 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "OfxVU_xLCco",
-      "url": "https://www.youtube.com/watch?v=OfxVU_xLCco",
+      "video_id": "PHRIS8rRPao",
+      "url": "https://www.youtube.com/watch?v=PHRIS8rRPao",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): LEVSKI SOFIA X FC SALZBURG | EUROPA LEAGUE 26/27 | 1ª RODADA",
+      "titulo": "AO VIVO (SOM AMBIENTE): AUXERRE X BREST | LIGUE 1 26/27 | 5ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-17T13:40:00-03:00",
+      "inicio_programado": "2026-09-20T09:55:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "SUD2HZH1aCU",
+      "url": "https://www.youtube.com/watch?v=SUD2HZH1aCU",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): LE MANS X FC LORIENT | LIGUE 1 26/27 | 5ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-19T15:40:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "TmwEk5lnQpo",
+      "url": "https://www.youtube.com/watch?v=TmwEk5lnQpo",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: CELTA X RACING CLUB | LALIGA 26/27 | 7ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-19T13:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -549,23 +629,23 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "cDvqBEla-Vc",
+      "url": "https://www.youtube.com/watch?v=cDvqBEla-Vc",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: VFB STUTTGART X BORUSSIA DORTMUND | BUNDESLIGA 26/27 | 4ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-19T12:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "hy1RIIN7q7Q",
       "url": "https://www.youtube.com/watch?v=hy1RIIN7q7Q",
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: JUVENTUS X NEC NIJMEGEN | EUROPA LEAGUE 26/27 | 1ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-17T14:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "jEjVOYt-32Y",
-      "url": "https://www.youtube.com/watch?v=jEjVOYt-32Y",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: SORTEIO DA COPA DAVIS | QUADRA ABERTA",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-17T11:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -574,7 +654,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: REAL SOCIEDAD X BOURNEMOUTH | EUROPA LEAGUE 26/27 | 1ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-17T14:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -594,43 +674,68 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): CRYSTAL PALACE X LECH POZNAŃ | EUROPA LEAGUE 26/27 | 1ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-17T15:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "yzs_24bXpWg",
-      "url": "https://www.youtube.com/watch?v=yzs_24bXpWg",
+      "video_id": "w42u2aGp2zs",
+      "url": "https://www.youtube.com/watch?v=w42u2aGp2zs",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: REAL BETIS X GETAFE | LALIGA 26/27 | 6ª RODADA",
+      "titulo": "AO VIVO: SEVILLA X BARCELONA | LALIGA 26/27 | 7ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-17T13:30:00-03:00",
+      "inicio_programado": "2026-09-19T15:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "xXK4RtT1kVk",
+      "url": "https://www.youtube.com/watch?v=xXK4RtT1kVk",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): TOULOUSE X LE HAVRE | LIGUE 1 26/27 | 5ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-19T15:40:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "xgB1JN8nAQo",
+      "url": "https://www.youtube.com/watch?v=xgB1JN8nAQo",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): NICE X LILLE | LIGUE 1 26/27 | 5ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-20T12:10:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401912526",
+      "jogo": "Flamengo x Independiente del Valle",
+      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
+    }
+  ],
   "sem_transmissao": [
     {
-      "event_id": "401912540",
+      "event_id": "401912526",
       "rodada": 0,
       "competicao_chave": "libertadores",
       "competicao_nome": "Libertadores",
-      "jogo": "Corinthians x Estudiantes de La Plata",
-      "data_iso": "2026-09-16T21:30:00-03:00",
+      "jogo": "Flamengo x Independiente del Valle",
+      "data_iso": "2026-09-17T21:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 488,
+    "unidades": 87,
     "requisicoes": {
       "channels": 4,
-      "videos": 44,
-      "playlistItems": 40,
-      "search": 4
+      "videos": 43,
+      "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-16T21:44:47-03:00"
+  "atualizado_em": "2026-09-17T15:35:15-03:00"
 }
