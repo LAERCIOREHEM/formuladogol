@@ -1,9 +1,8 @@
 {
-  "atualizado_em": "2026-09-16T21:40:53.742796-03:00",
-  "atualizado_em_br": "16/09/2026 21:40 BRT",
+  "atualizado_em": "2026-09-17T00:11:30.740327-03:00",
+  "atualizado_em_br": "17/09/2026 00:11 BRT",
   "fonte": "ESPN",
   "fontes_complementares": [
-    "ESPN summary",
     "override manual"
   ],
   "fallbacks_resultado": [
@@ -24,15 +23,6 @@
       "fonte": "override manual",
       "origem": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial."
-    },
-    {
-      "event_id": "401841176",
-      "rodada": 21,
-      "jogo": "Botafogo x Grêmio",
-      "placar": "3 x 2",
-      "fonte": "ESPN summary",
-      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841176",
-      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
     }
   ],
   "rodada_atual": 21,
@@ -315,7 +305,6 @@
       "data_definir": false,
       "fonte_calendario": "CBF oficial — agenda de credenciamento",
       "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
-      "data_espn_original": "2026-07-29T15:00",
       "placar_mandante": 0,
       "placar_visitante": 0
     },

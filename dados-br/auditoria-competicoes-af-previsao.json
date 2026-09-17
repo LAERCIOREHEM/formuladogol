@@ -2,12 +2,12 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-09-16T21:41:22-03:00",
+  "gerado_em": "2026-09-17T00:12:05-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "mudanca_esportiva": true,
-  "hash_estado_antes": "32ed518757ae820ec273a8d68c331079daa7487287294ab4eaf6c7834cae885c",
-  "hash_estado_depois": "965b81713b431712f7ec4a5c2fbf34a1d833bb38217daebedf3bcbf4dddf2ebd",
+  "hash_estado_antes": "965b81713b431712f7ec4a5c2fbf34a1d833bb38217daebedf3bcbf4dddf2ebd",
+  "hash_estado_depois": "98c75ce1c597b671474ca39e0474df9c21f9df5be75f1046da77f818df6bf1e0",
   "fonte": "ESPN",
   "temporada": 2026,
   "competicoes": [
@@ -17,11 +17,11 @@
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
       "gerado_em": "2026-09-15T05:13:36-03:00",
       "cache_efetivo_minutos": 45,
-      "erro": "copa_do_brasil: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard?dates=20260826-20261006&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
+      "erro": "copa_do_brasil: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard?dates=20260827-20261007&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
       "fallback_seguro_para_af": true,
       "motivos_fallback": [],
       "alertas_fallback": [
-        "snapshot anterior tem 40.5h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
+        "snapshot anterior tem 43.0h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
       ],
       "summary_partidas_iniciadas": {
         "consultados": 0,
@@ -38,11 +38,11 @@
       "competicao": "libertadores",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-09-16T21:41:15-03:00",
+      "gerado_em": "2026-09-17T00:11:58-03:00",
       "cache_efetivo_minutos": 5,
       "eventos": 155,
-      "finalizados": 148,
-      "pendentes": 7,
+      "finalizados": 149,
+      "pendentes": 6,
       "fase_atual": {
         "status": "em_andamento",
         "ordem": 700,
@@ -51,16 +51,14 @@
         "eventos_pendentes": 1
       },
       "recuperacao": "summary_individual_apos_falha_scoreboard",
-      "erro_scoreboard": "libertadores: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=20260826-20261006&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
+      "erro_scoreboard": "libertadores: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=20260827-20261007&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
       "summary_partidas_iniciadas": {
-        "consultados": 2,
-        "confirmados": 2,
-        "atualizados": 2,
-        "ao_vivo": [
-          "401912540"
-        ],
+        "consultados": 1,
+        "confirmados": 1,
+        "atualizados": 1,
+        "ao_vivo": [],
         "finalizados": [
-          "401912525"
+          "401912540"
         ],
         "pendentes": [],
         "pendentes_vencidos": [],
@@ -72,16 +70,14 @@
         "janela_fim": "2027-01-13T23:59:59-03:00",
         "requisicoes": 4,
         "ultima_completa_em": "2026-09-13T05:13:02-03:00",
-        "ajustes_editoriais_aplicados": 2,
+        "ajustes_editoriais_aplicados": 1,
         "summary_partidas_iniciadas": {
-          "consultados": 2,
-          "confirmados": 2,
-          "atualizados": 2,
-          "ao_vivo": [
-            "401912540"
-          ],
+          "consultados": 1,
+          "confirmados": 1,
+          "atualizados": 1,
+          "ao_vivo": [],
           "finalizados": [
-            "401912525"
+            "401912540"
           ],
           "erros": []
         }
@@ -89,58 +85,30 @@
     },
     {
       "competicao": "sul_americana",
-      "status": "atualizado",
+      "status": "preservado_apos_falha_seguro",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
       "gerado_em": "2026-09-16T21:41:22-03:00",
-      "cache_efetivo_minutos": 5,
-      "eventos": 152,
-      "finalizados": 151,
-      "pendentes": 1,
-      "fase_atual": {
-        "status": "em_andamento",
-        "ordem": 700,
-        "nome": "Quartas de final",
-        "eventos": 5,
-        "eventos_pendentes": 1
-      },
-      "recuperacao": "summary_individual_apos_falha_scoreboard",
-      "erro_scoreboard": "sul_americana: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard?dates=20260826-20261006&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
+      "cache_efetivo_minutos": 45,
+      "erro": "sul_americana: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard?dates=20260827-20261007&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
+      "fallback_seguro_para_af": true,
+      "motivos_fallback": [],
+      "alertas_fallback": [],
       "summary_partidas_iniciadas": {
-        "consultados": 1,
-        "confirmados": 1,
-        "atualizados": 1,
+        "consultados": 0,
+        "confirmados": 0,
+        "atualizados": 0,
         "ao_vivo": [],
-        "finalizados": [
-          "401913071"
-        ],
+        "finalizados": [],
         "pendentes": [],
         "pendentes_vencidos": [],
         "erros": []
-      },
-      "coleta": {
-        "modo": "incremental",
-        "janela_inicio": "2026-08-25T00:00:00-03:00",
-        "janela_fim": "2027-01-13T23:59:59-03:00",
-        "requisicoes": 4,
-        "ultima_completa_em": "2026-09-12T05:15:07-03:00",
-        "ajustes_editoriais_aplicados": 0,
-        "summary_partidas_iniciadas": {
-          "consultados": 1,
-          "confirmados": 1,
-          "atualizados": 1,
-          "ao_vivo": [],
-          "finalizados": [
-            "401913071"
-          ],
-          "erros": []
-        }
       }
     }
   ],
   "falhas": [
-    "copa_do_brasil: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard?dates=20260826-20261006&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
-    "libertadores: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=20260826-20261006&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
-    "sul_americana: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard?dates=20260826-20261006&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden"
+    "copa_do_brasil: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard?dates=20260827-20261007&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
+    "libertadores: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=20260827-20261007&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
+    "sul_americana: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard?dates=20260827-20261007&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden"
   ],
   "falhas_bloqueantes": [],
   "fontes_totalmente_atualizadas": false,

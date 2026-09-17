@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-09-16T21:41:15-03:00",
+  "gerado_em": "2026-09-17T00:11:58-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -21,8 +21,8 @@
   },
   "resumo": {
     "eventos": 155,
-    "finalizados": 148,
-    "pendentes": 7,
+    "finalizados": 149,
+    "pendentes": 6,
     "equipes": 49,
     "equipes_serie_a_2026": 8
   },
@@ -32,16 +32,14 @@
     "janela_fim": "2027-01-13T23:59:59-03:00",
     "requisicoes": 4,
     "ultima_completa_em": "2026-09-13T05:13:02-03:00",
-    "ajustes_editoriais_aplicados": 2,
+    "ajustes_editoriais_aplicados": 1,
     "summary_partidas_iniciadas": {
-      "consultados": 2,
-      "confirmados": 2,
-      "atualizados": 2,
-      "ao_vivo": [
-        "401912540"
-      ],
+      "consultados": 1,
+      "confirmados": 1,
+      "atualizados": 1,
+      "ao_vivo": [],
       "finalizados": [
-        "401912525"
+        "401912540"
       ],
       "erros": []
     }
@@ -5845,9 +5843,9 @@
     {
       "event_id": "401912540",
       "data_iso": "2026-09-16T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qua., Setembro 16º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "FT",
       "fase": "2026 CONMEBOL Libertadores, Quarterfinals",
       "fase_ordem": 900,
       "semana": null,
@@ -5872,10 +5870,10 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": false,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 1
       },
-      "vencedor": null,
+      "vencedor": "Estudiantes de La Plata",
       "penaltis": false,
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",

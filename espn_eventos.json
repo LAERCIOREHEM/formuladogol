@@ -1,8 +1,7 @@
 {
-  "atualizado_em": "2026-09-16T21:40:53.742796-03:00",
+  "atualizado_em": "2026-09-17T00:11:30.740327-03:00",
   "fonte": "ESPN",
   "fontes_complementares": [
-    "ESPN summary",
     "override manual"
   ],
   "fallbacks_resultado": [
@@ -23,15 +22,6 @@
       "fonte": "override manual",
       "origem": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial."
-    },
-    {
-      "event_id": "401841176",
-      "rodada": 21,
-      "jogo": "Botafogo x Grêmio",
-      "placar": "3 x 2",
-      "fonte": "ESPN summary",
-      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841176",
-      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
     }
   ],
   "total": 370,
@@ -7816,7 +7806,7 @@
       "visitante": "Grêmio",
       "estadio": "Joao Havelange Stadium",
       "transmissao": "",
-      "status": "FT",
+      "status": "90'+10'",
       "estado": "post",
       "concluido": true,
       "placar_mandante": 3,
@@ -7832,9 +7822,9 @@
       "motivo_ajuste": "",
       "resultado_manual": false,
       "resultado_fallback": false,
-      "fonte_resultado": "ESPN summary",
-      "origem_resultado": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841176",
-      "motivo_fallback": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN.",
+      "fonte_resultado": "ESPN",
+      "origem_resultado": "",
+      "motivo_fallback": "",
       "motivo_resultado_manual": ""
     },
     {
@@ -8145,7 +8135,7 @@
       "fonte_evento": "ESPN",
       "fonte_calendario": "CBF oficial — agenda de credenciamento",
       "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
-      "data_espn_original": "2026-07-29T15:00",
+      "data_espn_original": "",
       "finalizado_em": "",
       "rodada_corrigida_de": 1,
       "motivo_ajuste": "rodada reconciliada pela matriz canônica de 380 jogos",
