@@ -3,9 +3,10 @@
 
 Princípios:
 - só é chamada depois que o gerador determinístico confirmou que há matéria elegível;
-- recebe um dossiê factual fechado e não pesquisa a web;
+- recebe um pacote factual fechado e não pesquisa a web;
 - devolve somente JSON estruturado;
 - nunca altera placares, probabilidades ou qualquer cálculo do projeto;
+- para continentais, usa uma segunda passagem de copy desk por padrão;
 - se a API falhar, o gerador chamador pode usar seu fallback determinístico.
 """
 from __future__ import annotations
@@ -19,7 +20,7 @@ from typing import Any, Mapping, Sequence
 
 DEFAULT_MODEL = "gpt-5.6-sol"
 DEFAULT_REASONING = "high"
-DEFAULT_MAX_OUTPUT_TOKENS = 9000
+DEFAULT_MAX_OUTPUT_TOKENS = 12000
 OPENAI_URL = "https://api.openai.com/v1/responses"
 
 
@@ -40,41 +41,47 @@ def _extract_output_text(response: Mapping[str, Any]) -> str:
 
 # Espelha a lista que cada gerador aplica na validação da saída.
 _TERMOS_BANIDOS: dict[str, tuple[str, ...]] = {
-    "continentais": ("dossiê", "snapshot", "a narrativa", "mergulhar", "jornada"),
+    "continentais": (
+        "dossiê",
+        "snapshot",
+        "a narrativa",
+        "mergulhar",
+        "jornada",
+        "vale destacar",
+        "o futebol nos ensina",
+        "mais do que nunca",
+    ),
     "copa_do_brasil": ("vale destacar", "a narrativa", "mergulhar", "jornada", "dossiê", "snapshot oficial"),
     "rodada": ("vale destacar", "a narrativa", "mergulhar", "jornada", "o futebol nos ensina", "mais do que nunca", "dossiê factual", "snapshot"),
 }
 
 
 def termos_proibidos_para_prompt(termos: Sequence[str]) -> str:
-    """Repassa ao modelo a MESMA lista que o validador aplica na saída.
-
-    Sem isto o prompt fala em "dossiê" o tempo todo e o modelo devolve a
-    palavra, sendo reprovado por um critério que nunca lhe foi informado.
-    """
+    """Repassa ao modelo a MESMA lista que o validador aplica na saída."""
     if not termos:
         return ""
     lista = ", ".join(f'"{t}"' for t in termos)
     return (
-        f" PROIBIDO ESCREVER, em qualquer campo do JSON, os termos: {lista}. "
+        f"PROIBIDO ESCREVER, em qualquer campo do JSON, os termos: {lista}. "
         "Eles reprovam o texto automaticamente. Ao se referir ao material de apoio, escreva "
-        "'os números do Fórmula do Gol' ou simplesmente apresente o fato, nunca o nome do arquivo ou do processo interno."
+        "'os números do Fórmula do Gol' ou simplesmente apresente o fato; nunca exponha nomes de arquivos, "
+        "rotinas, hashes, processos internos ou o funcionamento da IA."
     )
 
 
 def _base_instruction() -> str:
     return (
-        "Você é o editor-chefe esportivo do Fórmula do Gol. Escreva como um jornalista esportivo brasileiro experiente, "
-        "com domínio de manchetes, SEO, marketing editorial e leitura de probabilidades. O objetivo é transformar um fechamento "
-        "esportivo já auditado em uma matéria que tenha notícia, hierarquia, consequência e chamariz, sem sensacionalismo vazio. "
-        "Use SOMENTE fatos e números presentes no dossiê. Não invente jogadores, autores de gols, declarações, ambiente de estádio, "
-        "desempenho tático, causas ou chaveamentos que o dossiê não informe. Números são bem-vindos: placares, agregados, percentuais "
-        "e variações devem aparecer quando forem jornalisticamente relevantes. Abra pelo fato mais forte, não por metodologia. "
-        "A metodologia e a auditabilidade pertencem ao rodapé da página e não devem dominar a redação. Evite linguagem de relatório, "
-        "frases burocráticas como 'o quadro ficou definido', clichês vazios, autoelogio do modelo e explicações sobre o próprio processo de IA. "
-        "A manchete deve nomear clubes e o acontecimento central sempre que possível. A linha fina deve acrescentar consequência, não repetir o título. "
-        "Priorize: fato novo -> protagonistas -> consequência esportiva -> probabilidades -> próximo objetivo. "
-        "Entregue exclusivamente o JSON compatível com o schema solicitado."
+        "Você é o editor-chefe esportivo do Fórmula do Gol, com padrão de redação de uma mesa internacional de futebol. "
+        "Escreva em português do Brasil com precisão, ritmo, hierarquia jornalística e leitura analítica dos números. "
+        "A matéria deve parecer escrita por um editor esportivo sênior: abertura forte, desenvolvimento fluido, consequência esportiva clara e análise quantitativa útil. "
+        "Use SOMENTE fatos e números presentes no pacote factual. Não invente jogadores, autores de gols, declarações, público, ambiente de estádio, tática, lesões, causas ou chaveamentos que não estejam explicitamente fornecidos. "
+        "Não transforme o texto em relatório, ata, lista de placares ou documentação técnica. Sintetize os confrontos e explique por que os resultados importam. "
+        "Quando houver probabilidades, diferencie com precisão a chance TOTAL de Libertadores da contribuição de uma via específica; nunca trate as duas como sinônimos. "
+        "A manchete deve ter notícia e personalidade sem clickbait. A linha fina deve acrescentar contexto e consequência. "
+        "Os parágrafos devem variar construção e tamanho; evite começar várias frases da mesma maneira. "
+        "Priorize: fato mais relevante -> tensão/virada da fase -> quadro dos classificados e eliminados -> efeito nas probabilidades -> próximo desafio quando fornecido. "
+        "Não explique metodologia no corpo salvo quando indispensável para evitar interpretação errada de um número. "
+        "Entregue exclusivamente JSON compatível com o schema solicitado."
     )
 
 
@@ -82,7 +89,7 @@ def _specific_instruction(kind: str) -> str:
     if kind == "copa_do_brasil":
         return (
             "Para Copa do Brasil: trate o último confronto encerrado como gancho quando ele completar a fase; apresente todos os classificados logo no início; "
-            "use os placares agregados relevantes; conecte explicitamente a classificação às probabilidades de Libertadores. Se o dossiê trouxer uma regra "
+            "use os placares agregados relevantes; conecte explicitamente a classificação às probabilidades de Libertadores. Se o material trouxer uma regra "
             "de qualificação continental, explique-a com precisão. Em semifinal, diga 'avançar à final' ou 'vencer o confronto da semifinal', nunca 'vencer o próximo jogo' "
             "quando a fase for de ida e volta. Dê destaque aos maiores saltos e quedas de probabilidade sem confundir chance total de Libertadores com a via Copa do Brasil."
         )
@@ -90,77 +97,127 @@ def _specific_instruction(kind: str) -> str:
         return (
             "Para Brasileirão: a manchete deve refletir o principal acontecimento da rodada e, preferencialmente, nomear os clubes envolvidos. "
             "Cruze resultados com as maiores mudanças de título, Libertadores e rebaixamento. Use posição, pontos e percentuais quando ajudarem a explicar a notícia. "
-            "Não faça uma seção para cada métrica por obrigação; construa uma narrativa de rodada."
+            "Não faça uma seção para cada métrica por obrigação; construa uma matéria de rodada."
         )
     if kind == "continentais":
         return (
-            "Para Libertadores/Sul-Americana: antes de redigir, audite o fechamento CONJUNTO do recorte brasileiro das duas competições. "
-            "A fase só está fechada quando todos os confrontos da fase que envolveram ao menos um clube brasileiro estão resolvidos; jogos exclusivamente estrangeiros não bloqueiam. "
-            "Preencha o objeto auditoria estritamente com os classificados e eliminados recebidos no dossiê. Se houver qualquer contradição factual, marque consistente=false e não tente conciliá-la por memória. "
-            "Depois, destaque quem avançou e quem caiu, use agregados e decisões por pênaltis quando constarem no dossiê, e conecte o resultado ao impacto nas probabilidades dos clubes brasileiros. "
-            "Em confronto decidido nos pênaltis, o vencedor dos 90/120 minutos NÃO define o classificado: use exclusivamente o classificado/vencedor_penaltis já auditado no pacote factual. "
-            "A IA não cria fatos, não decide placares e não transforma partida pendente em encerrada; ela apenas audita o pacote factual já fechado deterministicamente."
+            "Para Libertadores/Sul-Americana, escreva uma matéria de fechamento de fase, não uma enumeração de sete confrontos. "
+            "Primeiro audite o fechamento CONJUNTO do recorte brasileiro: a fase só está fechada quando todos os confrontos da fase que envolveram ao menos um clube brasileiro estão resolvidos; jogos exclusivamente estrangeiros não bloqueiam. "
+            "Preencha o objeto auditoria estritamente com os classificados e eliminados recebidos. Se houver qualquer contradição factual, marque consistente=false e não tente conciliá-la por memória. "
+            "Em confronto decidido nos pênaltis, o vencedor dos 90/120 minutos NÃO define o classificado: use exclusivamente classificado/vencedor_penaltis já auditado. "
+            "Na prosa, escolha os dois ou três acontecimentos que realmente definiram a fase e trate os demais com síntese. Evite o molde repetitivo 'Na Libertadores..., No fim...'. "
+            "A matéria ideal tem 4 seções e aproximadamente 450 a 800 palavras de prosa: (1) abertura/saldo brasileiro; (2) Libertadores; (3) Sul-Americana; (4) leitura das probabilidades e/ou semifinais. "
+            "Mencione TODOS os clubes brasileiros participantes ao menos uma vez, mas não desperdice um parágrafo isolado para cada clube. "
+            "Quando houver virada de confronto, derrota na volta com classificação no agregado ou decisão por pênaltis, use isso como matéria-prima editorial. "
+            "Se 'contexto_verificado.proximos_confrontos' estiver presente, cite os confrontos da fase seguinte exatamente como fornecidos e não invente datas. "
+            "Se houver movimentos de probabilidade, selecione apenas os mais informativos: maior alta, maior queda e um caso contraintuitivo relevante. "
+            "O texto deve explicar o significado esportivo dos números, não apenas repeti-los. "
+            "A IA não cria fatos, não decide placares, não altera classificados e não transforma partida pendente em encerrada."
         )
     raise EditorialAIError(f"tipo editorial desconhecido: {kind}")
 
 
-def build_payload(kind: str, dossier: Mapping[str, Any], schema: Mapping[str, Any], model: str | None = None) -> dict[str, Any]:
-    selected_model = (model or os.environ.get("OPENAI_EDITORIAL_MODEL") or os.environ.get("OPENAI_MODEL") or DEFAULT_MODEL).strip()
-    reasoning = (os.environ.get("OPENAI_EDITORIAL_REASONING") or DEFAULT_REASONING).strip()
+def _schema_format(kind: str, schema: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "type": "json_schema",
+        "name": f"editorial_fdg_{kind}",
+        "strict": True,
+        "schema": dict(schema),
+    }
+
+
+def _selected_model(model: str | None = None) -> str:
+    return (model or os.environ.get("OPENAI_EDITORIAL_MODEL") or os.environ.get("OPENAI_MODEL") or DEFAULT_MODEL).strip()
+
+
+def _reasoning() -> str:
+    return (os.environ.get("OPENAI_EDITORIAL_REASONING") or DEFAULT_REASONING).strip()
+
+
+def _max_tokens() -> int:
     try:
-        max_tokens = int(os.environ.get("OPENAI_EDITORIAL_MAX_TOKENS") or DEFAULT_MAX_OUTPUT_TOKENS)
+        return int(os.environ.get("OPENAI_EDITORIAL_MAX_TOKENS") or DEFAULT_MAX_OUTPUT_TOKENS)
     except ValueError:
-        max_tokens = DEFAULT_MAX_OUTPUT_TOKENS
+        return DEFAULT_MAX_OUTPUT_TOKENS
+
+
+def build_payload(kind: str, dossier: Mapping[str, Any], schema: Mapping[str, Any], model: str | None = None) -> dict[str, Any]:
     instruction = _base_instruction() + "\n\n" + _specific_instruction(kind)
     banidos = _TERMOS_BANIDOS.get(kind)
     if banidos:
         instruction += "\n\n" + termos_proibidos_para_prompt(banidos)
     return {
-        "model": selected_model,
+        "model": _selected_model(model),
         "store": False,
-        "reasoning": {"effort": reasoning},
+        "reasoning": {"effort": _reasoning()},
         "input": [
             {"role": "developer", "content": instruction},
             {
                 "role": "user",
                 "content": (
-                    "Dossiê factual auditado. Todo número utilizável está aqui; não complete lacunas por memória:\n"
+                    "Pacote factual auditado. Todo fato e número utilizável está abaixo; não complete lacunas por memória e não pesquise nada fora dele:\n"
                     + json.dumps(dossier, ensure_ascii=False, separators=(",", ":"))
                 ),
             },
         ],
-        "max_output_tokens": max_tokens,
-        "text": {
-            "format": {
-                "type": "json_schema",
-                "name": f"editorial_fdg_{kind}",
-                "strict": True,
-                "schema": dict(schema),
-            }
-        },
+        "max_output_tokens": _max_tokens(),
+        "text": {"format": _schema_format(kind, schema)},
     }
 
 
-def generate_editorial(kind: str, dossier: Mapping[str, Any], schema: Mapping[str, Any]) -> tuple[dict[str, Any], str]:
+def build_review_payload(kind: str, dossier: Mapping[str, Any], draft: Mapping[str, Any], schema: Mapping[str, Any], model: str | None = None) -> dict[str, Any]:
+    """Segunda passagem de copy desk sem abrir espaço para novos fatos."""
+    instruction = (
+        _base_instruction()
+        + "\n\n"
+        + _specific_instruction(kind)
+        + "\n\nVocê agora atua como COPY DESK FINAL. Receberá o pacote factual e um rascunho já estruturado. "
+        "Reescreva o rascunho para elevar clareza, ritmo, hierarquia, precisão e densidade informativa. "
+        "Preserve EXATAMENTE os fatos auditados, os status de classificação e os números; não acrescente nenhum fato que não esteja no pacote. "
+        "A auditoria do JSON final deve refletir somente o pacote factual, não sua opinião sobre o rascunho. "
+        "Elimine redundância, enumeração mecânica e frases burocráticas. Dê ao texto uma abertura com notícia, transições naturais e um fechamento que aponte a consequência esportiva. "
+        "Não imite a voz de nenhum jornalista específico; use apenas o padrão de qualidade de uma redação internacional de alto nível."
+    )
+    banidos = _TERMOS_BANIDOS.get(kind)
+    if banidos:
+        instruction += "\n\n" + termos_proibidos_para_prompt(banidos)
+    return {
+        "model": _selected_model(model),
+        "store": False,
+        "reasoning": {"effort": _reasoning()},
+        "input": [
+            {"role": "developer", "content": instruction},
+            {
+                "role": "user",
+                "content": (
+                    "PACOTE FACTUAL:\n"
+                    + json.dumps(dossier, ensure_ascii=False, separators=(",", ":"))
+                    + "\n\nRASCUNHO A SER EDITADO:\n"
+                    + json.dumps(draft, ensure_ascii=False, separators=(",", ":"))
+                ),
+            },
+        ],
+        "max_output_tokens": _max_tokens(),
+        "text": {"format": _schema_format(kind, schema)},
+    }
+
+
+def _call_structured(payload: Mapping[str, Any]) -> tuple[dict[str, Any], str]:
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not api_key:
         raise EditorialAIError("OPENAI_API_KEY não configurada")
-    payload = build_payload(kind, dossier, schema)
     body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     request = urllib.request.Request(
         OPENAI_URL,
         data=body,
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        },
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=120) as raw:
+        with urllib.request.urlopen(request, timeout=180) as raw:
             response = json.loads(raw.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")[:1500]
+        detail = exc.read().decode("utf-8", errors="replace")[:2000]
         raise EditorialAIError(f"OpenAI HTTP {exc.code}: {detail}") from exc
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
         raise EditorialAIError(f"falha ao chamar OpenAI: {exc}") from exc
@@ -177,8 +234,25 @@ def generate_editorial(kind: str, dossier: Mapping[str, Any], schema: Mapping[st
         raise EditorialAIError(f"JSON editorial inválido: {exc}") from exc
     if not isinstance(parsed, dict):
         raise EditorialAIError("editorial OpenAI não é objeto JSON")
-    model = str(response.get("model") or payload["model"])
-    return parsed, f"openai:{model}:editorial-dedicado-v3"
+    return parsed, str(response.get("model") or payload.get("model") or "")
+
+
+def _review_enabled(kind: str) -> bool:
+    if kind != "continentais":
+        return False
+    value = (os.environ.get("OPENAI_EDITORIAL_REVIEW") or "1").strip().lower()
+    return value not in {"0", "false", "no", "off"}
+
+
+def generate_editorial(kind: str, dossier: Mapping[str, Any], schema: Mapping[str, Any]) -> tuple[dict[str, Any], str]:
+    """Gera editorial estruturado; continentais passam por redação + copy desk."""
+    payload = build_payload(kind, dossier, schema)
+    draft, model = _call_structured(payload)
+    if _review_enabled(kind):
+        review_payload = build_review_payload(kind, dossier, draft, schema, model=model or None)
+        reviewed, review_model = _call_structured(review_payload)
+        return reviewed, f"openai:{review_model or model}:editorial-dedicado-v4:copydesk"
+    return draft, f"openai:{model}:editorial-dedicado-v4"
 
 
 def self_test() -> int:
@@ -200,7 +274,28 @@ def self_test() -> int:
     assert "não complete lacunas" in payload["input"][1]["content"]
     assert "avançar à final" in payload["input"][0]["content"]
     assert "api.openai.com" in OPENAI_URL
-    print("OK self-test: camada editorial dedicada, schema estruturado e prompt factual.")
+
+    continental_schema = {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {"titulo": {"type": "string"}},
+        "required": ["titulo"],
+    }
+    dossier = {
+        "classificados_brasileiros": ["Palmeiras"],
+        "eliminados_brasileiros": ["Corinthians"],
+        "contexto_verificado": {"proximos_confrontos": ["Fluminense x Palmeiras"]},
+    }
+    c_payload = build_payload("continentais", dossier, continental_schema, "gpt-5.6-sol")
+    instruction = c_payload["input"][0]["content"]
+    assert "copy" not in instruction.lower()  # primeira passagem continua sendo redação, não revisão
+    assert "450 a 800 palavras" in instruction
+    assert "proximos_confrontos" in instruction
+    assert "vencedor dos 90/120 minutos NÃO define" in instruction
+    review = build_review_payload("continentais", dossier, {"titulo": "Rascunho"}, continental_schema, "gpt-5.6-sol")
+    assert "COPY DESK FINAL" in review["input"][0]["content"]
+    assert _review_enabled("continentais") is True
+    print("OK self-test: camada editorial v4, Structured Outputs e copy desk continental em duas passagens.")
     return 0
 
 
