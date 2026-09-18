@@ -386,23 +386,34 @@ def _api_football_apply_final(event: dict[str, Any], row: dict[str, Any]) -> dic
     penalty = score.get("penalty") or {}
     ph = penalty.get("home")
     pa = penalty.get("away")
+    home_name = (updated.get("mandante") or {}).get("nome")
+    away_name = (updated.get("visitante") or {}).get("nome")
     if ph is not None and pa is not None:
-        updated["penaltis"] = {"mandante": int(ph), "visitante": int(pa)}
+        ph_i, pa_i = int(ph), int(pa)
+        updated["penaltis"] = {"mandante": ph_i, "visitante": pa_i}
+        if ph_i > pa_i:
+            updated["vencedor_penaltis"] = home_name
+        elif pa_i > ph_i:
+            updated["vencedor_penaltis"] = away_name
+        else:
+            updated["vencedor_penaltis"] = None
     else:
-        updated.pop("penaltis", None)
-    teams = row.get("teams") or {}
-    home_winner = (teams.get("home") or {}).get("winner")
-    away_winner = (teams.get("away") or {}).get("winner")
-    if home_winner is True:
-        updated["vencedor"] = (updated.get("mandante") or {}).get("nome")
-    elif away_winner is True:
-        updated["vencedor"] = (updated.get("visitante") or {}).get("nome")
-    elif int(home_goals) > int(away_goals):
-        updated["vencedor"] = (updated.get("mandante") or {}).get("nome")
+        updated["penaltis"] = False
+        updated["vencedor_penaltis"] = None
+
+    # Não usar teams.*.winner aqui: em fixtures encerrados em PEN alguns
+    # provedores usam esse booleano para o vencedor da CHAVE, enquanto o campo
+    # ``vencedor`` do snapshot significa vencedor da PARTIDA. A separação evita
+    # reproduzir LDU x Palmeiras/2026 como se a LDU tivesse vencido os pênaltis.
+    if int(home_goals) > int(away_goals):
+        updated["vencedor"] = home_name
     elif int(away_goals) > int(home_goals):
-        updated["vencedor"] = (updated.get("visitante") or {}).get("nome")
+        updated["vencedor"] = away_name
     else:
         updated["vencedor"] = None
+    for side_key, is_winner in (("mandante", updated["vencedor"] == home_name), ("visitante", updated["vencedor"] == away_name)):
+        if isinstance(updated.get(side_key), dict):
+            updated[side_key]["vencedor"] = bool(updated["vencedor"] and is_winner)
     updated["fonte_resultado_fallback"] = {
         "fonte": "API-Football",
         "fixture_id": ((row.get("fixture") or {}).get("id")),
@@ -484,6 +495,67 @@ def refresh_started_pending_with_api_football(
     if final_ids:
         refreshed["fonte"] = "ESPN + API-Football"
     return refreshed, collection["api_football_resgate_resultados"]
+
+
+def refresh_completed_penalty_events_with_api_football(
+    spec: CompetitionSpec,
+    snapshot: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Completa vencedor/placar de pênaltis quando a ESPN não os separa do jogo.
+
+    Só consulta partidas já concluídas e explicitamente marcadas como decididas
+    nos pênaltis, sem ``vencedor_penaltis`` confiável. É uma auditoria barata e
+    fail-closed: se a API-Football não confirmar a disputa, o snapshot permanece
+    sem vencedor dos pênaltis e o AF recusa zerar/classificar qualquer clube.
+    """
+    targets = [
+        event for event in (snapshot.get("eventos") or [])
+        if event.get("concluido")
+        and bool(event.get("penaltis"))
+        and not str(event.get("vencedor_penaltis") or "").strip()
+    ]
+    if not targets or not str(os.environ.get("API_FOOTBALL_KEY") or "").strip():
+        return snapshot, {
+            "consultados": 0, "corrigidos": [], "requisicoes": 0,
+            "erros": ([] if not targets else ["API_FOOTBALL_KEY ausente; auditoria de pênaltis não executada"]),
+        }
+    by_id = {str(item.get("event_id") or ""): copy.deepcopy(item) for item in (snapshot.get("eventos") or [])}
+    dates: dict[str, tuple[list[dict[str, Any]], dict[str, Any]]] = {}
+    corrected: list[str] = []
+    errors: list[str] = []
+    for original in targets:
+        event_id = str(original.get("event_id") or "").strip()
+        kickoff = parse_datetime(original.get("data_iso"))
+        if not event_id or kickoff is None:
+            continue
+        date_key = kickoff.strftime("%Y-%m-%d")
+        try:
+            if date_key not in dates:
+                dates[date_key] = _api_football_fetch_date(date_key)
+            rows, _meta = dates[date_key]
+            fixture = _api_football_select_fixture(rows, original)
+            if fixture is None:
+                errors.append(f"{event_id}: fixture não encontrado em {date_key}")
+                continue
+            parsed = _api_football_apply_final(original, fixture)
+            if parsed is None or not str(parsed.get("vencedor_penaltis") or "").strip():
+                errors.append(f"{event_id}: API-Football não confirmou vencedor dos pênaltis")
+                continue
+            by_id[event_id] = parsed
+            corrected.append(event_id)
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"{event_id}: {type(exc).__name__}: {exc}")
+    collection = dict(snapshot.get("coleta") or {})
+    collection["api_football_auditoria_penaltis"] = {
+        "consultados": len(targets), "corrigidos": corrected,
+        "datas_consultadas": sorted(dates), "requisicoes": _API_FOOTBALL_REQUESTS,
+        "remaining": _API_FOOTBALL_REMAINING, "reserva": API_FOOTBALL_RESERVE,
+        "erros": errors,
+    }
+    refreshed = build_snapshot_from_normalized(spec, list(by_id.values()), collection=collection) if corrected else copy.deepcopy(snapshot)
+    if corrected:
+        refreshed["fonte"] = "ESPN + API-Football"
+    return refreshed, collection["api_football_auditoria_penaltis"]
 
 
 def date_windows_between(
@@ -644,6 +716,17 @@ def team_payload(competitor: dict[str, Any], spec: CompetitionSpec) -> dict[str,
     }
 
 
+def shootout_score_value(competitor: Mapping[str, Any]) -> int | None:
+    """Extrai a pontuação da disputa de pênaltis sem confundir com o placar do jogo."""
+    for key in ("shootoutScore", "penaltyScore", "shootout", "penalties"):
+        if key not in competitor:
+            continue
+        value = score_value(competitor.get(key))
+        if value is not None:
+            return int(value)
+    return None
+
+
 def extract_event(event: dict[str, Any], spec: CompetitionSpec) -> dict[str, Any] | None:
     competitions = event.get("competitions") or []
     if not competitions or not isinstance(competitions[0], dict):
@@ -652,11 +735,14 @@ def extract_event(event: dict[str, Any], spec: CompetitionSpec) -> dict[str, Any
     competitors = competition.get("competitors") or []
     if len(competitors) != 2:
         return None
-    teams = [team_payload(item, spec) for item in competitors if isinstance(item, dict)]
+    raw_competitors = [item for item in competitors if isinstance(item, dict)]
+    teams = [team_payload(item, spec) for item in raw_competitors]
     if len(teams) != 2:
         return None
     home = next((item for item in teams if item["mandante"]), teams[0])
     away = next((item for item in teams if not item["mandante"]), teams[1])
+    raw_home = next((item for item in raw_competitors if item.get("homeAway") == "home"), raw_competitors[0])
+    raw_away = next((item for item in raw_competitors if item.get("homeAway") == "away"), raw_competitors[1])
     status_type = (event.get("status") or {}).get("type") or {}
     completed = bool(status_type.get("completed"))
     state = str(status_type.get("state") or ("post" if completed else "pre")).lower()
@@ -673,6 +759,17 @@ def extract_event(event: dict[str, Any], spec: CompetitionSpec) -> dict[str, Any
         leg = {}
     status_detail = str(status_type.get("detail") or status_type.get("shortDetail") or "").strip()
     winner = next((item["nome"] for item in teams if item["vencedor"]), None)
+    penalty_home = shootout_score_value(raw_home)
+    penalty_away = shootout_score_value(raw_away)
+    penalty_scores = None
+    penalty_winner = None
+    if penalty_home is not None and penalty_away is not None:
+        penalty_scores = {"mandante": int(penalty_home), "visitante": int(penalty_away)}
+        if penalty_home > penalty_away:
+            penalty_winner = home["nome"]
+        elif penalty_away > penalty_home:
+            penalty_winner = away["nome"]
+    status_penalties = bool("pen" in normalize_text(status_detail) or "penal" in normalize_text(status_detail))
     return {
         "event_id": str(event.get("id") or ""),
         "data_iso": event_date.isoformat() if event_date else str(event.get("date") or ""),
@@ -686,8 +783,12 @@ def extract_event(event: dict[str, Any], spec: CompetitionSpec) -> dict[str, Any
         "estadio": venue,
         "mandante": home,
         "visitante": away,
+        # ``vencedor`` representa somente o vencedor do jogo/tempo regulamentar.
+        # Em mata-mata, a decisão nos pênaltis é um fato diferente e precisa ser
+        # carregada explicitamente; nunca pode ser inferida deste campo.
         "vencedor": winner,
-        "penaltis": bool("pen" in normalize_text(status_detail) or "penal" in normalize_text(status_detail)),
+        "penaltis": penalty_scores if penalty_scores is not None else status_penalties,
+        "vencedor_penaltis": penalty_winner,
     }
 
 
@@ -776,7 +877,7 @@ def stabilize_unfinished_events_for_af(
         old = previous_by_id.get(event_id)
         if not old or event.get("concluido") or old.get("concluido"):
             continue
-        for field in ("estado", "status", "vencedor", "penaltis"):
+        for field in ("estado", "status", "vencedor", "penaltis", "vencedor_penaltis"):
             if field in old:
                 event[field] = copy.deepcopy(old.get(field))
         for side in ("mandante", "visitante"):
@@ -1895,6 +1996,9 @@ def run_update(
             snapshot, api_football_refresh = refresh_started_pending_with_api_football(
                 spec, snapshot
             )
+            snapshot, api_football_penalties = refresh_completed_penalty_events_with_api_football(
+                spec, snapshot
+            )
             snapshot = stabilize_unfinished_events_for_af(snapshot, previous)
             assert_no_overdue_pending(
                 snapshot, spec, grace_hours=max(4, live_window_hours)
@@ -1928,6 +2032,7 @@ def run_update(
                     "fase_atual": snapshot.get("fase_atual"),
                     "summary_partidas_iniciadas": summary_refresh,
                     "api_football_resgate_resultados": api_football_refresh,
+                    "api_football_auditoria_penaltis": api_football_penalties,
                     "coleta": snapshot.get("coleta") or {},
                 }
             )
@@ -1952,12 +2057,18 @@ def run_update(
             api_football_rescue: dict[str, Any] = {
                 "consultados": 0, "finalizados": [], "requisicoes": 0, "erros": [],
             }
+            api_football_penalty_rescue: dict[str, Any] = {
+                "consultados": 0, "corrigidos": [], "requisicoes": 0, "erros": [],
+            }
             rescued = previous
             try:
                 rescued, summary_rescue = refresh_started_pending_with_summaries(
                     spec, previous, grace_hours=max(4, live_window_hours)
                 )
                 rescued, api_football_rescue = refresh_started_pending_with_api_football(
+                    spec, rescued
+                )
+                rescued, api_football_penalty_rescue = refresh_completed_penalty_events_with_api_football(
                     spec, rescued
                 )
                 rescued = stabilize_unfinished_events_for_af(rescued, previous)
@@ -2001,6 +2112,7 @@ def run_update(
                         "erro_scoreboard": message,
                         "summary_partidas_iniciadas": summary_rescue,
                         "api_football_resgate_resultados": api_football_rescue,
+                        "api_football_auditoria_penaltis": api_football_penalty_rescue,
                         "coleta": rescued.get("coleta") or {},
                     }
                 )
@@ -2587,6 +2699,31 @@ def self_test() -> None:
     assert api_final["fase_ordem"] == 700 and api_final["perna"] == 2
     assert _api_football_name_similarity("LDU de Quito", "Liga de Quito") >= 0.9
     assert _api_football_name_similarity("Atlético Mineiro", "Atlético-MG") >= 0.9
+
+    # Regressão 2026-09-18: LDU venceu o jogo por 3x2, mas Palmeiras venceu
+    # a disputa por pênaltis por 4x3. Os dois fatos não podem compartilhar
+    # o mesmo campo ``vencedor``.
+    pen_event = {
+        "event_id": "401912525",
+        "data_iso": (now_brt() - timedelta(hours=3)).isoformat(),
+        "fase_ordem": 700, "fase": "Quartas de final", "perna": 2,
+        "estado": "pre", "concluido": False,
+        "mandante": {"nome": "Liga de Quito", "serie_a_2026": False, "placar": 0},
+        "visitante": {"nome": "Palmeiras", "serie_a_2026": True, "placar": 0},
+    }
+    pen_row = {
+        "fixture": {"id": 1001, "status": {"short": "PEN"}},
+        "teams": {
+            "home": {"name": "LDU Quito", "winner": False},
+            "away": {"name": "Palmeiras", "winner": True},
+        },
+        "goals": {"home": 3, "away": 2},
+        "score": {"fulltime": {"home": 3, "away": 2}, "penalty": {"home": 3, "away": 4}},
+    }
+    pen_final = _api_football_apply_final(pen_event, pen_row)
+    assert pen_final and pen_final["vencedor"] == "Liga de Quito"
+    assert pen_final["vencedor_penaltis"] == "Palmeiras"
+    assert pen_final["penaltis"] == {"mandante": 3, "visitante": 4}
 
     print("Self-test coleta AF-Previsão Continental incremental: OK")
 

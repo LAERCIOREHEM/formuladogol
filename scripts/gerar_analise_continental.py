@@ -7,6 +7,7 @@ import html
 import json
 import re
 import sys
+import unicodedata
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -158,6 +159,42 @@ def tie_key(event: Mapping[str, Any]) -> tuple[str, str]:
     return tuple(sorted((team_key(event.get('mandante') or {}), team_key(event.get('visitante') or {}))))
 
 
+def penalty_resolution(event: Mapping[str, Any]) -> tuple[str, dict[str, int] | None]:
+    """Retorna o vencedor da disputa de pênaltis, nunca o vencedor do jogo."""
+    raw = event.get('penaltis')
+    scores: dict[str, int] | None = None
+    if isinstance(raw, Mapping):
+        try:
+            home = int(raw.get('mandante')) if raw.get('mandante') is not None else None
+            away = int(raw.get('visitante')) if raw.get('visitante') is not None else None
+        except (TypeError, ValueError):
+            home = away = None
+        if home is not None and away is not None:
+            scores = {'mandante': home, 'visitante': away}
+    winner = str(event.get('vencedor_penaltis') or '').strip()
+    if not winner and scores is not None:
+        home_name = nm(event.get('mandante') or {})
+        away_name = nm(event.get('visitante') or {})
+        if scores['mandante'] > scores['visitante']:
+            winner = home_name
+        elif scores['visitante'] > scores['mandante']:
+            winner = away_name
+    # Compatibilidade histórica: somente overrides explicitamente auditados por
+    # event_id podem preencher uma disputa antiga sem placar estruturado. Isto
+    # não reabre a inferência perigosa por ``vencedor`` dos 90 minutos.
+    if not winner:
+        known = KNOWN_SHOOTOUTS.get(str(event.get('event_id') or ''))
+        if known:
+            winner = str(known.get('winner') or '').strip()
+            home_name = nm(event.get('mandante') or {})
+            ws, ls = int(known['winner_score']), int(known['loser_score'])
+            scores = {
+                'mandante': ws if home_name == winner else ls,
+                'visitante': ls if home_name == winner else ws,
+            }
+    return winner, scores
+
+
 def build_ties(comp: str, snapshot: Mapping[str, Any], rank: int) -> list[dict[str, Any]]:
     groups: dict[tuple[str, str], list[dict[str, Any]]] = {}
     for event in phase_events(snapshot, rank):
@@ -181,18 +218,22 @@ def build_ties(comp: str, snapshot: Mapping[str, Any], rank: int) -> list[dict[s
         # Platense (quartas/2026), por exemplo, o Platense venceu a volta por
         # 2 a 1, mas o Fluminense avançou por 3 a 2 no agregado.
         winner = ''
+        penalty_winner, penalty_scores = penalty_resolution(last)
         if len(legs) >= 2 and agg[team_key(a)] != agg[team_key(b)]:
             winner = nm(a) if agg[team_key(a)] > agg[team_key(b)] else nm(b)
         elif len(legs) >= 2 and bool(last.get('penaltis')):
-            # Com agregado empatado, somente uma decisão explicitamente
-            # marcada nos pênaltis pode usar o vencedor informado na volta.
-            winner = str(last.get('vencedor') or '').strip()
+            # Agregado empatado: somente o vencedor EXPLÍCITO da disputa pode
+            # classificar alguém. ``last.vencedor`` representa os 90/120 min e
+            # nunca é aceito como atalho (LDU 3x2 Palmeiras; Palmeiras 4x3 pen.).
+            winner = penalty_winner
         elif len(legs) < 2:
-            # Mantém compatibilidade para fixtures sintéticos/partida única;
-            # fases editoriais de ida e volta só são publicáveis quando a
-            # estrutura completa é validada em outro ponto.
-            winner = str(last.get('vencedor') or '').strip()
-        loser = next((x for x in (nm(a), nm(b)) if x != winner), '')
+            # Final em jogo único: se houver empate e pênaltis, usa a disputa;
+            # caso contrário, o vencedor factual da partida.
+            if int((last.get('mandante') or {}).get('placar') or 0) == int((last.get('visitante') or {}).get('placar') or 0) and bool(last.get('penaltis')):
+                winner = penalty_winner
+            else:
+                winner = str(last.get('vencedor') or '').strip()
+        loser = next((x for x in (nm(a), nm(b)) if winner and x != winner), '')
         brazilian = [nm(x) for x in (a, b) if br(x)]
         out.append({
             'competicao': comp,
@@ -206,6 +247,8 @@ def build_ties(comp: str, snapshot: Mapping[str, Any], rank: int) -> list[dict[s
             'brasileiros': brazilian,
             'br_classificados': [x for x in brazilian if x == winner],
             'penaltis': bool(last.get('penaltis')),
+            'vencedor_penaltis': penalty_winner,
+            'placar_penaltis': penalty_scores,
         })
     return sorted(out, key=lambda tie: (tie['competicao'], tie['times'][0], tie['times'][1]))
 
@@ -268,6 +311,10 @@ def rank_has_complete_two_leg_ties(snaps: Mapping[str, Mapping[str, Any]], rank:
             if len(legs) != 2 or leg_numbers != {1, 2}:
                 return False
             if not all(bool(event.get('concluido')) for event in legs):
+                return False
+            # Uma chave empatada no agregado sem vencedor explícito da disputa
+            # não está factualmente resolvida, ainda que a fonte marque FINAL.
+            if not str(tie.get('vencedor') or '').strip() or not str(tie.get('eliminado') or '').strip():
                 return False
     return found
 
@@ -441,13 +488,66 @@ def crest(side: Mapping[str, Any]) -> str:
     return f'https://a.espncdn.com/i/teamlogos/soccer/500/{tid}.png' if tid else ''
 
 
-def video_card(event_id: str, mm: Mapping[str, Any]) -> str:
-    video = (mm.get('jogos') or {}).get(str(event_id)) or {}
+def _video_norm(value: Any) -> str:
+    text = unicodedata.normalize('NFD', str(value or '').casefold())
+    text = ''.join(ch for ch in text if unicodedata.category(ch) != 'Mn')
+    return re.sub(r'\s+', ' ', re.sub(r'[^a-z0-9]+', ' ', text)).strip()
+
+
+def _video_aliases(name: str) -> set[str]:
+    base = _video_norm(name)
+    aliases = {base}
+    extras = {
+        'vasco da gama': 'vasco',
+        'atletico mg': 'atletico mineiro',
+        'liga de quito': 'ldu quito',
+        'estudiantes de la plata': 'estudiantes',
+        'independiente santa fe': 'santa fe',
+    }
+    if base in extras:
+        aliases.add(extras[base])
+    return {item for item in aliases if item}
+
+
+def video_entry_valid(video: Mapping[str, Any], event: Mapping[str, Any], comp: str) -> bool:
+    url = str(video.get('url') or '').strip()
+    title = str(video.get('titulo') or '').strip()
+    if not url or not title:
+        return False
+    normalized_title = f" {_video_norm(title)} "
+    for side in ('mandante', 'visitante'):
+        name = nm(event.get(side) or {})
+        if not any(f" {alias} " in normalized_title for alias in _video_aliases(name)):
+            return False
+    if comp == 'libertadores' and ' libertadores ' not in normalized_title:
+        return False
+    if comp == 'sul_americana' and not any(token in normalized_title for token in (' sudamericana ', ' sul americana ')):
+        return False
+    youtube = re.search(r'(?:v=|youtu\.be/|/live/)([A-Za-z0-9_-]{11})', url)
+    if youtube:
+        video_id = youtube.group(1)
+        if video.get('video_id') and str(video.get('video_id')) != video_id:
+            return False
+        if video.get('manual_verificado') is not True:
+            expected_channel = {
+                'libertadores': 'UCyuLjFPzlkMSYJpIpY8M6qA',
+                'sul_americana': 'UCFHE5FRBeksxt7YoFPGeKPw',
+            }.get(comp)
+            if expected_channel and str(video.get('channel_id') or '') != expected_channel:
+                return False
+        return True
+    # URL externa só é aceita quando houve verificação manual explícita.
+    return video.get('manual_verificado') is True
+
+
+def video_card(event: Mapping[str, Any], comp: str, mm: Mapping[str, Any]) -> str:
+    event_id = str(event.get('event_id') or '')
+    video = (mm.get('jogos') or {}).get(event_id) or {}
+    if not video_entry_valid(video, event, comp):
+        return '<p class="analysis-video-missing">Melhores momentos ainda não vinculados ou aguardando validação.</p>'
     url = str(video.get('url') or '').strip()
     title = esc(video.get('titulo') or 'Melhores momentos')
     source = esc(video.get('fonte') or 'Vídeo')
-    if not url:
-        return '<p class="analysis-video-missing">Melhores momentos ainda não vinculados.</p>'
     match = re.search(r'(?:v=|youtu\.be/|/live/)([A-Za-z0-9_-]{11})', url)
     vid = match.group(1) if match else ''
     if vid and video.get('embeddable') is True:
@@ -466,6 +566,14 @@ def video_card(event_id: str, mm: Mapping[str, Any]) -> str:
 def penalty_text(tie: Mapping[str, Any]) -> str:
     if not tie.get('penaltis'):
         return ''
+    scores = tie.get('placar_penaltis')
+    if isinstance(scores, Mapping) and scores.get('mandante') is not None and scores.get('visitante') is not None:
+        last = (tie.get('pernas') or [{}])[-1]
+        home_name = nm(last.get('mandante') or {})
+        a_name = nm((tie.get('team_objs') or [{}, {}])[0])
+        home_score, away_score = int(scores['mandante']), int(scores['visitante'])
+        a_score, b_score = (home_score, away_score) if a_name == home_name else (away_score, home_score)
+        return f'<span> · Pênaltis {a_score}–{b_score}</span>'
     last_event_id = str((tie.get('pernas') or [{}])[-1].get('event_id') or '')
     known = KNOWN_SHOOTOUTS.get(last_event_id)
     if not known:
@@ -498,7 +606,7 @@ def render_tie(tie: Mapping[str, Any], idx: int, mm: Mapping[str, Any]) -> str:
             f'<div class="analysis-cup-leg"><span>{label}</span>'
             f'<time datetime="{esc(event.get("data_iso"))}">{date_label(str(event.get("data_iso") or ""))}</time>'
             f'<p>{esc(nm(home))} <b>{int(home.get("placar") or 0)} × {int(away.get("placar") or 0)}</b> {esc(nm(away))}</p>'
-            f'<small>📍 {esc(event.get("estadio") or "—")}</small>{video_card(eid, mm)}</div>'
+            f'<small>📍 {esc(event.get("estadio") or "—")}</small>{video_card(event, tie["competicao"], mm)}</div>'
         )
     return (
         f'<article class="analysis-cup-tie"><header><span>{esc(COMP_NAMES[tie["competicao"]])} · CONFRONTO {idx}</span><b>ENCERRADO</b></header>'
@@ -741,6 +849,24 @@ def validate_continental_editorial(editorial: Mapping[str, Any], dossier: Mappin
         raise ContinentalEditorialError('editorial continental não menciona clubes do dossiê')
     if any(term in folded for term in TERMOS_PROIBIDOS):
         raise ContinentalEditorialError('editorial continental contém linguagem burocrática/artificial')
+
+    # A auditoria estruturada correta não basta se a prosa contradisser o
+    # próprio JSON. Cada sentença que cita um clube é checada contra seu status.
+    sentences = [part.casefold() for part in re.split(r'[.!?;\n]+', ' '.join(values)) if part.strip()]
+    def status_near_club(sentence: str, club: str, terms: str) -> bool:
+        # O verbo/status precisa estar semanticamente ligado ao clube, não apenas
+        # aparecer na mesma frase (ex.: 'Botafogo venceu, mas Cienciano avançou').
+        key = re.escape(club.casefold())
+        return bool(re.search(rf'{key}.{{0,35}}\b(?:{terms})\b', sentence))
+    for club in expected_qualified:
+        for sentence in sentences:
+            if status_near_club(sentence, club, r'eliminad[oa]s?|caiu|despediu-se|se despediu|ficou pelo caminho'):
+                raise ContinentalEditorialError(f'prosa contradiz classificado factual: {club}')
+    for club in expected_eliminated:
+        for sentence in sentences:
+            if status_near_club(sentence, club, r'classificad[oa]s?|avançou|avancou|segue vivo|semifinalista'):
+                raise ContinentalEditorialError(f'prosa contradiz eliminado factual: {club}')
+
     words = len(re.findall(r'\b[\wÀ-ÿ-]+\b', ' '.join(p for sec in sections for p in sec.get('paragrafos') or [])))
     if not 180 <= words <= 1000:
         raise ContinentalEditorialError(f'editorial continental fora do tamanho esperado: {words} palavras')
@@ -1042,7 +1168,7 @@ def build_article(rank: int, ties: Sequence[Mapping[str, Any]], mm: Mapping[str,
     qualified = sorted({winner for tie in ties for winner in tie['br_classificados']})
     participants = sorted({club for tie in ties for club in tie['brasileiros']})
     eliminated = sorted(set(participants) - set(qualified))
-    linked = sum(1 for tie in ties for event in tie['pernas'] if ((mm.get('jogos') or {}).get(str(event.get('event_id') or '')) or {}).get('url'))
+    linked = sum(1 for tie in ties for event in tie['pernas'] if video_entry_valid(((mm.get('jogos') or {}).get(str(event.get('event_id') or '')) or {}), event, tie['competicao']))
     dossier = {'render_version': RENDER_VERSION, 'fase_ordem': rank, 'confrontos': ties, 'mm': mm.get('jogos') or {}, 'estatisticas': stats or {}}
     return {
         'tipo': 'continentais_fase',
@@ -1461,13 +1587,31 @@ def self_test() -> None:
     assert aggregate_tie['br_classificados'] == ['Fluminense']
     assert aggregate_tie['eliminado'] == 'Platense'
 
+    # Regressão Palmeiras x LDU (quartas/2026): a LDU venceu a volta por 3x2,
+    # mas o Palmeiras venceu os pênaltis por 4x3. ``vencedor`` da partida não
+    # pode eliminar o clube que ganhou a disputa.
+    pal = {'espn_id': 'pal', 'nome': 'Palmeiras', 'serie_a_2026': True, 'placar': 0}
+    ldu = {'espn_id': 'ldu', 'nome': 'Liga de Quito', 'serie_a_2026': False, 'placar': 0}
+    pal_case = {'eventos': [
+        {'event_id': '401912527', 'fase_ordem': 700, 'perna': 1, 'data_iso': '2026-09-09T19:00:00-03:00',
+         'mandante': {**pal, 'placar': 1}, 'visitante': {**ldu, 'placar': 0}, 'concluido': True, 'vencedor': 'Palmeiras', 'penaltis': False},
+        {'event_id': '401912525', 'fase_ordem': 700, 'perna': 2, 'data_iso': '2026-09-16T19:00:00-03:00',
+         'mandante': {**ldu, 'placar': 3}, 'visitante': {**pal, 'placar': 2}, 'concluido': True, 'vencedor': 'Liga de Quito',
+         'penaltis': {'mandante': 3, 'visitante': 4}, 'vencedor_penaltis': 'Palmeiras'},
+    ]}
+    pal_tie = build_ties('libertadores', pal_case, 700)[0]
+    assert pal_tie['agregado'] in ([3, 3],)
+    assert pal_tie['vencedor'] == 'Palmeiras' and pal_tie['eliminado'] == 'Liga de Quito'
+    assert pal_tie['vencedor_penaltis'] == 'Palmeiras'
+
     # Empate no agregado decidido nos pênaltis continua usando o vencedor
     # explícito da volta, preservando o caso das oitavas do próprio Flu.
     pen_case = {'eventos': [
         {'event_id': 'pen1', 'fase_ordem': 600, 'perna': 1, 'data_iso': '2026-08-11T19:00:00-03:00',
          'mandante': {**flu, 'placar': 0}, 'visitante': {**pla, 'placar': 0}, 'concluido': True, 'vencedor': None},
         {'event_id': 'pen2', 'fase_ordem': 600, 'perna': 2, 'data_iso': '2026-08-18T19:00:00-03:00',
-         'mandante': {**pla, 'placar': 1}, 'visitante': {**flu, 'placar': 1}, 'concluido': True, 'vencedor': 'Fluminense', 'penaltis': True},
+         'mandante': {**pla, 'placar': 1}, 'visitante': {**flu, 'placar': 1}, 'concluido': True, 'vencedor': None,
+         'penaltis': {'mandante': 4, 'visitante': 5}, 'vencedor_penaltis': 'Fluminense'},
     ]}
     pen_tie = build_ties('libertadores', pen_case, 600)[0]
     assert pen_tie['vencedor'] == 'Fluminense' and pen_tie['br_classificados'] == ['Fluminense']

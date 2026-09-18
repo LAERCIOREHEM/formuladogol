@@ -68,8 +68,13 @@ class CupEvent:
     away: CupTeam
     home_goals: int | None
     away_goals: int | None
+    # ``winner`` é o vencedor da partida (90/120 min). Em confrontos
+    # decididos nos pênaltis, o vencedor da disputa é armazenado separadamente.
     winner: str | None
     penalties: bool
+    penalty_winner: str | None
+    penalty_home: int | None
+    penalty_away: int | None
 
 
 @dataclass(frozen=True)
@@ -134,6 +139,27 @@ def parse_team(payload: Mapping[str, Any]) -> CupTeam:
     )
 
 
+def parse_penalty_payload(item: Mapping[str, Any]) -> tuple[bool, str | None, int | None, int | None]:
+    raw = item.get("penaltis")
+    home_score = away_score = None
+    if isinstance(raw, Mapping):
+        try:
+            home_score = None if raw.get("mandante") is None else int(raw.get("mandante"))
+            away_score = None if raw.get("visitante") is None else int(raw.get("visitante"))
+        except (TypeError, ValueError):
+            home_score = away_score = None
+    penalties = bool(raw) or bool(item.get("vencedor_penaltis"))
+    winner = str(item.get("vencedor_penaltis") or "").strip() or None
+    if winner is None and home_score is not None and away_score is not None:
+        home_name = str(((item.get("mandante") or {}).get("nome")) or "").strip()
+        away_name = str(((item.get("visitante") or {}).get("nome")) or "").strip()
+        if home_score > away_score:
+            winner = home_name or None
+        elif away_score > home_score:
+            winner = away_name or None
+    return penalties, winner, home_score, away_score
+
+
 def parse_snapshot(snapshot: Mapping[str, Any]) -> tuple[str, list[CupEvent], dict[str, Any]]:
     if int(snapshot.get("schema_version") or 0) < 2:
         raise ContinentalDataNotReady("snapshot continental anterior à normalização exata de clubes")
@@ -146,6 +172,7 @@ def parse_snapshot(snapshot: Mapping[str, Any]) -> tuple[str, list[CupEvent], di
     for item in snapshot.get("eventos") or []:
         home_payload = item.get("mandante") or {}
         away_payload = item.get("visitante") or {}
+        penalties, penalty_winner, penalty_home, penalty_away = parse_penalty_payload(item)
         events.append(
             CupEvent(
                 event_id=str(item.get("event_id") or ""),
@@ -158,7 +185,10 @@ def parse_snapshot(snapshot: Mapping[str, Any]) -> tuple[str, list[CupEvent], di
                 home_goals=(None if home_payload.get("placar") is None else int(home_payload["placar"])),
                 away_goals=(None if away_payload.get("placar") is None else int(away_payload["placar"])),
                 winner=(str(item.get("vencedor")) if item.get("vencedor") else None),
-                penalties=bool(item.get("penaltis")),
+                penalties=penalties,
+                penalty_winner=penalty_winner,
+                penalty_home=penalty_home,
+                penalty_away=penalty_away,
             )
         )
     if not events:
@@ -492,8 +522,8 @@ def completed_tie_winner(tie: Tie) -> str | None:
         else:
             aggregate_a += event.away_goals
             aggregate_b += event.home_goals
-        if event.penalties and event.winner:
-            fixed_winner = event.winner
+        if event.penalties and event.penalty_winner:
+            fixed_winner = event.penalty_winner
 
     if aggregate_a > aggregate_b:
         return tie.team_a
@@ -550,8 +580,8 @@ def simulate_current_tie(
             else:
                 aggregate_a += event.away_goals
                 aggregate_b += event.home_goals
-            if event.penalties and event.winner:
-                fixed_winner = event.winner
+            if event.penalties and event.penalty_winner:
+                fixed_winner = event.penalty_winner
             continue
         home_id = a_id if home_is_a else b_id
         away_id = b_id if home_is_a else a_id
@@ -645,13 +675,18 @@ def completed_champion(events: Sequence[CupEvent]) -> tuple[str, str | None] | N
     if not finals:
         return None
     event = sorted(finals, key=lambda item: (item.played_at, item.event_id))[-1]
-    winner = event.winner
-    if not winner and event.home_goals is not None and event.away_goals is not None:
+    winner = None
+    if event.home_goals is not None and event.away_goals is not None:
         if event.home_goals > event.away_goals:
             winner = event.home.name
         elif event.away_goals > event.home_goals:
             winner = event.away.name
+        elif event.penalties:
+            winner = event.penalty_winner
     if not winner:
+        # Final encerrada e empatada sem vencedor explícito dos pênaltis: falha
+        # fechada. O campo ``event.winner`` pode representar apenas o jogo e não
+        # é aceito como substituto da disputa.
         return None
     runner = event.away.name if winner == event.home.name else event.home.name
     return winner, runner
@@ -1340,6 +1375,44 @@ def load_snapshots() -> dict[str, dict[str, Any]]:
 
 
 def self_test() -> None:
+    # Regressão factual 2026-09-18: LDU venceu a volta por 3x2, agregado 3x3,
+    # Palmeiras venceu os pênaltis por 4x3. O vencedor do jogo NÃO é o
+    # classificado do confronto.
+    pal_snapshot = {
+        "schema_version": 2, "status": "ok",
+        "competicao": {"chave": "libertadores", "final_partida_unica": True},
+        "eventos": [
+            {"event_id": "401912527", "data_iso": "2026-09-09T19:00:00-03:00", "fase": "Quartas de final", "fase_ordem": 700, "concluido": True,
+             "mandante": {"nome": "Palmeiras", "espn_id": "2029", "serie_a_2026": True, "placar": 1},
+             "visitante": {"nome": "Liga de Quito", "espn_id": "4816", "serie_a_2026": False, "placar": 0}, "vencedor": "Palmeiras", "penaltis": False},
+            {"event_id": "401912525", "data_iso": "2026-09-16T19:00:00-03:00", "fase": "Quartas de final", "fase_ordem": 700, "concluido": True,
+             "mandante": {"nome": "Liga de Quito", "espn_id": "4816", "serie_a_2026": False, "placar": 3},
+             "visitante": {"nome": "Palmeiras", "espn_id": "2029", "serie_a_2026": True, "placar": 2}, "vencedor": "Liga de Quito",
+             "penaltis": {"mandante": 3, "visitante": 4}, "vencedor_penaltis": "Palmeiras"},
+        ],
+    }
+    _, pal_events, _ = parse_snapshot(pal_snapshot)
+    pal_tie = Tie(key="ldu::palmeiras", team_a="Palmeiras", team_b="Liga de Quito", events=tuple(pal_events), order_key=("", ""))
+    assert completed_tie_winner(pal_tie) == "Palmeiras"
+
+    # Caso complementar: Atlético-MG venceu a volta e também os pênaltis. A
+    # separação continua correta quando os dois vencedores coincidem.
+    galo_snapshot = {
+        "schema_version": 2, "status": "ok",
+        "competicao": {"chave": "sul_americana", "final_partida_unica": True},
+        "eventos": [
+            {"event_id": "401913073", "data_iso": "2026-09-09T19:00:00-03:00", "fase": "Quartas de final", "fase_ordem": 700, "concluido": True,
+             "mandante": {"nome": "Santos", "espn_id": "2674", "serie_a_2026": True, "placar": 2},
+             "visitante": {"nome": "Atlético-MG", "espn_id": "7632", "serie_a_2026": True, "placar": 0}, "vencedor": "Santos", "penaltis": False},
+            {"event_id": "401913071", "data_iso": "2026-09-16T19:00:00-03:00", "fase": "Quartas de final", "fase_ordem": 700, "concluido": True,
+             "mandante": {"nome": "Atlético-MG", "espn_id": "7632", "serie_a_2026": True, "placar": 4},
+             "visitante": {"nome": "Santos", "espn_id": "2674", "serie_a_2026": True, "placar": 2}, "vencedor": "Atlético-MG",
+             "penaltis": {"mandante": 3, "visitante": 1}, "vencedor_penaltis": "Atlético-MG"},
+        ],
+    }
+    _, galo_events, _ = parse_snapshot(galo_snapshot)
+    galo_tie = Tie(key="atletico::santos", team_a="Santos", team_b="Atlético-MG", events=tuple(galo_events), order_key=("", ""))
+    assert completed_tie_winner(galo_tie) == "Atlético-MG"
     teams = tuple(f"Clube {index:02d}" for index in range(20))
     league_model = {
         "mu": math.log(1.15),

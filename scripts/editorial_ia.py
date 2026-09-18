@@ -98,6 +98,7 @@ def _specific_instruction(kind: str) -> str:
             "A fase só está fechada quando todos os confrontos da fase que envolveram ao menos um clube brasileiro estão resolvidos; jogos exclusivamente estrangeiros não bloqueiam. "
             "Preencha o objeto auditoria estritamente com os classificados e eliminados recebidos no dossiê. Se houver qualquer contradição factual, marque consistente=false e não tente conciliá-la por memória. "
             "Depois, destaque quem avançou e quem caiu, use agregados e decisões por pênaltis quando constarem no dossiê, e conecte o resultado ao impacto nas probabilidades dos clubes brasileiros. "
+            "Em confronto decidido nos pênaltis, o vencedor dos 90/120 minutos NÃO define o classificado: use exclusivamente o classificado/vencedor_penaltis já auditado no pacote factual. "
             "A IA não cria fatos, não decide placares e não transforma partida pendente em encerrada; ela apenas audita o pacote factual já fechado deterministicamente."
         )
     raise EditorialAIError(f"tipo editorial desconhecido: {kind}")
