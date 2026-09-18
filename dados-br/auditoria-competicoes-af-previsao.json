@@ -2,11 +2,11 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-09-17T23:36:59-03:00",
+  "gerado_em": "2026-09-17T23:57:06-03:00",
   "status": "ok",
   "coleta_confiavel": true,
-  "mudanca_esportiva": true,
-  "hash_estado_antes": "98c75ce1c597b671474ca39e0474df9c21f9df5be75f1046da77f818df6bf1e0",
+  "mudanca_esportiva": false,
+  "hash_estado_antes": "ad41547eb2663d8082deea44f6d83ef75283963cad2e34d6363831a8f753d7bd",
   "hash_estado_depois": "ad41547eb2663d8082deea44f6d83ef75283963cad2e34d6363831a8f753d7bd",
   "fonte": "ESPN",
   "temporada": 2026,
@@ -21,7 +21,7 @@
       "fallback_seguro_para_af": true,
       "motivos_fallback": [],
       "alertas_fallback": [
-        "snapshot anterior tem 66.4h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
+        "snapshot anterior tem 66.7h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
       ],
       "summary_partidas_iniciadas": {
         "consultados": 0,
@@ -63,51 +63,23 @@
     },
     {
       "competicao": "sul_americana",
-      "status": "atualizado",
+      "status": "preservado_apos_falha_seguro",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
       "gerado_em": "2026-09-17T23:36:59-03:00",
       "cache_efetivo_minutos": 5,
-      "eventos": 152,
-      "finalizados": 152,
-      "pendentes": 0,
-      "fase_atual": {
-        "status": "encerrada",
-        "ordem": 700,
-        "nome": "Quartas de final",
-        "eventos": 8,
-        "eventos_pendentes": 0
-      },
-      "recuperacao": "summary_individual_apos_falha_scoreboard",
-      "erro_scoreboard": "sul_americana: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard?dates=20260827-20261007&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
+      "erro": "sul_americana: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard?dates=20260827-20261007&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
+      "fallback_seguro_para_af": true,
+      "motivos_fallback": [],
+      "alertas_fallback": [],
       "summary_partidas_iniciadas": {
-        "consultados": 1,
-        "confirmados": 1,
-        "atualizados": 1,
+        "consultados": 0,
+        "confirmados": 0,
+        "atualizados": 0,
         "ao_vivo": [],
-        "finalizados": [
-          "401913072"
-        ],
+        "finalizados": [],
         "pendentes": [],
         "pendentes_vencidos": [],
         "erros": []
-      },
-      "coleta": {
-        "modo": "incremental",
-        "janela_inicio": "2026-08-25T00:00:00-03:00",
-        "janela_fim": "2027-01-13T23:59:59-03:00",
-        "requisicoes": 4,
-        "ultima_completa_em": "2026-09-12T05:15:07-03:00",
-        "ajustes_editoriais_aplicados": 0,
-        "summary_partidas_iniciadas": {
-          "consultados": 1,
-          "confirmados": 1,
-          "atualizados": 1,
-          "ao_vivo": [],
-          "finalizados": [
-            "401913072"
-          ],
-          "erros": []
-        }
       }
     }
   ],
