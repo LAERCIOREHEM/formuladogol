@@ -27,6 +27,7 @@ import re
 import sys
 import time
 import unicodedata
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -64,6 +65,11 @@ OVERRIDES_PATH = ROOT / "dados-br" / "ajustes-competicoes.json"
 SNAPSHOT_SCHEMA_VERSION = 2
 BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{league}/scoreboard"
 SUMMARY_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{league}/summary"
+API_FOOTBALL_ROOT = "https://v3.football.api-sports.io"
+API_FOOTBALL_RESERVE = int(os.environ.get("API_FOOTBALL_CONTINENTAL_RESERVE", "12"))
+_API_FOOTBALL_DATE_CACHE: dict[str, list[dict[str, Any]]] = {}
+_API_FOOTBALL_REQUESTS = 0
+_API_FOOTBALL_REMAINING: int | None = None
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -228,6 +234,256 @@ def fetch_json(url: str, timeout: int = 30, attempts: int = 3) -> dict[str, Any]
             if attempt < attempts:
                 time.sleep(2 * attempt)
     raise RuntimeError(f"falha ao buscar {url}: {last_error}")
+
+
+
+def _api_football_team_token(value: Any) -> str:
+    """Normaliza nomes ESPN/API-Football para pareamento conservador."""
+    token = normalize_text(value)
+    aliases = {
+        "liga de quito": "ldu quito",
+        "ldu de quito": "ldu quito",
+        "ldu quito": "ldu quito",
+        "estudiantes de la plata": "estudiantes",
+        "estudiantes la plata": "estudiantes",
+        "estudiantes l p": "estudiantes",
+        "atletico mg": "atletico mineiro",
+        "atletico mineiro": "atletico mineiro",
+        "cienciano del cusco": "cienciano",
+        "cienciano": "cienciano",
+        "independiente del valle": "independiente del valle",
+        "montevideo city torque": "montevideo city torque",
+        "city torque": "montevideo city torque",
+    }
+    return aliases.get(token, token)
+
+
+def _api_football_name_similarity(left: Any, right: Any) -> float:
+    a = _api_football_team_token(left)
+    b = _api_football_team_token(right)
+    if not a or not b:
+        return 0.0
+    if a == b:
+        return 1.0
+    ac = a.replace(" ", "")
+    bc = b.replace(" ", "")
+    if ac == bc:
+        return 1.0
+    if min(len(ac), len(bc)) >= 5 and (ac in bc or bc in ac):
+        return 0.94
+    aa = {item for item in a.split() if len(item) >= 2}
+    bb = {item for item in b.split() if len(item) >= 2}
+    union = aa | bb
+    return (len(aa & bb) / len(union)) if union else 0.0
+
+
+def _api_football_pair_score(row: dict[str, Any], event: dict[str, Any]) -> tuple[float, float]:
+    teams = row.get("teams") or {}
+    api_home = ((teams.get("home") or {}).get("name"))
+    api_away = ((teams.get("away") or {}).get("name"))
+    home = (event.get("mandante") or {}).get("nome")
+    away = (event.get("visitante") or {}).get("nome")
+    direct = _api_football_name_similarity(api_home, home) + _api_football_name_similarity(api_away, away)
+    swapped = _api_football_name_similarity(api_home, away) + _api_football_name_similarity(api_away, home)
+    return direct, swapped
+
+
+def _api_football_select_fixture(rows: list[dict[str, Any]], event: dict[str, Any]) -> dict[str, Any] | None:
+    candidates: list[tuple[float, float, dict[str, Any]]] = []
+    for row in rows:
+        fixture_id = ((row.get("fixture") or {}).get("id"))
+        if fixture_id is None:
+            continue
+        direct, swapped = _api_football_pair_score(row, event)
+        candidates.append((direct, swapped, row))
+    candidates.sort(key=lambda item: item[0], reverse=True)
+    if not candidates:
+        return None
+    direct, swapped, best = candidates[0]
+    if direct < 1.55 or direct <= swapped:
+        return None
+    if len(candidates) > 1 and abs(direct - candidates[1][0]) < 0.08:
+        return None
+    return best
+
+
+def _api_football_fetch_date(date_key: str, *, timeout: int = 25) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Busca fixtures de um dia uma única vez por processo, respeitando a cota Free."""
+    global _API_FOOTBALL_REQUESTS, _API_FOOTBALL_REMAINING
+    if date_key in _API_FOOTBALL_DATE_CACHE:
+        return _API_FOOTBALL_DATE_CACHE[date_key], {
+            "cached": True,
+            "requests": _API_FOOTBALL_REQUESTS,
+            "remaining": _API_FOOTBALL_REMAINING,
+        }
+    key = str(os.environ.get("API_FOOTBALL_KEY") or "").strip()
+    if not key:
+        raise RuntimeError("API_FOOTBALL_KEY ausente")
+    if _API_FOOTBALL_REMAINING is not None and _API_FOOTBALL_REMAINING <= API_FOOTBALL_RESERVE:
+        raise RuntimeError(
+            f"API-Football preservada: remaining={_API_FOOTBALL_REMAINING} <= reserva={API_FOOTBALL_RESERVE}"
+        )
+    query = urllib.parse.urlencode({"date": date_key, "timezone": "America/Sao_Paulo"})
+    url = f"{API_FOOTBALL_ROOT}/fixtures?{query}"
+    request = urllib.request.Request(
+        url,
+        headers={
+            "Accept": "application/json",
+            "x-apisports-key": key,
+            "User-Agent": HEADERS["User-Agent"],
+        },
+    )
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        raw = response.read().decode(response.headers.get_content_charset() or "utf-8", errors="replace")
+        payload = json.loads(raw)
+        remaining_raw = response.headers.get("x-ratelimit-requests-remaining")
+        if remaining_raw not in (None, ""):
+            try:
+                _API_FOOTBALL_REMAINING = int(float(remaining_raw))
+            except ValueError:
+                pass
+    _API_FOOTBALL_REQUESTS += 1
+    errors = payload.get("errors") if isinstance(payload, dict) else None
+    if errors:
+        raise RuntimeError(f"API-Football retornou errors={errors}")
+    rows = payload.get("response") if isinstance(payload, dict) else None
+    if not isinstance(rows, list):
+        raise RuntimeError("API-Football sem lista response")
+    normalized_rows = [item for item in rows if isinstance(item, dict)]
+    _API_FOOTBALL_DATE_CACHE[date_key] = normalized_rows
+    return normalized_rows, {
+        "cached": False,
+        "requests": _API_FOOTBALL_REQUESTS,
+        "remaining": _API_FOOTBALL_REMAINING,
+    }
+
+
+def _api_football_final_status(row: dict[str, Any]) -> bool:
+    short = str((((row.get("fixture") or {}).get("status") or {}).get("short")) or "").strip().upper()
+    return short in {"FT", "AET", "PEN", "AWD", "WO"}
+
+
+def _api_football_apply_final(event: dict[str, Any], row: dict[str, Any]) -> dict[str, Any] | None:
+    """Converte somente um resultado FINAL da API-Football para o snapshot ESPN existente."""
+    if not _api_football_final_status(row):
+        return None
+    goals = row.get("goals") or {}
+    home_goals = goals.get("home")
+    away_goals = goals.get("away")
+    if home_goals is None or away_goals is None:
+        fulltime = ((row.get("score") or {}).get("fulltime") or {})
+        home_goals = fulltime.get("home")
+        away_goals = fulltime.get("away")
+    if home_goals is None or away_goals is None:
+        return None
+    updated = copy.deepcopy(event)
+    updated.setdefault("mandante", {})["placar"] = int(home_goals)
+    updated.setdefault("visitante", {})["placar"] = int(away_goals)
+    updated["estado"] = "post"
+    updated["status"] = "Final"
+    updated["concluido"] = True
+    score = row.get("score") or {}
+    penalty = score.get("penalty") or {}
+    ph = penalty.get("home")
+    pa = penalty.get("away")
+    if ph is not None and pa is not None:
+        updated["penaltis"] = {"mandante": int(ph), "visitante": int(pa)}
+    else:
+        updated.pop("penaltis", None)
+    teams = row.get("teams") or {}
+    home_winner = (teams.get("home") or {}).get("winner")
+    away_winner = (teams.get("away") or {}).get("winner")
+    if home_winner is True:
+        updated["vencedor"] = (updated.get("mandante") or {}).get("nome")
+    elif away_winner is True:
+        updated["vencedor"] = (updated.get("visitante") or {}).get("nome")
+    elif int(home_goals) > int(away_goals):
+        updated["vencedor"] = (updated.get("mandante") or {}).get("nome")
+    elif int(away_goals) > int(home_goals):
+        updated["vencedor"] = (updated.get("visitante") or {}).get("nome")
+    else:
+        updated["vencedor"] = None
+    updated["fonte_resultado_fallback"] = {
+        "fonte": "API-Football",
+        "fixture_id": ((row.get("fixture") or {}).get("id")),
+        "capturado_em": now_brt().isoformat(),
+    }
+    return updated
+
+
+def refresh_started_pending_with_api_football(
+    spec: CompetitionSpec,
+    snapshot: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Resgata FINAL de partidas iniciadas quando scoreboard/summary ESPN falham.
+
+    A API-Football é contingência factual de baixo consumo: uma única chamada
+    por data, compartilhada entre Libertadores/Sul-Americana neste processo.
+    Nunca inventa placar e nunca promove jogo LIVE para FINAL.
+    """
+    cutoff = now_brt() - timedelta(minutes=125)
+    targets = [
+        event for event in started_pending_events(snapshot)
+        if (parse_datetime(event.get("data_iso")) or now_brt()) <= cutoff
+    ]
+    if not targets:
+        return snapshot, {"consultados": 0, "finalizados": [], "requisicoes": 0, "erros": []}
+    if not str(os.environ.get("API_FOOTBALL_KEY") or "").strip():
+        return snapshot, {
+            "consultados": 0,
+            "finalizados": [],
+            "requisicoes": 0,
+            "erros": ["API_FOOTBALL_KEY ausente; fallback não executado"],
+        }
+
+    by_id = {
+        str(item.get("event_id")): copy.deepcopy(item)
+        for item in (snapshot.get("eventos") or [])
+        if item.get("event_id")
+    }
+    consulted = 0
+    final_ids: list[str] = []
+    errors: list[str] = []
+    dates: dict[str, tuple[list[dict[str, Any]], dict[str, Any]]] = {}
+    for original in targets:
+        event_id = str(original.get("event_id") or "").strip()
+        kickoff = parse_datetime(original.get("data_iso"))
+        if not event_id or kickoff is None:
+            continue
+        consulted += 1
+        date_key = kickoff.strftime("%Y-%m-%d")
+        try:
+            if date_key not in dates:
+                dates[date_key] = _api_football_fetch_date(date_key)
+            rows, _meta = dates[date_key]
+            fixture = _api_football_select_fixture(rows, original)
+            if fixture is None:
+                errors.append(f"{event_id}: fixture não encontrado em {date_key}")
+                continue
+            parsed = _api_football_apply_final(original, fixture)
+            if parsed is None:
+                status = (((fixture.get("fixture") or {}).get("status") or {}).get("short"))
+                errors.append(f"{event_id}: API-Football ainda não confirmou FINAL ({status or 'sem status'})")
+                continue
+            by_id[event_id] = parsed
+            final_ids.append(event_id)
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"{event_id}: {type(exc).__name__}: {exc}")
+
+    collection = dict(snapshot.get("coleta") or {})
+    collection["api_football_resgate_resultados"] = {
+        "consultados": consulted,
+        "finalizados": final_ids,
+        "datas_consultadas": sorted(dates),
+        "requisicoes": _API_FOOTBALL_REQUESTS,
+        "remaining": _API_FOOTBALL_REMAINING,
+        "reserva": API_FOOTBALL_RESERVE,
+        "erros": errors,
+    }
+    refreshed = build_snapshot_from_normalized(spec, list(by_id.values()), collection=collection)
+    if final_ids:
+        refreshed["fonte"] = "ESPN + API-Football"
+    return refreshed, collection["api_football_resgate_resultados"]
 
 
 def date_windows_between(
@@ -1043,7 +1299,32 @@ def normalize_active_knockout_stage(events: list[dict[str, Any]]) -> None:
         event["fase_ordem"] = inferred_rank
         event["fase"] = inferred_label
 
+def _placeholder_team_name(value: Any) -> bool:
+    token = normalize_text(value)
+    if not token:
+        return True
+    return (
+        token.startswith("tbd ")
+        or token in {"tbd", "a definir", "por definir", "to be determined", "winner", "vencedor"}
+        or token.startswith("winner of ")
+        or token.startswith("vencedor de ")
+    )
+
+
+def _materialized_event(event: dict[str, Any]) -> bool:
+    return not (
+        _placeholder_team_name((event.get("mandante") or {}).get("nome"))
+        or _placeholder_team_name((event.get("visitante") or {}).get("nome"))
+    )
+
+
 def detect_current_stage(events: list[dict[str, Any]]) -> dict[str, Any]:
+    # Semifinais/final publicadas como TBD são apenas agenda. Até os clubes
+    # reais existirem, a fase esportiva corrente continua sendo a última fase
+    # materializada (ex.: Quartas recém-encerradas).
+    materialized = [event for event in events if _materialized_event(event)]
+    if materialized:
+        events = materialized
     not_completed = [event for event in events if not event.get("concluido")]
     if not_completed:
         rank = min(int(event.get("fase_ordem") or 0) for event in not_completed)
@@ -1611,6 +1892,9 @@ def run_update(
             snapshot, summary_refresh = refresh_started_pending_with_summaries(
                 spec, snapshot, grace_hours=max(4, live_window_hours)
             )
+            snapshot, api_football_refresh = refresh_started_pending_with_api_football(
+                spec, snapshot
+            )
             snapshot = stabilize_unfinished_events_for_af(snapshot, previous)
             assert_no_overdue_pending(
                 snapshot, spec, grace_hours=max(4, live_window_hours)
@@ -1643,6 +1927,7 @@ def run_update(
                     "pendentes": snapshot["resumo"]["pendentes"],
                     "fase_atual": snapshot.get("fase_atual"),
                     "summary_partidas_iniciadas": summary_refresh,
+                    "api_football_resgate_resultados": api_football_refresh,
                     "coleta": snapshot.get("coleta") or {},
                 }
             )
@@ -1664,10 +1949,16 @@ def run_update(
                 "consultados": 0, "confirmados": 0, "atualizados": 0,
                 "ao_vivo": [], "finalizados": [], "pendentes": [], "pendentes_vencidos": [], "erros": [],
             }
+            api_football_rescue: dict[str, Any] = {
+                "consultados": 0, "finalizados": [], "requisicoes": 0, "erros": [],
+            }
             rescued = previous
             try:
                 rescued, summary_rescue = refresh_started_pending_with_summaries(
                     spec, previous, grace_hours=max(4, live_window_hours)
+                )
+                rescued, api_football_rescue = refresh_started_pending_with_api_football(
+                    spec, rescued
                 )
                 rescued = stabilize_unfinished_events_for_af(rescued, previous)
                 assert_no_overdue_pending(
@@ -1709,6 +2000,7 @@ def run_update(
                         "recuperacao": "summary_individual_apos_falha_scoreboard",
                         "erro_scoreboard": message,
                         "summary_partidas_iniciadas": summary_rescue,
+                        "api_football_resgate_resultados": api_football_rescue,
                         "coleta": rescued.get("coleta") or {},
                     }
                 )
@@ -1741,6 +2033,7 @@ def run_update(
                     "motivos_fallback": safe_reasons,
                     "alertas_fallback": age_warnings + live_warnings,
                     "summary_partidas_iniciadas": summary_rescue,
+                    "api_football_resgate_resultados": api_football_rescue,
                 }
             )
     after_snapshots = load_existing_snapshots()
@@ -1762,7 +2055,7 @@ def run_update(
         "mudanca_esportiva": before_hash != after_hash,
         "hash_estado_antes": before_hash,
         "hash_estado_depois": after_hash,
-        "fonte": "ESPN",
+        "fonte": "ESPN + API-Football contingencial",
         "temporada": SEASON,
         "competicoes": audit_rows,
         "falhas": failures,
@@ -2255,6 +2548,45 @@ def self_test() -> None:
     true_final[0]["perna"] = 1
     assert normalize_two_leg_pair_phase_consistency(true_final) == 0
     assert true_final[0]["fase_ordem"] == 900
+
+    placeholder_stage_events = pair_phase + [
+        normalized_test_event(
+            "semi-tbd", "2026-10-14T19:00:00-03:00", "TBD Home", "TBD Away",
+            rank=800, label="Semifinal", completed=False, home_goals=0, away_goals=0,
+        )
+    ]
+    stage = detect_current_stage(placeholder_stage_events)
+    assert stage["ordem"] == 700 and stage["status"] == "encerrada"
+
+    # Regressão 2026-09-18: quando ESPN scoreboard/summary estão bloqueados,
+    # a API-Football pode confirmar um FINAL sem alterar a identidade/fase.
+    api_event = {
+        "event_id": "api-final",
+        "data_iso": (now_brt() - timedelta(hours=3)).isoformat(),
+        "fase_ordem": 700,
+        "fase": "Quartas de final",
+        "perna": 2,
+        "estado": "pre",
+        "concluido": False,
+        "mandante": {"nome": "Flamengo", "serie_a_2026": True, "placar": 0},
+        "visitante": {"nome": "Independiente del Valle", "serie_a_2026": False, "placar": 0},
+    }
+    api_row = {
+        "fixture": {"id": 999, "status": {"short": "FT"}},
+        "teams": {
+            "home": {"name": "Flamengo", "winner": None},
+            "away": {"name": "Independiente del Valle", "winner": None},
+        },
+        "goals": {"home": 1, "away": 1},
+        "score": {"fulltime": {"home": 1, "away": 1}, "penalty": {"home": None, "away": None}},
+    }
+    assert _api_football_select_fixture([api_row], api_event) is api_row
+    api_final = _api_football_apply_final(api_event, api_row)
+    assert api_final and api_final["concluido"] is True
+    assert api_final["mandante"]["placar"] == 1 and api_final["visitante"]["placar"] == 1
+    assert api_final["fase_ordem"] == 700 and api_final["perna"] == 2
+    assert _api_football_name_similarity("LDU de Quito", "Liga de Quito") >= 0.9
+    assert _api_football_name_similarity("Atlético Mineiro", "Atlético-MG") >= 0.9
 
     print("Self-test coleta AF-Previsão Continental incremental: OK")
 

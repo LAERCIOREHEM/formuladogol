@@ -274,7 +274,27 @@ def stage_group_is_consistent(stage_events: Sequence[CupEvent]) -> bool:
     return bool(ties) and len(participants) == 2 * len(ties) and is_power_of_two(len(participants))
 
 
+def placeholder_team_name(value: str) -> bool:
+    token = normalize_text(value)
+    if not token:
+        return True
+    return (
+        token.startswith("tbd ")
+        or token in {"tbd", "a definir", "por definir", "to be determined", "winner", "vencedor"}
+        or token.startswith("winner of ")
+        or token.startswith("vencedor de ")
+    )
+
+
+def materialized_knockout_event(event: CupEvent) -> bool:
+    """Ignora placeholders da fase seguinte até os clubes reais existirem."""
+    return not (placeholder_team_name(event.home.name) or placeholder_team_name(event.away.name))
+
+
 def current_stage(events: Sequence[CupEvent]) -> tuple[int, str, list[CupEvent]]:
+    events = [event for event in events if materialized_knockout_event(event)]
+    if not events:
+        raise ContinentalDataNotReady("snapshot contém apenas placeholders de chaveamento")
     pending = [event for event in events if not event.completed]
     if not pending:
         latest = max(event.played_at for event in events)
@@ -1655,6 +1675,94 @@ def self_test() -> None:
     assert abs(fixed["auditoria"]["soma_probabilidades_sul_americana_pct"] - 600.0) < 0.02
     assert sum(fixed["pontuacao_objetivos"]["libertadores"]) == sum(fixed["auditoria"]["media_clubes_serie_a_2026_na_libertadores"] for _ in range(deterministic_sims))
     assert sum(fixed["pontuacao_objetivos"]["sul_americana_ou_melhor"]) == sum(fixed["pontuacao_objetivos"]["libertadores"]) + deterministic_sims * int(config["sul_americana_vagas"])
+
+    # Regressão 2026-09-18: Semifinal/Final pré-criadas como TBD não podem
+    # virar a fase atual nem bloquear o AF após o fechamento das Quartas.
+    qf_events = [
+        {
+            "event_id": "q1a", "data_iso": "2026-09-10T19:00:00-03:00",
+            "estado": "post", "concluido": True, "fase": "Quartas de final", "fase_ordem": 700,
+            "mandante": {"nome": teams[0], "espn_id": "1", "serie_a_2026": True, "placar": 1},
+            "visitante": {"nome": teams[4], "espn_id": "5", "serie_a_2026": False, "placar": 0},
+            "vencedor": teams[0], "penaltis": False,
+        },
+        {
+            "event_id": "q1b", "data_iso": "2026-09-17T19:00:00-03:00",
+            "estado": "post", "concluido": True, "fase": "Quartas de final", "fase_ordem": 700,
+            "mandante": {"nome": teams[4], "espn_id": "5", "serie_a_2026": False, "placar": 0},
+            "visitante": {"nome": teams[0], "espn_id": "1", "serie_a_2026": True, "placar": 1},
+            "vencedor": teams[0], "penaltis": False,
+        },
+        {
+            "event_id": "q2a", "data_iso": "2026-09-10T21:30:00-03:00",
+            "estado": "post", "concluido": True, "fase": "Quartas de final", "fase_ordem": 700,
+            "mandante": {"nome": teams[1], "espn_id": "2", "serie_a_2026": True, "placar": 2},
+            "visitante": {"nome": teams[5], "espn_id": "6", "serie_a_2026": False, "placar": 0},
+            "vencedor": teams[1], "penaltis": False,
+        },
+        {
+            "event_id": "q2b", "data_iso": "2026-09-17T21:30:00-03:00",
+            "estado": "post", "concluido": True, "fase": "Quartas de final", "fase_ordem": 700,
+            "mandante": {"nome": teams[5], "espn_id": "6", "serie_a_2026": False, "placar": 1},
+            "visitante": {"nome": teams[1], "espn_id": "2", "serie_a_2026": True, "placar": 1},
+            "vencedor": None, "penaltis": False,
+        },
+        {
+            "event_id": "q3a", "data_iso": "2026-09-11T19:00:00-03:00",
+            "estado": "post", "concluido": True, "fase": "Quartas de final", "fase_ordem": 700,
+            "mandante": {"nome": teams[2], "espn_id": "3", "serie_a_2026": True, "placar": 1},
+            "visitante": {"nome": teams[6], "espn_id": "7", "serie_a_2026": False, "placar": 0},
+            "vencedor": teams[2], "penaltis": False,
+        },
+        {
+            "event_id": "q3b", "data_iso": "2026-09-18T19:00:00-03:00",
+            "estado": "post", "concluido": True, "fase": "Quartas de final", "fase_ordem": 700,
+            "mandante": {"nome": teams[6], "espn_id": "7", "serie_a_2026": False, "placar": 0},
+            "visitante": {"nome": teams[2], "espn_id": "3", "serie_a_2026": True, "placar": 1},
+            "vencedor": teams[2], "penaltis": False,
+        },
+        {
+            "event_id": "q4a", "data_iso": "2026-09-11T21:30:00-03:00",
+            "estado": "post", "concluido": True, "fase": "Quartas de final", "fase_ordem": 700,
+            "mandante": {"nome": teams[3], "espn_id": "4", "serie_a_2026": True, "placar": 1},
+            "visitante": {"nome": teams[7], "espn_id": "8", "serie_a_2026": False, "placar": 0},
+            "vencedor": teams[3], "penaltis": False,
+        },
+        {
+            "event_id": "q4b", "data_iso": "2026-09-18T21:30:00-03:00",
+            "estado": "post", "concluido": True, "fase": "Quartas de final", "fase_ordem": 700,
+            "mandante": {"nome": teams[7], "espn_id": "8", "serie_a_2026": False, "placar": 0},
+            "visitante": {"nome": teams[3], "espn_id": "4", "serie_a_2026": True, "placar": 1},
+            "vencedor": teams[3], "penaltis": False,
+        },
+        {
+            "event_id": "semi-tbd-1", "data_iso": "2026-10-14T19:00:00-03:00",
+            "estado": "pre", "concluido": False, "fase": "Semifinal", "fase_ordem": 800,
+            "mandante": {"nome": "TBD Home", "espn_id": None, "serie_a_2026": False, "placar": 0},
+            "visitante": {"nome": "TBD Away", "espn_id": None, "serie_a_2026": False, "placar": 0},
+            "vencedor": None, "penaltis": False,
+        },
+        {
+            "event_id": "semi-tbd-2", "data_iso": "2026-10-21T19:00:00-03:00",
+            "estado": "pre", "concluido": False, "fase": "Semifinal", "fase_ordem": 800,
+            "mandante": {"nome": "TBD Away", "espn_id": None, "serie_a_2026": False, "placar": 0},
+            "visitante": {"nome": "TBD Home", "espn_id": None, "serie_a_2026": False, "placar": 0},
+            "vencedor": None, "penaltis": False,
+        },
+    ]
+    placeholder_snapshot = {
+        "schema_version": 2,
+        "status": "ok",
+        "competicao": {"chave": "libertadores", "pareamento_apos_fase_atual": "chave", "final_partida_unica": True},
+        "eventos": qf_events,
+    }
+    _comp, parsed_placeholder, _meta = parse_snapshot(placeholder_snapshot)
+    ph_rank, _ph_stage, ph_events = current_stage(parsed_placeholder)
+    assert ph_rank == 700
+    assert len(ph_events) == 8
+    assert all(materialized_knockout_event(event) for event in ph_events)
+    ph_structure = validate_competition_snapshot_structure(placeholder_snapshot)
+    assert ph_structure["fase_ordem"] == 700 and ph_structure["equipes_ativas"] == 4
 
     print("Self-test AF-Previsão Continental Execução 2.5: OK")
 
