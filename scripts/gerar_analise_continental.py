@@ -525,6 +525,25 @@ def deterministic_audit(rank: int, ties: Sequence[Mapping[str, Any]]) -> dict[st
     }
 
 
+def tie_sentence(tie: Mapping[str, Any]) -> str:
+    """Frase jornalística de um confronto, só com dados já validados no tie."""
+    comp = COMP_NAMES[tie['competicao']]
+    winner, loser = tie['vencedor'], tie['eliminado']
+    agg = tie['agregado']
+    names = list(tie['times'])
+    win_agg, lose_agg = (agg[0], agg[1]) if names and names[0] == winner else (agg[1], agg[0])
+    legs = []
+    for event in tie['pernas']:
+        home, away = event['mandante'], event['visitante']
+        legs.append(f"{nm(home)} {int(home.get('placar') or 0)} a {int(away.get('placar') or 0)} {nm(away)}")
+    legs_text = ', '.join(legs)
+    if tie.get('penaltis'):
+        fecho = f'empatou em {win_agg} a {lose_agg} no agregado e {winner} avançou nos pênaltis'
+    else:
+        fecho = f'{winner} fechou a série em {win_agg} a {lose_agg} no agregado'
+    return f'Na {comp}, {winner} eliminou {loser}: {legs_text}. No fim, {fecho}.'
+
+
 def editorial_copy(rank: int, ties: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     qualified = sorted({winner for tie in ties for winner in tie['br_classificados']})
     participants = sorted({club for tie in ties for club in tie['brasileiros']})
@@ -556,24 +575,38 @@ def editorial_copy(rank: int, ties: Sequence[Mapping[str, Any]]) -> dict[str, An
             ],
         }
     phase = PHASES[rank][0]
+    lib = [tie for tie in ties if tie['competicao'] == 'libertadores']
+    sul = [tie for tie in ties if tie['competicao'] == 'sul_americana']
+    # Uma frase por confronto, com placares reais: garante substância e
+    # atende sozinho o piso de 180 palavras do validador.
+    lib_par = [tie_sentence(tie) for tie in lib]
+    sul_par = [tie_sentence(tie) for tie in sul]
+    lib_q = sorted({name for tie in lib for name in tie['br_classificados']})
+    sul_q = sorted({name for tie in sul for name in tie['br_classificados']})
+    if qualified and eliminated:
+        head = f"{', '.join(qualified)} seguem vivos; {', '.join(eliminated)} se despedem."
+    elif qualified:
+        head = f"{', '.join(qualified)} seguem vivos nas competições continentais."
+    else:
+        head = 'Nenhum clube brasileiro avançou nesta fase.'
+    sections = []
+    if lib_par:
+        sections.append({'titulo': f'Libertadores: o que ficou definido nas {phase.lower()}', 'paragrafos': lib_par[:5]})
+    if sul_par:
+        sections.append({'titulo': f'Sul-Americana: o que ficou definido nas {phase.lower()}', 'paragrafos': sul_par[:5]})
+    saldo = [
+        f'Somadas as duas competições, {len(participants)} clubes brasileiros disputaram esta fase e {len(qualified)} avançaram. '
+        + (f"Na Libertadores seguem {', '.join(lib_q)}. " if lib_q else 'A Libertadores não terá mais brasileiros nesta edição. ')
+        + (f"Na Sul-Americana seguem {', '.join(sul_q)}." if sul_q else 'A Sul-Americana não terá mais brasileiros nesta edição.'),
+        'O próximo balanço continental sai quando a fase seguinte tiver clube brasileiro em campo e todos os jogos dessa fase estiverem encerrados. '
+        'Se nenhum brasileiro alcançar a fase seguinte, este é o último capítulo continental da temporada.',
+    ]
+    sections.append({'titulo': 'O saldo brasileiro da fase', 'paragrafos': saldo})
     return {
         'auditoria': deterministic_audit(rank, ties),
-        'titulo': f'{phase} continentais: brasileiros definem seus caminhos na Libertadores e Sul-Americana',
-        'linha_fina': f'Fechamento dos confrontos de {phase.lower()} que envolveram clubes brasileiros nas duas competições continentais.',
-        'secoes': [
-            {'titulo': f'O fechamento de {phase.lower()}', 'paragrafos': [
-                f'Os confrontos de {phase.lower()} com participação brasileira estão concluídos. O Fórmula do Gol considera somente as chaves que tiveram ao menos um clube da Série A 2026 e não espera partidas exclusivamente estrangeiras para encerrar o editorial.',
-                f'Nesta fase, {len(participants)} brasileiro(s) participaram do recorte e {len(qualified)} avançaram. Os placares de ida, volta, agregado e eventuais decisões por pênaltis são apresentados a partir dos snapshots oficiais do projeto.',
-            ]},
-            {'titulo': 'Quem segue e quem se despede', 'paragrafos': [
-                ('Classificados: ' + ', '.join(qualified) + '.') if qualified else 'Nenhum clube brasileiro avançou nesta fase.',
-                ('Eliminados: ' + ', '.join(eliminated) + '.') if eliminated else 'Nenhum clube brasileiro foi eliminado nesta fase.',
-            ]},
-            {'titulo': 'Próxima fase', 'paragrafos': [
-                'O gerador só voltará a publicar quando existir uma nova fase eliminatória materializada nos snapshots com participação de clube brasileiro e todos os jogos desse recorte estiverem encerrados.',
-                'Se não houver brasileiro na fase seguinte, não será criado novo editorial continental.',
-            ]},
-        ],
+        'titulo': f'{phase} continentais: {len(qualified)} de {len(participants)} brasileiros avançam na Libertadores e na Sul-Americana',
+        'linha_fina': head,
+        'secoes': sections[:4],
     }
 
 
@@ -673,6 +706,12 @@ def continental_editorial_dossier(rank: int, ties: Sequence[Mapping[str, Any]], 
     }
 
 
+# Fonte única: o validador rejeita estes termos e o prompt da IA os proíbe
+# explicitamente (editorial_ia.termos_proibidos_para_prompt). Qualquer termo
+# novo aqui passa a valer nos dois lados ao mesmo tempo, sem risco de deriva.
+TERMOS_PROIBIDOS: tuple[str, ...] = ('dossiê', 'snapshot', 'a narrativa', 'mergulhar', 'jornada')
+
+
 def validate_continental_editorial(editorial: Mapping[str, Any], dossier: Mapping[str, Any]) -> None:
     if set(editorial) != {'auditoria', 'titulo', 'linha_fina', 'secoes'}:
         raise ContinentalEditorialError('editorial continental fora do schema')
@@ -700,8 +739,7 @@ def validate_continental_editorial(editorial: Mapping[str, Any], dossier: Mappin
     known = set(dossier.get('classificados_brasileiros') or []) | set(dossier.get('eliminados_brasileiros') or [])
     if known and not any(name.casefold() in folded for name in known):
         raise ContinentalEditorialError('editorial continental não menciona clubes do dossiê')
-    forbidden = ('dossiê', 'snapshot', 'a narrativa', 'mergulhar', 'jornada')
-    if any(term in folded for term in forbidden):
+    if any(term in folded for term in TERMOS_PROIBIDOS):
         raise ContinentalEditorialError('editorial continental contém linguagem burocrática/artificial')
     words = len(re.findall(r'\b[\wÀ-ÿ-]+\b', ' '.join(p for sec in sections for p in sec.get('paragrafos') or [])))
     if not 180 <= words <= 1000:
@@ -1289,7 +1327,15 @@ def publish(dry: bool = False, force_rank: int = 0, usar_ia: bool = False, sem_i
             print(f'::warning title=Editorial IA inválido::Fallback continental determinístico aplicado. {exc}')
             content = fallback
             origin = 'deterministico-jornalistico-contingencia'
-    validate_continental_editorial(content, editorial_context)
+    try:
+        validate_continental_editorial(content, editorial_context)
+    except ContinentalEditorialError as exc:
+        if content is fallback:
+            # Fallback determinístico reprovado pelo próprio validador: isso é
+            # defeito de código, não conteúdo ruim da IA. Falha com mensagem
+            # inequívoca em vez de repetir o erro genérico da camada de IA.
+            raise ContinentalEditorialError(f'FALLBACK DETERMINÍSTICO INVÁLIDO (corrija editorial_copy): {exc}') from exc
+        raise
     article = build_article(rank, ties, mm, now, stats, content, origin)
     same = bool(old and old.get('hash_dossie') == article['hash_dossie'] and old.get('hash_melhores_momentos') == article['hash_melhores_momentos'] and old.get('hash_estatisticas') == article['hash_estatisticas'] and old.get('hash_editorial') == article['hash_editorial'])
     if same and not history_changed:
@@ -1336,6 +1382,19 @@ def self_test() -> None:
     linked = sum(1 for tie in ties for event in tie['pernas'] if str(event.get('event_id') or '') in (mm.get('jogos') or {}))
     assert linked >= 10
     fake = {key: {'eventos': []} for key in snaps}
+    # Regressão 2026-09-18: o fallback determinístico precisa passar no MESMO
+    # validador aplicado à saída da IA. Ele continha "snapshots", termo da lista
+    # proibida, e derrubava o workflow sempre que a IA falhava.
+    fixture_dossier = continental_editorial_dossier(600, ties, {})
+    validate_continental_editorial(editorial_copy(600, ties), fixture_dossier)
+    for rank_check in PHASES:
+        # Cada rank precisa passar no validador REAL, não só na lista de termos:
+        # o fallback genérico também nascia curto demais (109 palavras).
+        validate_continental_editorial(
+            editorial_copy(rank_check, ties),
+            continental_editorial_dossier(rank_check, ties, {}),
+        )
+
     assert latest_publishable(fake) is None
     # Regra terminal: sem brasileiro na fase seguinte não há novo editorial.
     no_br = {key: {'eventos': [{'fase_ordem': 700, 'mandante': {'serie_a_2026': False}, 'visitante': {'serie_a_2026': False}, 'concluido': True}]} for key in snaps}

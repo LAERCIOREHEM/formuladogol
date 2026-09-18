@@ -15,7 +15,7 @@ import os
 import sys
 import urllib.error
 import urllib.request
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 DEFAULT_MODEL = "gpt-5.6-sol"
 DEFAULT_REASONING = "high"
@@ -36,6 +36,30 @@ def _extract_output_text(response: Mapping[str, Any]) -> str:
             if isinstance(part, Mapping) and part.get("type") == "output_text" and part.get("text"):
                 chunks.append(str(part["text"]))
     return "".join(chunks).strip()
+
+
+# Espelha a lista que cada gerador aplica na validação da saída.
+_TERMOS_BANIDOS: dict[str, tuple[str, ...]] = {
+    "continentais": ("dossiê", "snapshot", "a narrativa", "mergulhar", "jornada"),
+    "copa_do_brasil": ("vale destacar", "a narrativa", "mergulhar", "jornada", "dossiê", "snapshot oficial"),
+    "rodada": ("vale destacar", "a narrativa", "mergulhar", "jornada", "o futebol nos ensina", "mais do que nunca", "dossiê factual", "snapshot"),
+}
+
+
+def termos_proibidos_para_prompt(termos: Sequence[str]) -> str:
+    """Repassa ao modelo a MESMA lista que o validador aplica na saída.
+
+    Sem isto o prompt fala em "dossiê" o tempo todo e o modelo devolve a
+    palavra, sendo reprovado por um critério que nunca lhe foi informado.
+    """
+    if not termos:
+        return ""
+    lista = ", ".join(f'"{t}"' for t in termos)
+    return (
+        f" PROIBIDO ESCREVER, em qualquer campo do JSON, os termos: {lista}. "
+        "Eles reprovam o texto automaticamente. Ao se referir ao material de apoio, escreva "
+        "'os números do Fórmula do Gol' ou simplesmente apresente o fato, nunca o nome do arquivo ou do processo interno."
+    )
 
 
 def _base_instruction() -> str:
@@ -87,6 +111,9 @@ def build_payload(kind: str, dossier: Mapping[str, Any], schema: Mapping[str, An
     except ValueError:
         max_tokens = DEFAULT_MAX_OUTPUT_TOKENS
     instruction = _base_instruction() + "\n\n" + _specific_instruction(kind)
+    banidos = _TERMOS_BANIDOS.get(kind)
+    if banidos:
+        instruction += "\n\n" + termos_proibidos_para_prompt(banidos)
     return {
         "model": selected_model,
         "store": False,
