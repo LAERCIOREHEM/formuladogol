@@ -1092,22 +1092,57 @@ def render_page(article: Mapping[str, Any], ties: Sequence[Mapping[str, Any]], m
 </html>'''
 
 
+AF_SNAPSHOT_FILES = {
+    'copa_do_brasil': ROOT / 'dados-br/competicoes-af-previsao/copa-do-brasil.json',
+    'libertadores': ROOT / 'dados-br/competicoes-af-previsao/libertadores.json',
+    'sul_americana': ROOT / 'dados-br/competicoes-af-previsao/sul-americana.json',
+}
+
+
+def _canonical_hash_payload(payload: Mapping[str, Any]) -> str:
+    encoded = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(',', ':'), allow_nan=False
+    ).encode('utf-8')
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _continental_snapshots_state_hash_lightweight() -> str:
+    """Reproduz o hash esportivo do AF sem importar o motor NumPy.
+
+    O editorial só precisa provar que o arquivo público de probabilidades foi
+    calculado sobre os mesmos snapshots persistidos. Importar o simulador para
+    isso criava uma dependência desnecessária de NumPy no workflow editorial.
+    """
+    snapshots: dict[str, Mapping[str, Any]] = {}
+    for key, path in AF_SNAPSHOT_FILES.items():
+        data = load(path)
+        if not isinstance(data, Mapping):
+            raise ContinentalEditorialError(f'snapshot continental ausente ou inválido: {path.relative_to(ROOT)}')
+        snapshots[key] = data
+
+    stable: dict[str, Any] = {}
+    for key, snapshot in sorted(snapshots.items()):
+        stable[key] = {
+            'status': snapshot.get('status'),
+            'temporada': snapshot.get('temporada'),
+            'competicao': snapshot.get('competicao'),
+            'fase_atual': snapshot.get('fase_atual'),
+            'eventos': snapshot.get('eventos') or [],
+        }
+    return _canonical_hash_payload(stable)
+
+
 def validate_probability_alignment(snaps: Mapping[str, Mapping[str, Any]], ties: Sequence[Mapping[str, Any]], probabilities: Mapping[str, Any]) -> None:
     """Impede editorial com AF anterior ao último resultado continental."""
-    try:
-        from gerar_probabilidades_brasileirao import continental_snapshots_state_hash
-        from af_previsao_continental import load_snapshots as load_all_continental_snapshots
-    except Exception as exc:  # pragma: no cover - contrato de execução
-        raise ContinentalEditorialError(f'não foi possível carregar contrato de hash continental: {exc}') from exc
     # O hash publicado pelo AF cobre o universo continental inteiro usado nas
     # 2.000.000 de simulações (Copa do Brasil + Libertadores + Sul-Americana).
-    # O editorial recebe apenas Lib/Sula porque são as competições editoriais
-    # deste fluxo; comparar um hash parcial produziria falso desalinhamento.
+    # Esta validação é deliberadamente leve: não importa o simulador nem NumPy.
+    # O editorial recebe apenas Lib/Sula, mas o hash precisa incluir também a
+    # Copa do Brasil para ser idêntico ao produzido pelo AF-Previsão.
     try:
-        all_snaps = load_all_continental_snapshots()
+        current_hash = _continental_snapshots_state_hash_lightweight()
     except Exception as exc:
-        raise ContinentalEditorialError(f'não foi possível carregar todos os snapshots do AF-Previsão: {exc}') from exc
-    current_hash = continental_snapshots_state_hash(all_snaps)
+        raise ContinentalEditorialError(f'não foi possível calcular hash continental atual: {exc}') from exc
     af_hash = str((probabilities.get('integracao_continental') or {}).get('hash_snapshots') or '')
     if not current_hash or af_hash != current_hash:
         raise ContinentalEditorialError(
