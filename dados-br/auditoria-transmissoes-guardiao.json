@@ -3485,20 +3485,91 @@
         "Disney+ / ESPN"
       ],
       "status": "sem_chamada"
+    },
+    {
+      "event_id": "401841239",
+      "jogo": "Atlético-MG x Chapecoense",
+      "data_iso": "2026-09-19T16:00:00-03:00",
+      "checkpoint": -1440,
+      "executado_em": "2026-09-18T16:03:56-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Premiere"
+      ],
+      "status": "nao_resolvido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
+        "https://ge.globo.com/futebol/noticia/fim-de-semana-na-tv-saiba-as-partidas-com-transmissao-ao-vivo.ghtml",
+        "https://ge.globo.com/futebol/noticia/futebol-ao-vivo-confira-as-partidas-com-transmissao-no-meio-de-semana.ghtml",
+        "https://ge.globo.com/futebol/noticia/futebol-ao-vivo-saiba-os-jogos-com-transmissao-na-telinha-deste-fim-de-semana.ghtml",
+        "https://ge.globo.com/futebol/noticia/futebol-na-tv-saiba-as-transmissoes-ao-vivo-deste-fim-de-semana.ghtml",
+        "https://ge.globo.com/futebol/noticia/ligado-na-telinha-confira-os-jogos-com-transmissao-ao-vivo-no-meio-de-semana.ghtml",
+        "https://ge.globo.com/futebol/video/chapecoense-0-x-4-atletico-mg-melhores-momentos-9a-rodada-campeonato-brasileiro-2026-14490737.ghtml",
+        "https://ge.globo.com/google/amp/cartola/noticia/2026/09/15/caioba-cartola-show-caio-ribeiro-e-cassius-leitao-garantem-boas-dicas-e-resenha-para-a-rodada-28.ghtml",
+        "https://ge.globo.com/google/amp/futebol/noticia/ligado-na-tv-saiba-as-partidas-com-transmissao-ao-vivo-neste-fim-de-semana.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/atletico-mg-x-chapecoense-veja-onde-assistir-escalacoes-desfalques-e-arbitragem-1.ghtml",
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/atletico-mg-x-chapecoense-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
+        "https://ge.globo.com/mg/futebol/copa-do-brasil/noticia/copa-do-brasil-tudo-o-que-voce-precisa-saber-sobre-atletico-mg-x-chapecoense.ghtml",
+        "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/04/02/chapecoense-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/09/12/chapecoense-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/chapecoense-x-atletico-mg-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
+        "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/rodada-28-tudo-o-que-voce-precisa-saber-sobre-chapecoense-x-atletico-mg.ghtml",
+        "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/09/05/sao-paulo-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://globoplay.globo.com/v/14488742",
+        "https://www.espn.com.br/futebol/partida/_/jogoId/401841239/chapecoense-atletico-mg",
+        "https://www.espn.com.br/futebol/time/calendario/_/id/7632/bra.camp.mineiro",
+        "https://www.espn.com.br/futebol/time/calendario/_/id/9318/chapecoense"
+      ],
+      "rejeicoes": [
+        "confiança 0.880 abaixo do limiar"
+      ],
+      "resumo": "Atlético-MG x Chapecoense, Brasileirão Série A 2026, 28ª rodada, está confirmado para sábado, 19/09/2026, às 16h (horário de Brasília), na Arena MRV. A grade consultada do ge indica Premiere como a transmissão integral. Não há evidência consultada de Globo, SporTV, GE TV, CazéTV/YouTube ou outra plataforma para este jogo; portanto, Premiere é a grade completa identificada."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401912526",
-    "jogo": "Flamengo x Independiente del Valle",
-    "data_iso": "2026-09-17T21:30:00-03:00",
-    "checkpoint": -15,
-    "executado_em": "2026-09-17T21:18:13-03:00",
-    "chamada_openai": false,
-    "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
+    "event_id": "401841239",
+    "jogo": "Atlético-MG x Chapecoense",
+    "data_iso": "2026-09-19T16:00:00-03:00",
+    "checkpoint": -1440,
+    "executado_em": "2026-09-18T16:03:56-03:00",
+    "chamada_openai": true,
+    "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "Disney+ / ESPN"
+      "Premiere"
     ],
-    "status": "sem_chamada"
+    "status": "nao_resolvido",
+    "modelo": "gpt-5.6-terra",
+    "fontes_web": [
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
+      "https://ge.globo.com/futebol/noticia/fim-de-semana-na-tv-saiba-as-partidas-com-transmissao-ao-vivo.ghtml",
+      "https://ge.globo.com/futebol/noticia/futebol-ao-vivo-confira-as-partidas-com-transmissao-no-meio-de-semana.ghtml",
+      "https://ge.globo.com/futebol/noticia/futebol-ao-vivo-saiba-os-jogos-com-transmissao-na-telinha-deste-fim-de-semana.ghtml",
+      "https://ge.globo.com/futebol/noticia/futebol-na-tv-saiba-as-transmissoes-ao-vivo-deste-fim-de-semana.ghtml",
+      "https://ge.globo.com/futebol/noticia/ligado-na-telinha-confira-os-jogos-com-transmissao-ao-vivo-no-meio-de-semana.ghtml",
+      "https://ge.globo.com/futebol/video/chapecoense-0-x-4-atletico-mg-melhores-momentos-9a-rodada-campeonato-brasileiro-2026-14490737.ghtml",
+      "https://ge.globo.com/google/amp/cartola/noticia/2026/09/15/caioba-cartola-show-caio-ribeiro-e-cassius-leitao-garantem-boas-dicas-e-resenha-para-a-rodada-28.ghtml",
+      "https://ge.globo.com/google/amp/futebol/noticia/ligado-na-tv-saiba-as-partidas-com-transmissao-ao-vivo-neste-fim-de-semana.ghtml",
+      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/atletico-mg-x-chapecoense-veja-onde-assistir-escalacoes-desfalques-e-arbitragem-1.ghtml",
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/atletico-mg-x-chapecoense-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
+      "https://ge.globo.com/mg/futebol/copa-do-brasil/noticia/copa-do-brasil-tudo-o-que-voce-precisa-saber-sobre-atletico-mg-x-chapecoense.ghtml",
+      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/04/02/chapecoense-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/09/12/chapecoense-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/chapecoense-x-atletico-mg-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
+      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/rodada-28-tudo-o-que-voce-precisa-saber-sobre-chapecoense-x-atletico-mg.ghtml",
+      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/09/05/sao-paulo-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://globoplay.globo.com/v/14488742",
+      "https://www.espn.com.br/futebol/partida/_/jogoId/401841239/chapecoense-atletico-mg",
+      "https://www.espn.com.br/futebol/time/calendario/_/id/7632/bra.camp.mineiro",
+      "https://www.espn.com.br/futebol/time/calendario/_/id/9318/chapecoense"
+    ],
+    "rejeicoes": [
+      "confiança 0.880 abaixo do limiar"
+    ],
+    "resumo": "Atlético-MG x Chapecoense, Brasileirão Série A 2026, 28ª rodada, está confirmado para sábado, 19/09/2026, às 16h (horário de Brasília), na Arena MRV. A grade consultada do ge indica Premiere como a transmissão integral. Não há evidência consultada de Globo, SporTV, GE TV, CazéTV/YouTube ou outra plataforma para este jogo; portanto, Premiere é a grade completa identificada."
   },
-  "atualizado_em": "2026-09-17T21:18:13-03:00"
+  "atualizado_em": "2026-09-18T16:03:56-03:00"
 }

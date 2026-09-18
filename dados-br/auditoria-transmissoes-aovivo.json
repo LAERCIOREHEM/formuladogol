@@ -13,14 +13,14 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 43,
+    "jogos_na_janela": 42,
     "jogos_foco": 1,
     "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 48,
+    "candidatos_oficiais_encontrados": 51,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 0,
-    "search_api_jogos_pulados_grade_estavel": 1,
+    "search_api_jogos_elegiveis": 1,
+    "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 6,
     "sem_transmissao": 1,
     "erros": 0
@@ -69,12 +69,12 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401912526",
-      "rodada": 0,
-      "competicao_chave": "libertadores",
-      "competicao_nome": "Libertadores",
-      "jogo": "Flamengo x Independiente del Valle",
-      "data_iso": "2026-09-17T21:30:00-03:00",
+      "event_id": "401841239",
+      "rodada": 28,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Atlético-MG x Chapecoense",
+      "data_iso": "2026-09-19T16:00:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -285,26 +285,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "E4Ilm886VgI",
-      "url": "https://www.youtube.com/watch?v=E4Ilm886VgI",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "FLAMENGO X INDEPENDIENTE DEL VALLE | LIBERTADORES | NARRAÇÃO AO VIVO | NOCHE DE COPA",
-      "status": "live",
-      "inicio_programado": "2026-09-17T20:00:00-03:00",
-      "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
-    },
-    {
-      "video_id": "87NerY2s9V8",
-      "url": "https://www.youtube.com/watch?v=87NerY2s9V8",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: BUFFALO BILLS X DETROIT LIONS | NFL 2026/27 | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-09-17T20:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "F_zyo3Em_0Q",
       "url": "https://www.youtube.com/watch?v=F_zyo3Em_0Q",
       "fonte": "getv",
@@ -341,7 +321,7 @@
       "canal": "ge tv",
       "titulo": "AO VIVO: SÃO BERNARDO X ATLÉTICO GO | BRASILEIRÃO SÉRIE B 2026 | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-09-19T19:00:00-03:00",
+      "inicio_programado": "2026-09-18T20:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -385,16 +365,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "wBLq8Y3-P5c",
-      "url": "https://www.youtube.com/watch?v=wBLq8Y3-P5c",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "FLAMENGO X INDEPENDIENTE DEL VALLE | NARRAÇÃO AO VIVO | LIBERTADORES 2026 | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-09-17T20:30:00-03:00",
-      "motivo": "conteúdo rejeitado: narracao"
-    },
-    {
       "video_id": "ztGmnkkCUls",
       "url": "https://www.youtube.com/watch?v=ztGmnkkCUls",
       "fonte": "getv",
@@ -405,6 +375,36 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "3jO0sKE8fFg",
+      "url": "https://www.youtube.com/watch?v=3jO0sKE8fFg",
+      "fonte": "sbt",
+      "canal": "SBT",
+      "titulo": "Márcia Fellipe canta FORRÓ EXPLOSIVO no placo do EITA LUCAS! | Eita Lucas! (19/10/26)",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-19T15:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "0h9oFPNiN4Q",
+      "url": "https://www.youtube.com/watch?v=0h9oFPNiN4Q",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): SKATE VERTICAL | PRO TOUR STU | ETAPA DE SÃO PAULO",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-20T16:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "18aItYft-kU",
+      "url": "https://www.youtube.com/watch?v=18aItYft-kU",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ATLÉTICO DE MADRID X REAL MADRID E MARSEILLE X PSG! DOMINGO DE CLÁSSICOS! | SEIS EM UM",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-20T17:45:00-03:00",
+      "motivo": "conteúdo reúne mais de uma partida"
+    },
+    {
       "video_id": "1T0F68d0Qms",
       "url": "https://www.youtube.com/watch?v=1T0F68d0Qms",
       "fonte": "cazetv",
@@ -412,6 +412,16 @@
       "titulo": "AO VIVO: OSASUNA X RAYO VALLECANO | LALIGA 26/27 | 7ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-09-19T06:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "2Y4_nNPy2VE",
+      "url": "https://www.youtube.com/watch?v=2Y4_nNPy2VE",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: LOGO APÓS A ESTREIA DO BRASIL NA COPA DAVIS | QUADRA ABERTA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-18T19:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -480,7 +490,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: BAYERN DE MUNIQUE X UNION BERLIN | BUNDESLIGA 26/27 | 4ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-18T14:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -615,14 +625,24 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "eRXQ9v4r6hs",
+      "url": "https://www.youtube.com/watch?v=eRXQ9v4r6hs",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ESPANYOL X ELCHE | LALIGA 26/27 | 7ª RODADA",
+      "status": "live",
+      "inicio_programado": "2026-09-18T15:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "f8D3NeIhah4",
       "url": "https://www.youtube.com/watch?v=f8D3NeIhah4",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: TÊNIS: JOÃO FONSECA EM QUADRA! BRASIL X SUÍÇA | COPA DO MUNDO DE TÊNIS | COPA DAVIS",
-      "status": "upcoming",
+      "titulo": "AO VIVO: TÊNIS | JOÃO FONSECA X DOMINIC STRICKER | BRASIL X SUÍÇA | COPA DO MUNDO DE TÊNIS",
+      "status": "live",
       "inicio_programado": "2026-09-18T14:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
+      "motivo": "conteúdo reúne mais de uma partida"
     },
     {
       "video_id": "hK76uv3Q39w",
@@ -635,23 +655,33 @@
       "motivo": "conteúdo reúne mais de uma partida"
     },
     {
-      "video_id": "ja3tXm_7hmE",
-      "url": "https://www.youtube.com/watch?v=ja3tXm_7hmE",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: TÊNIS: TCHÉQUIA X ESTADOS UNIDOS | COPA DO MUNDO DE TÊNIS | NA SEQUÊNCIA TEM JOÃO FONSECA!",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-18T09:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "mZfauDMdxq4",
       "url": "https://www.youtube.com/watch?v=mZfauDMdxq4",
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: MÔNACO X LENS | LIGUE 1 26/27 | 5ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-18T15:15:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "oelDWS-hGyg",
+      "url": "https://www.youtube.com/watch?v=oelDWS-hGyg",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "VEJA COMO FOI: BRASIL X ESTADOS UNIDOS | COPA DO MUNDO FEMININA SUB-20 FIFA 2026 | OITAVAS DE FINAL",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-18T20:15:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "qJwx5LJZUTc",
+      "url": "https://www.youtube.com/watch?v=qJwx5LJZUTc",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "ORLANDINHO EM FAMÍLIA! OS PAIS CONTAM A HISTÓRIA DO CRAQUE DA COPA DAVIS",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-18T20:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -685,33 +715,27 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [
-    {
-      "event_id": "401912526",
-      "jogo": "Flamengo x Independiente del Valle",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    }
-  ],
+  "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401912526",
-      "rodada": 0,
-      "competicao_chave": "libertadores",
-      "competicao_nome": "Libertadores",
-      "jogo": "Flamengo x Independiente del Valle",
-      "data_iso": "2026-09-17T21:30:00-03:00",
+      "event_id": "401841239",
+      "rodada": 28,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Atlético-MG x Chapecoense",
+      "data_iso": "2026-09-19T16:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 88,
+    "unidades": 87,
     "requisicoes": {
       "channels": 4,
-      "videos": 44,
+      "videos": 43,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-17T21:16:12-03:00"
+  "atualizado_em": "2026-09-18T16:01:21-03:00"
 }
