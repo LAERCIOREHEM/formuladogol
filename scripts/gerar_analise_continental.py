@@ -175,14 +175,23 @@ def build_ties(comp: str, snapshot: Mapping[str, Any], rank: int) -> list[dict[s
             agg[team_key(event['mandante'])] += int((event['mandante'] or {}).get('placar') or 0)
             agg[team_key(event['visitante'])] += int((event['visitante'] or {}).get('placar') or 0)
         last = legs[-1]
-        winner = str(last.get('vencedor') or '').strip()
-        if not winner and len(legs) >= 2 and agg[team_key(a)] != agg[team_key(b)]:
+        # O classificado de um mata-mata de ida e volta é definido pelo
+        # AGREGADO, não pelo vencedor isolado da partida de volta. A ESPN
+        # preenche ``vencedor`` como vencedor do jogo; em Fluminense x
+        # Platense (quartas/2026), por exemplo, o Platense venceu a volta por
+        # 2 a 1, mas o Fluminense avançou por 3 a 2 no agregado.
+        winner = ''
+        if len(legs) >= 2 and agg[team_key(a)] != agg[team_key(b)]:
             winner = nm(a) if agg[team_key(a)] > agg[team_key(b)] else nm(b)
-        if not winner:
-            for event in reversed(legs):
-                if event.get('vencedor'):
-                    winner = str(event['vencedor'])
-                    break
+        elif len(legs) >= 2 and bool(last.get('penaltis')):
+            # Com agregado empatado, somente uma decisão explicitamente
+            # marcada nos pênaltis pode usar o vencedor informado na volta.
+            winner = str(last.get('vencedor') or '').strip()
+        elif len(legs) < 2:
+            # Mantém compatibilidade para fixtures sintéticos/partida única;
+            # fases editoriais de ida e volta só são publicáveis quando a
+            # estrutura completa é validada em outro ponto.
+            winner = str(last.get('vencedor') or '').strip()
         loser = next((x for x in (nm(a), nm(b)) if x != winner), '')
         brazilian = [nm(x) for x in (a, b) if br(x)]
         out.append({
@@ -1375,6 +1384,34 @@ def self_test() -> None:
     }
     closed = editorial_eligibility(closed_joint, history)
     assert closed['action'] == 'publish' and closed['rank'] == 700 and closed['pendentes'] == []
+
+    # Regressão Fluminense x Platense (quartas/2026): o vencedor da volta
+    # pode ser diferente do classificado do confronto. O agregado tem
+    # precedência absoluta quando não está empatado.
+    flu = {'espn_id': 'flu', 'nome': 'Fluminense', 'serie_a_2026': True, 'placar': 0}
+    pla = {'espn_id': 'pla', 'nome': 'Platense', 'serie_a_2026': False, 'placar': 0}
+    aggregate_case = {'eventos': [
+        {'event_id': 'flu1', 'fase_ordem': 700, 'perna': 1, 'data_iso': '2026-09-08T19:00:00-03:00',
+         'mandante': {**flu, 'placar': 2}, 'visitante': {**pla, 'placar': 0}, 'concluido': True, 'vencedor': 'Fluminense'},
+        {'event_id': 'flu2', 'fase_ordem': 900, 'perna': 2, 'data_iso': '2026-09-15T19:00:00-03:00',
+         'mandante': {**pla, 'placar': 2}, 'visitante': {**flu, 'placar': 1}, 'concluido': True, 'vencedor': 'Platense'},
+    ]}
+    aggregate_tie = build_ties('libertadores', aggregate_case, 700)[0]
+    assert aggregate_tie['agregado'] in ([3, 2], [2, 3])
+    assert aggregate_tie['vencedor'] == 'Fluminense'
+    assert aggregate_tie['br_classificados'] == ['Fluminense']
+    assert aggregate_tie['eliminado'] == 'Platense'
+
+    # Empate no agregado decidido nos pênaltis continua usando o vencedor
+    # explícito da volta, preservando o caso das oitavas do próprio Flu.
+    pen_case = {'eventos': [
+        {'event_id': 'pen1', 'fase_ordem': 600, 'perna': 1, 'data_iso': '2026-08-11T19:00:00-03:00',
+         'mandante': {**flu, 'placar': 0}, 'visitante': {**pla, 'placar': 0}, 'concluido': True, 'vencedor': None},
+        {'event_id': 'pen2', 'fase_ordem': 600, 'perna': 2, 'data_iso': '2026-08-18T19:00:00-03:00',
+         'mandante': {**pla, 'placar': 1}, 'visitante': {**flu, 'placar': 1}, 'concluido': True, 'vencedor': 'Fluminense', 'penaltis': True},
+    ]}
+    pen_tie = build_ties('libertadores', pen_case, 600)[0]
+    assert pen_tie['vencedor'] == 'Fluminense' and pen_tie['br_classificados'] == ['Fluminense']
 
     context = continental_editorial_dossier(600, ties, {'comparacoes': []})
     deterministic = editorial_copy(600, ties)
