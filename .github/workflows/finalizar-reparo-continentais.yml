@@ -1,0 +1,238 @@
+name: Finalizar reparo continental 2026
+run-name: Confirmar publicação · e-mail · autolimpeza
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: repo-write-main
+  cancel-in-progress: false
+
+jobs:
+  finalizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Baixar main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Validar estado reparado antes da notificação
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          article_path = Path('analises/continentais-2026-quartas-brasileiros.html')
+          prob_path = Path('dados-br/probabilidades-brasileirao.json')
+          manifest_path = Path('dados-br/analises.json')
+
+          for path in (article_path, prob_path, manifest_path):
+              if not path.is_file():
+                  raise SystemExit(f'arquivo obrigatório ausente: {path}')
+
+          html = article_path.read_text(encoding='utf-8')
+          required_html = (
+              'Classificado: Palmeiras',
+              'Pênaltis 4–3',
+              'Flamengo <b>1 × 1</b> Independiente del Valle',
+              'Classificado: Flamengo',
+              'Classificado: Fluminense',
+              'Classificado: Atlético-MG',
+              'Classificado: Vasco da Gama',
+          )
+          missing = [needle for needle in required_html if needle not in html]
+          if missing:
+              raise SystemExit('editorial reparado não passou na validação: ' + ' | '.join(missing))
+          forbidden = (
+              '<strong>Palmeiras</strong><small>ELIMINADO</small>',
+              'Classificado: Liga de Quito</strong><span>Eliminado: Palmeiras',
+              'Flamengo <b>1 × 0</b> Independiente del Valle',
+          )
+          bad = [needle for needle in forbidden if needle in html]
+          if bad:
+              raise SystemExit('editorial ainda contém estado contaminado: ' + ' | '.join(bad))
+
+          probabilities = json.loads(prob_path.read_text(encoding='utf-8'))
+          if probabilities.get('status') != 'ok':
+              raise SystemExit('probabilidades-brasileirao.json não está com status ok')
+          sims = int((probabilities.get('simulacao') or {}).get('quantidade') or 0)
+          if sims != 2_000_000:
+              raise SystemExit(f'AF não está no cálculo oficial de 2.000.000 simulações: {sims}')
+
+          clubs = {str(x.get('clube') or ''): x for x in probabilities.get('clubes') or []}
+          pal = clubs.get('Palmeiras')
+          if not pal:
+              raise SystemExit('Palmeiras ausente do AF')
+          route = (((pal.get('decomposicao_chances') or {}).get('libertadores') or {}).get('vias') or {}).get('via_titulo_libertadores') or {}
+          if not bool(route.get('possivel_estruturalmente')) or bool(route.get('impossivel_estruturalmente')):
+              raise SystemExit('Palmeiras ainda está estruturalmente eliminado na via título da Libertadores')
+
+          for eliminated, comp, route_key in (
+              ('Corinthians', 'libertadores', 'via_titulo_libertadores'),
+              ('Santos', 'libertadores', 'via_titulo_sul_americana'),
+              ('São Paulo', 'libertadores', 'via_titulo_sul_americana'),
+          ):
+              item = clubs.get(eliminated)
+              if not item:
+                  raise SystemExit(f'{eliminated} ausente do AF')
+              lib = (item.get('decomposicao_chances') or {}).get('libertadores') or {}
+              via = ((lib.get('vias') or {}).get(route_key) or {})
+              if bool(via.get('possivel_estruturalmente')) or float(via.get('percentual_estimado') or 0) != 0.0:
+                  raise SystemExit(f'{eliminated} ainda mantém via continental inválida: {route_key}')
+
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          article = next((x for x in manifest.get('artigos') or [] if x.get('id_editorial') == 'continentais-2026-quartas-brasileiros'), None)
+          if not article:
+              raise SystemExit('editorial continental das Quartas ausente do manifesto')
+
+          print('OK: editorial, AF 2M e integridade estrutural confirmados antes do e-mail.')
+          print('Título:', article.get('titulo'))
+          print('Palmeiras via título Libertadores:', route.get('exibicao') or route.get('percentual_estimado'))
+          PY
+
+      - name: Confirmar editorial publicado no site
+        env:
+          ARTICLE_URL: https://formuladogol.com.br/analises/continentais-2026-quartas-brasileiros.html
+        shell: bash
+        run: |
+          set -euo pipefail
+          ok=0
+          for attempt in $(seq 1 12); do
+            echo "Verificação pública ${attempt}/12..."
+            if curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "${ARTICLE_URL}?integrity=20260918-${GITHUB_RUN_ID}" -o /tmp/editorial-publicado.html; then
+              if grep -Fq 'Classificado: Palmeiras' /tmp/editorial-publicado.html \
+                && grep -Fq 'Pênaltis 4–3' /tmp/editorial-publicado.html \
+                && grep -Fq 'Flamengo <b>1 × 1</b> Independiente del Valle' /tmp/editorial-publicado.html; then
+                ok=1
+                break
+              fi
+            fi
+            sleep 15
+          done
+          if [[ "$ok" != "1" ]]; then
+            echo '::error title=Publicação ainda não confirmada::O site público não apresentou os três invariantes do reparo dentro da janela de verificação.'
+            exit 1
+          fi
+          echo 'OK: editorial reparado confirmado no site público.'
+
+      - name: Enviar e-mail de publicação concluída
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
+          EMAIL_REMETENTE: ${{ secrets.EMAIL_REMETENTE }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ARTICLE_URL: https://formuladogol.com.br/analises/continentais-2026-quartas-brasileiros.html
+          STATS_URL: https://formuladogol.com.br/estatisticas.html#probabilidades
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${RESEND_API_KEY:-}" || -z "${EMAIL_DESTINO:-}" ]]; then
+            echo '::error title=E-mail obrigatório não configurado::RESEND_API_KEY e EMAIL_DESTINO são necessários para concluir a autolimpeza.'
+            exit 1
+          fi
+
+          PAYLOAD="$(python - <<'PY'
+          import html
+          import json
+          import os
+          from pathlib import Path
+
+          manifest = json.loads(Path('dados-br/analises.json').read_text(encoding='utf-8'))
+          article = next(x for x in manifest.get('artigos') or [] if x.get('id_editorial') == 'continentais-2026-quartas-brasileiros')
+          title = str(article.get('titulo') or 'Quartas continentais dos brasileiros')
+          deck = str(article.get('linha_fina') or '')
+          article_url = os.environ['ARTICLE_URL']
+          stats_url = os.environ['STATS_URL']
+          run_url = os.environ['RUN_URL']
+          sender = os.environ.get('EMAIL_REMETENTE') or 'onboarding@resend.dev'
+          destination = os.environ['EMAIL_DESTINO']
+
+          x_text = (
+              'Quartas continentais fechadas no Fórmula do Gol: Palmeiras, Flamengo e Fluminense seguem na Libertadores; '
+              'Atlético-MG e Vasco avançam na Sul-Americana. Probabilidades recalculadas em 2 milhões de simulações. '
+              'Veja a análise completa.'
+          )
+          insta_text = (
+              'CONTINENTAIS 2026 — QUARTAS ENCERRADAS\n\n'
+              'O Fórmula do Gol atualizou o cenário após o fechamento dos confrontos dos brasileiros. '\
+              'Palmeiras, Flamengo e Fluminense avançaram na Libertadores; Atlético-MG e Vasco seguem na Sul-Americana. '\
+              'O AF-Previsão foi recalculado com 2 milhões de simulações.\n\n'
+              'Análise completa no site.'
+          )
+
+          body = f'''<h2>Fórmula do Gol — Editorial Continental publicado</h2>
+          <p><strong>Reparo concluído e publicação confirmada.</strong></p>
+          <p><strong>{html.escape(title)}</strong></p>
+          <p>{html.escape(deck)}</p>
+          <ul>
+            <li>Palmeiras classificado; agregado 3×3 e 4×3 nos pênaltis.</li>
+            <li>Flamengo classificado; volta 1×1 e agregado 3×1.</li>
+            <li>AF-Previsão recalculado com 2.000.000 de simulações.</li>
+            <li>Via de título da Libertadores do Palmeiras novamente estruturalmente ativa.</li>
+          </ul>
+          <p><a href="{html.escape(article_url, quote=True)}">Abrir editorial publicado</a><br>
+          <a href="{html.escape(stats_url, quote=True)}">Abrir probabilidades atualizadas</a><br>
+          <a href="{html.escape(run_url, quote=True)}">Abrir execução de finalização</a></p>
+          <hr>
+          <h3>Texto-base para X</h3>
+          <p>{html.escape(x_text)}</p>
+          <h3>Texto-base para Instagram</h3>
+          <p style="white-space:pre-line">{html.escape(insta_text)}</p>
+          <hr>
+          <p>Após este e-mail, os workflows temporários de reparo/finalização serão removidos automaticamente. As proteções permanentes permanecem no projeto.</p>'''
+
+          print(json.dumps({
+              'from': f'Fórmula do Gol <{sender}>',
+              'to': [destination],
+              'subject': 'Fórmula do Gol: Editorial Continental publicado e reparo concluído',
+              'html': body,
+          }, ensure_ascii=False))
+          PY
+          )"
+
+          HTTP_CODE="$(curl -sS -o /tmp/resend-finalizacao-continentais.json -w '%{http_code}' \
+            -X POST 'https://api.resend.com/emails' \
+            -H "Authorization: Bearer ${RESEND_API_KEY}" \
+            -H 'Content-Type: application/json' \
+            --data "$PAYLOAD")"
+
+          if [[ ! "$HTTP_CODE" =~ ^2 ]]; then
+            echo "::error title=Falha no e-mail de sucesso::Resend HTTP ${HTTP_CODE}; $(head -c 700 /tmp/resend-finalizacao-continentais.json 2>/dev/null)"
+            exit 1
+          fi
+          echo 'OK: e-mail de publicação enviado. Autolimpeza autorizada.'
+
+      - name: Autodestruir workflows temporários
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git rm --ignore-unmatch \
+            .github/workflows/reparar-integridade-continentais.yml \
+            .github/workflows/finalizar-reparo-continentais.yml
+
+          if git diff --cached --quiet; then
+            echo 'Workflows temporários já estavam removidos.'
+            exit 0
+          fi
+
+          git commit -m 'Remover workflows temporários do reparo continental [skip ci]'
+          git pull --rebase origin main
+          git push origin HEAD:main
+          echo 'OK: workflows temporários removidos do repositório.'
+
+      - name: Resumo final
+        if: success()
+        run: |
+          echo 'Editorial confirmado, e-mail enviado e workflows temporários removidos.'
+          echo 'Nenhum deploy adicional é necessário.'
