@@ -112,7 +112,7 @@ jobs:
         run: |
           set -euo pipefail
           if [[ -n "${YOUTUBE_API_KEY:-}" ]]; then
-            python scripts/buscar_melhores_momentos_continentais.py
+            python scripts/buscar_melhores_momentos_continentais.py --fase-ordem "${{ steps.readiness.outputs.rank }}"
           else
             echo "::warning title=YouTube API ausente::Preservando vínculos já publicados; o editorial não será bloqueado."
           fi
