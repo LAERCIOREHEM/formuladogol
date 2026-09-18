@@ -9,20 +9,20 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-09-16T21:41:22-03:00",
+  "gerado_em": "2026-09-17T23:36:59-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
-    "status": "em_andamento",
+    "status": "encerrada",
     "ordem": 700,
     "nome": "Quartas de final",
-    "eventos": 5,
-    "eventos_pendentes": 1
+    "eventos": 8,
+    "eventos_pendentes": 0
   },
   "resumo": {
     "eventos": 152,
-    "finalizados": 151,
-    "pendentes": 1,
+    "finalizados": 152,
+    "pendentes": 0,
     "equipes": 56,
     "equipes_serie_a_2026": 7
   },
@@ -39,7 +39,7 @@
       "atualizados": 1,
       "ao_vivo": [],
       "finalizados": [
-        "401913071"
+        "401913072"
       ],
       "erros": []
     }
@@ -5885,8 +5885,8 @@
       "estado": "post",
       "concluido": true,
       "status": "FT",
-      "fase": "2026 CONMEBOL Sudamericana, Quarterfinals",
-      "fase_ordem": 900,
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
       "semana": null,
       "perna": 2,
       "estadio": "",
@@ -5921,8 +5921,8 @@
       "estado": "post",
       "concluido": true,
       "status": "FT",
-      "fase": "2026 CONMEBOL Sudamericana, Quarterfinals",
-      "fase_ordem": 900,
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
       "semana": null,
       "perna": 2,
       "estadio": "",
@@ -5957,8 +5957,8 @@
       "estado": "post",
       "concluido": true,
       "status": "FT-Pens",
-      "fase": "2026 CONMEBOL Sudamericana, Quarterfinals",
-      "fase_ordem": 900,
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
       "semana": null,
       "perna": 2,
       "estadio": "",
@@ -5990,14 +5990,14 @@
     {
       "event_id": "401913072",
       "data_iso": "2026-09-17T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qui., Setembro 17º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "FT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
       "perna": 2,
-      "estadio": "Estadio Centenario",
+      "estadio": "",
       "mandante": {
         "espn_id": "19002",
         "nome": "Montevideo City Torque",
@@ -6006,8 +6006,8 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 3
       },
       "visitante": {
         "espn_id": "3372",
@@ -6020,15 +6020,15 @@
         "vencedor": false,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Montevideo City Torque",
       "penaltis": false
     }
   ],
   "validacao_af": {
     "status": "pronto",
-    "fase": "Final",
-    "fase_ordem": 900,
-    "chaves": 1,
-    "equipes_ativas": 1
+    "fase": "Quartas de final",
+    "fase_ordem": 700,
+    "chaves": 4,
+    "equipes_ativas": 4
   }
 }
