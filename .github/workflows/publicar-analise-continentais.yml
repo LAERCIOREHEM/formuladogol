@@ -123,6 +123,8 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_EDITORIAL_MODEL: ${{ vars.OPENAI_EDITORIAL_MODEL || 'gpt-5.6-sol' }}
           OPENAI_EDITORIAL_REASONING: high
+          OPENAI_EDITORIAL_REVIEW: '1'
+          OPENAI_EDITORIAL_MAX_TOKENS: '12000'
         run: python scripts/gerar_analise_continental.py --usar-ia
 
       - name: Validar artefatos editoriais
@@ -131,6 +133,8 @@ jobs:
           set -euo pipefail
           python -m json.tool dados-br/analises.json >/dev/null
           python -m json.tool dados-br/melhores-momentos-continentais.json >/dev/null
+          python -m json.tool dados-br/correcoes/melhores-momentos-continentais-verificados.json >/dev/null
+          python -m json.tool dados-br/correcoes/contexto-editorial-continentais-2026.json >/dev/null
           python scripts/validar_artefatos_analises.py
 
       - name: Publicar alterações
