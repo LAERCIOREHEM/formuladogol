@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-09-17T23:36:59-03:00",
+  "gerado_em": "2026-09-18T11:40:56-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -27,7 +27,7 @@
     "equipes_serie_a_2026": 7
   },
   "coleta": {
-    "modo": "incremental",
+    "modo": "recuperacao_canônica",
     "janela_inicio": "2026-08-25T00:00:00-03:00",
     "janela_fim": "2027-01-13T23:59:59-03:00",
     "requisicoes": 4,
@@ -42,7 +42,9 @@
         "401913072"
       ],
       "erros": []
-    }
+    },
+    "recuperacao_incidente": "continentais-2026-quartas-20260918",
+    "fonte_recuperacao": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana"
   },
   "equipes": [
     {
@@ -5769,7 +5771,13 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
+      }
     },
     {
       "event_id": "401912542",
@@ -5805,7 +5813,13 @@
         "placar": 0
       },
       "vencedor": "Boca Juniors",
-      "penaltis": false
+      "penaltis": false,
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
+      }
     },
     {
       "event_id": "401913073",
@@ -5841,7 +5855,13 @@
         "placar": 0
       },
       "vencedor": "Santos",
-      "penaltis": false
+      "penaltis": false,
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
+      }
     },
     {
       "event_id": "401913074",
@@ -5877,14 +5897,20 @@
         "placar": 0
       },
       "vencedor": "Cienciano del Cusco",
-      "penaltis": false
+      "penaltis": false,
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
+      }
     },
     {
       "event_id": "401913959",
       "data_iso": "2026-09-15T19:00:00-03:00",
       "estado": "post",
       "concluido": true,
-      "status": "FT",
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5913,14 +5939,20 @@
         "placar": 0
       },
       "vencedor": "Vasco da Gama",
-      "penaltis": false
+      "penaltis": false,
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
+      }
     },
     {
       "event_id": "401912524",
       "data_iso": "2026-09-15T21:30:00-03:00",
       "estado": "post",
       "concluido": true,
-      "status": "FT",
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5945,18 +5977,24 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": false,
-        "vencedor": true,
+        "vencedor": false,
         "placar": 1
       },
-      "vencedor": "Boca Juniors",
-      "penaltis": false
+      "vencedor": null,
+      "penaltis": false,
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
+      }
     },
     {
       "event_id": "401913071",
       "data_iso": "2026-09-16T19:00:00-03:00",
       "estado": "post",
       "concluido": true,
-      "status": "FT-Pens",
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5985,14 +6023,24 @@
         "placar": 2
       },
       "vencedor": "Atlético-MG",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 3,
+        "visitante": 1
+      },
+      "vencedor_penaltis": "Atlético-MG",
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
+      }
     },
     {
       "event_id": "401913072",
       "data_iso": "2026-09-17T21:30:00-03:00",
       "estado": "post",
       "concluido": true,
-      "status": "FT",
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -6021,14 +6069,13 @@
         "placar": 0
       },
       "vencedor": "Montevideo City Torque",
-      "penaltis": false
+      "penaltis": false,
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
+      }
     }
-  ],
-  "validacao_af": {
-    "status": "pronto",
-    "fase": "Quartas de final",
-    "fase_ordem": 700,
-    "chaves": 4,
-    "equipes_ativas": 4
-  }
+  ]
 }

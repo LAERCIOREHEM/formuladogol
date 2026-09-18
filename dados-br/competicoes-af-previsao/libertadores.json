@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-09-18T07:40:46-03:00",
+  "gerado_em": "2026-09-18T11:40:56-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -20,19 +20,19 @@
     "eventos_pendentes": 0
   },
   "resumo": {
-    "eventos": 155,
+    "eventos": 151,
     "finalizados": 150,
-    "pendentes": 5,
+    "pendentes": 1,
     "equipes": 49,
     "equipes_serie_a_2026": 8
   },
   "coleta": {
-    "modo": "incremental",
+    "modo": "recuperacao_canônica",
     "janela_inicio": "2026-08-25T00:00:00-03:00",
     "janela_fim": "2027-01-13T23:59:59-03:00",
     "requisicoes": 4,
     "ultima_completa_em": "2026-09-13T05:13:02-03:00",
-    "ajustes_editoriais_aplicados": 2,
+    "ajustes_editoriais_aplicados": 1,
     "summary_partidas_iniciadas": {
       "consultados": 1,
       "confirmados": 1,
@@ -42,7 +42,9 @@
         "401912526"
       ],
       "erros": []
-    }
+    },
+    "recuperacao_incidente": "continentais-2026-quartas-20260918",
+    "fonte_recuperacao": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores"
   },
   "equipes": [
     {
@@ -430,7 +432,7 @@
       "sigla": "TBD Away",
       "pais": null,
       "serie_a_2026": false,
-      "jogos": 5
+      "jogos": 1
     },
     {
       "espn_id": "131556",
@@ -439,7 +441,7 @@
       "sigla": "TBD Home",
       "pais": null,
       "serie_a_2026": false,
-      "jogos": 5
+      "jogos": 1
     },
     {
       "espn_id": "2687",
@@ -5638,6 +5640,12 @@
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
+      },
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -5678,6 +5686,12 @@
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
+      },
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -5718,6 +5732,12 @@
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
+      },
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -5758,6 +5778,12 @@
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
+      },
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -5765,7 +5791,7 @@
       "data_iso": "2026-09-15T19:00:00-03:00",
       "estado": "post",
       "concluido": true,
-      "status": "FT",
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5798,6 +5824,12 @@
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
+      },
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -5805,7 +5837,7 @@
       "data_iso": "2026-09-16T19:00:00-03:00",
       "estado": "post",
       "concluido": true,
-      "status": "FT-Pens",
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5834,10 +5866,20 @@
         "placar": 2
       },
       "vencedor": "Liga de Quito",
-      "penaltis": true,
+      "penaltis": {
+        "mandante": 3,
+        "visitante": 4
+      },
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
+      },
+      "vencedor_penaltis": "Palmeiras",
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -5845,7 +5887,7 @@
       "data_iso": "2026-09-16T21:30:00-03:00",
       "estado": "post",
       "concluido": true,
-      "status": "FT",
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5878,6 +5920,12 @@
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
+      },
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -5885,7 +5933,7 @@
       "data_iso": "2026-09-17T21:30:00-03:00",
       "estado": "post",
       "concluido": true,
-      "status": "FT",
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5899,7 +5947,7 @@
         "pais": null,
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": true,
+        "vencedor": false,
         "placar": 1
       },
       "visitante": {
@@ -5911,158 +5959,20 @@
         "serie_a_2026": false,
         "mandante": false,
         "vencedor": false,
-        "placar": 0
+        "placar": 1
       },
-      "vencedor": "Flamengo",
+      "vencedor": null,
       "penaltis": false,
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
+      },
+      "correcao_integridade": {
+        "incidente": "continentais-2026-quartas-20260918",
+        "fonte": "CONMEBOL",
+        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
+        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
-    },
-    {
-      "event_id": "401912522",
-      "data_iso": "2026-10-14T15:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "P.A.",
-      "fase": "Semifinal",
-      "fase_ordem": 800,
-      "semana": null,
-      "perna": 1,
-      "estadio": "",
-      "mandante": {
-        "espn_id": "131556",
-        "nome": "TBD Home",
-        "nome_espn": "TBD Home",
-        "sigla": "TBD Home",
-        "pais": null,
-        "serie_a_2026": false,
-        "mandante": true,
-        "vencedor": false,
-        "placar": 0
-      },
-      "visitante": {
-        "espn_id": "131554",
-        "nome": "TBD Away",
-        "nome_espn": "TBD Away",
-        "sigla": "TBD Away",
-        "pais": null,
-        "serie_a_2026": false,
-        "mandante": false,
-        "vencedor": false,
-        "placar": 0
-      },
-      "vencedor": null,
-      "penaltis": false
-    },
-    {
-      "event_id": "401912523",
-      "data_iso": "2026-10-14T15:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "P.A.",
-      "fase": "Semifinal",
-      "fase_ordem": 800,
-      "semana": null,
-      "perna": 1,
-      "estadio": "",
-      "mandante": {
-        "espn_id": "131556",
-        "nome": "TBD Home",
-        "nome_espn": "TBD Home",
-        "sigla": "TBD Home",
-        "pais": null,
-        "serie_a_2026": false,
-        "mandante": true,
-        "vencedor": false,
-        "placar": 0
-      },
-      "visitante": {
-        "espn_id": "131554",
-        "nome": "TBD Away",
-        "nome_espn": "TBD Away",
-        "sigla": "TBD Away",
-        "pais": null,
-        "serie_a_2026": false,
-        "mandante": false,
-        "vencedor": false,
-        "placar": 0
-      },
-      "vencedor": null,
-      "penaltis": false
-    },
-    {
-      "event_id": "401912520",
-      "data_iso": "2026-10-21T15:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "P.A.",
-      "fase": "Semifinal",
-      "fase_ordem": 800,
-      "semana": null,
-      "perna": 2,
-      "estadio": "",
-      "mandante": {
-        "espn_id": "131556",
-        "nome": "TBD Home",
-        "nome_espn": "TBD Home",
-        "sigla": "TBD Home",
-        "pais": null,
-        "serie_a_2026": false,
-        "mandante": true,
-        "vencedor": false,
-        "placar": 0
-      },
-      "visitante": {
-        "espn_id": "131554",
-        "nome": "TBD Away",
-        "nome_espn": "TBD Away",
-        "sigla": "TBD Away",
-        "pais": null,
-        "serie_a_2026": false,
-        "mandante": false,
-        "vencedor": false,
-        "placar": 0
-      },
-      "vencedor": null,
-      "penaltis": false
-    },
-    {
-      "event_id": "401912521",
-      "data_iso": "2026-10-21T15:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "P.A.",
-      "fase": "Semifinal",
-      "fase_ordem": 800,
-      "semana": null,
-      "perna": 2,
-      "estadio": "",
-      "mandante": {
-        "espn_id": "131556",
-        "nome": "TBD Home",
-        "nome_espn": "TBD Home",
-        "sigla": "TBD Home",
-        "pais": null,
-        "serie_a_2026": false,
-        "mandante": true,
-        "vencedor": false,
-        "placar": 0
-      },
-      "visitante": {
-        "espn_id": "131554",
-        "nome": "TBD Away",
-        "nome_espn": "TBD Away",
-        "sigla": "TBD Away",
-        "pais": null,
-        "serie_a_2026": false,
-        "mandante": false,
-        "vencedor": false,
-        "placar": 0
-      },
-      "vencedor": null,
-      "penaltis": false
     },
     {
       "event_id": "401912519",
@@ -6100,12 +6010,5 @@
       "vencedor": null,
       "penaltis": false
     }
-  ],
-  "validacao_af": {
-    "status": "pronto",
-    "fase": "Quartas de final",
-    "fase_ordem": 700,
-    "chaves": 4,
-    "equipes_ativas": 4
-  }
+  ]
 }
