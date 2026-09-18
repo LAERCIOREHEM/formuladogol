@@ -3593,73 +3593,89 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: Mirassol x Botafogo, Brasileirão Série A 2026, 28ª rodada, sábado, 19/09/2026, às 17h (BRT), no Maião. A grade completa apurada é Record, CazéTV e Premiere; portanto, não é transmissão exclusiva. O vídeo da CazéTV é específico da partida e está programado como transmissão ao vivo."
+    },
+    {
+      "event_id": "401841244",
+      "jogo": "Remo x Santos",
+      "data_iso": "2026-09-19T18:30:00-03:00",
+      "checkpoint": -1440,
+      "executado_em": "2026-09-18T18:32:48-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Premiere"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a",
+        "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/14/bahia-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/09/01/cbf-detalha-rodadas-27-a-30-da-serie-a-veja-os-jogos-do-remo.ghtml",
+        "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/09/16/remo-inicia-venda-de-ingressos-para-o-jogo-contra-o-santos-veja-os-valores.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/remo-x-santos-fc/832170",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/bahia-entra-no-g-4-do-brasileirao-com-triunfo-sobre-o-remo",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/botafogo-segura-palmeiras-e-ajuda-fla-a-tomar-a-lideranca-do-brasileirao",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/vitoria-do-corinthians-sobre-o-remo-encerra-1-turno-da-serie-a-veja-raio-x-do-brasileirao",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/selecao-masculina/tite-convoca-a-selecao-brasileira-para-amistosos-de-setembro/cbf-divulga-tabela-detalhada-das-rodadas-15-a-19-do-brasileirao-sub-20",
+        "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026"
+      ],
+      "canais_depois": [
+        "Premiere"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/remo-x-santos-fc/832170",
+        "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/09/16/remo-inicia-venda-de-ingressos-para-o-jogo-contra-o-santos-veja-os-valores.ghtml"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Remo x Santos, Campeonato Brasileiro Série A 2026, fase única, rodada 28, sábado, 19/09/2026, às 18h30 (horário de Brasília), no Mangueirão, em Belém. A página oficial da CBF do jogo lista Premiere como transmissão. Não há evidência consultada de transmissão integral por Globo, SporTV, GE TV, CazéTV, Prime Video, Disney+ / ESPN, Paramount+, Record ou SBT. Exclusividade não foi afirmada explicitamente pela fonte, portanto marcada como false."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841245",
-    "jogo": "Mirassol x Botafogo",
-    "data_iso": "2026-09-19T17:00:00-03:00",
+    "event_id": "401841244",
+    "jogo": "Remo x Santos",
+    "data_iso": "2026-09-19T18:30:00-03:00",
     "checkpoint": -1440,
-    "executado_em": "2026-09-18T17:04:10-03:00",
+    "executado_em": "2026-09-18T18:32:48-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "CazéTV",
       "Premiere"
     ],
-    "status": "corrigido",
+    "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://credencial.cbf.com.br/competicoes/listar/42/1",
-      "https://ge.globo.com/agenda",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/04/01/botafogo-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2025/12/15/cbf-divulga-regulamento-especifico-e-tabela-basica-do-brasileirao-2026-com-mudancas-nas-regras.ghtml",
+      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a",
+      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/14/bahia-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
       "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/rs/futebol/times/internacional/noticia/2026/01/12/estatisticas-do-inter-em-2026-veja-campanha-artilheiros-e-videos.ghtml",
-      "https://sports.sbt.com.br/noticia/sbt-sports/cbf-divulga-tabela-e-altera-regras-do-brasileirao-2026",
-      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/301823",
-      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/527047",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/mirassol-x-vitoria/832155",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2026/botafogo-x-gremio-novorizontino-saf/833142",
+      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/09/01/cbf-detalha-rodadas-27-a-30-da-serie-a-veja-os-jogos-do-remo.ghtml",
+      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/09/16/remo-inicia-venda-de-ingressos-para-o-jogo-contra-o-santos-veja-os-valores.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/remo-x-santos-fc/832170",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/bahia-entra-no-g-4-do-brasileirao-com-triunfo-sobre-o-remo",
       "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/botafogo-segura-palmeiras-e-ajuda-fla-a-tomar-a-lideranca-do-brasileirao",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/fla-goleia-mirassol-e-reduz-diferenca-para-o-lider-palmeiras",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/flamengo-vence-mirassol-e-cola-no-palmeiras",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/noticias/a/mirassol-reage-e-arranca-empate-apos-sair-perdendo-por-3-a-0-para-o-botafogo",
-      "https://www.cbf.com.br/futebol-brasileiro/ranking/competicoes-ranking/a/botafogo-sp-e-operario-pr-empatam-pela-27-rodada-da-serie-b-novorizontino-e-athletic-jogam-nesta-sexta",
-      "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2025/20385/60646",
-      "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/20385",
-      "https://www.cbf.com.br/futebol-brasileiro/times/copa-do-brasil/masculino/2026/20385",
-      "https://www.uol.com.br/esporte/futebol/times/botafogo",
-      "https://www.uol.com.br/esporte/futebol/times/mirassol",
-      "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/08/31/cbf-rodadas-brasileirao.amp.htm",
-      "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/09/13/mirassol-x-vitoria---brasileirao.amp.htm",
-      "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2025/12/16/veja-a-tabela-completa-de-todos-os-jogos-no-brasileirao-2026-do-palmeiras.amp.htm",
-      "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2025/12/16/veja-a-tabela-completa-de-todos-os-jogos-no-brasileirao-2026-do-sao-paulo.htm",
-      "https://www.youtube.com/watch?v=5tuFjljf3OA"
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/vitoria-do-corinthians-sobre-o-remo-encerra-1-turno-da-serie-a-veja-raio-x-do-brasileirao",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/selecao-masculina/tite-convoca-a-selecao-brasileira-para-amistosos-de-setembro/cbf-divulga-tabela-detalhada-das-rodadas-15-a-19-do-brasileirao-sub-20",
+      "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026"
     ],
     "canais_depois": [
-      "CazéTV",
-      "Premiere",
-      "Record"
+      "Premiere"
     ],
     "exclusivo": false,
-    "confianca": 0.98,
+    "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://www.uol.com.br/esporte/futebol/times/mirassol",
-      "https://www.youtube.com/watch?v=5tuFjljf3OA"
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/remo-x-santos-fc/832170",
+      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/09/16/remo-inicia-venda-de-ingressos-para-o-jogo-contra-o-santos-veja-os-valores.ghtml"
     ],
-    "youtube": [
-      {
-        "url": "https://www.youtube.com/watch?v=5tuFjljf3OA",
-        "scope": "match",
-        "valid_for_match": true,
-        "reason": "Vídeo do canal verificado CazéTV, intitulado “AO VIVO: MIRASSOL X BOTAFOGO | BRASILEIRÃO 2026 | 28ª RODADA”; a identificação nomeia a partida e a rodada, não apenas aquecimento, watchalong, pós-jogo ou melhores momentos."
-      }
-    ],
+    "youtube": [],
     "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: Mirassol x Botafogo, Brasileirão Série A 2026, 28ª rodada, sábado, 19/09/2026, às 17h (BRT), no Maião. A grade completa apurada é Record, CazéTV e Premiere; portanto, não é transmissão exclusiva. O vídeo da CazéTV é específico da partida e está programado como transmissão ao vivo."
+    "resumo": "Confirmado para o Brasil: Remo x Santos, Campeonato Brasileiro Série A 2026, fase única, rodada 28, sábado, 19/09/2026, às 18h30 (horário de Brasília), no Mangueirão, em Belém. A página oficial da CBF do jogo lista Premiere como transmissão. Não há evidência consultada de transmissão integral por Globo, SporTV, GE TV, CazéTV, Prime Video, Disney+ / ESPN, Paramount+, Record ou SBT. Exclusividade não foi afirmada explicitamente pela fonte, portanto marcada como false."
   },
-  "atualizado_em": "2026-09-18T17:04:10-03:00"
+  "atualizado_em": "2026-09-18T18:32:48-03:00"
 }
