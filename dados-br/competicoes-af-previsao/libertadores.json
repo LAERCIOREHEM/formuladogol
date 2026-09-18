@@ -9,20 +9,20 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-09-17T00:11:58-03:00",
+  "gerado_em": "2026-09-18T07:40:46-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
-    "status": "em_andamento",
+    "status": "encerrada",
     "ordem": 700,
     "nome": "Quartas de final",
-    "eventos": 5,
-    "eventos_pendentes": 1
+    "eventos": 8,
+    "eventos_pendentes": 0
   },
   "resumo": {
     "eventos": 155,
-    "finalizados": 149,
-    "pendentes": 6,
+    "finalizados": 150,
+    "pendentes": 5,
     "equipes": 49,
     "equipes_serie_a_2026": 8
   },
@@ -32,14 +32,14 @@
     "janela_fim": "2027-01-13T23:59:59-03:00",
     "requisicoes": 4,
     "ultima_completa_em": "2026-09-13T05:13:02-03:00",
-    "ajustes_editoriais_aplicados": 1,
+    "ajustes_editoriais_aplicados": 2,
     "summary_partidas_iniciadas": {
       "consultados": 1,
       "confirmados": 1,
       "atualizados": 1,
       "ao_vivo": [],
       "finalizados": [
-        "401912540"
+        "401912526"
       ],
       "erros": []
     }
@@ -5766,8 +5766,8 @@
       "estado": "post",
       "concluido": true,
       "status": "FT",
-      "fase": "2026 CONMEBOL Libertadores, Quarterfinals",
-      "fase_ordem": 900,
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
       "semana": null,
       "perna": 2,
       "estadio": "Ciudad de Vicente López",
@@ -5806,8 +5806,8 @@
       "estado": "post",
       "concluido": true,
       "status": "FT-Pens",
-      "fase": "2026 CONMEBOL Libertadores, Quarterfinals",
-      "fase_ordem": 900,
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
       "semana": null,
       "perna": 2,
       "estadio": "Rodrigo Paz Delgado",
@@ -5846,8 +5846,8 @@
       "estado": "post",
       "concluido": true,
       "status": "FT",
-      "fase": "2026 CONMEBOL Libertadores, Quarterfinals",
-      "fase_ordem": 900,
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
       "semana": null,
       "perna": 2,
       "estadio": "Neo Química Arena",
@@ -5883,9 +5883,9 @@
     {
       "event_id": "401912526",
       "data_iso": "2026-09-17T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qui., Setembro 17º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "FT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5899,8 +5899,8 @@
         "pais": null,
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 1
       },
       "visitante": {
         "espn_id": "17086",
@@ -5913,7 +5913,7 @@
         "vencedor": false,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Flamengo",
       "penaltis": false,
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
@@ -6103,9 +6103,9 @@
   ],
   "validacao_af": {
     "status": "pronto",
-    "fase": "Final",
-    "fase_ordem": 900,
-    "chaves": 1,
-    "equipes_ativas": 1
+    "fase": "Quartas de final",
+    "fase_ordem": 700,
+    "chaves": 4,
+    "equipes_ativas": 4
   }
 }
