@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import copy
 import hashlib
+import importlib
 import json
 import os
 import re
@@ -52,7 +53,6 @@ from gerar_analise_rodada import (  # noqa: E402
     resumo_editorial,
     schema_editorial,
 )
-import gerar_analise_copa_do_brasil as copa  # noqa: E402
 
 TZ = ZoneInfo("America/Sao_Paulo")
 AUDIT_PATH = ROOT / "dados-br" / "auditoria-ia.json"
@@ -353,8 +353,22 @@ def round_editorial_candidate(moment: datetime) -> dict[str, Any] | None:
     }
 
 
+
+def _load_copa_editorial_module():
+    """Carrega a camada da Copa do Brasil somente quando ela for realmente usada.
+
+    O módulo da Copa importa o motor AF-Previsão, que por sua vez depende de
+    NumPy. A auditoria diária precisa conseguir executar seus testes de
+    governança/segurança mesmo em um runner auxiliar que ainda não instalou as
+    dependências científicas. A execução operacional continua instalando e
+    validando requirements-af-previsao.txt no workflow antes da auditoria.
+    """
+    return importlib.import_module("gerar_analise_copa_do_brasil")
+
+
 def copa_editorial_candidate() -> dict[str, Any] | None:
     try:
+        copa = _load_copa_editorial_module()
         snapshot = copa.load_json(copa.COPA_PATH)
         copa.activate_phase(copa.phase_rank_from_snapshot(snapshot))
         phase = copa.phase_summary(snapshot)
@@ -1231,6 +1245,10 @@ def self_test() -> int:
     assert normalize_url("https://GE.GLOBO.COM/a/?utm=x#z") == "https://ge.globo.com/a"
     schema = audit_schema()
     assert "editorial_rodada" not in schema["properties"] and "editorial_copa" not in schema["properties"]
+    # Governança deve ser testável sem carregar o motor científico. Isso evita
+    # que uma checagem puramente estática de workflows dependa de NumPy.
+    assert "gerar_analise_copa_do_brasil" not in sys.modules
+    assert "af_previsao_continental" not in sys.modules
 
     triage = {
         "pendencias": {
