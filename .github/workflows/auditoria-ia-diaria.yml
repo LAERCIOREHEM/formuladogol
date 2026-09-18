@@ -36,8 +36,16 @@ jobs:
           cache: 'pip'
           cache-dependency-path: requirements-af-previsao.txt
 
-      - name: Instalar dependências já usadas pelo motor estatístico
-        run: python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
+      - name: Instalar e comprovar dependências do AF-Previsão
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
+          python - <<'PY'
+          import numpy
+          import curl_cffi
+          print(f'OK: numpy={numpy.__version__}; curl_cffi={curl_cffi.__version__}')
+          PY
 
       - name: Validar integralmente a camada antes da execução
         shell: bash
