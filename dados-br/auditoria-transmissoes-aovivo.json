@@ -17,10 +17,10 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 5,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 45,
+    "candidatos_oficiais_encontrados": 42,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 0,
-    "search_api_jogos_pulados_grade_estavel": 1,
+    "search_api_jogos_elegiveis": 1,
+    "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 6,
     "sem_transmissao": 0,
     "erros": 0
@@ -80,7 +80,7 @@
         "CazéTV"
       ],
       "manual": false,
-      "descoberta_antecipada": true
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841243",
@@ -94,7 +94,7 @@
         "GE TV"
       ],
       "manual": false,
-      "descoberta_antecipada": false
+      "descoberta_antecipada": true
     },
     {
       "event_id": "401841242",
@@ -263,16 +263,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "HqFxqARY3G8",
-      "url": "https://www.youtube.com/watch?v=HqFxqARY3G8",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: TÊNIS | SP OPEN 2026 | SEMIFINAL | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-09-19T12:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "lHXt6D_tO8E",
       "url": "https://www.youtube.com/watch?v=lHXt6D_tO8E",
       "fonte": "sbt",
@@ -323,6 +313,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "HqFxqARY3G8",
+      "url": "https://www.youtube.com/watch?v=HqFxqARY3G8",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: TÊNIS | SP OPEN 2026 | SEMIFINAL | ge tv",
+      "status": "live",
+      "inicio_programado": "2026-09-19T12:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "NSuMkx2IDhg",
       "url": "https://www.youtube.com/watch?v=NSuMkx2IDhg",
       "fonte": "getv",
@@ -368,7 +368,7 @@
       "fonte": "getv",
       "canal": "ge tv",
       "titulo": "AO VIVO: SÃO PAULO X FLAMENGO | SEMIFINAL | BRASILEIRÃO FEMININO 2026 | ge tv",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-19T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -498,7 +498,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: LYON X RENNES | LIGUE 1 26/27 | 5ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-19T15:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -513,16 +513,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "QQbVDgHCW-g",
-      "url": "https://www.youtube.com/watch?v=QQbVDgHCW-g",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ORLANDO LUZ E RAFAEL MATOS X JAKUB PAUL E DOMINIC STRICKER | BRASIL X SUÍÇA | COPA DAVIS",
-      "status": "live",
-      "inicio_programado": "2026-09-19T13:00:00-03:00",
-      "motivo": "conteúdo reúne mais de uma partida"
-    },
-    {
       "video_id": "SUD2HZH1aCU",
       "url": "https://www.youtube.com/watch?v=SUD2HZH1aCU",
       "fonte": "cazetv",
@@ -530,16 +520,6 @@
       "titulo": "AO VIVO (SOM AMBIENTE): LE MANS X FC LORIENT | LIGUE 1 26/27 | 5ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-09-19T15:40:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "TmwEk5lnQpo",
-      "url": "https://www.youtube.com/watch?v=TmwEk5lnQpo",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: CELTA X RACING CLUB | LALIGA 26/27 | 7ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-19T13:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -567,20 +547,10 @@
       "url": "https://www.youtube.com/watch?v=Zm5YJptWpa4",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: BRASIL X ESPANHA | COPA DO MUNDO FEMININA SUB-20 FIFA 2026 | QUARTAS DE FINAL",
+      "titulo": "AO VIVO: ORLANDO LUZ E RAFAEL MATOS X JAKUB PAUL E DOMINIC STRICKER | BRASIL X SUÍÇA | COPA DAVIS",
       "status": "live",
       "inicio_programado": "2026-09-19T09:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "cDvqBEla-Vc",
-      "url": "https://www.youtube.com/watch?v=cDvqBEla-Vc",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: VFB STUTTGART X BORUSSIA DORTMUND | BUNDESLIGA 26/27 | 4ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-19T12:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
+      "motivo": "conteúdo reúne mais de uma partida"
     },
     {
       "video_id": "hK76uv3Q39w",
@@ -643,13 +613,7 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [
-    {
-      "event_id": "401841243",
-      "jogo": "São Paulo x Internacional",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    }
-  ],
+  "search_api_pulados": [],
   "sem_transmissao": [],
   "erros": [],
   "quota_estimada_youtube": {
@@ -661,5 +625,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-19T15:01:34-03:00"
+  "atualizado_em": "2026-09-19T15:31:26-03:00"
 }
