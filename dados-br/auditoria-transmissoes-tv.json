@@ -4,8 +4,8 @@
     "jogos_na_janela": 42,
     "jogos_com_transmissao": 33,
     "jogos_sem_transmissao_na_janela": 9,
-    "jogos_sem_transmissao_14d": 0,
-    "jogos_sem_transmissao_fora_14d": 9,
+    "jogos_sem_transmissao_14d": 1,
+    "jogos_sem_transmissao_fora_14d": 8,
     "jogos_criticos_sem_transmissao_72h": 0,
     "registros_preservados": 23,
     "jogos_guardiao_ia": 7,
@@ -27,7 +27,7 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 4103
+      "duracao_ms": 4369
     },
     "espn": {
       "ok": true,
@@ -42,22 +42,31 @@
       "jogos_com_canal": 6
     }
   },
-  "sem_transmissao": [],
+  "sem_transmissao": [
+    {
+      "event_id": "401841168",
+      "rodada": 21,
+      "jogo": "Atlético-MG x Bragantino",
+      "data_iso": "2026-10-03T18:30:00-03:00",
+      "faltam_horas": 335.8,
+      "nivel": "aviso"
+    }
+  ],
   "sem_transmissao_futura": [
     {
       "event_id": "401841168",
       "rodada": 21,
       "jogo": "Atlético-MG x Bragantino",
       "data_iso": "2026-10-03T18:30:00-03:00",
-      "faltam_horas": 336.2,
-      "nivel": "futuro"
+      "faltam_horas": 335.8,
+      "nivel": "aviso"
     },
     {
       "event_id": "401841252",
       "rodada": 29,
       "jogo": "Remo x Grêmio",
       "data_iso": "2026-10-07T19:30:00-03:00",
-      "faltam_horas": 433.2,
+      "faltam_horas": 432.8,
       "nivel": "futuro"
     },
     {
@@ -65,7 +74,7 @@
       "rodada": 29,
       "jogo": "Vitória x Chapecoense",
       "data_iso": "2026-10-07T20:00:00-03:00",
-      "faltam_horas": 433.7,
+      "faltam_horas": 433.3,
       "nivel": "futuro"
     },
     {
@@ -73,7 +82,7 @@
       "rodada": 29,
       "jogo": "Fluminense x Coritiba",
       "data_iso": "2026-10-08T21:30:00-03:00",
-      "faltam_horas": 459.2,
+      "faltam_horas": 458.8,
       "nivel": "futuro"
     },
     {
@@ -81,7 +90,7 @@
       "rodada": 30,
       "jogo": "São Paulo x Vitória",
       "data_iso": "2026-10-10T21:00:00-03:00",
-      "faltam_horas": 506.7,
+      "faltam_horas": 506.3,
       "nivel": "futuro"
     },
     {
@@ -89,7 +98,7 @@
       "rodada": 30,
       "jogo": "Bahia x Mirassol",
       "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 529.2,
+      "faltam_horas": 528.8,
       "nivel": "futuro"
     },
     {
@@ -97,7 +106,7 @@
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 553.2,
+      "faltam_horas": 552.8,
       "nivel": "futuro"
     },
     {
@@ -105,7 +114,7 @@
       "rodada": 31,
       "jogo": "Remo x Bragantino",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 668.7,
+      "faltam_horas": 668.3,
       "nivel": "futuro"
     },
     {
@@ -113,7 +122,7 @@
       "rodada": 31,
       "jogo": "Fluminense x Santos",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 668.7,
+      "faltam_horas": 668.3,
       "nivel": "futuro"
     }
   ],
@@ -346,5 +355,5 @@
     "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
   "artigos_ge_descobertos": [],
-  "atualizado_em": "2026-09-19T18:18:31-03:00"
+  "atualizado_em": "2026-09-19T18:40:49-03:00"
 }
