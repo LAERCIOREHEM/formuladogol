@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-18",
-  "executado_em": "2026-09-18T15:12:03-03:00",
+  "data_brt": "2026-09-19",
+  "executado_em": "2026-09-19T11:46:47-03:00",
   "status": "atencao",
-  "resumo": "Auditoria concluída sem pendências factuais de público/renda, transmissão ou melhores momentos. Há aviso determinístico de falhas em fontes de transmissão, mas sem perda crítica de cobertura; nenhuma intervenção é necessária.",
+  "resumo": "Auditoria concluída. Não há pendências de público/renda, transmissão ou melhores momentos que exijam investigação ou correção. Foram registrados avisos de falha em 2 fontes de transmissão, sem perda crítica de cobertura.",
   "triagem": {
-    "data_hora_brt": "2026-09-18T15:12:03-03:00",
+    "data_hora_brt": "2026-09-19T11:46:47-03:00",
     "saude": {
       "status_deterministico": "atencao",
       "criticos": [],
       "avisos": [
-        "4 fonte(s) de transmissão falharam, sem perda crítica de cobertura"
+        "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura"
       ],
       "indicadores": {
         "estatisticas_erros_criticos": 0,
@@ -21,7 +21,7 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 7.5
+        "ultimo_sucesso_horas": 6.6
       }
     },
     "pendencias": {
@@ -59,12 +59,12 @@
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "Auditoria concluída sem pendências factuais de público/renda, transmissão ou melhores momentos. Há aviso determinístico de falhas em fontes de transmissão, mas sem perda crítica de cobertura; nenhuma intervenção é necessária.",
+    "resumo": "Auditoria concluída. Não há pendências de público/renda, transmissão ou melhores momentos que exijam investigação ou correção. Foram registrados avisos de falha em 2 fontes de transmissão, sem perda crítica de cobertura.",
     "problemas": [
       {
         "categoria": "fonte",
         "severidade": "atencao",
-        "mensagem": "4 fonte(s) de transmissão falharam, sem perda crítica de cobertura. Como os dados finais permanecem íntegros e não há pendências de transmissão, o aviso não configura incidente crítico.",
+        "mensagem": "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura. Os dados finais de cobertura permanecem íntegros; não há intervenção necessária.",
         "event_id": "",
         "requer_intervencao": false
       }
@@ -584,6 +584,19 @@
       "executado_em": "2026-09-18T15:12:03-03:00",
       "status": "atencao",
       "resumo": "Auditoria concluída sem pendências factuais de público/renda, transmissão ou melhores momentos. Há aviso determinístico de falhas em fontes de transmissão, mas sem perda crítica de cobertura; nenhuma intervenção é necessária.",
+      "chamadas_openai": 1,
+      "web_searches": 0,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-19",
+      "executado_em": "2026-09-19T11:46:47-03:00",
+      "status": "atencao",
+      "resumo": "Auditoria concluída. Não há pendências de público/renda, transmissão ou melhores momentos que exijam investigação ou correção. Foram registrados avisos de falha em 2 fontes de transmissão, sem perda crítica de cobertura.",
       "chamadas_openai": 1,
       "web_searches": 0,
       "publicos_aplicados": 0,
