@@ -15,14 +15,14 @@
   "resumo": {
     "jogos_na_janela": 42,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 6,
+    "descobertas_antecipadas": 5,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 50,
+    "candidatos_oficiais_encontrados": 52,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 0,
-    "search_api_jogos_pulados_grade_estavel": 1,
+    "search_api_jogos_elegiveis": 1,
+    "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 6,
-    "sem_transmissao": 1,
+    "sem_transmissao": 0,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -83,18 +83,6 @@
       "descoberta_antecipada": true
     },
     {
-      "event_id": "401841247",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Vasco da Gama x Coritiba",
-      "data_iso": "2026-09-19T20:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
       "event_id": "401841243",
       "rodada": 28,
       "competicao_chave": "brasileirao",
@@ -106,7 +94,7 @@
         "GE TV"
       ],
       "manual": false,
-      "descoberta_antecipada": true
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841242",
@@ -279,7 +267,7 @@
       "url": "https://www.youtube.com/watch?v=RBNVGCX3BkM",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: SÃO BERNARDO X ATLÉTICO GO | BRASILEIRÃO SÉRIE B 2026 | ge tv",
+      "titulo": "AO VIVO: SÃO BERNARDO X ATLÉTICO-GO | BRASILEIRÃO SÉRIE B 2026 | ge tv",
       "status": "live",
       "inicio_programado": "2026-09-18T20:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -353,6 +341,16 @@
       "status": "upcoming",
       "inicio_programado": "2026-09-25T06:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "WeZ0Ref-tho",
+      "url": "https://www.youtube.com/watch?v=WeZ0Ref-tho",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: GRÊMIO X PALMEIRAS | BRASILEIRÃO 2026 | PRÉ-JOGO | Premiere",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-20T10:00:00-03:00",
+      "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
       "video_id": "dILd1qB6Lkw",
@@ -492,6 +490,16 @@
       "titulo": "AO VIVO: VASCO X REMO | BRASILEIRÃO 2026 | 30ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-10-11T17:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "FtDAjw2-1PU",
+      "url": "https://www.youtube.com/watch?v=FtDAjw2-1PU",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "ORLANDINHO EM FAMÍLIA! OS PAIS CONTAM A HISTÓRIA DO CRAQUE DA COPA DAVIS",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-18T22:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -705,24 +713,8 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [
-    {
-      "event_id": "401841247",
-      "jogo": "Vasco da Gama x Coritiba",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    }
-  ],
-  "sem_transmissao": [
-    {
-      "event_id": "401841247",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Vasco da Gama x Coritiba",
-      "data_iso": "2026-09-19T20:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    }
-  ],
+  "search_api_pulados": [],
+  "sem_transmissao": [],
   "erros": [],
   "quota_estimada_youtube": {
     "unidades": 88,
@@ -733,5 +725,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-18T20:31:10-03:00"
+  "atualizado_em": "2026-09-18T21:01:15-03:00"
 }
