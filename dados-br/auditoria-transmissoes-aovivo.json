@@ -69,18 +69,6 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841239",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Chapecoense",
-      "data_iso": "2026-09-19T16:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
       "event_id": "401841245",
       "rodada": 28,
       "competicao_chave": "brasileirao",
@@ -93,6 +81,18 @@
       ],
       "manual": false,
       "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401841247",
+      "rodada": 28,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Vasco da Gama x Coritiba",
+      "data_iso": "2026-09-19T20:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841243",
@@ -657,19 +657,19 @@
   ],
   "search_api_pulados": [
     {
-      "event_id": "401841239",
-      "jogo": "Atlético-MG x Chapecoense",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
+      "event_id": "401841247",
+      "jogo": "Vasco da Gama x Coritiba",
+      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
     }
   ],
   "sem_transmissao": [
     {
-      "event_id": "401841239",
+      "event_id": "401841247",
       "rodada": 28,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Chapecoense",
-      "data_iso": "2026-09-19T16:00:00-03:00",
+      "jogo": "Vasco da Gama x Coritiba",
+      "data_iso": "2026-09-19T20:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -683,5 +683,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-19T14:31:38-03:00"
+  "atualizado_em": "2026-09-19T14:41:16-03:00"
 }
