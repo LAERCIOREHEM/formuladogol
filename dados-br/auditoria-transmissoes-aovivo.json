@@ -17,10 +17,10 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 50,
+    "candidatos_oficiais_encontrados": 48,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
     "transmissoes_publicadas": 6,
     "sem_transmissao": 1,
     "erros": 0
@@ -83,6 +83,18 @@
       "descoberta_antecipada": true
     },
     {
+      "event_id": "401841244",
+      "rodada": 28,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Remo x Santos",
+      "data_iso": "2026-09-19T18:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
+    },
+    {
       "event_id": "401841243",
       "rodada": 28,
       "competicao_chave": "brasileirao",
@@ -95,18 +107,6 @@
       ],
       "manual": false,
       "descoberta_antecipada": true
-    },
-    {
-      "event_id": "401841246",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Grêmio x Palmeiras",
-      "data_iso": "2026-09-20T11:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
     },
     {
       "event_id": "401841242",
@@ -480,7 +480,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: BRASIL X ESPANHA | COPA DO MUNDO FEMININA SUB-20 FIFA 2026 | QUARTAS DE FINAL",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-19T13:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -502,16 +502,6 @@
       "titulo": "AO VIVO: VASCO X REMO | BRASILEIRÃO 2026 | 30ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-10-11T17:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "GMcZMgBZbYA",
-      "url": "https://www.youtube.com/watch?v=GMcZMgBZbYA",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: MAMELODI SUNDOWNS X AL AHLI | MUNDIAL DE CLUBES FIFA 2026 | 2ª FASE",
-      "status": "live",
-      "inicio_programado": "2026-09-19T09:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -540,7 +530,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): PARIS FC X STRASBOURG | LIGUE 1 26/27 | 5ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-19T12:10:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -562,16 +552,6 @@
       "titulo": "AO VIVO (SOM AMBIENTE): AUXERRE X BREST | LIGUE 1 26/27 | 5ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-09-20T09:55:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "PkxFxGRmCak",
-      "url": "https://www.youtube.com/watch?v=PkxFxGRmCak",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: COREIA DO SUL X ITÁLIA | COPA DO MUNDO FEMININA SUB-20 FIFA 2026 | QUARTAS DE FINAL",
-      "status": "live",
-      "inicio_programado": "2026-09-19T09:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -649,7 +629,7 @@
       "url": "https://www.youtube.com/watch?v=hK76uv3Q39w",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: TÊNIS | PAVLASEK E RIKL x HARRISON E KRAJICEK | TCHÉQUIA X EUA | COPA DO MUNDO DE TÊNIS",
+      "titulo": "AO VIVO: TÊNIS | JAKUB MENSIK X BEN SHELTON | TCHÉQUIA X EUA | COPA DO MUNDO DE TÊNIS",
       "status": "live",
       "inicio_programado": "2026-09-19T08:45:00-03:00",
       "motivo": "conteúdo reúne mais de uma partida"
@@ -705,15 +685,21 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401841244",
+      "jogo": "Remo x Santos",
+      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
+    }
+  ],
   "sem_transmissao": [
     {
-      "event_id": "401841246",
+      "event_id": "401841244",
       "rodada": 28,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Grêmio x Palmeiras",
-      "data_iso": "2026-09-20T11:00:00-03:00",
+      "jogo": "Remo x Santos",
+      "data_iso": "2026-09-19T18:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -727,5 +713,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-19T11:11:16-03:00"
+  "atualizado_em": "2026-09-19T12:31:31-03:00"
 }

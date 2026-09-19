@@ -3897,52 +3897,33 @@
         "grade vazia"
       ],
       "resumo": "Partida confirmada: Grêmio x Palmeiras, 28ª rodada do Brasileirão Série A, domingo, 20/09/2026, às 11h (BRT), na Arena do Grêmio. A apuração atual confirma confronto, competição, rodada, data, horário e local, mas não encontrou página oficial ou editorial consultada que especifique os canais/plataformas da transmissão integral. Portanto, a indicação anterior de apenas Globo não é suficiente para confirmar a grade completa, e nenhum canal foi validado por inferência."
+    },
+    {
+      "event_id": "401841244",
+      "jogo": "Remo x Santos",
+      "data_iso": "2026-09-19T18:30:00-03:00",
+      "checkpoint": -360,
+      "executado_em": "2026-09-19T12:33:50-03:00",
+      "chamada_openai": false,
+      "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
+      "canais_antes": [
+        "Premiere"
+      ],
+      "status": "sem_chamada"
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841246",
-    "jogo": "Grêmio x Palmeiras",
-    "data_iso": "2026-09-20T11:00:00-03:00",
-    "checkpoint": -1440,
-    "executado_em": "2026-09-19T11:13:34-03:00",
-    "chamada_openai": true,
-    "motivo_chamada": "checkpoint de auditoria completa",
+    "event_id": "401841244",
+    "jogo": "Remo x Santos",
+    "data_iso": "2026-09-19T18:30:00-03:00",
+    "checkpoint": -360,
+    "executado_em": "2026-09-19T12:33:50-03:00",
+    "chamada_openai": false,
+    "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
     "canais_antes": [
-      "Globo"
+      "Premiere"
     ],
-    "status": "nao_resolvido",
-    "modelo": "gpt-5.6-terra",
-    "fontes_web": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/29/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-25a-rodada.ghtml",
-      "https://ge.globo.com/futebol/noticia/futebol-ao-vivo-confira-os-jogos-com-transmissao-na-tv-no-fim-de-semana.ghtml",
-      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/google/amp/rs/futebol/brasileirao-serie-a/noticia/gremio-x-palmeiras-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2016/09/artilheiros-e-cacados-gabriel-jesus-e-luan-se-reveem-apos-ouro-olimpico.html",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2023/09/21/gremio-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2025/11/25/gremio-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/gremio-x-atletico-mg-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/gremio-x-palmeiras-tudo-o-que-voce-precisa-saber-sobre-o-jogo-da-rodada-15.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/gremio-x-palmeiras-veja-onde-assistir-escalacoes-desfalques-e-arbitragem-1.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/rodada-10-tudo-o-que-voce-precisa-saber-sobre-gremio-x-palmeiras.ghtml",
-      "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/gremio-x-palmeiras-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
-      "https://ge.globo.com/rs/futebol/times/gremio/noticia/the-killer-bolanos-volta-apos-2-meses-e-e-arma-do-gremio-contra-o-palmeiras.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/04/02/palmeiras-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://globoplay.globo.com/v/13071156",
-      "https://globoplay.globo.com/v/14972358",
-      "https://globoplay.globo.com/v/4264517",
-      "https://globoplay.globo.com/v/5390891",
-      "https://globoplay.globo.com/v/7855167",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/bahia-entra-no-g-4-do-brasileirao-com-triunfo-sobre-o-remo",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/botafogo-segura-palmeiras-e-ajuda-fla-a-tomar-a-lideranca-do-brasileirao",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-sub20/a/brasileirao-sub-20-a-restam-duas-rodadas-para-o-fim-da-primeira-fase",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/selecao-masculina/tite-convoca-a-selecao-brasileira-para-amistosos-de-setembro/cbf-divulga-tabela-detalhada-das-rodadas-15-a-19-do-brasileirao-sub-20",
-      "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026"
-    ],
-    "rejeicoes": [
-      "modelo não conseguiu confirmar a grade",
-      "grade vazia"
-    ],
-    "resumo": "Partida confirmada: Grêmio x Palmeiras, 28ª rodada do Brasileirão Série A, domingo, 20/09/2026, às 11h (BRT), na Arena do Grêmio. A apuração atual confirma confronto, competição, rodada, data, horário e local, mas não encontrou página oficial ou editorial consultada que especifique os canais/plataformas da transmissão integral. Portanto, a indicação anterior de apenas Globo não é suficiente para confirmar a grade completa, e nenhum canal foi validado por inferência."
+    "status": "sem_chamada"
   },
-  "atualizado_em": "2026-09-19T11:13:34-03:00"
+  "atualizado_em": "2026-09-19T12:33:50-03:00"
 }
