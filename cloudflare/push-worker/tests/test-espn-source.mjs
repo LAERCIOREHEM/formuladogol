@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { fetchEspnLivePlays, fetchEspnScorerEnrichment, fetchEspnScoreboard, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnSummaryGateway, fetchEspnTechnicalHotTestPlays, fetchEspnTechnicalLivePlays, fetchEspnTechnicalScoreboard, probeEspnSources, summaryGoalCount, summaryNamedScorerHintCount, unwrapScoreboard, unwrapSummary } from '../src/espn-source.js';
+import { fetchEspnLivePlays, fetchEspnScorerEnrichment, fetchEspnScoreboard, fetchEspnScoreboardFresh, fetchEspnScoreboardGateway, fetchEspnSummary, fetchEspnSummaryGateway, fetchEspnTechnicalHotTestPlays, fetchEspnTechnicalLivePlays, fetchEspnTechnicalScoreboard, probeEspnSources, summaryGoalCount, summaryNamedScorerHintCount, unwrapScoreboard, unwrapSummary } from '../src/espn-source.js';
 
 const event = {
   id: '401909112',
@@ -312,3 +312,39 @@ console.log('espn-source: PASS');
   assert.equal(values.get('totalShots'), '2');
   assert.equal(values.get('shotsOnTarget'), '1');
 }
+
+
+// LiveState v4: state=post sem completed=true não pode vencer um feed IN real.
+{
+  const falsePost = {
+    id: '401841245',
+    date: '2026-09-19T20:00:00Z',
+    competitions: [{
+      id: '401841245',
+      status: { displayClock: "0'", period: 0, type: { state: 'post', completed: false, shortDetail: 'Post' } },
+      competitors: [
+        { homeAway: 'home', score: '0', team: { id: '1', displayName: 'Mirassol' } },
+        { homeAway: 'away', score: '0', team: { id: '2', displayName: 'Botafogo' } },
+      ],
+    }],
+  };
+  const liveEvent = structuredClone(falsePost);
+  liveEvent.competitions[0].status = { displayClock: "44'", period: 1, type: { state: 'in', completed: false, shortDetail: "44'" } };
+  liveEvent.competitions[0].competitors[0].score = '1';
+  liveEvent.competitions[0].competitors[1].score = '1';
+
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('/core/bra.1/scoreboard')) return Response.json({ content: { events: [liveEvent] } });
+    if (href.includes('/core/soccer/scoreboard')) return Response.json({ content: { events: [falsePost] } });
+    if (href.includes('site.web.api.espn.com')) return Response.json({ events: [falsePost] });
+    if (href.includes('site.api.espn.com')) return Response.json({ events: [falsePost] });
+    throw new Error(`URL inesperada ${href}`);
+  };
+  const result = await fetchEspnScoreboardGateway('bra.1', '20260919', fakeFetch);
+  assert.equal(result.data.events[0].competitions[0].status.type.state, 'in');
+  assert.equal(result.data.events[0].competitions[0].status.displayClock, "44'");
+  assert.equal(result.selectedSources['401841245'], 'espn_cdn_league');
+}
+
+console.log('espn-source live-state-v4: PASS');

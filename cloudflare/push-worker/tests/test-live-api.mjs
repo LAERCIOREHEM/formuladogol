@@ -81,6 +81,9 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
   assert.equal(first.status, 200);
   assert.equal(first.body.ok, true);
   assert.equal(first.body.stale, false);
+  assert.equal(first.body.stateContractVersion, 1);
+  assert.equal(first.body.transport, 'worker-espn');
+  assert.equal(first.body.scoreboardState, 'in');
   assert.equal(first.body.data.events[0].status.displayClock, "53'");
   assert.equal(first.body.selectedSources['401999001'], 'espn_cdn_league');
   assert.equal(calls, 4);
@@ -89,6 +92,28 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
   assert.equal(second.status, 200);
   assert.equal(second.body.cacheStatus, 'hot');
   assert.equal(second.body.data.events[0].status.displayClock, "53'");
+
+  // fresh=1 deve ignorar o hot cache para que Tabela/Estatísticas vejam o mesmo
+  // estado ESPN recente que o módulo Ao Vivo.
+  let freshCalls = 0;
+  const forceFreshUrl = new URL('https://x/v1/live/state?league=conmebol.sudamericana&dates=20260915-20260917&fresh=1');
+  const forced = await resolveLiveScoreboard(forceFreshUrl, {
+    cache,
+    fetchImpl: async (url) => {
+      freshCalls += 1;
+      const href = String(url);
+      if (href.includes('/core/conmebol.sudamericana/scoreboard')) return Response.json({ content: { events: [scoreboardEvent({ clock: "54'", home: 1, away: 1 })] } });
+      if (href.includes('/core/soccer/scoreboard')) return Response.json({ content: { events: [fresh] } });
+      if (href.includes('site.web.api.espn.com')) return new Response('blocked', { status: 503, headers: { 'content-type': 'text/plain' } });
+      if (href.includes('site.api.espn.com')) return Response.json({ events: [fresh] });
+      throw new Error(`URL inesperada ${href}`);
+    },
+    now: () => 1_004_000
+  });
+  assert.equal(forced.status, 200);
+  assert.equal(forced.body.cacheStatus, 'miss');
+  assert.equal(forced.body.data.events[0].status.displayClock, "54'");
+  assert.equal(freshCalls, 4);
 
   cache.dropTier('hot');
   const degraded = await resolveLiveScoreboard(url, {
@@ -99,8 +124,18 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
   assert.equal(degraded.status, 200);
   assert.equal(degraded.body.stale, true);
   assert.equal(degraded.body.cacheStatus, 'stale-fallback');
-  assert.equal(degraded.body.data.events[0].status.displayClock, "53'");
+  assert.equal(degraded.body.data.events[0].status.displayClock, "54'");
   assert.match(degraded.body.upstreamError, /503/);
+
+  // Estado IN com mais de 90 s não pode ser reciclado indefinidamente: um
+  // visitante novo deve receber falha/fallback central, nunca placar congelado.
+  cache.dropTier('hot');
+  const tooOld = await resolveLiveScoreboard(url, {
+    cache,
+    fetchImpl: async () => new Response('offline', { status: 503, headers: { 'content-type': 'text/plain' } }),
+    now: () => 1_181_000
+  });
+  assert.equal(tooOld.status, 503);
 }
 
 

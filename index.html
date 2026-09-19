@@ -2954,7 +2954,7 @@ body > .container > section.hero > img {
 <div id="modal-container"></div>
 
 <script src="js/br-estatisticas-ordem.js?v=20260816-ordem-canonica-v1"></script>
-<script src="js/br-classificacao-live.js?v=20260816-live-fatos-v1"></script>
+<script src="js/br-classificacao-live.js?v=20260919-live-state-v4"></script>
 <script>
 const BR_PUBLIC_ONLY = true;
 
@@ -3636,6 +3636,7 @@ let state = {
   rankingDesempenhoCarregado: false,
   // Placar ESPN usado também para a classificação provisória ao vivo.
   espnLive: {},
+  espnLiveMeta: null,
   _espnLiveUltima: null,
   // Transmissões do módulo Ao vivo usadas também na aba Jogos.
   transmissoesTv: {},
@@ -5837,10 +5838,11 @@ function nomeJogadorCurtoESPN(atleta) {
 }
 
 // ========================================================================
-// AO VIVO — ESPN (bra.1), direto do navegador, a cada 30 segundos.
-// Mesma técnica do módulo da Copa (aovivo.js): a API da ESPN aceita CORS,
-// então o placar em tempo real NÃO depende do GitHub Actions.
-// Fora da janela de jogo o motor dorme (zero requisições).
+// LiveState ESPN (bra.1), a cada 30 segundos.
+// Fonte primária: Push Worker -> múltiplas superfícies ESPN. Se o transporte
+// central falhar, o SDK tenta a ESPN diretamente no navegador e, por último,
+// reutiliza apenas um estado ESPN recente com TTL curto. Jogos, Tabela e
+// Estatísticas passam a compartilhar o mesmo contrato factual.
 // ========================================================================
 const ESPN_SCOREBOARD_BR = 'https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard';
 const ESPN_LIVE_MS = 30000;          // durante jogo: 30s
@@ -5870,6 +5872,9 @@ function espnChaveJogo(nomeM, nomeV) {
 }
 
 function espnLiveDoJogo(j) {
+  if (window.BRClassificacaoLive && typeof window.BRClassificacaoLive.findLiveGame === 'function') {
+    return window.BRClassificacaoLive.findLiveGame(j, state.espnLive || {}, nomeCanonico);
+  }
   const k = espnChaveJogo((j.mandante || {}).nome, (j.visitante || {}).nome);
   return k ? (state.espnLive || {})[k] : null;
 }
@@ -5900,8 +5905,12 @@ function espnLiveEhFinalReal(live, referencia = new Date()) {
 
 async function espnLiveBuscar() {
   if (!window.BRClassificacaoLive) throw new Error('Motor de classificação ao vivo indisponível');
-  state.espnLive = await window.BRClassificacaoLive.fetchScoreboard({ canonicalize: nomeCanonico });
-  state._espnLiveUltima = new Date();
+  const snapshot = await window.BRClassificacaoLive.fetchLiveState({
+    canonicalize: nomeCanonico,
+  });
+  state.espnLive = snapshot.liveMap || {};
+  state.espnLiveMeta = snapshot.meta || null;
+  state._espnLiveUltima = new Date(Number(snapshot.meta?.fetchedAt || Date.now()));
 }
 
 let _espnTimer = null;

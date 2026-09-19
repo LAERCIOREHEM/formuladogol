@@ -573,6 +573,9 @@ export default {
         version: 7,
         revision: '6-R10R4',
         liveGatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
+        liveStateContractVersion: LIVE_API_CONSTANTS.LIVE_STATE_CONTRACT_VERSION,
+        liveStatePrimary: 'worker-espn',
+        liveStateDirectFallback: true,
         liveStatsFallbackVersion: 4,
         theSportsDbStatsReady: true,
         apiFootballStatsReady: Boolean(env.API_FOOTBALL_KEY),
@@ -598,7 +601,7 @@ export default {
     if (origin && !ALLOWED_ORIGINS.has(origin)) return json(request, { ok: false, error: 'origin_not_allowed' }, 403);
 
     try {
-      if (url.pathname === '/v1/live/scoreboard' && request.method === 'GET') {
+      if ((url.pathname === '/v1/live/scoreboard' || url.pathname === '/v1/live/state') && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'live-scoreboard'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
         const result = await resolveLiveScoreboard(url, {
           fallbackScoreboard: ({ league, now }) => monitorLiveScoreboardFallback(env, league, now)

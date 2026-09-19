@@ -40,6 +40,7 @@
     results: null,
     schedule: null,
     espnLive: {},
+    espnLiveMeta: null,
     espnLiveFetchedAt: null,
     espnLiveError: null,
     liveFacts: {},
@@ -2810,11 +2811,13 @@
     if (!options.force && !liveWindowActive()) return false;
     liveRefreshState.ocupado = true;
     try {
-      const live = await engine.fetchScoreboard({ canonicalize: canonicalLiveTeam });
+      const snapshot = await engine.fetchLiveState({ canonicalize: canonicalLiveTeam });
+      const live = snapshot.liveMap || {};
       const signature = liveSignature(live);
       const changed = signature !== liveRefreshState.assinatura;
       state.espnLive = live;
-      state.espnLiveFetchedAt = new Date();
+      state.espnLiveMeta = snapshot.meta || null;
+      state.espnLiveFetchedAt = new Date(Number(snapshot.meta?.fetchedAt || Date.now()));
       state.espnLiveError = null;
       liveRefreshState.assinatura = signature;
       standingsCache.live = null;

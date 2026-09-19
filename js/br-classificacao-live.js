@@ -8,12 +8,30 @@
 
   const SCOREBOARD_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard";
   const SUMMARY_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary";
+  const LIVE_STATE_URL = "https://push.formuladogol.com.br/v1/live/state";
+  const LIVE_SUMMARY_URL = "https://push.formuladogol.com.br/v1/live/summary";
+  const LIVE_STATE_VERSION = "4";
   const FINAL_MINUTES_AFTER_START = 90;
+  const WORKER_TIMEOUT_MS = 6500;
+  const DIRECT_TIMEOUT_MS = 6500;
+  const ACTIVE_CACHE_MAX_AGE_MS = 90000;
+  const IDLE_CACHE_MAX_AGE_MS = 45000;
+  const POST_CACHE_MAX_AGE_MS = 180000;
+  const STORAGE_KEY = "fdg.br.live-state.v4";
 
   function numberScore(value) {
     if (value === null || value === undefined || value === "" || value === "-") return null;
     const n = Number(value);
     return Number.isFinite(n) ? n : null;
+  }
+
+  function competitorScore(competitor) {
+    const raw = competitor && competitor.score;
+    if (raw && typeof raw === "object") {
+      const value = raw.value ?? raw.displayValue ?? raw.score ?? raw.total;
+      if (value !== null && value !== undefined && value !== "") return value;
+    }
+    return raw !== null && raw !== undefined && raw !== "" ? raw : "-";
   }
 
   function normalizeText(value) {
@@ -60,6 +78,15 @@
     return numberScore(live.placarMandante) !== null && numberScore(live.placarVisitante) !== null;
   }
 
+  function livePhase(live, referenceDate) {
+    if (!live) return "PRE";
+    if (isInterrupted(live)) return "INTERRUPTED";
+    const state = String(live.estado || "").toLowerCase();
+    if (state === "in") return "IN";
+    if (isRealFinal(live, referenceDate)) return "POST_PENDING";
+    return "PRE";
+  }
+
   function gameKey(home, away, canonicalize) {
     const canon = typeof canonicalize === "function" ? canonicalize : (value) => value;
     const h = canon(home);
@@ -86,14 +113,14 @@
         const away = competitors.find((item) => item.homeAway === "away");
         if (!home || !away) continue;
 
-        const rawHome = (home.team || {}).displayName || (home.team || {}).name;
-        const rawAway = (away.team || {}).displayName || (away.team || {}).name;
+        const rawHome = (home.team || {}).displayName || (home.team || {}).shortDisplayName || (home.team || {}).name;
+        const rawAway = (away.team || {}).displayName || (away.team || {}).shortDisplayName || (away.team || {}).name;
         const homeName = canonicalize(rawHome);
         const awayName = canonicalize(rawAway);
         const key = gameKey(homeName, awayName, (value) => value);
         if (!key) continue;
 
-        const status = competition.status || {};
+        const status = competition.status || event.status || {};
         const type = status.type || {};
         const dataIso = event.date || competition.date || null;
         const eventDate = dataIso ? new Date(dataIso) : null;
@@ -134,8 +161,8 @@
           status: status.displayClock || type.shortDetail || type.detail || "",
           statusName,
           statusDescription,
-          placarMandante: home.score != null ? home.score : "-",
-          placarVisitante: away.score != null ? away.score : "-",
+          placarMandante: competitorScore(home),
+          placarVisitante: competitorScore(away),
           mandante: homeName,
           visitante: awayName,
           dataIso,
@@ -346,32 +373,205 @@
     return { goals, appearances: uniqueAppearances };
   }
 
-  async function fetchSummary(eventId, options) {
-    const opts = options || {};
-    const fetcher = opts.fetcher || (typeof fetch === "function" ? fetch.bind(globalThis) : null);
-    if (!fetcher) throw new Error("fetch indisponível");
-    const url = `${opts.url || SUMMARY_URL}?event=${encodeURIComponent(String(eventId || ""))}&_=${Date.now()}`;
-    const response = await fetcher(url, { cache:"no-store", signal: opts.signal });
-    if (!response || !response.ok) throw new Error(`ESPN summary HTTP ${response ? response.status : "sem resposta"}`);
-    return response.json();
-  }
-
   function dateToken(date) {
     return date.toISOString().slice(0, 10).replace(/-/g, "");
   }
 
-  async function fetchScoreboard(options) {
+  function storageFromOptions(opts) {
+    if (opts && opts.storage) return opts.storage;
+    try { return typeof sessionStorage !== "undefined" ? sessionStorage : null; } catch (_) { return null; }
+  }
+
+  function liveValues(liveMap) {
+    return Object.values(liveMap || {}).filter((item) => item && typeof item === "object" && item.mandante && item.visitante);
+  }
+
+  function liveMapState(liveMap) {
+    const values = liveValues(liveMap);
+    if (values.some((game) => String(game.estado || "").toLowerCase() === "in")) return "in";
+    if (values.some((game) => String(game.estado || "").toLowerCase() === "post" || game.completed === true)) return "post";
+    return "pre";
+  }
+
+  function cacheMaxAge(liveMap) {
+    const state = liveMapState(liveMap);
+    if (state === "in") return ACTIVE_CACHE_MAX_AGE_MS;
+    if (state === "post") return POST_CACHE_MAX_AGE_MS;
+    return IDLE_CACHE_MAX_AGE_MS;
+  }
+
+  function readLastLiveState(opts, reference) {
+    const storage = storageFromOptions(opts);
+    if (!storage || typeof storage.getItem !== "function") return null;
+    try {
+      const saved = JSON.parse(storage.getItem(STORAGE_KEY) || "null");
+      if (!saved || saved.version !== LIVE_STATE_VERSION || !saved.liveMap) return null;
+      const fetchedAt = Number(saved.meta && saved.meta.fetchedAt || 0);
+      if (!fetchedAt) return null;
+      const ageMs = Math.max(0, reference.getTime() - fetchedAt);
+      if (ageMs > cacheMaxAge(saved.liveMap)) return null;
+      return {
+        liveMap: saved.liveMap,
+        meta: { ...(saved.meta || {}), source: "last-valid-espn", fallback: true, ageMs, liveStateVersion: LIVE_STATE_VERSION },
+      };
+    } catch (_) { return null; }
+  }
+
+  function writeLastLiveState(opts, state) {
+    const storage = storageFromOptions(opts);
+    if (!storage || typeof storage.setItem !== "function") return;
+    try {
+      storage.setItem(STORAGE_KEY, JSON.stringify({ version: LIVE_STATE_VERSION, liveMap: state.liveMap, meta: state.meta }));
+    } catch (_) { /* cache local é apenas contingência */ }
+  }
+
+  function publishLiveState(state) {
+    try {
+      const diagnostics = {
+        ...(state.meta || {}),
+        liveGames: liveValues(state.liveMap).filter((game) => String(game.estado || "").toLowerCase() === "in").length,
+        totalGames: liveValues(state.liveMap).length,
+      };
+      if (typeof globalThis !== "undefined") globalThis.__FDG_LIVE_STATE__ = diagnostics;
+      if (typeof globalThis !== "undefined" && typeof globalThis.dispatchEvent === "function" && typeof CustomEvent === "function") {
+        globalThis.dispatchEvent(new CustomEvent("fdg:live-state", { detail: diagnostics }));
+      }
+    } catch (_) { /* observabilidade não interfere no dado */ }
+    return state;
+  }
+
+  async function fetchJson(url, opts, timeoutMs) {
+    const fetcher = opts.fetcher || (typeof fetch === "function" ? fetch.bind(globalThis) : null);
+    if (!fetcher) throw new Error("fetch indisponível");
+    const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+    try {
+      const response = await fetcher(url, { cache: "no-store", signal: opts.signal || (controller && controller.signal) || undefined });
+      if (!response || !response.ok) throw new Error(`HTTP ${response ? response.status : "sem resposta"}`);
+      return await response.json();
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
+
+  function eventIdFromGame(game) {
+    return String(game && (game.event_id || game.eventId || game.espn_event_id || game.espnEventId || game.id_espn) || "").trim();
+  }
+
+  function findLiveGame(game, liveMap, canonicalize) {
+    if (!game || !liveMap) return null;
+    const eventId = eventIdFromGame(game);
+    if (eventId) {
+      const byId = liveValues(liveMap).find((live) => String(live.eventId || "") === eventId);
+      if (byId) return byId;
+    }
+    const home = (game.mandante && typeof game.mandante === "object") ? game.mandante.nome : game.mandante;
+    const away = (game.visitante && typeof game.visitante === "object") ? game.visitante.nome : game.visitante;
+    const key = gameKey(home, away, canonicalize);
+    if (key && liveMap[key]) return liveMap[key];
+    const canon = typeof canonicalize === "function" ? canonicalize : (value) => value;
+    const h = canon(home), a = canon(away);
+    if (!h || !a) return null;
+    return liveValues(liveMap).find((live) => canon(live.mandante) === h && canon(live.visitante) === a) || null;
+  }
+
+  async function fetchLiveState(options) {
     const opts = options || {};
     const reference = opts.referenceDate instanceof Date ? opts.referenceDate : new Date();
     const start = dateToken(new Date(reference.getTime() - 86400000));
     const end = dateToken(new Date(reference.getTime() + 86400000));
-    const url = `${opts.url || SCOREBOARD_URL}?dates=${start}-${end}&limit=60&_=${reference.getTime()}`;
-    const fetcher = opts.fetcher || (typeof fetch === "function" ? fetch.bind(globalThis) : null);
-    if (!fetcher) throw new Error("fetch indisponível");
-    const response = await fetcher(url, { cache: "no-store" });
-    if (!response || !response.ok) throw new Error(`ESPN HTTP ${response ? response.status : "sem resposta"}`);
-    const payload = await response.json();
-    return normalizeScoreboard(payload, { canonicalize: opts.canonicalize, referenceDate: reference });
+    const dates = `${start}-${end}`;
+    const errors = [];
+    let workerFallbackState = null;
+
+    if (opts.worker !== false) {
+      try {
+        const workerUrl = `${opts.workerUrl || LIVE_STATE_URL}?league=bra.1&dates=${dates}${opts.forceFresh === true ? "&fresh=1" : ""}&_=${reference.getTime()}`;
+        const envelope = await fetchJson(workerUrl, opts, Number(opts.workerTimeoutMs || WORKER_TIMEOUT_MS));
+        const payload = envelope && envelope.data && Array.isArray(envelope.data.events) ? envelope.data : envelope;
+        const liveMap = normalizeScoreboard(payload, { canonicalize: opts.canonicalize, referenceDate: reference });
+        const state = {
+          liveMap,
+          meta: {
+            source: "worker-espn",
+            transport: "worker",
+            upstream: envelope.source || "espn",
+            sources: Array.isArray(envelope.sources) ? envelope.sources : [],
+            fetchedAt: Number(envelope.fetchedAt || reference.getTime()),
+            stale: envelope.stale === true,
+            ageMs: Number(envelope.ageMs || 0),
+            fallback: false,
+            liveStateVersion: LIVE_STATE_VERSION,
+          },
+        };
+        if (envelope.stale === true) {
+          workerFallbackState = {
+            liveMap: state.liveMap,
+            meta: { ...state.meta, fallback: true, source: "worker-espn-stale" },
+          };
+          errors.push(`worker=stale:${String(envelope.cacheStatus || "fallback")}`);
+        } else {
+          writeLastLiveState(opts, state);
+          return publishLiveState(state);
+        }
+      } catch (error) {
+        errors.push(`worker=${String(error && error.message || error)}`);
+      }
+    }
+
+    try {
+      const directUrl = `${opts.url || SCOREBOARD_URL}?dates=${dates}&limit=60&_=${reference.getTime()}`;
+      const payload = await fetchJson(directUrl, opts, Number(opts.directTimeoutMs || DIRECT_TIMEOUT_MS));
+      const liveMap = normalizeScoreboard(payload, { canonicalize: opts.canonicalize, referenceDate: reference });
+      const state = {
+        liveMap,
+        meta: {
+          source: "direct-espn", transport: "browser", upstream: "espn_site_api",
+          sources: ["espn_site_api"], fetchedAt: reference.getTime(), stale: false, ageMs: 0, fallback: errors.length > 0,
+          liveStateVersion: LIVE_STATE_VERSION,
+        },
+      };
+      writeLastLiveState(opts, state);
+      return publishLiveState(state);
+    } catch (error) {
+      errors.push(`direct=${String(error && error.message || error)}`);
+    }
+
+    if (workerFallbackState) {
+      workerFallbackState.meta.errors = errors;
+      writeLastLiveState(opts, workerFallbackState);
+      return publishLiveState(workerFallbackState);
+    }
+
+    const cached = readLastLiveState(opts, reference);
+    if (cached) {
+      cached.meta.errors = errors;
+      return publishLiveState(cached);
+    }
+    throw new Error(`ESPN live indisponível: ${errors.join(" | ")}`);
+  }
+
+  async function fetchScoreboard(options) {
+    return (await fetchLiveState(options)).liveMap;
+  }
+
+  async function fetchSummary(eventId, options) {
+    const opts = options || {};
+    const id = encodeURIComponent(String(eventId || ""));
+    const errors = [];
+    if (opts.worker !== false) {
+      try {
+        const workerUrl = `${opts.workerSummaryUrl || LIVE_SUMMARY_URL}?league=bra.1&event=${id}&state=${encodeURIComponent(opts.state || "in")}&fresh=1&_=${Date.now()}`;
+        const envelope = await fetchJson(workerUrl, opts, Number(opts.workerTimeoutMs || WORKER_TIMEOUT_MS));
+        if (envelope && envelope.data && typeof envelope.data === "object") return envelope.data;
+        throw new Error("payload summary do Worker inválido");
+      } catch (error) { errors.push(`worker=${String(error && error.message || error)}`); }
+    }
+    try {
+      const url = `${opts.url || SUMMARY_URL}?event=${id}&_=${Date.now()}`;
+      return await fetchJson(url, opts, Number(opts.directTimeoutMs || DIRECT_TIMEOUT_MS));
+    } catch (error) { errors.push(`direct=${String(error && error.message || error)}`); }
+    throw new Error(`ESPN summary indisponível: ${errors.join(" | ")}`);
   }
 
   function resultCounts(results, canonicalize) {
@@ -443,6 +643,7 @@
         visitante: away,
         placarMandante: hs,
         placarVisitante: as,
+        livePhase: final ? "POST_PENDING" : "IN",
       });
     }
     return output;
@@ -554,15 +755,23 @@
   return {
     SCOREBOARD_URL,
     SUMMARY_URL,
+    LIVE_STATE_URL,
+    LIVE_SUMMARY_URL,
+    LIVE_STATE_VERSION,
     numberScore,
+    competitorScore,
     normalizeText,
     liveStatusText,
     isInterrupted,
     isRealFinal,
+    livePhase,
     gameKey,
     normalizeScoreboard,
+    fetchLiveState,
     fetchScoreboard,
     fetchSummary,
+    eventIdFromGame,
+    findLiveGame,
     normalizeSummaryFacts,
     resultCounts,
     liveResultAlreadyStored,

@@ -3,6 +3,7 @@
 
   const ESPN_API_ROOT = "https://site.api.espn.com/apis/site/v2/sports/soccer";
   const LIVE_GATEWAY_ROOT = "https://push.formuladogol.com.br/v1/live";
+  const LIVE_STATE_CONTRACT_VERSION = 1;
   const LIVE_GATEWAY_TIMEOUT_MS = 5500;
   const DIRECT_ESPN_FALLBACK_TIMEOUT_MS = 5000;
   const DEFAULT_LEAGUE = "bra.1";
@@ -328,6 +329,11 @@
     return dateKey(d).replace(/-/g, "");
   }
 
+  function sharedBrasileiraoLiveDates(reference = new Date()) {
+    const token = (date) => date.toISOString().slice(0, 10).replace(/-/g, "");
+    return token(new Date(reference.getTime() - 86400000)) + "-" + token(new Date(reference.getTime() + 86400000));
+  }
+
   function formatDateTime(d) {
     if (!d) return "Horário a definir";
     return new Intl.DateTimeFormat("pt-BR", {
@@ -644,16 +650,21 @@
   }
 
   async function fetchScoreboardPayload(league, dates) {
-    const params = new URLSearchParams({ league: String(league || DEFAULT_LEAGUE), dates: String(dates || "") });
+    const resolvedLeague = String(league || DEFAULT_LEAGUE);
+    const resolvedDates = resolvedLeague === DEFAULT_LEAGUE ? sharedBrasileiraoLiveDates(new Date()) : String(dates || "");
+    const params = new URLSearchParams({ league: resolvedLeague, dates: resolvedDates });
     let gatewayError = null;
 
     try {
-      const envelope = await fetchJson(LIVE_GATEWAY_ROOT + "/scoreboard?" + params.toString() + "&_=" + Date.now(), {
+      const envelope = await fetchJson(LIVE_GATEWAY_ROOT + "/state?" + params.toString() + "&_=" + Date.now(), {
         timeoutMs: LIVE_GATEWAY_TIMEOUT_MS,
         mode: "cors"
       });
       if (!envelope || envelope.ok !== true || !envelope.data || !Array.isArray(envelope.data.events)) {
         throw new Error("Gateway ao vivo retornou payload inválido");
+      }
+      if (Number(envelope.stateContractVersion || 0) !== LIVE_STATE_CONTRACT_VERSION || envelope.transport !== "worker-espn") {
+        throw new Error("Gateway ao vivo ainda não expõe o contrato LiveState esperado");
       }
       return {
         data: envelope.data,

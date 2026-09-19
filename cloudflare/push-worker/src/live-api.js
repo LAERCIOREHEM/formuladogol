@@ -9,9 +9,10 @@ import {
 import { fetchApiFootballPlayerDefenseFallback, fetchApiFootballStatsFallback } from './api-football-source.js';
 import { fetchTheSportsDbStatsFallback } from './thesportsdb-source.js';
 
-const LIVE_GATEWAY_VERSION = '3';
+const LIVE_GATEWAY_VERSION = '4';
+const LIVE_STATE_CONTRACT_VERSION = 1;
 const SCOREBOARD_HOT_TTL_SECONDS = 8;
-const SCOREBOARD_FALLBACK_TTL_SECONDS = 600;
+const SCOREBOARD_FALLBACK_TTL_SECONDS = 180;
 const SUMMARY_HOT_TTL_SECONDS = 8;
 const SUMMARY_FALLBACK_TTL_SECONDS = 900;
 const STATS_FALLBACK_TTL_SECONDS = 120;
@@ -118,6 +119,30 @@ function validEventId(value) {
   return /^[A-Za-z0-9._:-]{1,96}$/.test(text(value));
 }
 
+function scoreboardState(data) {
+  const events = Array.isArray(data?.events) ? data.events : [];
+  let hasPost = false;
+  for (const event of events) {
+    const competition = event?.competitions?.[0] || event?.competition || {};
+    const status = competition?.status || event?.status || {};
+    const type = status?.type || {};
+    const state = text(type?.state).toLowerCase();
+    if (state === 'in') return 'in';
+    if (type?.completed === true || state === 'post') hasPost = true;
+  }
+  return hasPost ? 'post' : 'pre';
+}
+
+function scoreboardFallbackAcceptable(cached, now) {
+  if (!cached || !Array.isArray(cached?.data?.events)) return false;
+  const fetchedAt = Number(cached?.fetchedAt || 0);
+  if (!fetchedAt) return false;
+  const ageMs = Math.max(0, now - fetchedAt);
+  const state = scoreboardState(cached.data);
+  const maxAgeMs = state === 'in' ? 90_000 : state === 'post' ? 180_000 : 45_000;
+  return ageMs <= maxAgeMs;
+}
+
 function cacheKey(kind, parts, tier) {
   const path = parts.map((part) => encodeURIComponent(text(part))).join('/');
   return new Request(`${INTERNAL_CACHE_ORIGIN}/${kind}/${tier}/${path}`, { method: 'GET' });
@@ -206,6 +231,7 @@ function staleEnvelope(cached, now, error) {
 export async function resolveLiveScoreboard(url, deps = {}) {
   const league = text(url.searchParams.get('league'));
   const dates = text(url.searchParams.get('dates'));
+  const forceFresh = url.searchParams.get('fresh') === '1';
   if (!ALLOWED_LEAGUES.has(league)) return { status: 400, body: { ok: false, error: 'invalid_league' } };
   if (!validDates(dates)) return { status: 400, body: { ok: false, error: 'invalid_dates' } };
 
@@ -216,7 +242,7 @@ export async function resolveLiveScoreboard(url, deps = {}) {
   const hotKey = cacheKey('scoreboard', [league, dates], 'hot');
   const fallbackKey = cacheKey('scoreboard', [league, dates], 'fallback');
 
-  const hot = await readCached(cache, hotKey);
+  const hot = forceFresh ? null : await readCached(cache, hotKey);
   if (hot && Array.isArray(hot?.data?.events)) {
     return {
       status: 200,
@@ -228,6 +254,9 @@ export async function resolveLiveScoreboard(url, deps = {}) {
     const result = await fetchEspnScoreboardGateway(league, dates, fetchImpl);
     const envelope = publicEnvelope(result, now, {
       cacheStatus: 'miss',
+      stateContractVersion: LIVE_STATE_CONTRACT_VERSION,
+      transport: 'worker-espn',
+      scoreboardState: scoreboardState(result.data),
       selectedSources: result.selectedSources || {},
       attempts: result.attempts || []
     });
@@ -238,8 +267,17 @@ export async function resolveLiveScoreboard(url, deps = {}) {
     return { status: 200, body: envelope };
   } catch (error) {
     const cached = await readCached(cache, fallbackKey);
-    if (cached && Array.isArray(cached?.data?.events)) {
-      return { status: 200, body: { ...staleEnvelope(cached, now, error), cacheStatus: 'stale-fallback' } };
+    if (scoreboardFallbackAcceptable(cached, now)) {
+      return {
+        status: 200,
+        body: {
+          ...staleEnvelope(cached, now, error),
+          cacheStatus: 'stale-fallback',
+          stateContractVersion: LIVE_STATE_CONTRACT_VERSION,
+          transport: 'worker-espn',
+          scoreboardState: scoreboardState(cached.data)
+        }
+      };
     }
 
     if (typeof deps.fallbackScoreboard === 'function') {
@@ -254,6 +292,9 @@ export async function resolveLiveScoreboard(url, deps = {}) {
             fetchedAt: Number(fallback.fetchedAt || now),
             stale: true,
             cacheStatus: 'monitor-fallback',
+            stateContractVersion: LIVE_STATE_CONTRACT_VERSION,
+            transport: 'worker-espn-monitor',
+            scoreboardState: scoreboardState(fallback.data),
             ageMs: Math.max(0, now - Number(fallback.fetchedAt || now)),
             upstreamError: text(error?.message || error).slice(0, 500),
             data: fallback.data
@@ -624,6 +665,7 @@ export async function resolveLiveSummary(url, deps = {}) {
 
 export const LIVE_API_CONSTANTS = Object.freeze({
   LIVE_GATEWAY_VERSION,
+  LIVE_STATE_CONTRACT_VERSION,
   SCOREBOARD_HOT_TTL_SECONDS,
   SCOREBOARD_FALLBACK_TTL_SECONDS,
   SUMMARY_HOT_TTL_SECONDS,

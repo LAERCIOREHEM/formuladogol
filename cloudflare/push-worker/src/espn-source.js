@@ -230,7 +230,9 @@ function eventStateRank(event) {
   const status = event?.status || competition?.status || {};
   const type = status?.type || {};
   const state = text(type?.state).toLowerCase();
-  if (type?.completed === true || state === 'post') return 3;
+  // A ESPN ocasionalmente publica state=post antes da conclusão efetiva.
+  // completed=true é o único sinal que pode superar um feed concorrente IN.
+  if (type?.completed === true) return 3;
   if (state === 'in') return 2;
   return 1;
 }
