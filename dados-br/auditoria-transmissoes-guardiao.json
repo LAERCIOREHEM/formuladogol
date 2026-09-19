@@ -4359,52 +4359,95 @@
         "confiança 0.660 abaixo do limiar"
       ],
       "resumo": "Partida confirmada: Flamengo x Bragantino, Brasileirão 2026, 28ª rodada, domingo, 20/09/2026, às 18h30 (BRT), no Maracanã. O vídeo da GE TV não transmite o jogo integral: trata-se de aquecimento/pré-jogo e direciona o público para assistir à partida no SporTV. Isso confirma indicação de SporTV, mas não há, nas fontes consultadas, confirmação oficial suficiente da grade completa (incluindo ou não Premiere e demais plataformas); por isso a transmissão permanece não resolvida e nenhum canal é listado como grade final."
+    },
+    {
+      "event_id": "401841247",
+      "jogo": "Vasco da Gama x Coritiba",
+      "data_iso": "2026-09-19T20:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-09-19T19:13:04-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Prime Video"
+      ],
+      "status": "nao_resolvido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+        "https://credencial.cbf.com.br/competicoes/listar/42/1",
+        "https://ge.globo.com/getv/noticia/2026/09/16/ge-tv-amplia-distribuicao-e-chega-ao-prime-video.ghtml",
+        "https://ge.globo.com/google/amp/futebol/noticia/fim-de-semana-na-tv-saiba-as-partidas-com-transmissao-ao-vivo.ghtml",
+        "https://ge.globo.com/google/amp/pa/futebol/brasileirao-serie-a/noticia/2026/08/31/remo-x-coritiba-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/04/01/coritiba-x-vasco-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/times/coritiba/noticia/2026/09/16/vasco-fluminense-e-botafogo-sequencia-contra-trio-carioca-pode-ser-decisiva-ao-coritiba-na-serie-a.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2023/09/05/vasco-x-coritiba-cbf-altera-data-de-jogo-do-campeonato-brasileiro.ghtml",
+        "https://ge.globo.com/pr/futebol/times/coritiba/noticia/2026/03/30/coritiba-conhece-tabela-detalhada-ate-a-17a-rodada-da-serie-a-confira.ghtml",
+        "https://ge.globo.com/pr/futebol/times/coritiba/noticia/2026/09/17/quem-vai-substituir-breno-lopes-saiba-as-opcoes-do-coritiba-para-definir-o-ataque-diante-do-vasco.ghtml",
+        "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/05/10/vasco-x-athletico-pr-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://www.primevideo.com/-/el/detail/0UB3SR0PR8OFGMURBWQ003W4A7",
+        "https://www.primevideo.com/-/pt/detail/0I2PPYZVPFCYF3CYAW6E9KLBJ1",
+        "https://www.primevideo.com/-/pt/detail/0NXX6LTZXCOHDL3V0AKSEULO9X",
+        "https://www.primevideo.com/-/pt/detail/0RPEIXBSKTUFWTNTJYNAPCVEL8",
+        "https://www.primevideo.com/-/pt/detail/0U2R8F7V7OCFE29OLGPIQ1OLIS",
+        "https://www.primevideo.com/-/pt/region/na/detail/0FUIEAEDBMIES0U6MLT3BE69HQ",
+        "https://www.primevideo.com/detail/0KV4CBTWTCKG16N44QG7AM9M7V",
+        "https://www.primevideo.com/detail/0RPEIXBSKTUFWTNTJYNAPCVEL8",
+        "https://www.primevideo.com/detail/0U2R8F7V7OCFE29OLGPIQ1OLIS",
+        "https://www.primevideo.com/detail/0UB3SR0PR8OFGMURBWQ003W4A7",
+        "https://www.youtube.com/watch?v=6RxQ_EW3vOU",
+        "https://www.youtube.com/watch?v=_kh3XB7XyEU"
+      ],
+      "rejeicoes": [
+        "avaliação YouTube refere URL que não está no dossiê atual"
+      ],
+      "resumo": "Confirmado para o Brasil: Vasco da Gama x Coritiba, Brasileirão Série A, 28ª rodada, sábado, 19/09/2026, às 20h30 (BRT), em São Januário. A transmissão integral é exclusiva do Prime Video. A página do Prime Video anuncia a cobertura a partir de 19h30 BRT; o horário da bola rolando permanece 20h30, conforme CBF e ge."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841241",
-    "jogo": "Flamengo x Bragantino",
-    "data_iso": "2026-09-20T18:30:00-03:00",
-    "checkpoint": -1440,
-    "executado_em": "2026-09-19T18:40:26-03:00",
+    "event_id": "401841247",
+    "jogo": "Vasco da Gama x Coritiba",
+    "data_iso": "2026-09-19T20:30:00-03:00",
+    "checkpoint": -90,
+    "executado_em": "2026-09-19T19:13:04-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "GE TV"
+      "Prime Video"
     ],
     "status": "nao_resolvido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/14/cbf-divulga-tabela-detalhada-das-rodadas-25-e-26-da-serie-a-do-brasileirao.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/05/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-26a-rodada.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/03/14/botafogo-x-flamengo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/13/flamengo-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/flamengo-x-bragantino-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
+      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+      "https://credencial.cbf.com.br/competicoes/listar/42/1",
+      "https://ge.globo.com/getv/noticia/2026/09/16/ge-tv-amplia-distribuicao-e-chega-ao-prime-video.ghtml",
+      "https://ge.globo.com/google/amp/futebol/noticia/fim-de-semana-na-tv-saiba-as-partidas-com-transmissao-ao-vivo.ghtml",
+      "https://ge.globo.com/google/amp/pa/futebol/brasileirao-serie-a/noticia/2026/08/31/remo-x-coritiba-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/04/01/coritiba-x-vasco-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
       "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/google/amp/rj/futebol/brasileirao-serie-a/noticia/2026/09/12/botafogo-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/sp/vale-do-paraiba-regiao/futebol/times/bragantino/noticia/2026/09/15/bragantino-tem-dois-novos-desfalques-para-enfrentar-o-flamengo-e-retorno-de-pelo-menos-um-jogador.ghtml",
-      "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/09/06/remo-x-flamengo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/15/athletico-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2025/11/22/flamengo-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/05/24/vasco-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/07/17/fluminense-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/07/26/flamengo-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/08/30/flamengo-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/09/02/flamengo-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/09/16/botafogo-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/times/bragantino/noticia/2026/09/16/rodriguinho-vanderlan-e-sasha-voltam-a-treinar-e-podem-reforcar-o-bragantino-contra-o-flamengo.ghtml",
-      "https://ge.globo.com/video/flamengo-x-bragantino-amanha-as-20h-ao-vivo-no-premiere-12850545.ghtml",
-      "https://www.youtube.com/watch?v=_U7JS7cgsBg",
-      "https://www.youtube.com/watch?v=c3QGUc_UFMM",
-      "https://www.youtube.com/watch?v=vTirRFBGnMU"
+      "https://ge.globo.com/google/amp/pr/futebol/times/coritiba/noticia/2026/09/16/vasco-fluminense-e-botafogo-sequencia-contra-trio-carioca-pode-ser-decisiva-ao-coritiba-na-serie-a.ghtml",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2023/09/05/vasco-x-coritiba-cbf-altera-data-de-jogo-do-campeonato-brasileiro.ghtml",
+      "https://ge.globo.com/pr/futebol/times/coritiba/noticia/2026/03/30/coritiba-conhece-tabela-detalhada-ate-a-17a-rodada-da-serie-a-confira.ghtml",
+      "https://ge.globo.com/pr/futebol/times/coritiba/noticia/2026/09/17/quem-vai-substituir-breno-lopes-saiba-as-opcoes-do-coritiba-para-definir-o-ataque-diante-do-vasco.ghtml",
+      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/05/10/vasco-x-athletico-pr-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://www.primevideo.com/-/el/detail/0UB3SR0PR8OFGMURBWQ003W4A7",
+      "https://www.primevideo.com/-/pt/detail/0I2PPYZVPFCYF3CYAW6E9KLBJ1",
+      "https://www.primevideo.com/-/pt/detail/0NXX6LTZXCOHDL3V0AKSEULO9X",
+      "https://www.primevideo.com/-/pt/detail/0RPEIXBSKTUFWTNTJYNAPCVEL8",
+      "https://www.primevideo.com/-/pt/detail/0U2R8F7V7OCFE29OLGPIQ1OLIS",
+      "https://www.primevideo.com/-/pt/region/na/detail/0FUIEAEDBMIES0U6MLT3BE69HQ",
+      "https://www.primevideo.com/detail/0KV4CBTWTCKG16N44QG7AM9M7V",
+      "https://www.primevideo.com/detail/0RPEIXBSKTUFWTNTJYNAPCVEL8",
+      "https://www.primevideo.com/detail/0U2R8F7V7OCFE29OLGPIQ1OLIS",
+      "https://www.primevideo.com/detail/0UB3SR0PR8OFGMURBWQ003W4A7",
+      "https://www.youtube.com/watch?v=6RxQ_EW3vOU",
+      "https://www.youtube.com/watch?v=_kh3XB7XyEU"
     ],
     "rejeicoes": [
-      "modelo não conseguiu confirmar a grade",
-      "grade vazia",
-      "confiança 0.660 abaixo do limiar"
+      "avaliação YouTube refere URL que não está no dossiê atual"
     ],
-    "resumo": "Partida confirmada: Flamengo x Bragantino, Brasileirão 2026, 28ª rodada, domingo, 20/09/2026, às 18h30 (BRT), no Maracanã. O vídeo da GE TV não transmite o jogo integral: trata-se de aquecimento/pré-jogo e direciona o público para assistir à partida no SporTV. Isso confirma indicação de SporTV, mas não há, nas fontes consultadas, confirmação oficial suficiente da grade completa (incluindo ou não Premiere e demais plataformas); por isso a transmissão permanece não resolvida e nenhum canal é listado como grade final."
+    "resumo": "Confirmado para o Brasil: Vasco da Gama x Coritiba, Brasileirão Série A, 28ª rodada, sábado, 19/09/2026, às 20h30 (BRT), em São Januário. A transmissão integral é exclusiva do Prime Video. A página do Prime Video anuncia a cobertura a partir de 19h30 BRT; o horário da bola rolando permanece 20h30, conforme CBF e ge."
   },
-  "atualizado_em": "2026-09-19T18:40:26-03:00"
+  "atualizado_em": "2026-09-19T19:13:04-03:00"
 }
