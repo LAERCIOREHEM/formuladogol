@@ -3799,54 +3799,113 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado: Atlético-MG x Chapecoense, Brasileirão 2026 (28ª rodada), sábado, 19/09/2026, às 16h (BRT), na Arena MRV, em Belo Horizonte. A transmissão integral confirmada para o Brasil é do Premiere (pay-per-view). Não há evidência consultada que confirme Globo, SporTV, GE TV ou outra plataforma para esta partida; o UOL ressalva que a exibição pode variar por estado caso exista TV aberta, mas não identifica praça ou emissora, portanto ela não foi incluída. Não há URL do YouTube no dossiê."
+    },
+    {
+      "event_id": "401841245",
+      "jogo": "Mirassol x Botafogo",
+      "data_iso": "2026-09-19T17:00:00-03:00",
+      "checkpoint": -360,
+      "executado_em": "2026-09-19T11:03:50-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+      "canais_antes": [
+        "CazéTV",
+        "Premiere",
+        "Record"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/04/01/botafogo-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://www.cbf.com.br/a-cbf/noticias/analise-do-var/a/analise-do-var-botafogo-rj-x-red-bull-bragantino-sp-27-rodada-do-brasileirao-serie-a-2026-12092026",
+        "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/322852",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2026/botafogo-x-gremio-novorizontino-saf/833142",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/botafogo-segura-palmeiras-e-ajuda-fla-a-tomar-a-lideranca-do-brasileirao",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/brasileirao-de-volta-confira-o-retrospecto-dos-confrontos-da-19-rodada",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/fla-goleia-mirassol-e-reduz-diferenca-para-o-lider-palmeiras",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/flamengo-vence-mirassol-e-cola-no-palmeiras",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/noticias/a/mirassol-reage-e-arranca-empate-apos-sair-perdendo-por-3-a-0-para-o-botafogo",
+        "https://www.cbf.com.br/futebol-brasileiro/times/copa-do-brasil/masculino/2026/20385",
+        "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/mirassol-x-botafogo-horario-e-onde-assistir-ao-jogo-do-brasileirao.amp.htm",
+        "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/09/19/botafogo-estreia-tite-e-corre-atras-de-segunda-vitoria-seguida-no-brasileirao-contra-o-mirassol.htm"
+      ],
+      "canais_depois": [
+        "CazéTV",
+        "Premiere",
+        "Record"
+      ],
+      "exclusivo": false,
+      "confianca": 0.98,
+      "fontes_aceitas": [
+        "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/mirassol-x-botafogo-horario-e-onde-assistir-ao-jogo-do-brasileirao.amp.htm"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=5tuFjljf3OA",
+          "scope": "unknown",
+          "valid_for_match": false,
+          "reason": "O URL está identificado no dossiê como uma live da CazéTV para Mirassol x Botafogo, e a CazéTV foi confirmada como transmissora da partida por fonte esportiva consultada. Porém, a página específica do YouTube não ficou acessível na verificação para comprovar que este link, em particular, exibirá integralmente o jogo — e não somente pré-jogo ou cobertura."
+        }
+      ],
+      "youtube_removidos": [
+        "https://www.youtube.com/watch?v=5tuFjljf3OA"
+      ],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Mirassol x Botafogo, Brasileirão 2026, 28ª rodada, sábado, 19/09/2026, às 17h (horário de Brasília), no José Maria de Campos Maia, em Mirassol (SP). A grade completa é Record, CazéTV e Premiere. A Record pode ter disponibilidade regional, conforme a praça."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841239",
-    "jogo": "Atlético-MG x Chapecoense",
-    "data_iso": "2026-09-19T16:00:00-03:00",
+    "event_id": "401841245",
+    "jogo": "Mirassol x Botafogo",
+    "data_iso": "2026-09-19T17:00:00-03:00",
     "checkpoint": -360,
-    "executado_em": "2026-09-19T10:03:51-03:00",
+    "executado_em": "2026-09-19T11:03:50-03:00",
     "chamada_openai": true,
-    "motivo_chamada": "fonte preservada exige reconfirmação",
+    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
     "canais_antes": [
-      "Premiere"
+      "CazéTV",
+      "Premiere",
+      "Record"
     ],
     "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://credencial.cbf.com.br/competicoes/listar/42/1",
-      "https://download.uol.com.br/files/2023/05/1667102178_20230526173425_357.pdf",
-      "https://ge.globo.com/google/amp/futebol/noticia/fim-de-semana-na-tv-saiba-as-partidas-com-transmissao-ao-vivo.ghtml",
-      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/google/amp/sc/futebol/times/chapecoense/noticia/2026/09/14/chapecoense-perde-dois-zagueiros-para-jogo-contra-o-atletico-mg.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/09/12/atletico-mg-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/pe/futebol/brasileirao-serie-a/noticia/cbf-detalha-tabela-da-serie-a-entre-a-16a-e-20a-rodadas-veja-horarios-e-dias-dos-jogos.ghtml",
-      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/rodada-28-tudo-o-que-voce-precisa-saber-sobre-chapecoense-x-atletico-mg.ghtml",
-      "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/09/17/atletico-mg-x-chapecoense-ao-vivo-onde-assistir-horario-e-informacoes-pela-28-rodada-do-brasileirao.html",
-      "https://jcconcursos.uol.com.br/media/uploads/anexos/concurso-sejusp-mg-edital-1-2025.pdf",
-      "https://p.download.uol.com.br/mtv/narua/jornal_130910.pdf",
-      "https://p.download.uol.com.br/omossoroense/mudanca/pics/pdf/EDICAO_020914.pdf",
-      "https://p.download.uol.com.br/omossoroense/mudanca/pics/pdf/EDICAO_120515.pdf",
-      "https://p.download.uol.com.br/omossoroense/mudanca/pics/pdf/EDICAO_150815.pdf",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
-      "https://www.espn.com.br/futebol/partida/_/jogoId/401841239/chapecoense-atletico-mg",
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/atletico-mg-x-chapecoense-horario-e-onde-assistir-ao-jogo-do-brasileirao.amp.htm",
-      "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/09/19/apos-noite-epica-na-sul-americana-atletico-mg-pega-chapecoense-de-olho-no-g-6-do-brasileirao.amp.htm"
+      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/04/01/botafogo-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://www.cbf.com.br/a-cbf/noticias/analise-do-var/a/analise-do-var-botafogo-rj-x-red-bull-bragantino-sp-27-rodada-do-brasileirao-serie-a-2026-12092026",
+      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/322852",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2026/botafogo-x-gremio-novorizontino-saf/833142",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/botafogo-segura-palmeiras-e-ajuda-fla-a-tomar-a-lideranca-do-brasileirao",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/brasileirao-de-volta-confira-o-retrospecto-dos-confrontos-da-19-rodada",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/fla-goleia-mirassol-e-reduz-diferenca-para-o-lider-palmeiras",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/flamengo-vence-mirassol-e-cola-no-palmeiras",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/noticias/a/mirassol-reage-e-arranca-empate-apos-sair-perdendo-por-3-a-0-para-o-botafogo",
+      "https://www.cbf.com.br/futebol-brasileiro/times/copa-do-brasil/masculino/2026/20385",
+      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/mirassol-x-botafogo-horario-e-onde-assistir-ao-jogo-do-brasileirao.amp.htm",
+      "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/09/19/botafogo-estreia-tite-e-corre-atras-de-segunda-vitoria-seguida-no-brasileirao-contra-o-mirassol.htm"
     ],
     "canais_depois": [
-      "Premiere"
+      "CazéTV",
+      "Premiere",
+      "Record"
     ],
     "exclusivo": false,
-    "confianca": 0.9,
+    "confianca": 0.98,
     "fontes_aceitas": [
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/atletico-mg-x-chapecoense-horario-e-onde-assistir-ao-jogo-do-brasileirao.amp.htm",
-      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml"
+      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/mirassol-x-botafogo-horario-e-onde-assistir-ao-jogo-do-brasileirao.amp.htm"
     ],
-    "youtube": [],
-    "youtube_removidos": [],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=5tuFjljf3OA",
+        "scope": "unknown",
+        "valid_for_match": false,
+        "reason": "O URL está identificado no dossiê como uma live da CazéTV para Mirassol x Botafogo, e a CazéTV foi confirmada como transmissora da partida por fonte esportiva consultada. Porém, a página específica do YouTube não ficou acessível na verificação para comprovar que este link, em particular, exibirá integralmente o jogo — e não somente pré-jogo ou cobertura."
+      }
+    ],
+    "youtube_removidos": [
+      "https://www.youtube.com/watch?v=5tuFjljf3OA"
+    ],
     "overlay_alterado": true,
-    "resumo": "Confirmado: Atlético-MG x Chapecoense, Brasileirão 2026 (28ª rodada), sábado, 19/09/2026, às 16h (BRT), na Arena MRV, em Belo Horizonte. A transmissão integral confirmada para o Brasil é do Premiere (pay-per-view). Não há evidência consultada que confirme Globo, SporTV, GE TV ou outra plataforma para esta partida; o UOL ressalva que a exibição pode variar por estado caso exista TV aberta, mas não identifica praça ou emissora, portanto ela não foi incluída. Não há URL do YouTube no dossiê."
+    "resumo": "Confirmado para o Brasil: Mirassol x Botafogo, Brasileirão 2026, 28ª rodada, sábado, 19/09/2026, às 17h (horário de Brasília), no José Maria de Campos Maia, em Mirassol (SP). A grade completa é Record, CazéTV e Premiere. A Record pode ter disponibilidade regional, conforme a praça."
   },
-  "atualizado_em": "2026-09-19T10:03:51-03:00"
+  "atualizado_em": "2026-09-19T11:03:50-03:00"
 }
