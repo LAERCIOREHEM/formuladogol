@@ -4403,51 +4403,111 @@
         "avaliação YouTube refere URL que não está no dossiê atual"
       ],
       "resumo": "Confirmado para o Brasil: Vasco da Gama x Coritiba, Brasileirão Série A, 28ª rodada, sábado, 19/09/2026, às 20h30 (BRT), em São Januário. A transmissão integral é exclusiva do Prime Video. A página do Prime Video anuncia a cobertura a partir de 19h30 BRT; o horário da bola rolando permanece 20h30, conforme CBF e ge."
+    },
+    {
+      "event_id": "401841243",
+      "jogo": "São Paulo x Internacional",
+      "data_iso": "2026-09-19T21:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-09-19T19:42:57-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Premiere",
+        "SporTV"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://credencial.cbf.com.br/competicoes/listar/42/1",
+        "https://ge.globo.com/futebol/noticia/bola-rolando-confira-os-jogos-com-transmissao-ao-vivo-na-tv-no-meio-de-semana.ghtml",
+        "https://ge.globo.com/futebol/noticia/futebol-na-telinha-confira-os-jogos-com-transmissao-ao-vivo-no-meio-de-semana.ghtml",
+        "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/07/16/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-19a-rodada.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/08/29/sao-paulo-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/03/18/santos-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/09/12/santos-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/526369",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/sao-paulo-x-internacional/832163",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-sub17/brasileirao-sub-17-santos-vence-internacional-e-cola-do-g-8",
+        "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/20002"
+      ],
+      "canais_depois": [
+        "Premiere",
+        "SporTV"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/sao-paulo-x-internacional/832163",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=hGl4EL9HSvE",
+          "scope": "pre_game",
+          "valid_for_match": false,
+          "reason": "O título informado identifica o conteúdo como “AQUECIMENTO AO VIVO”, isto é, programação pré-jogo; não há evidência de transmissão integral da partida."
+        }
+      ],
+      "youtube_removidos": [
+        "https://www.youtube.com/watch?v=hGl4EL9HSvE"
+      ],
+      "overlay_alterado": true,
+      "resumo": "Confirmado: São Paulo x Internacional, Brasileirão Série A 2026, fase única, rodada 28, será em 19/09/2026 às 21:00 (BRT), no Morumbi/Morumbis. A CBF lista Premiere e Sportv como as transmissões da partida; portanto, a grade completa no Brasil é Premiere e SporTV, sem exclusividade. O URL do YouTube fornecido é de aquecimento ao vivo e não constitui transmissão integral do jogo."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841247",
-    "jogo": "Vasco da Gama x Coritiba",
-    "data_iso": "2026-09-19T20:30:00-03:00",
+    "event_id": "401841243",
+    "jogo": "São Paulo x Internacional",
+    "data_iso": "2026-09-19T21:00:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-09-19T19:13:04-03:00",
+    "executado_em": "2026-09-19T19:42:57-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "Prime Video"
+      "Premiere",
+      "SporTV"
     ],
-    "status": "nao_resolvido",
+    "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
       "https://credencial.cbf.com.br/competicoes/listar/42/1",
-      "https://ge.globo.com/getv/noticia/2026/09/16/ge-tv-amplia-distribuicao-e-chega-ao-prime-video.ghtml",
-      "https://ge.globo.com/google/amp/futebol/noticia/fim-de-semana-na-tv-saiba-as-partidas-com-transmissao-ao-vivo.ghtml",
-      "https://ge.globo.com/google/amp/pa/futebol/brasileirao-serie-a/noticia/2026/08/31/remo-x-coritiba-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/04/01/coritiba-x-vasco-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/futebol/noticia/bola-rolando-confira-os-jogos-com-transmissao-ao-vivo-na-tv-no-meio-de-semana.ghtml",
+      "https://ge.globo.com/futebol/noticia/futebol-na-telinha-confira-os-jogos-com-transmissao-ao-vivo-no-meio-de-semana.ghtml",
+      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/07/16/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-19a-rodada.ghtml",
       "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/google/amp/pr/futebol/times/coritiba/noticia/2026/09/16/vasco-fluminense-e-botafogo-sequencia-contra-trio-carioca-pode-ser-decisiva-ao-coritiba-na-serie-a.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2023/09/05/vasco-x-coritiba-cbf-altera-data-de-jogo-do-campeonato-brasileiro.ghtml",
-      "https://ge.globo.com/pr/futebol/times/coritiba/noticia/2026/03/30/coritiba-conhece-tabela-detalhada-ate-a-17a-rodada-da-serie-a-confira.ghtml",
-      "https://ge.globo.com/pr/futebol/times/coritiba/noticia/2026/09/17/quem-vai-substituir-breno-lopes-saiba-as-opcoes-do-coritiba-para-definir-o-ataque-diante-do-vasco.ghtml",
-      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/05/10/vasco-x-athletico-pr-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://www.primevideo.com/-/el/detail/0UB3SR0PR8OFGMURBWQ003W4A7",
-      "https://www.primevideo.com/-/pt/detail/0I2PPYZVPFCYF3CYAW6E9KLBJ1",
-      "https://www.primevideo.com/-/pt/detail/0NXX6LTZXCOHDL3V0AKSEULO9X",
-      "https://www.primevideo.com/-/pt/detail/0RPEIXBSKTUFWTNTJYNAPCVEL8",
-      "https://www.primevideo.com/-/pt/detail/0U2R8F7V7OCFE29OLGPIQ1OLIS",
-      "https://www.primevideo.com/-/pt/region/na/detail/0FUIEAEDBMIES0U6MLT3BE69HQ",
-      "https://www.primevideo.com/detail/0KV4CBTWTCKG16N44QG7AM9M7V",
-      "https://www.primevideo.com/detail/0RPEIXBSKTUFWTNTJYNAPCVEL8",
-      "https://www.primevideo.com/detail/0U2R8F7V7OCFE29OLGPIQ1OLIS",
-      "https://www.primevideo.com/detail/0UB3SR0PR8OFGMURBWQ003W4A7",
-      "https://www.youtube.com/watch?v=6RxQ_EW3vOU",
-      "https://www.youtube.com/watch?v=_kh3XB7XyEU"
+      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/08/29/sao-paulo-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/03/18/santos-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/09/12/santos-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/526369",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/sao-paulo-x-internacional/832163",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-sub17/brasileirao-sub-17-santos-vence-internacional-e-cola-do-g-8",
+      "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/20002"
     ],
-    "rejeicoes": [
-      "avaliação YouTube refere URL que não está no dossiê atual"
+    "canais_depois": [
+      "Premiere",
+      "SporTV"
     ],
-    "resumo": "Confirmado para o Brasil: Vasco da Gama x Coritiba, Brasileirão Série A, 28ª rodada, sábado, 19/09/2026, às 20h30 (BRT), em São Januário. A transmissão integral é exclusiva do Prime Video. A página do Prime Video anuncia a cobertura a partir de 19h30 BRT; o horário da bola rolando permanece 20h30, conforme CBF e ge."
+    "exclusivo": false,
+    "confianca": 0.99,
+    "fontes_aceitas": [
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/sao-paulo-x-internacional/832163",
+      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml"
+    ],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=hGl4EL9HSvE",
+        "scope": "pre_game",
+        "valid_for_match": false,
+        "reason": "O título informado identifica o conteúdo como “AQUECIMENTO AO VIVO”, isto é, programação pré-jogo; não há evidência de transmissão integral da partida."
+      }
+    ],
+    "youtube_removidos": [
+      "https://www.youtube.com/watch?v=hGl4EL9HSvE"
+    ],
+    "overlay_alterado": true,
+    "resumo": "Confirmado: São Paulo x Internacional, Brasileirão Série A 2026, fase única, rodada 28, será em 19/09/2026 às 21:00 (BRT), no Morumbi/Morumbis. A CBF lista Premiere e Sportv como as transmissões da partida; portanto, a grade completa no Brasil é Premiere e SporTV, sem exclusividade. O URL do YouTube fornecido é de aquecimento ao vivo e não constitui transmissão integral do jogo."
   },
-  "atualizado_em": "2026-09-19T19:13:04-03:00"
+  "atualizado_em": "2026-09-19T19:42:57-03:00"
 }
