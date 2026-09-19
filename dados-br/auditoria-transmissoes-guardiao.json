@@ -4035,72 +4035,111 @@
       ],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: São Paulo x Internacional, Brasileirão Série A 2026, rodada 28, sábado, 19/09/2026, às 21h (BRT), no Morumbis. A transmissão integral é de SporTV e Premiere. GE TV não integra a grade da partida: o link do YouTube informado é de aquecimento/pré-jogo, não do jogo completo."
+    },
+    {
+      "event_id": "401841245",
+      "jogo": "Mirassol x Botafogo",
+      "data_iso": "2026-09-19T17:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-09-19T15:43:35-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "CazéTV",
+        "Premiere",
+        "Record"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://copadomundo.uol.com.br/busca/montecarlo.htm",
+        "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/09/17/mirassol-x-botafogo-onde-assistir-ao-vivo-horario-e-provaveis-escalacoes-pela-28-rodada-da-serie-a.html",
+        "https://www.uol.com.br/esporte",
+        "https://www.uol.com.br/esporte/futebol",
+        "https://www.uol.com.br/esporte/futebol/times/botafogo",
+        "https://www.uol.com.br/esporte/futebol/times/santos",
+        "https://www.uol.com.br/esporte/futebol/ultimas-noticias/gazeta-esportiva/2025/10/31/mirassol-x-botafogo-pelo-brasileirao-onde-assistir-ao-vivo-historico-estatisticas-e-escalacoes.htm",
+        "https://www.uol.com.br/esporte/futebol/ultimas-noticias/gazeta-esportiva/2026/03/17/palmeiras-x-botafogo-pelo-brasileirao-onde-assistir-estatisticas-historico-e-provaveis-escalacoes.amp.htm",
+        "https://www.uol.com.br/esporte/ultimas",
+        "https://www.uol.com.br/esporte/ultimas-noticias/2025/11/01/transmissao-ao-vivo-de-mirassol-x-botafogo-pelo-brasileirao-veja-onde-assistir.htm",
+        "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/mirassol-x-botafogo-horario-e-onde-assistir-ao-jogo-do-brasileirao.ghtm",
+        "https://www.youtube.com/watch?v=5tuFjljf3OA"
+      ],
+      "canais_depois": [
+        "CazéTV",
+        "Premiere",
+        "Record"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/mirassol-x-botafogo-horario-e-onde-assistir-ao-jogo-do-brasileirao.ghtm",
+        "https://www.youtube.com/watch?v=5tuFjljf3OA"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=5tuFjljf3OA",
+          "scope": "match",
+          "valid_for_match": true,
+          "reason": "Vídeo ao vivo do canal oficial CazéTV, intitulado “AO VIVO: MIRASSOL X BOTAFOGO | BRASILEIRÃO 2026 | 28ª RODADA”. A indicação é corroborada pela grade consultada, que lista a CazéTV como detentora da transmissão da partida; não há sinal de que seja apenas pré-jogo, watchalong, pós-jogo ou melhores momentos."
+        }
+      ],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Mirassol x Botafogo, Brasileirão 2026, 28ª rodada, sábado, 19/09/2026, às 17h (horário de Brasília), no José Maria de Campos Maia, em Mirassol. Transmissão completa pela Record, CazéTV e Premiere. A disponibilidade da Record pode variar por praça; a do Premiere depende da assinatura. Não há exclusividade."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841243",
-    "jogo": "São Paulo x Internacional",
-    "data_iso": "2026-09-19T21:00:00-03:00",
-    "checkpoint": -360,
-    "executado_em": "2026-09-19T15:03:54-03:00",
+    "event_id": "401841245",
+    "jogo": "Mirassol x Botafogo",
+    "data_iso": "2026-09-19T17:00:00-03:00",
+    "checkpoint": -90,
+    "executado_em": "2026-09-19T15:43:35-03:00",
     "chamada_openai": true,
-    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+    "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
+      "CazéTV",
       "Premiere",
-      "SporTV"
+      "Record"
     ],
     "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://credencial.cbf.com.br/competicoes/listar/42/1",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/14/cbf-divulga-tabela-detalhada-das-rodadas-25-e-26-da-serie-a-do-brasileirao.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2016/08/cbf-divulga-tabela-detalhada-das-rodadas-22-26-da-serie.html",
-      "https://ge.globo.com/futebol/copa-do-mundo/noticia/2026/07/05/quando-volta-o-brasileirao-eliminacao-do-brasil-faz-torcedores-virarem-a-chave-em-2026.ghtml",
-      "https://ge.globo.com/futebol/times/sao-paulo/noticia/2026/04/02/analise-sao-paulo-perde-forca-com-mudancas-e-troca-a-euforia-da-lideranca-por-pressao.ghtml",
-      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/google/amp/sp/futebol/brasileirao-serie-a/noticia/sao-paulo-x-internacional-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
-      "https://ge.globo.com/google/amp/sp/ribeirao-preto-e-regiao/futebol/futebol-feminino/brasileiro-feminino/noticia/2026/09/12/flamengo-x-sao-paulo-no-brasileiro-feminino-onde-assistir-ao-vivo-e-horario.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/06/22/brasileirao-serie-a-veja-tabela-detalhada-das-rodadas-19-a-24.ghtml",
-      "https://ge.globo.com/rs/futebol/times/internacional/noticia/2026/01/12/estatisticas-do-inter-em-2026-veja-campanha-artilheiros-e-videos.ghtml",
-      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/09/12/chapecoense-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2022/11/08/sao-paulo-x-internacional-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2023/05/07/sao-paulo-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/08/29/sao-paulo-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/09/05/sao-paulo-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/09/12/palmeiras-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/central-do-apito-arbitro-deveria-ter-expulsado-victor-cuesta-do-inter-contra-o-sao-paulo.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/sao-paulo-x-internacional-veja-onde-assistir-escalacoes-desfalques-e-arbitragem-2.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/09/12/santos-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/video/sao-paulo-x-internacional-saiba-tudo-sobre-o-jogo-da-27a-rodada-do-brasileirao-serie-a-12941173.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/corinthians-x-fluminense/832164",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/internacional-x-sao-paulo/831976",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/brasileirao-betano-21-rodada-comeca-nesta-quarta",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil/sub17/com-classico-san-sao-segunda-rodada-do-brasileirao-se-inicia-nesta-quarta"
+      "https://copadomundo.uol.com.br/busca/montecarlo.htm",
+      "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/09/17/mirassol-x-botafogo-onde-assistir-ao-vivo-horario-e-provaveis-escalacoes-pela-28-rodada-da-serie-a.html",
+      "https://www.uol.com.br/esporte",
+      "https://www.uol.com.br/esporte/futebol",
+      "https://www.uol.com.br/esporte/futebol/times/botafogo",
+      "https://www.uol.com.br/esporte/futebol/times/santos",
+      "https://www.uol.com.br/esporte/futebol/ultimas-noticias/gazeta-esportiva/2025/10/31/mirassol-x-botafogo-pelo-brasileirao-onde-assistir-ao-vivo-historico-estatisticas-e-escalacoes.htm",
+      "https://www.uol.com.br/esporte/futebol/ultimas-noticias/gazeta-esportiva/2026/03/17/palmeiras-x-botafogo-pelo-brasileirao-onde-assistir-estatisticas-historico-e-provaveis-escalacoes.amp.htm",
+      "https://www.uol.com.br/esporte/ultimas",
+      "https://www.uol.com.br/esporte/ultimas-noticias/2025/11/01/transmissao-ao-vivo-de-mirassol-x-botafogo-pelo-brasileirao-veja-onde-assistir.htm",
+      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/mirassol-x-botafogo-horario-e-onde-assistir-ao-jogo-do-brasileirao.ghtm",
+      "https://www.youtube.com/watch?v=5tuFjljf3OA"
     ],
     "canais_depois": [
+      "CazéTV",
       "Premiere",
-      "SporTV"
+      "Record"
     ],
     "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/rs/futebol/times/internacional/noticia/2026/01/12/estatisticas-do-inter-em-2026-veja-campanha-artilheiros-e-videos.ghtml",
-      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://credencial.cbf.com.br/competicoes/listar/42/1"
+      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/mirassol-x-botafogo-horario-e-onde-assistir-ao-jogo-do-brasileirao.ghtm",
+      "https://www.youtube.com/watch?v=5tuFjljf3OA"
     ],
     "youtube": [
       {
-        "url": "https://www.youtube.com/watch?v=hGl4EL9HSvE",
-        "scope": "pre_game",
-        "valid_for_match": false,
-        "reason": "O título identificado no dossiê é “SÃO PAULO X INTERNACIONAL | AQUECIMENTO AO VIVO”, com início programado às 20h; isso caracteriza cobertura pré-jogo, não transmissão integral da partida das 21h."
+        "url": "https://www.youtube.com/watch?v=5tuFjljf3OA",
+        "scope": "match",
+        "valid_for_match": true,
+        "reason": "Vídeo ao vivo do canal oficial CazéTV, intitulado “AO VIVO: MIRASSOL X BOTAFOGO | BRASILEIRÃO 2026 | 28ª RODADA”. A indicação é corroborada pela grade consultada, que lista a CazéTV como detentora da transmissão da partida; não há sinal de que seja apenas pré-jogo, watchalong, pós-jogo ou melhores momentos."
       }
     ],
-    "youtube_removidos": [
-      "https://www.youtube.com/watch?v=hGl4EL9HSvE"
-    ],
+    "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: São Paulo x Internacional, Brasileirão Série A 2026, rodada 28, sábado, 19/09/2026, às 21h (BRT), no Morumbis. A transmissão integral é de SporTV e Premiere. GE TV não integra a grade da partida: o link do YouTube informado é de aquecimento/pré-jogo, não do jogo completo."
+    "resumo": "Confirmado para o Brasil: Mirassol x Botafogo, Brasileirão 2026, 28ª rodada, sábado, 19/09/2026, às 17h (horário de Brasília), no José Maria de Campos Maia, em Mirassol. Transmissão completa pela Record, CazéTV e Premiere. A disponibilidade da Record pode variar por praça; a do Premiere depende da assinatura. Não há exclusividade."
   },
-  "atualizado_em": "2026-09-19T15:03:54-03:00"
+  "atualizado_em": "2026-09-19T15:43:35-03:00"
 }
