@@ -515,3 +515,69 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
 }
 
 console.log('live-api tests: ok');
+
+
+// R10: snapshot PRE em fallback/cache jamais pode ser servido como jogo IN.
+// Se a ESPN do Worker estiver momentaneamente indisponível, o frontend precisa
+// receber 503 e cair para a chamada ESPN direta, em vez de exibir 0/0 antigo.
+{
+  const cache = new MemoryCache();
+  const team = (id, name) => ({ id, displayName: name });
+  const stat = (name, value) => ({ name, displayValue: String(value) });
+  const pre = {
+    header: { competitions: [{ status: { type: { state: 'pre', completed: false } } }] },
+    boxscore: { teams: [
+      { team: team('1', 'Atlético-MG'), statistics: [stat('possessionPct', '0%'), stat('totalShots', 0)] },
+      { team: team('2', 'Chapecoense'), statistics: [stat('possessionPct', '0%'), stat('totalShots', 0)] }
+    ] }
+  };
+  const primeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('sports.core.api.espn.com')) return new Response('offline', { status: 503, headers: { 'content-type': 'text/plain' } });
+    if (href.includes('cdn.espn.com') || href.includes('site.api.espn.com')) return Response.json({ gamepackageJSON: pre });
+    throw new Error(`URL inesperada ${href}`);
+  };
+  let result = await resolveLiveSummary(new URL('https://x/v1/live/summary?league=bra.1&event=401841239&expectedGoals=0'), {
+    cache, fetchImpl: primeFetch, now: () => 10_000
+  });
+  assert.equal(result.status, 200);
+
+  const offline = async () => new Response('offline', { status: 503, headers: { 'content-type': 'text/plain' } });
+  result = await resolveLiveSummary(new URL('https://x/v1/live/summary?league=bra.1&event=401841239&expectedGoals=0&state=in&fresh=1'), {
+    cache, fetchImpl: offline, now: () => 20_000
+  });
+  assert.equal(result.status, 503, 'cache PRE não pode mascarar falha ESPN durante jogo IN');
+}
+
+// R10: Brasileirão é ESPN-only. Não chamar TheSportsDB/API-Football para
+// completar estatísticas, mesmo quando a cobertura ESPN ainda está reduzida.
+{
+  const cache = new MemoryCache();
+  const team = (id, name) => ({ id, displayName: name });
+  const stat = (name, value) => ({ name, displayValue: String(value) });
+  const live = {
+    header: { competitions: [{ status: { type: { state: 'in', completed: false } }, competitors: [
+      { homeAway: 'home', team: team('1', 'Atlético-MG') }, { homeAway: 'away', team: team('2', 'Chapecoense') }
+    ] }] },
+    boxscore: { teams: [
+      { team: team('1', 'Atlético-MG'), statistics: [stat('possessionPct', '60%'), stat('totalShots', 2), stat('shotsOnTarget', 1), stat('foulsCommitted', 1), stat('wonCorners', 1)] },
+      { team: team('2', 'Chapecoense'), statistics: [stat('possessionPct', '40%'), stat('totalShots', 1), stat('shotsOnTarget', 0), stat('foulsCommitted', 2), stat('wonCorners', 0)] }
+    ] },
+    plays: [{ id: 'kickoff', text: 'Kickoff' }]
+  };
+  let externalCalls = 0;
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('thesportsdb.com') || href.includes('api-sports.io')) { externalCalls += 1; throw new Error('fonte externa proibida no Brasileirão'); }
+    if (href.includes('sports.core.api.espn.com')) return Response.json({ items: [{ id: 'kickoff', text: 'Kickoff' }] });
+    if (href.includes('cdn.espn.com') || href.includes('site.api.espn.com')) return Response.json({ gamepackageJSON: live });
+    throw new Error(`URL inesperada ${href}`);
+  };
+  const result = await resolveLiveSummary(new URL('https://x/v1/live/summary?league=bra.1&event=401841239&expectedGoals=0&state=in&fresh=1'), {
+    cache, fetchImpl: fakeFetch, now: () => 30_000, apiFootballKey: 'nao-usar'
+  });
+  assert.equal(result.status, 200);
+  assert.equal(result.body.statsProvider, 'espn');
+  assert.equal(result.body.espnOnly, true);
+  assert.equal(externalCalls, 0);
+}

@@ -700,9 +700,13 @@
     const params = new URLSearchParams({
       league: String(league),
       event: eventId,
-      expectedGoals: String(expectedGoals)
+      expectedGoals: String(expectedGoals),
+      state: String(game.state || "")
     });
-    if (options.forceFresh) params.set("fresh", "1");
+    // Brasileirão ao vivo: sempre pede a camada ESPN multi-superfície fresca.
+    // O hot-cache de poucos segundos continua útil para outros consumidores,
+    // mas o painel visível não deve herdar os zeros do pré-jogo.
+    if (options.forceFresh || (league === "bra.1" && game.state === "in")) params.set("fresh", "1");
     let gatewayError = null;
 
     try {
@@ -722,8 +726,54 @@
         statsBestKnownApplied: envelope.statsBestKnownApplied === true,
         statsFallback: envelope.statsFallback || null,
         statsFallbacks: Array.isArray(envelope.statsFallbacks) ? envelope.statsFallbacks : [],
-        apiFootballBudget: envelope.apiFootballBudget || null
+        apiFootballBudget: envelope.apiFootballBudget || null,
+        cacheStatus: String(envelope.cacheStatus || ""),
+        stale: envelope.stale === true,
+        ageMs: Number(envelope.ageMs || 0) || 0,
+        observedState: String(envelope.observedState || ""),
+        espnOnly: envelope.espnOnly === true
       };
+
+      // Segunda perna ESPN-only para o Brasileirão. Se o Worker recebeu uma
+      // superfície atrasada (ou precisou servir cache), confrontamos com o
+      // Site API que historicamente abastece esta página diretamente. Não há
+      // API externa: escolhemos apenas a resposta ESPN com estatísticas mais
+      // informativas para este mesmo eventId.
+      if (league === "bra.1" && game.state === "in") {
+        const gatewayRows = extractStatsRows(game, envelope.data);
+        const gatewayScore = statsRowsFreshnessScore(gatewayRows);
+        const meta = envelope.data.__fdgLiveMeta || {};
+        const shouldConfirmDirect = gatewayRows.length <= PARTIAL_STATS_THRESHOLD || gatewayScore < 100 || meta.stale || /stale/i.test(meta.cacheStatus || "");
+        if (shouldConfirmDirect) {
+          try {
+            const directUrl = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/summary?event=" + encodeURIComponent(eventId) + "&_fdg_live=" + Date.now();
+            const direct = await fetchJson(directUrl, {
+              timeoutMs: DIRECT_ESPN_FALLBACK_TIMEOUT_MS,
+              signal: options.signal || undefined,
+              cache: "no-store"
+            });
+            const directRows = extractStatsRows(game, direct);
+            const directScore = statsRowsFreshnessScore(directRows);
+            if (directScore > gatewayScore) {
+              direct.__fdgLiveMeta = {
+                statsProvider: "espn-direct-fresh",
+                statsCoverage: { minPerTeam: directRows.length, maxPerTeam: directRows.length },
+                statsQuality: directRows.length >= 17 ? "COMPLETE" : directRows.length >= 14 ? "GOOD" : directRows.length >= 10 ? "DEGRADED" : "CRITICAL",
+                statsTargetMinPerTeam: 10,
+                statsBestKnownApplied: false,
+                cacheStatus: "direct-fresh",
+                stale: false,
+                ageMs: 0,
+                observedState: "in",
+                espnOnly: true
+              };
+              return direct;
+            }
+          } catch (_) {
+            // A camada multi-superfície do Worker permanece como fonte ESPN.
+          }
+        }
+      }
       return envelope.data;
     } catch (error) {
       if (isAbortError(error)) throw error;
@@ -2230,6 +2280,17 @@
     const m = String(v == null ? "" : v).replace(",", ".").replace("%", "").match(/-?\d+(?:\.\d+)?/);
     return m ? Number(m[0]) : NaN;
   }
+  function statsRowsFreshnessScore(rows) {
+    const list = Array.isArray(rows) ? rows : [];
+    let meaningful = 0;
+    for (const row of list) {
+      const h = numericStat(row && row.home), a = numericStat(row && row.away);
+      if ((Number.isFinite(h) && h !== 0) || (Number.isFinite(a) && a !== 0)) meaningful += 1;
+    }
+    // Um único valor não-zero vale mais que uma coleção inteira de placeholders
+    // 0/0; a cardinalidade desempata duas respostas ESPN já efetivamente vivas.
+    return meaningful * 100 + list.length;
+  }
   function formatStatValue(rule, raw) {
     if (raw == null || raw === "") return "";
     const s = String(raw).trim();
@@ -2310,10 +2371,17 @@
     const key = statsEventKey(g);
     if (!key) return currentRows;
     const fixtureKey = statsFixtureKey(g);
+
+    // Estatística pré-jogo 0/0 é placeholder da ESPN, não observação esportiva.
+    // Não a persistimos no sessionStorage. Assim ela não contamina o primeiro
+    // minuto quando o estado muda de PRE para IN.
+    if (g && g.state === "pre") return currentRows || [];
+
     let entry = state.statsPorId[key];
-    if (!entry || entry.fixtureKey !== fixtureKey || !entry.metrics || typeof entry.metrics !== "object") {
-      entry = { fixtureKey, updatedAt: 0, metrics: {} };
+    if (!entry || entry.fixtureKey !== fixtureKey || !entry.metrics || typeof entry.metrics !== "object" || (g && g.state === "in" && entry.gameState === "pre")) {
+      entry = { fixtureKey, updatedAt: 0, gameState: String(g && g.state || ""), metrics: {} };
     }
+    entry.gameState = String(g && g.state || entry.gameState || "");
 
     // A ESPN pode entregar primeiro um conjunto resumido e, segundos depois,
     // o boxscore completo. Atualizamos toda métrica presente, mas preservamos
@@ -2493,8 +2561,10 @@
   }
 
   function renderStats(g, summary) {
+    if (g && g.state === "pre") return '<div class="live-empty">As estatísticas serão exibidas após o início da partida.</div>';
     const rows = collectStats(g, summary);
-    if (!rows.length) return '<div class="live-empty">As estatísticas serão exibidas quando estiverem disponíveis para esta partida.</div>';
+    const allZeroPlaceholder = g && g.state === "in" && rows.length > 0 && statsRowsFreshnessScore(rows) < 100;
+    if (!rows.length || allZeroPlaceholder) return '<div class="live-empty">A ESPN está atualizando as estatísticas deste jogo. O painel será preenchido automaticamente assim que os dados ao vivo forem publicados.</div>';
     const names = '<div class="live-stats-head"><div>' + esc(g.home.nome) + '</div><div>comparativo</div><div>' + esc(g.away.nome) + '</div></div>';
     const sourceMeta = statsSourceMeta(summary);
     return '<div class="live-stats live-stats-complete">' + names + rows.map((r) => '<div class="live-stat-row">' +

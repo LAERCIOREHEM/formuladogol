@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { fetchEspnLivePlays, fetchEspnScorerEnrichment, fetchEspnScoreboard, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays, fetchEspnTechnicalLivePlays, fetchEspnTechnicalScoreboard, probeEspnSources, summaryGoalCount, summaryNamedScorerHintCount, unwrapScoreboard, unwrapSummary } from '../src/espn-source.js';
+import { fetchEspnLivePlays, fetchEspnScorerEnrichment, fetchEspnScoreboard, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnSummaryGateway, fetchEspnTechnicalHotTestPlays, fetchEspnTechnicalLivePlays, fetchEspnTechnicalScoreboard, probeEspnSources, summaryGoalCount, summaryNamedScorerHintCount, unwrapScoreboard, unwrapSummary } from '../src/espn-source.js';
 
 const event = {
   id: '401909112',
@@ -276,3 +276,39 @@ assert.equal(summaryNamedScorerHintCount({ plays: [{ scoringPlay: true, text: 'G
 }
 
 console.log('espn-source: PASS');
+
+
+// R10: no Brasileirão, um boxscore ESPN ainda preso nos placeholders 0/0
+// não pode bloquear a mesma métrica já atualizada em outra superfície ESPN.
+{
+  const team = (id, name) => ({ id, displayName: name });
+  const stat = (name, value) => ({ name, displayValue: String(value) });
+  const preZero = {
+    header: { competitions: [{ status: { type: { state: 'in', completed: false } } }] },
+    boxscore: { teams: [
+      { team: team('1', 'Atlético-MG'), statistics: [stat('possessionPct', '0%'), stat('totalShots', 0), stat('shotsOnTarget', 0), stat('foulsCommitted', 0), stat('wonCorners', 0)] },
+      { team: team('2', 'Chapecoense'), statistics: [stat('possessionPct', '0%'), stat('totalShots', 0), stat('shotsOnTarget', 0), stat('foulsCommitted', 0), stat('wonCorners', 0)] }
+    ] },
+    plays: [{ id: 'kickoff', text: 'Kickoff' }]
+  };
+  const live = structuredClone(preZero);
+  live.boxscore.teams[0].statistics = [stat('possessionPct', '61.2%'), stat('totalShots', 2), stat('shotsOnTarget', 1), stat('foulsCommitted', 1), stat('wonCorners', 1)];
+  live.boxscore.teams[1].statistics = [stat('possessionPct', '38.8%'), stat('totalShots', 1), stat('shotsOnTarget', 0), stat('foulsCommitted', 2), stat('wonCorners', 0)];
+
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('/core/bra.1/game')) return Response.json({ gamepackageJSON: preZero });
+    if (href.includes('site.api.espn.com')) return Response.json(live);
+    if (href.includes('/core/bra.1/boxscore')) return Response.json({ gamepackageJSON: { boxscore: preZero.boxscore } });
+    if (href.includes('/playbyplay') || href.includes('/core/soccer/') || href.includes('/apis/site/v3/') || href.includes('sports.core.api.espn.com')) {
+      return new Response('offline', { status: 503, headers: { 'content-type': 'text/plain' } });
+    }
+    throw new Error(`URL inesperada ${href}`);
+  };
+  const result = await fetchEspnSummaryGateway('bra.1', '401841239', fakeFetch, 0);
+  const home = result.data.boxscore.teams.find((row) => row.team.id === '1');
+  const values = new Map(home.statistics.map((row) => [row.name, row.displayValue]));
+  assert.equal(values.get('possessionPct'), '61.2%');
+  assert.equal(values.get('totalShots'), '2');
+  assert.equal(values.get('shotsOnTarget'), '1');
+}

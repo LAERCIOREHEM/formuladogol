@@ -780,8 +780,12 @@ const STAT_TOKEN_ALIASES = new Map([
   ['interceptions', 'interceptions'], ['crosses', 'crosses'], ['totalcrosses', 'crosses']
 ]);
 
+function rawStatToken(stat) {
+  return normalizeStatToken(stat?.name || stat?.label || stat?.displayName || stat?.shortDisplayName || stat?.abbreviation);
+}
+
 function statToken(stat) {
-  const raw = normalizeStatToken(stat?.name || stat?.label || stat?.displayName || stat?.shortDisplayName || stat?.abbreviation);
+  const raw = rawStatToken(stat);
   return STAT_TOKEN_ALIASES.get(raw) || raw;
 }
 
@@ -795,6 +799,33 @@ function teamToken(entry) {
 
 function statValuePresent(stat) {
   return stat && (stat.displayValue != null || stat.value != null || stat.rawValue != null);
+}
+
+function statNumericValue(stat) {
+  if (!statValuePresent(stat)) return NaN;
+  const raw = stat.displayValue ?? stat.value ?? stat.rawValue;
+  const match = text(raw).replace(',', '.').replace('%', '').match(/-?\d+(?:\.\d+)?/);
+  return match ? Number(match[0]) : NaN;
+}
+
+function shouldReplaceStat(current, incoming) {
+  if (!statValuePresent(current)) return statValuePresent(incoming);
+  if (!statValuePresent(incoming)) return false;
+  // Durante a transição pré-jogo -> ao vivo algumas superfícies ESPN mantêm
+  // placeholders 0/0 enquanto outra superfície já publicou o valor real.
+  // Zero nunca deve bloquear um valor ESPN não-zero do MESMO eventId/métrica.
+  const currentValue = statNumericValue(current);
+  const incomingValue = statNumericValue(incoming);
+  if (Number.isFinite(currentValue) && Number.isFinite(incomingValue)) {
+    // Só promovemos 0 -> não-zero quando a ESPN usa o MESMO identificador
+    // de métrica. Aliases diferentes (ex.: wonCorners vs cornerKicks) podem
+    // representar superfícies com semântica/atualização distintas e mantêm a
+    // precedência da variante estatisticamente mais rica.
+    const sameRawMetric = rawStatToken(current) === rawStatToken(incoming);
+    if (sameRawMetric && currentValue === 0 && incomingValue !== 0) return true;
+    if (currentValue !== 0 && incomingValue === 0) return false;
+  }
+  return false;
 }
 
 function mergeStatLists(primary = [], extras = []) {
@@ -811,7 +842,7 @@ function mergeStatLists(primary = [], extras = []) {
       out.push(copy);
       return;
     }
-    if (!statValuePresent(current) && statValuePresent(stat)) Object.assign(current, stat);
+    if (shouldReplaceStat(current, stat)) Object.assign(current, stat);
   };
   for (const stat of Array.isArray(primary) ? primary : []) absorb(stat);
   for (const stat of Array.isArray(extras) ? extras : []) absorb(stat);

@@ -9,7 +9,7 @@ import {
 import { fetchApiFootballPlayerDefenseFallback, fetchApiFootballStatsFallback } from './api-football-source.js';
 import { fetchTheSportsDbStatsFallback } from './thesportsdb-source.js';
 
-const LIVE_GATEWAY_VERSION = '2';
+const LIVE_GATEWAY_VERSION = '3';
 const SCOREBOARD_HOT_TTL_SECONDS = 8;
 const SCOREBOARD_FALLBACK_TTL_SECONDS = 600;
 const SUMMARY_HOT_TTL_SECONDS = 8;
@@ -283,6 +283,8 @@ export async function resolveLiveSummary(url, deps = {}) {
   const eventId = text(url.searchParams.get('event'));
   const expectedGoals = Math.max(0, Math.min(30, Number(url.searchParams.get('expectedGoals') || 0) || 0));
   const forceFresh = url.searchParams.get('fresh') === '1';
+  const requestedStateRaw = text(url.searchParams.get('state')).toLowerCase();
+  const requestedState = ['pre', 'in', 'post'].includes(requestedStateRaw) ? requestedStateRaw : '';
   if (!ALLOWED_LEAGUES.has(league)) return { status: 400, body: { ok: false, error: 'invalid_league' } };
   if (!validEventId(eventId)) return { status: 400, body: { ok: false, error: 'invalid_event' } };
 
@@ -293,10 +295,17 @@ export async function resolveLiveSummary(url, deps = {}) {
   const hotKey = cacheKey('summary', [league, eventId], 'hot');
   const fallbackKey = cacheKey('summary', [league, eventId], 'fallback');
   const isContinental = CONTINENTAL_LEAGUES.has(league);
+  const isBrasileirao = league === 'bra.1';
+  const preserveBestStats = isContinental || isBrasileirao;
   const target = isContinental ? CONTINENTAL_STATS_TARGET : STATS_FALLBACK_THRESHOLD;
 
   const acceptable = (entry) => {
     if (!entry || !entry.data || typeof entry.data !== 'object') return false;
+    const cachedState = summaryState(entry.data);
+    // Nunca servir snapshot PRE como se fosse jogo em andamento. Esse era o
+    // caminho que mantinha os cinco zeros pré-jogo quando o edge ESPN oscilava.
+    if (requestedState === 'in' && cachedState === 'pre') return false;
+    if (requestedState === 'post' && cachedState === 'pre') return false;
     if (expectedGoals <= 0) return true;
     return summaryGoalCount(entry.data) >= expectedGoals;
   };
@@ -322,7 +331,7 @@ export async function resolveLiveSummary(url, deps = {}) {
 
     const statsStore = deps.statsStore || null;
     const dayKey = utcDayKey(now);
-    const bestKey = isContinental ? cacheKey('summary-stats-best', [league, eventId], 'best') : null;
+    const bestKey = preserveBestStats ? cacheKey('summary-stats-best', [league, eventId], 'best') : null;
     const bestSharedKey = `best:${league}:${eventId}`;
     const previousBest = bestKey
       ? await readLayeredCache(cache, bestKey, statsStore, bestSharedKey, STATS_BEST_KNOWN_TTL_SECONDS)
@@ -415,10 +424,10 @@ export async function resolveLiveSummary(url, deps = {}) {
       statsFallbackErrors.apiFootball = `orçamento diário protegido: ${Number(budgetState?.remaining)} requisições restantes`;
     }
 
-    // TheSportsDB continua como contingência gratuita/complementar. Nas
-    // continentais ele entra depois da API-Football; nas demais ligas mantém o
-    // comportamento anterior sem consumir a cota da API-Football.
-    if (shouldTryStatsFallback && coverageBelow(summaryTeamMetricCoverage(data), target)) {
+    // TheSportsDB fica restrito às competições continentais. No Brasileirão
+    // a cadeia volta a ser ESPN-only: múltiplas superfícies ESPN + preservação
+    // best-known, sem misturar fornecedores externos.
+    if (isContinental && shouldTryStatsFallback && coverageBelow(summaryTeamMetricCoverage(data), target)) {
       const statsKey = cacheKey('summary-stats', [league, eventId], 'thesportsdb');
       const mapKey = cacheKey('summary-stats-map', [league, eventId], 'thesportsdb');
       const statsSharedKey = `tsdb:${league}:${eventId}`;
@@ -539,10 +548,11 @@ export async function resolveLiveSummary(url, deps = {}) {
       if (playerError) statsFallbackErrors.apiFootballPlayers = playerError;
     }
 
-    // Best-known state no servidor: resposta temporariamente pobre nunca pode
-    // apagar métricas factuais já vistas para o mesmo jogo continental.
+    // Best-known state no servidor: resposta ESPN temporariamente pobre nunca
+    // pode apagar métricas factuais já vistas para o mesmo jogo. Vale também
+    // para o Brasileirão, mas sem acrescentar qualquer fornecedor externo.
     let bestKnownApplied = false;
-    if (isContinental && previousBest?.data) {
+    if (preserveBestStats && previousBest?.data) {
       const previous = summaryTeamMetricCoverage(data);
       const preserved = mergeExternalStatisticsIntoSummary(data, previousBest.data);
       const after = summaryTeamMetricCoverage(preserved);
@@ -554,7 +564,7 @@ export async function resolveLiveSummary(url, deps = {}) {
     }
 
     const finalCoverage = summaryTeamMetricCoverage(data);
-    if (isContinental && bestKey && finalCoverage.maxPerTeam > 0) {
+    if (preserveBestStats && bestKey && finalCoverage.maxPerTeam > 0) {
       await writeLayeredCache(cache, bestKey, statsStore, bestSharedKey, {
         data: statisticsSnapshot(data),
         providers: providers.filter((provider) => provider !== 'espn'),
@@ -572,9 +582,12 @@ export async function resolveLiveSummary(url, deps = {}) {
       attempts: result.attempts || [],
       statsProvider: providers.join('+'),
       statsCoverage: finalCoverage,
-      statsQuality: isContinental ? statsQuality(finalCoverage) : null,
+      statsQuality: statsQuality(finalCoverage),
       statsTargetMinPerTeam: target,
       statsBestKnownApplied: bestKnownApplied,
+      requestedState: requestedState || null,
+      observedState: summaryState(data) || null,
+      espnOnly: isBrasileirao,
       statsFallback: statsFallbacks.length ? statsFallbacks[statsFallbacks.length - 1] : null,
       statsFallbacks,
       statsFallbackError: Object.values(statsFallbackErrors).filter(Boolean).join(' | '),
