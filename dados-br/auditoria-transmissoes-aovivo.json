@@ -17,10 +17,10 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 42,
+    "candidatos_oficiais_encontrados": 41,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 0,
-    "search_api_jogos_pulados_grade_estavel": 1,
+    "search_api_jogos_elegiveis": 1,
+    "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 6,
     "sem_transmissao": 1,
     "erros": 0
@@ -69,18 +69,6 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841239",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Chapecoense",
-      "data_iso": "2026-09-19T16:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
       "event_id": "401841245",
       "rodada": 28,
       "competicao_chave": "brasileirao",
@@ -107,6 +95,18 @@
       ],
       "manual": false,
       "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401841240",
+      "rodada": 28,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Corinthians x Fluminense",
+      "data_iso": "2026-09-20T16:00:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841242",
@@ -406,16 +406,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "3jO0sKE8fFg",
-      "url": "https://www.youtube.com/watch?v=3jO0sKE8fFg",
-      "fonte": "sbt",
-      "canal": "SBT",
-      "titulo": "Márcia Fellipe canta FORRÓ EXPLOSIVO no placo do EITA LUCAS! | Eita Lucas! (19/10/26)",
-      "status": "live",
-      "inicio_programado": "2026-09-19T15:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "QPXfWJ--0QQ",
       "url": "https://www.youtube.com/watch?v=QPXfWJ--0QQ",
       "fonte": "sbt",
@@ -626,21 +616,15 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [
-    {
-      "event_id": "401841239",
-      "jogo": "Atlético-MG x Chapecoense",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    }
-  ],
+  "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401841239",
+      "event_id": "401841240",
       "rodada": 28,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Chapecoense",
-      "data_iso": "2026-09-19T16:00:00-03:00",
+      "jogo": "Corinthians x Fluminense",
+      "data_iso": "2026-09-20T16:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -654,5 +638,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-19T15:46:14-03:00"
+  "atualizado_em": "2026-09-19T16:01:41-03:00"
 }
