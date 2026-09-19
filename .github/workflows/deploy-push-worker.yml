@@ -157,34 +157,144 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
+          # As versões esperadas são extraídas do MESMO código que acabou de ser
+          # publicado. Isso impede o healthcheck de ficar desatualizado quando
+          # LIVE_GATEWAY_VERSION/liveStatsFallbackVersion evoluírem.
+          EXPECTED_REVISION="$(node <<'NODE'
+          const fs = require('fs');
+          const s = fs.readFileSync('src/index.js', 'utf8');
+          const m = s.match(/revision:\s*['"]([^'"]+)['"]/);
+          if (!m) process.exit(2);
+          process.stdout.write(m[1]);
+          NODE
+          )"
+
+          EXPECTED_GATEWAY="$(node --input-type=module <<'NODE'
+          import { LIVE_API_CONSTANTS } from './src/live-api.js';
+          process.stdout.write(String(LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION));
+          NODE
+          )"
+
+          EXPECTED_STATS_FALLBACK="$(node <<'NODE'
+          const fs = require('fs');
+          const s = fs.readFileSync('src/index.js', 'utf8');
+          const m = s.match(/liveStatsFallbackVersion:\s*(\d+)/);
+          if (!m) process.exit(2);
+          process.stdout.write(m[1]);
+          NODE
+          )"
+
+          echo "Esperado pelo código local: revision=${EXPECTED_REVISION}; gateway=${EXPECTED_GATEWAY}; statsFallback=${EXPECTED_STATS_FALLBACK}"
+
+          READY=0
           for i in 1 2 3 4 5 6 7 8 9 10; do
-            if curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"revision":"6-R10R4"'; then
-              echo 'Push Worker saudável.'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"liveGatewayVersion":"2"'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"liveStatsFallbackVersion":3'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"theSportsDbStatsReady":true'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"apiFootballStatsReady":true'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"apiFootballContinentalOnly":true'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"bestKnownStatsCache":true'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"engineVersion":5'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"overturnPolicyVersion":"6-R10R4"'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"livePolicyVersion":"6-R10"'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"goalReconciliationPolicyVersion":"6-R9-R1"'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"goalScorerEnrichmentPolicyVersion":"6-R9"'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"goalRecoveryPolicyVersion":"6-R10R4"'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"essentialAlertPolicyVersion":"6-R10R4"'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"readinessVersion":"6-R10"'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"fastPollMs":10000'
-              echo 'Motor esportivo, seis preferências (Gols inclui gol anulado), recovery R10R4, readiness T-30/T-10/T+3 e push rápido saudáveis.'
-              curl -fsS --max-time 20 https://push.formuladogol.com.br/v1/monitor/source-probe | grep -q '"sourceLayerVersion":"6-R9"'
-              echo 'Fontes ESPN R9 acessíveis a partir do próprio Cloudflare Worker.'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/dispatch/status | grep -q '"dispatchVersion":5'
-              echo 'Fila de alertas saudável.'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/ops/status | grep -q '"opsVersion":7'
-              echo 'Hardening operacional E6 saudável.'
-              exit 0
+            if HEALTH="$(curl -fsS --max-time 10 https://push.formuladogol.com.br/health 2>/dev/null)"; then
+              printf '%s' "$HEALTH" >/tmp/fdg-push-health.json
+              if EXPECTED_REVISION="$EXPECTED_REVISION" \
+                 EXPECTED_GATEWAY="$EXPECTED_GATEWAY" \
+                 EXPECTED_STATS_FALLBACK="$EXPECTED_STATS_FALLBACK" \
+                 API_FOOTBALL_EXPECTED="${FDG_PUSH_API_FOOTBALL_KEY:+1}" \
+                 node <<'NODE'
+          const fs = require('fs');
+          const h = JSON.parse(fs.readFileSync('/tmp/fdg-push-health.json', 'utf8'));
+          const expectedRevision = process.env.EXPECTED_REVISION;
+          const expectedGateway = process.env.EXPECTED_GATEWAY;
+          const expectedFallback = Number(process.env.EXPECTED_STATS_FALLBACK);
+          const problems = [];
+          if (h.ok !== true) problems.push(`ok=${h.ok}`);
+          if (h.revision !== expectedRevision) problems.push(`revision=${h.revision} esperado=${expectedRevision}`);
+          if (String(h.liveGatewayVersion) !== String(expectedGateway)) {
+            problems.push(`liveGatewayVersion=${h.liveGatewayVersion} esperado=${expectedGateway}`);
+          }
+          if (Number(h.liveStatsFallbackVersion) !== expectedFallback) {
+            problems.push(`liveStatsFallbackVersion=${h.liveStatsFallbackVersion} esperado=${expectedFallback}`);
+          }
+          if (h.theSportsDbStatsReady !== true) problems.push('theSportsDbStatsReady!=true');
+          if (h.apiFootballContinentalOnly !== true) problems.push('apiFootballContinentalOnly!=true');
+          if (h.bestKnownStatsCache !== true) problems.push('bestKnownStatsCache!=true');
+          if (process.env.API_FOOTBALL_EXPECTED === '1' && h.apiFootballStatsReady !== true) {
+            problems.push('apiFootballStatsReady!=true apesar de API_FOOTBALL_KEY configurada');
+          }
+          if (problems.length) {
+            console.error('Health ainda não corresponde ao deploy: ' + problems.join(' | '));
+            process.exit(1);
+          }
+          console.log('Push Worker saudável e versões LIVE coerentes com o código publicado.');
+          NODE
+              then
+                READY=1
+                break
+              fi
             fi
+            echo "Aguardando propagação do Worker (${i}/10)..."
             sleep 6
           done
-          echo 'ERRO: healthcheck do Push Worker não confirmou prontidão.'
-          exit 1
+
+          if [ "$READY" -ne 1 ]; then
+            echo 'ERRO: healthcheck não convergiu para a versão publicada.'
+            echo 'Última resposta /health:'
+            cat /tmp/fdg-push-health.json 2>/dev/null || true
+            exit 1
+          fi
+
+          curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status >/tmp/fdg-monitor-status.json
+          node <<'NODE'
+          const fs = require('fs');
+          const m = JSON.parse(fs.readFileSync('/tmp/fdg-monitor-status.json', 'utf8'));
+          const expected = {
+            engineVersion: 5,
+            overturnPolicyVersion: '6-R10R4',
+            livePolicyVersion: '6-R10',
+            goalReconciliationPolicyVersion: '6-R9-R1',
+            goalScorerEnrichmentPolicyVersion: '6-R9',
+            goalRecoveryPolicyVersion: '6-R10R4',
+            essentialAlertPolicyVersion: '6-R10R4',
+            readinessVersion: '6-R10',
+            fastPollMs: 10000,
+          };
+          const problems = [];
+          for (const [k, v] of Object.entries(expected)) {
+            if (m[k] !== v) problems.push(`${k}=${m[k]} esperado=${v}`);
+          }
+          if (problems.length) {
+            console.error('Monitor esportivo inconsistente: ' + problems.join(' | '));
+            process.exit(1);
+          }
+          console.log('Motor esportivo, recovery, readiness e push rápido saudáveis.');
+          NODE
+
+          curl -fsS --max-time 20 https://push.formuladogol.com.br/v1/monitor/source-probe >/tmp/fdg-source-probe.json
+          node <<'NODE'
+          const fs = require('fs');
+          const p = JSON.parse(fs.readFileSync('/tmp/fdg-source-probe.json', 'utf8'));
+          if (p.sourceLayerVersion !== '6-R9') {
+            console.error(`sourceLayerVersion=${p.sourceLayerVersion} esperado=6-R9`);
+            process.exit(1);
+          }
+          console.log('Fontes ESPN R9 acessíveis a partir do próprio Cloudflare Worker.');
+          NODE
+
+          curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/dispatch/status >/tmp/fdg-dispatch-status.json
+          node <<'NODE'
+          const fs = require('fs');
+          const d = JSON.parse(fs.readFileSync('/tmp/fdg-dispatch-status.json', 'utf8'));
+          if (d.dispatchVersion !== 5) {
+            console.error(`dispatchVersion=${d.dispatchVersion} esperado=5`);
+            process.exit(1);
+          }
+          console.log('Fila de alertas saudável.');
+          NODE
+
+          curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/ops/status >/tmp/fdg-ops-status.json
+          node <<'NODE'
+          const fs = require('fs');
+          const o = JSON.parse(fs.readFileSync('/tmp/fdg-ops-status.json', 'utf8'));
+          if (o.opsVersion !== 7) {
+            console.error(`opsVersion=${o.opsVersion} esperado=7`);
+            process.exit(1);
+          }
+          console.log('Hardening operacional E6 saudável.');
+          NODE
+
+          echo 'OK: deploy e smoke test do Push Worker concluídos.'
