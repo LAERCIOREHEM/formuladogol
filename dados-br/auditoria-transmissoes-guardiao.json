@@ -4193,57 +4193,115 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Vitória x Cruzeiro, Brasileirão Série A 2026, fase única, rodada 28: domingo, 20/09/2026, às 16h (horário de Brasília), no Manoel Barradas, em Salvador. A página oficial da CBF lista a transmissão completa no Brasil por GE TV, Globo e Premiere. Portanto, não é exclusiva da GE TV."
+    },
+    {
+      "event_id": "401841245",
+      "jogo": "Mirassol x Botafogo",
+      "data_iso": "2026-09-19T17:00:00-03:00",
+      "checkpoint": -15,
+      "executado_em": "2026-09-19T16:48:23-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+      "canais_antes": [
+        "CazéTV",
+        "Premiere",
+        "Record"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/09/17/mirassol-x-botafogo-onde-assistir-ao-vivo-horario-e-provaveis-escalacoes-pela-28-rodada-da-serie-a.html",
+        "https://p.download.uol.com.br/mtv/narua/jornal_150910.pdf",
+        "https://p.download.uol.com.br/mtv/narua/jornal_240910.pdf",
+        "https://www.uol.com.br/esporte/futebol",
+        "https://www.uol.com.br/esporte/futebol/times/botafogo",
+        "https://www.uol.com.br/esporte/futebol/ultimas-noticias/gazeta-esportiva/2025/10/31/mirassol-x-botafogo-pelo-brasileirao-onde-assistir-ao-vivo-historico-estatisticas-e-escalacoes.htm",
+        "https://www.uol.com.br/esporte/futebol/ultimas-noticias/gazeta-esportiva/2026/03/31/botafogo-x-mirassol-pelo-brasileiro-veja-provaveis-escalacoes-e-onde-assistir-ao-vivo.htm",
+        "https://www.uol.com.br/esporte/ultimas-noticias/2025/09/17/onde-vai-passar-botafogo-x-mirassol-pelo-brasileirao-como-assistir-ao-vivo.htm",
+        "https://www.uol.com.br/esporte/ultimas-noticias/2025/11/01/mirassol-x-botafogo-horario-e-onde-assistir-ao-jogo-do-brasileirao.htm",
+        "https://www.uol.com.br/esporte/ultimas-noticias/2026/04/01/onde-vai-passar-botafogo-x-mirassol-pelo-brasileirao-como-assistir-ao-vivo.ghtm",
+        "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/02/jogo-do-flamengo-hoje-pelo-brasileirao-que-horas-comeca-e-onde-assistir.ghtm",
+        "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/mirassol-x-botafogo-horario-e-onde-assistir-ao-jogo-do-brasileirao.amp.htm",
+        "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/09/12/botafogo-e-red-bull-bragantino-jogam-em-busca-de-reabilitacao-no-brasileirao-e-mirando-com-g-6.amp.htm",
+        "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/09/19/botafogo-estreia-tite-e-corre-atras-de-segunda-vitoria-seguida-no-brasileirao-contra-o-mirassol.amp.htm"
+      ],
+      "canais_depois": [
+        "CazéTV",
+        "Premiere",
+        "Record"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/mirassol-x-botafogo-horario-e-onde-assistir-ao-jogo-do-brasileirao.amp.htm",
+        "https://www.uol.com.br/esporte/futebol/times/botafogo"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=5tuFjljf3OA",
+          "scope": "match",
+          "valid_for_match": true,
+          "reason": "O dossiê identifica a live da CazéTV como “AO VIVO: MIRASSOL X BOTAFOGO | BRASILEIRÃO 2026 | 28ª RODADA”; a CazéTV também consta na grade de transmissão integral confirmada pelas fontes consultadas."
+        }
+      ],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Grade confirmada para Mirassol x Botafogo, Brasileirão 2026, 28ª rodada: sábado, 19 de setembro de 2026, às 17h00 (horário de Brasília), no Estádio José Maria de Campos Maia, em Mirassol (SP). Transmissão integral no Brasil por Record (TV aberta, sujeita à praça), CazéTV e Premiere. Não é exclusiva."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841242",
-    "jogo": "Vitória x Cruzeiro",
-    "data_iso": "2026-09-20T16:00:00-03:00",
-    "checkpoint": -1440,
-    "executado_em": "2026-09-19T16:13:24-03:00",
+    "event_id": "401841245",
+    "jogo": "Mirassol x Botafogo",
+    "data_iso": "2026-09-19T17:00:00-03:00",
+    "checkpoint": -15,
+    "executado_em": "2026-09-19T16:48:23-03:00",
     "chamada_openai": true,
-    "motivo_chamada": "checkpoint de auditoria completa",
+    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
     "canais_antes": [
-      "GE TV"
+      "CazéTV",
+      "Premiere",
+      "Record"
     ],
-    "status": "corrigido",
+    "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2026/08/29/vasco-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/07/26/cruzeiro-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/09/12/santos-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/vitoria-x-cruzeiro/832169",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/bahia-entra-no-g-4-do-brasileirao-com-triunfo-sobre-o-remo",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/vitoria-bate-gremio-e-se-distancia-do-z-4-do-brasileirao-da-serie-a",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-sub20/a/brasileirao-sub-20-a-restam-duas-rodadas-para-o-fim-da-primeira-fase",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-serie-a/cbf-divulga-tabela-detalhada-das-rodadas-19-a-24-do-brasileirao-serie-a",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/selecao-masculina/tite-convoca-a-selecao-brasileira-para-amistosos-de-setembro/cbf-divulga-tabela-detalhada-das-rodadas-15-a-19-do-brasileirao-sub-20",
-      "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
-      "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/sub-20/2026/2008"
+      "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/09/17/mirassol-x-botafogo-onde-assistir-ao-vivo-horario-e-provaveis-escalacoes-pela-28-rodada-da-serie-a.html",
+      "https://p.download.uol.com.br/mtv/narua/jornal_150910.pdf",
+      "https://p.download.uol.com.br/mtv/narua/jornal_240910.pdf",
+      "https://www.uol.com.br/esporte/futebol",
+      "https://www.uol.com.br/esporte/futebol/times/botafogo",
+      "https://www.uol.com.br/esporte/futebol/ultimas-noticias/gazeta-esportiva/2025/10/31/mirassol-x-botafogo-pelo-brasileirao-onde-assistir-ao-vivo-historico-estatisticas-e-escalacoes.htm",
+      "https://www.uol.com.br/esporte/futebol/ultimas-noticias/gazeta-esportiva/2026/03/31/botafogo-x-mirassol-pelo-brasileiro-veja-provaveis-escalacoes-e-onde-assistir-ao-vivo.htm",
+      "https://www.uol.com.br/esporte/ultimas-noticias/2025/09/17/onde-vai-passar-botafogo-x-mirassol-pelo-brasileirao-como-assistir-ao-vivo.htm",
+      "https://www.uol.com.br/esporte/ultimas-noticias/2025/11/01/mirassol-x-botafogo-horario-e-onde-assistir-ao-jogo-do-brasileirao.htm",
+      "https://www.uol.com.br/esporte/ultimas-noticias/2026/04/01/onde-vai-passar-botafogo-x-mirassol-pelo-brasileirao-como-assistir-ao-vivo.ghtm",
+      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/02/jogo-do-flamengo-hoje-pelo-brasileirao-que-horas-comeca-e-onde-assistir.ghtm",
+      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/mirassol-x-botafogo-horario-e-onde-assistir-ao-jogo-do-brasileirao.amp.htm",
+      "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/09/12/botafogo-e-red-bull-bragantino-jogam-em-busca-de-reabilitacao-no-brasileirao-e-mirando-com-g-6.amp.htm",
+      "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/09/19/botafogo-estreia-tite-e-corre-atras-de-segunda-vitoria-seguida-no-brasileirao-contra-o-mirassol.amp.htm"
     ],
     "canais_depois": [
-      "GE TV",
-      "Globo",
-      "Premiere"
+      "CazéTV",
+      "Premiere",
+      "Record"
     ],
     "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/vitoria-x-cruzeiro/832169",
-      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml"
+      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/mirassol-x-botafogo-horario-e-onde-assistir-ao-jogo-do-brasileirao.amp.htm",
+      "https://www.uol.com.br/esporte/futebol/times/botafogo"
     ],
     "youtube": [
       {
-        "url": "https://www.youtube.com/watch?v=gGpphhcxZPU",
+        "url": "https://www.youtube.com/watch?v=5tuFjljf3OA",
         "scope": "match",
         "valid_for_match": true,
-        "reason": "O título informado no dossiê identifica explicitamente “VITÓRIA X CRUZEIRO | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv”, com início programado às 14h30 de 20/09/2026. Isso caracteriza cobertura da partida integral, e a GE TV também consta na listagem oficial de transmissões da CBF."
+        "reason": "O dossiê identifica a live da CazéTV como “AO VIVO: MIRASSOL X BOTAFOGO | BRASILEIRÃO 2026 | 28ª RODADA”; a CazéTV também consta na grade de transmissão integral confirmada pelas fontes consultadas."
       }
     ],
     "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Vitória x Cruzeiro, Brasileirão Série A 2026, fase única, rodada 28: domingo, 20/09/2026, às 16h (horário de Brasília), no Manoel Barradas, em Salvador. A página oficial da CBF lista a transmissão completa no Brasil por GE TV, Globo e Premiere. Portanto, não é exclusiva da GE TV."
+    "resumo": "Grade confirmada para Mirassol x Botafogo, Brasileirão 2026, 28ª rodada: sábado, 19 de setembro de 2026, às 17h00 (horário de Brasília), no Estádio José Maria de Campos Maia, em Mirassol (SP). Transmissão integral no Brasil por Record (TV aberta, sujeita à praça), CazéTV e Premiere. Não é exclusiva."
   },
-  "atualizado_em": "2026-09-19T16:13:24-03:00"
+  "atualizado_em": "2026-09-19T16:48:23-03:00"
 }
