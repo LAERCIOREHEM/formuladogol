@@ -15,14 +15,14 @@
   "resumo": {
     "jogos_na_janela": 42,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 5,
+    "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 41,
+    "candidatos_oficiais_encontrados": 40,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
     "transmissoes_publicadas": 6,
-    "sem_transmissao": 0,
+    "sem_transmissao": 1,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -79,6 +79,18 @@
       "fontes_encontradas": [
         "CazéTV"
       ],
+      "manual": false,
+      "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401841244",
+      "rodada": 28,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Remo x Santos",
+      "data_iso": "2026-09-19T18:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
       "manual": false,
       "descoberta_antecipada": false
     },
@@ -508,7 +520,7 @@
       "url": "https://www.youtube.com/watch?v=QQbVDgHCW-g",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: ORLANDO LUZ E RAFAEL MATOS X JAKUB PAUL E DOMINIC STRICKER | BRASIL X SUÍÇA | COPA DAVIS",
+      "titulo": "AO VIVO: MATHEUS PUCINELLI X REMY BERTOLA | BRASIL X SUÍÇA | COPA DAVIS",
       "status": "live",
       "inicio_programado": "2026-09-19T13:00:00-03:00",
       "motivo": "conteúdo reúne mais de uma partida"
@@ -542,16 +554,6 @@
       "status": "upcoming",
       "inicio_programado": "2026-09-20T12:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "hK76uv3Q39w",
-      "url": "https://www.youtube.com/watch?v=hK76uv3Q39w",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: TÊNIS | JIRI LEHECKA X LEARNER TIEN | TCHÉQUIA X EUA | COPA DO MUNDO DE TÊNIS",
-      "status": "live",
-      "inicio_programado": "2026-09-19T08:45:00-03:00",
-      "motivo": "conteúdo reúne mais de uma partida"
     },
     {
       "video_id": "te7S-a11k1I",
@@ -604,8 +606,24 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
-  "sem_transmissao": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401841244",
+      "jogo": "Remo x Santos",
+      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
+    }
+  ],
+  "sem_transmissao": [
+    {
+      "event_id": "401841244",
+      "rodada": 28,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Remo x Santos",
+      "data_iso": "2026-09-19T18:30:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
+    }
+  ],
   "erros": [],
   "quota_estimada_youtube": {
     "unidades": 87,
@@ -616,5 +634,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-19T16:46:12-03:00"
+  "atualizado_em": "2026-09-19T17:03:31-03:00"
 }
