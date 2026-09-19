@@ -57,6 +57,7 @@ on:
       - 'js/br-estatisticas.js'
       - 'js/br-estatisticas-ordem.js'
       - 'js/br-classificacao-live.js'
+      - 'tests/test-br-classificacao-live.mjs'
       - 'js/br-acuracia.js'
       - 'js/br-feedback.js'
       - 'js/br-menu.js'
@@ -111,6 +112,25 @@ jobs:
         with:
           ref: main
           fetch-depth: 2
+
+      - name: Node para validações LiveState
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validar LiveState ESPN compartilhado
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check js/br-classificacao-live.js
+          node --check js/br-estatisticas.js
+          node --check js/br-aovivo.js
+          node tests/test-br-classificacao-live.mjs
+          grep -q 'br-classificacao-live.js?v=20260919-live-state-v4' index.html
+          grep -q 'br-classificacao-live.js?v=20260919-live-state-v4' estatisticas.html
+          grep -q 'br-estatisticas.js?v=20260919-live-state-v4' estatisticas.html
+          grep -q 'br-aovivo.js?v=20260919-live-state-v4' aovivo.html
+          echo 'OK: Ao Vivo, Tabela e Estatísticas usam o mesmo LiveState v4.'
 
       - name: Montar site público
         shell: bash
@@ -690,6 +710,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
+          node --check _site/js/br-classificacao-live.js
+          node --check _site/js/br-estatisticas.js
+          node --check _site/js/br-aovivo.js
+          grep -q 'br-classificacao-live.js?v=20260919-live-state-v4' _site/index.html
+          grep -q 'br-classificacao-live.js?v=20260919-live-state-v4' _site/estatisticas.html
+          grep -q 'br-estatisticas.js?v=20260919-live-state-v4' _site/estatisticas.html
+          grep -q 'br-aovivo.js?v=20260919-live-state-v4' _site/aovivo.html
+          grep -q 'const LIVE_STATE_VERSION = "4"' _site/js/br-classificacao-live.js
+          echo 'OK: pacote público contém LiveState v4 e cache-bust correto.'
 
           FORBIDDEN=(
             _site/apostas.html
@@ -1480,6 +1510,13 @@ jobs:
                   criticas.extend([grupo[0], grupo[len(grupo)//2], grupo[-1]])
           criticas = list(dict.fromkeys(criticas))
 
+          ativos_live = [
+              (HOST + "/", "br-classificacao-live.js?v=20260919-live-state-v4"),
+              (HOST + "/estatisticas.html", "br-classificacao-live.js?v=20260919-live-state-v4"),
+              (HOST + "/aovivo.html", "br-aovivo.js?v=20260919-live-state-v4"),
+              (HOST + "/js/br-classificacao-live.js", 'const LIVE_STATE_VERSION = "4"'),
+          ]
+
           def check(url):
               last = None
               for tentativa in range(1, 7):
@@ -1505,7 +1542,29 @@ jobs:
           for url in criticas:
               status = check(url)
               print(f"SMOKE {status}: {url}")
-          print(f"ORG-7R PUBLIC SMOKE PASS: {len(criticas)} URLs críticas")
+
+          for url, marker in ativos_live:
+              last = None
+              for tentativa in range(1, 7):
+                  try:
+                      sep = "&" if "?" in url else "?"
+                      req = urllib.request.Request(
+                          url + sep + "live_v4_smoke=" + str(int(time.time())),
+                          headers={"User-Agent":"FormulaDoGol-LiveState-Smoke/4.0","Cache-Control":"no-cache"},
+                      )
+                      with urllib.request.urlopen(req, timeout=20) as resp:
+                          body = resp.read(900000).decode("utf-8", errors="replace")
+                      if marker in body:
+                          print(f"LIVE V4 SMOKE PASS: {url}")
+                          break
+                      last = "marcador ausente"
+                  except Exception as exc:
+                      last = str(exc)
+                  time.sleep(10 * tentativa)
+              else:
+                  raise SystemExit(f"LIVE V4 SMOKE FALHOU: {url} -> {last}")
+
+          print(f"ORG-7R PUBLIC SMOKE PASS: {len(criticas)} URLs críticas + LiveState v4")
           PY
 
       - name: Confirmar e avisar publicação editorial

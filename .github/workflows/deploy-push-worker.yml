@@ -185,7 +185,13 @@ jobs:
           NODE
           )"
 
-          echo "Esperado pelo código local: revision=${EXPECTED_REVISION}; gateway=${EXPECTED_GATEWAY}; statsFallback=${EXPECTED_STATS_FALLBACK}"
+          EXPECTED_STATE_CONTRACT="$(node --input-type=module <<'NODE'
+          import { LIVE_API_CONSTANTS } from './src/live-api.js';
+          process.stdout.write(String(LIVE_API_CONSTANTS.LIVE_STATE_CONTRACT_VERSION));
+          NODE
+          )"
+
+          echo "Esperado pelo código local: revision=${EXPECTED_REVISION}; gateway=${EXPECTED_GATEWAY}; stateContract=${EXPECTED_STATE_CONTRACT}; statsFallback=${EXPECTED_STATS_FALLBACK}"
 
           READY=0
           for i in 1 2 3 4 5 6 7 8 9 10; do
@@ -194,6 +200,7 @@ jobs:
               if EXPECTED_REVISION="$EXPECTED_REVISION" \
                  EXPECTED_GATEWAY="$EXPECTED_GATEWAY" \
                  EXPECTED_STATS_FALLBACK="$EXPECTED_STATS_FALLBACK" \
+                 EXPECTED_STATE_CONTRACT="$EXPECTED_STATE_CONTRACT" \
                  API_FOOTBALL_EXPECTED="${FDG_PUSH_API_FOOTBALL_KEY:+1}" \
                  node <<'NODE'
           const fs = require('fs');
@@ -201,6 +208,7 @@ jobs:
           const expectedRevision = process.env.EXPECTED_REVISION;
           const expectedGateway = process.env.EXPECTED_GATEWAY;
           const expectedFallback = Number(process.env.EXPECTED_STATS_FALLBACK);
+          const expectedStateContract = Number(process.env.EXPECTED_STATE_CONTRACT);
           const problems = [];
           if (h.ok !== true) problems.push(`ok=${h.ok}`);
           if (h.revision !== expectedRevision) problems.push(`revision=${h.revision} esperado=${expectedRevision}`);
@@ -210,6 +218,11 @@ jobs:
           if (Number(h.liveStatsFallbackVersion) !== expectedFallback) {
             problems.push(`liveStatsFallbackVersion=${h.liveStatsFallbackVersion} esperado=${expectedFallback}`);
           }
+          if (Number(h.liveStateContractVersion) !== expectedStateContract) {
+            problems.push(`liveStateContractVersion=${h.liveStateContractVersion} esperado=${expectedStateContract}`);
+          }
+          if (h.liveStatePrimary !== 'worker-espn') problems.push(`liveStatePrimary=${h.liveStatePrimary}`);
+          if (h.liveStateDirectFallback !== true) problems.push('liveStateDirectFallback!=true');
           if (h.theSportsDbStatsReady !== true) problems.push('theSportsDbStatsReady!=true');
           if (h.apiFootballContinentalOnly !== true) problems.push('apiFootballContinentalOnly!=true');
           if (h.bestKnownStatsCache !== true) problems.push('bestKnownStatsCache!=true');
@@ -237,6 +250,24 @@ jobs:
             cat /tmp/fdg-push-health.json 2>/dev/null || true
             exit 1
           fi
+
+          TODAY_UTC="$(date -u +%Y%m%d)"
+          curl -fsS --max-time 20 "https://push.formuladogol.com.br/v1/live/state?league=bra.1&dates=${TODAY_UTC}&fresh=1" >/tmp/fdg-live-state.json
+          EXPECTED_STATE_CONTRACT="$EXPECTED_STATE_CONTRACT" node <<'NODE'
+          const fs = require('fs');
+          const s = JSON.parse(fs.readFileSync('/tmp/fdg-live-state.json', 'utf8'));
+          const expected = Number(process.env.EXPECTED_STATE_CONTRACT);
+          const problems = [];
+          if (s.ok !== true) problems.push(`ok=${s.ok}`);
+          if (Number(s.stateContractVersion) !== expected) problems.push(`stateContractVersion=${s.stateContractVersion} esperado=${expected}`);
+          if (s.transport !== 'worker-espn') problems.push(`transport=${s.transport}`);
+          if (!Array.isArray(s?.data?.events)) problems.push('data.events ausente');
+          if (problems.length) {
+            console.error('LiveState canônico inconsistente: ' + problems.join(' | '));
+            process.exit(1);
+          }
+          console.log(`LiveState canônico ESPN saudável: ${s.data.events.length} evento(s) no dia.`);
+          NODE
 
           curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status >/tmp/fdg-monitor-status.json
           node <<'NODE'
