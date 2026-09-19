@@ -1,59 +1,116 @@
 {
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
-  "etapa": "Recuperação de integridade — Quartas continentais 2026",
-  "gerado_em": "2026-09-18T11:40:56-03:00",
+  "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
+  "gerado_em": "2026-09-19T05:11:59-03:00",
   "status": "ok",
   "coleta_confiavel": true,
-  "mudanca_esportiva": true,
-  "hash_estado_antes": "1ce93385067a009137b73901d474cd2bf51ab7059e289db5d853a18ff6ed23dd",
+  "mudanca_esportiva": false,
+  "hash_estado_antes": "7a9e1aafb277f53782bfbc3414b60ccbb299ef2895ce55542d74a967591305e8",
   "hash_estado_depois": "7a9e1aafb277f53782bfbc3414b60ccbb299ef2895ce55542d74a967591305e8",
-  "fonte": "CONMEBOL — reconciliação canônica auditada",
+  "fonte": "ESPN + API-Football contingencial",
   "temporada": 2026,
   "competicoes": [
     {
       "competicao": "copa_do_brasil",
-      "status": "preservado",
+      "status": "preservado_apos_falha_seguro",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
       "gerado_em": "2026-09-15T05:13:36-03:00",
+      "cache_efetivo_minutos": 45,
+      "erro": "copa_do_brasil: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard?dates=20260829-20261009&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
       "fallback_seguro_para_af": true,
       "motivos_fallback": [],
-      "alertas_fallback": []
+      "alertas_fallback": [
+        "snapshot anterior tem 96.0h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
+      ],
+      "summary_partidas_iniciadas": {
+        "consultados": 0,
+        "confirmados": 0,
+        "atualizados": 0,
+        "ao_vivo": [],
+        "finalizados": [],
+        "pendentes": [],
+        "pendentes_vencidos": [],
+        "erros": []
+      },
+      "api_football_resgate_resultados": {
+        "consultados": 0,
+        "finalizados": [],
+        "requisicoes": 0,
+        "erros": []
+      }
     },
     {
       "competicao": "libertadores",
-      "status": "recuperado_canonico",
+      "status": "preservado_apos_falha_seguro",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
       "gerado_em": "2026-09-18T11:40:56-03:00",
+      "cache_efetivo_minutos": 45,
+      "erro": "libertadores: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=20260829-20261009&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
       "fallback_seguro_para_af": true,
       "motivos_fallback": [],
-      "alertas_fallback": []
+      "alertas_fallback": [],
+      "summary_partidas_iniciadas": {
+        "consultados": 0,
+        "confirmados": 0,
+        "atualizados": 0,
+        "ao_vivo": [],
+        "finalizados": [],
+        "pendentes": [],
+        "pendentes_vencidos": [],
+        "erros": []
+      },
+      "api_football_resgate_resultados": {
+        "consultados": 0,
+        "finalizados": [],
+        "requisicoes": 0,
+        "erros": []
+      }
     },
     {
       "competicao": "sul_americana",
-      "status": "recuperado_canonico",
+      "status": "preservado_apos_falha_seguro",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
       "gerado_em": "2026-09-18T11:40:56-03:00",
+      "cache_efetivo_minutos": 45,
+      "erro": "sul_americana: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard?dates=20260829-20261009&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
       "fallback_seguro_para_af": true,
       "motivos_fallback": [],
-      "alertas_fallback": []
+      "alertas_fallback": [],
+      "summary_partidas_iniciadas": {
+        "consultados": 0,
+        "confirmados": 0,
+        "atualizados": 0,
+        "ao_vivo": [],
+        "finalizados": [],
+        "pendentes": [],
+        "pendentes_vencidos": [],
+        "erros": []
+      },
+      "api_football_resgate_resultados": {
+        "consultados": 0,
+        "finalizados": [],
+        "requisicoes": 0,
+        "erros": []
+      }
     }
   ],
-  "falhas": [],
+  "falhas": [
+    "copa_do_brasil: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard?dates=20260829-20261009&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
+    "libertadores: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=20260829-20261009&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden",
+    "sul_americana: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard?dates=20260829-20261009&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden"
+  ],
   "falhas_bloqueantes": [],
-  "fontes_totalmente_atualizadas": true,
+  "fontes_totalmente_atualizadas": false,
   "snapshots_prontos_para_af": true,
-  "recuperacao_integridade": {
-    "incidente": "continentais-2026-quartas-20260918",
-    "arquivo_canonico": "dados-br/correcoes/continentais-2026-quartas-canonico.json",
-    "fontes": {
-      "libertadores": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
-      "sul_americana": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana"
-    },
-    "regra": "probabilidades nunca são editadas manualmente; novo AF é obrigatório após a restauração factual"
-  },
-  "auditoria_anterior": {
-    "gerado_em": "2026-09-18T07:40:53-03:00",
-    "hash_estado_depois": "1ce93385067a009137b73901d474cd2bf51ab7059e289db5d853a18ff6ed23dd"
+  "regras_operacionais": {
+    "cache_padrao_minutos": 45,
+    "cache_janela_de_jogo_minutos": 5,
+    "janela_de_jogo_horas_apos_inicio": 4,
+    "janela_incremental_dias_passado": 21,
+    "janela_incremental_dias_futuro": 120,
+    "reconstrucao_completa_horas": 168,
+    "falha_de_rede": "preserva o último snapshot íntegro; --strict transforma a falha em erro",
+    "nenhum_json_vazio": true
   }
 }
