@@ -17,7 +17,7 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 48,
+    "candidatos_oficiais_encontrados": 45,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 0,
     "search_api_jogos_pulados_grade_estavel": 1,
@@ -69,6 +69,18 @@
   },
   "jogos_analisados": [
     {
+      "event_id": "401841239",
+      "rodada": 28,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Atlético-MG x Chapecoense",
+      "data_iso": "2026-09-19T16:00:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
+    },
+    {
       "event_id": "401841245",
       "rodada": 28,
       "competicao_chave": "brasileirao",
@@ -81,18 +93,6 @@
       ],
       "manual": false,
       "descoberta_antecipada": true
-    },
-    {
-      "event_id": "401841244",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Remo x Santos",
-      "data_iso": "2026-09-19T18:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
     },
     {
       "event_id": "401841243",
@@ -275,6 +275,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "HqFxqARY3G8",
+      "url": "https://www.youtube.com/watch?v=HqFxqARY3G8",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: TÊNIS | SP OPEN 2026 | SEMIFINAL | ge tv",
+      "status": "live",
+      "inicio_programado": "2026-09-19T12:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "lHXt6D_tO8E",
       "url": "https://www.youtube.com/watch?v=lHXt6D_tO8E",
       "fonte": "sbt",
@@ -322,16 +332,6 @@
       "titulo": "AO VIVO: SÉRVIA X HOLANDA | UEFA NATIONS LEAGUE 2026 | FASE DE GRUPOS | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-09-27T13:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "HqFxqARY3G8",
-      "url": "https://www.youtube.com/watch?v=HqFxqARY3G8",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: TÊNIS | SP OPEN 2026 | SEMIFINAL | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-19T12:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -475,16 +475,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "8mL4P3zrd3c",
-      "url": "https://www.youtube.com/watch?v=8mL4P3zrd3c",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: BRASIL X ESPANHA | COPA DO MUNDO FEMININA SUB-20 FIFA 2026 | QUARTAS DE FINAL",
-      "status": "live",
-      "inicio_programado": "2026-09-19T13:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "8vPpyDKRrpc",
       "url": "https://www.youtube.com/watch?v=8vPpyDKRrpc",
       "fonte": "cazetv",
@@ -505,16 +495,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "Hf0M2Lpami8",
-      "url": "https://www.youtube.com/watch?v=Hf0M2Lpami8",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ATHLETIC BILBAO X ALAVÉS | LALIGA 26/27 | 7ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-19T11:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "MLK8nR630jo",
       "url": "https://www.youtube.com/watch?v=MLK8nR630jo",
       "fonte": "cazetv",
@@ -522,16 +502,6 @@
       "titulo": "AO VIVO: GETAFE X MÁLAGA | LALIGA 26/27 | 7ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-09-20T08:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "MaNDNAu0Dz0",
-      "url": "https://www.youtube.com/watch?v=MaNDNAu0Dz0",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): PARIS FC X STRASBOURG | LIGUE 1 26/27 | 5ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-19T12:10:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -560,7 +530,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: ORLANDO LUZ E RAFAEL MATOS X JAKUB PAUL E DOMINIC STRICKER | BRASIL X SUÍÇA | COPA DAVIS",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-19T13:00:00-03:00",
       "motivo": "conteúdo reúne mais de uma partida"
     },
@@ -580,7 +550,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: CELTA X RACING CLUB | LALIGA 26/27 | 7ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-19T13:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -609,7 +579,7 @@
       "url": "https://www.youtube.com/watch?v=Zm5YJptWpa4",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: BRIGHTON X ARSENAL | PREMIER LEAGUE 26/27 | 5ª RODADA",
+      "titulo": "AO VIVO: BRASIL X ESPANHA | COPA DO MUNDO FEMININA SUB-20 FIFA 2026 | QUARTAS DE FINAL",
       "status": "live",
       "inicio_programado": "2026-09-19T09:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -620,7 +590,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: VFB STUTTGART X BORUSSIA DORTMUND | BUNDESLIGA 26/27 | 4ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-19T12:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -651,7 +621,7 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: SEVILLA X BARCELONA | LALIGA 26/27 | 7ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-19T15:00:00-03:00",
+      "inicio_programado": "2026-09-19T15:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -687,19 +657,19 @@
   ],
   "search_api_pulados": [
     {
-      "event_id": "401841244",
-      "jogo": "Remo x Santos",
+      "event_id": "401841239",
+      "jogo": "Atlético-MG x Chapecoense",
       "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
     }
   ],
   "sem_transmissao": [
     {
-      "event_id": "401841244",
+      "event_id": "401841239",
       "rodada": 28,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Remo x Santos",
-      "data_iso": "2026-09-19T18:30:00-03:00",
+      "jogo": "Atlético-MG x Chapecoense",
+      "data_iso": "2026-09-19T16:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -713,5 +683,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-19T12:31:31-03:00"
+  "atualizado_em": "2026-09-19T14:31:38-03:00"
 }
