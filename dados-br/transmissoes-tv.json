@@ -255,7 +255,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -322,22 +322,26 @@
       "data_iso": "2026-09-20T16:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "GE TV"
+        "GE TV",
+        "Premiere",
+        "Globo"
       ],
-      "origem": "YouTube oficial validado",
+      "origem": "Guardião IA verificado",
       "confianca": "confirmado",
-      "estavel": false,
+      "estavel": true,
       "exclusivo": false,
       "fontes": [
         {
-          "fonte": "YouTube oficial validado",
+          "fonte": "Guardião IA verificado",
           "canais": [
-            "GE TV"
+            "GE TV",
+            "Globo",
+            "Premiere"
           ],
-          "referencia": "https://www.youtube.com/watch?v=gGpphhcxZPU",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
-          "autoridade": 120,
-          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+          "referencia": "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/vitoria-x-cruzeiro/832169 | https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+          "capturado_em": "2026-09-19T16:13:24-03:00",
+          "autoridade": 900,
+          "detalhe": "grade completa reconciliada por web_search; confiança=0.99; checkpoint=-1440"
         }
       ],
       "acessos": [
@@ -345,6 +349,21 @@
           "nome": "Assistir na GE TV",
           "url": "https://www.youtube.com/watch?v=gGpphhcxZPU",
           "tipo": "player_oficial"
+        },
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -369,7 +388,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=_U7JS7cgsBg",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -403,7 +422,7 @@
             "Premiere"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -446,7 +465,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -510,7 +529,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -579,7 +598,7 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=7uq9nMdsVFU",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -617,7 +636,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -675,7 +694,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -741,7 +760,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -825,7 +844,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -900,7 +919,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -959,7 +978,7 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=90fW7TbZ9sg",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -993,7 +1012,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1033,7 +1052,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1104,7 +1123,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1182,7 +1201,7 @@
             "Paramount+"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1230,7 +1249,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1290,7 +1309,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1355,7 +1374,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1418,7 +1437,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1478,7 +1497,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1541,7 +1560,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1601,7 +1620,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1666,7 +1685,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1729,7 +1748,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1787,7 +1806,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-09-19T16:03:50-03:00",
+          "capturado_em": "2026-09-19T16:13:36-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1821,5 +1840,5 @@
       ]
     }
   },
-  "atualizado_em": "2026-09-19T16:03:50-03:00"
+  "atualizado_em": "2026-09-19T16:13:36-03:00"
 }
