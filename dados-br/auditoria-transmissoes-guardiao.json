@@ -3752,74 +3752,101 @@
       ],
       "overlay_alterado": true,
       "resumo": "Confirmado: São Paulo x Internacional, Brasileirão 2026, 28ª rodada, será no sábado, 19/09/2026, às 21h (BRT), no Morumbis. A transmissão integral no Brasil é de SporTV e Premiere. O vídeo da GE TV no YouTube é exclusivamente de aquecimento/pré-jogo e direciona o público para assistir à partida no SporTV; portanto, GE TV não integra a grade da partida."
+    },
+    {
+      "event_id": "401841239",
+      "jogo": "Atlético-MG x Chapecoense",
+      "data_iso": "2026-09-19T16:00:00-03:00",
+      "checkpoint": -360,
+      "executado_em": "2026-09-19T10:03:51-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "fonte preservada exige reconfirmação",
+      "canais_antes": [
+        "Premiere"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://credencial.cbf.com.br/competicoes/listar/42/1",
+        "https://download.uol.com.br/files/2023/05/1667102178_20230526173425_357.pdf",
+        "https://ge.globo.com/google/amp/futebol/noticia/fim-de-semana-na-tv-saiba-as-partidas-com-transmissao-ao-vivo.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://ge.globo.com/google/amp/sc/futebol/times/chapecoense/noticia/2026/09/14/chapecoense-perde-dois-zagueiros-para-jogo-contra-o-atletico-mg.ghtml",
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/09/12/atletico-mg-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/pe/futebol/brasileirao-serie-a/noticia/cbf-detalha-tabela-da-serie-a-entre-a-16a-e-20a-rodadas-veja-horarios-e-dias-dos-jogos.ghtml",
+        "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/rodada-28-tudo-o-que-voce-precisa-saber-sobre-chapecoense-x-atletico-mg.ghtml",
+        "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/09/17/atletico-mg-x-chapecoense-ao-vivo-onde-assistir-horario-e-informacoes-pela-28-rodada-do-brasileirao.html",
+        "https://jcconcursos.uol.com.br/media/uploads/anexos/concurso-sejusp-mg-edital-1-2025.pdf",
+        "https://p.download.uol.com.br/mtv/narua/jornal_130910.pdf",
+        "https://p.download.uol.com.br/omossoroense/mudanca/pics/pdf/EDICAO_020914.pdf",
+        "https://p.download.uol.com.br/omossoroense/mudanca/pics/pdf/EDICAO_120515.pdf",
+        "https://p.download.uol.com.br/omossoroense/mudanca/pics/pdf/EDICAO_150815.pdf",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
+        "https://www.espn.com.br/futebol/partida/_/jogoId/401841239/chapecoense-atletico-mg",
+        "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/atletico-mg-x-chapecoense-horario-e-onde-assistir-ao-jogo-do-brasileirao.amp.htm",
+        "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/09/19/apos-noite-epica-na-sul-americana-atletico-mg-pega-chapecoense-de-olho-no-g-6-do-brasileirao.amp.htm"
+      ],
+      "canais_depois": [
+        "Premiere"
+      ],
+      "exclusivo": false,
+      "confianca": 0.9,
+      "fontes_aceitas": [
+        "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/atletico-mg-x-chapecoense-horario-e-onde-assistir-ao-jogo-do-brasileirao.amp.htm",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado: Atlético-MG x Chapecoense, Brasileirão 2026 (28ª rodada), sábado, 19/09/2026, às 16h (BRT), na Arena MRV, em Belo Horizonte. A transmissão integral confirmada para o Brasil é do Premiere (pay-per-view). Não há evidência consultada que confirme Globo, SporTV, GE TV ou outra plataforma para esta partida; o UOL ressalva que a exibição pode variar por estado caso exista TV aberta, mas não identifica praça ou emissora, portanto ela não foi incluída. Não há URL do YouTube no dossiê."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841243",
-    "jogo": "São Paulo x Internacional",
-    "data_iso": "2026-09-19T21:00:00-03:00",
-    "checkpoint": -1440,
-    "executado_em": "2026-09-18T21:03:00-03:00",
+    "event_id": "401841239",
+    "jogo": "Atlético-MG x Chapecoense",
+    "data_iso": "2026-09-19T16:00:00-03:00",
+    "checkpoint": -360,
+    "executado_em": "2026-09-19T10:03:51-03:00",
     "chamada_openai": true,
-    "motivo_chamada": "checkpoint de auditoria completa",
+    "motivo_chamada": "fonte preservada exige reconfirmação",
     "canais_antes": [
-      "GE TV",
-      "Premiere",
-      "SporTV"
+      "Premiere"
     ],
-    "status": "corrigido",
+    "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/ESP/Futebol/TabelaJogos/0%2C%2CEEJ0-4286-2005%2C00.html",
-      "https://ge.globo.com/ESP/Futebol/TabelaJogos/0%2C%2CEEJ0-4410-2006%2C00.html",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2025/12/16/tabela-do-brasileirao-2026-veja-os-jogos-de-bahia-e-vitoria-ba-vi-esta-marcado-para-5a-rodada.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/02/10/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-3a-rodada.ghtml",
-      "https://ge.globo.com/futebol/copa-do-mundo/noticia/2026/07/05/quando-volta-o-brasileirao-eliminacao-do-brasil-faz-torcedores-virarem-a-chave-em-2026.ghtml",
-      "https://ge.globo.com/futebol/noticia/agenda-do-fim-de-semana-saiba-os-jogos-com-transmissao-ao-vivo-na-tv.ghtml",
-      "https://ge.globo.com/go/futebol/noticia/2026/03/09/agenda-do-futebol-na-semana-veja-jogos-entre-9-e-15-de-marco.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/04/01/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-9a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/05/23/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-17a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/07/16/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-19a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/07/25/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-20a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/08/14/cbf-divulga-tabela-detalhada-das-rodadas-25-e-26-da-serie-a-do-brasileirao.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/08/15/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-23a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/08/29/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-25a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2025/12/15/cbf-divulga-regulamento-especifico-e-tabela-basica-do-brasileirao-2026-com-mudancas-nas-regras.ghtml",
+      "https://credencial.cbf.com.br/competicoes/listar/42/1",
+      "https://download.uol.com.br/files/2023/05/1667102178_20230526173425_357.pdf",
+      "https://ge.globo.com/google/amp/futebol/noticia/fim-de-semana-na-tv-saiba-as-partidas-com-transmissao-ao-vivo.ghtml",
       "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/google/amp/rs/futebol/times/internacional/noticia/2026/01/12/estatisticas-do-inter-em-2026-veja-campanha-artilheiros-e-videos.ghtml",
-      "https://ge.globo.com/google/amp/sp/futebol/brasileirao-serie-a/noticia/sao-paulo-x-internacional-veja-onde-assistir-escalacoes-desfalques-e-arbitragem-2.ghtml",
-      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/stjd-converte-infracoes-ao-protocolo-em-multa-e-incentiva-clubes-a-alertarem-sobre-a-covid.ghtml",
-      "https://ge.globo.com/rs/futebol/times/internacional/noticia/2026/01/12/estatisticas-do-inter-em-2026-veja-campanha-artilheiros-e-videos.ghtml",
-      "https://ge.globo.com/sc/futebol/times/chapecoense/noticia/2025/12/17/confira-os-jogos-da-chapecoense-na-serie-a-de-2026.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/sao-paulo-x-internacional-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
-      "https://ge.globo.com/sp/tem-esporte/futebol-feminino/noticia/cbf-divulga-datas-horarios-e-locais-das-semifinais-do-brasileiro-feminino-sub-18.ghtml",
-      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2025/08/27/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-23-a-27-do-brasileirao-veja-a-tabela.ghtml",
-      "https://www.youtube.com/watch?v=hGl4EL9HSvE"
+      "https://ge.globo.com/google/amp/sc/futebol/times/chapecoense/noticia/2026/09/14/chapecoense-perde-dois-zagueiros-para-jogo-contra-o-atletico-mg.ghtml",
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/09/12/atletico-mg-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/pe/futebol/brasileirao-serie-a/noticia/cbf-detalha-tabela-da-serie-a-entre-a-16a-e-20a-rodadas-veja-horarios-e-dias-dos-jogos.ghtml",
+      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/rodada-28-tudo-o-que-voce-precisa-saber-sobre-chapecoense-x-atletico-mg.ghtml",
+      "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/09/17/atletico-mg-x-chapecoense-ao-vivo-onde-assistir-horario-e-informacoes-pela-28-rodada-do-brasileirao.html",
+      "https://jcconcursos.uol.com.br/media/uploads/anexos/concurso-sejusp-mg-edital-1-2025.pdf",
+      "https://p.download.uol.com.br/mtv/narua/jornal_130910.pdf",
+      "https://p.download.uol.com.br/omossoroense/mudanca/pics/pdf/EDICAO_020914.pdf",
+      "https://p.download.uol.com.br/omossoroense/mudanca/pics/pdf/EDICAO_120515.pdf",
+      "https://p.download.uol.com.br/omossoroense/mudanca/pics/pdf/EDICAO_150815.pdf",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
+      "https://www.espn.com.br/futebol/partida/_/jogoId/401841239/chapecoense-atletico-mg",
+      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/atletico-mg-x-chapecoense-horario-e-onde-assistir-ao-jogo-do-brasileirao.amp.htm",
+      "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/09/19/apos-noite-epica-na-sul-americana-atletico-mg-pega-chapecoense-de-olho-no-g-6-do-brasileirao.amp.htm"
     ],
     "canais_depois": [
-      "Premiere",
-      "SporTV"
+      "Premiere"
     ],
     "exclusivo": false,
-    "confianca": 0.98,
+    "confianca": 0.9,
     "fontes_aceitas": [
-      "https://ge.globo.com/google/amp/rs/futebol/times/internacional/noticia/2026/01/12/estatisticas-do-inter-em-2026-veja-campanha-artilheiros-e-videos.ghtml",
-      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://www.youtube.com/watch?v=hGl4EL9HSvE"
+      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/atletico-mg-x-chapecoense-horario-e-onde-assistir-ao-jogo-do-brasileirao.amp.htm",
+      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml"
     ],
-    "youtube": [
-      {
-        "url": "https://www.youtube.com/watch?v=hGl4EL9HSvE",
-        "scope": "pre_game",
-        "valid_for_match": false,
-        "reason": "O título identifica o conteúdo como “Aquecimento ao vivo”, e a descrição informa ser pré-jogo/bastidores, além de orientar o público a assistir ao jogo pelo SporTV. Não há evidência de transmissão integral da partida."
-      }
-    ],
-    "youtube_removidos": [
-      "https://www.youtube.com/watch?v=hGl4EL9HSvE"
-    ],
+    "youtube": [],
+    "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado: São Paulo x Internacional, Brasileirão 2026, 28ª rodada, será no sábado, 19/09/2026, às 21h (BRT), no Morumbis. A transmissão integral no Brasil é de SporTV e Premiere. O vídeo da GE TV no YouTube é exclusivamente de aquecimento/pré-jogo e direciona o público para assistir à partida no SporTV; portanto, GE TV não integra a grade da partida."
+    "resumo": "Confirmado: Atlético-MG x Chapecoense, Brasileirão 2026 (28ª rodada), sábado, 19/09/2026, às 16h (BRT), na Arena MRV, em Belo Horizonte. A transmissão integral confirmada para o Brasil é do Premiere (pay-per-view). Não há evidência consultada que confirme Globo, SporTV, GE TV ou outra plataforma para esta partida; o UOL ressalva que a exibição pode variar por estado caso exista TV aberta, mas não identifica praça ou emissora, portanto ela não foi incluída. Não há URL do YouTube no dossiê."
   },
-  "atualizado_em": "2026-09-18T21:03:00-03:00"
+  "atualizado_em": "2026-09-19T10:03:51-03:00"
 }
