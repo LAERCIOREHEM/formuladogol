@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-19T20:41:04.777142-03:00",
+  "gerado_em": "2026-09-19T21:21:45.576351-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 270,
   "total_com_estatisticas": 270,
-  "total_com_publico": 267,
+  "total_com_publico": 269,
   "total_com_eventos": 270,
   "total_com_jogadores": 270,
   "total_eventos_validados": 270,
@@ -597,9 +597,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Estadio Municipal José Maria de Campos Maia",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 5899,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/09/19/mirassol-carimba-estreia-de-tite-vence-botafogo-e-segue-fora-do-z-4-do-brasileirao.htm",
       "arbitro": "Felipe Fernandes De Lima",
       "stats": [
         {
@@ -1124,7 +1124,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-19T20:41:02.364705-03:00"
+      "atualizado_em": "2026-09-19T20:41:02.364705-03:00",
+      "renda": 155736,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841239": {
       "event_id": "401841239",
@@ -1136,9 +1138,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Arena MRV",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 35844,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://atletico.com.br/galo-empata-com-a-chapecoense-na-arena-mrv",
       "arbitro": "Raphael Claus",
       "stats": [
         {
@@ -1669,7 +1671,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-19T20:41:04.692665-03:00"
+      "atualizado_em": "2026-09-19T20:41:04.692665-03:00",
+      "renda": 1865150.25,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841176": {
       "event_id": "401841176",
@@ -152348,5 +152352,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 259,
+  "total_com_renda": 269
 }
