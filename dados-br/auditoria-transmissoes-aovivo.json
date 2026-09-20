@@ -13,16 +13,16 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 37,
+    "jogos_na_janela": 36,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 3,
+    "descobertas_antecipadas": 4,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 25,
+    "candidatos_oficiais_encontrados": 23,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
     "transmissoes_publicadas": 4,
-    "sem_transmissao": 0,
+    "sem_transmissao": 1,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -93,6 +93,18 @@
       "fontes_encontradas": [
         "GE TV"
       ],
+      "manual": false,
+      "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401841238",
+      "rodada": 28,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Athletico-PR x Bahia",
+      "data_iso": "2026-09-20T19:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
       "manual": false,
       "descoberta_antecipada": false
     },
@@ -184,16 +196,6 @@
       "titulo": "INDIANAPOLIS COLTS X KANSAS CITY CHIEFS | AQUECIMENTO AO VIVO | NFL | #live | sportv",
       "status": "upcoming",
       "inicio_programado": "2026-09-20T20:20:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "WdJzk-IO-KQ",
-      "url": "https://www.youtube.com/watch?v=WdJzk-IO-KQ",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: BRASIL X EL SALVADOR | COPA DAS NAÇÕES DE FUTEBOL DE AREIA | FINAL | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-09-20T12:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -322,18 +324,8 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: VILLARREAL X LEVANTE | LALIGA 26/27 | 7ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-20T13:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "4RwtDrpVoSs",
-      "url": "https://www.youtube.com/watch?v=4RwtDrpVoSs",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ATLÉTICO DE MADRID X REAL MADRID | LALIGA 26/27 | 7ª RODADA",
       "status": "live",
-      "inicio_programado": "2026-09-20T10:00:00-03:00",
+      "inicio_programado": "2026-09-20T13:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -392,13 +384,29 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: COREIA DO NORTE X CANADÁ | COPA DO MUNDO FEMININA SUB-20 FIFA 2026 | QUARTAS DE FINAL",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-20T13:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
-  "sem_transmissao": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401841238",
+      "jogo": "Athletico-PR x Bahia",
+      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
+    }
+  ],
+  "sem_transmissao": [
+    {
+      "event_id": "401841238",
+      "rodada": 28,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Athletico-PR x Bahia",
+      "data_iso": "2026-09-20T19:30:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
+    }
+  ],
   "erros": [],
   "quota_estimada_youtube": {
     "unidades": 87,
@@ -409,5 +417,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-20T12:35:52-03:00"
+  "atualizado_em": "2026-09-20T13:40:48-03:00"
 }

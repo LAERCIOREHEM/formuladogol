@@ -4717,62 +4717,33 @@
       ],
       "overlay_alterado": true,
       "resumo": "Confirmado: Flamengo x Red Bull Bragantino, Brasileirão Série A 2026, rodada 28, domingo, 20/09/2026, às 18h30 (BRT), no Maracanã. A página oficial da CBF lista a transmissão integral em Premiere e SporTV. Não há evidência de Globo para esta partida. O link da GE TV é somente aquecimento/pré-jogo e não transmite a íntegra do jogo."
+    },
+    {
+      "event_id": "401841238",
+      "jogo": "Athletico-PR x Bahia",
+      "data_iso": "2026-09-20T19:30:00-03:00",
+      "checkpoint": -360,
+      "executado_em": "2026-09-20T13:42:56-03:00",
+      "chamada_openai": false,
+      "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
+      "canais_antes": [
+        "Premiere"
+      ],
+      "status": "sem_chamada"
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841241",
-    "jogo": "Flamengo x Bragantino",
-    "data_iso": "2026-09-20T18:30:00-03:00",
+    "event_id": "401841238",
+    "jogo": "Athletico-PR x Bahia",
+    "data_iso": "2026-09-20T19:30:00-03:00",
     "checkpoint": -360,
-    "executado_em": "2026-09-20T12:38:06-03:00",
-    "chamada_openai": true,
-    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+    "executado_em": "2026-09-20T13:42:56-03:00",
+    "chamada_openai": false,
+    "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
     "canais_antes": [
-      "GE TV",
-      "Globo"
+      "Premiere"
     ],
-    "status": "corrigido",
-    "modelo": "gpt-5.6-terra",
-    "fontes_web": [
-      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/google/amp/sp/vale-do-paraiba-regiao/futebol/times/bragantino/noticia/2026/09/15/bragantino-tem-dois-novos-desfalques-para-enfrentar-o-flamengo-e-retorno-de-pelo-menos-um-jogador.ghtml",
-      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/times/bragantino/noticia/2026/09/16/rodriguinho-vanderlan-e-sasha-voltam-a-treinar-e-podem-reforcar-o-bragantino-contra-o-flamengo.ghtml",
-      "https://ge.globo.com/video/flamengo-x-bragantino-amanha-as-20h-ao-vivo-no-premiere-12850545.ghtml",
-      "https://globoplay.globo.com/v/10984189",
-      "https://globoplay.globo.com/v/11470949",
-      "https://globoplay.globo.com/v/14120447",
-      "https://interativos.ge.globo.com/futebol/times/flamengo/voce-escala/vc-escala-monte-o-flamengo-contra-o-bragantino",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/flamengo-x-red-bull-bragantino/832161",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/bahia-entra-no-g-4-do-brasileirao-com-triunfo-sobre-o-remo",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
-      "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/sub-20/2026/20007",
-      "https://www.youtube.com/watch?v=MxEmsbr8nJY",
-      "https://www.youtube.com/watch?v=_U7JS7cgsBg"
-    ],
-    "canais_depois": [
-      "Premiere",
-      "SporTV"
-    ],
-    "exclusivo": false,
-    "confianca": 0.99,
-    "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/flamengo-x-red-bull-bragantino/832161",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
-      "https://www.youtube.com/watch?v=_U7JS7cgsBg"
-    ],
-    "youtube": [
-      {
-        "url": "https://www.youtube.com/watch?v=_U7JS7cgsBg",
-        "scope": "pre_game",
-        "valid_for_match": false,
-        "reason": "O título e a descrição identificam o conteúdo como “Aquecimento ao vivo” e orientam a assistir ao jogo pelo SporTV; portanto, trata-se de pré-jogo, não da transmissão integral da partida."
-      }
-    ],
-    "youtube_removidos": [
-      "https://www.youtube.com/watch?v=_U7JS7cgsBg"
-    ],
-    "overlay_alterado": true,
-    "resumo": "Confirmado: Flamengo x Red Bull Bragantino, Brasileirão Série A 2026, rodada 28, domingo, 20/09/2026, às 18h30 (BRT), no Maracanã. A página oficial da CBF lista a transmissão integral em Premiere e SporTV. Não há evidência de Globo para esta partida. O link da GE TV é somente aquecimento/pré-jogo e não transmite a íntegra do jogo."
+    "status": "sem_chamada"
   },
-  "atualizado_em": "2026-09-20T12:38:06-03:00"
+  "atualizado_em": "2026-09-20T13:42:56-03:00"
 }

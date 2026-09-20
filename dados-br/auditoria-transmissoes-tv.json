@@ -1,45 +1,51 @@
 {
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
-    "jogos_na_janela": 37,
-    "jogos_com_transmissao": 29,
+    "jogos_na_janela": 36,
+    "jogos_com_transmissao": 28,
     "jogos_sem_transmissao_na_janela": 8,
     "jogos_sem_transmissao_14d": 1,
     "jogos_sem_transmissao_fora_14d": 7,
     "jogos_criticos_sem_transmissao_72h": 0,
     "registros_preservados": 22,
-    "jogos_guardiao_ia": 5,
+    "jogos_guardiao_ia": 4,
     "jogos_estaveis_sem_reconsulta_editorial": 4,
-    "fontes_com_falha": 0
+    "fontes_com_falha": 2
   },
   "fontes": {
     "guardiao_ia": {
       "ok": true,
-      "jogos_com_canal": 5
+      "jogos_com_canal": 4
     },
     "cbf": {
-      "ok": true,
-      "competicoes_ok": [
-        "brasileirao"
-      ],
+      "ok": false,
+      "competicoes_ok": [],
       "registros": 0,
       "erros": [
+        "Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 5539
+      "duracao_ms": 9427
+    },
+    "ge_agenda": {
+      "ok": true,
+      "jogos_com_canal": 0,
+      "duracao_ms": 5770
+    },
+    "ge_artigos": {
+      "ok": true,
+      "artigos_consultados": 10,
+      "jogos_com_canal": 0,
+      "duracao_ms": 89577
     },
     "espn": {
-      "ok": true,
-      "competicoes_consultadas": 1,
-      "eventos_na_janela": 0,
-      "scoreboard_com_canal": 0,
-      "summary_com_canal": 0,
-      "duracao_ms": 0
+      "ok": false,
+      "erro": "RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20260918-20261121&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden"
     },
     "youtube_oficial": {
       "ok": true,
-      "jogos_com_canal": 3
+      "jogos_com_canal": 4
     }
   },
   "sem_transmissao": [
@@ -48,7 +54,7 @@
       "rodada": 21,
       "jogo": "Atlético-MG x Bragantino",
       "data_iso": "2026-10-03T18:30:00-03:00",
-      "faltam_horas": 317.9,
+      "faltam_horas": 316.8,
       "nivel": "aviso"
     }
   ],
@@ -58,7 +64,7 @@
       "rodada": 21,
       "jogo": "Atlético-MG x Bragantino",
       "data_iso": "2026-10-03T18:30:00-03:00",
-      "faltam_horas": 317.9,
+      "faltam_horas": 316.8,
       "nivel": "aviso"
     },
     {
@@ -66,7 +72,7 @@
       "rodada": 29,
       "jogo": "Remo x Grêmio",
       "data_iso": "2026-10-07T19:30:00-03:00",
-      "faltam_horas": 414.9,
+      "faltam_horas": 413.8,
       "nivel": "futuro"
     },
     {
@@ -74,7 +80,7 @@
       "rodada": 29,
       "jogo": "Fluminense x Coritiba",
       "data_iso": "2026-10-08T21:30:00-03:00",
-      "faltam_horas": 440.9,
+      "faltam_horas": 439.8,
       "nivel": "futuro"
     },
     {
@@ -82,7 +88,7 @@
       "rodada": 30,
       "jogo": "São Paulo x Vitória",
       "data_iso": "2026-10-10T21:00:00-03:00",
-      "faltam_horas": 488.4,
+      "faltam_horas": 487.3,
       "nivel": "futuro"
     },
     {
@@ -90,7 +96,7 @@
       "rodada": 30,
       "jogo": "Bahia x Mirassol",
       "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 510.9,
+      "faltam_horas": 509.8,
       "nivel": "futuro"
     },
     {
@@ -98,7 +104,7 @@
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 534.9,
+      "faltam_horas": 533.8,
       "nivel": "futuro"
     },
     {
@@ -106,7 +112,7 @@
       "rodada": 31,
       "jogo": "Remo x Bragantino",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 650.4,
+      "faltam_horas": 649.3,
       "nivel": "futuro"
     },
     {
@@ -114,7 +120,7 @@
       "rodada": 31,
       "jogo": "Fluminense x Santos",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 650.4,
+      "faltam_horas": 649.3,
       "nivel": "futuro"
     }
   ],
@@ -335,9 +341,22 @@
     }
   ],
   "erros": [
+    "CBF: Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
     "CBF: Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
-    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
+    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
+    "ESPN: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20260918-20261121&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 403: Forbidden"
   ],
-  "artigos_ge_descobertos": [],
-  "atualizado_em": "2026-09-20T12:38:20-03:00"
+  "artigos_ge_descobertos": [
+    "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/20/vitoria-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/09/20/athletico-x-bahia-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/20/flamengo-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/09/20/corinthians-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/sp/campinas-e-regiao/futebol/brasileirao-serie-b/noticia/2026/09/19/ponte-preta-x-crb-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/gato-mestre/noticia/2026/09/19/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-28a-rodada-do-brasileirao.ghtml",
+    "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/19/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-28a-rodada.ghtml",
+    "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/09/19/sao-paulo-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/09/19/remo-x-santos-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/sp/tem-esporte/futebol/brasileirao-serie-a/noticia/2026/09/19/mirassol-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+  ],
+  "atualizado_em": "2026-09-20T13:41:04-03:00"
 }
