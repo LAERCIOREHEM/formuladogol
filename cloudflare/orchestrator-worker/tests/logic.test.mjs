@@ -144,26 +144,19 @@ test('TV coverage ignores games beyond 72h and only treats near gaps as operatio
   assert.equal(tvIntervalHours(coverage), 168);
 });
 
-test('highlight retries are sparse and first eligibility is +20 min', () => {
-  assert.equal(POLICY.melhoresMomentos.firstAfterFinalMinutes, 20);
-  assert.equal(mmRetryInterval(0.5), 25);
-  assert.equal(mmRetryInterval(1), 45);
-  assert.equal(mmRetryInterval(2), 90);
-  assert.equal(mmRetryInterval(5), 180);
-  assert.equal(mmRetryInterval(10), 360);
-  assert.equal(mmRetryInterval(20), 720);
-  assert.equal(mmRetryInterval(100), 1440);
-  const results = { resultados: [{ event_id: 'x', rodada: 22, data_iso: '2026-09-03T10:00:00Z', finalizado_em: '2026-09-03T12:00:00Z' }] };
-  assert.equal(pendingHighlights({ results, auto: { jogos: {} }, manual: { jogos: {} }, now: d('2026-09-03T12:19:00Z') }).length, 0);
-  assert.equal(pendingHighlights({ results, auto: { jogos: {} }, manual: { jogos: {} }, now: d('2026-09-03T12:20:00Z') }).length, 1);
+test('highlight GitHub fallback starts only after Fastlane window (+6h)', () => {
+  assert.equal(POLICY.melhoresMomentos.firstAfterFinalMinutes, 360);
+  assert.equal(mmRetryInterval(7), 360);
+    assert.equal(mmRetryInterval(30), 1440);
+          const results = { resultados: [{ event_id: 'x', rodada: 22, data_iso: '2026-09-03T10:00:00Z', finalizado_em: '2026-09-03T12:00:00Z' }] };
+  assert.equal(pendingHighlights({ results, auto: { jogos: {} }, manual: { jogos: {} }, now: d('2026-09-03T17:59:00Z') }).length, 0);
+  assert.equal(pendingHighlights({ results, auto: { jogos: {} }, manual: { jogos: {} }, now: d('2026-09-03T18:00:00Z') }).length, 1);
 });
 
 test('public/renda backoff is sparse and never exhausts', () => {
-  assert.equal(publicRetryInterval(1), 120);
-  assert.equal(publicRetryInterval(5), 120);
-  assert.equal(publicRetryInterval(8), 180);
-  assert.equal(publicRetryInterval(20), 360);
-  assert.equal(publicRetryInterval(30), 720);
+  assert.equal(publicRetryInterval(7), 360);
+  assert.equal(publicRetryInterval(20), 720);
+  assert.equal(publicRetryInterval(30), 1440);
   assert.equal(publicRetryInterval(100), 1440);
 });
 
@@ -319,14 +312,14 @@ test('public trigger uses the small audit and detects a new final before the aud
   ] };
   const audit = { gerado_em: '2026-09-02T10:00:00Z', sem_publico: [{ event_id: 'old' }] };
   const pending = pendingPublicsFromAudit({
-    results, audit, aiState: { esgotados: [] }, now: d('2026-09-03T14:20:00Z'),
+    results, audit, aiState: { esgotados: [] }, now: d('2026-09-03T18:20:00Z'),
   });
   assert.deepEqual(new Set(pending.map((x) => x.eventId)), new Set(['old', 'new']));
   assert.equal(pending.find((x) => x.eventId === 'new').firstCheck, true);
 
   const audited = pendingPublicsFromAudit({
-    results, audit: { gerado_em: '2026-09-03T14:30:00Z', sem_publico: [{ event_id: 'old' }], sem_renda: [] },
-    aiState: { esgotados: ['old'], jogos: { old: { tentativas: 8, esgotado: true } } }, now: d('2026-09-03T14:40:00Z'),
+    results, audit: { gerado_em: '2026-09-03T18:30:00Z', sem_publico: [{ event_id: 'old' }], sem_renda: [] },
+    aiState: { esgotados: ['old'], jogos: { old: { tentativas: 8, esgotado: true } } }, now: d('2026-09-03T18:40:00Z'),
   });
   assert.deepEqual(audited.map((x) => x.eventId), ['old']);
   assert.ok(audited[0].missingFields.includes('publico'));
@@ -336,9 +329,9 @@ test('rent-only audit gap remains eligible even when attendance is already known
   const results = { resultados: [{ event_id: 'rent', data_iso: '2026-09-03T10:00:00Z', finalizado_em: '2026-09-03T12:00:00Z' }] };
   const pending = pendingPublicsFromAudit({
     results,
-    audit: { gerado_em: '2026-09-03T14:30:00Z', sem_publico: [], sem_renda: [{ event_id: 'rent' }] },
+    audit: { gerado_em: '2026-09-03T18:30:00Z', sem_publico: [], sem_renda: [{ event_id: 'rent' }] },
     aiState: { esgotados: [] },
-    now: d('2026-09-03T14:40:00Z'),
+    now: d('2026-09-03T18:40:00Z'),
   });
   assert.equal(pending.length, 1);
   assert.deepEqual(pending[0].missingFields, ['renda']);

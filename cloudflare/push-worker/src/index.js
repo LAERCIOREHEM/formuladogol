@@ -6,6 +6,7 @@ import { opsStatus, runOperationalMaintenance } from './ops.js';
 import { probeEspnSources } from './espn-source.js';
 import { LIVE_API_CONSTANTS, resolveLiveScoreboard, resolveLiveSummary } from './live-api.js';
 import { createLiveStatsStore } from './live-stats-store.js';
+import { postgameStatus, readPostgameFastlane, runPostgameMaintenance } from './postgame-fastlane.js';
 
 export { PushState, SportsMonitor };
 
@@ -543,7 +544,11 @@ async function handleTest(request, env) {
 
 export default {
   async scheduled(controller, env, ctx) {
-    ctx.waitUntil(runOperationalMaintenance(env, singletonMonitor(env)));
+    const monitor = singletonMonitor(env);
+    ctx.waitUntil((async () => {
+      await runOperationalMaintenance(env, monitor);
+      await runPostgameMaintenance(env, monitor);
+    })());
   },
 
   async queue(batch, env) {
@@ -571,7 +576,7 @@ export default {
         ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok) && Boolean(operational?.ok),
         service: 'formula-do-gol-push',
         version: 7,
-        revision: '6-R10R6',
+        revision: '6-R10R6-PG1',
         liveGatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
         liveStateContractVersion: LIVE_API_CONSTANTS.LIVE_STATE_CONTRACT_VERSION,
         liveFactsContractVersion: LIVE_API_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
@@ -587,6 +592,8 @@ export default {
         apiFootballBudgetReserve: LIVE_API_CONSTANTS.API_FOOTBALL_BUDGET_RESERVE,
         continentalStatsTargetMinPerTeam: LIVE_API_CONSTANTS.CONTINENTAL_STATS_TARGET,
         bestKnownStatsCache: true,
+        postgameFastlane: true,
+        postgameFastlaneVersion: 1,
         sportsMonitorReady: Boolean(monitor?.ok),
         operationalState: operational?.state || 'unknown',
         sports: {
@@ -609,6 +616,15 @@ export default {
           fallbackScoreboard: ({ league, now }) => monitorLiveScoreboardFallback(env, league, now)
         });
         return json(request, result.body, result.status, { 'Cache-Control': 'no-store', 'X-FDG-Live-Gateway': LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION });
+      }
+      if (url.pathname === '/v1/postgame' && request.method === 'GET') {
+        if (!(await allowStatusRead(request, env, 'postgame-fastlane'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
+        const ids = String(url.searchParams.get('event_ids') || '').split(',').map((v) => cleanId(v)).filter(Boolean);
+        return json(request, { ok: true, version: 1, rows: await readPostgameFastlane(env, ids) }, 200, { 'Cache-Control': 'no-store' });
+      }
+      if (url.pathname === '/v1/postgame/status' && request.method === 'GET') {
+        if (!(await allowStatusRead(request, env, 'postgame-status'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
+        return json(request, await postgameStatus(env), 200, { 'Cache-Control': 'no-store' });
       }
       if (url.pathname === '/v1/live/summary' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'live-summary'))) return json(request, { ok: false, error: 'rate_limited' }, 429);

@@ -184,7 +184,7 @@ export class OrchestratorState {
     return {
       ok: true,
       engine: 'fdg-cloudflare-orchestrator',
-      version: String(this.env.ORCHESTRATOR_VERSION || '1.5.0'),
+      version: String(this.env.ORCHESTRATOR_VERSION || '1.7.0'),
       mode: String(this.env.ORCHESTRATOR_MODE || 'shadow'),
       ...status,
       recentDecisions: history.slice(-10).reverse(),
@@ -584,7 +584,8 @@ export class OrchestratorState {
       };
     }
 
-    // 3) Públicos: primeira busca após +30 min e backoff por event_id.
+    // 3) Públicos: GitHub é fallback/consolidação após +6h. O Fastlane do Push Worker
+    // faz a perseguição imediata via Cloudflare + OpenAI sem abrir Actions.
     const publicSourcesReady = ready(
       'resultados.json', 'dados-br/estado-publicos-ia.json', 'dados-br/auditoria-publicos.json',
     );
@@ -612,7 +613,8 @@ export class OrchestratorState {
     }
     if (nextPublicDue) hints.publicos = { pending: publics.length, nextDueAt: nextPublicDue.toISOString() };
 
-    // 4) Melhores momentos: busca por jogo e backoff esparso.
+    // 4) Melhores momentos: GitHub é fallback/consolidação após +6h. O Fastlane
+    // do Push Worker varre uploads oficiais a cada poucos minutos desde o FINAL.
     const mmSourcesReady = ready(
       'resultados.json', 'dados-br/melhores-momentos.json', 'dados-br/melhores-momentos-manual.json',
       'dados-br/auditoria-melhores-momentos.json',

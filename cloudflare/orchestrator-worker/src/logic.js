@@ -12,16 +12,19 @@ export const POLICY = Object.freeze({
   },
   slowEvalMinutes: 15,
   publicos: {
-    firstAfterFinalMinutes: 30,
+    // O Fastlane do Push Worker pesquisa a cada poucos minutos. GitHub vira
+    // apenas consolidação/fallback tardio para reduzir Actions.
+    firstAfterFinalMinutes: 360,
     retryBands: [
-      [4, 120], [6, 120], [9, 180], [12, 180], [18, 360],
-      [24, 360], [36, 720], [48, 720], [99999, 1440],
+      [12, 360], [24, 720], [48, 1440], [99999, 1440],
     ],
   },
   melhoresMomentos: {
-    firstAfterFinalMinutes: 20,
+    // O Fastlane Cloudflare assume a perseguição imediata. A Action fica como
+    // consolidação/versionamento apenas se o dado ainda faltar após 6 horas.
+    firstAfterFinalMinutes: 360,
     retryBands: [
-      [0.75, 25], [1.5, 45], [3, 90], [6, 180], [12, 360], [24, 720], [99999, 1440],
+      [12, 360], [24, 720], [48, 1440], [99999, 1440],
     ],
   },
   transmissoes: {

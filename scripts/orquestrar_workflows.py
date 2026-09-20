@@ -18,7 +18,7 @@ Política resumida
    Placar/gol AO VIVO NÃO dispara pipeline pesado: a classificação live é
    calculada no navegador a partir do scoreboard ESPN.
 2. Públicos pendentes:
-   - primeira tentativa 30 min após o FINAL;
+   - Fastlane Cloudflare faz a busca imediata; GitHub só entra como fallback/consolidação após 6h;
    - retentativas seguem o relógio por campo gravado pela própria camada de IA;
    - erro técnico usa backoff curto e não vira fracasso documental.
 3. Melhores momentos:
@@ -154,27 +154,20 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "manutencao_diaria_apos": "05:10",
     },
     "publicos": {
-        "primeira_tentativa_apos_final_minutos": 30,
+        "primeira_tentativa_apos_final_minutos": 360,
         "intervalos_retentativa": [
-            {"ate_horas": 2, "minutos": 30},
-            {"ate_horas": 6, "minutos": 60},
-            {"ate_horas": 12, "minutos": 90},
-            {"ate_horas": 24, "minutos": 120},
-            {"ate_horas": 48, "minutos": 180},
-            {"ate_horas": 72, "minutos": 360},
-            {"ate_horas": 168, "minutos": 720},
-            {"ate_horas": 99999, "minutos": 720},
+            {"ate_horas": 12, "minutos": 360},
+            {"ate_horas": 24, "minutos": 720},
+            {"ate_horas": 48, "minutos": 1440},
+            {"ate_horas": 99999, "minutos": 1440},
         ],
     },
     "melhores_momentos": {
-        "primeira_tentativa_apos_final_minutos": 20,
+        "primeira_tentativa_apos_final_minutos": 360,
         "intervalos_retentativa": [
-            {"ate_horas": 0.75, "minutos": 25},
-            {"ate_horas": 1.5, "minutos": 45},
-            {"ate_horas": 3, "minutos": 90},
-            {"ate_horas": 6, "minutos": 180},
             {"ate_horas": 12, "minutos": 360},
             {"ate_horas": 24, "minutos": 720},
+            {"ate_horas": 48, "minutos": 1440},
             {"ate_horas": 99999, "minutos": 1440},
         ],
         "ignorar_rodada_zero": True,
@@ -1540,9 +1533,9 @@ def self_test() -> int:
     assert parse_dt("2026-08-09T21:24:00-03:00", tz).hour == 21
     assert time_reached(now, "06:30")
     assert not time_reached(datetime(2026, 8, 9, 5, 0, tzinfo=tz), "06:30")
-    assert mm_retry_interval(0.5, config) == 25
-    assert mm_retry_interval(1.0, config) == 45
-    assert mm_retry_interval(3.0, config) == 90
+    assert mm_retry_interval(0.5, config) == 360
+    assert mm_retry_interval(1.0, config) == 360
+    assert mm_retry_interval(3.0, config) == 360
 
     # --- Circuit breaker por falha repetida ---------------------------------
     def _run(conclusion: str, minutos_atras: int) -> dict[str, Any]:
@@ -1577,7 +1570,7 @@ def self_test() -> int:
     assert backoff_por_falha(alvo, config=config, runs=runs_5, now=now, tz=tz).action == "none"
     # Ação 'none' nunca é afetada pelo breaker.
     assert backoff_por_falha(Decision("none", "x"), config=config, runs=runs_5, now=now, tz=tz).action == "none"
-    assert mm_retry_interval(5.0, config) == 180
+    assert mm_retry_interval(5.0, config) == 360
     assert mm_retry_interval(10.0, config) == 360
     assert mm_retry_interval(20.0, config) == 720
     assert mm_retry_interval(100.0, config) == 1440
@@ -1810,11 +1803,11 @@ def self_test() -> int:
 
     assert canonical_hash({"b": 2, "a": 1}) == canonical_hash({"a": 1, "b": 2})
 
-    assert public_retry_interval(1.0, config) == 30
-    assert public_retry_interval(5.0, config) == 60
-    assert public_retry_interval(20.0, config) == 120
-    assert public_retry_interval(100.0, config) == 720
-    assert public_retry_interval(500.0, config) == 720
+    assert public_retry_interval(7.0, config) == 360
+    assert public_retry_interval(20.0, config) == 720
+    assert public_retry_interval(30.0, config) == 1440
+    assert public_retry_interval(100.0, config) == 1440
+    assert public_retry_interval(500.0, config) == 1440
 
     # --- Contrato de hash entre orquestrador e gerador ----------------------
     # Este teste existe porque a divergência entre as duas formas de calcular o

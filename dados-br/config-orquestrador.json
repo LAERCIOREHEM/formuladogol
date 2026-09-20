@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "descricao": "Política determinística de contingência/manual. O orquestrador operacional primário roda no Cloudflare Worker; a IA não decide gatilhos.",
   "timezone": "America/Sao_Paulo",
   "atualizar_brasileirao": {
@@ -10,24 +10,8 @@
     "manutencao_diaria_apos": "05:10"
   },
   "melhores_momentos": {
-    "primeira_tentativa_apos_final_minutos": 20,
+    "primeira_tentativa_apos_final_minutos": 360,
     "intervalos_retentativa": [
-      {
-        "ate_horas": 0.75,
-        "minutos": 25
-      },
-      {
-        "ate_horas": 1.5,
-        "minutos": 45
-      },
-      {
-        "ate_horas": 3,
-        "minutos": 90
-      },
-      {
-        "ate_horas": 6,
-        "minutos": 180
-      },
       {
         "ate_horas": 12,
         "minutos": 360
@@ -37,11 +21,16 @@
         "minutos": 720
       },
       {
+        "ate_horas": 48,
+        "minutos": 1440
+      },
+      {
         "ate_horas": 99999,
         "minutos": 1440
       }
     ],
-    "ignorar_rodada_zero": true
+    "ignorar_rodada_zero": true,
+    "politica": "Fastlane Cloudflare/YouTube tenta imediatamente e com alta frequência; GitHub só consolida/faz fallback após 6h se o dado ainda não estiver versionado."
   },
   "transmissoes": {
     "tv_diaria_apos": "06:30",
@@ -75,42 +64,26 @@
     "bloquear_se_writer_ativo": true
   },
   "publicos": {
-    "primeira_tentativa_apos_final_minutos": 30,
+    "primeira_tentativa_apos_final_minutos": 360,
     "intervalos_retentativa": [
       {
-        "ate_horas": 2,
-        "minutos": 30
-      },
-      {
-        "ate_horas": 6,
-        "minutos": 60
-      },
-      {
         "ate_horas": 12,
-        "minutos": 90
-      },
-      {
-        "ate_horas": 24,
-        "minutos": 120
-      },
-      {
-        "ate_horas": 48,
-        "minutos": 180
-      },
-      {
-        "ate_horas": 72,
         "minutos": 360
       },
       {
-        "ate_horas": 168,
+        "ate_horas": 24,
         "minutos": 720
       },
       {
+        "ate_horas": 48,
+        "minutos": 1440
+      },
+      {
         "ate_horas": 99999,
-        "minutos": 720
+        "minutos": 1440
       }
     ],
-    "politica": "público e renda independentes; IA com web_search amplo e obrigatório; erro técnico não consome tentativa documental; sem esgotamento definitivo; após 72h retentar no máximo a cada 12h até resolução documental"
+    "politica": "Fastlane Cloudflare/OpenAI web_search persegue público/renda imediatamente e salva overlay no D1; GitHub só consolida/faz fallback após 6h. Campos continuam independentes e nunca são estimados."
   },
   "backoff_falhas": {
     "ativo": true,
@@ -129,6 +102,7 @@
     "cron": "*/5 * * * *",
     "modo_inicial": "shadow",
     "cron_job_org": false,
-    "github_orquestrador": "fallback manual apenas"
+    "github_orquestrador": "fallback manual apenas",
+    "postgame_fastlane": "formula-do-gol-push (cron 1 min + D1; sem GitHub para atualização imediata)"
   }
 }

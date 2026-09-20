@@ -22,6 +22,7 @@ import {
 import { fetchEspnLivePlays, fetchEspnScorerEnrichment, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays, fetchEspnTechnicalLivePlays, fetchEspnTechnicalScoreboard } from './espn-source.js';
 import { buildHotEspnTestEvent, detectHotEspnMutation, HOT_ESPN_TEST_CONSTANTS, hotEspnSnapshot, publicHotEspnTest } from './hot-espn-test.js';
 import { buildHotMatchPrematchEvent, hotMatchNextPollDelay, hotMatchPrematchDue, hotMatchTargetEvent, HOT_MATCH_TEST_CONSTANTS, markHotMatchTechnicalEvent, publicHotMatchTest } from './hot-match-test.js';
+import { recordPostgameFinal } from './postgame-fastlane.js';
 
 const AGENDA_URL = 'https://formuladogol.com.br/dados-br/agenda-clubes-br.json';
 const ALLOWED_LEAGUES = new Set(['bra.1', 'bra.copa_do_brazil', 'conmebol.libertadores', 'conmebol.sudamericana']);
@@ -1016,6 +1017,17 @@ export class SportsMonitor {
         if (await this.recordEvent(event)) newlyEmitted.push(event);
       }
       matches[game.eventId] = nextMatch;
+
+      // Pós-jogo Fastlane: assim que o monitor confirma a transição para FINAL,
+      // registra a partida no D1. A busca efetiva roda no cron de 1 minuto e
+      // não depende de GitHub Actions nem de deploy do site.
+      if (observation.state === 'post' && previous?.state !== 'post') {
+        try {
+          await recordPostgameFinal(this.env, game, observation, startedAt);
+        } catch (error) {
+          sourceWarnings.push(`${game.league}/${game.eventId}/postgame-fastlane: ${text(error?.message || error)}`);
+        }
+      }
 
       if (dueCheckpoints.length) {
         let audience = {};

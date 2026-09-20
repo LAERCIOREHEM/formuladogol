@@ -3192,6 +3192,8 @@ function melhoresMomentosDoJogo(j) {
   const mapa = state.melhoresMomentos || {};
   const id = String((j && (j.event_id || j.id)) || '');
   if (id && mapa[id]) return mapa[id];
+  const fastlane = id ? (state.postgameFastlane || {})[id] : null;
+  if (fastlane && fastlane.highlight && fastlane.highlight.url) return fastlane.highlight;
   const chave = chaveMelhoresMomentos(j);
   if (chave && mapa[chave]) return mapa[chave];
   const rodada = Number(j && j.rodada || 0);
@@ -3351,6 +3353,57 @@ function htmlMelhoresMomentos(j, contexto = 'jogo') {
   </button>`;
 }
 
+const BR_POSTGAME_FASTLANE_URL = 'https://push.formuladogol.com.br/v1/postgame';
+let _postgameFastlaneTimer = null;
+
+function postgameFastlaneIdsVisiveis() {
+  return [...new Set((state.resultados || []).slice(0, 40).map((j) => String((j && (j.event_id || j.id)) || '')).filter(Boolean))];
+}
+
+async function carregarPostgameFastlane(opcoes = {}) {
+  const ids = postgameFastlaneIdsVisiveis();
+  if (!ids.length && state.resultadosCarregados) return;
+  try {
+    const url = new URL(BR_POSTGAME_FASTLANE_URL);
+    if (ids.length) url.searchParams.set('event_ids', ids.join(','));
+    url.searchParams.set('_', String(Date.now()));
+    const resp = await fetch(url.toString(), { cache: 'no-store' });
+    if (!resp.ok) throw new Error('Fastlane HTTP ' + resp.status);
+    const data = await resp.json();
+    const mapa = { ...(state.postgameFastlane || {}) };
+    for (const row of (Array.isArray(data && data.rows) ? data.rows : [])) {
+      const id = String(row && row.event_id || '');
+      if (id) mapa[id] = row;
+    }
+    state.postgameFastlane = mapa;
+    state.postgameFastlaneMeta = { version: Number(data && data.version || 1), atualizado_em: new Date().toISOString() };
+    state.postgameFastlaneErro = null;
+    if (state.view === 'resultados') renderResultados();
+  } catch (e) {
+    state.postgameFastlaneErro = e && e.message ? e.message : String(e || 'indisponível');
+    if (!opcoes.silencioso) console.warn('Pós-jogo Fastlane indisponível:', state.postgameFastlaneErro);
+  }
+}
+
+function postgameFastlaneDoJogo(j) {
+  const id = String((j && (j.event_id || j.id)) || '');
+  return id ? ((state.postgameFastlane || {})[id] || null) : null;
+}
+
+async function postgameFastlaneTick() {
+  _postgameFastlaneTimer = null;
+  if (document.hidden || state.view !== 'resultados') return;
+  await carregarPostgameFastlane({ silencioso: true });
+  const rows = postgameFastlaneIdsVisiveis().map((id) => (state.postgameFastlane || {})[id]).filter(Boolean);
+  const pendente = rows.some((row) => row.public_status !== 'resolved' || row.highlight_status !== 'resolved');
+  _postgameFastlaneTimer = setTimeout(postgameFastlaneTick, pendente ? 15000 : 60000);
+}
+
+function postgameFastlaneArmar() {
+  if (_postgameFastlaneTimer || state.view !== 'resultados' || document.hidden) return;
+  _postgameFastlaneTimer = setTimeout(postgameFastlaneTick, 50);
+}
+
 async function carregarJogosDetalhes(opcoes = {}) {
   try {
     const resp = await fetch('dados-br/jogos-detalhes.json?t=' + Date.now(), { cache: 'no-store' });
@@ -3379,11 +3432,20 @@ async function carregarJogosDetalhes(opcoes = {}) {
 function detalhesDoJogo(j) {
   const mapa = state.jogosDetalhes || {};
   const id = String((j && (j.event_id || j.id)) || '');
-  if (id && mapa[id]) return mapa[id];
-  for (const det of Object.values(mapa)) {
-    if (det && id && String(det.event_id || '') === id) return det;
+  let base = id && mapa[id] ? mapa[id] : null;
+  if (!base) {
+    for (const det of Object.values(mapa)) {
+      if (det && id && String(det.event_id || '') === id) { base = det; break; }
+    }
   }
-  return null;
+  const fast = id ? postgameFastlaneDoJogo(j) : null;
+  if (!base && !fast) return null;
+  const merged = { ...(base || {}), event_id: id || (base && base.event_id) || '' };
+  if (!(Number(merged.publico) > 0) && Number(fast && fast.publico) > 0) merged.publico = Number(fast.publico);
+  if (!(Number(merged.publico_pagante) > 0) && Number(fast && fast.publico_pagante) > 0) merged.publico_pagante = Number(fast.publico_pagante);
+  if (!(Number(merged.renda) > 0) && Number(fast && fast.renda) > 0) merged.renda = Number(fast.renda);
+  if (fast && fast.public_sources && typeof fast.public_sources === 'object') merged.fontes_publico_fastlane = fast.public_sources;
+  return merged;
 }
 
 function ordenarEstatisticasParaExibicao(stats) {
@@ -3630,6 +3692,10 @@ let state = {
   jogosDetalhesMeta: null,
   jogosDetalhesCarregados: false,
   jogosDetalhesErro: null,
+  // Pós-jogo Fastlane — overlay dinâmico do Cloudflare (sem commit/deploy).
+  postgameFastlane: {},
+  postgameFastlaneMeta: null,
+  postgameFastlaneErro: null,
   // Ranking Vivo de desempenho dos clubes
   rankingDesempenho: {},
   rankingDesempenhoMeta: null,
@@ -4320,6 +4386,8 @@ function setView(v, opcoes = {}) {
   if (!opcoes.fromHistory) brAtualizarRota(v);
   else brAplicarMetadadosDaView(v, false);
   state.view = v;
+  if (v !== 'resultados' && _postgameFastlaneTimer) { clearTimeout(_postgameFastlaneTimer); _postgameFastlaneTimer = null; }
+  if (v === 'resultados') postgameFastlaneArmar();
   if (v !== 'em-breve') state.futuroModulo = null;
   if (v === 'jogos' && !state.jogosCarregados) {
     carregarJogos();
@@ -5940,7 +6008,10 @@ function espnLiveArmar() {
 }
 
 document.addEventListener('visibilitychange', function () {
-  if (!document.hidden) espnLiveArmar();
+  if (!document.hidden) {
+    espnLiveArmar();
+    postgameFastlaneArmar();
+  }
 });
 
 // ========================================================================
@@ -5999,9 +6070,16 @@ async function carregarResultados(opcoes = {}) {
     state.resultadosErro = e.message;
     state.resultadosCarregados = true;
   }
-  await carregarMelhoresMomentos({ silencioso: true });
-  await carregarJogosDetalhes({ silencioso: true });
+  // Resultados básicos aparecem imediatamente. Melhores momentos, detalhes
+  // pesados e o Fastlane dinâmico são carregados em paralelo e enriquecem a
+  // tela conforme chegam; nenhum deles bloqueia o primeiro paint.
   if (state.view === 'resultados') renderResultados();
+  await Promise.allSettled([
+    carregarMelhoresMomentos({ silencioso: true }),
+    carregarJogosDetalhes({ silencioso: true }),
+    carregarPostgameFastlane({ silencioso: true })
+  ]);
+  if (state.view === 'resultados') { renderResultados(); postgameFastlaneArmar(); }
   // A coluna "Últimos 5" da tabela depende dos resultados; se o usuário
   // estiver na tabela, redesenha para a forma aparecer.
   if (state.view === 'tabela') renderTabela();
