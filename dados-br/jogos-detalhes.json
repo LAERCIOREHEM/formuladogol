@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-19T23:45:51.355605-03:00",
+  "gerado_em": "2026-09-20T01:52:08.902738-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 272,
   "total_com_estatisticas": 272,
-  "total_com_publico": 270,
+  "total_com_publico": 271,
   "total_com_eventos": 272,
   "total_com_jogadores": 272,
   "total_eventos_validados": 272,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Estádio Cícero Pompeu de Toledo",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 25395,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://saopaulofc.net/no-morumbis-tricolor-derrota-o-internacional-pelo-campeonato-brasileiro",
       "arbitro": "Bruno Arleu de Araujo",
       "stats": [
         {
@@ -559,7 +559,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-19T23:31:03.379533-03:00"
+      "atualizado_em": "2026-09-19T23:31:03.379533-03:00",
+      "renda": 907260,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841247": {
       "event_id": "401841247",
@@ -153484,5 +153486,5 @@
     }
   },
   "total_com_publico_pagante": 260,
-  "total_com_renda": 270
+  "total_com_renda": 271
 }

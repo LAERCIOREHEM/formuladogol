@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "_comentario": "Estado por campo da camada IA de público/renda. Não há esgotamento definitivo: lacunas permanecem em backoff até serem resolvidas documentalmente.",
-  "gerado_em": "2026-09-19T23:45:33-03:00",
+  "gerado_em": "2026-09-20T01:51:55-03:00",
   "jogos": {
     "401841244": {
       "schema_version": 2,
@@ -10,44 +10,21 @@
       "campos": {
         "publico": {
           "status": "pending",
-          "tentativas": 2,
-          "ultima_tentativa": "2026-09-19T23:45:33-03:00",
-          "proxima_tentativa": "2026-09-20T00:45:33-03:00",
+          "tentativas": 3,
+          "ultima_tentativa": "2026-09-20T01:51:55-03:00",
+          "proxima_tentativa": "2026-09-20T02:51:55-03:00",
           "backoff_minutos": 60
         },
         "renda": {
           "status": "pending",
-          "tentativas": 2,
-          "ultima_tentativa": "2026-09-19T23:45:33-03:00",
-          "proxima_tentativa": "2026-09-20T00:45:33-03:00",
+          "tentativas": 3,
+          "ultima_tentativa": "2026-09-20T01:51:55-03:00",
+          "proxima_tentativa": "2026-09-20T02:51:55-03:00",
           "backoff_minutos": 60
         }
       },
       "esgotado": false,
-      "proxima_tentativa": "2026-09-20T00:45:33-03:00"
-    },
-    "401841247": {
-      "schema_version": 2,
-      "rodada": 28,
-      "partida": "Vasco da Gama x Coritiba",
-      "campos": {
-        "publico": {
-          "status": "resolved",
-          "tentativas": 1,
-          "ultima_tentativa": "2026-09-19T23:45:33-03:00",
-          "resolvido_em": "2026-09-19T23:45:33-03:00",
-          "proxima_tentativa": ""
-        },
-        "renda": {
-          "status": "resolved",
-          "tentativas": 1,
-          "ultima_tentativa": "2026-09-19T23:45:33-03:00",
-          "resolvido_em": "2026-09-19T23:45:33-03:00",
-          "proxima_tentativa": ""
-        }
-      },
-      "esgotado": false,
-      "proxima_tentativa": ""
+      "proxima_tentativa": "2026-09-20T02:51:55-03:00"
     },
     "401841243": {
       "schema_version": 2,
@@ -55,30 +32,30 @@
       "partida": "São Paulo x Internacional",
       "campos": {
         "publico": {
-          "status": "pending",
-          "tentativas": 1,
-          "ultima_tentativa": "2026-09-19T23:45:33-03:00",
-          "proxima_tentativa": "2026-09-20T00:15:33-03:00",
-          "backoff_minutos": 30
+          "status": "resolved",
+          "tentativas": 2,
+          "ultima_tentativa": "2026-09-20T01:51:55-03:00",
+          "resolvido_em": "2026-09-20T01:51:55-03:00",
+          "proxima_tentativa": ""
         },
         "renda": {
-          "status": "pending",
-          "tentativas": 1,
-          "ultima_tentativa": "2026-09-19T23:45:33-03:00",
-          "proxima_tentativa": "2026-09-20T00:15:33-03:00",
-          "backoff_minutos": 30
+          "status": "resolved",
+          "tentativas": 2,
+          "ultima_tentativa": "2026-09-20T01:51:55-03:00",
+          "resolvido_em": "2026-09-20T01:51:55-03:00",
+          "proxima_tentativa": ""
         }
       },
       "esgotado": false,
-      "proxima_tentativa": "2026-09-20T00:15:33-03:00"
+      "proxima_tentativa": ""
     }
   },
   "esgotados": [],
   "ultima_execucao": {
-    "pendentes_avaliados": 3,
+    "pendentes_avaliados": 2,
     "aceitos": 1,
     "rejeitados": 0,
-    "nao_encontrados": 2,
+    "nao_encontrados": 1,
     "erro": "",
     "rejeicoes_detalhadas": [
       {
@@ -87,76 +64,65 @@
           "modelo declarou que não encontrou"
         ],
         "nao_e_erro": true
-      },
-      {
-        "event_id": "401841243",
-        "motivos": [
-          "modelo declarou que não encontrou"
-        ],
-        "nao_e_erro": true
       }
     ],
     "fontes_consultadas": [
-      "https://365scores.com/pt-br/apostas/palpites/internacional-x-sao-paulo",
+      "https://83fdbff3-efa9-42ab-9fe1-42b84b9193bb.internacional.com.br/noticias/servico-de-jogo/ingressos-a-venda-para-apoiar-o-inter-no-morumbis",
       "https://acervosantista.com.br/13-10-1976-remo-1-x-2-santos-campeonato-brasileiro",
       "https://arxiv.org/abs/2008.02322",
-      "https://clubedoremo.com.br/noticias/remo-inicia-venda-de-ingressos-para-partida-diante-do-santos",
+      "https://as.com/futbol/internacional/un-brasileirao-de-record-f202601-n",
+      "https://atribuna.com.br/esportes/santos-fc/santos-vence-o-remo-no-fim-e-chega-a-quarta-vitoria-seguida-no-brasileir-o-1.530192",
+      "https://bpachannel.com/2026/05/veja-os-publicos-da-17a-rodada-do-campeonato-brasileiro",
+      "https://cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/remo-x-santos-fc/832170",
+      "https://conteudo.fpf.org.br/Competicoes/2026/3973/boletins-financeiros/36/boletins/36.pdf",
+      "https://diariooficial.palmas.to.gov.br/media/diario/3940-28-4-2026-21-38-22.pdf",
+      "https://en.wikipedia.org/wiki/2026_Clube_do_Remo_season",
+      "https://en.wikipedia.org/wiki/2026_Santos_FC_season",
       "https://es.wikipedia.org/wiki/Campeonato_Brasile%C3%B1o_de_F%C3%BAtbol_Serie_A_2026",
-      "https://esportes.terra.com.br/infograficos/campeonato-brasileiro-2013-serie-a.pdf",
-      "https://esportes.terra.com.br/infograficos/campeonato-brasileiro-2014-serie-b.pdf",
-      "https://futebolinterior.com.br/vasco-5-x-0-coritiba-cruzmaltino-goleia-e-dorme-fora-do-z4",
-      "https://futebolpaulista.com.br/Repositorio/Institucional/2023/1402169_BALAN%C3%87OSPFC_2018_2.pdf",
-      "https://futebolpaulista.com.br/Repositorio/Institucional/2025/420-2026-7%20SPFC%20DF%2031%2012%202025%20RAI%20PDF%20ass%20%281%29.pdf",
       "https://gazetaesportiva.com/times/sao-paulo/sao-paulo-recorde-publico-morumbis-2026",
-      "https://ge.globo.com/ba/futebol/times/bahia/noticia/2026/09/14/bahia-2-x-1-remo-assista-aos-gols-e-aos-melhores-momentos-do-jogo.ghtml",
-      "https://ge.globo.com/gato-mestre/noticia/2026/09/06/remo-0-x-1-flamengo-tem-o-maior-publico-da-26a-rodada-do-brasileirao-veja-a-lista.ghtml",
-      "https://ge.globo.com/google/amp/gato-mestre/noticia/2025/10/31/flamengo-domina-rankings-de-publico-e-renda-dos-brasileiros-na-libertadores-2025-veja-numeros.ghtml",
-      "https://ge.globo.com/google/amp/gato-mestre/noticia/2026/07/23/veja-os-publicos-da-19a-rodada-do-campeonato-brasileiro.ghtml",
-      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/02/06/autor-do-primeiro-gol-do-remo-na-elite-apos-32-anos-joao-pedro-e-o-primeiro-guineense-a-marcar-nos-pontos-corridos.ghtml",
-      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/07/24/remo-encerra-turno-com-apenas-duas-rodadas-fora-do-z-4-um-dos-piores-mandantes-e-incomodando-gigantes.ghtml",
-      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/08/05/remo-bate-proprio-recorde-de-publico-no-ano-em-eliminacao-para-o-santos.ghtml",
-      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/08/24/pos-copa-do-remo-tem-eliminacao-e-apenas-uma-vitoria.ghtml",
-      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/09/01/analise-no-melhor-jogo-do-ano-remo-aprende-com-o-coritiba-que-eficiencia-vale-mais-que-volume.ghtml",
-      "https://goapostas.com/palpites/remo-x-santos-palpite-brasileirao-serie-a-19-09-2026",
+      "https://ge.globo.com/google/amp/pa/futebol/times/remo/noticia/2026/08/05/remo-bate-proprio-recorde-de-publico-no-ano-em-eliminacao-para-o-santos.ghtml",
+      "https://hemeroteca-pdf.bn.gov.br/348970/per348970_1931_06980.pdf",
+      "https://hemeroteca-pdf.bn.gov.br/761036/per761036_1951_00587.pdf",
       "https://hemeroteca-pdf.bn.gov.br/761036/per761036_1951_00709.pdf",
-      "https://hemeroteca-pdf.bn.gov.br/761036/per761036_1989_22312.pdf",
-      "https://hemeroteca-pdf.bn.gov.br/761036/per761036_1989_22515.pdf",
-      "https://ioepa.com.br/pages/2025/2025.10.01.DOE.pdf",
-      "https://netflu.com.br/sao-paulo-x-internacional-palpites-prognostico-serie-a-19-09-2026",
-      "https://netvasco.com.br/n/392974/sao-januario-recebeu-19943-torcedores-para-vasco-x-coritiba",
-      "https://netvasco.com.br/news/noticias16/arquivos/20260401-174640-1-.pdf",
-      "https://pm.pa.gov.br/phocadownload/userupload/userupload/sales.44248/BG%20N%20172%20de%2013%20SET%202024.pdf",
-      "https://portalicoaraci.com.br/",
-      "https://portaltela.com/esportes/2026/05/14/publicos-dos-jogos-de-volta-da-quinta-fase-da-copa-do-brasil-sao-divulgados",
-      "https://pt.wikipedia.org/wiki/Campeonato_Paulista_de_Futebol_de_2026",
+      "https://hemeroteca.ihgg.org/publicacoes/DIARIO_DA_MANHA/1996/08/DIARIO_DA_MANHA_1996_08_26.pdf",
+      "https://ingressos.internacional.com.br/noticias/tv-inter/saiba-onde-assistir-ao-confronto-entre-inter-e-sao-paulo",
+      "https://jornaisdesergipe.ufs.br/bitstream/123456789/44515/1/Jornal%20da%20Cidade%201973.09.25.pdf",
+      "https://lance.com.br/sites-de-apostas/palpites/remo-x-santos-19-09-2026.html",
+      "https://lance.com.br/temporeal/partida/brasileirao-serie-a-2026-19-09-2026-remo-paxsantos",
+      "https://legado.internacional.com.br/jogos/masculino/brasileirao-2026/19-09-2026-brasileirao-2026-sao-paulo-x-internacional",
+      "https://oliberal.com/esportes/amp/bahia-engata-quarto-triunfo-seguido-bate-o-remo-e-entra-no-g-4-do-brasileirao-1.1168776",
+      "https://oliberal.com/esportes/parazao/re-pa-da-final-do-parazao-leva-mais-de-46-mil-torcedores-ao-mangueirao-1.1094573",
+      "https://oliberal.com/esportes/remo/amp/remo-garante-renda-milionaria-em-jogo-contra-o-santos-veja-quanto-o-leao-azul-arrecadou-1.1153727",
+      "https://oliberal.com/esportes/remo/amp/remo-x-flamengo-leva-mais-de-51-mil-ao-mangueirao-e-gera-renda-milionaria-veja-numeros-1.1165943",
+      "https://oliberal.com/esportes/remo/gabigol-decide-santos-vence-e-remo-segue-afundado-na-zona-de-rebaixamento-1.1170830",
+      "https://oliberal.com/esportes/remo/remo-registra-maior-publico-na-serie-a-mas-tem-parte-da-renda-bloqueada-1.1109622",
+      "https://placadojogo.com/jogo/2026-09-19-remo-x-santos",
+      "https://pt.wikipedia.org/wiki/Campeonato_Brasileiro_de_Futebol_de_2026_-_S%C3%A9rie_A",
       "https://pt.wikipedia.org/wiki/Est%C3%A1dio_do_Morumbi",
-      "https://pt.wikipedia.org/wiki/Liga_do_Futebol_Brasileiro",
-      "https://pt.wikipedia.org/wiki/P%C3%BAblicos_do_Clube_do_Remo",
       "https://pt.wikipedia.org/wiki/Temporada_do_S%C3%A3o_Paulo_Futebol_Clube_de_2019",
-      "https://publicoerenda.com.br/clubes/remo",
-      "https://radiofa.com.br/noticias/remo-fatura-milhoes-com-publico-gigante-diante-do-flamengo",
-      "https://reddit.com/r/futebol/comments/1nke1hj",
-      "https://reddit.com/r/futebol/comments/1whbwxh/m%C3%A9dia_de_p%C3%BAblico_do_brasileir%C3%A3o_2026",
-      "https://reddit.com/r/futebol/comments/1wkzlwf/match_thread_campeonato_brasileiro_vasco_x",
-      "https://reddit.com/r/futebol/comments/1wl3987/r_rique_vasco_5_x_0_coritiba_brasileir%C3%A3o_s%C3%A9rie_a",
-      "https://reddit.com/r/futebol/comments/1wl3iy2/postmatch_thread_campeonato_brasileiro_vasco_5_x",
-      "https://reddit.com/r/vasco/comments/1vu0dfp/o_vasco_est%C3%A1_classificado_para_as_quartas_da",
-      "https://reddit.com/r/vasco/comments/1vuoq2d/vasco_entra_na_justi%C3%A7a_para_mandar_jogo_contra_o",
-      "https://reddit.com/r/vasco/comments/1whkrk1/o_vasco_da_gama_encara_o_boca_juniors_arg_as",
-      "https://reddit.com/r/vasco/comments/1wjujhh/s%C3%A3o_janu%C3%A1rio_na_semifinal_da_sul_americana_sim",
-      "https://reddit.com/r/vasco/comments/1wkax4m/hoje_tem_vasco_em_s%C3%A3o_janu%C3%A1rio_pelo_brasileir%C3%A3o",
-      "https://reddit.com/r/vasco/comments/1wkyz1f/match_thread_campeonato_brasileiro_vasco_x",
-      "https://reddit.com/r/vasco/comments/1wl3iwl/postmatch_thread_campeonato_brasileiro_vasco_5_x",
+      "https://publicoerenda.com.br/clubes/sao-paulo",
+      "https://reddit.com/r/ClubeDoRemo/comments/1wkvzrf/match_thread_campeonato_brasileiro_remo_x_santos",
+      "https://reddit.com/r/ClubeDoRemo/comments/1wl11lt/postmatch_thread_campeonato_brasileiro_remo_1_x_2",
+      "https://reddit.com/r/SaoPauloFC/comments/1pdhx5d/jogo_campeonato_brasileiro_s%C3%A3o_paulo_x",
+      "https://reddit.com/r/SaoPauloFC/comments/1s9y2yg/jogo_campeonato_brasileiro_internacional_x_s%C3%A3o",
+      "https://reddit.com/r/SaoPauloFC/comments/1wgjuxp/s%C3%A3o_paulo_deve_quebrar_recorde_de_p%C3%BAblico_no_ano",
+      "https://reddit.com/r/SaoPauloFC/comments/1wl0bwm/jogo_campeonato_brasileiro_s%C3%A3o_paulo_x",
+      "https://reddit.com/r/SaoPauloFC/comments/1wl44xc/p%C3%B3sjogo_campeonato_brasileiro_s%C3%A3o_paulo_1_x_0",
+      "https://reddit.com/r/futebol/comments/1s9y2uj/match_thread_campeonato_brasileiro_internacional",
+      "https://reddit.com/r/futebol/comments/1wl0bvr/match_thread_campeonato_brasileiro_s%C3%A3o_paulo_x",
+      "https://reddit.com/r/futebol/comments/1wl44w7/postmatch_thread_campeonato_brasileiro_s%C3%A3o_paulo",
+      "https://reddit.com/r/internacional/comments/1wklk3r/hoje_tem_inter",
+      "https://reddit.com/r/internacional/comments/1wl070n/jogo_sampa_x_colorado",
+      "https://riopretoprev.sp.gov.br/wp-content/uploads/2026/03/Relatorio-diligencia-2semestre-2025-e-abertura-da-carteira.pdf",
+      "https://sampi.net.br/arquivos/capas/f62618120e393af4f0ab922a2a440c881923686607.pdf",
       "https://saopaulofc.net/ingressos-para-sao-paulo-x-internacional-pelo-brasileirao-3",
-      "https://sindesp-pa.com.br/PDF/ebooks/20250512090543000049.pdf",
-      "https://spdiario.com.br/media/uploads/pdfs/2026__-__edicoes/2026-03-23_diariosp_segunda.pdf",
-      "https://spfcpedia.com.br/ebooks/site/anuario-2021.pdf",
-      "https://spfcpedia.com.br/ebooks/site/cartel-tricolor-sansao.pdf",
-      "https://spfcticket.net/jogo/sao-paulo-fc-x-sc-internacional-brasileirao-betano-2026",
-      "https://sports.sbt.com.br/noticia/sul-americana-1/sao-paulo-reage-tarde-empata-com-o-boca-e-cai-da-sul-americana",
-      "https://terra.com.br/amp/esportes/vasco/reforcos-brilham-e-vasco-arrasa-o-coxa-barreira-virou-baile%2Ceca509c8c705c13fdf820e8c83da1074tzon3l1t.html",
-      "https://terra.com.br/esportes",
-      "https://terra.com.br/esportes/futebol/com-torcida-sao-paulo-arrecadou-mais-de-r-2-milhoes%2Cb0ec37866465d8f5c92b886b44caf64d5xuonuk2.html"
+      "https://saopaulofc.net/no-morumbis-tricolor-derrota-o-internacional-pelo-campeonato-brasileiro",
+      "https://sc.internacional.com.br/",
+      "https://spfcpedia.com.br/ebooks/site/material-de-imprensa-pre-jogo-2024.pdf",
+      "https://static.ndmais.com.br/2026/04/022_flo_esporte-2.pdf",
+      "https://stcbfsiteprdimgbrs.blob.core.windows.net/img-site/cdn/Tabela_Detalhada_BSA_2026_16_03_68b0c066c3.pdf",
+      "https://www1.folha.uol.com.br/esporte/2026/09/sao-paulo-vence-inter-por-1-a-0-depois-de-eliminacao-da-sul-americana.shtml",
+      "https://x.twstalker.com/mundo_sportiv"
     ]
   },
   "migracao_schema_2": "Estados legados esgotados foram reabertos; registros já resolvidos foram descartados.",
