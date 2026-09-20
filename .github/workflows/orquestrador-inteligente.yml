@@ -105,6 +105,7 @@ jobs:
           ACAO: ${{ steps.plano.outputs.acao }}
           EVENT_ID: ${{ steps.plano.outputs.event_id }}
           RODADA: ${{ steps.plano.outputs.rodada }}
+          CHECKPOINT: ${{ steps.plano.outputs.checkpoint }}
         shell: bash
         run: |
           set -euo pipefail
@@ -113,7 +114,8 @@ jobs:
               gh workflow run atualizar-brasileirao.yml --ref main
               ;;
             publicos)
-              gh workflow run atualizar-publicos-brasileirao.yml --ref main
+              test -n "$EVENT_ID"
+              gh workflow run atualizar-publicos-brasileirao.yml --ref main -f modo=partida -f event_id="$EVENT_ID"
               ;;
             melhores_momentos)
               if [[ -n "${EVENT_ID:-}" ]]; then

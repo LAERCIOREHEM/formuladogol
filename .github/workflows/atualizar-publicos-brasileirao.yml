@@ -1,11 +1,25 @@
 name: Atualizar públicos do Brasileirão
-run-name: Públicos · incremental
+run-name: Públicos · ${{ inputs.modo || 'automatico' }} · ${{ inputs.event_id || 'geral' }}
 
 on:
   # Sem schedule próprio. O orquestrador dispara somente quando existe partida
   # FINAL com lacuna de público/renda e o backoff da pendência venceu.
   workflow_dispatch:
     inputs:
+      modo:
+        description: "Modo da coleta: automático, partida específica ou backlog"
+        required: true
+        default: automatico
+        type: choice
+        options:
+          - automatico
+          - partida
+          - backlog
+      event_id:
+        description: "event_id ESPN (obrigatório no modo partida)"
+        required: false
+        default: ''
+        type: string
       reabrir_esgotados:
         description: "Compatibilidade: zerar manualmente o backoff de público/renda (normalmente desnecessário no schema v2)"
         type: boolean
@@ -65,9 +79,17 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_PUBLICOS_MODEL: ${{ vars.OPENAI_PUBLICOS_MODEL || vars.OPENAI_MODEL || 'gpt-5.6-sol' }}
           REABRIR: ${{ inputs.reabrir_esgotados }}
+          MODO: ${{ inputs.modo || 'automatico' }}
+          EVENT_ID: ${{ inputs.event_id }}
         run: |
           set -euo pipefail
           cp dados-br/publicos-complementares.json /tmp/publicos-antes.json
+
+          case "${MODO:-automatico}" in automatico|partida|backlog) ;; *) echo "::error::Modo inválido: $MODO"; exit 2 ;; esac
+          if [[ "${MODO:-automatico}" == "partida" && -z "${EVENT_ID:-}" ]]; then
+            echo "::error::O modo partida exige event_id."
+            exit 2
+          fi
 
           # Fluxo correto: coletor determinístico PRIMEIRO; IA somente como fallback
           # para o que continuar faltando. A IA usa web_search amplo e obrigatório,
@@ -81,21 +103,37 @@ jobs:
               estado = json.loads(caminho.read_text(encoding='utf-8'))
           except Exception:
               estado = {}
-          estado['jogos'] = {}
+          alvo = __import__('os').environ.get('EVENT_ID', '').strip()
+          jogos = estado.get('jogos') if isinstance(estado.get('jogos'), dict) else {}
+          if alvo:
+              jogos.pop(alvo, None)
+              estado['jogos'] = jogos
+              print(f'Backoff zerado somente para {alvo}.')
+          else:
+              estado['jogos'] = {}
+              print('Backoff zerado para todas as pendências.')
           estado['esgotados'] = []
           caminho.write_text(json.dumps(estado, ensure_ascii=False, indent=2) + "\n", encoding='utf-8')
-          print('Marcadores de esgotado zerados a pedido do disparo manual.')
           PY
           fi
 
-          # Fonte documental determinística/primária. Se preencher tudo, a IA
-          # detectará zero pendências e não consumirá chamada OpenAI.
-          python scripts/atualizar_publicos_brasileirao.py --max-rodadas 3
+          # Fonte documental determinística/primária. Em modo partida o coletor
+          # fica preso ao event_id escolhido; nenhuma lacuna antiga compete com ele.
+          DET_CMD=(python scripts/atualizar_publicos_brasileirao.py --max-rodadas 3)
+          if [[ "${MODO:-automatico}" == "partida" ]]; then
+            DET_CMD+=(--event-id "$EVENT_ID" --max-rodadas 1)
+          fi
+          "${DET_CMD[@]}"
+
+          IA_CMD=(python scripts/completar_publicos_ia.py --grace-horas 0.5 --modo "${MODO:-automatico}")
+          case "${MODO:-automatico}" in
+            partida) IA_CMD+=(--event-id "$EVENT_ID" --max-jogos 1) ;;
+            automatico) IA_CMD+=(--max-jogos 1) ;;
+            backlog) IA_CMD+=(--max-jogos 10) ;;
+          esac
 
           set +e
-          python scripts/completar_publicos_ia.py \
-            --grace-horas 0.5 \
-            --max-jogos 10 2>&1 | tee /tmp/camada-ia.log
+          "${IA_CMD[@]}" 2>&1 | tee /tmp/camada-ia.log
           IA_RC=${PIPESTATUS[0]}
           set -e
 
@@ -162,25 +200,59 @@ jobs:
         if: always()
         env:
           NOVOS: ${{ steps.coleta.outputs.novos }}
+          MODO: ${{ inputs.modo || 'automatico' }}
+          EVENT_ID: ${{ inputs.event_id }}
         shell: bash
         run: |
           {
             echo "## Públicos do Brasileirão"
             echo ""
+            echo "- **Modo:** \`${MODO:-automatico}\`"
+            if [[ -n "${EVENT_ID:-}" ]]; then echo "- **event_id alvo:** \`$EVENT_ID\`"; fi
             if [[ "${NOVOS:-false}" == "true" ]]; then
-              echo "- **Resultado:** novos públicos encontrados e derivados atualizados"
+              echo "- **Resultado:** novos dados encontrados e derivados atualizados"
             else
               echo "- **Resultado:** nenhuma informação nova; snapshot preservado"
             fi
             echo ""
-            echo "### Camada de IA"
+            echo "### Diagnóstico OpenAI/Web Search"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, pathlib
+          prefix = 'FDG_DIAGNOSTICO_JSON='
+          log = pathlib.Path('/tmp/camada-ia.log').read_text(encoding='utf-8', errors='replace') if pathlib.Path('/tmp/camada-ia.log').exists() else ''
+          rows = [line[len(prefix):] for line in log.splitlines() if line.startswith(prefix)]
+          if not rows:
+              print('- Diagnóstico estruturado: **indisponível**')
+          else:
+              try:
+                  d = json.loads(rows[-1])
+              except Exception:
+                  print('- Diagnóstico estruturado: **inválido**')
+              else:
+                  print(f"- OpenAI chamada: **{'SIM' if d.get('openai_called') else 'NÃO'}**")
+                  if d.get('model'): print(f"- Modelo: `{d.get('model')}`")
+                  print(f"- Web Search: **{'SIM' if d.get('web_search') else 'NÃO'}**")
+                  print(f"- Buscas executadas: **{int(d.get('web_search_calls') or 0)}**")
+                  print(f"- Referências retornadas: **{int(d.get('source_rows') or 0)}**")
+                  print(f"- Resultado: **{d.get('resultado') or 'sem diagnóstico'}**")
+                  urls = d.get('urls') or []
+                  if urls:
+                      print('- Fontes efetivamente retornadas/lidas:')
+                      for url in urls[:12]: print(f"  - {url}")
+                  rejeitados = d.get('rejeitados') or []
+                  if rejeitados:
+                      print('- Rejeições/ausências:')
+                      for row in rejeitados[:10]:
+                          print(f"  - `{row.get('event_id') or '?'}`: {'; '.join(row.get('motivos') or [])}")
+          PY
+
+          {
             echo ""
+            echo "### Log final da camada de IA"
             echo '```'
-            if [[ -s /tmp/camada-ia.log ]]; then
-              tail -n 40 /tmp/camada-ia.log
-            else
-              echo "camada de IA não produziu saída"
-            fi
+            if [[ -s /tmp/camada-ia.log ]]; then tail -n 35 /tmp/camada-ia.log; else echo "camada de IA não produziu saída"; fi
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           exit 0

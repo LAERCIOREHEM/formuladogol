@@ -1,12 +1,18 @@
 name: Guardião IA de transmissões
-run-name: Guardião transmissões · ${{ inputs.event_id }} · T${{ inputs.checkpoint }}
+run-name: Guardião transmissões · ${{ inputs.event_ids || inputs.event_id }} · T${{ inputs.checkpoint }}
 
 on:
   workflow_dispatch:
     inputs:
       event_id:
-        description: 'event_id da partida a auditar'
-        required: true
+        description: 'event_id único da partida (compatibilidade/manual)'
+        required: false
+        default: ''
+        type: string
+      event_ids:
+        description: 'Lista CSV de event_ids para auditoria em lote no mesmo checkpoint'
+        required: false
+        default: ''
         type: string
       checkpoint:
         description: 'Checkpoint em minutos (ex.: -1440, -360, -90, -15, 10)'
@@ -47,6 +53,29 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Preparar alvos da auditoria
+        env:
+          EVENT_ID: ${{ inputs.event_id }}
+          EVENT_IDS: ${{ inputs.event_ids }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY' >> "$GITHUB_ENV"
+          import os
+          raw = os.environ.get('EVENT_IDS', '').strip() or os.environ.get('EVENT_ID', '').strip()
+          ids = []
+          for part in raw.replace(';', ',').split(','):
+              value = part.strip()
+              if value and value not in ids:
+                  ids.append(value)
+          if not ids:
+              raise SystemExit('ERRO: informe event_id ou event_ids')
+          if len(ids) > 8:
+              raise SystemExit('ERRO: lote do Guardião limitado a 8 partidas por execução')
+          print('TARGET_EVENT_IDS=' + ','.join(ids))
+          print('TARGET_LABEL=' + '+'.join(ids))
+          PY
+
       - name: Instalar cliente HTTP do coletor
         run: python -m pip install --disable-pip-version-check --no-cache-dir curl-cffi==0.15.0
 
@@ -72,7 +101,6 @@ jobs:
       - name: Revalidar player YouTube já conhecido
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-          EVENT_ID: ${{ inputs.event_id }}
         shell: bash
         run: |
           set -euo pipefail
@@ -80,7 +108,10 @@ jobs:
             echo "::warning title=YouTube não revalidado::YOUTUBE_API_KEY ausente; Guardião continuará com Web Search."
             exit 0
           fi
-          python scripts/buscar_transmissoes_aovivo_brasileirao.py --event-id "$EVENT_ID" --no-search
+          IFS=',' read -ra IDS <<< "$TARGET_EVENT_IDS"
+          for EVENT_ID in "${IDS[@]}"; do
+            python scripts/buscar_transmissoes_aovivo_brasileirao.py --event-id "$EVENT_ID" --no-search
+          done
 
       - name: Atualizar fontes determinísticas antes da IA
         run: python scripts/atualizar_transmissoes_tv_brasileirao.py
@@ -89,22 +120,22 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_TRANSMISSION_MODEL: ${{ vars.OPENAI_TRANSMISSION_MODEL || vars.OPENAI_MODEL || 'gpt-5.6-sol' }}
-          EVENT_ID: ${{ inputs.event_id }}
           CHECKPOINT: ${{ inputs.checkpoint }}
           FORCE: ${{ inputs.force }}
         shell: bash
         run: |
           set -euo pipefail
-          CMD=(python scripts/guardiao_transmissoes_ia.py --event-id "$EVENT_ID" --checkpoint "$CHECKPOINT")
-          if [[ "${FORCE:-false}" == "true" ]]; then CMD+=(--force); fi
-          "${CMD[@]}"
+          IFS=',' read -ra IDS <<< "$TARGET_EVENT_IDS"
+          for EVENT_ID in "${IDS[@]}"; do
+            CMD=(python scripts/guardiao_transmissoes_ia.py --event-id "$EVENT_ID" --checkpoint "$CHECKPOINT")
+            if [[ "${FORCE:-false}" == "true" ]]; then CMD+=(--force); fi
+            "${CMD[@]}"
+          done
 
       - name: Reconciliar grade final sem nova rede
         run: python scripts/atualizar_transmissoes_tv_brasileirao.py --local-only
 
       - name: Validar publicação reconciliada
-        env:
-          EVENT_ID: ${{ inputs.event_id }}
         shell: bash
         run: |
           set -euo pipefail
@@ -115,7 +146,7 @@ jobs:
           if [[ -f dados-br/auditoria-transmissoes-guardiao.json ]]; then python -m json.tool dados-br/auditoria-transmissoes-guardiao.json >/dev/null; fi
           python - <<'PY'
           import json, os
-          event_id = os.environ['EVENT_ID']
+          event_ids = [x for x in os.environ['TARGET_EVENT_IDS'].split(',') if x]
           tv = json.load(open('dados-br/transmissoes-tv.json', encoding='utf-8'))
           guardian = {}
           try:
@@ -123,20 +154,19 @@ jobs:
           except FileNotFoundError:
               pass
           manual = json.load(open('transmissoes.json', encoding='utf-8'))
-          g = (guardian.get('jogos') or {}).get(event_id)
-          out = (tv.get('jogos') or {}).get(event_id)
-          manual_rule = next((x for x in manual.get('transmissoes') or [] if str(x.get('event_id') or '') == event_id), None)
-          if g and not manual_rule:
-              assert out, f'{event_id}: Guardião resolveu mas TV final não publicou o jogo'
-              assert set(out.get('canais') or []) == set(g.get('canais') or []), \
-                  f"{event_id}: grade final diverge do Guardião: {out.get('canais')} != {g.get('canais')}"
-          print('Reconciliação do Guardião validada para', event_id)
+          for event_id in event_ids:
+              g = (guardian.get('jogos') or {}).get(event_id)
+              out = (tv.get('jogos') or {}).get(event_id)
+              manual_rule = next((x for x in manual.get('transmissoes') or [] if str(x.get('event_id') or '') == event_id), None)
+              if g and not manual_rule:
+                  assert out, f'{event_id}: Guardião resolveu mas TV final não publicou o jogo'
+                  assert set(out.get('canais') or []) == set(g.get('canais') or []), \
+                      f"{event_id}: grade final diverge do Guardião: {out.get('canais')} != {g.get('canais')}"
+              print('Reconciliação do Guardião validada para', event_id)
           PY
 
       - name: Commitar apenas mudança factual/auditoria do Guardião
         id: publish
-        env:
-          EVENT_ID: ${{ inputs.event_id }}
         shell: bash
         run: |
           set -euo pipefail
@@ -180,7 +210,7 @@ jobs:
               exit 0
             fi
             git add -- "${FILES[@]}"
-            git commit -m "Auditar transmissão ${EVENT_ID} com Guardião IA - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+            git commit -m "Auditar transmissões ${TARGET_LABEL} com Guardião IA - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
             if git push origin HEAD:main; then
               echo "published=true" >> "$GITHUB_OUTPUT"
               exit 0
@@ -199,14 +229,14 @@ jobs:
       - name: Resumo
         if: always()
         env:
-          EVENT_ID: ${{ inputs.event_id }}
           CHECKPOINT: ${{ inputs.checkpoint }}
         shell: bash
         run: |
           {
             echo "## Guardião IA de transmissões"
             echo ""
-            echo "- event_id: \`$EVENT_ID\`"
+            echo "- event_ids: \`$TARGET_EVENT_IDS\`"
+            echo "- partidas no lote: \`$(awk -F, '{print NF}' <<< "$TARGET_EVENT_IDS")\`"
             echo "- checkpoint: \`T$CHECKPOINT\`"
             echo "- modelo padrão: \`gpt-5.6-sol\`"
             echo "- política: fontes determinísticas → Web Search → validação → overlay → reconciliação local"
