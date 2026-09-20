@@ -1,16 +1,17 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-19",
-  "executado_em": "2026-09-19T11:46:47-03:00",
+  "data_brt": "2026-09-20",
+  "executado_em": "2026-09-20T11:51:16-03:00",
   "status": "atencao",
-  "resumo": "Auditoria concluída. Não há pendências de público/renda, transmissão ou melhores momentos que exijam investigação ou correção. Foram registrados avisos de falha em 2 fontes de transmissão, sem perda crítica de cobertura.",
+  "resumo": "A pendência de público e renda do evento 401841244 permanece sem correção automática: a fonte consultada confirma a realização da partida, mas não declara diretamente números de público nem renda bruta documental.",
   "triagem": {
-    "data_hora_brt": "2026-09-19T11:46:47-03:00",
+    "data_hora_brt": "2026-09-20T11:51:16-03:00",
     "saude": {
       "status_deterministico": "atencao",
       "criticos": [],
       "avisos": [
-        "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura"
+        "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura",
+        "1 público(s) ainda elegíveis para complementação"
       ],
       "indicadores": {
         "estatisticas_erros_criticos": 0,
@@ -21,11 +22,24 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 6.6
+        "ultimo_sucesso_horas": 6.7
       }
     },
     "pendencias": {
-      "publicos": [],
+      "publicos": [
+        {
+          "event_id": "401841244",
+          "rodada": 28,
+          "data_iso": "2026-09-19T18:30",
+          "mandante": "Remo",
+          "visitante": "Santos",
+          "horas_desde_fim": 15.4,
+          "faltando": [
+            "publico",
+            "renda"
+          ]
+        }
+      ],
       "transmissoes": [],
       "melhores_momentos_apos_24h": []
     },
@@ -51,21 +65,47 @@
     "limite_chamadas_dia": 1,
     "falhas_consecutivas": 0,
     "erro": "",
-    "web_habilitada": false,
-    "web_searches": 0,
-    "web_tool_calls": 0,
-    "web_acoes": [],
-    "fontes_web": []
+    "web_habilitada": true,
+    "web_searches": 1,
+    "web_tool_calls": 1,
+    "web_acoes": [
+      {
+        "type": "search",
+        "queries": [
+          "Remo Santos 19 setembro 2026 público renda 401841244"
+        ]
+      }
+    ],
+    "fontes_web": [
+      "https://ge.globo.com/gato-mestre/noticia/2026/05/22/ranking-de-publico-2026-flamengo-amplia-distancia-na-lideranca-corinthians-segue-em-segundo.ghtml",
+      "https://ge.globo.com/gato-mestre/noticia/2026/07/23/veja-os-publicos-da-19a-rodada-do-campeonato-brasileiro.ghtml",
+      "https://ge.globo.com/gato-mestre/noticia/2026/07/24/flamengo-domina-rankings-de-publico-e-renda-no-primeiro-turno-do-brasileiro-2026-veja-balanco.ghtml",
+      "https://ge.globo.com/google/amp/gato-mestre/noticia/2026/03/13/flamengo-lidera-ranking-de-media-de-publico-em-2026-corinthians-e-o-segundo-colocado-veja-ranking.ghtml",
+      "https://ge.globo.com/google/amp/gato-mestre/noticia/2026/07/23/veja-os-publicos-da-19a-rodada-do-campeonato-brasileiro.ghtml",
+      "https://ge.globo.com/google/amp/pa/futebol/times/remo/noticia/2026/08/05/remo-bate-proprio-recorde-de-publico-no-ano-em-eliminacao-para-o-santos.ghtml",
+      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/09/06/remo-e-flamengo-e-jogo-de-maior-publico-do-mangueirao-em-2026-e-um-dos-maiores-apos-reforma.ghtml",
+      "https://transparencia.santosfc.com.br/wp-content/uploads/2024/01/ESTATUTO-SOCIAL-2022.pdf",
+      "https://transparencia.santosfc.com.br/wp-content/uploads/2025/04/Parecer-do-Conselho-Fiscal-Ano-2023.pdf",
+      "https://transparencia.santosfc.com.br/wp-content/uploads/2025/06/4.-Publicacao-DOU-SLI-2403762.pdf",
+      "https://transparencia.santosfc.com.br/wp-content/uploads/documentos/Parecer%20Fiscal/2025%20-%20RELAT%C3%93RIO%20DO%203%C2%BA%20TRIMESTRE.pdf",
+      "https://transparencia.santosfc.com.br/wp-content/uploads/documentos/Presta%C3%A7%C3%A3o%20de%20Contas/Balan%C3%A7os/2011%20-%20Balan%C3%A7o%20Auditado%20Publica%C3%A7%C3%A3o%20Jornal.pdf",
+      "https://transparencia.santosfc.com.br/wp-content/uploads/documentos/Presta%C3%A7%C3%A3o%20de%20Contas/Balan%C3%A7os/2012%20-%20Balan%C3%A7o%20Auditado%20Publica%C3%A7%C3%A3o%20Jornal.pdf",
+      "https://www.lance.com.br/temporeal/partida/brasileirao-serie-a-2026-19-09-2026-remo-paxsantos",
+      "https://www.santosfc.com.br/santos-fc-bate-remo-por-2-a-1-e-emplaca-quarta-vitoria-seguida-no-brasileirao",
+      "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/09/19/remo-x-santos-campeonato-brasileiro.amp.htm",
+      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/19/remo-x-santos-horario-e-onde-assistir-ao-jogo-do-brasileirao.ghtm",
+      "https://www1.folha.uol.com.br/esporte/2026/09/gabigol-decide-no-fim-e-santos-vence-o-remo-no-mangueirao.shtml"
+    ]
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "Auditoria concluída. Não há pendências de público/renda, transmissão ou melhores momentos que exijam investigação ou correção. Foram registrados avisos de falha em 2 fontes de transmissão, sem perda crítica de cobertura.",
+    "resumo": "A pendência de público e renda do evento 401841244 permanece sem correção automática: a fonte consultada confirma a realização da partida, mas não declara diretamente números de público nem renda bruta documental.",
     "problemas": [
       {
-        "categoria": "fonte",
+        "categoria": "publico",
         "severidade": "atencao",
-        "mensagem": "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura. Os dados finais de cobertura permanecem íntegros; não há intervenção necessária.",
-        "event_id": "",
+        "mensagem": "Não foi encontrada, na consulta disponível, declaração direta e inequívoca de público presente ou total e de renda bruta para Remo x Santos. Manter ambos os campos pendentes, sem estimativa ou conversão de público pagante.",
+        "event_id": "401841244",
         "requer_intervencao": false
       }
     ],
@@ -599,6 +639,19 @@
       "resumo": "Auditoria concluída. Não há pendências de público/renda, transmissão ou melhores momentos que exijam investigação ou correção. Foram registrados avisos de falha em 2 fontes de transmissão, sem perda crítica de cobertura.",
       "chamadas_openai": 1,
       "web_searches": 0,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-20",
+      "executado_em": "2026-09-20T11:51:16-03:00",
+      "status": "atencao",
+      "resumo": "A pendência de público e renda do evento 401841244 permanece sem correção automática: a fonte consultada confirma a realização da partida, mas não declara diretamente números de público nem renda bruta documental.",
+      "chamadas_openai": 1,
+      "web_searches": 1,
       "publicos_aplicados": 0,
       "transmissoes_aplicadas": 0,
       "editoriais_aplicados": [],
