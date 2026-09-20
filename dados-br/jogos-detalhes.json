@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-20T13:21:12.167300-03:00",
+  "gerado_em": "2026-09-20T14:06:44.388612-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 273,
   "total_com_estatisticas": 273,
-  "total_com_publico": 271,
+  "total_com_publico": 272,
   "total_com_eventos": 273,
   "total_com_jogadores": 273,
   "total_eventos_validados": 273,
@@ -20,9 +20,9 @@
       "placar_mandante": 0,
       "placar_visitante": 0,
       "estadio": "Arena do Grêmio",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 50694,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://esporte.ig.com.br/parceiros/jogada10/2026-09-20/com-brilho-de-weverton--gremio-segura-empate-contra-o-palmeiras.html",
       "arbitro": "Paulo Cezar Zanovelli Da Silva",
       "stats": [
         {
@@ -593,7 +593,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-20T13:21:00.764167-03:00"
+      "atualizado_em": "2026-09-20T13:21:00.764167-03:00",
+      "renda": 3614527.2,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841243": {
       "event_id": "401841243",
@@ -154069,5 +154071,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 260,
+  "total_com_renda": 272
 }

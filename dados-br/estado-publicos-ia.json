@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "_comentario": "Estado por campo da camada IA de público/renda. Não há esgotamento definitivo: lacunas permanecem em backoff até serem resolvidas documentalmente.",
-  "gerado_em": "2026-09-20T13:28:09-03:00",
+  "gerado_em": "2026-09-20T14:06:36-03:00",
   "jogos": {
     "401841244": {
       "schema_version": 2,
@@ -32,103 +32,69 @@
       "partida": "Grêmio x Palmeiras",
       "campos": {
         "publico": {
-          "status": "pending",
-          "tentativas": 1,
-          "ultima_tentativa": "2026-09-20T13:28:09-03:00",
-          "proxima_tentativa": "2026-09-20T13:58:09-03:00",
-          "backoff_minutos": 30
+          "status": "resolved",
+          "tentativas": 2,
+          "ultima_tentativa": "2026-09-20T14:06:36-03:00",
+          "resolvido_em": "2026-09-20T14:06:36-03:00",
+          "proxima_tentativa": ""
         },
         "renda": {
-          "status": "pending",
-          "tentativas": 1,
-          "ultima_tentativa": "2026-09-20T13:28:09-03:00",
-          "proxima_tentativa": "2026-09-20T13:58:09-03:00",
-          "backoff_minutos": 30
+          "status": "resolved",
+          "tentativas": 2,
+          "ultima_tentativa": "2026-09-20T14:06:36-03:00",
+          "resolvido_em": "2026-09-20T14:06:36-03:00",
+          "proxima_tentativa": ""
         }
       },
       "esgotado": false,
-      "proxima_tentativa": "2026-09-20T13:58:09-03:00"
+      "proxima_tentativa": ""
     }
   },
   "esgotados": [],
   "ultima_execucao": {
-    "pendentes_avaliados": 2,
-    "aceitos": 0,
+    "pendentes_avaliados": 1,
+    "aceitos": 1,
     "rejeitados": 0,
-    "nao_encontrados": 2,
+    "nao_encontrados": 0,
     "erro": "",
-    "rejeicoes_detalhadas": [
-      {
-        "event_id": "401841244",
-        "motivos": [
-          "modelo declarou que não encontrou"
-        ],
-        "nao_e_erro": true
-      },
-      {
-        "event_id": "401841246",
-        "motivos": [
-          "modelo declarou que não encontrou"
-        ],
-        "nao_e_erro": true
-      }
-    ],
+    "rejeicoes_detalhadas": [],
     "fontes_consultadas": [
-      "https://acervosantista.com.br/13-10-1976-remo-1-x-2-santos-campeonato-brasileiro",
-      "https://atribuna.com.br/esportes/santos-fc/santos-vence-o-remo-no-fim-e-chega-a-quarta-vitoria-seguida-no-brasileir-o-1.530192",
       "https://atribunamt.com.br/wp-content/uploads/2025/11/edicao-26-11-2025-1.pdf",
-      "https://cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/remo-x-santos-fc/832170",
-      "https://conteudo.fpf.org.br/Competicoes/2026/3973/boletins-financeiros/72/boletins/72.pdf",
-      "https://datafc.com.br/pt/jogos/2026-09-19-brasileirao-serie-a-remo-santos-100",
-      "https://demo.futnews.app/campeonato-brasileiro/2026/partida/remo-x-santos-280",
-      "https://diariodopeixe.com.br/noticias/veja-qual-foi-o-lucro-do-santos-na-vitoria-contra-o-cruzeiro-no-brasileirao",
+      "https://conteudo.fpf.org.br/Competicoes/2025/70100/boletins-financeiros/136/boletins/136.pdf",
       "https://es.wikipedia.org/wiki/Campeonato_Brasile%C3%B1o_de_F%C3%BAtbol_Serie_A_2026",
-      "https://futebol80.com.br/links/times/ceara/cearaft.htm",
-      "https://futebol80.com.br/links/times/gremio/gremioft.htm",
-      "https://futebol80.com.br/links/times/palmeiras/palmeirasfichas/palmeirasft2026.htm",
-      "https://ge.globo.com/gato-mestre/noticia/2026/09/06/remo-0-x-1-flamengo-tem-o-maior-publico-da-26a-rodada-do-brasileirao-veja-a-lista.ghtml",
-      "https://ge.globo.com/google/amp/gato-mestre/noticia/2026/07/24/flamengo-domina-rankings-de-publico-e-renda-no-primeiro-turno-do-brasileiro-2026-veja-balanco.ghtml",
-      "https://ge.globo.com/google/amp/gato-mestre/noticia/2026/09/04/gre-nal-registra-a-maior-renda-da-copa-do-brasil-2026-veja-ranking.ghtml",
-      "https://ge.globo.com/google/amp/pa/futebol/times/remo/noticia/2026/05/11/remo-bate-proprio-recorde-e-garante-maior-publico-da-15a-rodada-da-serie-a.ghtml",
-      "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/09/03/gre-nal-da-copa-do-brasil-quebra-recorde-e-vira-maior-publico-da-historia-da-arena-do-gremio.ghtml",
+      "https://esporte.ig.com.br/parceiros/jogada10/2026-09-20/com-brilho-de-weverton--gremio-segura-empate-contra-o-palmeiras.html",
+      "https://gremio.net//contato",
       "https://gremio.net/noticias/detalhes/26822/servico--gremio-x-palmeiras-pelo-brasileirao",
       "https://gremionews.com.br/bastidores/3829-quanto-o-gremio-ja-arrecadou-de-bilheteria-em-jogos-na-arena-em-2026",
-      "https://hemeroteca.ciasc.sc.gov.br/jornais/cidadedeblumenau/1970/CID1970570.pdf",
-      "https://j1diario.com.br/wp-content/uploads/2025/03/03-29-25.pdf",
-      "https://jornaisdesergipe.ufs.br/bitstream/123456789/45864/1/Jornal%20da%20Cidade%201978.09.18.pdf",
-      "https://lullyfm.com/veja-os-clubes-que-mais-arrecadaram-com-bilheteria-em-2026-ate-aqui",
-      "https://memoria.pr.gov.br/pergamumweb/vinculos/0001c1/0001c19f.pdf",
+      "https://grenal.net.br/lista-publicos-grenais.php",
+      "https://meatbrasil.com.br/wp-content/uploads/2023/09/estado-sp.pdf",
       "https://palmeiras.com.br/jogo",
       "https://palmeiras.com.br/noticias/gremio-x-palmeiras-informacoes-estatisticas-e-curiosidades-7",
       "https://palmeiras.com.br/wp-content/uploads/2026/03/Relatorio-Palmeiras-2026-WEB.pdf",
-      "https://palmeiras.com.br/wp-content/uploads/2026/06/Relatorio-Palmeiras-2025-v8.pdf",
+      "https://plurisports.com.br/wp-content/uploads/2023/05/Relatorio-Mensal-Renda-e-Ticket-Medio-Abr23-Parte-II.pdf",
       "https://portal.gremio.net/noticias/brasileirao-venda-de-ingressos-para-gremio-x-palmeiras-inicia-hoje-14-09-2026",
+      "https://portal.gremio.net/noticias/gremio-registra-maior-publico-de-sua-historia-na-arena-04-09-2026",
+      "https://portaldogremista.com.br/wp-content/uploads/2026/02/portaldogremista.com.br-vai-para-o-jogo-veja-o-guia-completo-de-gremio-e-juventude-na-arena-guia-grexjuv-gau-26-semifinal.pdf",
+      "https://portaldopalestra.com.br/gremio-0-x-0-palmeiras-brasileirao-rodada-28-resultado",
       "https://prefeitura.poa.br/eptc/noticias/confira-o-esquema-de-transito-e-transporte-para-gremio-x-palmeiras",
       "https://pt.wikipedia.org/wiki/Arena_Barueri",
       "https://pt.wikipedia.org/wiki/Arena_do_Gr%C3%AAmio",
-      "https://pt.wikipedia.org/wiki/Campeonato_Brasileiro_de_Futebol_de_1971",
-      "https://pt.wikipedia.org/wiki/Estat%C3%ADsticas_da_Neo_Qu%C3%ADmica_Arena",
+      "https://pt.wikipedia.org/wiki/Confrontos_entre_Gr%C3%AAmio_e_Palmeiras_no_futebol",
       "https://pt.wikipedia.org/wiki/Grenal",
-      "https://pt.wikipedia.org/wiki/P%C3%BAblicos_no_Campeonato_Brasileiro_de_Futebol",
-      "https://publicoerenda.com.br/",
+      "https://pt.wikipedia.org/wiki/Sociedade_Esportiva_Palmeiras",
       "https://publicoerenda.com.br/clubes/gremio",
-      "https://reddit.com/r/ClubeDoRemo/comments/1wkvzrf/match_thread_campeonato_brasileiro_remo_x_santos",
-      "https://reddit.com/r/ClubeDoRemo/comments/1wl11lt/postmatch_thread_campeonato_brasileiro_remo_1_x_2",
+      "https://reddit.com/r/CRFla/comments/1t93ybe/n%C3%A3o_tem_jeito_%C3%A9_o_trem_pagador_do_futebol",
+      "https://reddit.com/r/futebol/comments/1fn4c5i",
+      "https://reddit.com/r/futebol/comments/1gmzvx1",
       "https://reddit.com/r/futebol/comments/1wlgihm/match_thread_campeonato_brasileiro_gr%C3%AAmio_x",
       "https://reddit.com/r/futebol/comments/1wlkxnb/postmatch_thread_campeonato_brasileiro_gr%C3%AAmio_0_x",
-      "https://reddit.com/r/gremio/comments/1saxbxf/match_thread_campeonato_brasileiro_palmeiras_x",
-      "https://reddit.com/r/gremio/comments/1wl5e96/hoje_tem_gr%C3%AAmiooo",
       "https://reddit.com/r/gremio/comments/1wlgils/match_thread_campeonato_brasileiro_gr%C3%AAmio_x",
       "https://reddit.com/r/gremio/comments/1wlkxt8/postmatch_thread_campeonato_brasileiro_gr%C3%AAmio_0_x",
+      "https://reddit.com/r/palmeiras/comments/1gmzvvv",
       "https://reddit.com/r/palmeiras/comments/1wlgik9/match_thread_campeonato_brasileiro_gr%C3%AAmio_x",
       "https://reddit.com/r/palmeiras/comments/1wlkxqy/postmatch_thread_campeonato_brasileiro_gr%C3%AAmio_0_x",
       "https://reddit.com/r/sepalmeiras/comments/1wlgiid/match_thread_campeonato_brasileiro_gr%C3%AAmio_x",
-      "https://reddit.com/r/sepalmeiras/comments/1wlkxoj/postmatch_thread_campeonato_brasileiro_gr%C3%AAmio_0_x",
-      "https://sampi.net.br/arquivos/capas/aa09495c8dddc5957d0385a062bf2f36689922286.pdf",
-      "https://santosfc.com.br/santos-fc-bate-remo-por-2-a-1-e-emplaca-quarta-vitoria-seguida-no-brasileirao",
-      "https://spfcpedia.com.br/ebooks/site/30-anos-do-brasileiro-de-1991.pdf",
-      "https://spfcpedia.com.br/ebooks/site/cartel-tricolor-sansao.pdf",
-      "https://stigabc.org.br/wp-content/uploads/2025/07/publicacao-09.11.pdf"
+      "https://reddit.com/r/sepalmeiras/comments/1wlkxoj/postmatch_thread_campeonato_brasileiro_gr%C3%AAmio_0_x"
     ]
   },
   "migracao_schema_2": "Estados legados esgotados foram reabertos; registros já resolvidos foram descartados.",
