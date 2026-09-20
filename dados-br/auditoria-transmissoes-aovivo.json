@@ -17,8 +17,8 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 4,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 30,
-    "search_api_fallback_chamadas": 0,
+    "candidatos_oficiais_encontrados": 31,
+    "search_api_fallback_chamadas": 4,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 4,
@@ -199,6 +199,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "QI_orExVqdI",
+      "url": "https://www.youtube.com/watch?v=QI_orExVqdI",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: BRASIL X ARGENTINA | PRÉ-OLÍMPICO MASCULINO DE VÔLEI | ge tv",
+      "status": "live",
+      "inicio_programado": "2026-09-20T09:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "lHXt6D_tO8E",
       "url": "https://www.youtube.com/watch?v=lHXt6D_tO8E",
       "fonte": "sbt",
@@ -354,7 +364,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: ATLÉTICO DE MADRID X REAL MADRID | LALIGA 26/27 | 7ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-20T10:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -394,7 +404,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: GETAFE X MÁLAGA | LALIGA 26/27 | 7ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-20T08:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -424,7 +434,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): TÊNIS DE MESA | FINAIS DO WTT STAR CONTENDER DE ASTANA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-20T09:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -434,7 +444,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: COLÔMBIA X NIGÉRIA | COPA DO MUNDO FEMININA SUB-20 FIFA 2026 | QUARTAS DE FINAL",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-20T09:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -473,13 +483,14 @@
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 87,
+    "unidades": 488,
     "requisicoes": {
       "channels": 4,
-      "videos": 43,
-      "playlistItems": 40
+      "videos": 44,
+      "playlistItems": 40,
+      "search": 4
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-20T05:00:53-03:00"
+  "atualizado_em": "2026-09-20T09:30:54-03:00"
 }
