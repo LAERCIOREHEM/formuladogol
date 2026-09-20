@@ -59,6 +59,7 @@ CONFIG_ORQ = ROOT / "dados-br" / "config-orquestrador.json"
 
 FUSO_BRASILIA = timezone(timedelta(hours=-3))
 OPENAI_URL = "https://api.openai.com/v1/responses"
+DIAG_PREFIX = "FDG_DIAGNOSTICO_JSON="
 DEFAULT_MODEL = "gpt-5.6-sol"
 
 # Público e renda são ficha técnica, não interpretação editorial. Fontes oficiais,
@@ -271,6 +272,8 @@ def pendencias(
     max_tentativas: int,
     max_jogos: int,
     agora: datetime,
+    modo: str = "automatico",
+    event_id_alvo: str = "",
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     del max_tentativas  # legado CLI: não existe mais limite definitivo de tentativas.
     resultados = carregar_json(RESULTADOS, {})
@@ -319,6 +322,9 @@ def pendencias(
         event_id = str(bruto.get("event_id") or bruto.get("id") or "").strip()
         if not event_id:
             continue
+        alvo = str(event_id_alvo or "").strip()
+        if alvo and event_id != alvo:
+            continue
         det = jogos_det.get(event_id) if isinstance(jogos_det, Mapping) else None
         cmp_ = jogos_comp.get(event_id) if isinstance(jogos_comp, Mapping) else None
         if not isinstance(det, Mapping) or det.get("placar_mandante") is None:
@@ -362,7 +368,10 @@ def pendencias(
         estado_jogo = tentativas.get(event_id) if isinstance(tentativas.get(event_id), Mapping) else {}
         # Cada campo tem agenda própria. Público resolvido não paralisa renda e
         # nenhuma lacuna é abandonada definitivamente por contagem de tentativas.
-        faltando_due = [campo for campo in faltando_real if _field_due(estado_jogo, campo, ended, agora)]
+        # Uma partida explicitamente solicitada já foi escolhida pelo
+        # orquestrador (ou pelo operador). Nesse modo não há competição com o
+        # backlog e o backoff global não pode expulsá-la da chamada atual.
+        faltando_due = list(faltando_real) if alvo else [campo for campo in faltando_real if _field_due(estado_jogo, campo, ended, agora)]
         if not faltando_due:
             continue
 
@@ -381,13 +390,19 @@ def pendencias(
             "faltando": faltando_due,
         })
 
-    # Prioriza o mais antigo entre os elegíveis para que uma pendência histórica
-    # não seja eternamente preterida por jogos recém-encerrados.
-    pendentes.sort(key=lambda item: (item.get("finalizado_em") or "", item.get("event_id") or ""))
+    # "backlog" é deliberadamente antigo→novo. O modo automático, quando
+    # chamado sem event_id, prioriza o jogo mais recente. O modo "partida"
+    # contém no máximo o alvo explícito e não compete com nenhum outro jogo.
+    reverso = str(modo or "automatico").lower() != "backlog"
+    pendentes.sort(
+        key=lambda item: (item.get("finalizado_em") or "", item.get("event_id") or ""),
+        reverse=reverso,
+    )
     estado["schema_version"] = 2
     estado["jogos"] = tentativas
     estado["esgotados"] = []
-    return pendentes[: max(1, int(max_jogos))], estado
+    limite = 1 if str(event_id_alvo or "").strip() else max(1, int(max_jogos))
+    return pendentes[:limite], estado
 
 
 # --------------------------------------------------------------------------- #
@@ -523,6 +538,24 @@ def coletar_fontes(resposta: Mapping[str, Any]) -> set[str]:
                 if alvo:
                     urls.add(alvo)
     return urls
+
+
+def diagnostico_web(resposta: Mapping[str, Any]) -> dict[str, Any]:
+    calls = 0
+    source_rows = 0
+    for item in resposta.get("output") or []:
+        if not isinstance(item, Mapping) or item.get("type") != "web_search_call":
+            continue
+        calls += 1
+        action = item.get("action") or {}
+        if isinstance(action, Mapping):
+            source_rows += sum(1 for row in (action.get("sources") or []) if isinstance(row, Mapping))
+    urls = sorted(coletar_fontes(resposta))
+    return {"web_search_calls": calls, "source_rows": source_rows, "urls": urls[:60]}
+
+
+def emitir_diagnostico(payload: Mapping[str, Any]) -> None:
+    print(DIAG_PREFIX + json.dumps(dict(payload), ensure_ascii=False, separators=(",", ":")))
 
 
 def chamar_openai(payload: Mapping[str, Any], api_key: str, timeout: int = 210) -> dict[str, Any]:
@@ -981,6 +1014,8 @@ def main() -> int:
     parser.add_argument("--grace-horas", type=float, default=GRACE_HORAS_PADRAO)
     parser.add_argument("--max-tentativas", type=int, default=MAX_TENTATIVAS_PADRAO)
     parser.add_argument("--max-jogos", type=int, default=MAX_JOGOS_PADRAO)
+    parser.add_argument("--modo", choices=["automatico", "partida", "backlog"], default="automatico")
+    parser.add_argument("--event-id", default="", help="No modo partida, força esta partida a entrar sozinha na pesquisa.")
     parser.add_argument(
         "--reabrir-esgotados",
         action="store_true",
@@ -995,6 +1030,11 @@ def main() -> int:
         return self_test()
 
     agora = agora_brt()
+    alvo = str(args.event_id or "").strip()
+    if args.modo == "partida" and not alvo:
+        raise PublicoIAError("--modo partida exige --event-id")
+    if alvo and args.modo != "partida":
+        args.modo = "partida"
 
     if args.reabrir_esgotados and not args.dry_run:
         estado_atual = carregar_json(ESTADO, {})
@@ -1011,12 +1051,20 @@ def main() -> int:
         max_tentativas=args.max_tentativas,
         max_jogos=args.max_jogos,
         agora=agora,
+        modo=args.modo,
+        event_id_alvo=alvo,
     )
 
     def encerrar(motivo: str, *, contar_tentativa: bool) -> int:
         """Sempre deixa rastro em disco: sem isto não há como auditar a camada."""
         if args.dry_run:
             print(f"[dry-run] {motivo}")
+            emitir_diagnostico({
+                "modo": args.modo, "event_id": alvo, "openai_called": False,
+                "model": "", "web_search": False, "web_search_calls": 0,
+                "source_rows": 0, "urls": [], "resultado": motivo,
+                "pendentes": [str(p.get("event_id") or "") for p in pendentes],
+            })
             print("novos=false")
             return 0
         if contar_tentativa:
@@ -1041,6 +1089,12 @@ def main() -> int:
             novo_estado["esgotados"] = []
         salvar_json(ESTADO, novo_estado)
         print(motivo)
+        emitir_diagnostico({
+            "modo": args.modo, "event_id": alvo, "openai_called": False,
+            "model": "", "web_search": False, "web_search_calls": 0,
+            "source_rows": 0, "urls": [], "resultado": motivo,
+            "pendentes": [str(p.get("event_id") or "") for p in pendentes],
+        })
         print("novos=false")
         return 0
 
@@ -1068,9 +1122,11 @@ def main() -> int:
     aceitos: list[dict[str, Any]] = []
     rejeitados: list[dict[str, Any]] = []
     fontes_web: set[str] = set()
+    web_diag: dict[str, Any] = {"web_search_calls": 0, "source_rows": 0, "urls": []}
     try:
         resposta = chamar_openai(montar_payload(pendentes, model, max_tool_calls), api_key)
         fontes_web = coletar_fontes(resposta)
+        web_diag = diagnostico_web(resposta)
         propostas = (resposta.get("_parsed") or {}).get("jogos") or []
         aceitos, rejeitados = validar(propostas, pendentes, fontes_web)
     except PublicoIAError as exc:
@@ -1081,6 +1137,12 @@ def main() -> int:
         estado = atualizar_estado_erro_tecnico(estado, pendentes, erro, agora)
         salvar_json(ESTADO, estado)
         print(f"Falha técnica: nova tentativa em {TECHNICAL_RETRY_MINUTES} min sem consumir tentativa documental.")
+        emitir_diagnostico({
+            "modo": args.modo, "event_id": alvo, "openai_called": True, "model": model,
+            "web_search": bool(web_diag.get("web_search_calls")), **web_diag,
+            "resultado": "erro_tecnico", "erro": erro,
+            "pendentes": [str(p.get("event_id") or "") for p in pendentes],
+        })
         print("novos=false")
         return 0
 
@@ -1106,6 +1168,14 @@ def main() -> int:
             estado["ultima_execucao"]["fontes_consultadas"] = sorted(fontes_web)[:60]
         salvar_json(ESTADO, estado)
 
+    emitir_diagnostico({
+        "modo": args.modo, "event_id": alvo, "openai_called": True, "model": model,
+        "web_search": bool(web_diag.get("web_search_calls")), **web_diag,
+        "pendentes": [str(p.get("event_id") or "") for p in pendentes],
+        "aceitos": [str(x.get("event_id") or "") for x in aceitos],
+        "rejeitados": [{"event_id": str(x.get("event_id") or ""), "motivos": list(x.get("motivos") or [])} for x in rejeitados],
+        "resultado": "dados_novos" if gravados else "nao_encontrado_ou_sem_alteracao",
+    })
     print(f"novos={'true' if gravados else 'false'}")
     return 0
 

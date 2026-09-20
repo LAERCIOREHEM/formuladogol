@@ -1430,6 +1430,20 @@ def render_stats(stats: Mapping[str, Any]) -> str:
     )
 
 
+def phase_event_ids(ties: Sequence[Mapping[str, Any]]) -> list[str]:
+    return sorted({
+        str(event.get('event_id') or '')
+        for tie in ties
+        for event in (tie.get('pernas') or [])
+        if str(event.get('event_id') or '').strip()
+    })
+
+
+def phase_mm_snapshot(ties: Sequence[Mapping[str, Any]], mm: Mapping[str, Any]) -> dict[str, Any]:
+    games = mm.get('jogos') if isinstance(mm.get('jogos'), Mapping) else {}
+    return {event_id: games[event_id] for event_id in phase_event_ids(ties) if event_id in games}
+
+
 def build_article(rank: int, ties: Sequence[Mapping[str, Any]], mm: Mapping[str, Any], now: datetime, stats: Mapping[str, Any] | None = None, content: Mapping[str, Any] | None = None, origin: str = 'deterministico-jornalistico') -> dict[str, Any]:
     phase, slug_phase, menu_label = PHASES[rank]
     content = dict(content or editorial_copy(rank, ties))
@@ -1439,7 +1453,13 @@ def build_article(rank: int, ties: Sequence[Mapping[str, Any]], mm: Mapping[str,
     participants = sorted({club for tie in ties for club in tie['brasileiros']})
     eliminated = sorted(set(participants) - set(qualified))
     linked = sum(1 for tie in ties for event in tie['pernas'] if video_entry_valid(((mm.get('jogos') or {}).get(str(event.get('event_id') or '')) or {}), event, tie['competicao']))
-    dossier = {'render_version': RENDER_VERSION, 'fase_ordem': rank, 'confrontos': ties, 'mm': mm.get('jogos') or {}, 'estatisticas': stats or {}}
+    phase_mm = phase_mm_snapshot(ties, mm)
+    phase_facts = {'render_version': RENDER_VERSION, 'fase_ordem': rank, 'confrontos': ties}
+    phase_stats = stats or {}
+    hash_facts = canon(phase_facts)
+    hash_videos = canon(phase_mm)
+    hash_stats = canon(phase_stats)
+    dossier = {'fatos_fase': phase_facts, 'videos_fase': phase_mm, 'estatisticas_fase': phase_stats}
     return {
         'tipo': 'continentais_fase',
         'id_editorial': article_id,
@@ -1462,8 +1482,14 @@ def build_article(rank: int, ties: Sequence[Mapping[str, Any]], mm: Mapping[str,
         'clubes_brasileiros': participants,
         'hash_dossie': canon(dossier),
         'hash_editorial': canon(content),
-        'hash_melhores_momentos': canon(mm.get('jogos') or {}),
-        'hash_estatisticas': canon(stats or {}),
+        # Fingerprints estritamente limitados à fase deste editorial. Vídeo de
+        # semifinal não invalida artigo das quartas, e vice-versa. Os nomes
+        # legados permanecem por compatibilidade, mas agora têm o mesmo escopo.
+        'hash_fatos_fase': hash_facts,
+        'hash_videos_fase': hash_videos,
+        'hash_estatisticas_fase': hash_stats,
+        'hash_melhores_momentos': hash_videos,
+        'hash_estatisticas': hash_stats,
         'melhores_momentos_vinculados': linked,
         'editorial': content,
         'auditoria_factual': content.get('auditoria') or {},
@@ -1733,7 +1759,13 @@ def publish(dry: bool = False, force_rank: int = 0, usar_ia: bool = False, sem_i
             raise ContinentalEditorialError(f'FALLBACK DETERMINÍSTICO INVÁLIDO (corrija editorial_copy): {exc}') from exc
         raise
     article = build_article(rank, ties, mm, now, stats, content, origin)
-    same = bool(old and old.get('hash_dossie') == article['hash_dossie'] and old.get('hash_melhores_momentos') == article['hash_melhores_momentos'] and old.get('hash_estatisticas') == article['hash_estatisticas'] and old.get('hash_editorial') == article['hash_editorial'])
+    same = bool(
+        old
+        and old.get('hash_fatos_fase') == article['hash_fatos_fase']
+        and old.get('hash_videos_fase') == article['hash_videos_fase']
+        and old.get('hash_estatisticas_fase') == article['hash_estatisticas_fase']
+        and old.get('hash_editorial') == article['hash_editorial']
+    )
     if same and not history_changed:
         print('NONE: editorial continental já está atualizado.')
         return 0
@@ -1795,6 +1827,21 @@ def self_test() -> None:
             )
         ]
         assert not invalid_videos, f'melhores momentos não validados nas quartas: {invalid_videos}'
+
+        # Regressão: mudanças fora da fase não podem alterar o fingerprint do
+        # editorial. Uma mudança em um event_id da própria fase deve alterar.
+        now_fixture = agora_br().replace(year=2026, month=9, day=20, hour=12, minute=0, second=0, microsecond=0)
+        base_article = build_article(700, qf_ties, mm_qf, now_fixture, {}, editorial_copy(700, qf_ties, context=editorial_verified_context(700)))
+        unrelated = json.loads(json.dumps(mm_qf))
+        unrelated.setdefault('jogos', {})['SEMIFINAL-FUTURA-TESTE'] = {'url': 'https://example.invalid/semifinal'}
+        same_phase = build_article(700, qf_ties, unrelated, now_fixture, {}, base_article['editorial'])
+        assert same_phase['hash_fatos_fase'] == base_article['hash_fatos_fase']
+        assert same_phase['hash_videos_fase'] == base_article['hash_videos_fase']
+        phase_id = phase_event_ids(qf_ties)[0]
+        changed = json.loads(json.dumps(mm_qf))
+        changed.setdefault('jogos', {}).setdefault(phase_id, {})['__regression_marker__'] = 'mudou'
+        changed_phase = build_article(700, qf_ties, changed, now_fixture, {}, base_article['editorial'])
+        assert changed_phase['hash_videos_fase'] != base_article['hash_videos_fase']
 
         qf_context = editorial_verified_context(700)
         # O fallback premium precisa passar no mesmo copy desk do conteúdo OpenAI.

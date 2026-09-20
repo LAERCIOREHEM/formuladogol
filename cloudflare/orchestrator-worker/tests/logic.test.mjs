@@ -14,11 +14,13 @@ import {
   latestEligibleRound,
   liveCheckpointDue,
   guardianCheckpointDue,
+  guardianResolution,
   mmRetryInterval,
   normalizeAgenda,
   pendingHighlights,
   pendingPublicsFromAudit,
   publicRetryInterval,
+  publicPendingFingerprint,
   relevantSportsGames,
   roundState,
   sha256Hex,
@@ -88,6 +90,40 @@ test('transmission Guardian uses T-24/T-6/T-90/T-15/T+10 checkpoints', () => {
   assert.equal(guardianCheckpointDue(game, d('2026-09-08T20:31:00Z'), -360), -90);
   assert.equal(guardianCheckpointDue(game, d('2026-09-08T21:46:00Z'), -90), -15);
   assert.equal(guardianCheckpointDue(game, d('2026-09-08T22:11:00Z'), -15), 10);
+});
+
+test('transmission Guardian only runs for a real unresolved transmission gap', () => {
+  const premiere = guardianResolution({
+    eventId: '401',
+    tv: { jogos: { 401: { canais: ['Premiere'], estavel: true, confianca: 'confirmado' } } },
+    liveAuto: { jogos: {} }, liveManual: { jogos: {} }, guardian: { jogos: {} },
+  });
+  assert.equal(premiere.resolved, true);
+  assert.deepEqual(premiere.missing, []);
+  assert.equal(premiere.playerRequired, false);
+
+  const geTv = guardianResolution({
+    eventId: '402',
+    tv: { jogos: { 402: { canais: ['GE TV'], estavel: true, confianca: 'alta' } } },
+    liveAuto: { jogos: {} }, liveManual: { jogos: {} },
+    guardian: { jogos: { 402: { status: 'confirmado', confianca: 0.98, canais: ['GE TV'], youtube: [{ url: 'https://youtube.com/watch?v=ok', valid_for_match: true }] } } },
+  });
+  assert.equal(geTv.resolved, true);
+  assert.equal(geTv.playerRequired, true);
+  assert.equal(geTv.playerResolved, true);
+
+  const missingTv = guardianResolution({ eventId: '403', tv: { jogos: {} }, liveAuto: { jogos: {} }, liveManual: { jogos: {} }, guardian: { jogos: {} } });
+  assert.equal(missingTv.resolved, false);
+  assert.ok(missingTv.missing.includes('tv_ausente'));
+
+  const conflict = guardianResolution({
+    eventId: '404',
+    tv: { jogos: { 404: { canais: ['Premiere'], estavel: true, confianca: 'confirmado' } } },
+    liveAuto: { jogos: {} }, liveManual: { jogos: {} },
+    guardian: { jogos: { 404: { status: 'confirmado', confianca: 0.99, canais: ['Globo'] } } },
+  });
+  assert.equal(conflict.resolved, false);
+  assert.ok(conflict.missing.includes('conflito_fontes'));
 });
 
 test('TV cadence is proportional to missing coverage', () => {
@@ -304,16 +340,29 @@ test('rent-only audit gap remains eligible even when attendance is already known
   assert.equal(pending.length, 1);
   assert.deepEqual(pending[0].missingFields, ['renda']);
 });
+
+test('public pending fingerprint tracks only the fields that are still missing', () => {
+  assert.equal(publicPendingFingerprint({ missingFields: ['renda', 'publico', 'renda'] }), 'publico+renda');
+  assert.equal(publicPendingFingerprint({ missingFields: ['renda'] }), 'renda');
+  assert.equal(publicPendingFingerprint({ missingFields: [] }), 'reconciliar');
+});
 test('dispatch mapping is targeted and deterministic', () => {
   assert.deepEqual(dispatchSpec({ action: 'melhores_momentos', eventId: '401' }), {
     workflow: 'buscar-melhores-momentos-getv.yml', inputs: { modo: 'incremental', event_id: '401' },
   });
   assert.equal(dispatchSpec({ action: 'editorial_rodada', round: 22 }).inputs.rodada, '22');
+  assert.deepEqual(dispatchSpec({ action: 'publicos', eventId: '401' }), {
+    workflow: 'atualizar-publicos-brasileirao.yml', inputs: { modo: 'partida', event_id: '401' },
+  });
   assert.deepEqual(dispatchSpec({ action: 'transmissoes_guardian', eventId: '401', checkpoint: -90 }), {
     workflow: 'auditar-transmissoes-ia.yml', inputs: { event_id: '401', checkpoint: '-90' },
   });
+  assert.deepEqual(dispatchSpec({ action: 'transmissoes_guardian', eventIds: ['402', '401', '401'], checkpoint: -90 }), {
+    workflow: 'auditar-transmissoes-ia.yml', inputs: { event_ids: '401,402', checkpoint: '-90' },
+  });
   assert.equal(actionKey({ action: 'transmissao_aovivo', eventId: '401', checkpoint: -20 }), 'transmissao_aovivo:401:-20');
   assert.equal(actionKey({ action: 'transmissoes_guardian', eventId: '401', checkpoint: -90 }), 'transmissoes_guardian:401:-90');
+  assert.equal(actionKey({ action: 'transmissoes_guardian', eventIds: ['402', '401'], checkpoint: -90, fingerprint: 'gap' }), 'transmissoes_guardian:401,402:-90:gap');
 });
 
 test('continental joint gate reconciles false Final on leg 2 and ignores foreign-only pending matches', () => {

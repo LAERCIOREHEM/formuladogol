@@ -72,6 +72,7 @@ MM_MANUAL_PATH = ROOT / "dados-br" / "melhores-momentos-manual.json"
 MM_COPA_PATH = ROOT / "dados-br" / "melhores-momentos-copa-do-brasil.json"
 TV_PATH = ROOT / "dados-br" / "transmissoes-tv.json"
 TV_AUDIT_PATH = ROOT / "dados-br" / "auditoria-transmissoes-tv.json"
+GUARDIAN_PATH = ROOT / "dados-br" / "transmissoes-guardiao.json"
 LIVE_PATH = ROOT / "dados-br" / "transmissoes-aovivo.json"
 LIVE_MANUAL_PATH = ROOT / "dados-br" / "transmissoes-aovivo-manual.json"
 ANALYSES_PATH = ROOT / "dados-br" / "analises.json"
@@ -1123,6 +1124,73 @@ def transmission_live_decision(
     )
 
 
+def _channel_key(value: Any) -> str:
+    return str(value or "").strip().casefold()
+
+
+def _strong_tv_confidence(value: Any) -> bool:
+    return _channel_key(value) in {"confirmado", "confirmada", "alta", "high", "verified", "verificado"}
+
+
+def _published_player_valid(row: Any) -> bool:
+    if not isinstance(row, Mapping):
+        return False
+    candidates = [row.get("principal"), *((row.get("alternativas") or []) if isinstance(row.get("alternativas"), list) else [])]
+    for item in candidates:
+        if not isinstance(item, Mapping):
+            continue
+        url = str(item.get("url") or "").strip()
+        title = str(item.get("titulo") or "").casefold()
+        scope = str(item.get("escopo") or "").casefold()
+        if not url.startswith(("http://", "https://")):
+            continue
+        if any(token in title for token in ("aquecimento", "pré-jogo", "pre-game", "melhores momentos")):
+            continue
+        if str(item.get("status") or "").casefold() in {"live", "upcoming"} or scope in {"partida", "match"}:
+            return True
+    return False
+
+
+def transmission_guardian_resolution(event_id: str) -> tuple[bool, tuple[str, ...]]:
+    """Retorna resolvido + lacunas; checkpoint sozinho nunca autoriza o Guardião."""
+    tv = load_json(TV_PATH, {})
+    guardian = load_json(GUARDIAN_PATH, {})
+    live_auto = load_json(LIVE_PATH, {})
+    live_manual = load_json(LIVE_MANUAL_PATH, {})
+    tv_row = ((tv.get("jogos") or {}).get(event_id) if isinstance(tv, Mapping) else None) or {}
+    guard_row = ((guardian.get("jogos") or {}).get(event_id) if isinstance(guardian, Mapping) else None) or {}
+    live_row = ((live_manual.get("jogos") or {}).get(event_id) if isinstance(live_manual, Mapping) else None) or ((live_auto.get("jogos") or {}).get(event_id) if isinstance(live_auto, Mapping) else None) or {}
+
+    missing: list[str] = []
+    channels = sorted({_channel_key(value) for value in (tv_row.get("canais") or []) if str(value or "").strip()}) if isinstance(tv_row, Mapping) else []
+    if not channels:
+        missing.append("tv_ausente")
+
+    try:
+        guard_confidence = float(guard_row.get("confianca") or 0) if isinstance(guard_row, Mapping) else 0.0
+    except (TypeError, ValueError):
+        guard_confidence = 0.0
+    guardian_strong = isinstance(guard_row, Mapping) and str(guard_row.get("status") or "").casefold() in {"confirmado", "corrigido"} and guard_confidence >= 0.9
+    tv_strong = isinstance(tv_row, Mapping) and tv_row.get("estavel") is True and _strong_tv_confidence(tv_row.get("confianca"))
+    if channels and not tv_strong and not guardian_strong:
+        missing.append("fonte_fraca_ou_instavel")
+
+    if guardian_strong and isinstance(guard_row.get("canais"), list) and guard_row.get("canais"):
+        guardian_channels = sorted({_channel_key(value) for value in guard_row.get("canais") or [] if str(value or "").strip()})
+        if channels and guardian_channels and channels != guardian_channels:
+            missing.append("conflito_fontes")
+
+    player_required = any(name in set(channels) for name in {"ge tv", "cazétv", "cazetv", "sbt"})
+    guard_youtube = guard_row.get("youtube") if isinstance(guard_row, Mapping) else []
+    guard_player = any(
+        isinstance(item, Mapping) and item.get("valid_for_match") is True and str(item.get("url") or "").startswith(("http://", "https://"))
+        for item in (guard_youtube or [])
+    )
+    if player_required and not (guard_player or _published_player_valid(live_row)):
+        missing.append("player_integral_ausente")
+    return not missing, tuple(sorted(set(missing)))
+
+
 def transmission_guardian_decision(
     config: Mapping[str, Any],
     now: datetime,
@@ -1139,6 +1207,9 @@ def transmission_guardian_decision(
     for game in games:
         if game.event_id in final_ids:
             continue
+        resolved, _guardian_missing = transmission_guardian_resolution(game.event_id)
+        if resolved:
+            continue
         delta = (now - game.kickoff).total_seconds() / 60.0
         if delta < min(checkpoints) or delta > max(checkpoints):
             continue
@@ -1151,9 +1222,11 @@ def transmission_guardian_decision(
         return None
     candidates.sort(key=lambda item: abs(item[2]))
     game, checkpoint, _ = candidates[0]
+    _resolved, guardian_missing = transmission_guardian_resolution(game.event_id)
+    pendencias = ",".join(guardian_missing) or "reconciliar"
     return Decision(
         "transmissoes_guardian",
-        f"Guardião de transmissão T{checkpoint:+d} para {game.label}.",
+        f"Guardião de transmissão T{checkpoint:+d} para {game.label}; pendência real: {pendencias}.",
         event_id=game.event_id,
         mode="guardian",
         checkpoint=str(checkpoint),
@@ -1690,6 +1763,41 @@ def self_test() -> int:
             assert not allowed
     finally:
         globals()["TV_PATH"] = original_tv_path
+
+    # O Guardião só pode rodar por pendência factual; checkpoint vencido com
+    # TV estável/resolvida precisa morrer no orquestrador.
+    original_paths = {name: globals()[name] for name in ("TV_PATH", "GUARDIAN_PATH", "LIVE_PATH", "LIVE_MANUAL_PATH")}
+    try:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root_tmp = Path(tmpdir)
+            paths = {
+                "TV_PATH": root_tmp / "tv.json",
+                "GUARDIAN_PATH": root_tmp / "guardian.json",
+                "LIVE_PATH": root_tmp / "live.json",
+                "LIVE_MANUAL_PATH": root_tmp / "live-manual.json",
+            }
+            for name, path in paths.items():
+                globals()[name] = path
+            paths["GUARDIAN_PATH"].write_text('{"jogos":{}}', encoding="utf-8")
+            paths["LIVE_PATH"].write_text('{"jogos":{}}', encoding="utf-8")
+            paths["LIVE_MANUAL_PATH"].write_text('{"jogos":{}}', encoding="utf-8")
+
+            paths["TV_PATH"].write_text(json.dumps({"jogos": {"premiere": {"canais": ["Premiere"], "estavel": True, "confianca": "confirmado"}}}), encoding="utf-8")
+            resolved, missing = transmission_guardian_resolution("premiere")
+            assert resolved and not missing
+
+            paths["TV_PATH"].write_text(json.dumps({"jogos": {"getv": {"canais": ["GE TV"], "estavel": True, "confianca": "alta"}}}), encoding="utf-8")
+            paths["LIVE_PATH"].write_text(json.dumps({"jogos": {"getv": {"principal": {"url": "https://youtube.com/watch?v=ok", "status": "live", "titulo": "A x B AO VIVO", "escopo": "partida"}}}}), encoding="utf-8")
+            resolved, missing = transmission_guardian_resolution("getv")
+            assert resolved and not missing
+
+            paths["TV_PATH"].write_text('{"jogos":{}}', encoding="utf-8")
+            resolved, missing = transmission_guardian_resolution("missing")
+            assert not resolved and "tv_ausente" in missing
+    finally:
+        for name, path in original_paths.items():
+            globals()[name] = path
+
     # TV futura no fallback: 168h saudável, 72h pendência futura, 24h em 14d
     # e 6h se crítica. O Worker Cloudflare é a fonte operacional primária.
     tx_cfg = deep_merge(DEFAULT_CONFIG, {"transmissoes": {

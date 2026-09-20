@@ -21,15 +21,20 @@ test('legacy GitHub orchestrator is manual fallback only', async () => {
   assert.match(yml, /workflow_dispatch:/);
   assert.doesNotMatch(yml, /^\s*schedule:/m);
   assert.match(yml, /-f event_id="\$EVENT_ID"/);
+  assert.match(yml, /atualizar-publicos-brasileirao\.yml --ref main -f modo=partida -f event_id="\$EVENT_ID"/);
 });
 
-test('Cloudflare deploy is explicit shadow/active and protects first install', async () => {
+test('Cloudflare deploy auto-activates on main push and protects first install', async () => {
   const yml = await read('.github/workflows/deploy-orchestrator-worker.yml');
+  assert.match(yml, /push:/);
+  assert.match(yml, /branches: \[main\]/);
   assert.match(yml, /default: "shadow"/);
   assert.match(yml, /Deploy base SHADOW/);
   assert.match(yml, /wrangler secret put GITHUB_TOKEN/);
-  assert.match(yml, /inputs\.mode == 'active'/);
+  assert.match(yml, /github\.event_name == 'push' \|\| inputs\.mode == 'active'/);
   assert.match(yml, /orchestrator\.formuladogol\.com\.br\/health/);
+  assert.match(yml, /transmissionGuardianNeedGate/);
+  assert.match(yml, /targetedPublicResearch/);
 });
 
 test('targeted highlights input reaches both BR scripts and skips Cup broad scan', async () => {
@@ -121,12 +126,37 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(state, /transmissoes_guardian/);
   const index = await read('cloudflare/orchestrator-worker/src/index.js');
   assert.match(index, /transmissionGuardian:\s*true/);
-  assert.match(index, /1\.4\.0/);
+  assert.match(index, /1\.5\.0/);
+  assert.match(index, /transmissionGuardianNeedGate:\s*true/);
+  assert.match(index, /transmissionGuardianBatching:\s*true/);
+  assert.match(index, /targetedPublicResearch:\s*true/);
+  assert.match(index, /continentalPhaseFingerprints:\s*true/);
   assert.match(index, /continentalAgendaAware:\s*true/);
   assert.match(index, /continentalStateIdempotency:\s*true/);
   assert.match(index, /brasileiraoSourceCircuitBreaker:\s*true/);
   assert.match(index, /espnScoreboardGateway:\s*true/);
 });
+
+test('public workflow is targetable and Guardian workflow supports batch event ids', async () => {
+  const publicYml = await read('.github/workflows/atualizar-publicos-brasileirao.yml');
+  const guardianYml = await read('.github/workflows/auditar-transmissoes-ia.yml');
+  const publicAi = await read('scripts/completar_publicos_ia.py');
+  const state = await read('cloudflare/orchestrator-worker/src/orchestrator-state.js');
+  const github = await read('cloudflare/orchestrator-worker/src/github.js');
+  assert.match(publicYml, /modo:/);
+  assert.match(publicYml, /event_id:/);
+  assert.match(publicYml, /--modo/);
+  assert.match(publicYml, /--event-id/);
+  assert.match(publicAi, /FDG_DIAGNOSTICO_JSON=/);
+  assert.match(publicAi, /web_search/);
+  assert.match(guardianYml, /event_ids:/);
+  assert.match(state, /guardianResolution/);
+  assert.match(state, /transmissoes-guardiao\.json/);
+  assert.match(state, /publicPendingFingerprint/);
+  assert.match(github, /modo:\s*'partida'/);
+  assert.match(github, /event_ids/);
+});
+
 
 test('live player state never inherits match live state', async () => {
   const live = await read('js/br-aovivo.js');

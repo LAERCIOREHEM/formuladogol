@@ -11,6 +11,7 @@ import {
   latestEligibleRound,
   liveCheckpointDue,
   guardianCheckpointDue,
+  guardianResolution,
   liveLinkedIds,
   liveSearchAllowed,
   localFinalIds,
@@ -21,6 +22,7 @@ import {
   pendingHighlights,
   pendingPublicsFromAudit,
   publicRetryInterval,
+  publicPendingFingerprint,
   relevantSportsGames,
   resultFinalTime,
   espnDay,
@@ -54,6 +56,7 @@ const SLOW_PATHS = [
   'dados-br/transmissoes-aovivo.json',
   'dados-br/transmissoes-aovivo-manual.json',
   'dados-br/transmissoes-tv.json',
+  'dados-br/transmissoes-guardiao.json',
   'dados-br/auditoria-transmissoes-tv.json',
   'dados-br/calendario-completo.json',
   'dados-br/config-analises.json',
@@ -139,7 +142,7 @@ export class OrchestratorState {
     return {
       ok: true,
       engine: 'fdg-cloudflare-orchestrator',
-      version: String(this.env.ORCHESTRATOR_VERSION || '1.4.0'),
+      version: String(this.env.ORCHESTRATOR_VERSION || '1.5.0'),
       mode: String(this.env.ORCHESTRATOR_MODE || 'shadow'),
       ...status,
       recentDecisions: history.slice(-10).reverse(),
@@ -427,6 +430,7 @@ export class OrchestratorState {
     const liveAuto = data(bundle, 'dados-br/transmissoes-aovivo.json', { jogos: {} });
     const liveManual = data(bundle, 'dados-br/transmissoes-aovivo-manual.json', { jogos: {} });
     const tv = data(bundle, 'dados-br/transmissoes-tv.json', { jogos: {} });
+    const guardian = data(bundle, 'dados-br/transmissoes-guardiao.json', { jogos: {} });
     const tvAudit = data(bundle, 'dados-br/auditoria-transmissoes-tv.json', {});
     const calendar = data(bundle, 'dados-br/calendario-completo.json', { jogos: [] });
     const analysisConfig = data(bundle, 'dados-br/config-analises.json', {});
@@ -487,27 +491,40 @@ export class OrchestratorState {
       };
     }
 
-    // 2b) Guardião IA: auditoria T-24/T-6/T-90/T-15/T+10. A IA decide
-    // a grade somente dentro do workflow; o Worker apenas agenda checkpoints.
+    // 2b) Guardião IA: checkpoint é apenas janela de oportunidade. Antes de
+    // abrir uma Action, o Worker prova que existe pendência factual real. Jogos
+    // já resolvidos não voltam a rodar em T-90/T-15/T+10. Alvos simultâneos no
+    // mesmo checkpoint são consolidados em uma única auditoria.
+    const guardianSourcesReady = ready(
+      'dados-br/transmissoes-tv.json', 'dados-br/transmissoes-aovivo.json',
+      'dados-br/transmissoes-aovivo-manual.json', 'dados-br/transmissoes-guardiao.json',
+    );
     const guardianCandidates = [];
-    for (const game of games) {
+    for (const game of guardianSourcesReady ? games : []) {
       if (finalIds.has(game.eventId)) continue;
       const delta = (now.getTime() - game.kickoff.getTime()) / 60000;
       const cps = POLICY.transmissoes.guardianCheckpointsMinutes;
       if (delta < cps[0] || delta > cps.at(-1)) continue;
+      const resolution = guardianResolution({ eventId: game.eventId, tv, liveAuto, liveManual, guardian });
+      if (resolution.resolved) continue;
       const lastCheckpoint = await this.state.storage.get(`guardiancp:${game.eventId}`);
       const cp = guardianCheckpointDue(game, now, typeof lastCheckpoint === 'number' ? lastCheckpoint : null);
       if (cp == null) continue;
-      guardianCandidates.push({ game, cp, delta });
+      guardianCandidates.push({ game, cp, delta, resolution });
     }
     guardianCandidates.sort((a, b) => Math.abs(a.delta) - Math.abs(b.delta));
     if (guardianCandidates.length) {
-      const { game, cp } = guardianCandidates[0];
+      const primary = guardianCandidates[0];
+      const batch = guardianCandidates.filter((row) => row.cp === primary.cp).slice(0, 8);
+      const eventIds = batch.map((row) => row.game.eventId);
+      const updates = Object.fromEntries(batch.map((row) => [`guardiancp:${row.game.eventId}`, row.cp]));
+      const missing = [...new Set(batch.flatMap((row) => row.resolution.missing))].sort();
       return {
-        action: 'transmissoes_guardian', eventId: game.eventId, checkpoint: cp,
-        reason: `Guardião de transmissão T${cp >= 0 ? '+' : ''}${cp} para ${gameLabel(game)}.`,
+        action: 'transmissoes_guardian', eventIds, eventId: eventIds.length === 1 ? eventIds[0] : '', checkpoint: primary.cp,
+        fingerprint: batch.map((row) => `${row.game.eventId}:${row.resolution.fingerprint}`).sort().join(';'),
+        reason: `Guardião T${primary.cp >= 0 ? '+' : ''}${primary.cp}: ${eventIds.length} jogo(s) com pendência real (${missing.join(', ')}).`,
         retryMinutes: 1,
-        stateUpdates: { [`guardiancp:${game.eventId}`]: cp }, hints,
+        stateUpdates: updates, hints,
       };
     }
 
@@ -525,15 +542,15 @@ export class OrchestratorState {
       const due = last ? new Date(last.getTime() + interval * 60000) : item.ended;
       if (!nextPublicDue || due < nextPublicDue) nextPublicDue = due;
       if (!last || dueFromLast(last, now, interval)) {
-        const updates = {};
-        for (const pending of publics) updates[`public:${pending.eventId}`] = now.toISOString();
-        hints.publicos = { pending: publics.length, nextDueAt: now.toISOString() };
+        const fingerprint = publicPendingFingerprint(item);
+        hints.publicos = { pending: publics.length, nextDueAt: now.toISOString(), target: item.eventId, faltando: fingerprint };
         return {
-          action: 'publicos', eventId: item.eventId,
+          action: 'publicos', eventId: item.eventId, missingFields: item.missingFields || [], fingerprint,
           reason: last
-            ? `Retentativa de público/renda: ${publics.length} jogo(s) seguem pendentes; backoff ${interval} min.`
-            : `Primeira busca de público/renda para ${item.eventId}; FINAL há ${Math.round(item.ageMinutes)} min; faltando=${(item.missingFields || []).join(",") || "reconciliar"}.`,
-          retryMinutes: Math.max(1, interval || 1), stateUpdates: updates, hints,
+            ? `Retentativa direcionada de público/renda para ${item.eventId}; faltando=${fingerprint}; backoff ${interval} min.`
+            : `Primeira busca direcionada de público/renda para ${item.eventId}; FINAL há ${Math.round(item.ageMinutes)} min; faltando=${fingerprint}.`,
+          retryMinutes: Math.max(1, interval || 1),
+          stateUpdates: { [`public:${item.eventId}`]: now.toISOString() }, hints,
         };
       }
     }

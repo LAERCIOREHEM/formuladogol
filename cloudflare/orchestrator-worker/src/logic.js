@@ -345,6 +345,83 @@ export function guardianCheckpointDue(game, now, lastCheckpoint = null, checkpoi
   return liveCheckpointDue(game, now, lastCheckpoint, checkpoints);
 }
 
+function channelKey(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function strongTvConfidence(value) {
+  const key = String(value || '').trim().toLowerCase();
+  return ['confirmado', 'confirmada', 'alta', 'high', 'verified', 'verificado'].includes(key);
+}
+
+function validGuardianPlayer(guardianRow) {
+  return (guardianRow?.youtube || []).some((row) => row?.valid_for_match === true && /^https?:\/\//i.test(String(row?.url || '')));
+}
+
+function validPublishedPlayer(liveRow) {
+  if (!liveRow || typeof liveRow !== 'object') return false;
+  const candidates = [liveRow.principal, ...(liveRow.alternativas || [])].filter(Boolean);
+  return candidates.some((row) => {
+    const url = String(row?.url || '');
+    const title = String(row?.titulo || '').toLowerCase();
+    const scope = String(row?.escopo || '').toLowerCase();
+    if (!/^https?:\/\//i.test(url)) return false;
+    if (/(aquecimento|pré[- ]?jogo|pre[- ]?game|melhores momentos)/i.test(title)) return false;
+    return row?.status === 'live' || row?.status === 'upcoming' || scope === 'partida' || scope === 'match';
+  });
+}
+
+/**
+ * Decide se o Guardião de transmissão ainda tem trabalho factual para um jogo.
+ * O relógio sozinho nunca autoriza uma Action: TV precisa estar ausente/fraca,
+ * haver conflito de fontes ou faltar player integral quando o canal digital o exige.
+ */
+export function guardianResolution({ eventId, tv, liveAuto, liveManual, guardian }) {
+  const id = String(eventId || '').trim();
+  const tvRow = tv?.jogos?.[id];
+  const guardianRow = guardian?.jogos?.[id];
+  const liveRow = liveManual?.jogos?.[id] || liveAuto?.jogos?.[id];
+  const missing = [];
+
+  const channels = [...new Set((tvRow?.canais || []).map((x) => String(x || '').trim()).filter(Boolean))];
+  if (!channels.length) missing.push('tv_ausente');
+
+  const guardianConfidence = Number(guardianRow?.confianca || 0);
+  const guardianStrong = ['confirmado', 'corrigido'].includes(String(guardianRow?.status || '').toLowerCase()) && guardianConfidence >= 0.9;
+  const tvStrong = Boolean(tvRow?.estavel === true && strongTvConfidence(tvRow?.confianca));
+  if (channels.length && !tvStrong && !guardianStrong) missing.push('fonte_fraca_ou_instavel');
+
+  if (guardianStrong && Array.isArray(guardianRow?.canais) && guardianRow.canais.length) {
+    const a = [...new Set(channels.map(channelKey))].sort().join('|');
+    const b = [...new Set(guardianRow.canais.map(channelKey))].sort().join('|');
+    if (a && b && a !== b) missing.push('conflito_fontes');
+  }
+
+  const digitalChannels = new Set(channels.map(channelKey));
+  const playerRequired = ['ge tv', 'cazétv', 'cazetv', 'sbt'].some((name) => digitalChannels.has(name));
+  const playerResolved = validGuardianPlayer(guardianRow) || validPublishedPlayer(liveRow);
+  if (playerRequired && !playerResolved) missing.push('player_integral_ausente');
+
+  const fingerprint = [
+    channels.map(channelKey).sort().join(','),
+    playerRequired ? (playerResolved ? 'player-ok' : 'player-missing') : 'player-na',
+    missing.slice().sort().join(','),
+  ].join('|');
+  return {
+    resolved: missing.length === 0,
+    missing,
+    channels,
+    playerRequired,
+    playerResolved,
+    fingerprint,
+  };
+}
+
+export function publicPendingFingerprint(item) {
+  const fields = [...new Set((item?.missingFields || []).map(String).filter(Boolean))].sort();
+  return fields.length ? fields.join('+') : 'reconciliar';
+}
+
 export function tvCoverage(games, tv, now, days = 30) {
   const t = parseDate(now).getTime();
   const max = t + days * 86400000;
@@ -744,9 +821,14 @@ export function continentalDecision(snaps, analyses, history) {
 
 export function actionKey(decision) {
   const bits = [decision?.action || 'none'];
-  if (decision?.eventId) bits.push(decision.eventId);
+  const eventIds = Array.isArray(decision?.eventIds)
+    ? [...new Set(decision.eventIds.map(String).filter(Boolean))].sort()
+    : [];
+  if (eventIds.length) bits.push(eventIds.join(','));
+  else if (decision?.eventId) bits.push(decision.eventId);
   if (decision?.round) bits.push(String(decision.round));
   if (decision?.checkpoint != null) bits.push(String(decision.checkpoint));
+  if (decision?.fingerprint) bits.push(String(decision.fingerprint));
   if (decision?.signature) bits.push(String(decision.signature));
   return bits.join(':');
 }

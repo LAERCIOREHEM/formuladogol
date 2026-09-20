@@ -710,6 +710,7 @@ def executar_coleta(
     *,
     sem_rede: bool = False,
     max_rodadas: int = 0,
+    event_id_alvo: str = "",
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     jogos_mapa = payload.get("jogos") if isinstance(payload.get("jogos"), dict) else {}
     mapa: dict[str, dict[str, Any]] = {str(k): dict(v) for k, v in jogos_mapa.items() if isinstance(v, dict)}
@@ -736,7 +737,11 @@ def executar_coleta(
         return not (tem_presente and tem_pagantes and tem_renda)
 
     pendentes = [j for j in finalizados if precisa_enriquecimento(j)]
-    rodadas_pendentes = sorted({int(j.get("rodada") or 0) for j in pendentes if int(j.get("rodada") or 0) > 0}, reverse=True)
+    alvo = str(event_id_alvo or "").strip()
+    pendentes_rede = [j for j in pendentes if not alvo or str(j.get("event_id") or "") == alvo]
+    if alvo and not any(str(j.get("event_id") or "") == alvo for j in finalizados):
+        raise RuntimeError(f"event_id alvo {alvo} não existe entre os jogos finalizados")
+    rodadas_pendentes = sorted({int(j.get("rodada") or 0) for j in pendentes_rede if int(j.get("rodada") or 0) > 0}, reverse=True)
     if max_rodadas > 0:
         rodadas_pendentes = rodadas_pendentes[:max_rodadas]
 
@@ -753,7 +758,7 @@ def executar_coleta(
                 por_rodada[r].append(jogo)
 
         for rodada in rodadas_pendentes:
-            jogos_rodada = por_rodada.get(rodada, [])
+            jogos_rodada = [j for j in por_rodada.get(rodada, []) if not alvo or str(j.get("event_id") or "") == alvo]
             fonte_existente = _fonte_rodada_existente(payload, rodada)
             datas = datas_candidatas(jogos_rodada)
             descobertas, audit_sitemap, erros_sitemap = descobrir_urls_ge_por_sitemap(rodada, datas)
@@ -1149,6 +1154,7 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true", help="Executa coleta/auditoria sem gravar arquivos.")
     parser.add_argument("--sem-rede", action="store_true", help="Somente consolida/propaga os complementos já gravados.")
     parser.add_argument("--max-rodadas", type=int, default=0, help="Limita rodadas consultadas na rede (0 = todas pendentes).")
+    parser.add_argument("--event-id", default="", help="Modo direcionado: consulta somente esta partida, mantendo a auditoria global.")
     args = parser.parse_args()
 
     if args.self_test:
@@ -1170,6 +1176,7 @@ def main() -> None:
         payload,
         sem_rede=bool(args.sem_rede),
         max_rodadas=max(0, int(args.max_rodadas or 0)),
+        event_id_alvo=str(args.event_id or "").strip(),
     )
 
     if args.dry_run:
@@ -1178,6 +1185,7 @@ def main() -> None:
             "total_sem_publico": audit["total_sem_publico"],
             "rodadas_pendentes": audit["rodadas_pendentes_no_inicio"],
             "conflitos": len(audit["conflitos"]),
+            "event_id_alvo": str(args.event_id or "").strip(),
             "erros_fontes": len(audit["erros_fontes"]),
         }, ensure_ascii=False))
         return

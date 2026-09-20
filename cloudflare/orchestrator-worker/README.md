@@ -53,7 +53,7 @@ A avaliação das demais tarefas continua no mesmo ciclo de 5 minutos. O módulo
 Se houver qualquer dúvida após a ativação, execute novamente **Deploy Orchestrator Worker** escolhendo `shadow`.
 O Worker continua observando, mas para de criar `workflow_dispatch` no GitHub.
 
-## Fontes do repositório (v1.4.0)
+## Fontes do repositório (v1.5.0)
 
 O Worker tenta cada JSON primeiro em `SITE_BASE`. Se o artefato não estiver publicado no Pages ou a fonte pública estiver temporariamente indisponível, ele faz fallback autenticado para o mesmo caminho no branch configurado do GitHub via Contents API. Locks, estados operacionais críticos e os insumos da decisão continental (`estado-editorial-continentais.json`, `status-atualizacao.json`, snapshots de Libertadores/Sul-Americana, histórico continental e `analises.json`) são lidos diretamente da `main`, evitando decisões com uma cópia atrasada do Pages logo após um resultado ou writer esportivo.
 

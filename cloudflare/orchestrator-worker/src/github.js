@@ -60,13 +60,18 @@ export function dispatchSpec(decision) {
     case 'atualizar_brasileirao':
       return { workflow: 'atualizar-brasileirao.yml', inputs: {} };
     case 'publicos':
-      return { workflow: 'atualizar-publicos-brasileirao.yml', inputs: {} };
+      return { workflow: 'atualizar-publicos-brasileirao.yml', inputs: { modo: 'partida', event_id: decision.eventId || '' } };
     case 'melhores_momentos':
       return { workflow: 'buscar-melhores-momentos-getv.yml', inputs: { modo: 'incremental', event_id: decision.eventId || '' } };
     case 'transmissao_aovivo':
       return { workflow: 'buscar-transmissoes-aovivo-brasileirao.yml', inputs: { modo: 'aovivo', event_id: decision.eventId || '' } };
-    case 'transmissoes_guardian':
-      return { workflow: 'auditar-transmissoes-ia.yml', inputs: { event_id: decision.eventId || '', checkpoint: String(decision.checkpoint ?? '') } };
+    case 'transmissoes_guardian': {
+      const eventIds = Array.isArray(decision.eventIds) ? [...new Set(decision.eventIds.map(String).filter(Boolean))].sort() : [];
+      const inputs = eventIds.length > 1
+        ? { event_ids: eventIds.join(','), checkpoint: String(decision.checkpoint ?? '') }
+        : { event_id: eventIds[0] || decision.eventId || '', checkpoint: String(decision.checkpoint ?? '') };
+      return { workflow: 'auditar-transmissoes-ia.yml', inputs };
+    }
     case 'transmissoes_tv':
       return { workflow: 'buscar-transmissoes-aovivo-brasileirao.yml', inputs: { modo: 'tv' } };
     case 'editorial_copa_do_brasil':
