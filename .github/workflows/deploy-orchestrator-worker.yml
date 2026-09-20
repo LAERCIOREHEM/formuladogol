@@ -139,31 +139,47 @@ jobs:
           URL='https://orchestrator.formuladogol.com.br/health'
           for i in $(seq 1 20); do
             BODY="$(curl -fsS --max-time 10 "$URL" 2>/dev/null || true)"
-            if printf '%s' "$BODY" | grep -q '"service":"formula-do-gol-orchestrator"' \
-              && printf '%s' "$BODY" | grep -q "\"mode\":\"$EXPECTED\"" \
-              && printf '%s' "$BODY" | grep -q '"liveBrowserUntouched":true' \
-              && printf '%s' "$BODY" | grep -q '"transmissionGuardian":true' \
-              && printf '%s' "$BODY" | grep -q '"transmissionGuardianNeedGate":true' \
-              && printf '%s' "$BODY" | grep -q '"transmissionGuardianBatching":true' \
-              && printf '%s' "$BODY" | grep -q '"transmissionNeedDrivenV2":true' \
-              && printf '%s' "$BODY" | grep -q '"adaptiveSlowPath":true' \
-              && printf '%s' "$BODY" | grep -q '"transmissionTvOperationalWindowHours":72' \
-              && printf '%s' "$BODY" | grep -q '"transmissionYoutubeOnlyWhenRequired":true' \
-              && printf '%s' "$BODY" | grep -q '"publicFirstAttemptAfterFinalMinutes":30' \
-              && printf '%s' "$BODY" | grep -q '"targetedPublicResearch":true' \
-              && printf '%s' "$BODY" | grep -q '"continentalPhaseFingerprints":true' \
-              && printf '%s' "$BODY" | grep -q '"continentalAgendaAware":true' \
-              && printf '%s' "$BODY" | grep -q '"continentalStateIdempotency":true' \
-              && printf '%s' "$BODY" | grep -q '"brasileiraoSourceCircuitBreaker":true' \
-              && printf '%s' "$BODY" | grep -q '"espnScoreboardGateway":true' \
-              && printf '%s' "$BODY" | grep -q '"cron":"\*/5 \* \* \* \*"'; then
+            if HEALTH_BODY="$BODY" EXPECTED_MODE="$EXPECTED" node <<'NODE'
+          const body = process.env.HEALTH_BODY || '';
+          const expectedMode = process.env.EXPECTED_MODE || '';
+          let p;
+          try { p = JSON.parse(body); } catch { process.exit(1); }
+          const ok =
+            p.ok === true &&
+            p.service === 'formula-do-gol-orchestrator' &&
+            p.mode === expectedMode &&
+            p.cron === '*/5 * * * *' &&
+            p.liveBrowserUntouched === true &&
+            p.transmissionGuardian === true &&
+            p.transmissionGuardianNeedGate === true &&
+            p.transmissionGuardianBatching === true &&
+            p.transmissionNeedDrivenV2 === true &&
+            p.adaptiveSlowPath === true &&
+            p.transmissionTvOperationalWindowHours === 72 &&
+            p.transmissionYoutubeOnlyWhenRequired === true &&
+            p.publicFirstAttemptAfterFinalMinutes === 360 &&
+            p.postgameFastlanePrimary === true &&
+            p.postgameFastlaneCronMinutes === 1 &&
+            p.githubPostgameFallbackHours === 6 &&
+            p.targetedPublicResearch === true &&
+            p.continentalPhaseFingerprints === true &&
+            p.continentalAgendaAware === true &&
+            p.continentalStateIdempotency === true &&
+            p.brasileiraoSourceCircuitBreaker === true &&
+            p.espnScoreboardGateway === true;
+          process.exit(ok ? 0 : 1);
+          NODE
+            then
               echo "Health OK em modo $EXPECTED."
               printf '%s\n' "$BODY"
               exit 0
             fi
+            echo "Tentativa $i/20: health ainda não refletiu o contrato esperado."
             sleep 6
           done
-          echo "ERRO: health não confirmou modo $EXPECTED em $URL"
+          echo "ERRO: health não confirmou modo $EXPECTED e contrato Fastlane em $URL"
+          curl -fsS --max-time 10 "$URL" || true
+          echo
           exit 1
 
       - name: Confirmar estado persistente
