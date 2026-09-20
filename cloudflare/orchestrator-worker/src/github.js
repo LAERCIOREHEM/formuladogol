@@ -73,7 +73,7 @@ export function dispatchSpec(decision) {
       return { workflow: 'auditar-transmissoes-ia.yml', inputs };
     }
     case 'transmissoes_tv':
-      return { workflow: 'buscar-transmissoes-aovivo-brasileirao.yml', inputs: { modo: 'tv' } };
+      return { workflow: 'buscar-transmissoes-aovivo-brasileirao.yml', inputs: { modo: 'tv', event_id: decision.eventId || '' } };
     case 'editorial_copa_do_brasil':
       return { workflow: 'publicar-analise-copa-do-brasil.yml', inputs: {} };
     case 'editorial_continentais':

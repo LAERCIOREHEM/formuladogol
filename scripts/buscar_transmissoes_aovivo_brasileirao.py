@@ -1105,10 +1105,18 @@ def build_outputs(
             automatic_links[source_key] = cand.public(str(channels[source_key].get("nome") or source_key))
 
         existing_links = existing_links_for_game(existing, game)
-        valid_candidate_ids = {c.video_id for c in candidates if c.status in {"upcoming", "live"}}
+        candidate_by_id = {c.video_id: c for c in candidates if c.status in {"upcoming", "live"}}
         for source_key, link in existing_links.items():
-            if str(link.get("video_id")) in valid_candidate_ids and source_key not in automatic_links:
-                automatic_links[source_key] = link
+            video_id = str(link.get("video_id") or "")
+            cand = candidate_by_id.get(video_id)
+            if cand is None or source_key in automatic_links:
+                continue
+            # Nunca preservar só porque o vídeo continua live/upcoming. Ele precisa
+            # passar NOVAMENTE pela validação editorial daquela partida. Isso remove
+            # aquecimento/pré-jogo que antes sobrevivia por reconciliação.
+            evaluated = evaluate_candidate(cand, game, config, aliases)
+            if not evaluated.rejected_reason:
+                automatic_links[source_key] = cand.public(str(channels.get(source_key, {}).get("nome") or source_key))
 
         links = automatic_links
         origin = "automático"
@@ -1384,6 +1392,11 @@ def selftest() -> None:
     ids_found = extract_video_ids_from_streams_html(html_fake)
     assert "Cih-UxYNCSs" in ids_found, f"ID da live Cazé não encontrado: {ids_found}"
     assert len(ids_found) == 3
+
+    # Regressão operacional: um vídeo de aquecimento que ainda está upcoming/live
+    # deve continuar rejeitado na revalidação; status ativo sozinho não o preserva.
+    warming = Candidate("WWWWWWWWWWW", "getv", "UC2", "ge tv", "FLAMENGO X BRAGANTINO | AQUECIMENTO AO VIVO", "", "live", game.kickoff, game.kickoff, None)
+    assert evaluate_candidate(warming, game, config, aliases).rejected_reason
 
     print("SELFTEST OK: vínculo, rejeições, aliases, prioridade GE TV>SBT>CazéTV, SBT em @sbt/@SBTSports, embed só quando validado, link único, /streams, uploads e fallback search")
 

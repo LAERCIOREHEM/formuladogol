@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "descricao": "Política determinística de contingência/manual. O orquestrador operacional primário roda no Cloudflare Worker; a IA não decide gatilhos.",
   "timezone": "America/Sao_Paulo",
   "atualizar_brasileirao": {
@@ -52,20 +52,22 @@
     "tv_intervalo_pendencia_horas": 24,
     "aovivo_checkpoints_minutos": [
       -90,
-      -45,
-      -20,
-      -5,
-      10,
-      30
+      -15,
+      10
     ],
     "tv_intervalo_pendencia_30d_horas": 72,
     "guardiao_checkpoints_minutos": [
-      -1440,
-      -360,
       -90,
       -15,
       10
-    ]
+    ],
+    "janela_operacional_tv_horas": 72,
+    "tv_checkpoints_minutos": [
+      -4320,
+      -1440,
+      -360
+    ],
+    "politica": "need-driven: >72h nunca dispara; TV somente em T-72/T-24/T-6 se canal seguir ausente; player YouTube somente se grade exigir GE TV/SBT/CazéTV; Guardião apenas exceção em T-90/T-15/T+10."
   },
   "github": {
     "branch": "main",
@@ -124,7 +126,7 @@
   "execucao_primaria": {
     "plataforma": "Cloudflare Workers Cron Trigger",
     "worker": "formula-do-gol-orchestrator",
-    "cron": "* * * * *",
+    "cron": "*/5 * * * *",
     "modo_inicial": "shadow",
     "cron_job_org": false,
     "github_orquestrador": "fallback manual apenas"

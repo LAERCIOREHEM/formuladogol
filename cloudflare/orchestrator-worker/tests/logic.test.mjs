@@ -71,23 +71,21 @@ test('agenda normalization and sports probe window', () => {
   assert.equal(relevantSportsGames(games, d('2026-09-04T02:01:00Z')).length, 0); // T+241
 });
 
-test('player search uses six checkpoints instead of 10-minute polling', () => {
+test('player search is need-driven with only T-90/T-15/T+10 opportunities', () => {
   const game = { kickoff: d('2026-09-03T22:00:00Z') };
-  assert.deepEqual(POLICY.transmissoes.liveCheckpointsMinutes, [-90, -45, -20, -5, 10, 30]);
+  assert.deepEqual(POLICY.transmissoes.liveCheckpointsMinutes, [-90, -15, 10]);
   assert.equal(liveCheckpointDue(game, d('2026-09-03T20:29:00Z'), null), null);
   assert.equal(liveCheckpointDue(game, d('2026-09-03T20:30:00Z'), null), -90);
-  assert.equal(liveCheckpointDue(game, d('2026-09-03T21:16:00Z'), -90), -45);
-  assert.equal(liveCheckpointDue(game, d('2026-09-03T22:11:00Z'), -5), 10);
-  assert.equal(liveCheckpointDue(game, d('2026-09-03T22:31:00Z'), 30), null);
+  assert.equal(liveCheckpointDue(game, d('2026-09-03T21:46:00Z'), -90), -15);
+  assert.equal(liveCheckpointDue(game, d('2026-09-03T22:11:00Z'), -15), 10);
+  assert.equal(liveCheckpointDue(game, d('2026-09-03T22:31:00Z'), 10), null);
 });
 
-test('transmission Guardian uses T-24/T-6/T-90/T-15/T+10 checkpoints', () => {
+test('transmission Guardian is exception-only at T-90/T-15/T+10', () => {
   const game = { kickoff: d('2026-09-08T22:00:00Z') };
-  assert.deepEqual(POLICY.transmissoes.guardianCheckpointsMinutes, [-1440, -360, -90, -15, 10]);
-  assert.equal(guardianCheckpointDue(game, d('2026-09-07T21:59:00Z'), null), null);
-  assert.equal(guardianCheckpointDue(game, d('2026-09-07T22:00:00Z'), null), -1440);
-  assert.equal(guardianCheckpointDue(game, d('2026-09-08T16:01:00Z'), -1440), -360);
-  assert.equal(guardianCheckpointDue(game, d('2026-09-08T20:31:00Z'), -360), -90);
+  assert.deepEqual(POLICY.transmissoes.guardianCheckpointsMinutes, [-90, -15, 10]);
+  assert.equal(guardianCheckpointDue(game, d('2026-09-08T20:29:00Z'), null), null);
+  assert.equal(guardianCheckpointDue(game, d('2026-09-08T20:30:00Z'), null), -90);
   assert.equal(guardianCheckpointDue(game, d('2026-09-08T21:46:00Z'), -90), -15);
   assert.equal(guardianCheckpointDue(game, d('2026-09-08T22:11:00Z'), -15), 10);
 });
@@ -126,18 +124,23 @@ test('transmission Guardian only runs for a real unresolved transmission gap', (
   assert.ok(conflict.missing.includes('conflito_fontes'));
 });
 
-test('TV cadence is proportional to missing coverage', () => {
+test('TV coverage ignores games beyond 72h and only treats near gaps as operational', () => {
   const now = d('2026-09-03T12:00:00Z');
   const mk = (id, hours) => ({ eventId: id, kickoff: new Date(now.getTime() + hours * 3600000) });
-  const games = [mk('a', 48), mk('b', 10 * 24), mk('c', 20 * 24), mk('d', 40 * 24)];
-  let coverage = tvCoverage(games, { jogos: {} }, now, 30);
-  assert.deepEqual([coverage.critical72h, coverage.missing14d, coverage.missing30d], [1, 2, 3]);
+  const games = [mk('a', 48), mk('b', 80), mk('c', 24), mk('d', 5)];
+  let coverage = tvCoverage(games, { jogos: {} }, now);
+  assert.equal(coverage.missing72h, 3);
+  assert.equal(coverage.critical24h, 2);
+  assert.equal(coverage.critical6h, 1);
+  assert.equal(tvIntervalHours(coverage), 1);
+  coverage = tvCoverage(games, { jogos: { d: { canais: ['Premiere'], estavel: true, confianca: 'confirmado' } } }, now);
+  assert.equal(coverage.missing72h, 2);
   assert.equal(tvIntervalHours(coverage), 6);
-  coverage = tvCoverage(games, { jogos: { a: { canais: ['Premiere'] } } }, now, 30);
+  coverage = tvCoverage(games, { jogos: { d: { canais: ['Premiere'], estavel: true, confianca: 'confirmado' }, c: { canais: ['Globo'], estavel: true, confianca: 'confirmado' } } }, now);
+  assert.equal(coverage.missing72h, 1);
   assert.equal(tvIntervalHours(coverage), 24);
-  coverage = tvCoverage(games, { jogos: { a: { canais: ['Premiere'] }, b: { canais: ['Globo'] } } }, now, 30);
-  assert.equal(tvIntervalHours(coverage), 72);
-  coverage = tvCoverage(games, { jogos: { a: { canais: ['Premiere'] }, b: { canais: ['Globo'] }, c: { canais: ['ESPN'] } } }, now, 30);
+  coverage = tvCoverage(games, { jogos: { d: { canais: ['Premiere'], estavel: true, confianca: 'confirmado' }, c: { canais: ['Globo'], estavel: true, confianca: 'confirmado' }, a: { canais: ['ESPN'], estavel: true, confianca: 'confirmado' } } }, now);
+  assert.equal(coverage.missing72h, 0);
   assert.equal(tvIntervalHours(coverage), 168);
 });
 

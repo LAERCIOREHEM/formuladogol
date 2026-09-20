@@ -29,6 +29,7 @@ import {
   timeReached,
   tvCoverage,
   tvIntervalHours,
+  tvCheckpointDue,
 } from './logic.js';
 import { activeWriter, dispatchSpec, dispatchWorkflow } from './github.js';
 import { fetchSiteBundle, probeEspn, probeEspnAvailability, repositoryFallbacks } from './sources.js';
@@ -96,6 +97,47 @@ function isAfter(a, b) {
 function dueFromLast(last, now, intervalMinutes) {
   if (!last) return true;
   return minutesBetween(last, now) >= Number(intervalMinutes || 0);
+}
+
+function agendaRuntimeSignature(games) {
+  return games.map((g) => `${g.eventId}|${g.kickoff?.toISOString?.() || ''}|${g.concluded ? 1 : 0}`).sort().join(';');
+}
+
+function minDate(...values) {
+  const dates = values.flat().map(parseDate).filter(Boolean);
+  return dates.length ? new Date(Math.min(...dates.map((d) => d.getTime()))) : null;
+}
+
+function nextTransmissionBoundary(games, now) {
+  const t = parseDate(now)?.getTime() ?? Date.now();
+  const future = [];
+  for (const game of games || []) {
+    if (!game?.kickoff || game.concluded) continue;
+    for (const cp of POLICY.transmissoes.tvCheckpointsMinutes || []) {
+      const at = game.kickoff.getTime() + cp * 60000;
+      if (at > t) future.push(new Date(at));
+    }
+    for (const cp of POLICY.transmissoes.liveCheckpointsMinutes || []) {
+      const at = game.kickoff.getTime() + cp * 60000;
+      if (at > t) future.push(new Date(at));
+    }
+  }
+  return future.length ? new Date(Math.min(...future.map((d) => d.getTime()))) : null;
+}
+
+function boundedNextSlowAt(now, games, hints = {}, afterAction = false) {
+  const floor = new Date(now.getTime() + 5 * 60000);
+  const cap = new Date(now.getTime() + (afterAction ? 20 : 60) * 60000);
+  const transmission = nextTransmissionBoundary(games, now);
+  const hinted = minDate(
+    hints?.publicos?.nextDueAt,
+    hints?.melhoresMomentos?.nextDueAt,
+    hints?.editorialContinental?.nextCheckAt,
+    transmission,
+  );
+  if (!hinted) return cap;
+  if (hinted < floor) return floor;
+  return hinted < cap ? hinted : cap;
 }
 
 function cupPendingHighlights(cup, cupHighlights, now) {
@@ -315,7 +357,13 @@ export class OrchestratorState {
 
       if (!candidate) {
         const lastSlow = await this.storageDate('meta:lastSlowEval');
-        if (!lastSlow || minutesBetween(lastSlow, now) >= POLICY.slowEvalMinutes) {
+        const nextSlowAt = await this.storageDate('meta:nextSlowEvalAt');
+        const currentAgendaSignature = agendaRuntimeSignature(games);
+        const priorAgendaSignature = String((await this.state.storage.get('meta:agendaSignature')) || '');
+        const agendaChanged = priorAgendaSignature !== currentAgendaSignature;
+        const dueByClock = !nextSlowAt || nextSlowAt.getTime() <= now.getTime();
+        const legacyDue = !lastSlow || minutesBetween(lastSlow, now) >= POLICY.slowEvalMinutes;
+        if (agendaChanged || dueByClock || (!nextSlowAt && legacyDue)) {
           slowEvaluated = true;
           const slowBundle = await fetchSiteBundle(this.env, SLOW_PATHS);
           errors.push(...bundleErrors(slowBundle));
@@ -323,10 +371,15 @@ export class OrchestratorState {
           hints = slow?.hints || (await this.state.storage.get('meta:lastHints')) || {};
           candidate = slow?.action && slow.action !== 'none' ? slow : null;
           if (candidate?.hints) delete candidate.hints;
+          const nextAt = boundedNextSlowAt(now, games, hints, Boolean(candidate));
           await this.state.storage.put('meta:lastSlowEval', now.toISOString());
-          await this.state.storage.put('meta:lastHints', hints);
+          await this.state.storage.put('meta:nextSlowEvalAt', nextAt.toISOString());
+          await this.state.storage.put('meta:agendaSignature', currentAgendaSignature);
+          await this.state.storage.put('meta:lastHints', { ...hints, nextSlowEvalAt: nextAt.toISOString() });
+          hints = { ...hints, nextSlowEvalAt: nextAt.toISOString() };
         } else {
           hints = (await this.state.storage.get('meta:lastHints')) || {};
+          hints = { ...hints, nextSlowEvalAt: nextSlowAt?.toISOString?.() || '' };
         }
       }
 
@@ -462,30 +515,33 @@ export class OrchestratorState {
       }
     }
 
-    // 2) Player oficial: checkpoints em vez de polling uniforme de 10 em 10 min.
+    // 2) Player oficial: NEED-DRIVEN. O relógio só define quando tentar;
+    // a elegibilidade factual vem da grade TV. Premiere/SporTV/Globo/Record/
+    // Prime/Paramount/Disney não abrem busca de YouTube. Player já resolvido
+    // encerra definitivamente os checkpoints posteriores para aquele snapshot.
     const liveSourcesReady = ready('dados-br/transmissoes-aovivo.json', 'dados-br/transmissoes-aovivo-manual.json', 'dados-br/transmissoes-tv.json');
-    const linkedLive = liveLinkedIds(liveAuto, liveManual);
     const liveCandidates = [];
     for (const game of liveSourcesReady ? games : []) {
       if (finalIds.has(game.eventId)) continue;
       const delta = (now.getTime() - game.kickoff.getTime()) / 60000;
-      if (delta < POLICY.transmissoes.liveCheckpointsMinutes[0] || delta > POLICY.transmissoes.liveCheckpointsMinutes.at(-1)) continue;
-      const alreadyLinked = linkedLive.has(game.eventId);
-      const policy = alreadyLinked
-        ? { allowed: true, reason: 'player já publicado; revalidar status real do YouTube' }
-        : liveSearchAllowed(game.eventId, tv);
+      const cps = POLICY.transmissoes.liveCheckpointsMinutes;
+      if (delta < cps[0] || delta > cps.at(-1)) continue;
+      const policy = liveSearchAllowed(game.eventId, tv);
       if (!policy.allowed) continue;
+      const resolution = guardianResolution({ eventId: game.eventId, tv, liveAuto, liveManual, guardian });
+      if (!resolution.playerRequired || resolution.playerResolved) continue;
       const lastCheckpoint = await this.state.storage.get(`livecp:${game.eventId}`);
       const cp = liveCheckpointDue(game, now, typeof lastCheckpoint === 'number' ? lastCheckpoint : null);
       if (cp == null) continue;
-      liveCandidates.push({ game, cp, policy: policy.reason, delta });
+      liveCandidates.push({ game, cp, policy: policy.reason, delta, resolution });
     }
     liveCandidates.sort((a, b) => Math.abs(a.delta) - Math.abs(b.delta));
     if (liveCandidates.length) {
-      const { game, cp, policy } = liveCandidates[0];
+      const { game, cp, policy, resolution } = liveCandidates[0];
       return {
         action: 'transmissao_aovivo', eventId: game.eventId, checkpoint: cp,
-        reason: `Checkpoint T${cp >= 0 ? '+' : ''}${cp} do player oficial para ${gameLabel(game)}; ${policy}.`,
+        fingerprint: resolution.fingerprint,
+        reason: `Player necessário T${cp >= 0 ? '+' : ''}${cp} para ${gameLabel(game)}; ${policy}; player integral ainda ausente.`,
         retryMinutes: 1,
         stateUpdates: { [`livecp:${game.eventId}`]: cp }, hints,
       };
@@ -528,7 +584,7 @@ export class OrchestratorState {
       };
     }
 
-    // 3) Públicos: primeira busca após +15 min e backoff por event_id.
+    // 3) Públicos: primeira busca após +30 min e backoff por event_id.
     const publicSourcesReady = ready(
       'resultados.json', 'dados-br/estado-publicos-ia.json', 'dados-br/auditoria-publicos.json',
     );
@@ -699,32 +755,35 @@ export class OrchestratorState {
       };
     }
 
-    // 6) Grade futura: 6h crítica, 24h <14d, 72h pendência 15-30d, 7 dias se mês completo.
-    const coverage = tvCoverage(games, tv, now, 30);
-    const intervalHours = tvIntervalHours(coverage);
-    let lastTv = await this.storageDate('tv:last');
-    if (!lastTv) lastTv = parseDate(tvAudit?.atualizado_em);
-    const nextTv = lastTv ? new Date(lastTv.getTime() + intervalHours * 3600000) : now;
+    // 6) Grade futura: somente uma lacuna REAL dentro de 72h é operacional.
+    // Jogos mais distantes ficam simplesmente "a confirmar" e NÃO abrem Action.
+    // Para cada event_id há no máximo tentativas determinísticas em T-72h, T-24h e T-6h.
+    const coverage = tvCoverage(games, tv, now);
+    const tvCandidates = [];
+    for (const row of coverage.missing) {
+      const game = row.game;
+      if (finalIds.has(game.eventId)) continue;
+      const lastCheckpoint = await this.state.storage.get(`tvcp:${game.eventId}`);
+      const cp = tvCheckpointDue(game, now, typeof lastCheckpoint === 'number' ? lastCheckpoint : null);
+      if (cp == null) continue;
+      tvCandidates.push({ game, cp, hours: row.hours });
+    }
+    tvCandidates.sort((a, b) => a.hours - b.hours);
     hints.transmissoesTv = {
-      missing30d: coverage.missing30d,
-      missing14d: coverage.missing14d,
-      critical72h: coverage.critical72h,
-      intervalHours,
-      nextDueAt: nextTv.toISOString(),
+      windowHours: POLICY.transmissoes.tvWindowHours,
+      missing72h: coverage.missing72h,
+      critical24h: coverage.critical24h,
+      critical6h: coverage.critical6h,
+      nextTargets: tvCandidates.slice(0, 5).map((row) => ({ eventId: row.game.eventId, checkpoint: row.cp, hours: Math.round(row.hours * 10) / 10 })),
     };
-    const critical = coverage.critical72h > 0;
-    if ((critical || timeReached(now, POLICY.transmissoes.tvAfter)) && (!lastTv || hoursSince(lastTv, now) >= intervalHours)) {
+    if (tvCandidates.length) {
+      const { game, cp } = tvCandidates[0];
       return {
-        action: 'transmissoes_tv',
-        reason: coverage.critical72h
-          ? `${coverage.critical72h} jogo(s) nas próximas 72h sem grade; retry crítico ${intervalHours}h.`
-          : coverage.missing14d
-            ? `${coverage.missing14d} jogo(s) em 14 dias sem grade; nova busca após ${intervalHours}h.`
-            : coverage.missing30d
-              ? `${coverage.missing30d} jogo(s) em 30 dias sem grade; manutenção após ${intervalHours}h.`
-              : `Grade dos próximos 30 dias completa; manutenção semanal (${intervalHours}h).`,
-        retryMinutes: intervalHours * 60,
-        stateUpdates: { 'tv:last': now.toISOString() }, hints,
+        action: 'transmissoes_tv', eventId: game.eventId, checkpoint: cp,
+        fingerprint: `tv-ausente:${game.eventId}:T${cp}`,
+        reason: `Grade ausente para ${gameLabel(game)} dentro da janela operacional; tentativa determinística T${cp >= 0 ? '+' : ''}${cp}.`,
+        retryMinutes: 1,
+        stateUpdates: { [`tvcp:${game.eventId}`]: cp, 'tv:last': now.toISOString() }, hints,
       };
     }
 

@@ -187,8 +187,8 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "tv_retentativa_critica_horas": 6,
         "aovivo_antes_minutos": 90,
         "aovivo_depois_minutos": 180,
-        "aovivo_checkpoints_minutos": [-90, -45, -20, -5, 10, 30],
-        "guardiao_checkpoints_minutos": [-1440, -360, -90, -15, 10],
+        "aovivo_checkpoints_minutos": [-90, -15, 10],
+        "guardiao_checkpoints_minutos": [-90, -15, 10],
     },
     "github": {"branch": "main", "historico_runs": 100, "bloquear_se_writer_ativo": True},
 }
@@ -1058,17 +1058,11 @@ def live_search_allowed(event_id: str) -> tuple[bool, str]:
     games = tv.get("jogos") if isinstance(tv, Mapping) else {}
     item = games.get(event_id) if isinstance(games, Mapping) else None
     if not isinstance(item, Mapping):
-        return True, "grade ainda não consolidada"
-    channels = {str(value) for value in (item.get("canais") or []) if value}
-    if channels & {"GE TV", "SBT", "CazéTV"}:
-        return True, "grade já indica GE TV/SBT/CazéTV"
-    if item.get("exclusivo") is True:
-        return False, "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
-    if channels & {"Globo", "Record"}:
-        return True, "grade aberta pode ter direito digital"
-    if item.get("estavel") is True:
-        return False, "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    return True, "grade ainda não estável"
+        return False, "grade ausente; primeiro resolver TV pelo coletor determinístico"
+    channels = {str(value).strip().casefold() for value in (item.get("canais") or []) if value}
+    if channels & {"ge tv", "sbt", "cazétv", "cazetv"}:
+        return True, "grade exige player oficial GE TV/SBT/CazéTV"
+    return False, "grade não exige player oficial GE TV/SBT/CazéTV"
 
 
 def transmission_live_decision(
@@ -1082,7 +1076,7 @@ def transmission_live_decision(
     only_never_checked: bool = False,
 ) -> Decision | None:
     cfg = config["transmissoes"]
-    checkpoints = [int(v) for v in (cfg.get("aovivo_checkpoints_minutos") or [-90, -45, -20, -5, 10, 30])]
+    checkpoints = [int(v) for v in (cfg.get("aovivo_checkpoints_minutos") or [-90, -15, 10])]
     checkpoints = sorted(set(checkpoints))
     if not checkpoints:
         return None
@@ -1096,11 +1090,12 @@ def transmission_live_decision(
         delta = (now - game.kickoff).total_seconds() / 60.0
         if delta < min(checkpoints) or delta > max(checkpoints):
             continue
-        if game.event_id in linked:
-            allowed, reason = True, "player já publicado; revalidar status real do YouTube"
-        else:
-            allowed, reason = live_search_allowed(game.event_id)
+        allowed, reason = live_search_allowed(game.event_id)
         if not allowed:
+            continue
+        resolved, missing = transmission_guardian_resolution(game.event_id)
+        # Busca de player só existe se a grade o exige e ele ainda está ausente.
+        if "player_integral_ausente" not in missing:
             continue
         last, _ = last_run(runs, WORKFLOW_TRANSMISSOES, tz, title_contains=f"aovivo · {game.event_id}")
         if only_never_checked and last is not None:
@@ -1200,7 +1195,7 @@ def transmission_guardian_decision(
     runs: Sequence[Mapping[str, Any]],
 ) -> Decision | None:
     cfg = config["transmissoes"]
-    checkpoints = sorted(set(int(v) for v in (cfg.get("guardiao_checkpoints_minutos") or [-1440, -360, -90, -15, 10])))
+    checkpoints = sorted(set(int(v) for v in (cfg.get("guardiao_checkpoints_minutos") or [-90, -15, 10])))
     if not checkpoints:
         return None
     candidates: list[tuple[Game, int, float]] = []
@@ -1240,15 +1235,14 @@ def tv_decision(
     runs: Sequence[Mapping[str, Any]],
     audit_summary: Mapping[str, Any] | None = None,
 ) -> Decision | None:
-    """Agenda a varredura completa de TV com cadência proporcional à pendência.
+    """Fallback manual NEED-DRIVEN para grade TV.
 
-    Esta função existe apenas como fallback manual do antigo runner GitHub. O
-    Cloudflare primário calcula a cobertura diretamente da agenda: 6h se houver
-    lacuna <72h, 24h em até 14d, 72h em 15-30d e 168h quando o mês está completo.
+    A política canônica é a mesma do Cloudflare: jogos a mais de 72h não são
+    pendência operacional. O fallback nunca faz manutenção preventiva de 14/30
+    dias; só reage quando a auditoria comprova lacuna dentro de 72h.
     """
     cfg = config["transmissoes"]
     last, _ = last_run(runs, WORKFLOW_TRANSMISSOES, tz, title_contains="· tv")
-    first_after = str(cfg.get("tv_diaria_apos") or "06:30")
 
     if audit_summary is None:
         audit = load_json(TV_AUDIT_PATH, {})
@@ -1257,57 +1251,19 @@ def tv_decision(
     else:
         summary = audit_summary
 
-    def _count(key: str) -> int:
-        try:
-            return max(0, int(summary.get(key) or 0))
-        except (TypeError, ValueError):
-            return 0
+    try:
+        critical = max(0, int(summary.get("jogos_criticos_sem_transmissao_72h") or 0))
+    except (TypeError, ValueError):
+        critical = 0
+    if critical <= 0:
+        return None
 
-    critical = _count("jogos_criticos_sem_transmissao_72h")
-    missing_14d = _count("jogos_sem_transmissao_14d")
-    missing_future = _count("jogos_sem_transmissao_fora_14d")
     age_minutes = minutes_since(last, now)
     critical_hours = float(cfg.get("tv_retentativa_critica_horas") or 6)
-    pending_hours = float(cfg.get("tv_intervalo_pendencia_horas") or 24)
-    pending_30d_hours = float(cfg.get("tv_intervalo_pendencia_30d_horas") or 72)
-    healthy_hours = float(cfg.get("tv_intervalo_saudavel_horas") or 168)
-
-    # Primeira execução: conserva a janela matinal para evitar varredura
-    # desnecessária à meia-noite após um deploy/recriação de histórico.
-    if last is None:
-        if time_reached(now, first_after):
-            return Decision("transmissoes_tv", "Primeira atualização da grade de TV ainda não executada.", mode="tv")
-        return None
-
-    # Lacuna realmente próxima merece prioridade e independe do horário-base.
-    if critical > 0 and age_minutes >= critical_hours * 60:
+    if last is None or age_minutes >= critical_hours * 60:
         return Decision(
             "transmissoes_tv",
-            f"Há {critical} jogo(s) nas próximas 72h sem grade confirmada; retentativa crítica após {critical_hours:g}h.",
-            mode="tv",
-        )
-
-    if not time_reached(now, first_after):
-        return None
-
-    if missing_14d > 0 and age_minutes >= pending_hours * 60:
-        return Decision(
-            "transmissoes_tv",
-            f"Há {missing_14d} jogo(s) nos próximos 14 dias sem grade; nova pesquisa após {pending_hours:g}h.",
-            mode="tv",
-        )
-
-    if missing_14d == 0 and missing_future > 0 and age_minutes >= pending_30d_hours * 60:
-        return Decision(
-            "transmissoes_tv",
-            f"Há {missing_future} jogo(s) futuros fora de 14 dias ainda sem grade; manutenção após {pending_30d_hours:g}h.",
-            mode="tv",
-        )
-
-    if missing_14d == 0 and missing_future == 0 and age_minutes >= healthy_hours * 60:
-        return Decision(
-            "transmissoes_tv",
-            f"Cobertura futura completa; manutenção preventiva semanal após {healthy_hours:g}h.",
+            f"Há {critical} jogo(s) dentro de 72h sem grade confirmada; fallback manual need-driven.",
             mode="tv",
         )
     return None
@@ -1715,9 +1671,11 @@ def self_test() -> int:
         live_game = Game("live-1", "brasileirao", "bra.1", now + timedelta(minutes=20), "Mirassol", "Flamengo")
         original_live_allowed = globals()["live_search_allowed"]
         original_live_entries = globals()["live_entries"]
+        original_guardian_resolution = globals()["transmission_guardian_resolution"]
         try:
-            globals()["live_search_allowed"] = lambda event_id: (True, "grade indica CazéTV")
+            globals()["live_search_allowed"] = lambda event_id: (True, "grade exige CazéTV")
             globals()["live_entries"] = lambda path: set()
+            globals()["transmission_guardian_resolution"] = lambda event_id: (False, ("player_integral_ausente",))
             first = transmission_live_decision(config, now, [live_game], set(), tz, [], only_never_checked=True)
             assert first and first.action == "transmissao_aovivo" and first.event_id == "live-1"
             prior_live_run = [{
@@ -1729,6 +1687,7 @@ def self_test() -> int:
         finally:
             globals()["live_search_allowed"] = original_live_allowed
             globals()["live_entries"] = original_live_entries
+            globals()["transmission_guardian_resolution"] = original_guardian_resolution
 
         # Gol novo durante a partida NÃO deve disparar workflow pesado; o browser
         # já atualiza classificação/estatísticas pelo scoreboard ESPN a cada 30 s.
@@ -1798,17 +1757,12 @@ def self_test() -> int:
         for name, path in original_paths.items():
             globals()[name] = path
 
-    # TV futura no fallback: 168h saudável, 72h pendência futura, 24h em 14d
-    # e 6h se crítica. O Worker Cloudflare é a fonte operacional primária.
-    tx_cfg = deep_merge(DEFAULT_CONFIG, {"transmissoes": {
-        "tv_diaria_apos": "06:30",
-        "tv_intervalo_saudavel_horas": 168,
-        "tv_intervalo_pendencia_horas": 24,
-        "tv_intervalo_pendencia_30d_horas": 72,
-        "tv_retentativa_critica_horas": 6,
-    }})
+    # TV futura no fallback segue a mesma política NEED-DRIVEN do Cloudflare:
+    # somente lacuna dentro de 72h pode abrir workflow. Pendências mais distantes
+    # permanecem como "a confirmar" sem manutenção preventiva.
+    tx_cfg = deep_merge(DEFAULT_CONFIG, {"transmissoes": {"tv_retentativa_critica_horas": 6}})
     tx_now = datetime(2026, 8, 16, 12, 0, tzinfo=tz)
-    healthy_summary = {"jogos_sem_transmissao_14d": 0, "jogos_sem_transmissao_fora_14d": 0, "jogos_criticos_sem_transmissao_72h": 0}
+    healthy_summary = {"jogos_sem_transmissao_14d": 9, "jogos_sem_transmissao_fora_14d": 20, "jogos_criticos_sem_transmissao_72h": 0}
     recent_tv = [{
         "name": WORKFLOW_TRANSMISSOES, "status": "completed", "conclusion": "success",
         "created_at": "2026-08-15T15:00:00Z", "display_title": "Transmissões · tv · todos",
@@ -1818,13 +1772,7 @@ def self_test() -> int:
         "name": WORKFLOW_TRANSMISSOES, "status": "completed", "conclusion": "success",
         "created_at": "2026-08-08T15:00:00Z", "display_title": "Transmissões · tv · todos",
     }]
-    assert tv_decision(tx_cfg, tx_now, tz, old_tv, healthy_summary).action == "transmissoes_tv"
-    pending_summary = {"jogos_sem_transmissao_14d": 2, "jogos_sem_transmissao_fora_14d": 0, "jogos_criticos_sem_transmissao_72h": 0}
-    day_old_tv = [{
-        "name": WORKFLOW_TRANSMISSOES, "status": "completed", "conclusion": "success",
-        "created_at": "2026-08-15T14:00:00Z", "display_title": "Transmissões · tv · todos",
-    }]
-    assert tv_decision(tx_cfg, tx_now, tz, day_old_tv, pending_summary).action == "transmissoes_tv"
+    assert tv_decision(tx_cfg, tx_now, tz, old_tv, healthy_summary) is None
     critical_summary = {"jogos_sem_transmissao_14d": 1, "jogos_sem_transmissao_fora_14d": 0, "jogos_criticos_sem_transmissao_72h": 1}
     six_hours_tv = [{
         "name": WORKFLOW_TRANSMISSOES, "status": "completed", "conclusion": "success",

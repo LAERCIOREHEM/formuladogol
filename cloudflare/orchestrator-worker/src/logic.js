@@ -10,9 +10,9 @@ export const POLICY = Object.freeze({
     dailyRetryMinutes: 360,
     sourceProbeMinutes: 5,
   },
-  slowEvalMinutes: 5,
+  slowEvalMinutes: 15,
   publicos: {
-    firstAfterFinalMinutes: 120,
+    firstAfterFinalMinutes: 30,
     retryBands: [
       [4, 120], [6, 120], [9, 180], [12, 180], [18, 360],
       [24, 360], [36, 720], [48, 720], [99999, 1440],
@@ -25,8 +25,13 @@ export const POLICY = Object.freeze({
     ],
   },
   transmissoes: {
-    liveCheckpointsMinutes: [-90, -45, -20, -5, 10, 30],
-    guardianCheckpointsMinutes: [-1440, -360, -90, -15, 10],
+    // Need-driven: nenhum player é procurado se a grade não exigir GE TV/SBT/CazéTV.
+    liveCheckpointsMinutes: [-90, -15, 10],
+    // O Guardião é escalonamento de exceção perto do jogo, nunca auditoria T-24h/T-6h de rotina.
+    guardianCheckpointsMinutes: [-90, -15, 10],
+    // Grade futura só vira pendência operacional a partir de T-72h.
+    tvCheckpointsMinutes: [-4320, -1440, -360],
+    tvWindowHours: 72,
     tvAfter: '06:30',
     tvCriticalHours: 6,
     tvMissing14dHours: 24,
@@ -326,13 +331,11 @@ export function liveLinkedIds(auto, manual) {
 
 export function liveSearchAllowed(eventId, tv) {
   const item = tv?.jogos?.[eventId];
-  if (!item || typeof item !== 'object') return { allowed: true, reason: 'grade ainda não consolidada' };
-  const channels = new Set((item.canais || []).map(String));
-  if (['GE TV', 'SBT', 'CazéTV'].some((x) => channels.has(x))) return { allowed: true, reason: 'grade já indica GE TV/SBT/CazéTV' };
-  if (item.exclusivo === true) return { allowed: false, reason: 'grade exclusiva confirmada sem player-alvo' };
-  if (channels.has('Globo') || channels.has('Record')) return { allowed: true, reason: 'grade aberta pode ter direito digital' };
-  if (item.estavel === true) return { allowed: false, reason: 'grade estável sem indício de player-alvo' };
-  return { allowed: true, reason: 'grade ainda não estável' };
+  if (!item || typeof item !== 'object') return { allowed: false, reason: 'grade ausente; primeiro resolver TV pelo coletor determinístico' };
+  const channels = new Set((item.canais || []).map((x) => String(x || '').trim().toLowerCase()));
+  const playerRequired = ['ge tv', 'sbt', 'cazétv', 'cazetv'].some((x) => channels.has(x));
+  if (!playerRequired) return { allowed: false, reason: 'grade não exige player oficial GE TV/SBT/CazéTV' };
+  return { allowed: true, reason: 'grade exige player oficial GE TV/SBT/CazéTV' };
 }
 
 export function liveCheckpointDue(game, now, lastCheckpoint = null, checkpoints = POLICY.transmissoes.liveCheckpointsMinutes) {
@@ -422,31 +425,47 @@ export function publicPendingFingerprint(item) {
   return fields.length ? fields.join('+') : 'reconciliar';
 }
 
-export function tvCoverage(games, tv, now, days = 30) {
+export function tvCoverage(games, tv, now, hoursWindow = POLICY.transmissoes.tvWindowHours) {
   const t = parseDate(now).getTime();
-  const max = t + days * 86400000;
+  const max = t + hoursWindow * 3600000;
   const published = tv?.jogos && typeof tv.jogos === 'object' ? tv.jogos : {};
   const missing = [];
   for (const game of games) {
     const k = game.kickoff.getTime();
     if (k < t - 6 * 3600000 || k > max) continue;
-    if (published[game.eventId]?.canais?.length) continue;
+    const row = published[game.eventId];
+    const channels = Array.isArray(row?.canais) ? row.canais.filter(Boolean) : [];
+    const confidence = String(row?.confianca || '').trim().toLowerCase();
+    const operationallyResolved = channels.length > 0
+      && (row?.estavel === true || ['confirmado', 'confirmada', 'manual', 'alta', 'high', 'verified', 'verificado'].includes(confidence));
+    // `preservado`/instável não equivale a grade confirmada: dentro de 72h ele
+    // volta à fila determinística, sem antecipar buscas semanas antes.
+    if (operationallyResolved) continue;
     const hours = (k - t) / 3600000;
-    missing.push({ game, hours });
+    missing.push({ game, hours, reason: channels.length ? 'grade_preservada_ou_instavel' : 'tv_ausente' });
   }
   return {
+    windowHours: hoursWindow,
+    missing72h: missing.length,
+    critical24h: missing.filter((x) => x.hours <= 24).length,
+    critical6h: missing.filter((x) => x.hours <= 6).length,
+    // aliases legados para consumidores/tests antigos; agora limitados à janela operacional de 72h.
     missing30d: missing.length,
-    missing14d: missing.filter((x) => x.hours <= 14 * 24).length,
-    critical72h: missing.filter((x) => x.hours <= 72).length,
+    missing14d: missing.length,
+    critical72h: missing.length,
     missing,
   };
 }
 
 export function tvIntervalHours(coverage) {
-  if (coverage.critical72h > 0) return POLICY.transmissoes.tvCriticalHours;
-  if (coverage.missing14d > 0) return POLICY.transmissoes.tvMissing14dHours;
-  if (coverage.missing30d > 0) return POLICY.transmissoes.tvMissing30dHours;
-  return POLICY.transmissoes.tvHealthy30dHours;
+  if (coverage.critical6h > 0) return 1;
+  if (coverage.critical24h > 0) return 6;
+  if (coverage.missing72h > 0) return 24;
+  return 168;
+}
+
+export function tvCheckpointDue(game, now, lastCheckpoint = null, checkpoints = POLICY.transmissoes.tvCheckpointsMinutes) {
+  return liveCheckpointDue(game, now, lastCheckpoint, checkpoints);
 }
 
 export function roundState(round, calendar, results, now, config = {}) {
