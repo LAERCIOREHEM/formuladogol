@@ -26,6 +26,7 @@ jobs:
       FDG_PUSH_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       FDG_PUSH_EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
       FDG_PUSH_API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+      FDG_PUSH_YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
     defaults:
       run:
         working-directory: cloudflare/push-worker
@@ -44,7 +45,8 @@ jobs:
           set -euo pipefail
           test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo 'ERRO: secret CLOUDFLARE_API_TOKEN ausente.'; exit 1; }
           test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo 'ERRO: secret CLOUDFLARE_ACCOUNT_ID ausente.'; exit 1; }
-          test -n "${FDG_PUSH_OPENAI_API_KEY:-}" || { echo 'ERRO: secret OPENAI_API_KEY ausente; o Guardião IA não pode operar.'; exit 1; }
+          test -n "${FDG_PUSH_OPENAI_API_KEY:-}" || { echo 'ERRO: secret OPENAI_API_KEY ausente; o Guardião IA/Fastlane não pode operar.'; exit 1; }
+          test -n "${FDG_PUSH_YOUTUBE_API_KEY:-}" || { echo 'ERRO: secret YOUTUBE_API_KEY ausente; o Fastlane de melhores momentos não pode operar.'; exit 1; }
 
           # Desde o fallback continental v3, API-Football é a camada
           # prioritária de enriquecimento quando a ESPN vem incompleta.
@@ -136,6 +138,8 @@ jobs:
         run: |
           set -euo pipefail
           printf '%s' "$FDG_PUSH_OPENAI_API_KEY" | npx wrangler secret put OPENAI_API_KEY --config wrangler.generated.jsonc
+          printf '%s' "$FDG_PUSH_YOUTUBE_API_KEY" | npx wrangler secret put YOUTUBE_API_KEY --config wrangler.generated.jsonc
+          echo 'Secret YOUTUBE_API_KEY atualizado para o pós-jogo Fastlane.'
 
           # API-Football é obrigatória desde o fallback continental v3. A validação
           # acima impede o deploy sem chave; aqui sincronizamos o secret no Worker.
@@ -233,6 +237,8 @@ jobs:
             problems.push(`liveFactsContractVersion=${h.liveFactsContractVersion} esperado=${expectedFactsContract}`);
           }
           if (h.canonicalLiveFacts !== true) problems.push('canonicalLiveFacts!=true');
+          if (h.postgameFastlane !== true) problems.push('postgameFastlane!=true');
+          if (Number(h.postgameFastlaneVersion) !== 1) problems.push(`postgameFastlaneVersion=${h.postgameFastlaneVersion}`);
           if (h.liveStatePrimary !== 'worker-espn') problems.push(`liveStatePrimary=${h.liveStatePrimary}`);
           if (h.liveStateDirectFallback !== true) problems.push('liveStateDirectFallback!=true');
           if (h.theSportsDbStatsReady !== true) problems.push('theSportsDbStatsReady!=true');
@@ -262,6 +268,17 @@ jobs:
             cat /tmp/fdg-push-health.json 2>/dev/null || true
             exit 1
           fi
+
+          curl -fsS --max-time 10 'https://push.formuladogol.com.br/v1/postgame/status' >/tmp/fdg-postgame-status.json
+          node <<'NODE'
+          const fs = require('fs');
+          const s = JSON.parse(fs.readFileSync('/tmp/fdg-postgame-status.json', 'utf8'));
+          if (s.ok !== true || s.engine !== 'cloudflare-postgame-fastlane' || Number(s.version) !== 1) {
+            console.error('Fastlane pós-jogo não respondeu com o contrato esperado:', s);
+            process.exit(1);
+          }
+          console.log(`Fastlane pós-jogo OK: total=${Number(s.total || 0)} publicPending=${Number(s.publicPending || 0)} highlightPending=${Number(s.highlightPending || 0)}`);
+          NODE
 
           TODAY_UTC="$(date -u +%Y%m%d)"
           curl -fsS --max-time 20 "https://push.formuladogol.com.br/v1/live/state?league=bra.1&dates=${TODAY_UTC}&fresh=1" >/tmp/fdg-live-state.json
