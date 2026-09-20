@@ -251,16 +251,30 @@ function fresherEvent(candidate, current) {
   if (!current) return true;
   const candidateState = eventStateRank(candidate);
   const currentState = eventStateRank(current);
-  if (candidateState !== currentState) return candidateState > currentState;
+  const candidateScore = eventScoreTotal(candidate);
+  const currentScore = eventScoreTotal(current);
+
+  // LiveState v6: o relógio de uma superfície ESPN pode avançar antes de ela
+  // incorporar o gol que outra superfície já publicou. Dentro do mesmo estado,
+  // o placar nunca pode regredir só porque o clock é alguns segundos/minutos
+  // maior. Uma redução legítima por VAR só vence quando o feed com placar maior
+  // deixa de existir (ou seja, as superfícies convergem para a redução).
+  if (candidateState !== currentState) {
+    const liveVsCompleted = new Set([candidateState, currentState]);
+    if (liveVsCompleted.has(2) && liveVsCompleted.has(3) && candidateScore !== currentScore) {
+      if (candidateState === 3 && candidateScore < currentScore) return false;
+      if (currentState === 3 && currentScore < candidateScore) return true;
+    }
+    return candidateState > currentState;
+  }
+
+  if (candidateScore !== currentScore) return candidateScore > currentScore;
   const candidatePeriod = eventPeriod(candidate);
   const currentPeriod = eventPeriod(current);
   if (candidatePeriod !== currentPeriod) return candidatePeriod > currentPeriod;
   const candidateClock = eventClockNumber(candidate);
   const currentClock = eventClockNumber(current);
   if (candidateClock !== currentClock) return candidateClock > currentClock;
-  const candidateScore = eventScoreTotal(candidate);
-  const currentScore = eventScoreTotal(current);
-  if (candidateScore !== currentScore) return candidateScore > currentScore;
   return false;
 }
 

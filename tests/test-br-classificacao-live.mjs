@@ -63,7 +63,7 @@ const workerPayload = {
     storage: { getItem: () => null, setItem: () => {} },
   });
   assert.equal(state.meta.source, 'worker-espn');
-  assert.equal(state.meta.liveStateVersion, '5');
+  assert.equal(state.meta.liveStateVersion, '6');
   assert.equal(Object.keys(state.liveMap).length, 2);
   assert.ok(calls[0].includes('/v1/live/state?league=bra.1'));
   assert.ok(!calls[0].includes('fresh=1'), 'fluxo normal compartilha o hot snapshot do Worker');
@@ -183,10 +183,10 @@ const workerPayload = {
 {
   const game = { eventId: 'live-hulk', estado: 'in', placarMandante: 1, placarVisitante: 0, mandante: 'Fluminense', visitante: 'Corinthians' };
   const envelope = {
-    ok: true, factsContractVersion: 1, fetchedAt: Date.now(), facts: {
-      contractVersion: 1, eventId: 'live-hulk', goals: [{ minute: "23'", teamId: '3445', team: 'Fluminense', side: 'home', scorer: 'Hulk', assists: ['John Kennedy'], ownGoal: false }],
+    ok: true, factsContractVersion: 2, fetchedAt: Date.now(), facts: {
+      contractVersion: 2, eventId: 'live-hulk', goals: [{ minute: "23'", teamId: '3445', team: 'Fluminense', side: 'home', scorer: 'Hulk', assists: ['John Kennedy'], ownGoal: false, scoreAfter: { home: 1, away: 0 } }],
       appearances: [{ name: 'Hulk', team: 'Fluminense' }, { name: 'John Kennedy', team: 'Fluminense' }],
-      integrity: { expectedGoals: 1, observedGoalCount: 1, teamResolvedCount: 1, scorerResolvedCount: 1, usableGoalCount: 1, complete: true }
+      integrity: { expectedHome: 1, expectedAway: 0, expectedGoals: 1, observedGoalCount: 1, teamResolvedCount: 1, scorerResolvedCount: 1, usableGoalCount: 1, mathematicallyValid: true, scoreComplete: true, identityComplete: true, complete: true }
     }
   };
   const facts = await live.fetchMatchFacts(game, { canonicalize: (v) => v, fetcher: async () => Response.json(envelope), storage: { getItem: () => null, setItem: () => {} } });
@@ -196,7 +196,24 @@ const workerPayload = {
 }
 
 
-// Regressões estruturais v5: desempenho, refresh orientado a placar e setas canônicas.
+// Live Facts v6: se o Worker canônico falhar num placar com gol, o cliente NÃO
+// pode reconstruir autoria pela ESPN direta. É preferível mostrar só o placar.
+{
+  const game = { eventId: 'no-raw-fallback', estado: 'in', placarMandante: 1, placarVisitante: 0, mandante: 'Flamengo', visitante: 'Bragantino' };
+  const calls = [];
+  const fetcher = async (url) => {
+    const href = String(url); calls.push(href);
+    if (href.includes('push.formuladogol.com.br')) return new Response('offline', { status: 503 });
+    if (href.includes('site.api.espn.com')) return Response.json({ scoringPlays: [{ scoringPlay: true, homeScore: 1, awayScore: 0, athletesInvolved: [{ displayName: 'Jogador Fantasma' }] }] });
+    throw new Error(`URL inesperada ${href}`);
+  };
+  await assert.rejects(() => live.fetchMatchFacts(game, { fetcher, storage: { getItem: () => null, setItem: () => {} } }), /Live Facts canônicos indisponíveis/);
+  assert.ok(calls.every((href) => !href.includes('site.api.espn.com')), 'fetchMatchFacts não pode consultar summary bruto direto');
+  assert.ok(calls[0].includes('expectedHome=1') && calls[0].includes('expectedAway=0'), 'placar exato deve viajar no contrato');
+}
+
+
+// Regressões estruturais v6: desempenho, refresh orientado a placar e setas canônicas.
 {
   const statsSource = fs.readFileSync(new URL('../js/br-estatisticas.js', import.meta.url), 'utf8');
   const liveSource = fs.readFileSync(new URL('../js/br-aovivo.js', import.meta.url), 'utf8');
@@ -210,8 +227,12 @@ const workerPayload = {
   assert.match(liveSource, /const LIVE_REFRESH_MS = 10000/);
   assert.match(liveSource, /renderMain\(selected,cached,all\); updateCountdowns\(\); updateFreshnessUi\(selected\);/);
   assert.match(liveSource, /summaryScoreKey/);
+  assert.match(liveSource, /if \(!canonical \|\| !Array\.isArray\(canonical\.goals\)\) return \{home,away\};/, 'Ao Vivo não pode cair para parser bruto de gols');
+  assert.ok(!liveSource.includes('eventRows(g,summary).filter(r=>r.type.key==="goal")'), 'parser bruto de gols deve estar eliminado do render');
+  assert.ok(liveSource.indexOf('if (teamId && teamId===homeId)') < liveSource.indexOf('else if (goal.side==="home")'), 'teamId precisa ter precedência sobre side');
+  assert.match(statsSource, /factsMatchCurrentScore/, 'estatísticas devem rejeitar Live Facts de outro placar');
   assert.match(indexSource, /const posBase = Object\.fromEntries\(\(state\.tabela \|\| \[\]\)\.map/);
   assert.match(indexSource, /htmlSetaMovimento\(posBase\[t\.time\], t\.pos, true\)/);
 }
 
-console.log('OK: LiveState v5 — placar canônico, facts e dois jogos simultâneos.');
+console.log('OK: LiveState v6 — placar anti-regressão, Live Facts canônicos e dois jogos simultâneos.');

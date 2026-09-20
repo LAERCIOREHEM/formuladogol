@@ -413,11 +413,20 @@
     return candidates.length === 1 ? candidates[0] : null;
   }
 
+  function factsMatchCurrentScore(eventId, facts) {
+    if (!facts || facts?.integrity?.mathematicallyValid === false) return false;
+    const game = liveApplicableGames().find((item) => String(item.eventId || "") === String(eventId));
+    if (!game) return false;
+    const expectedHome = Math.max(0, Number(game.placarMandante || 0) || 0);
+    const expectedAway = Math.max(0, Number(game.placarVisitante || 0) || 0);
+    return Number(facts?.integrity?.expectedHome) === expectedHome && Number(facts?.integrity?.expectedAway) === expectedAway;
+  }
+
   function liveDeltas() {
     const goals = new Map(), assists = new Map(), appearances = new Map();
     const activeEventIds = new Set(liveApplicableGames().map((game) => String(game.eventId || "")).filter(Boolean));
     for (const [eventId, facts] of Object.entries(state.liveFacts || {})) {
-      if (!activeEventIds.has(String(eventId)) || !facts) continue;
+      if (!activeEventIds.has(String(eventId)) || !facts || !factsMatchCurrentScore(eventId, facts)) continue;
       for (const appearance of facts.appearances || []) {
         const key = playerKey(appearance.name, appearance.team);
         if (!key || key === "|") continue;
@@ -514,7 +523,7 @@
 
     const activeEventIds = new Set(liveApplicableGames().map((game) => String(game.eventId || "")).filter(Boolean));
     for (const [eventId, facts] of Object.entries(state.liveFacts || {})) {
-      if (!activeEventIds.has(String(eventId)) || !facts) continue;
+      if (!activeEventIds.has(String(eventId)) || !facts || !factsMatchCurrentScore(eventId, facts)) continue;
       for (const goal of facts.goals || []) {
         if (!goal?.ownGoal || !goal?.team) continue;
         add(byClub, goal.team);
@@ -2749,7 +2758,10 @@
         next[eventId]={...facts,ok:facts?.integrity?.complete===true};
       } catch (error) {
         failures += 1;
-        next[eventId]=previous[eventId] || {ok:false,goals:[],appearances:[],integrity:{expectedGoals:(Number(game.placarMandante)||0)+(Number(game.placarVisitante)||0),complete:false,status:"unavailable"}};
+        const expectedHome=Math.max(0,Number(game.placarMandante)||0), expectedAway=Math.max(0,Number(game.placarVisitante)||0);
+        const prior=previous[eventId];
+        const sameScore=prior && Number(prior?.integrity?.expectedHome)===expectedHome && Number(prior?.integrity?.expectedAway)===expectedAway && prior?.integrity?.mathematicallyValid!==false;
+        next[eventId]=sameScore?prior:{ok:false,goals:[],appearances:[],integrity:{expectedHome,expectedAway,expectedGoals:expectedHome+expectedAway,observedGoalCount:0,mathematicallyValid:true,complete:false,status:"unavailable"}};
       }
     }));
     const changed=liveFactsSignature(next)!==liveFactsSignature(previous);

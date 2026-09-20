@@ -169,12 +169,12 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
   const fakeFetch = async (url) => {
     const href = String(url);
     if (href.includes('/core/conmebol.sudamericana/game')) {
-      return Response.json({ gamepackageJSON: { plays: [{ id: 'g1', scoringPlay: true, text: 'Goal scored by A' }] } });
+      return Response.json({ gamepackageJSON: { plays: [{ id: 'g1', scoringPlay: true, text: 'Goal scored by A', team: { id: '1' }, homeScore: 1, awayScore: 0, athletesInvolved: [{ id: '10', displayName: 'Jogador A' }] }] } });
     }
     if (href.includes('/core/conmebol.sudamericana/playbyplay')) {
       return Response.json({ gamepackageJSON: { plays: [
-        { id: 'g1', scoringPlay: true, text: 'Goal scored by A' },
-        { id: 'g2', scoringPlay: true, text: 'Goal scored by B' }
+        { id: 'g1', scoringPlay: true, text: 'Goal scored by A', team: { id: '1' }, homeScore: 1, awayScore: 0, athletesInvolved: [{ id: '10', displayName: 'Jogador A' }] },
+        { id: 'g2', scoringPlay: true, text: 'Goal scored by B', team: { id: '2' }, homeScore: 1, awayScore: 1, athletesInvolved: [{ id: '20', displayName: 'Jogador B' }] }
       ] } });
     }
     if (href.includes('/core/soccer/game') || href.includes('/core/soccer/playbyplay')) {
@@ -182,15 +182,15 @@ function scoreboardEvent({ id = '401999001', clock = "50'", home = 0, away = 0, 
     }
     if (href.includes('site.api.espn.com')) {
       return Response.json({
-        header: { id: '401999001' },
+        header: { id: '401999001', competitions: [{ competitors: [{ homeAway: 'home', score: '1', team: { id: '1', displayName: 'Time A' } }, { homeAway: 'away', score: '1', team: { id: '2', displayName: 'Time B' } }] }] },
         gameInfo: { venue: { fullName: 'Estádio teste' } },
         boxscore: { teams: [{ team: { id: '1' }, statistics: [{ name: 'possessionPct', displayValue: '55%' }] }] },
         rosters: [{ team: { id: '1' }, roster: [{ athlete: { id: '10', displayName: 'Jogador A' } }] }],
-        plays: [{ id: 'g1', scoringPlay: true, text: 'Goal scored by A' }]
+        plays: [{ id: 'g1', scoringPlay: true, text: 'Goal scored by A', team: { id: '1' }, homeScore: 1, awayScore: 0, athletesInvolved: [{ id: '10', displayName: 'Jogador A' }] }]
       });
     }
     if (href.includes('sports.core.api.espn.com')) {
-      return Response.json({ items: [{ id: 'g1', scoringPlay: true, text: 'Goal scored by A' }] });
+      return Response.json({ items: [{ id: 'g1', scoringPlay: true, text: 'Goal scored by A', team: { id: '1' }, homeScore: 1, awayScore: 0, athletesInvolved: [{ id: '10', displayName: 'Jogador A' }] }] });
     }
     throw new Error(`URL inesperada ${href}`);
   };
@@ -616,3 +616,52 @@ console.log('live-api tests: ok');
   assert.equal(result.body.espnOnly, true);
   assert.equal(externalCalls, 0);
 }
+
+// Live Facts v6 integrado: 0x0 descarta scoringPlay fantasma e o hot-cache
+// precisa ser invalidado assim que o placar canônico muda para 1x0.
+{
+  const cache = new MemoryCache();
+  let phase = 0;
+  const payload = () => {
+    const homeScore = phase === 0 ? 0 : 1;
+    const plays = phase === 0
+      ? [
+          { id: 'rogue-plata', scoringPlay: true, team: { id: '819' }, homeScore: 1, awayScore: 0, clock: { displayValue: "10'" }, athletesInvolved: [{ displayName: 'Gonzalo Plata' }], text: 'Goal! Gonzalo Plata.' },
+          { id: 'rogue-varela', scoringPlay: true, team: { id: '819' }, homeScore: 2, awayScore: 0, clock: { displayValue: "13'" }, athletesInvolved: [{ displayName: 'Guillermo Varela' }], text: 'Goal! Guillermo Varela.' }
+        ]
+      : [{ id: 'real-goal', scoringPlay: true, team: { id: '819' }, homeScore: 1, awayScore: 0, clock: { displayValue: "21'" }, athletesInvolved: [{ displayName: 'Gonzalo Plata' }], text: 'Goal! Gonzalo Plata.' }];
+    return {
+      header: { id: '401841241', competitions: [{ status: { type: { state: 'in', completed: false } }, competitors: [
+        { homeAway: 'home', score: String(homeScore), team: { id: '819', displayName: 'Flamengo' } },
+        { homeAway: 'away', score: '0', team: { id: '6079', displayName: 'Bragantino' } }
+      ] }] },
+      plays
+    };
+  };
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    const data = payload();
+    if (href.includes('sports.core.api.espn.com')) return Response.json({ items: data.plays });
+    if (href.includes('cdn.espn.com')) return Response.json({ gamepackageJSON: data });
+    if (href.includes('site.api.espn.com')) return Response.json(data);
+    throw new Error(`URL inesperada ${href}`);
+  };
+
+  let result = await resolveLiveSummary(new URL('https://x/v1/live/summary?league=bra.1&event=401841241&state=in&expectedHome=0&expectedAway=0&expectedGoals=0&fresh=1'), { cache, fetchImpl: fakeFetch, now: () => 10_000_000 });
+  assert.equal(result.status, 200);
+  assert.equal(result.body.facts.integrity.expectedGoals, 0);
+  assert.equal(result.body.facts.goals.length, 0);
+  assert.equal(result.body.facts.integrity.rawGoalVariants >= 2, true);
+  assert.equal(result.body.facts.integrity.complete, true);
+
+  phase = 1;
+  result = await resolveLiveSummary(new URL('https://x/v1/live/summary?league=bra.1&event=401841241&state=in&expectedHome=1&expectedAway=0&expectedGoals=1'), { cache, fetchImpl: fakeFetch, now: () => 10_001_000 });
+  assert.equal(result.status, 200);
+  assert.equal(result.body.cacheStatus, 'miss', 'facts 0x0 do hot-cache não podem servir ao placar 1x0');
+  assert.equal(result.body.facts.integrity.expectedHome, 1);
+  assert.equal(result.body.facts.integrity.expectedAway, 0);
+  assert.equal(result.body.facts.goals.length, 1);
+  assert.equal(result.body.facts.goals[0].scorer, 'Gonzalo Plata');
+}
+
+console.log('live-api Live Facts v6 integration: ok');

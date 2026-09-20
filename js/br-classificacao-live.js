@@ -10,16 +10,16 @@
   const SUMMARY_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary";
   const LIVE_STATE_URL = "https://push.formuladogol.com.br/v1/live/state";
   const LIVE_SUMMARY_URL = "https://push.formuladogol.com.br/v1/live/summary";
-  const LIVE_STATE_VERSION = "5";
-  const LIVE_FACTS_CONTRACT_VERSION = 1;
+  const LIVE_STATE_VERSION = "6";
+  const LIVE_FACTS_CONTRACT_VERSION = 2;
   const FINAL_MINUTES_AFTER_START = 90;
   const WORKER_TIMEOUT_MS = 4500;
   const DIRECT_TIMEOUT_MS = 4500;
   const ACTIVE_CACHE_MAX_AGE_MS = 90000;
   const IDLE_CACHE_MAX_AGE_MS = 45000;
   const POST_CACHE_MAX_AGE_MS = 180000;
-  const STORAGE_KEY = "fdg.br.live-state.v5";
-  const FACTS_STORAGE_PREFIX = "fdg.br.live-facts.v1.";
+  const STORAGE_KEY = "fdg.br.live-state.v6";
+  const FACTS_STORAGE_PREFIX = "fdg.br.live-facts.v2.";
 
   function numberScore(value) {
     if (value === null || value === undefined || value === "" || value === "-") return null;
@@ -580,10 +580,15 @@
     const opts = options || {};
     const id = encodeURIComponent(String(eventId || ""));
     const expectedGoals = Math.max(0, Number(opts.expectedGoals || 0) || 0);
+    const expectedHome = numberScore(opts.expectedHome);
+    const expectedAway = numberScore(opts.expectedAway);
+    const exactScore = expectedHome !== null && expectedAway !== null
+      ? `&expectedHome=${expectedHome}&expectedAway=${expectedAway}`
+      : "";
     const errors = [];
     if (opts.worker !== false) {
       try {
-        const workerUrl = `${opts.workerSummaryUrl || LIVE_SUMMARY_URL}?league=bra.1&event=${id}&state=${encodeURIComponent(opts.state || "in")}&expectedGoals=${expectedGoals}${opts.forceFresh === true ? "&fresh=1" : ""}&_=${Date.now()}`;
+        const workerUrl = `${opts.workerSummaryUrl || LIVE_SUMMARY_URL}?league=bra.1&event=${id}&state=${encodeURIComponent(opts.state || "in")}&expectedGoals=${expectedGoals}${exactScore}${opts.forceFresh === true ? "&fresh=1" : ""}&_=${Date.now()}`;
         const envelope = await fetchJson(workerUrl, opts, Number(opts.workerTimeoutMs || WORKER_TIMEOUT_MS));
         if (envelope && envelope.data && typeof envelope.data === "object") return envelope.data;
         throw new Error("payload summary do Worker inválido");
@@ -594,25 +599,76 @@
     throw new Error(`ESPN summary indisponível: ${errors.join(" | ")}`);
   }
 
-  function factsExpectedGoals(live) { return Math.max(0, (numberScore(live && live.placarMandante) || 0) + (numberScore(live && live.placarVisitante) || 0)); }
-  function factsQuality(facts) { const i=facts?.integrity||{}; return (i.complete?100000:0)+Number(i.usableGoalCount||0)*1000+Number(i.scorerResolvedCount||0)*100+(facts?.goals||[]).reduce((sum,g)=>sum+(g.assists||[]).length,0)*10+(facts?.appearances||[]).length; }
+  function factsExpectedScore(live) {
+    const home = numberScore(live && live.placarMandante);
+    const away = numberScore(live && live.placarVisitante);
+    return {
+      home: home === null ? 0 : Math.max(0, home),
+      away: away === null ? 0 : Math.max(0, away),
+    };
+  }
+  function factsExpectedGoals(live) { const score=factsExpectedScore(live); return score.home+score.away; }
+  function factsQuality(facts) {
+    const i=facts?.integrity||{};
+    if (i.mathematicallyValid === false) return -1;
+    return (i.complete?100000:0)+(i.scoreComplete?20000:0)+Number(i.usableGoalCount||0)*1000+Number(i.scorerResolvedCount||0)*100+(facts?.goals||[]).reduce((sum,g)=>sum+(g.assists||[]).length,0)*10+(facts?.appearances||[]).length;
+  }
   function finalizeFacts(rawFacts, live, canonicalize, meta) {
     const canon=typeof canonicalize==="function"?canonicalize:(value)=>value;
-    const goals=(Array.isArray(rawFacts?.goals)?rawFacts.goals:[]).map((g)=>({...g,team:canon(g.team||(g.side==="home"?live?.mandante:g.side==="away"?live?.visitante:"")),scorer:cleanPlayerName(g.scorer||""),assists:(Array.isArray(g.assists)?g.assists:[]).map(cleanPlayerName).filter(Boolean)}));
+    const expected=factsExpectedScore(live), expectedGoals=expected.home+expected.away;
+    const rawGoals=Array.isArray(rawFacts?.goals)?rawFacts.goals:[];
+    const goals=rawGoals.filter((g)=>{
+      const h=numberScore(g?.scoreAfter?.home), a=numberScore(g?.scoreAfter?.away);
+      if (expectedGoals===0) return false;
+      return h!==null&&a!==null&&h<=expected.home&&a<=expected.away&&h+a<=expectedGoals;
+    }).map((g)=>{
+      const rawTeam=String(g.team||"").trim();
+      const team=rawTeam?canon(rawTeam):(g.side==="home"?canon(live?.mandante):g.side==="away"?canon(live?.visitante):"");
+      return {...g,team,scorer:cleanPlayerName(g.scorer||""),assists:(Array.isArray(g.assists)?g.assists:[]).map(cleanPlayerName).filter(Boolean)};
+    });
     const appearances=(Array.isArray(rawFacts?.appearances)?rawFacts.appearances:[]).map((a)=>({...a,name:cleanPlayerName(a.name||""),team:canon(a.team||"")})).filter((a)=>a.name&&a.team);
-    const expectedGoals=Math.max(0,Number(rawFacts?.integrity?.expectedGoals??factsExpectedGoals(live))||0), observedGoalCount=goals.length, teamResolvedCount=goals.filter((g)=>g.team).length, scorerResolvedCount=goals.filter((g)=>g.ownGoal||g.scorer).length, usableGoalCount=goals.filter((g)=>g.team&&(g.ownGoal||g.scorer)).length;
-    const scoreComplete=expectedGoals===0||observedGoalCount>=expectedGoals, identityComplete=expectedGoals===0||(teamResolvedCount>=expectedGoals&&scorerResolvedCount>=expectedGoals&&usableGoalCount>=expectedGoals), complete=scoreComplete&&identityComplete;
-    return {...rawFacts,contractVersion:LIVE_FACTS_CONTRACT_VERSION,goals,appearances,integrity:{...(rawFacts?.integrity||{}),expectedGoals,observedGoalCount,teamResolvedCount,scorerResolvedCount,usableGoalCount,scoreComplete,identityComplete,complete,missingGoals:Math.max(0,expectedGoals-observedGoalCount),missingTeams:Math.max(0,expectedGoals-teamResolvedCount),missingScorers:Math.max(0,expectedGoals-scorerResolvedCount),status:complete?"complete":scoreComplete?"identity-pending":"summary-pending"},meta:meta||rawFacts?.meta||{}};
+    const observedGoalCount=goals.length, teamResolvedCount=goals.filter((g)=>g.team).length, scorerResolvedCount=goals.filter((g)=>g.ownGoal||g.scorer).length, usableGoalCount=goals.filter((g)=>g.team&&(g.ownGoal||g.scorer)).length;
+    const upstream=rawFacts?.integrity||{};
+    const exactScoreMatches=Number(upstream.expectedHome)===expected.home&&Number(upstream.expectedAway)===expected.away&&Number(upstream.expectedGoals)===expectedGoals;
+    const mathematicallyValid=upstream.mathematicallyValid!==false&&observedGoalCount<=expectedGoals&&goals.every((g)=>Number(g?.scoreAfter?.home)<=expected.home&&Number(g?.scoreAfter?.away)<=expected.away);
+    const scoreComplete=expectedGoals===0
+      ? observedGoalCount===0&&mathematicallyValid
+      : exactScoreMatches&&mathematicallyValid&&upstream.scoreComplete===true&&observedGoalCount===expectedGoals;
+    const identityComplete=expectedGoals===0?observedGoalCount===0:(teamResolvedCount===expectedGoals&&scorerResolvedCount===expectedGoals&&usableGoalCount===expectedGoals);
+    const complete=scoreComplete&&identityComplete;
+    return {...rawFacts,contractVersion:LIVE_FACTS_CONTRACT_VERSION,goals,appearances,integrity:{...upstream,expectedHome:expected.home,expectedAway:expected.away,expectedGoals,observedGoalCount,teamResolvedCount,scorerResolvedCount,usableGoalCount,mathematicallyValid,scoreComplete,identityComplete,complete,missingGoals:Math.max(0,expectedGoals-observedGoalCount),missingTeams:Math.max(0,expectedGoals-teamResolvedCount),missingScorers:Math.max(0,expectedGoals-scorerResolvedCount),status:complete?"complete":scoreComplete?"identity-pending":"summary-pending"},meta:meta||rawFacts?.meta||{}};
   }
-  function localFacts(summary,live,canonicalize){const base=normalizeSummaryFacts(summary||{},live||{},canonicalize); return finalizeFacts(base,live,canonicalize,{source:"direct-espn",fetchedAt:Date.now(),stale:false});}
   function factsStorage(options){if(options&&options.storage)return options.storage; try{return typeof sessionStorage!=="undefined"?sessionStorage:null;}catch(_){return null;}}
-  function readFactsCache(eventId,expectedGoals,options){const storage=factsStorage(options); if(!storage)return null; try{const saved=JSON.parse(storage.getItem(FACTS_STORAGE_PREFIX+eventId)||"null"); if(!saved||Number(saved.expectedGoals)!==Number(expectedGoals)||Date.now()-Number(saved.fetchedAt||0)>600000)return null; return saved.facts||null;}catch(_){return null;}}
-  function writeFactsCache(eventId,expectedGoals,facts,options){const storage=factsStorage(options); if(!storage||!facts)return; try{storage.setItem(FACTS_STORAGE_PREFIX+eventId,JSON.stringify({expectedGoals,fetchedAt:Date.now(),facts}));}catch(_){}}
+  function factsScoreKey(score){return `${Number(score?.home||0)}:${Number(score?.away||0)}`;}
+  function readFactsCache(eventId,expectedScore,options){const storage=factsStorage(options); if(!storage)return null; try{const saved=JSON.parse(storage.getItem(FACTS_STORAGE_PREFIX+eventId)||"null"); if(!saved||String(saved.scoreKey||"")!==factsScoreKey(expectedScore)||Date.now()-Number(saved.fetchedAt||0)>600000)return null; const facts=saved.facts||null; if(Number(facts?.contractVersion||0)!==LIVE_FACTS_CONTRACT_VERSION)return null; return facts;}catch(_){return null;}}
+  function writeFactsCache(eventId,expectedScore,facts,options){const storage=factsStorage(options); if(!storage||!facts||facts?.integrity?.mathematicallyValid===false)return; try{storage.setItem(FACTS_STORAGE_PREFIX+eventId,JSON.stringify({scoreKey:factsScoreKey(expectedScore),fetchedAt:Date.now(),facts}));}catch(_){}}
   async function fetchMatchFacts(game, options) {
-    const opts=options||{}, live=game&&typeof game==="object"?game:{eventId:String(game||"")}, eventId=String(live.eventId||live.id||game||""); if(!eventId)throw new Error("event_id ausente"); const expectedGoals=factsExpectedGoals(live), errors=[]; let best=null;
-    if(opts.worker!==false){try{const id=encodeURIComponent(eventId),url=`${opts.workerSummaryUrl||LIVE_SUMMARY_URL}?league=bra.1&event=${id}&state=${encodeURIComponent(live.estado||opts.state||"in")}&expectedGoals=${expectedGoals}${opts.forceFresh===true?"&fresh=1":""}&_=${Date.now()}`; const envelope=await fetchJson(url,opts,Number(opts.workerTimeoutMs||WORKER_TIMEOUT_MS)); if(Number(envelope?.factsContractVersion||envelope?.facts?.contractVersion||0)===LIVE_FACTS_CONTRACT_VERSION&&envelope?.facts){best=finalizeFacts(envelope.facts,live,opts.canonicalize,{source:"worker-canonical",fetchedAt:Number(envelope.fetchedAt||Date.now()),stale:envelope.stale===true,factsBestKnownApplied:envelope.factsBestKnownApplied===true}); if(best.integrity.complete){writeFactsCache(eventId,expectedGoals,best,opts); return best;}}}catch(error){errors.push(`worker=${String(error&&error.message||error)}`);}}
-    try{const direct=await fetchJson(`${opts.url||SUMMARY_URL}?event=${encodeURIComponent(eventId)}&_=${Date.now()}`,opts,Number(opts.directTimeoutMs||DIRECT_TIMEOUT_MS)); const candidate=localFacts(direct,live,opts.canonicalize); if(!best||factsQuality(candidate)>factsQuality(best))best=candidate;}catch(error){errors.push(`direct=${String(error&&error.message||error)}`);}
-    const cached=readFactsCache(eventId,expectedGoals,opts); if(cached&&(!best||factsQuality(cached)>factsQuality(best)))best={...cached,meta:{...(cached.meta||{}),source:"last-complete-facts",stale:true,errors}}; if(best){writeFactsCache(eventId,expectedGoals,best,opts); return best;} throw new Error(`ESPN facts indisponível: ${errors.join(" | ")}`);
+    const opts=options||{}, live=game&&typeof game==="object"?game:{eventId:String(game||"")}, eventId=String(live.eventId||live.id||game||"");
+    if(!eventId)throw new Error("event_id ausente");
+    const expectedScore=factsExpectedScore(live), expectedGoals=expectedScore.home+expectedScore.away, errors=[];
+    let best=null;
+    if(opts.worker!==false){
+      try{
+        const id=encodeURIComponent(eventId);
+        const url=`${opts.workerSummaryUrl||LIVE_SUMMARY_URL}?league=bra.1&event=${id}&state=${encodeURIComponent(live.estado||opts.state||"in")}&expectedGoals=${expectedGoals}&expectedHome=${expectedScore.home}&expectedAway=${expectedScore.away}${opts.forceFresh===true?"&fresh=1":""}&_=${Date.now()}`;
+        const envelope=await fetchJson(url,opts,Number(opts.workerTimeoutMs||WORKER_TIMEOUT_MS));
+        if(Number(envelope?.factsContractVersion||envelope?.facts?.contractVersion||0)===LIVE_FACTS_CONTRACT_VERSION&&envelope?.facts){
+          best=finalizeFacts(envelope.facts,live,opts.canonicalize,{source:"worker-canonical-v2",fetchedAt:Number(envelope.fetchedAt||Date.now()),stale:envelope.stale===true,factsBestKnownApplied:envelope.factsBestKnownApplied===true});
+          if(best.integrity.complete){writeFactsCache(eventId,expectedScore,best,opts); return best;}
+        } else throw new Error("contrato canônico de fatos incompatível");
+      }catch(error){errors.push(`worker=${String(error&&error.message||error)}`);}
+    }
+
+    // Live Facts v6: autoria de gol/assistência NUNCA volta a ser inferida do
+    // JSON bruto no navegador. Se o Worker falhar, somente um snapshot canônico
+    // já validado para o MESMO placar pode ser reutilizado.
+    const cached=readFactsCache(eventId,expectedScore,opts);
+    if(cached&&(!best||factsQuality(cached)>factsQuality(best)))best={...cached,meta:{...(cached.meta||{}),source:"last-canonical-facts",stale:true,errors}};
+    if(best){writeFactsCache(eventId,expectedScore,best,opts); return best;}
+    if(expectedGoals===0){
+      return finalizeFacts({eventId,goals:[],appearances:[],integrity:{expectedHome:0,expectedAway:0,expectedGoals:0,scoreComplete:true,identityComplete:true,complete:true,mathematicallyValid:true,reconciliationState:"scoreboard-zero-client-guard"}},live,opts.canonicalize,{source:"scoreboard-zero-client-guard",stale:false,errors});
+    }
+    throw new Error(`Live Facts canônicos indisponíveis: ${errors.join(" | ")}`);
   }
 
   function resultCounts(results, canonicalize) {

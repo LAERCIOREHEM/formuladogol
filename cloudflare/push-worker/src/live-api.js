@@ -10,7 +10,7 @@ import { fetchApiFootballPlayerDefenseFallback, fetchApiFootballStatsFallback } 
 import { fetchTheSportsDbStatsFallback } from './thesportsdb-source.js';
 import { normalizeLiveFacts, chooseBestKnownLiveFacts, LIVE_FACTS_CONSTANTS } from './live-facts.js';
 
-const LIVE_GATEWAY_VERSION = '5';
+const LIVE_GATEWAY_VERSION = '6';
 const LIVE_STATE_CONTRACT_VERSION = 1;
 const SCOREBOARD_HOT_TTL_SECONDS = 8;
 const SCOREBOARD_FALLBACK_TTL_SECONDS = 180;
@@ -323,7 +323,13 @@ export async function resolveLiveScoreboard(url, deps = {}) {
 export async function resolveLiveSummary(url, deps = {}) {
   const league = text(url.searchParams.get('league'));
   const eventId = text(url.searchParams.get('event'));
-  const expectedGoals = Math.max(0, Math.min(30, Number(url.searchParams.get('expectedGoals') || 0) || 0));
+  const expectedHomeRaw = url.searchParams.get('expectedHome');
+  const expectedAwayRaw = url.searchParams.get('expectedAway');
+  const expectedHome = expectedHomeRaw != null && expectedHomeRaw !== '' && Number.isFinite(Number(expectedHomeRaw)) ? Math.max(0, Math.min(30, Number(expectedHomeRaw))) : null;
+  const expectedAway = expectedAwayRaw != null && expectedAwayRaw !== '' && Number.isFinite(Number(expectedAwayRaw)) ? Math.max(0, Math.min(30, Number(expectedAwayRaw))) : null;
+  const exactExpectedScore = expectedHome != null && expectedAway != null;
+  const expectedGoalsParam = Math.max(0, Math.min(30, Number(url.searchParams.get('expectedGoals') || 0) || 0));
+  const expectedGoals = exactExpectedScore ? expectedHome + expectedAway : expectedGoalsParam;
   const forceFresh = url.searchParams.get('fresh') === '1';
   const requestedStateRaw = text(url.searchParams.get('state')).toLowerCase();
   const requestedState = ['pre', 'in', 'post'].includes(requestedStateRaw) ? requestedStateRaw : '';
@@ -348,8 +354,16 @@ export async function resolveLiveSummary(url, deps = {}) {
     // caminho que mantinha os cinco zeros pré-jogo quando o edge ESPN oscilava.
     if (requestedState === 'in' && cachedState === 'pre') return false;
     if (requestedState === 'post' && cachedState === 'pre') return false;
-    if (expectedGoals <= 0) return true;
-    return summaryGoalCount(entry.data) >= expectedGoals;
+    const facts = entry.facts;
+    const integrity = facts?.integrity || {};
+    if (Number(facts?.contractVersion || entry.factsContractVersion || 0) !== LIVE_FACTS_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION) return false;
+    if (exactExpectedScore) {
+      if (Number(integrity.expectedHome) !== Number(expectedHome) || Number(integrity.expectedAway) !== Number(expectedAway)) return false;
+    } else if (Number(integrity.expectedGoals) !== Number(expectedGoals)) {
+      return false;
+    }
+    if (expectedGoals === 0) return Number(integrity.observedGoalCount || 0) === 0 && integrity.mathematicallyValid !== false;
+    return integrity.scoreComplete === true && integrity.mathematicallyValid !== false;
   };
 
   const previousSummaryEnvelope = await readCached(cache, fallbackKey);
@@ -616,7 +630,13 @@ export async function resolveLiveSummary(url, deps = {}) {
       }, STATS_BEST_KNOWN_TTL_SECONDS, now);
     }
 
-    const currentFacts = normalizeLiveFacts(data, { eventId, expectedGoals });
+    const currentFacts = normalizeLiveFacts(data, {
+      eventId,
+      expectedGoals,
+      expectedHome,
+      expectedAway,
+      variants: result.variants || []
+    });
     const chosenFacts = chooseBestKnownLiveFacts(currentFacts, previousSummaryEnvelope?.facts);
     const liveFacts = chosenFacts.facts;
 
@@ -627,9 +647,11 @@ export async function resolveLiveSummary(url, deps = {}) {
       factsIntegrity: liveFacts?.integrity || null,
       factsBestKnownApplied: chosenFacts.applied === true,
       cacheStatus: 'miss',
+      expectedHome,
+      expectedAway,
       expectedGoals,
-      goalCount: Number(result.goalCount || 0),
-      complete: result.complete !== false,
+      goalCount: Number(liveFacts?.integrity?.observedGoalCount || 0),
+      complete: liveFacts?.integrity?.scoreComplete === true,
       attempts: result.attempts || [],
       statsProvider: providers.join('+'),
       statsCoverage: finalCoverage,

@@ -347,4 +347,65 @@ console.log('espn-source: PASS');
   assert.equal(result.selectedSources['401841245'], 'espn_cdn_league');
 }
 
-console.log('espn-source live-state-v4: PASS');
+console.log('espn-source live-state legacy regressions: PASS');
+
+// LiveState v6: um feed com relógio maior NÃO pode regredir um gol já visto
+// em outra superfície. Caso real: 1x3 em 90+6 contra 1x2 em 90+7.
+{
+  const mk = (scoreAway, clock, sourceState = 'in', completed = false) => ({
+    id: '401841241',
+    date: '2026-09-20T18:30:00Z',
+    status: { type: { state: sourceState, completed, shortDetail: clock }, displayClock: clock, period: 2 },
+    competitions: [{
+      id: '401841241',
+      status: { type: { state: sourceState, completed, shortDetail: clock }, displayClock: clock, period: 2 },
+      competitors: [
+        { homeAway: 'home', score: '1', team: { id: '3456', displayName: 'Vitória' } },
+        { homeAway: 'away', score: String(scoreAway), team: { id: '2022', displayName: 'Cruzeiro' } }
+      ]
+    }]
+  });
+  const score13 = mk(3, "90+6'");
+  const stale12 = mk(2, "90+7'");
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('/core/bra.1/scoreboard')) return Response.json({ content: { events: [score13] } });
+    if (href.includes('/core/soccer/scoreboard')) return Response.json({ content: { events: [stale12] } });
+    if (href.includes('site.web.api.espn.com')) return Response.json({ events: [stale12] });
+    if (href.includes('site.api.espn.com')) return Response.json({ events: [stale12] });
+    throw new Error(`URL inesperada ${href}`);
+  };
+  const result = await fetchEspnScoreboardGateway('bra.1', '20260920', fakeFetch);
+  const chosen = result.data.events[0];
+  assert.equal(chosen.competitions[0].competitors[1].score, '3');
+  assert.equal(chosen.competitions[0].status.displayClock, "90+6'");
+  assert.equal(result.selectedSources['401841241'], 'espn_cdn_league');
+}
+
+// Mesmo se a superfície atrasada marcar completed=true, ela não pode consolidar
+// FINAL com placar menor do que um feed IN que já observou mais gols.
+{
+  const live13 = {
+    id: 'v-final-guard', date: '2026-09-20T18:30:00Z',
+    competitions: [{ status: { type: { state: 'in', completed: false }, displayClock: "90+6'", period: 2 }, competitors: [
+      { homeAway: 'home', score: '1', team: { id: 'h', displayName: 'Vitória' } },
+      { homeAway: 'away', score: '3', team: { id: 'a', displayName: 'Cruzeiro' } }
+    ] }]
+  };
+  const final12 = structuredClone(live13);
+  final12.competitions[0].status = { type: { state: 'post', completed: true }, displayClock: "90+7'", period: 2 };
+  final12.competitions[0].competitors[1].score = '2';
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('/core/bra.1/scoreboard')) return Response.json({ content: { events: [live13] } });
+    if (href.includes('/core/soccer/scoreboard')) return Response.json({ content: { events: [final12] } });
+    if (href.includes('site.web.api.espn.com')) return Response.json({ events: [final12] });
+    if (href.includes('site.api.espn.com')) return Response.json({ events: [final12] });
+    throw new Error(`URL inesperada ${href}`);
+  };
+  const result = await fetchEspnScoreboardGateway('bra.1', '20260920', fakeFetch);
+  assert.equal(result.data.events[0].competitions[0].competitors[1].score, '3');
+  assert.equal(result.data.events[0].competitions[0].status.type.state, 'in');
+}
+
+console.log('espn-source live-state-v6 anti-regression: PASS');

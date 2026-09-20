@@ -712,10 +712,14 @@
     if (!game || !game.id) throw new Error("Jogo sem eventId para summary");
     const league = game.espnLeague || DEFAULT_LEAGUE;
     const eventId = String(game.id);
-    const expectedGoals = Math.max(0, Number(numericScore(game.home && game.home.score) || 0) + Number(numericScore(game.away && game.away.score) || 0));
+    const expectedHome = Math.max(0, Number(numericScore(game.home && game.home.score) || 0));
+    const expectedAway = Math.max(0, Number(numericScore(game.away && game.away.score) || 0));
+    const expectedGoals = expectedHome + expectedAway;
     const params = new URLSearchParams({
       league: String(league),
       event: eventId,
+      expectedHome: String(expectedHome),
+      expectedAway: String(expectedAway),
       expectedGoals: String(expectedGoals),
       state: String(game.state || "")
     });
@@ -2441,19 +2445,31 @@
   }
 
   function goalsBySide(g, summary) {
+    // Live Facts v6: autoria/assistência nunca é reconstruída a partir do JSON
+    // bruto no navegador. O scoreboard define QUANTOS gols existem; o Worker
+    // canônico define QUEM marcou. Na ausência do contrato canônico mostramos
+    // o placar sem inventar marcadores.
     const canonical = summary && summary.__fdgLiveFacts;
-    if (canonical && Array.isArray(canonical.goals) && canonical.goals.length) {
-      const home=[], away=[], homeId=String(g.home.id||""), awayId=String(g.away.id||"");
-      for (const goal of canonical.goals) {
-        const item={min:String(goal.minute||""),athlete:compactPlayerName(goal.scorer||"")||(goal.ownGoal?"Gol contra":"Gol")};
-        if (goal.side==="home" || (goal.teamId && String(goal.teamId)===homeId)) home.push(item);
-        else if (goal.side==="away" || (goal.teamId && String(goal.teamId)===awayId)) away.push(item);
-        else if (goal.team===g.home.nome) home.push(item); else if (goal.team===g.away.nome) away.push(item);
-      }
-      return {home,away};
+    const home=[], away=[];
+    if (!canonical || !Array.isArray(canonical.goals)) return {home,away};
+    const expectedHome=Math.max(0,Number(numericScore(g.home&&g.home.score)||0));
+    const expectedAway=Math.max(0,Number(numericScore(g.away&&g.away.score)||0));
+    const integrity=canonical.integrity||{};
+    if (Number(integrity.expectedHome)!==expectedHome || Number(integrity.expectedAway)!==expectedAway || integrity.mathematicallyValid===false) return {home,away};
+    const homeId=String(g.home.id||""), awayId=String(g.away.id||"");
+    for (const goal of canonical.goals) {
+      const item={min:String(goal.minute||""),athlete:compactPlayerName(goal.scorer||"")||(goal.ownGoal?"Gol contra":"Gol")};
+      const teamId=String(goal.teamId||"");
+      // Identidade ESPN tem precedência absoluta sobre o side textual.
+      if (teamId && teamId===homeId) home.push(item);
+      else if (teamId && teamId===awayId) away.push(item);
+      else if (goal.team===g.home.nome) home.push(item);
+      else if (goal.team===g.away.nome) away.push(item);
+      else if (goal.side==="home") home.push(item);
+      else if (goal.side==="away") away.push(item);
     }
-    const rows=eventRows(g,summary).filter(r=>r.type.key==="goal"), home=[], away=[], homeId=String(g.home.id||""), awayId=String(g.away.id||"");
-    for(const row of rows){const item={min:row.min,athlete:row.athlete||compactPlayerName(row.text.replace(/^Gol\s*[—-]?\s*/i,""))||"Gol"}; if(row.teamId&&row.teamId===homeId)home.push(item); else if(row.teamId&&row.teamId===awayId)away.push(item); else if(row.team===g.home.nome)home.push(item); else if(row.team===g.away.nome)away.push(item);} return {home,away};
+    // Defesa final: marcadores jamais podem exceder o placar corrente.
+    return {home:home.slice(0,expectedHome),away:away.slice(0,expectedAway)};
   }
 
   function renderGoalsUnderTeams(g, summary) {
