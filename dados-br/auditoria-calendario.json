@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-20T18:08:59.305130-03:00",
+  "gerado_em": "2026-09-20T18:21:04.104201-03:00",
   "fonte": "auditoria local sobre JSONs normalizados da ESPN",
   "escopo": "módulo Brasileirão; nenhum arquivo da Copa",
   "resumo": {
@@ -12,7 +12,7 @@
     "partidas_com_data_confirmada": 370,
     "partidas_com_data_a_definir": 10,
     "resultados_publicados": 275,
-    "proximos_publicados": 36,
+    "proximos_publicados": 34,
     "eventos_espn_na_janela": 370,
     "ajustes_calendario_configurados": 3,
     "jogos_adiados_sem_data": 0,
@@ -23,7 +23,7 @@
     "kickoffs_preservados_sem_confirmacao_atual": 0,
     "kickoffs_espn_provisorios_suprimidos_da_agenda": 0,
     "kickoffs_herdados_provisorios_suprimidos": 0,
-    "falhas_graves": 1
+    "falhas_graves": 0
   },
   "avisos": [],
   "distribuicao_jogos_disputados": {
@@ -643,23 +643,7 @@
       "integra": true
     }
   ],
-  "duplicados_entre_resultados_e_proximos": [
-    {
-      "rodada": 28,
-      "mandante": "Corinthians",
-      "visitante": "Fluminense"
-    },
-    {
-      "rodada": 28,
-      "mandante": "Vitória",
-      "visitante": "Cruzeiro"
-    }
-  ],
-  "falhas": [
-    {
-      "tipo": "jogo_em_resultados_e_proximos",
-      "total": 2
-    }
-  ],
+  "duplicados_entre_resultados_e_proximos": [],
+  "falhas": [],
   "observacao": "O calendário só é substituído depois de validar 380 partidas, 38 rodadas íntegras, 20 clubes com 38 jogos e 190 confrontos de ida e volta."
 }
