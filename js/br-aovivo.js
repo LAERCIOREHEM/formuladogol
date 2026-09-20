@@ -865,20 +865,66 @@
     return String(principal.canal || principal.fonte || "YouTube");
   }
 
-  function isCommentaryOnlyTitle(value) {
-    const raw = String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    return /\blances?\s+(?:em\s+tempo\s+real|ao\s+vivo)\b/.test(raw)
-      || /\blance\s+a\s+lance\b/.test(raw)
-      || raw.includes("noche de copa")
-      || raw.includes("watchalong")
-      || raw.includes("watch party")
-      || (raw.includes("sem imagens") && (raw.includes("ao vivo") || raw.includes("tempo real")));
+  function normalizedTransmissionText(value) {
+    return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   }
 
-  function sanitizeLivePrincipal(principal) {
+  function isRejectedTransmissionTitle(value) {
+    const raw = normalizedTransmissionText(value);
+    if (!raw) return true;
+    const blockedFragments = [
+      "aquecimento", "esquenta", "pre-jogo", "pre jogo", "pre-game", "pregame",
+      "pos-jogo", "pos jogo", "post-game", "postgame", "melhores momentos", "highlights",
+      "watchalong", "watch party", "react", "reaction", "coletiva", "podcast",
+      "radio", "narracao", "narração", "sem imagens", "sem imagem", "audio apenas", "áudio apenas",
+      "lances em tempo real", "lances ao vivo", "lance a lance", "tempo real sem imagens",
+      "noche de copa", "programa esportivo", "compacto"
+    ];
+    return blockedFragments.some((term) => raw.includes(normalizedTransmissionText(term)))
+      || /\blances?\s+(?:em\s+tempo\s+real|ao\s+vivo)\b/.test(raw)
+      || /\blance\s+a\s+lance\b/.test(raw);
+  }
+
+  function providerKeyForPrincipal(principal) {
+    if (!principal) return "";
+    if (sourceIsCaze(principal.fonte) || sourceIsCaze(principal.nome) || sourceIsCaze(principal.canal)) return "cazetv";
+    if (sourceIsSbt(principal.fonte) || sourceIsSbt(principal.nome) || sourceIsSbt(principal.canal)) return "sbt";
+    if (String(principal.fonte || "").toLowerCase() === "getv" || normalizedTransmissionText(principal.nome || principal.canal).includes("ge tv")) return "getv";
+    return "";
+  }
+
+  function canonicalTvAllowsPrincipal(game, principal) {
+    const tvEntry = transmissionEntryForGame(game, state.transmissoesTv);
+    const canais = tvEntry && Array.isArray(tvEntry.canais) ? tvEntry.canais.filter(Boolean) : [];
+    // Uma grade confirmada é autoridade negativa também: se ela existe e lista
+    // Premiere/SporTV, um player GE TV/Cazé/SBT preservado em cache não pode aparecer.
+    const authoritative = !!(tvEntry && canais.length && (tvEntry.estavel === true || String(tvEntry.confianca || "").toLowerCase() === "confirmado"));
+    if (!authoritative) return true;
+    const providerKey = providerKeyForPrincipal(principal);
+    if (!providerKey) return false;
+    return canais.some((canal) => {
+      const provider = providerForChannel(canal);
+      return !!provider && provider.key === providerKey;
+    });
+  }
+
+  function sanitizeLivePrincipal(principal, game) {
     if (!principal || typeof principal !== "object") return null;
-    if (String(principal.video_id || "") === "Co2aqgVd5qk" || isCommentaryOnlyTitle(principal.titulo || principal.title)) return null;
+    const title = principal.titulo || principal.title || "";
+    if (String(principal.video_id || "") === "Co2aqgVd5qk" || isRejectedTransmissionTitle(title)) return null;
     const clean = Object.assign({}, principal);
+    const providerKey = providerKeyForPrincipal(clean);
+    const titleN = normalizedTransmissionText(title);
+    // GE TV só é tratada como transmissão integral quando o título fala em
+    // imagens/jogo completo OU a grade canônica confirmada lista GE TV.
+    if (providerKey === "getv") {
+      const explicitFullVideo = titleN.includes("com imagens") || titleN.includes("transmissao completa") || titleN.includes("jogo completo");
+      if (!explicitFullVideo && !canonicalTvAllowsPrincipal(game, clean)) return null;
+    }
+    // CazéTV/SBT podem não usar "com imagens" no título, mas precisam ser uma
+    // live da partida e jamais conteúdo editorial periférico.
+    if ((providerKey === "cazetv" || providerKey === "sbt") && !titleN.includes("ao vivo") && !canonicalTvAllowsPrincipal(game, clean)) return null;
+    if (game && !canonicalTvAllowsPrincipal(game, clean)) return null;
     if (sourceIsCaze(clean.fonte) || sourceIsCaze(clean.nome) || sourceIsCaze(clean.canal)) clean.embeddable = false;
     return clean;
   }
@@ -887,7 +933,8 @@
     const out = {};
     for (const [key, entry] of Object.entries(source && typeof source === "object" ? source : {})) {
       if (!entry || typeof entry !== "object") continue;
-      const principal = sanitizeLivePrincipal(entry.principal);
+      // Aqui ainda não há game normalizado; aplica apenas as travas textuais.
+      const principal = sanitizeLivePrincipal(entry.principal, null);
       if (!principal) continue;
       out[key] = Object.assign({}, entry, { principal });
     }
@@ -951,7 +998,7 @@
     }
   }
 
-  const TRANSMISSION_CACHE_YT = "br2026_transmissoes_youtube_v3";
+  const TRANSMISSION_CACHE_YT = "br2026_transmissoes_youtube_v4";
   const TRANSMISSION_CACHE_TV = "br2026_transmissoes_tv_v1";
 
   function cachedTransmissionMap(key) {
@@ -966,9 +1013,8 @@
 
   function saveTransmissionMap(key, value) {
     try {
-      if (value && typeof value === "object" && Object.keys(value).length) {
-        localStorage.setItem(key, JSON.stringify(value));
-      }
+      if (value && typeof value === "object") localStorage.setItem(key, JSON.stringify(value));
+      else localStorage.removeItem(key);
     } catch (_) {}
   }
 
@@ -996,11 +1042,17 @@
       ? tvResult.value.jogos
       : {};
 
-    // Nunca apaga um link válido por causa de uma falha transitória, 404 durante
-    // deploy ou resposta vazia em um único ciclo. O manual prevalece sobre o robô.
-    const mergedYoutube = sanitizeTransmissionMap(Object.assign({}, previousYoutube, automatic, manual));
-    state.transmissoes = Object.keys(mergedYoutube).length ? mergedYoutube : sanitizeTransmissionMap(previousYoutube);
-    state.transmissoesTv = Object.keys(tv).length ? Object.assign({}, previousTv, tv) : previousTv;
+    // O arquivo publicado é autoritativo quando foi carregado com sucesso.
+    // Não fazemos union com cache antigo: essa estratégia ressuscitava players
+    // de aquecimento já removidos do JSON atual. Cache só é fallback de rede.
+    const automaticLoaded = youtubeResult.status === "fulfilled" && youtubeResult.value && youtubeResult.value.jogos && typeof youtubeResult.value.jogos === "object";
+    const manualLoaded = manualResult.status === "fulfilled" && manualResult.value && manualResult.value.jogos && typeof manualResult.value.jogos === "object";
+    const baseYoutube = automaticLoaded ? automatic : previousYoutube;
+    const mergedYoutube = Object.assign({}, baseYoutube, manualLoaded ? manual : {});
+    state.transmissoes = sanitizeTransmissionMap(mergedYoutube);
+
+    const tvLoaded = tvResult.status === "fulfilled" && tvResult.value && tvResult.value.jogos && typeof tvResult.value.jogos === "object";
+    state.transmissoesTv = tvLoaded ? tv : previousTv;
     saveTransmissionMap(TRANSMISSION_CACHE_YT, state.transmissoes);
     saveTransmissionMap(TRANSMISSION_CACHE_TV, state.transmissoesTv);
   }
@@ -1026,8 +1078,9 @@
 
   function transmissionForGame(game) {
     const entry = transmissionEntryForGame(game, state.transmissoes);
-    if (!entry || !sanitizeLivePrincipal(entry.principal)) return null;
-    return Object.assign({}, entry, { principal: sanitizeLivePrincipal(entry.principal) });
+    const principal = entry && sanitizeLivePrincipal(entry.principal, game);
+    if (!entry || !principal) return null;
+    return Object.assign({}, entry, { principal });
   }
 
   function providerForChannel(channel) {

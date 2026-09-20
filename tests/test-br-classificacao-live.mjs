@@ -230,6 +230,12 @@ const workerPayload = {
   assert.match(liveSource, /if \(!canonical \|\| !Array\.isArray\(canonical\.goals\)\) return \{home,away\};/, 'Ao Vivo não pode cair para parser bruto de gols');
   assert.ok(!liveSource.includes('eventRows(g,summary).filter(r=>r.type.key==="goal")'), 'parser bruto de gols deve estar eliminado do render');
   assert.ok(liveSource.indexOf('if (teamId && teamId===homeId)') < liveSource.indexOf('else if (goal.side==="home")'), 'teamId precisa ter precedência sobre side');
+  assert.match(liveSource, /isRejectedTransmissionTitle/);
+  assert.match(liveSource, /aquecimento/);
+  assert.match(liveSource, /sem imagens/);
+  assert.match(liveSource, /canonicalTvAllowsPrincipal/);
+  assert.match(liveSource, /br2026_transmissoes_youtube_v4/);
+  assert.match(liveSource, /const baseYoutube = automaticLoaded \? automatic : previousYoutube/);
   assert.match(statsSource, /factsMatchCurrentScore/, 'estatísticas devem rejeitar Live Facts de outro placar');
   assert.match(indexSource, /const posBase = Object\.fromEntries\(\(state\.tabela \|\| \[\]\)\.map/);
   assert.match(indexSource, /htmlSetaMovimento\(posBase\[t\.time\], t\.pos, true\)/);
