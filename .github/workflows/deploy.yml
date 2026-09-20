@@ -129,7 +129,7 @@ jobs:
           grep -q 'br-classificacao-live.js?v=20260920-live-facts-v6' index.html
           grep -q 'br-classificacao-live.js?v=20260920-live-facts-v6' estatisticas.html
           grep -q 'br-estatisticas.js?v=20260920-live-facts-v6' estatisticas.html
-          grep -q 'br-aovivo.js?v=20260920-live-facts-v6' aovivo.html
+          grep -q 'br-aovivo.js?v=20260920-transmission-integral-v1' aovivo.html
           echo 'OK: Ao Vivo, Tabela e Estatísticas usam LiveState v6 + Live Facts v2.'
 
       - name: Montar site público
@@ -717,7 +717,7 @@ jobs:
           grep -q 'br-classificacao-live.js?v=20260920-live-facts-v6' _site/index.html
           grep -q 'br-classificacao-live.js?v=20260920-live-facts-v6' _site/estatisticas.html
           grep -q 'br-estatisticas.js?v=20260920-live-facts-v6' _site/estatisticas.html
-          grep -q 'br-aovivo.js?v=20260920-live-facts-v6' _site/aovivo.html
+          grep -q 'br-aovivo.js?v=20260920-transmission-integral-v1' _site/aovivo.html
           grep -q 'const LIVE_STATE_VERSION = "6"' _site/js/br-classificacao-live.js
           echo 'OK: pacote público contém LiveState v6 / Live Facts v2 e cache-bust correto.'
 
@@ -1513,7 +1513,7 @@ jobs:
           ativos_live = [
               (HOST + "/", "br-classificacao-live.js?v=20260920-live-facts-v6"),
               (HOST + "/estatisticas.html", "br-classificacao-live.js?v=20260920-live-facts-v6"),
-              (HOST + "/aovivo.html", "br-aovivo.js?v=20260920-live-facts-v6"),
+              (HOST + "/aovivo.html", "br-aovivo.js?v=20260920-transmission-integral-v1"),
               (HOST + "/js/br-classificacao-live.js", 'const LIVE_STATE_VERSION = "6"'),
           ]
 
