@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
+import fs from 'node:fs';
 
 const require = createRequire(import.meta.url);
 const live = require('../js/br-classificacao-live.js');
@@ -62,7 +63,7 @@ const workerPayload = {
     storage: { getItem: () => null, setItem: () => {} },
   });
   assert.equal(state.meta.source, 'worker-espn');
-  assert.equal(state.meta.liveStateVersion, '4');
+  assert.equal(state.meta.liveStateVersion, '5');
   assert.equal(Object.keys(state.liveMap).length, 2);
   assert.ok(calls[0].includes('/v1/live/state?league=bra.1'));
   assert.ok(!calls[0].includes('fresh=1'), 'fluxo normal compartilha o hot snapshot do Worker');
@@ -167,4 +168,50 @@ const workerPayload = {
   assert.equal(map['Mirassol|Botafogo'].placarVisitante, 0);
 }
 
-console.log('OK: LiveState v4 — Worker ESPN primário, fallback direto, eventId e dois jogos simultâneos.');
+
+// Fallback direto: mesmo sem team/teamId, a transição 0x0 -> 1x0 resolve o clube do autor.
+{
+  const fallback = live.normalizeSummaryFacts({ scoringPlays: [{
+    id: 'fallback-goal', scoringPlay: true, homeScore: 1, awayScore: 0,
+    clock: { displayValue: "11'" }, athletesInvolved: [{ displayName: 'Hulk' }], text: 'Goal! Hulk.'
+  }] }, { eventId: 'fallback', mandante: 'Fluminense', visitante: 'Corinthians', placarMandante: 1, placarVisitante: 0 }, (v) => v);
+  assert.equal(fallback.goals[0].team, 'Fluminense');
+  assert.equal(fallback.goals[0].scorer, 'Hulk');
+}
+
+// Facts canônicos: o cliente não pode chamar um summary de completo só porque houve HTTP 200.
+{
+  const game = { eventId: 'live-hulk', estado: 'in', placarMandante: 1, placarVisitante: 0, mandante: 'Fluminense', visitante: 'Corinthians' };
+  const envelope = {
+    ok: true, factsContractVersion: 1, fetchedAt: Date.now(), facts: {
+      contractVersion: 1, eventId: 'live-hulk', goals: [{ minute: "23'", teamId: '3445', team: 'Fluminense', side: 'home', scorer: 'Hulk', assists: ['John Kennedy'], ownGoal: false }],
+      appearances: [{ name: 'Hulk', team: 'Fluminense' }, { name: 'John Kennedy', team: 'Fluminense' }],
+      integrity: { expectedGoals: 1, observedGoalCount: 1, teamResolvedCount: 1, scorerResolvedCount: 1, usableGoalCount: 1, complete: true }
+    }
+  };
+  const facts = await live.fetchMatchFacts(game, { canonicalize: (v) => v, fetcher: async () => Response.json(envelope), storage: { getItem: () => null, setItem: () => {} } });
+  assert.equal(facts.integrity.complete, true);
+  assert.equal(facts.goals[0].scorer, 'Hulk');
+  assert.deepEqual(facts.goals[0].assists, ['John Kennedy']);
+}
+
+
+// Regressões estruturais v5: desempenho, refresh orientado a placar e setas canônicas.
+{
+  const statsSource = fs.readFileSync(new URL('../js/br-estatisticas.js', import.meta.url), 'utf8');
+  const liveSource = fs.readFileSync(new URL('../js/br-aovivo.js', import.meta.url), 'utf8');
+  const indexSource = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  assert.match(statsSource, /const LIVE_SCORE_REFRESH_MS = 10000/);
+  assert.match(statsSource, /engine\.fetchMatchFacts\(game/);
+  assert.match(statsSource, /carregarDadosEssenciais/);
+  const essentials = statsSource.match(/Promise\.all\(\[([^\]]+)\]\.map\(\(key\) => loadDataset\(key, force\)\)\)/)?.[1] || '';
+  assert.ok(!essentials.includes('probabilitiesHistory'), 'histórico de ~22 MB não pode bloquear o primeiro paint');
+  assert.match(statsSource, /data-load-probability-history/);
+  assert.match(liveSource, /const LIVE_REFRESH_MS = 10000/);
+  assert.match(liveSource, /renderMain\(selected,cached,all\); updateCountdowns\(\); updateFreshnessUi\(selected\);/);
+  assert.match(liveSource, /summaryScoreKey/);
+  assert.match(indexSource, /const posBase = Object\.fromEntries\(\(state\.tabela \|\| \[\]\)\.map/);
+  assert.match(indexSource, /htmlSetaMovimento\(posBase\[t\.time\], t\.pos, true\)/);
+}
+
+console.log('OK: LiveState v5 — placar canônico, facts e dois jogos simultâneos.');

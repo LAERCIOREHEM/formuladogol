@@ -260,12 +260,23 @@ def attendance_stats(results: list[dict[str, Any]], details: dict[str, Any]) -> 
     }
 
 
-def club_goals(table: list[dict[str, Any]], leaders: dict[str, Any]) -> list[dict[str, Any]]:
+def club_goals(table: list[dict[str, Any]], leaders: dict[str, Any], details: dict[str, Any]) -> list[dict[str, Any]]:
     scorers_by_team: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    own_goals_by_team: dict[str, int] = defaultdict(int)
     for player in leaders.get("artilharia") or []:
         team = para_canonico(player.get("time")) or str(player.get("time") or "")
         if team:
             scorers_by_team[team].append(dict(player))
+    for game in details.values():
+        if not isinstance(game, dict):
+            continue
+        for goal in game.get("gols") or []:
+            description = str(goal.get("descricao") or "")
+            if not re.search(r"own goal|gol contra", description, flags=re.I):
+                continue
+            team = para_canonico(goal.get("time")) or str(goal.get("time") or "")
+            if team:
+                own_goals_by_team[team] += 1
     output = []
     for row in table:
         team = para_canonico(row.get("time")) or str(row.get("time") or "")
@@ -274,7 +285,8 @@ def club_goals(table: list[dict[str, Any]], leaders: dict[str, Any]) -> list[dic
         scorers = sorted(scorers_by_team.get(team, []), key=lambda x: (-int(x.get("gols") or 0), norm(x.get("nome"))))
         known = sum(int(x.get("gols") or 0) for x in scorers)
         total_goals = int(row.get("gp") or 0)
-        difference = max(0, total_goals - known)
+        own_goals = int(own_goals_by_team.get(team, 0))
+        unattributed = max(0, total_goals - known - own_goals)
         output.append({
             "time": team,
             "escudo": (ESCUDOS_TIMES.get(team) or {}).get("escudo", ""),
@@ -285,7 +297,9 @@ def club_goals(table: list[dict[str, Any]], leaders: dict[str, Any]) -> list[dic
             "media_gols": round(total_goals / int(row.get("jogos") or 1), 2) if int(row.get("jogos") or 0) else 0,
             "marcadores": scorers,
             "gols_mapeados_nos_lideres": known,
-            "gols_nao_individualizados": difference,
+            "gols_contra_favorecendo": own_goals,
+            "gols_sem_autoria": unattributed,
+            "gols_nao_individualizados": own_goals + unattributed,
         })
     output.sort(key=lambda x: (-int(x["gols_pro"]), -int(x["saldo"]), norm(x["time"])))
     for i, row in enumerate(output, 1):
@@ -325,11 +339,12 @@ def main() -> None:
             "jogos_com_publico": sum(1 for x in games_index if x.get("publico") not in (None, "")),
             "jogos_com_renda": sum(1 for x in games_index if isinstance(x.get("renda"), (int, float)) and float(x.get("renda") or 0) > 0),
             "clubes": len(table),
+            "gols_contra": sum(int(x.get("gols_contra_favorecendo") or 0) for x in club_goals(table, leaders, details)),
         },
         "performance_por_partida": performance_records(results, details),
         "sequencias": sequence_rankings(results),
         "publico": attendance_stats(results, details),
-        "gols_por_clube": club_goals(table, leaders),
+        "gols_por_clube": club_goals(table, leaders, details),
         "jogos": games_index,
     }
     write_json(OUT, payload)

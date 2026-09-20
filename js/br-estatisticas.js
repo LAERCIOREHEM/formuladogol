@@ -24,11 +24,16 @@
     updateStatus: "dados-br/status-atualizacao.json",
   };
 
-  // Intervalo igual ao do AO VIVO da home e do br-aovivo.js (ESPN_LIVE_MS).
-  const REFRESH_MS = 30000;
+  // Poll leve de placar durante jogos; fatos individuais são orientados por mudança de placar.
+  const STATIC_REFRESH_MS = 30000;
+  const LIVE_SCORE_REFRESH_MS = 10000;
+  const LIVE_FACTS_REFRESH_MS = 30000;
+  const LIVE_FACTS_RETRY_MS = 5000;
 
   const refreshState = { timer: null, ocupado: false, assinatura: null };
-  const liveRefreshState = { timer: null, ocupado: false, assinatura: null };
+  const liveRefreshState = { timer: null, ocupado: false, assinatura: null, lastFactsAt: 0 };
+  const loadedDatasets = new Set();
+  const loadingDatasets = new Map();
 
   const state = {
     leaders: null,
@@ -412,7 +417,7 @@
     const goals = new Map(), assists = new Map(), appearances = new Map();
     const activeEventIds = new Set(liveApplicableGames().map((game) => String(game.eventId || "")).filter(Boolean));
     for (const [eventId, facts] of Object.entries(state.liveFacts || {})) {
-      if (!activeEventIds.has(String(eventId)) || !facts || facts.ok !== true) continue;
+      if (!activeEventIds.has(String(eventId)) || !facts) continue;
       for (const appearance of facts.appearances || []) {
         const key = playerKey(appearance.name, appearance.team);
         if (!key || key === "|") continue;
@@ -501,18 +506,15 @@
       map.set(key, (map.get(key) || 0) + amount);
     };
 
-    for (const game of Object.values(state.details?.jogos || {})) {
-      if (!game || typeof game !== "object") continue;
-      for (const goal of game.gols || []) {
-        const description = String(goal?.descricao || "");
-        if (!/own goal|gol contra/i.test(description) || !goal?.time) continue;
-        add(byClub, goal.time);
-      }
+    // Histórico agregado no JSON leve da competição: evita baixar jogos-detalhes.json (~4 MB) só para contar gols contra.
+    for (const club of state.competition?.gols_por_clube || []) {
+      const amount = Number(club?.gols_contra_favorecendo || 0);
+      if (amount > 0 && club?.time) add(byClub, club.time, amount);
     }
 
     const activeEventIds = new Set(liveApplicableGames().map((game) => String(game.eventId || "")).filter(Boolean));
     for (const [eventId, facts] of Object.entries(state.liveFacts || {})) {
-      if (!activeEventIds.has(String(eventId)) || !facts || facts.ok !== true) continue;
+      if (!activeEventIds.has(String(eventId)) || !facts) continue;
       for (const goal of facts.goals || []) {
         if (!goal?.ownGoal || !goal?.team) continue;
         add(byClub, goal.team);
@@ -572,9 +574,11 @@
     const gamesRead = Number(completeness.jogos_lidos) || 0;
     const lineupGames = Number(completeness.jogos_com_escalacoes) || 0;
     const liveGames = liveApplicableGames();
-    const liveFactsOk = liveGames.filter((game) => state.liveFacts?.[String(game.eventId)]?.ok === true).length;
-    const liveSuffix = liveGames.length ? ` · 🔴 eventos ao vivo: ${liveFactsOk}/${liveGames.length} jogos provisórios` : "";
-    const statusTone = gamesRead === totalGames && lineupGames === totalGames && (!liveGames.length || liveFactsOk === liveGames.length) ? "" : " is-warning";
+    const liveFactsComplete = liveGames.filter((game) => state.liveFacts?.[String(game.eventId)]?.integrity?.complete === true).length;
+    const liveFactsPending = liveGames.length - liveFactsComplete;
+    const missingScorers = liveGames.reduce((sum, game) => sum + Number(state.liveFacts?.[String(game.eventId)]?.integrity?.missingScorers || 0), 0);
+    const liveSuffix = liveGames.length ? ` · 🔴 fatos ao vivo completos: ${liveFactsComplete}/${liveGames.length}${liveFactsPending ? ` · ${liveFactsPending} em sincronização` : ""}${missingScorers ? ` · ${missingScorers} autoria(s) pendente(s)` : ""}` : "";
+    const statusTone = gamesRead === totalGames && lineupGames === totalGames && (!liveGames.length || liveFactsComplete === liveGames.length) ? "" : " is-warning";
     const status = `Base consolidada: ${coverageLabel(gamesRead, totalGames)} jogos encerrados · escalações: ${coverageLabel(lineupGames, totalGames)} · atualizado ${dateTimeCompactBR(state.leaders?.atualizado_em)}${liveSuffix}`;
     const filterLabel = selectedClub ? `${selectedClub} · ${list.length} ${list.length === 1 ? "jogador" : "jogadores"} no ranking` : `${allPlayers.length} jogadores no ranking geral`;
     const goalRows = type === "artilheiros" ? championshipGoalsRows() : [];
@@ -790,12 +794,13 @@
       if (home) { home.jogos = Number(home.jogos||0)+1; home.gols_pro=Number(home.gols_pro||0)+hs; home.gols_contra=Number(home.gols_contra||0)+as; home._liveGoals=(home._liveGoals||0)+hs; }
       if (away) { away.jogos = Number(away.jogos||0)+1; away.gols_pro=Number(away.gols_pro||0)+as; away.gols_contra=Number(away.gols_contra||0)+hs; away._liveGoals=(away._liveGoals||0)+as; }
       const facts = state.liveFacts?.[String(game.eventId)];
-      if (!facts?.ok) continue;
+      if (!facts) continue;
       for (const goal of facts.goals || []) {
-        if (goal.ownGoal || !goal.scorer || !goal.team) continue;
+        if (!goal.team) continue;
         const club = byClub.get(normalize(goal.team)); if (!club) continue;
-        const key = playerKey(goal.scorer, club.time);
         parsedScorers.set(normalize(club.time), (parsedScorers.get(normalize(club.time))||0)+1);
+        if (goal.ownGoal || !goal.scorer) continue;
+        const key = playerKey(goal.scorer, club.time);
         let marker = club.marcadores.find((row) => playerKey(row.nome, club.time) === key) || findPlayerRow(club.marcadores, goal.scorer, club.time);
         if (!marker) { marker={ nome:goal.scorer, time:club.time, escudo:club.escudo, gols:0, jogos:0 }; club.marcadores.push(marker); }
         marker.gols=Number(marker.gols||0)+1; marker._liveDelta=Number(marker._liveDelta||0)+1;
@@ -1495,30 +1500,20 @@
   function probabilityMovementSnapshot() {
     const table = Array.isArray(state.table?.tabela) ? state.table.tabela : [];
     if (!table.length) return null;
-    const current = Object.fromEntries(table.map((row) => [row.time || row.clube, Number(row.pos)]));
-    const today = dataHojeBR();
-    let snapshot = null;
-    try { snapshot = JSON.parse(localStorage.getItem("snapshot_tabela_v2") || "null"); } catch (_) {}
-    if (!snapshot) {
-      snapshot = { dataBase: today, posicoesBase: current };
-      try { localStorage.setItem("snapshot_tabela_v2", JSON.stringify(snapshot)); } catch (_) {}
-    } else if (hojeEhTercaBR() && snapshot.dataBase !== today) {
-      snapshot = { dataBase: today, posicoesBase: current };
-      try { localStorage.setItem("snapshot_tabela_v2", JSON.stringify(snapshot)); } catch (_) {}
-    }
-    return snapshot;
+    return { dataBase: "classificacao-oficial", posicoesBase: Object.fromEntries(table.map((row) => [row.time || row.clube, Number(row.pos)])) };
   }
 
   function probabilityMovementHtml(team, currentPosition) {
-    if (hojeEhTercaBR()) return "";
+    // Movimento significa exclusivamente a posição provisória causada pelos jogos em andamento.
+    if (!liveApplicableGames().length) return "";
     const snapshot = probabilityMovementSnapshot();
     const base = Number(snapshot?.posicoesBase?.[team]);
     const current = Number(currentPosition);
     if (!base || !current || base === current) return "";
     const diff = base - current;
     return diff > 0
-      ? `<span class="probability-position-move is-up" title="Subiu ${diff} ${diff === 1 ? "posição" : "posições"}">▲${diff}</span>`
-      : `<span class="probability-position-move is-down" title="Caiu ${-diff} ${-diff === 1 ? "posição" : "posições"}">▼${-diff}</span>`;
+      ? `<span class="probability-position-move is-up" title="Posição provisória ao vivo: subiu ${diff} ${diff === 1 ? "posição" : "posições"}">▲${diff}</span>`
+      : `<span class="probability-position-move is-down" title="Posição provisória ao vivo: caiu ${-diff} ${-diff === 1 ? "posição" : "posições"}">▼${-diff}</span>`;
   }
 
   function probabilityStandingBadge(standing) {
@@ -1841,7 +1836,7 @@
       const reference = clubRound > 0 ? `Após jogo · R${integer(clubRound)}` : "Após jogo";
       return `<tr><th scope="row"><span>${escapeHtml(reference)}</span><small>${escapeHtml(dateBR(snapshot?.gerado_em))}</small></th><td>${position ? `${integer(position)}º` : "—"}</td><td>${points ?? "—"}</td><td>${escapeHtml(probabilityDisplayText(null, Number(row?.campeao_pct)))}</td><td>${escapeHtml(probabilityDisplayText(null, probabilityHistoryValue(row, "libertadores_pct")))}</td><td>${escapeHtml(probabilityDisplayText(null, probabilityHistoryValue(row, "sul_americana_pct")))}</td><td>${escapeHtml(probabilityDisplayText(null, Number(row?.rebaixamento_pct)))}</td></tr>`;
     }).join("");
-    const gameHistory = gameHistoryRows.length ? `<details class="probability-game-history-details"><summary>Ver histórico após cada jogo do clube <span>${integer(gameHistoryRows.length)} registros recentes</span></summary><div class="probability-history-scroll"><table><thead><tr><th>Referência</th><th>Pos.</th><th>Pts</th><th>Título</th><th>Libertadores</th><th>Sul-Americana</th><th>Queda</th></tr></thead><tbody>${gameBody}</tbody></table></div><p>Esta camada registra a fotografia imediatamente após partidas do próprio clube. Ela é informativa e não substitui os marcos globais usados pelos editoriais.</p></details>` : "";
+    const gameHistory = gameHistoryRows.length ? `<details class="probability-game-history-details"><summary>Ver histórico após cada jogo do clube <span>${integer(gameHistoryRows.length)} registros recentes</span></summary><div class="probability-history-scroll"><table><thead><tr><th>Referência</th><th>Pos.</th><th>Pts</th><th>Título</th><th>Libertadores</th><th>Sul-Americana</th><th>Queda</th></tr></thead><tbody>${gameBody}</tbody></table></div><p>Esta camada registra a fotografia imediatamente após partidas do próprio clube. Ela é informativa e não substitui os marcos globais usados pelos editoriais.</p></details>` : (state.probabilitiesHistory === null ? `<div class="probability-game-history-details"><button type="button" data-load-probability-history>Carregar histórico técnico após cada jogo</button><p>Arquivo detalhado carregado somente sob demanda para manter a página rápida.</p></div>` : "");
     const forecastHistory = displayRows.length ? `<section class="club-forecast-history">
       <div class="club-evolution-head"><div><span>AF-Previsão ${probabilityClubContext(club?.clube)}</span><strong>Evolução da previsão</strong></div><small>${integer(historyRows.length)} ${historyRows.length === 1 ? "marco fechado" : "marcos fechados"} + cálculo atual</small></div>
       <div class="probability-history-scroll"><table><thead><tr><th>Referência</th><th>Pos.</th><th>Pts</th><th>Título</th><th>Libertadores</th><th>Sul-Americana</th><th>Queda</th></tr></thead><tbody>${body}</tbody></table></div>
@@ -2448,16 +2443,7 @@
       view.hidden = !active;
     });
     if (updateHash) history.replaceState(null, "", `#${tab}`);
-    if (tab === "jogos") {
-      renderGameFilter();
-      renderGames();
-    } else if (tab === "campeonato") {
-      renderChampionship();
-    } else if (tab === "probabilidades") {
-      renderProbabilities();
-    } else if (tab === "desempenho") {
-      renderRanking();
-    }
+    ensureTabData(tab).then(() => { if (state.tab === tab) renderCurrentTab(); }).catch((error) => console.warn("Estatísticas: falha ao carregar aba", tab, error));
   }
 
   function openGame(eventId) {
@@ -2616,96 +2602,72 @@
         $("topo-probabilidades")?.scrollIntoView({ behavior: "smooth", block: "start" });
         return;
       }
+      const historyLoader = event.target.closest("[data-load-probability-history]");
+      if (historyLoader) {
+        historyLoader.disabled = true;
+        historyLoader.textContent = "Carregando histórico…";
+        loadDataset("probabilitiesHistory").then(() => renderProbabilities()).catch((error) => { historyLoader.disabled = false; historyLoader.textContent = "Tentar carregar histórico novamente"; console.warn("Histórico técnico indisponível:", error); });
+        return;
+      }
       const game = event.target.closest("[data-open-game]");
       if (game) openGame(game.dataset.openGame);
     });
   }
 
-  function renderAll() {
-    renderPlayers("artilheiros");
-    renderPlayers("assistencias");
-    renderClubGoals();
-    renderRanking();
-    renderProbabilities();
-    renderChampionship();
-    renderGameFilter();
-    renderGames();
-    activateTab(state.tab, false);
+  function renderCurrentTab() {
+    if (state.tab === "artilheiros") renderPlayers("artilheiros");
+    else if (state.tab === "assistencias") renderPlayers("assistencias");
+    else if (state.tab === "gols-clube") renderClubGoals();
+    else if (state.tab === "jogos") { renderGameFilter(); renderGames(); }
+    else if (state.tab === "campeonato") renderChampionship();
+    else if (state.tab === "probabilidades") renderProbabilities();
+    else if (state.tab === "desempenho") renderRanking();
   }
 
-  // ────────────────────────────────────────────────────────────────────
-  // CARGA DE DADOS E ATUALIZAÇÃO AUTOMÁTICA
-  //
-  // O conjunto completo pesa ~5,8 MB (jogos-detalhes.json sozinho tem 2,8 MB).
-  // Rebaixar tudo a cada 30 s consumiria ~700 MB/hora por aba aberta, então a
-  // verificação periódica lê apenas duas sentinelas leves e só recarrega o
-  // conjunto quando elas indicam que os dados realmente mudaram:
-  //   • status-atualizacao.json  → snapshot_hash cobre tabela, resultados,
-  //     jogos e espn_eventos (o estado esportivo);
-  //   • auditoria-probabilidades.json → gerado_em e hash_entrada cobrem o
-  //     modelo AF-Previsão, que o snapshot_hash não alcança.
-  // ────────────────────────────────────────────────────────────────────
+  function renderAll() { renderCurrentTab(); }
+
+  // Carga progressiva: o primeiro paint não baixa jogos-detalhes (~4 MB) nem
+  // historico-probabilidades (~22 MB). Cada aba busca somente o que utiliza.
+  const DATASET_FALLBACKS = {
+    leaders: { status: "aguardando_workflow", artilharia: [], assistencias: [] },
+    competition: { resumo: {}, performance_por_partida: {}, sequencias: {}, publico: {}, gols_por_clube: [], jogos: [] },
+    details: { jogos: {} }, ranking: { ranking: [] }, rankingHistory: { total_snapshots: 0, snapshots: [] },
+    table: { tabela: [] }, results: { resultados: [] }, schedule: { jogos: [] }, audit: { status: "aguardando_workflow" },
+    probabilities: { status: "aguardando_workflow", clubes: [], partidas_restantes: [] }, probabilitiesAudit: { status: "aguardando_workflow" },
+    probabilitiesHistory: { total_snapshots: 0, snapshots: [] }, probabilityMilestones: { total_marcos: 0, marcos: [] },
+    probabilityModelsAudit: { status: "aguardando_workflow" }, probabilityEvaluation: { status: "aguardando_primeira_execucao", publicar_na_interface: false },
+    pointsThresholds: { status: "aguardando_workflow", niveis: [] }, updateStatus: {}, continentalAudit: { status: "aguardando_workflow", competicoes: [] },
+  };
+
+  async function loadDataset(key, force = false) {
+    if (!FILES[key]) throw new Error(`dataset desconhecido: ${key}`);
+    if (!force && loadedDatasets.has(key)) return state[key];
+    if (!force && loadingDatasets.has(key)) return loadingDatasets.get(key);
+    const promise = fetchJson(FILES[key], DATASET_FALLBACKS[key]).then((data) => {
+      state[key] = data; loadedDatasets.add(key); loadingDatasets.delete(key); return data;
+    }).catch((error) => { loadingDatasets.delete(key); throw error; });
+    loadingDatasets.set(key, promise);
+    return promise;
+  }
+
+  async function carregarDadosEssenciais(force = false) {
+    await Promise.all(["leaders","competition","table","results","schedule","audit","updateStatus","probabilitiesAudit","continentalAudit"].map((key) => loadDataset(key, force)));
+    standingsCache = { table: null, results: null, live: null, projection: null, mapa: new Map() };
+    refreshState.assinatura = assinaturaDados(state.updateStatus, state.probabilitiesAudit, state.continentalAudit);
+  }
+
+  async function ensureTabData(tab, options = {}) {
+    const force = options.force === true;
+    let keys = [];
+    if (tab === "jogos") keys = ["details"];
+    else if (tab === "desempenho") keys = ["ranking", "rankingHistory"];
+    else if (tab === "probabilidades") keys = ["probabilities","probabilityMilestones","probabilityModelsAudit","probabilityEvaluation","pointsThresholds"];
+    await Promise.all(keys.map((key) => loadDataset(key, force)));
+  }
 
   function assinaturaDados(statusPartidas, auditoriaProbabilidades, auditoriaContinental) {
-    const s = statusPartidas || {};
-    const a = auditoriaProbabilidades || {};
-    const c = auditoriaContinental || {};
-    return [
-      s.snapshot_hash || "",
-      s.ultimo_snapshot_valido || "",
-      s.ultimo_sucesso || "",
-      a.hash_entrada || "",
-      a.gerado_em || "",
-      c.hash_estado_depois || "",
-      c.gerado_em || "",
-    ].join("|");
-  }
-
-  async function carregarDados() {
-    const [leaders, competition, details, ranking, rankingHistory, table, results, schedule, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityMilestones, probabilityModelsAudit, probabilityEvaluation, pointsThresholds, updateStatus, continentalAudit] = await Promise.all([
-      fetchJson(FILES.leaders, { status: "aguardando_workflow", artilharia: [], assistencias: [] }),
-      fetchJson(FILES.competition, { resumo: {}, performance_por_partida: {}, sequencias: {}, publico: {}, gols_por_clube: [], jogos: [] }),
-      fetchJson(FILES.details, { jogos: {} }),
-      fetchJson(FILES.ranking, { ranking: [] }),
-      fetchJson(FILES.rankingHistory, { total_snapshots: 0, snapshots: [] }),
-      fetchJson(FILES.table, { tabela: [] }),
-      fetchJson(FILES.results, { resultados: [] }),
-      fetchJson(FILES.schedule, { jogos: [] }),
-      fetchJson(FILES.audit, { status: "aguardando_workflow" }),
-      fetchJson(FILES.probabilities, { status: "aguardando_workflow", clubes: [], partidas_restantes: [] }),
-      fetchJson(FILES.probabilitiesAudit, { status: "aguardando_workflow" }),
-      fetchJson(FILES.probabilitiesHistory, { total_snapshots: 0, snapshots: [] }),
-      fetchJson(FILES.probabilityMilestones, { total_marcos: 0, marcos: [] }),
-      fetchJson(FILES.probabilityModelsAudit, { status: "aguardando_workflow" }),
-      fetchJson(FILES.probabilityEvaluation, { status: "aguardando_primeira_execucao", publicar_na_interface: false }),
-      fetchJson(FILES.pointsThresholds, { status: "aguardando_workflow", niveis: [] }),
-      fetchJson(FILES.updateStatus, {}),
-      fetchJson(FILES.continentalAudit, { status: "aguardando_workflow", competicoes: [] }),
-    ]);
-
-    state.leaders = leaders;
-    state.competition = competition;
-    state.details = details;
-    state.ranking = ranking;
-    state.rankingHistory = rankingHistory;
-    state.table = table;
-    state.results = results;
-    state.schedule = schedule;
-    state.audit = audit;
-    state.probabilities = probabilities;
-    state.probabilitiesAudit = probabilitiesAudit;
-    state.probabilitiesHistory = probabilitiesHistory;
-    state.probabilityMilestones = probabilityMilestones;
-    state.probabilityModelsAudit = probabilityModelsAudit;
-    state.probabilityEvaluation = probabilityEvaluation;
-    state.pointsThresholds = pointsThresholds;
-    state.updateStatus = updateStatus;
-    state.continentalAudit = continentalAudit;
-
-    // A assinatura é semeada com os mesmos bytes que acabaram de ser aplicados
-    // na tela, e não numa leitura posterior. Sem isso, uma publicação ocorrida
-    // entre a carga e a primeira verificação passaria despercebida.
-    refreshState.assinatura = assinaturaDados(updateStatus, probabilitiesAudit, continentalAudit);
+    const s = statusPartidas || {}, a = auditoriaProbabilidades || {}, c = auditoriaContinental || {};
+    return [s.snapshot_hash || "", s.ultimo_snapshot_valido || "", s.ultimo_sucesso || "", a.hash_entrada || "", a.gerado_em || "", c.hash_estado_depois || "", c.gerado_em || ""].join("|");
   }
 
   async function verificarAtualizacao() {
@@ -2726,21 +2688,22 @@
       // Dados mudaram de fato. Preserva a rolagem porque renderAll() reescreve
       // o conteúdo dos painéis e a altura da página pode variar.
       const rolagem = window.scrollY;
-      await carregarDados();
-      renderAll();
+      await carregarDadosEssenciais(true);
+      await ensureTabData(state.tab, { force: true });
+      renderCurrentTab();
       window.scrollTo(0, rolagem);
     } catch (error) {
       console.warn("Estatísticas: atualização automática indisponível agora:", error);
     } finally {
       refreshState.ocupado = false;
       clearTimeout(refreshState.timer);
-      refreshState.timer = setTimeout(verificarAtualizacao, REFRESH_MS);
+      refreshState.timer = setTimeout(verificarAtualizacao, STATIC_REFRESH_MS);
     }
   }
 
   function armarAtualizacaoAutomatica() {
     clearTimeout(refreshState.timer);
-    refreshState.timer = setTimeout(verificarAtualizacao, REFRESH_MS);
+    refreshState.timer = setTimeout(verificarAtualizacao, STATIC_REFRESH_MS);
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) return;
       clearTimeout(refreshState.timer);
@@ -2752,8 +2715,20 @@
     return Object.entries(factsMap || {}).map(([eventId, facts]) => {
       const goals=(facts?.goals||[]).map((g)=>[g.minute,g.scorer,g.team,(g.assists||[]).join("+"),g.ownGoal?1:0].join("~")).join(";");
       const apps=(facts?.appearances||[]).map((a)=>playerKey(a.name,a.team)).sort().join(";");
-      return `${eventId}:${facts?.ok?1:0}:${goals}:${apps}`;
+      return `${eventId}:${facts?.integrity?.status||"unknown"}:${facts?.integrity?.expectedGoals??0}:${goals}:${apps}`;
     }).sort().join("|");
+  }
+
+  function renderLiveAffected() {
+    if (state.tab === "artilheiros") renderPlayers("artilheiros");
+    else if (state.tab === "assistencias") renderPlayers("assistencias");
+    else if (state.tab === "gols-clube") renderClubGoals();
+    else if (state.tab === "probabilidades") { renderProbabilityRanking(); renderProbabilityDetails(); }
+  }
+
+  function hasIncompleteLiveFacts() {
+    const games = liveApplicableGames();
+    return games.some((game) => state.liveFacts?.[String(game.eventId)]?.integrity?.complete !== true);
   }
 
   async function refreshLiveFacts(options = {}) {
@@ -2762,125 +2737,86 @@
     const games = liveApplicableGames();
     if (!games.length) {
       const had = Object.keys(state.liveFacts || {}).length > 0;
-      state.liveFacts = {}; state.liveFactsError = null;
-      if (had && options.render !== false) { renderPlayers("artilheiros"); renderPlayers("assistencias"); renderClubGoals(); }
+      state.liveFacts = {}; state.liveFactsError = null; liveRefreshState.lastFactsAt = Date.now();
+      if (had && options.render !== false) renderLiveAffected();
       return had;
     }
-    const previous = state.liveFacts || {};
-    const next = {};
-    let failures = 0;
+    const previous = state.liveFacts || {}, next = {}; let failures = 0;
     await Promise.all(games.map(async (game) => {
       const eventId=String(game.eventId||""); if(!eventId) return;
       try {
-        const summary=await engine.fetchSummary(eventId);
-        const facts=engine.normalizeSummaryFacts(summary, game, canonicalLiveTeam);
-        next[eventId]={ ok:true, ...facts };
+        const facts=await engine.fetchMatchFacts(game,{canonicalize:canonicalLiveTeam,forceFresh:options.forceFresh===true});
+        next[eventId]={...facts,ok:facts?.integrity?.complete===true};
       } catch (error) {
         failures += 1;
-        next[eventId]=previous[eventId] || { ok:false, goals:[], appearances:[] };
+        next[eventId]=previous[eventId] || {ok:false,goals:[],appearances:[],integrity:{expectedGoals:(Number(game.placarMandante)||0)+(Number(game.placarVisitante)||0),complete:false,status:"unavailable"}};
       }
     }));
     const changed=liveFactsSignature(next)!==liveFactsSignature(previous);
-    state.liveFacts=next; state.liveFactsFetchedAt=new Date(); state.liveFactsError=failures ? `${failures} summary(s) indisponível(is)` : null;
-    if ((changed || options.forceRender) && options.render !== false) { renderPlayers("artilheiros"); renderPlayers("assistencias"); renderClubGoals(); }
+    state.liveFacts=next; state.liveFactsFetchedAt=new Date(); state.liveFactsError=failures?`${failures} jogo(s) com fatos temporariamente indisponíveis`:null; liveRefreshState.lastFactsAt=Date.now();
+    if ((changed||options.forceRender)&&options.render!==false) renderLiveAffected();
     return changed;
   }
 
   function liveSignature(liveMap) {
-    return Object.values(liveMap || {})
-      .map((game) => [game.eventId || "", game.estado || "", game.placarMandante ?? "", game.placarVisitante ?? "", game.status || ""].join(":"))
-      .sort()
-      .join("|");
+    return Object.values(liveMap || {}).map((game)=>[game.eventId||"",game.estado||"",game.placarMandante??"",game.placarVisitante??"",game.status||""].join(":")).sort().join("|");
   }
 
   function liveWindowActive() {
-    const engine = window.BRClassificacaoLive;
-    if (!engine) return false;
-    return engine.isWindowActive(
-      Array.isArray(state.schedule?.jogos) ? state.schedule.jogos : [],
-      state.espnLive || {},
-      new Date(),
-      20,
-      150,
-    );
+    const engine=window.BRClassificacaoLive; if(!engine)return false;
+    return engine.isWindowActive(Array.isArray(state.schedule?.jogos)?state.schedule.jogos:[],state.espnLive||{},new Date(),20,150);
   }
 
   async function refreshLiveStandings(options = {}) {
-    const engine = window.BRClassificacaoLive;
-    if (!engine || liveRefreshState.ocupado || document.hidden) return false;
-    if (!options.force && !liveWindowActive()) return false;
-    liveRefreshState.ocupado = true;
+    const engine=window.BRClassificacaoLive;
+    if(!engine||liveRefreshState.ocupado||document.hidden)return {changed:false};
+    if(!options.force&&!liveWindowActive())return {changed:false};
+    liveRefreshState.ocupado=true;
     try {
-      const snapshot = await engine.fetchLiveState({ canonicalize: canonicalLiveTeam });
-      const live = snapshot.liveMap || {};
-      const signature = liveSignature(live);
-      const changed = signature !== liveRefreshState.assinatura;
-      state.espnLive = live;
-      state.espnLiveMeta = snapshot.meta || null;
-      state.espnLiveFetchedAt = new Date(Number(snapshot.meta?.fetchedAt || Date.now()));
-      state.espnLiveError = null;
-      liveRefreshState.assinatura = signature;
-      standingsCache.live = null;
-      if (changed && options.render !== false) {
-        renderProbabilityRanking();
-        renderProbabilityDetails();
-        renderClubGoals();
-      }
-      return changed;
-    } catch (error) {
-      // Falha momentânea da ESPN não apaga o último estado ao vivo válido.
-      state.espnLiveError = String(error?.message || error || "falha ao consultar ESPN");
-      console.warn("Estatísticas: classificação ao vivo temporariamente indisponível:", error);
-      return false;
-    } finally {
-      liveRefreshState.ocupado = false;
-    }
+      const previousSignature=liveRefreshState.assinatura;
+      const snapshot=await engine.fetchLiveState({canonicalize:canonicalLiveTeam,forceFresh:options.forceFresh===true});
+      const live=snapshot.liveMap||{}, signature=liveSignature(live), changed=signature!==previousSignature;
+      state.espnLive=live; state.espnLiveMeta=snapshot.meta||null; state.espnLiveFetchedAt=new Date(Number(snapshot.meta?.fetchedAt||Date.now())); state.espnLiveError=null; liveRefreshState.assinatura=signature; standingsCache.live=null;
+      if(changed&&options.render!==false)renderLiveAffected();
+      return {changed,scoreChanged:changed,signature};
+    } catch(error) {
+      state.espnLiveError=String(error?.message||error||"falha ao consultar ESPN"); console.warn("Estatísticas: classificação ao vivo temporariamente indisponível:",error); return {changed:false,error:true};
+    } finally { liveRefreshState.ocupado=false; }
   }
 
   function armLiveRefresh() {
     clearTimeout(liveRefreshState.timer);
+    const schedule = (delay) => { clearTimeout(liveRefreshState.timer); liveRefreshState.timer=setTimeout(tick,delay); };
     const tick = async () => {
-      if (!document.hidden && liveWindowActive()) {
-        await refreshLiveStandings();
-        await refreshLiveFacts();
-      }
-      clearTimeout(liveRefreshState.timer);
-      liveRefreshState.timer = setTimeout(tick, REFRESH_MS);
+      const started=Date.now();
+      if(!document.hidden&&liveWindowActive()) {
+        const standings=await refreshLiveStandings({force:true});
+        const incomplete=hasIncompleteLiveFacts();
+        const factsAge=Date.now()-Number(liveRefreshState.lastFactsAt||0);
+        if(standings.scoreChanged||incomplete||factsAge>=LIVE_FACTS_REFRESH_MS) await refreshLiveFacts({forceFresh:standings.scoreChanged||incomplete});
+        const delay=hasIncompleteLiveFacts()?LIVE_FACTS_RETRY_MS:Math.max(1000,LIVE_SCORE_REFRESH_MS-(Date.now()-started));
+        schedule(delay);
+      } else schedule(STATIC_REFRESH_MS);
     };
-    liveRefreshState.timer = setTimeout(tick, REFRESH_MS);
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) return;
-      clearTimeout(liveRefreshState.timer);
-      refreshLiveStandings({ force: liveWindowActive() }).then(() => refreshLiveFacts()).finally(() => {
-        liveRefreshState.timer = setTimeout(tick, REFRESH_MS);
-      });
-    });
+    schedule(0);
+    document.addEventListener("visibilitychange",()=>{if(document.hidden)return; schedule(0);});
   }
 
   async function load() {
     bindEvents();
-    const hashTab = location.hash.replace(/^#/, "");
-    const openProbabilityMethod = hashTab === "metodologia-probabilidades";
-    const abrirMetodologia = hashTab === "metodologia-ranking";
-    if (openProbabilityMethod) state.tab = "probabilidades";
-    else if (abrirMetodologia) state.tab = "desempenho";
-    else if (["artilheiros", "jogos", "assistencias", "gols-clube", "campeonato", "probabilidades", "desempenho"].includes(hashTab)) state.tab = hashTab;
+    const hashTab=location.hash.replace(/^#/,"");
+    const openProbabilityMethod=hashTab==="metodologia-probabilidades", abrirMetodologia=hashTab==="metodologia-ranking";
+    if(openProbabilityMethod)state.tab="probabilidades"; else if(abrirMetodologia)state.tab="desempenho"; else if(["artilheiros","jogos","assistencias","gols-clube","campeonato","probabilidades","desempenho"].includes(hashTab))state.tab=hashTab;
 
-    await carregarDados();
-    if (liveWindowActive()) {
-      await refreshLiveStandings({ force: true, render: false });
-      await refreshLiveFacts({ render: false });
-    }
-    renderAll();
-    if (openProbabilityMethod) {
-      requestAnimationFrame(() => $("metodologia-probabilidades")?.scrollIntoView({ behavior: "auto", block: "start" }));
-    }
-    if (abrirMetodologia) requestAnimationFrame(() => document.getElementById("metodologia-ranking")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-    if (hashTab.startsWith("probabilidade-")) {
-      requestAnimationFrame(() => document.getElementById(hashTab)?.scrollIntoView({ behavior: "auto", block: "start" }));
-    }
-    armarAtualizacaoAutomatica();
-    armLiveRefresh();
+    await carregarDadosEssenciais();
+    await ensureTabData(state.tab);
+    activateTab(state.tab,false);
+    renderCurrentTab();
+    // O primeiro paint não espera ESPN/summary. Tempo real entra progressivamente logo depois.
+    if(openProbabilityMethod)requestAnimationFrame(()=>$('metodologia-probabilidades')?.scrollIntoView({behavior:'auto',block:'start'}));
+    if(abrirMetodologia)requestAnimationFrame(()=>document.getElementById('metodologia-ranking')?.scrollIntoView({behavior:'smooth',block:'start'}));
+    if(hashTab.startsWith('probabilidade-'))requestAnimationFrame(()=>document.getElementById(hashTab)?.scrollIntoView({behavior:'auto',block:'start'}));
+    armarAtualizacaoAutomatica(); armLiveRefresh();
   }
 
   document.addEventListener("DOMContentLoaded", load);

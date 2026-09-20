@@ -8,8 +8,9 @@ import {
 } from './espn-source.js';
 import { fetchApiFootballPlayerDefenseFallback, fetchApiFootballStatsFallback } from './api-football-source.js';
 import { fetchTheSportsDbStatsFallback } from './thesportsdb-source.js';
+import { normalizeLiveFacts, chooseBestKnownLiveFacts, LIVE_FACTS_CONSTANTS } from './live-facts.js';
 
-const LIVE_GATEWAY_VERSION = '4';
+const LIVE_GATEWAY_VERSION = '5';
 const LIVE_STATE_CONTRACT_VERSION = 1;
 const SCOREBOARD_HOT_TTL_SECONDS = 8;
 const SCOREBOARD_FALLBACK_TTL_SECONDS = 180;
@@ -333,8 +334,8 @@ export async function resolveLiveSummary(url, deps = {}) {
   const now = Number(nowFn());
   const fetchImpl = deps.fetchImpl || globalThis.fetch;
   const cache = cacheFromDeps(deps);
-  const hotKey = cacheKey('summary', [league, eventId], 'hot');
-  const fallbackKey = cacheKey('summary', [league, eventId], 'fallback');
+  const hotKey = cacheKey('summary', [LIVE_GATEWAY_VERSION, league, eventId], 'hot');
+  const fallbackKey = cacheKey('summary', [LIVE_GATEWAY_VERSION, league, eventId], 'fallback');
   const isContinental = CONTINENTAL_LEAGUES.has(league);
   const isBrasileirao = league === 'bra.1';
   const preserveBestStats = isContinental || isBrasileirao;
@@ -351,6 +352,7 @@ export async function resolveLiveSummary(url, deps = {}) {
     return summaryGoalCount(entry.data) >= expectedGoals;
   };
 
+  const previousSummaryEnvelope = await readCached(cache, fallbackKey);
   const hot = forceFresh ? null : await readCached(cache, hotKey);
   if (acceptable(hot)) {
     return {
@@ -614,8 +616,16 @@ export async function resolveLiveSummary(url, deps = {}) {
       }, STATS_BEST_KNOWN_TTL_SECONDS, now);
     }
 
+    const currentFacts = normalizeLiveFacts(data, { eventId, expectedGoals });
+    const chosenFacts = chooseBestKnownLiveFacts(currentFacts, previousSummaryEnvelope?.facts);
+    const liveFacts = chosenFacts.facts;
+
     const mergedResult = { ...result, data };
     const envelope = publicEnvelope(mergedResult, now, {
+      factsContractVersion: LIVE_FACTS_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
+      facts: liveFacts,
+      factsIntegrity: liveFacts?.integrity || null,
+      factsBestKnownApplied: chosenFacts.applied === true,
       cacheStatus: 'miss',
       expectedGoals,
       goalCount: Number(result.goalCount || 0),
@@ -666,6 +676,7 @@ export async function resolveLiveSummary(url, deps = {}) {
 export const LIVE_API_CONSTANTS = Object.freeze({
   LIVE_GATEWAY_VERSION,
   LIVE_STATE_CONTRACT_VERSION,
+  LIVE_FACTS_CONTRACT_VERSION: LIVE_FACTS_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
   SCOREBOARD_HOT_TTL_SECONDS,
   SCOREBOARD_FALLBACK_TTL_SECONDS,
   SUMMARY_HOT_TTL_SECONDS,

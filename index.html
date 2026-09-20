@@ -2954,7 +2954,7 @@ body > .container > section.hero > img {
 <div id="modal-container"></div>
 
 <script src="js/br-estatisticas-ordem.js?v=20260816-ordem-canonica-v1"></script>
-<script src="js/br-classificacao-live.js?v=20260919-live-state-v4"></script>
+<script src="js/br-classificacao-live.js?v=20260920-live-structure-v5"></script>
 <script>
 const BR_PUBLIC_ONLY = true;
 
@@ -4094,16 +4094,16 @@ function gerenciarSnapshotRanking(rankingAtual) {
 
 // Renderiza a seta de movimento entre a posição base e a atual.
 // Retorna HTML pronto. Se hoje é terça, ou se não há diferença, retorna vazio.
-function htmlSetaMovimento(posBase, posAtual) {
-  // Terça-feira: sem setas (rodada acabou, nada a comparar)
-  if (hojeEhTerca()) return '';
+function htmlSetaMovimento(posBase, posAtual, aoVivo = false) {
+  // Ranking semanal mantém a regra antiga; tabela ao vivo sempre compara com a classificação oficial publicada.
+  if (!aoVivo && hojeEhTerca()) return '';
   if (!posBase || !posAtual || posBase === posAtual) return '';
   // Subiu: posBase > posAtual (ex: era 5º, agora é 3º → subiu 2)
   const diff = posBase - posAtual;
   if (diff > 0) {
-    return `<span class="seta-mov seta-up" title="Subiu ${diff} ${diff === 1 ? 'posição' : 'posições'}">▲ ${diff}</span>`;
+    return `<span class="seta-mov seta-up" title="${aoVivo ? 'Posição provisória ao vivo: ' : ''}Subiu ${diff} ${diff === 1 ? 'posição' : 'posições'}">▲ ${diff}</span>`;
   } else {
-    return `<span class="seta-mov seta-down" title="Caiu ${-diff} ${-diff === 1 ? 'posição' : 'posições'}">▼ ${-diff}</span>`;
+    return `<span class="seta-mov seta-down" title="${aoVivo ? 'Posição provisória ao vivo: ' : ''}Caiu ${-diff} ${-diff === 1 ? 'posição' : 'posições'}">▼ ${-diff}</span>`;
   }
 }
 
@@ -4920,8 +4920,9 @@ function renderTabela() {
 
   const projecaoAoVivo = tabelaComJogosAoVivo();
   const tabelaRender = projecaoAoVivo.tabela;
-  const snap = gerenciarSnapshotTabela();
-  const posBase = (snap && snap.posicoesBase) || {};
+  // Baseline canônico: classificação oficial publicada antes do overlay ao vivo.
+  // Não depende mais do localStorage do navegador, portanto todos veem as mesmas setas.
+  const posBase = Object.fromEntries((state.tabela || []).map(t => [t.time, Number(t.pos)]));
   const forma = calcularFormaTimes();
   if (!state.resultadosCarregados) carregarResultados();
 
@@ -4959,7 +4960,7 @@ function renderTabela() {
     if (t.pos >= 17) cls = 'zona-rebaixamento';
     else if (t.pos <= 4) cls = 'zona-libertadores';
     else if (t.pos === 5) cls = 'zona-prelibertadores';
-    const seta = htmlSetaMovimento(posBase[t.time], t.pos);
+    const seta = projecaoAoVivo.jogos.length ? htmlSetaMovimento(posBase[t.time], t.pos, true) : '';
     const esc = escudoDe(t.time);
     const identidade = `<div class="tabela-time-cel">${brEscudoImg(esc?.escudo || '', t.time, 'tabela-escudo')}<span>${brEscapeHtml(t.time)}</span>${t._aoVivo ? '<small style="color:#fb7185;font-size:8px;font-weight:900;letter-spacing:.08em;">AO VIVO</small>' : (t._provisorioFinal ? '<small style="color:var(--accent);font-size:8px;font-weight:900;letter-spacing:.08em;">FINAL</small>' : '')}</div>`;
     const celTime = linkClubeBrasileirao(t.time, identidade, 'tabela-time-link br-club-link');

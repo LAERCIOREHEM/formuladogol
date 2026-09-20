@@ -10,14 +10,16 @@
   const SUMMARY_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary";
   const LIVE_STATE_URL = "https://push.formuladogol.com.br/v1/live/state";
   const LIVE_SUMMARY_URL = "https://push.formuladogol.com.br/v1/live/summary";
-  const LIVE_STATE_VERSION = "4";
+  const LIVE_STATE_VERSION = "5";
+  const LIVE_FACTS_CONTRACT_VERSION = 1;
   const FINAL_MINUTES_AFTER_START = 90;
-  const WORKER_TIMEOUT_MS = 6500;
-  const DIRECT_TIMEOUT_MS = 6500;
+  const WORKER_TIMEOUT_MS = 4500;
+  const DIRECT_TIMEOUT_MS = 4500;
   const ACTIVE_CACHE_MAX_AGE_MS = 90000;
   const IDLE_CACHE_MAX_AGE_MS = 45000;
   const POST_CACHE_MAX_AGE_MS = 180000;
-  const STORAGE_KEY = "fdg.br.live-state.v4";
+  const STORAGE_KEY = "fdg.br.live-state.v5";
+  const FACTS_STORAGE_PREFIX = "fdg.br.live-facts.v1.";
 
   function numberScore(value) {
     if (value === null || value === undefined || value === "" || value === "-") return null;
@@ -279,6 +281,9 @@
   function teamFromEvent(item, teamMap, live, canonicalize) {
     const canon = typeof canonicalize === "function" ? canonicalize : (value) => value;
     const raw = item && (item.team || item.competitor || item.club);
+    const directId = String(item && (item.teamId || item.team_id || item.competitorId || item.clubId) || "");
+    if (directId && teamMap[directId]) return teamMap[directId];
+    if (typeof raw === "string" && teamMap[raw]) return teamMap[raw];
     if (raw && typeof raw === "object") {
       const id = String(raw.id || raw.uid || "");
       if (id && teamMap[id]) return teamMap[id];
@@ -346,12 +351,28 @@
       const team = teamFromEvent(item, teamMap, live || {}, canon);
       const minute = eventMinute(item);
       const ownGoal = /own goal|gol contra/i.test(text);
-      const key = [minute.replace(/\s+/g,""), normalizeText(scorer) || normalizeText(text), normalizeText(team)].join("|");
-      const quality = node.priority + (scorer ? 20 : 0) + (team ? 10 : 0) + (assists.length ? 3 : 0);
+      const rawHomeScore = item?.homeScore ?? item?.score?.homeScore ?? item?.score?.home;
+      const rawAwayScore = item?.awayScore ?? item?.score?.awayScore ?? item?.score?.away;
+      const homeScoreAfter = numberScore(rawHomeScore);
+      const awayScoreAfter = numberScore(rawAwayScore);
+      const key = [minute.replace(/\s+/g,""), normalizeText(scorer) || normalizeText(text), normalizeText(team), homeScoreAfter ?? "", awayScoreAfter ?? ""].join("|");
+      const quality = node.priority + (scorer ? 20 : 0) + (team ? 10 : 0) + (assists.length ? 3 : 0) + (homeScoreAfter !== null && awayScoreAfter !== null ? 4 : 0);
       const previous = best.get(key);
-      if (!previous || quality > previous.quality) best.set(key, { quality, goal:{ minute, scorer, team, assists, ownGoal, text } });
+      if (!previous || quality > previous.quality) best.set(key, { quality, goal:{ minute, scorer, team, assists, ownGoal, text, homeScoreAfter, awayScoreAfter } });
     }
     let goals = Array.from(best.values(), (entry) => entry.goal).sort((a,b) => (parseInt(a.minute)||999)-(parseInt(b.minute)||999));
+    // Fallback determinístico: se a superfície ESPN omite team/teamId mas informa
+    // o placar depois do gol, inferimos o lado pela transição do placar.
+    let seenHome = 0, seenAway = 0;
+    for (const goal of goals) {
+      if (!goal.team && goal.homeScoreAfter !== null && goal.awayScoreAfter !== null) {
+        if (goal.homeScoreAfter > seenHome && goal.awayScoreAfter === seenAway) goal.team = canon(live?.mandante);
+        else if (goal.awayScoreAfter > seenAway && goal.homeScoreAfter === seenHome) goal.team = canon(live?.visitante);
+      }
+      if (goal.homeScoreAfter !== null && goal.awayScoreAfter !== null) { seenHome = goal.homeScoreAfter; seenAway = goal.awayScoreAfter; }
+      else if (goal.team === canon(live?.mandante)) seenHome += 1;
+      else if (goal.team === canon(live?.visitante)) seenAway += 1;
+    }
     const limits = new Map([[canon(live?.mandante), numberScore(live?.placarMandante) || 0], [canon(live?.visitante), numberScore(live?.placarVisitante) || 0]]);
     const used = new Map();
     goals = goals.filter((goal) => {
@@ -558,20 +579,40 @@
   async function fetchSummary(eventId, options) {
     const opts = options || {};
     const id = encodeURIComponent(String(eventId || ""));
+    const expectedGoals = Math.max(0, Number(opts.expectedGoals || 0) || 0);
     const errors = [];
     if (opts.worker !== false) {
       try {
-        const workerUrl = `${opts.workerSummaryUrl || LIVE_SUMMARY_URL}?league=bra.1&event=${id}&state=${encodeURIComponent(opts.state || "in")}&fresh=1&_=${Date.now()}`;
+        const workerUrl = `${opts.workerSummaryUrl || LIVE_SUMMARY_URL}?league=bra.1&event=${id}&state=${encodeURIComponent(opts.state || "in")}&expectedGoals=${expectedGoals}${opts.forceFresh === true ? "&fresh=1" : ""}&_=${Date.now()}`;
         const envelope = await fetchJson(workerUrl, opts, Number(opts.workerTimeoutMs || WORKER_TIMEOUT_MS));
         if (envelope && envelope.data && typeof envelope.data === "object") return envelope.data;
         throw new Error("payload summary do Worker inválido");
       } catch (error) { errors.push(`worker=${String(error && error.message || error)}`); }
     }
-    try {
-      const url = `${opts.url || SUMMARY_URL}?event=${id}&_=${Date.now()}`;
-      return await fetchJson(url, opts, Number(opts.directTimeoutMs || DIRECT_TIMEOUT_MS));
-    } catch (error) { errors.push(`direct=${String(error && error.message || error)}`); }
+    try { return await fetchJson(`${opts.url || SUMMARY_URL}?event=${id}&_=${Date.now()}`, opts, Number(opts.directTimeoutMs || DIRECT_TIMEOUT_MS)); }
+    catch (error) { errors.push(`direct=${String(error && error.message || error)}`); }
     throw new Error(`ESPN summary indisponível: ${errors.join(" | ")}`);
+  }
+
+  function factsExpectedGoals(live) { return Math.max(0, (numberScore(live && live.placarMandante) || 0) + (numberScore(live && live.placarVisitante) || 0)); }
+  function factsQuality(facts) { const i=facts?.integrity||{}; return (i.complete?100000:0)+Number(i.usableGoalCount||0)*1000+Number(i.scorerResolvedCount||0)*100+(facts?.goals||[]).reduce((sum,g)=>sum+(g.assists||[]).length,0)*10+(facts?.appearances||[]).length; }
+  function finalizeFacts(rawFacts, live, canonicalize, meta) {
+    const canon=typeof canonicalize==="function"?canonicalize:(value)=>value;
+    const goals=(Array.isArray(rawFacts?.goals)?rawFacts.goals:[]).map((g)=>({...g,team:canon(g.team||(g.side==="home"?live?.mandante:g.side==="away"?live?.visitante:"")),scorer:cleanPlayerName(g.scorer||""),assists:(Array.isArray(g.assists)?g.assists:[]).map(cleanPlayerName).filter(Boolean)}));
+    const appearances=(Array.isArray(rawFacts?.appearances)?rawFacts.appearances:[]).map((a)=>({...a,name:cleanPlayerName(a.name||""),team:canon(a.team||"")})).filter((a)=>a.name&&a.team);
+    const expectedGoals=Math.max(0,Number(rawFacts?.integrity?.expectedGoals??factsExpectedGoals(live))||0), observedGoalCount=goals.length, teamResolvedCount=goals.filter((g)=>g.team).length, scorerResolvedCount=goals.filter((g)=>g.ownGoal||g.scorer).length, usableGoalCount=goals.filter((g)=>g.team&&(g.ownGoal||g.scorer)).length;
+    const scoreComplete=expectedGoals===0||observedGoalCount>=expectedGoals, identityComplete=expectedGoals===0||(teamResolvedCount>=expectedGoals&&scorerResolvedCount>=expectedGoals&&usableGoalCount>=expectedGoals), complete=scoreComplete&&identityComplete;
+    return {...rawFacts,contractVersion:LIVE_FACTS_CONTRACT_VERSION,goals,appearances,integrity:{...(rawFacts?.integrity||{}),expectedGoals,observedGoalCount,teamResolvedCount,scorerResolvedCount,usableGoalCount,scoreComplete,identityComplete,complete,missingGoals:Math.max(0,expectedGoals-observedGoalCount),missingTeams:Math.max(0,expectedGoals-teamResolvedCount),missingScorers:Math.max(0,expectedGoals-scorerResolvedCount),status:complete?"complete":scoreComplete?"identity-pending":"summary-pending"},meta:meta||rawFacts?.meta||{}};
+  }
+  function localFacts(summary,live,canonicalize){const base=normalizeSummaryFacts(summary||{},live||{},canonicalize); return finalizeFacts(base,live,canonicalize,{source:"direct-espn",fetchedAt:Date.now(),stale:false});}
+  function factsStorage(options){if(options&&options.storage)return options.storage; try{return typeof sessionStorage!=="undefined"?sessionStorage:null;}catch(_){return null;}}
+  function readFactsCache(eventId,expectedGoals,options){const storage=factsStorage(options); if(!storage)return null; try{const saved=JSON.parse(storage.getItem(FACTS_STORAGE_PREFIX+eventId)||"null"); if(!saved||Number(saved.expectedGoals)!==Number(expectedGoals)||Date.now()-Number(saved.fetchedAt||0)>600000)return null; return saved.facts||null;}catch(_){return null;}}
+  function writeFactsCache(eventId,expectedGoals,facts,options){const storage=factsStorage(options); if(!storage||!facts)return; try{storage.setItem(FACTS_STORAGE_PREFIX+eventId,JSON.stringify({expectedGoals,fetchedAt:Date.now(),facts}));}catch(_){}}
+  async function fetchMatchFacts(game, options) {
+    const opts=options||{}, live=game&&typeof game==="object"?game:{eventId:String(game||"")}, eventId=String(live.eventId||live.id||game||""); if(!eventId)throw new Error("event_id ausente"); const expectedGoals=factsExpectedGoals(live), errors=[]; let best=null;
+    if(opts.worker!==false){try{const id=encodeURIComponent(eventId),url=`${opts.workerSummaryUrl||LIVE_SUMMARY_URL}?league=bra.1&event=${id}&state=${encodeURIComponent(live.estado||opts.state||"in")}&expectedGoals=${expectedGoals}${opts.forceFresh===true?"&fresh=1":""}&_=${Date.now()}`; const envelope=await fetchJson(url,opts,Number(opts.workerTimeoutMs||WORKER_TIMEOUT_MS)); if(Number(envelope?.factsContractVersion||envelope?.facts?.contractVersion||0)===LIVE_FACTS_CONTRACT_VERSION&&envelope?.facts){best=finalizeFacts(envelope.facts,live,opts.canonicalize,{source:"worker-canonical",fetchedAt:Number(envelope.fetchedAt||Date.now()),stale:envelope.stale===true,factsBestKnownApplied:envelope.factsBestKnownApplied===true}); if(best.integrity.complete){writeFactsCache(eventId,expectedGoals,best,opts); return best;}}}catch(error){errors.push(`worker=${String(error&&error.message||error)}`);}}
+    try{const direct=await fetchJson(`${opts.url||SUMMARY_URL}?event=${encodeURIComponent(eventId)}&_=${Date.now()}`,opts,Number(opts.directTimeoutMs||DIRECT_TIMEOUT_MS)); const candidate=localFacts(direct,live,opts.canonicalize); if(!best||factsQuality(candidate)>factsQuality(best))best=candidate;}catch(error){errors.push(`direct=${String(error&&error.message||error)}`);}
+    const cached=readFactsCache(eventId,expectedGoals,opts); if(cached&&(!best||factsQuality(cached)>factsQuality(best)))best={...cached,meta:{...(cached.meta||{}),source:"last-complete-facts",stale:true,errors}}; if(best){writeFactsCache(eventId,expectedGoals,best,opts); return best;} throw new Error(`ESPN facts indisponível: ${errors.join(" | ")}`);
   }
 
   function resultCounts(results, canonicalize) {
@@ -659,6 +700,7 @@
       time: canonicalize(row.time || row.clube) || row.time || row.clube,
       _aoVivo: false,
       _provisorioFinal: false,
+      _basePos: Number(row.pos || 999),
     }));
     const byTeam = Object.fromEntries(base.map((row) => [row.time, row]));
     const games = applicableGames({
@@ -720,6 +762,7 @@
       Number(b.vitorias) - Number(a.vitorias) ||
       Number(b.sg) - Number(a.sg) ||
       Number(b.gp) - Number(a.gp) ||
+      Number(a._basePos || 999) - Number(b._basePos || 999) ||
       String(a.time).localeCompare(String(b.time), "pt-BR")
     );
     base.forEach((row, index) => { row.pos = index + 1; });
@@ -758,6 +801,7 @@
     LIVE_STATE_URL,
     LIVE_SUMMARY_URL,
     LIVE_STATE_VERSION,
+    LIVE_FACTS_CONTRACT_VERSION,
     numberScore,
     competitorScore,
     normalizeText,
@@ -770,6 +814,7 @@
     fetchLiveState,
     fetchScoreboard,
     fetchSummary,
+    fetchMatchFacts,
     eventIdFromGame,
     findLiveGame,
     normalizeSummaryFacts,

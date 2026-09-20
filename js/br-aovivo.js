@@ -4,8 +4,8 @@
   const ESPN_API_ROOT = "https://site.api.espn.com/apis/site/v2/sports/soccer";
   const LIVE_GATEWAY_ROOT = "https://push.formuladogol.com.br/v1/live";
   const LIVE_STATE_CONTRACT_VERSION = 1;
-  const LIVE_GATEWAY_TIMEOUT_MS = 5500;
-  const DIRECT_ESPN_FALLBACK_TIMEOUT_MS = 5000;
+  const LIVE_GATEWAY_TIMEOUT_MS = 4500;
+  const DIRECT_ESPN_FALLBACK_TIMEOUT_MS = 4500;
   const DEFAULT_LEAGUE = "bra.1";
   const LEAGUE_META = {
     "bra.1": { competitionKey: "brasileirao", competitionName: "Campeonato Brasileiro Série A", competitionShort: "Brasileirão" },
@@ -13,14 +13,16 @@
     "conmebol.libertadores": { competitionKey: "libertadores", competitionName: "CONMEBOL Libertadores", competitionShort: "Libertadores" },
     "conmebol.sudamericana": { competitionKey: "sul_americana", competitionName: "CONMEBOL Sudamericana", competitionShort: "Sul-Americana" }
   };
-  const REFRESH_MS = 30000;
+  const LIVE_REFRESH_MS = 10000;
+  const IDLE_REFRESH_MS = 30000;
+  const SUMMARY_REFRESH_MS = 30000;
   const TZ = "America/Sao_Paulo";
   const FINAL_RETENTION_BR_MS = 5 * 60000;
   const FINAL_RETENTION_OTHER_MS = 60 * 60000;
   const PRE_GAME_WINDOW_BEFORE_MS = 30 * 60000;
   const PRE_GAME_WINDOW_AFTER_MS = 90 * 60000;
   const FETCH_TIMEOUT_MS = 12000;
-  const STALE_DATA_MS = REFRESH_MS * 2 + 15000;
+  const STALE_DATA_MS = 35000;
   const FRESHNESS_CHECK_MS = 5000;
   const IMMEDIATE_REFRESH_DEBOUNCE_MS = 750;
 
@@ -206,6 +208,9 @@
     transmissoesTv: {},
     selecionado: new URLSearchParams(window.location.search || "").get("event") || "",
     resumoPorId: {},
+    summaryFetchedAt: {},
+    summaryScoreKey: {},
+    summaryLoadingKey: {},
     statsPorId: cachedLiveStats(),
     statsRetryAt: {},
     summaryRequestSerial: 0,
@@ -729,6 +734,8 @@
       if (!envelope || envelope.ok !== true || !envelope.data || typeof envelope.data !== "object") {
         throw new Error("Gateway de summary retornou payload inválido");
       }
+      envelope.data.__fdgLiveFacts = envelope.facts || null;
+      envelope.data.__fdgLiveFactsIntegrity = envelope.factsIntegrity || (envelope.facts && envelope.facts.integrity) || null;
       envelope.data.__fdgLiveMeta = {
         statsProvider: String(envelope.statsProvider || "espn"),
         statsCoverage: envelope.statsCoverage || null,
@@ -766,6 +773,8 @@
             const directRows = extractStatsRows(game, direct);
             const directScore = statsRowsFreshnessScore(directRows);
             if (directScore > gatewayScore) {
+              direct.__fdgLiveFacts = envelope.facts || null;
+              direct.__fdgLiveFactsIntegrity = envelope.factsIntegrity || (envelope.facts && envelope.facts.integrity) || null;
               direct.__fdgLiveMeta = {
                 statsProvider: "espn-direct-fresh",
                 statsCoverage: { minPerTeam: directRows.length, maxPerTeam: directRows.length },
@@ -1166,14 +1175,19 @@
   }
 
   async function loadLocal() {
-    const [agenda, eventos, probabilidades] = await Promise.all([
+    const [agenda, eventos] = await Promise.all([
       fetchJson("dados-br/agenda-clubes-br.json?t=" + Date.now()),
-      fetchJson("espn_eventos.json?t=" + Date.now()).catch(() => ({ eventos: [] })),
-      loadProbabilityDataset()
+      fetchJson("espn_eventos.json?t=" + Date.now()).catch(() => ({ eventos: [] }))
     ]);
     state.agenda = localGamesFromJson(agenda).filter((g) => !g.dataDefinir && g.date);
     state.eventosLocais = (eventos.eventos || []).slice();
-    state.probabilidadesJogos = probabilidades;
+    if (!state.probabilidadesJogos) {
+      loadProbabilityDataset().then((probabilidades) => {
+        state.probabilidadesJogos = probabilidades;
+        const selected = currentSelectedGame();
+        if (selected) renderMain(selected, state.resumoPorId[String(selected.id)] || null, allGames());
+      }).catch(() => {});
+    }
     for (const item of state.eventosLocais) {
       const key = String(item && item.event_id || "");
       const finalizado = parseDate(item && item.finalizado_em);
@@ -2427,17 +2441,19 @@
   }
 
   function goalsBySide(g, summary) {
-    const rows = eventRows(g, summary).filter(r => r.type.key === "goal");
-    const home = [], away = [];
-    const homeId = String(g.home.id || ""), awayId = String(g.away.id || "");
-    for (const row of rows) {
-      const item = { min: row.min, athlete: row.athlete || compactPlayerName(row.text.replace(/^Gol\s*[—-]?\s*/i, "")) || "Gol" };
-      if (row.teamId && row.teamId === homeId) home.push(item);
-      else if (row.teamId && row.teamId === awayId) away.push(item);
-      else if (row.team === g.home.nome) home.push(item);
-      else if (row.team === g.away.nome) away.push(item);
+    const canonical = summary && summary.__fdgLiveFacts;
+    if (canonical && Array.isArray(canonical.goals) && canonical.goals.length) {
+      const home=[], away=[], homeId=String(g.home.id||""), awayId=String(g.away.id||"");
+      for (const goal of canonical.goals) {
+        const item={min:String(goal.minute||""),athlete:compactPlayerName(goal.scorer||"")||(goal.ownGoal?"Gol contra":"Gol")};
+        if (goal.side==="home" || (goal.teamId && String(goal.teamId)===homeId)) home.push(item);
+        else if (goal.side==="away" || (goal.teamId && String(goal.teamId)===awayId)) away.push(item);
+        else if (goal.team===g.home.nome) home.push(item); else if (goal.team===g.away.nome) away.push(item);
+      }
+      return {home,away};
     }
-    return { home, away };
+    const rows=eventRows(g,summary).filter(r=>r.type.key==="goal"), home=[], away=[], homeId=String(g.home.id||""), awayId=String(g.away.id||"");
+    for(const row of rows){const item={min:row.min,athlete:row.athlete||compactPlayerName(row.text.replace(/^Gol\s*[—-]?\s*/i,""))||"Gol"}; if(row.teamId&&row.teamId===homeId)home.push(item); else if(row.teamId&&row.teamId===awayId)away.push(item); else if(row.team===g.home.nome)home.push(item); else if(row.team===g.away.nome)away.push(item);} return {home,away};
   }
 
   function renderGoalsUnderTeams(g, summary) {
@@ -2511,6 +2527,8 @@
 
       if (requestSerial !== state.summaryRequestSerial) return state.resumoPorId[eventId] || null;
       state.resumoPorId[eventId] = data;
+      state.summaryFetchedAt[eventId] = Date.now();
+      state.summaryScoreKey[eventId] = `${numericScore(g.home && g.home.score) ?? ""}:${numericScore(g.away && g.away.score) ?? ""}`;
       return data;
     } catch (e) {
       if (e && e.name !== "AbortError") console.warn("Summary ESPN indisponível para " + eventId + ":", e);
@@ -2658,20 +2676,23 @@
     document.dispatchEvent(new CustomEvent('fdg:live-game-changed', { detail: { eventId: app.dataset.eventId || '' } }));
   }
 
-  async function renderPage(expectedRefreshGeneration = null) {
-    const renderSerial = ++state.renderSerial;
-    const all = allGames();
-    const { selected, priorities } = chooseGame(all);
-    const switchGames = priorities.length ? priorities : (selected ? [selected] : []);
-    renderSwitcher(switchGames, selected);
-    const summary = await loadSummary(selected);
-    // Ao trocar rapidamente de partida, uma resposta anterior pode chegar depois.
-    // Nunca permitimos que ela redesenhe o jogo atualmente selecionado.
-    if (renderSerial !== state.renderSerial) return;
-    if (expectedRefreshGeneration !== null && expectedRefreshGeneration !== state.refreshGeneration) return;
-    renderMain(selected, summary, all);
-    updateCountdowns();
-    updateFreshnessUi(selected);
+  function renderPage(expectedRefreshGeneration = null) {
+    const renderSerial=++state.renderSerial, all=allGames(), {selected,priorities}=chooseGame(all), switchGames=priorities.length?priorities:(selected?[selected]:[]);
+    renderSwitcher(switchGames,selected);
+    const eventId=String(selected?.id||""), cached=eventId?state.resumoPorId[eventId]||null:null;
+    renderMain(selected,cached,all); updateCountdowns(); updateFreshnessUi(selected);
+    if(!selected||selected.source!=="espn"||!eventId)return;
+    const scoreKey=`${numericScore(selected.home&&selected.home.score)??""}:${numericScore(selected.away&&selected.away.score)??""}`;
+    const age=Date.now()-Number(state.summaryFetchedAt[eventId]||0), scoreChanged=state.summaryScoreKey[eventId]!==scoreKey;
+    if(cached&&!scoreChanged&&age<SUMMARY_REFRESH_MS)return;
+    if(state.summaryLoadingKey[eventId]===scoreKey)return;
+    state.summaryLoadingKey[eventId]=scoreKey;
+    loadSummary(selected).then((summary)=>{
+      const current=currentSelectedGame();
+      if(String(current?.id||"")!==eventId)return;
+      if(expectedRefreshGeneration!==null&&expectedRefreshGeneration!==state.refreshGeneration)return;
+      renderMain(current,summary,allGames()); updateCountdowns(); updateFreshnessUi(current);
+    }).catch(()=>{}).finally(()=>{if(state.summaryLoadingKey[eventId]===scoreKey)delete state.summaryLoadingKey[eventId];});
   }
 
   function updateCountdowns() {
@@ -2743,7 +2764,7 @@
           ? "Atualização atrasada · ESPN " + formatClockTime(new Date(sourceTs))
           : "Reconectando à ESPN…";
       } else if (live && sourceTs) {
-        badge.textContent = "ESPN · " + formatClockTime(new Date(sourceTs)) + " · 30s";
+        badge.textContent = "ESPN · " + formatClockTime(new Date(sourceTs)) + " · 10s";
       } else if (state.ultimaAtualizacao) {
         badge.textContent = "Atualizado " + formatClockTime(state.ultimaAtualizacao) + " · 30s";
       } else {
@@ -2772,7 +2793,7 @@
     }
   }
 
-  function scheduleNextRefresh(delay = REFRESH_MS, reason = "timer") {
+  function scheduleNextRefresh(delay = IDLE_REFRESH_MS, reason = "timer") {
     clearTimeout(state.timer);
     state.timer = setTimeout(() => refresh(reason), Math.max(0, Number(delay) || 0));
   }
@@ -2823,16 +2844,23 @@
     const generation = ++state.refreshGeneration;
 
     try {
-      if (state.primeiraCarga) await loadLocal();
+      if (state.primeiraCarga) {
+        await loadLocal();
+        if (generation !== state.refreshGeneration) return;
+        // Primeira pintura com o último snapshot local antes de qualquer chamada remota.
+        renderPage(generation);
+      }
       if (generation !== state.refreshGeneration) return;
 
-      const [scoreboardHealth] = await Promise.all([loadScoreboard(), loadTransmissions()]);
+      const transmissionPromise = loadTransmissions().catch((error) => { console.warn("Transmissões temporariamente indisponíveis:", error); });
+      const scoreboardHealth = await loadScoreboard();
       if (generation !== state.refreshGeneration) return;
 
       state.ultimaAtualizacao = new Date();
       state.ultimaFalha = "";
       state.primeiraCarga = false;
-      await renderPage(generation);
+      renderPage(generation);
+      transmissionPromise.then(() => { if (generation === state.refreshGeneration) renderPage(generation); });
 
       // Se apenas outra competição falhou, a partida selecionada continua marcada
       // pela sua própria fonte/idade; não transformamos uma falha parcial em erro
@@ -2847,10 +2875,11 @@
         state.ultimaFalha = e && e.message ? e.message : String(e);
         if (state.primeiraCarga) {
           try {
-            await Promise.all([loadLocal(), loadTransmissions()]);
+            await loadLocal();
             if (generation !== state.refreshGeneration) return;
             state.primeiraCarga = false;
-            await renderPage(generation);
+            renderPage(generation);
+            loadTransmissions().then(() => { if (generation === state.refreshGeneration) renderPage(generation); }).catch(() => {});
           } catch (_) {
             if (app) app.innerHTML = '<div class="panel"><div class="panel-inner"><div class="live-empty">Não foi possível carregar a agenda agora. Tente novamente em alguns instantes.</div></div></div>';
           }
@@ -2867,7 +2896,8 @@
         state.pendingRefreshReason = "";
         scheduleNextRefresh(0, nextReason);
       } else {
-        scheduleNextRefresh(REFRESH_MS, "timer");
+        const selected = currentSelectedGame();
+        scheduleNextRefresh(isLiveGame(selected) ? LIVE_REFRESH_MS : IDLE_REFRESH_MS, "timer");
       }
     }
   }
@@ -2885,7 +2915,7 @@
 
     const lastAttemptAt = state.ultimaTentativa instanceof Date ? state.ultimaTentativa.getTime() : 0;
     const requestTooOld = state.carregando && state.carregandoDesde > 0 && now - state.carregandoDesde > FETCH_TIMEOUT_MS + 1500;
-    const canRetry = !lastAttemptAt || now - lastAttemptAt >= Math.min(REFRESH_MS, 15000);
+    const canRetry = !lastAttemptAt || now - lastAttemptAt >= Math.min(LIVE_REFRESH_MS, 10000);
     if (requestTooOld || canRetry) requestImmediateRefresh("freshness-watchdog");
   }
 
