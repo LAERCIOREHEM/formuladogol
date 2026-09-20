@@ -191,7 +191,13 @@ jobs:
           NODE
           )"
 
-          echo "Esperado pelo código local: revision=${EXPECTED_REVISION}; gateway=${EXPECTED_GATEWAY}; stateContract=${EXPECTED_STATE_CONTRACT}; statsFallback=${EXPECTED_STATS_FALLBACK}"
+          EXPECTED_FACTS_CONTRACT="$(node --input-type=module <<'NODE'
+          import { LIVE_API_CONSTANTS } from './src/live-api.js';
+          process.stdout.write(String(LIVE_API_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION));
+          NODE
+          )"
+
+          echo "Esperado pelo código local: revision=${EXPECTED_REVISION}; gateway=${EXPECTED_GATEWAY}; stateContract=${EXPECTED_STATE_CONTRACT}; factsContract=${EXPECTED_FACTS_CONTRACT}; statsFallback=${EXPECTED_STATS_FALLBACK}"
 
           READY=0
           for i in 1 2 3 4 5 6 7 8 9 10; do
@@ -201,6 +207,7 @@ jobs:
                  EXPECTED_GATEWAY="$EXPECTED_GATEWAY" \
                  EXPECTED_STATS_FALLBACK="$EXPECTED_STATS_FALLBACK" \
                  EXPECTED_STATE_CONTRACT="$EXPECTED_STATE_CONTRACT" \
+                 EXPECTED_FACTS_CONTRACT="$EXPECTED_FACTS_CONTRACT" \
                  API_FOOTBALL_EXPECTED="${FDG_PUSH_API_FOOTBALL_KEY:+1}" \
                  node <<'NODE'
           const fs = require('fs');
@@ -209,6 +216,7 @@ jobs:
           const expectedGateway = process.env.EXPECTED_GATEWAY;
           const expectedFallback = Number(process.env.EXPECTED_STATS_FALLBACK);
           const expectedStateContract = Number(process.env.EXPECTED_STATE_CONTRACT);
+          const expectedFactsContract = Number(process.env.EXPECTED_FACTS_CONTRACT);
           const problems = [];
           if (h.ok !== true) problems.push(`ok=${h.ok}`);
           if (h.revision !== expectedRevision) problems.push(`revision=${h.revision} esperado=${expectedRevision}`);
@@ -221,6 +229,10 @@ jobs:
           if (Number(h.liveStateContractVersion) !== expectedStateContract) {
             problems.push(`liveStateContractVersion=${h.liveStateContractVersion} esperado=${expectedStateContract}`);
           }
+          if (Number(h.liveFactsContractVersion) !== expectedFactsContract) {
+            problems.push(`liveFactsContractVersion=${h.liveFactsContractVersion} esperado=${expectedFactsContract}`);
+          }
+          if (h.canonicalLiveFacts !== true) problems.push('canonicalLiveFacts!=true');
           if (h.liveStatePrimary !== 'worker-espn') problems.push(`liveStatePrimary=${h.liveStatePrimary}`);
           if (h.liveStateDirectFallback !== true) problems.push('liveStateDirectFallback!=true');
           if (h.theSportsDbStatsReady !== true) problems.push('theSportsDbStatsReady!=true');
