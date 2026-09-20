@@ -1,21 +1,21 @@
 {
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
-    "jogos_na_janela": 39,
-    "jogos_com_transmissao": 30,
-    "jogos_sem_transmissao_na_janela": 9,
+    "jogos_na_janela": 37,
+    "jogos_com_transmissao": 29,
+    "jogos_sem_transmissao_na_janela": 8,
     "jogos_sem_transmissao_14d": 1,
-    "jogos_sem_transmissao_fora_14d": 8,
+    "jogos_sem_transmissao_fora_14d": 7,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 22,
-    "jogos_guardiao_ia": 5,
+    "registros_preservados": 23,
+    "jogos_guardiao_ia": 3,
     "jogos_estaveis_sem_reconsulta_editorial": 5,
     "fontes_com_falha": 0
   },
   "fontes": {
     "guardiao_ia": {
       "ok": true,
-      "jogos_com_canal": 5
+      "jogos_com_canal": 3
     },
     "cbf": {
       "ok": true,
@@ -27,7 +27,7 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 4414
+      "duracao_ms": 4412
     },
     "espn": {
       "ok": true,
@@ -39,7 +39,7 @@
     },
     "youtube_oficial": {
       "ok": true,
-      "jogos_com_canal": 5
+      "jogos_com_canal": 4
     }
   },
   "sem_transmissao": [
@@ -48,7 +48,7 @@
       "rodada": 21,
       "jogo": "Atlético-MG x Bragantino",
       "data_iso": "2026-10-03T18:30:00-03:00",
-      "faltam_horas": 333.6,
+      "faltam_horas": 325.4,
       "nivel": "aviso"
     }
   ],
@@ -58,7 +58,7 @@
       "rodada": 21,
       "jogo": "Atlético-MG x Bragantino",
       "data_iso": "2026-10-03T18:30:00-03:00",
-      "faltam_horas": 333.6,
+      "faltam_horas": 325.4,
       "nivel": "aviso"
     },
     {
@@ -66,15 +66,7 @@
       "rodada": 29,
       "jogo": "Remo x Grêmio",
       "data_iso": "2026-10-07T19:30:00-03:00",
-      "faltam_horas": 430.6,
-      "nivel": "futuro"
-    },
-    {
-      "event_id": "401841250",
-      "rodada": 29,
-      "jogo": "Vitória x Chapecoense",
-      "data_iso": "2026-10-07T20:00:00-03:00",
-      "faltam_horas": 431.1,
+      "faltam_horas": 422.4,
       "nivel": "futuro"
     },
     {
@@ -82,7 +74,7 @@
       "rodada": 29,
       "jogo": "Fluminense x Coritiba",
       "data_iso": "2026-10-08T21:30:00-03:00",
-      "faltam_horas": 456.6,
+      "faltam_horas": 448.4,
       "nivel": "futuro"
     },
     {
@@ -90,7 +82,7 @@
       "rodada": 30,
       "jogo": "São Paulo x Vitória",
       "data_iso": "2026-10-10T21:00:00-03:00",
-      "faltam_horas": 504.1,
+      "faltam_horas": 495.9,
       "nivel": "futuro"
     },
     {
@@ -98,7 +90,7 @@
       "rodada": 30,
       "jogo": "Bahia x Mirassol",
       "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 526.6,
+      "faltam_horas": 518.4,
       "nivel": "futuro"
     },
     {
@@ -106,7 +98,7 @@
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 550.6,
+      "faltam_horas": 542.4,
       "nivel": "futuro"
     },
     {
@@ -114,7 +106,7 @@
       "rodada": 31,
       "jogo": "Remo x Bragantino",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 666.1,
+      "faltam_horas": 657.9,
       "nivel": "futuro"
     },
     {
@@ -122,7 +114,7 @@
       "rodada": 31,
       "jogo": "Fluminense x Santos",
       "data_iso": "2026-10-17T15:00:00-03:00",
-      "faltam_horas": 666.1,
+      "faltam_horas": 657.9,
       "nivel": "futuro"
     }
   ],
@@ -153,6 +145,14 @@
         "Globo",
         "Prime Video",
         "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841250",
+      "jogo": "Vitória x Chapecoense",
+      "canais": [
+        "Premiere",
+        "Globo"
       ]
     },
     {
@@ -308,9 +308,7 @@
       "event_id": "401841272",
       "jogo": "Corinthians x Vitória",
       "canais": [
-        "GE TV",
         "Premiere",
-        "SporTV",
         "Globo"
       ]
     },
@@ -348,5 +346,5 @@
     "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
   "artigos_ge_descobertos": [],
-  "atualizado_em": "2026-09-19T20:51:16-03:00"
+  "atualizado_em": "2026-09-20T05:03:46-03:00"
 }

@@ -13,14 +13,14 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 39,
+    "jogos_na_janela": 37,
     "jogos_foco": 1,
     "descobertas_antecipadas": 4,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 32,
+    "candidatos_oficiais_encontrados": 30,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 0,
-    "search_api_jogos_pulados_grade_estavel": 1,
+    "search_api_jogos_elegiveis": 1,
+    "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 4,
     "sem_transmissao": 1,
     "erros": 0
@@ -69,12 +69,12 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841243",
+      "event_id": "401841246",
       "rodada": 28,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "São Paulo x Internacional",
-      "data_iso": "2026-09-19T21:00:00-03:00",
+      "jogo": "Grêmio x Palmeiras",
+      "data_iso": "2026-09-20T11:00:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -209,16 +209,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "5tuFjljf3OA",
-      "url": "https://www.youtube.com/watch?v=5tuFjljf3OA",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "REPRISE: SEVILLA X BARCELONA | LALIGA 26/27 | 7ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-19T15:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "00OqlITF9Ng",
       "url": "https://www.youtube.com/watch?v=00OqlITF9Ng",
       "fonte": "getv",
@@ -326,16 +316,6 @@
       "titulo": "AO VIVO: BRASIL X ÍNDIA | AMISTOSO DA SELEÇÃO | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-10-03T11:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "QPXfWJ--0QQ",
-      "url": "https://www.youtube.com/watch?v=QPXfWJ--0QQ",
-      "fonte": "sbt",
-      "canal": "SBT",
-      "titulo": "Rodrigo Cáceres, Chrigor, Beto Marden X Gilmélandia, Sylvia Design e Lola | Viva a Noite (19/09/26)",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-20T02:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -479,33 +459,27 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [
-    {
-      "event_id": "401841243",
-      "jogo": "São Paulo x Internacional",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    }
-  ],
+  "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401841243",
+      "event_id": "401841246",
       "rodada": 28,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "São Paulo x Internacional",
-      "data_iso": "2026-09-19T21:00:00-03:00",
+      "jogo": "Grêmio x Palmeiras",
+      "data_iso": "2026-09-20T11:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 88,
+    "unidades": 87,
     "requisicoes": {
       "channels": 4,
-      "videos": 44,
+      "videos": 43,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-19T21:10:43-03:00"
+  "atualizado_em": "2026-09-20T05:00:53-03:00"
 }
