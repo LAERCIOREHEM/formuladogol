@@ -237,6 +237,10 @@ jobs:
                   print(f"- Buscas executadas: **{int(d.get('web_search_calls') or 0)}**")
                   print(f"- Referências retornadas: **{int(d.get('source_rows') or 0)}**")
                   print(f"- Resultado: **{d.get('resultado') or 'sem diagnóstico'}**")
+                  queries = d.get('search_queries') or []
+                  if queries:
+                      print('- Consultas realmente executadas:')
+                      for q in queries[:12]: print(f"  - `{q}`")
                   urls = d.get('urls') or []
                   if urls:
                       print('- Fontes efetivamente retornadas/lidas:')
