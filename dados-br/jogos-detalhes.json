@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-19T23:31:12.151483-03:00",
+  "gerado_em": "2026-09-19T23:45:51.355605-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 272,
   "total_com_estatisticas": 272,
-  "total_com_publico": 269,
+  "total_com_publico": 270,
   "total_com_eventos": 272,
   "total_com_jogadores": 272,
   "total_eventos_validados": 272,
@@ -571,9 +571,9 @@
       "placar_mandante": 5,
       "placar_visitante": 0,
       "estadio": "Estádio São Januário",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 19943,
+      "publico_tipo": "total",
+      "publico_fonte": "https://terra.com.br/amp/esportes/vasco/reforcos-brilham-e-vasco-arrasa-o-coxa-barreira-virou-baile%2Ceca509c8c705c13fdf820e8c83da1074tzon3l1t.html",
       "arbitro": "Braulio Da Silva Machado",
       "stats": [
         {
@@ -1135,7 +1135,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-19T23:31:05.536748-03:00"
+      "atualizado_em": "2026-09-19T23:31:05.536748-03:00",
+      "publico_pagante": 19280,
+      "renda": 1099020,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841244": {
       "event_id": "401841244",
@@ -153479,5 +153482,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 260,
+  "total_com_renda": 270
 }
