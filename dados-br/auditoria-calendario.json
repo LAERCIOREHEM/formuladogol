@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-19T22:35:57.716994-03:00",
+  "gerado_em": "2026-09-19T23:10:59.659294-03:00",
   "fonte": "auditoria local sobre JSONs normalizados da ESPN",
   "escopo": "módulo Brasileirão; nenhum arquivo da Copa",
   "resumo": {
@@ -11,7 +11,7 @@
     "confrontos_com_ida_e_volta": 190,
     "partidas_com_data_confirmada": 370,
     "partidas_com_data_a_definir": 10,
-    "resultados_publicados": 271,
+    "resultados_publicados": 272,
     "proximos_publicados": 38,
     "eventos_espn_na_janela": 370,
     "ajustes_calendario_configurados": 3,
@@ -23,13 +23,13 @@
     "kickoffs_preservados_sem_confirmacao_atual": 0,
     "kickoffs_espn_provisorios_suprimidos_da_agenda": 0,
     "kickoffs_herdados_provisorios_suprimidos": 0,
-    "falhas_graves": 0
+    "falhas_graves": 1
   },
   "avisos": [],
   "distribuicao_jogos_disputados": {
-    "28": 4,
+    "28": 5,
     "27": 14,
-    "26": 2
+    "26": 1
   },
   "jogos_disputados_por_clube": [
     {
@@ -38,6 +38,10 @@
     },
     {
       "time": "Coritiba",
+      "jogos_disputados": 28
+    },
+    {
+      "time": "Internacional",
       "jogos_disputados": 28
     },
     {
@@ -85,15 +89,15 @@
       "jogos_disputados": 27
     },
     {
-      "time": "Internacional",
-      "jogos_disputados": 27
-    },
-    {
       "time": "Palmeiras",
       "jogos_disputados": 27
     },
     {
       "time": "Santos",
+      "jogos_disputados": 27
+    },
+    {
+      "time": "São Paulo",
       "jogos_disputados": 27
     },
     {
@@ -106,10 +110,6 @@
     },
     {
       "time": "Bragantino",
-      "jogos_disputados": 26
-    },
-    {
-      "time": "São Paulo",
       "jogos_disputados": 26
     }
   ],
@@ -643,7 +643,18 @@
       "integra": true
     }
   ],
-  "duplicados_entre_resultados_e_proximos": [],
-  "falhas": [],
+  "duplicados_entre_resultados_e_proximos": [
+    {
+      "rodada": 28,
+      "mandante": "São Paulo",
+      "visitante": "Internacional"
+    }
+  ],
+  "falhas": [
+    {
+      "tipo": "jogo_em_resultados_e_proximos",
+      "total": 1
+    }
+  ],
   "observacao": "O calendário só é substituído depois de validar 380 partidas, 38 rodadas íntegras, 20 clubes com 38 jogos e 190 confrontos de ida e volta."
 }
