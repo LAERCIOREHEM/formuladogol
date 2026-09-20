@@ -15,7 +15,7 @@ on:
           - tv
           - completo
       event_id:
-        description: 'Opcional: pesquisar apenas um event_id da ESPN no modo aovivo'
+        description: 'Opcional: event_id alvo definido pelo orquestrador (aovivo ou TV)'
         required: false
         default: ''
         type: string
@@ -98,16 +98,9 @@ jobs:
             echo "Executando player ao vivo: ${CMD[*]}"
             "${CMD[@]}"
           else
-            # A varredura de grade já é pouco frequente (até 7 dias quando 30 dias estão cobertos).
-            # Aproveitamos essa execução para colher, SEM search.list caro,
-            # players GE TV/SBT/CazéTV que já estejam agendados em /streams/uploads.
-            # Isso evita depender dos últimos 90 minutos antes do jogo.
-            CMD=(python scripts/buscar_transmissoes_aovivo_brasileirao.py --no-search)
-            if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
-              CMD+=(--dry-run)
-            fi
-            echo "Modo tv: colheita barata de players futuros: ${CMD[*]}"
-            "${CMD[@]}"
+            # NEED-DRIVEN: modo TV NÃO procura player YouTube futuro. O player só
+            # é pesquisado perto do jogo e apenas quando a grade exigir GE TV/SBT/CazéTV.
+            echo "Modo tv: nenhuma varredura antecipada de player YouTube."
           fi
 
           TV_CMD=(python scripts/atualizar_transmissoes_tv_brasileirao.py)
@@ -216,22 +209,12 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           MODO="${INPUT_MODO:-completo}"
-          # O modo TV também executa a colheita barata de players futuros.
-          # Portanto, transmissoes-aovivo*.json SEMPRE entram no commit; caso
-          # contrário a live exata pode ser encontrada e descartada no fim do run.
-          PUBLIC_FILES=(
-            "dados-br/agenda-clubes-br.json"
-            "dados-br/transmissoes-aovivo.json"
-          )
-          FILES=(
-            "${PUBLIC_FILES[@]}"
-            "dados-br/auditoria-transmissoes-aovivo.json"
-          )
-          PUBLIC_FILES+=("dados-br/transmissoes-tv.json")
-          FILES+=(
-            "dados-br/transmissoes-tv.json"
-            "dados-br/auditoria-transmissoes-tv.json"
-          )
+          PUBLIC_FILES=("dados-br/agenda-clubes-br.json" "dados-br/transmissoes-tv.json")
+          FILES=("${PUBLIC_FILES[@]}" "dados-br/auditoria-transmissoes-tv.json")
+          if [[ "$MODO" != "tv" ]]; then
+            PUBLIC_FILES+=("dados-br/transmissoes-aovivo.json")
+            FILES+=("dados-br/transmissoes-aovivo.json" "dados-br/auditoria-transmissoes-aovivo.json")
+          fi
 
           if [[ -z "$(git status --porcelain -- "${PUBLIC_FILES[@]}")" ]]; then
             echo "Nenhuma mudança factual de agenda/transmissão. Auditoria isolada não gera commit/deploy."

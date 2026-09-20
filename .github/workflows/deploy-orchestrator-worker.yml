@@ -10,6 +10,9 @@ on:
       - '.github/workflows/orquestrador-inteligente.yml'
       - '.github/workflows/atualizar-publicos-brasileirao.yml'
       - '.github/workflows/auditar-transmissoes-ia.yml'
+      - '.github/workflows/buscar-transmissoes-aovivo-brasileirao.yml'
+      - 'scripts/buscar_transmissoes_aovivo_brasileirao.py'
+      - 'dados-br/config-orquestrador.json'
       - '.github/workflows/deploy-orchestrator-worker.yml'
   workflow_dispatch:
     inputs:
@@ -142,6 +145,11 @@ jobs:
               && printf '%s' "$BODY" | grep -q '"transmissionGuardian":true' \
               && printf '%s' "$BODY" | grep -q '"transmissionGuardianNeedGate":true' \
               && printf '%s' "$BODY" | grep -q '"transmissionGuardianBatching":true' \
+              && printf '%s' "$BODY" | grep -q '"transmissionNeedDrivenV2":true' \
+              && printf '%s' "$BODY" | grep -q '"adaptiveSlowPath":true' \
+              && printf '%s' "$BODY" | grep -q '"transmissionTvOperationalWindowHours":72' \
+              && printf '%s' "$BODY" | grep -q '"transmissionYoutubeOnlyWhenRequired":true' \
+              && printf '%s' "$BODY" | grep -q '"publicFirstAttemptAfterFinalMinutes":30' \
               && printf '%s' "$BODY" | grep -q '"targetedPublicResearch":true' \
               && printf '%s' "$BODY" | grep -q '"continentalPhaseFingerprints":true' \
               && printf '%s' "$BODY" | grep -q '"continentalAgendaAware":true' \
