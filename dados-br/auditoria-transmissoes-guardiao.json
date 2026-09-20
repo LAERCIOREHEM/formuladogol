@@ -4649,58 +4649,33 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para Vitória x Cruzeiro, Campeonato Brasileiro Série A 2026, fase única, rodada 28: domingo, 20 de setembro de 2026, às 16h (horário de Brasília), no Manoel Barradas, em Salvador. A grade oficial completa no Brasil é GE TV, Globo e Premiere. Não é exclusivo. O link do YouTube informado é classificado como transmissão integral: o título indica “ao vivo e com imagens”, e a CBF lista GE TV na grade oficial da partida."
+    },
+    {
+      "event_id": "401841246",
+      "jogo": "Grêmio x Palmeiras",
+      "data_iso": "2026-09-20T11:00:00-03:00",
+      "checkpoint": -15,
+      "executado_em": "2026-09-20T10:53:32-03:00",
+      "chamada_openai": false,
+      "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
+      "canais_antes": [
+        "Premiere"
+      ],
+      "status": "sem_chamada"
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841242",
-    "jogo": "Vitória x Cruzeiro",
-    "data_iso": "2026-09-20T16:00:00-03:00",
-    "checkpoint": -360,
-    "executado_em": "2026-09-20T10:13:42-03:00",
-    "chamada_openai": true,
-    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+    "event_id": "401841246",
+    "jogo": "Grêmio x Palmeiras",
+    "data_iso": "2026-09-20T11:00:00-03:00",
+    "checkpoint": -15,
+    "executado_em": "2026-09-20T10:53:32-03:00",
+    "chamada_openai": false,
+    "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
     "canais_antes": [
-      "GE TV",
-      "Premiere",
-      "Globo"
-    ],
-    "status": "confirmado",
-    "modelo": "gpt-5.6-terra",
-    "fontes_web": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/23/vitoria-x-bahia-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/04/01/cruzeiro-x-vitoria-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2026/08/29/vasco-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/mg/futebol/brasileirao-serie-a/noticia/2026/09/06/cruzeiro-x-athletico-pr-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/mg/futebol/copa-do-brasil/noticia/2026/09/01/atletico-mg-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/rj/futebol/copa-do-brasil/noticia/2026/08/26/vasco-x-vitoria-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2025/11/01/cruzeiro-x-vitoria-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/07/26/cruzeiro-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/mg/futebol/campeonato-mineiro/noticia/2026/03/08/cruzeiro-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/07/26/remo-x-vitoria-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/09/12/santos-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/vitoria-x-cruzeiro/832169"
-    ],
-    "canais_depois": [
-      "GE TV",
-      "Globo",
       "Premiere"
     ],
-    "exclusivo": false,
-    "confianca": 0.99,
-    "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/vitoria-x-cruzeiro/832169"
-    ],
-    "youtube": [
-      {
-        "url": "https://www.youtube.com/watch?v=gGpphhcxZPU",
-        "scope": "match",
-        "valid_for_match": true,
-        "reason": "O vídeo está identificado como “VITÓRIA X CRUZEIRO | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv”; a CBF também relaciona GE TV como transmissora oficial desta partida."
-      }
-    ],
-    "youtube_removidos": [],
-    "overlay_alterado": true,
-    "resumo": "Confirmado para Vitória x Cruzeiro, Campeonato Brasileiro Série A 2026, fase única, rodada 28: domingo, 20 de setembro de 2026, às 16h (horário de Brasília), no Manoel Barradas, em Salvador. A grade oficial completa no Brasil é GE TV, Globo e Premiere. Não é exclusivo. O link do YouTube informado é classificado como transmissão integral: o título indica “ao vivo e com imagens”, e a CBF lista GE TV na grade oficial da partida."
+    "status": "sem_chamada"
   },
-  "atualizado_em": "2026-09-20T10:13:42-03:00"
+  "atualizado_em": "2026-09-20T10:53:32-03:00"
 }
