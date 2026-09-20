@@ -128,7 +128,7 @@ MAX_PUBLICO = 250_000
 GRACE_HORAS_PADRAO = 0.5
 MAX_TENTATIVAS_PADRAO = 0  # compatibilidade CLI; não existe mais esgotamento definitivo
 MAX_JOGOS_PADRAO = 10
-SEARCH_POLICY_VERSION = 3
+SEARCH_POLICY_VERSION = 4
 TECHNICAL_RETRY_MINUTES = 30
 DEFAULT_RETRY_BANDS = ((2, 30), (6, 60), (12, 90), (24, 120), (48, 180), (72, 360), (168, 720), (99999, 720))
 
@@ -287,9 +287,9 @@ def pendencias(
     if not isinstance(tentativas, dict):
         tentativas = {}
 
-    # Política v3: libera imediatamente estados pendentes criados pela antiga
-    # busca cercada por allowlist. Mantemos a contagem histórica, mas zeramos
-    # relógios de backoff uma única vez para que a nova busca ampla tente agora.
+    # Política v4: libera imediatamente estados pendentes criados por uma busca
+    # anterior que podia encerrar cedo demais após uma página/snippet desatualizado. Mantemos
+    # a contagem histórica, mas zeramos relógios de backoff uma única vez para a busca orientada tentar agora.
     try:
         policy_version = int(estado.get("search_policy_version") or 0)
     except (TypeError, ValueError):
@@ -437,6 +437,22 @@ def schema_resposta() -> dict[str, Any]:
     }
 
 
+def consultas_obrigatorias(partida: Mapping[str, Any]) -> list[str]:
+    mandante = str(partida.get("mandante") or "").strip()
+    visitante = str(partida.get("visitante") or "").strip()
+    data_iso = str(partida.get("data_iso") or "").strip()
+    ano = data_iso[:4] if len(data_iso) >= 4 else "2026"
+    confronto = f"{mandante} x {visitante}".strip()
+    return [
+        f'"{confronto}" público renda {ano}',
+        f'"{confronto}" "PÚBLICO" "RENDA"',
+        f'"{confronto}" ficha técnica público renda',
+        f'site:estadao.com.br "{confronto}" público renda',
+        f'site:ge.globo.com "{confronto}" público renda',
+        f'site:terra.com.br "{confronto}" público renda',
+    ]
+
+
 def montar_payload(pendentes: Sequence[Mapping[str, Any]], model: str, max_tool_calls: int) -> dict[str, Any]:
     instrucao = (
         "Você localiza PÚBLICO e RENDA de partidas do Campeonato Brasileiro Série A já encerradas. "
@@ -446,7 +462,13 @@ def montar_payload(pendentes: Sequence[Mapping[str, Any]], model: str, max_tool_
         "aparecer na ficha técnica sob rótulos como 'Renda', 'Renda bruta' ou 'Borderô', muitas vezes numa "
         "matéria diferente daquela que traz o público. Quando a renda vier de outra página, informe a URL "
         "dela em 'fonte_url_renda'; quando vier da mesma, repita a URL. "
-        "Para CADA partida, USE O WEB_SEARCH e busque a reportagem do jogo ou a ficha técnica. "
+        "Para CADA partida, USE O WEB_SEARCH e execute consultas diferentes antes de concluir que não há dado. "
+        "O dossiê traz 'buscas_obrigatorias': faça pelo menos três consultas distintas dessa lista, incluindo "
+        "uma consulta literal com PÚBLICO/RENDA e uma consulta site: em grande portal. Não pare na primeira "
+        "matéria antiga que diga 'não divulgado': procure versões atualizadas e resultados indexados mais novos. "
+        "Um snippet de resultado de busca pode ser usado como evidência quando ele próprio declara de forma "
+        "inequívoca o público/renda, identifica a partida correta e a URL correspondente aparece entre as fontes "
+        "retornadas pelo web_search; isso é especialmente importante para páginas com paywall/robots. "
         "Priorize CBF, ge, grandes portais esportivos, imprensa regional e páginas oficiais dos clubes, "
         "mas NÃO deixe de usar outra página jornalística válida quando ela for a única que já publicou "
         "a ficha técnica exata. Evite redes sociais, fóruns, casas de aposta e páginas sem autoria/ficha técnica. "
@@ -454,7 +476,8 @@ def montar_payload(pendentes: Sequence[Mapping[str, Any]], model: str, max_tool_
         "(1) informe como 'presente' apenas o público presente/total declarado pela fonte; "
         "(2) NUNCA converta público pagante em presente — se a fonte só traz pagantes, preencha 'pagantes' "
         "e deixe 'publico' nulo com tipo 'indefinido'; "
-        "(3) fonte_url deve ser a URL exata da página que você efetivamente leu e que declara o número; "
+        "(3) fonte_url deve ser a URL exata da página ou resultado indexado que sustenta o número e que conste "
+        "entre as fontes retornadas pela busca; "
         "(4) se não encontrar algum número, devolva-o como nulo — não estime, não interpole, não use "
         "capacidade do estádio, preço médio de ingresso nem média histórica; devolver público sem renda "
         "é aceitável, mas só depois de procurar a renda de verdade em mais de uma fonte; "
@@ -462,15 +485,23 @@ def montar_payload(pendentes: Sequence[Mapping[str, Any]], model: str, max_tool_
         "(confira mandante, visitante, data e placar antes de responder). "
         "Responda exatamente no JSON Schema, uma entrada por event_id recebido."
     )
+    partidas = []
+    for bruto in pendentes:
+        item = dict(bruto)
+        item["buscas_obrigatorias"] = consultas_obrigatorias(item)
+        partidas.append(item)
     dossie = {
         "competicao": "Campeonato Brasileiro Série A 2026",
-        "instrucao_busca": "Procure a ficha técnica da partida (público e renda) em reportagens pós-jogo.",
-        "partidas": list(pendentes),
+        "instrucao_busca": (
+            "Procure a ficha técnica da partida (público e renda) em reportagens pós-jogo e também nos "
+            "snippets atuais do índice de busca quando a página estiver bloqueada/paywall."
+        ),
+        "partidas": partidas,
     }
     return {
         "model": model,
         "store": False,
-        "reasoning": {"effort": "low"},
+        "reasoning": {"effort": "medium"},
         "input": [
             {"role": "developer", "content": instrucao},
             {"role": "user", "content": "Partidas sem público:\n" + json.dumps(dossie, ensure_ascii=False, separators=(",", ":"))},
@@ -543,6 +574,7 @@ def coletar_fontes(resposta: Mapping[str, Any]) -> set[str]:
 def diagnostico_web(resposta: Mapping[str, Any]) -> dict[str, Any]:
     calls = 0
     source_rows = 0
+    queries: list[str] = []
     for item in resposta.get("output") or []:
         if not isinstance(item, Mapping) or item.get("type") != "web_search_call":
             continue
@@ -550,8 +582,23 @@ def diagnostico_web(resposta: Mapping[str, Any]) -> dict[str, Any]:
         action = item.get("action") or {}
         if isinstance(action, Mapping):
             source_rows += sum(1 for row in (action.get("sources") or []) if isinstance(row, Mapping))
+            candidatos = []
+            if action.get("query"):
+                candidatos.append(action.get("query"))
+            raw_queries = action.get("queries")
+            if isinstance(raw_queries, Sequence) and not isinstance(raw_queries, (str, bytes)):
+                candidatos.extend(raw_queries)
+            for q in candidatos:
+                texto = str(q or "").strip()
+                if texto and texto not in queries:
+                    queries.append(texto)
     urls = sorted(coletar_fontes(resposta))
-    return {"web_search_calls": calls, "source_rows": source_rows, "urls": urls[:60]}
+    return {
+        "web_search_calls": calls,
+        "source_rows": source_rows,
+        "search_queries": queries[:30],
+        "urls": urls[:60],
+    }
 
 
 def emitir_diagnostico(payload: Mapping[str, Any]) -> None:
@@ -985,6 +1032,20 @@ def self_test() -> int:
     assert payload["tool_choice"] == "required"
     assert payload["text"]["format"]["strict"] is True
     assert payload["max_tool_calls"] == 4
+    dossier = json.loads(payload["input"][1]["content"].split("\n", 1)[1])
+    buscas = dossier["partidas"][0]["buscas_obrigatorias"]
+    assert any("site:estadao.com.br" in q for q in buscas)
+    assert any('"PÚBLICO" "RENDA"' in q for q in buscas)
+    assert payload["reasoning"]["effort"] == "medium"
+
+    diag = diagnostico_web({
+        "output": [{
+            "type": "web_search_call",
+            "action": {"query": '"Fluminense x Remo" público renda', "sources": [{"url": URL}]},
+        }]
+    })
+    assert diag["web_search_calls"] == 1 and diag["source_rows"] == 1
+    assert diag["search_queries"] == ['"Fluminense x Remo" público renda']
 
     # Erro técnico não pode aumentar tentativas documentais nem gerar backoff longo.
     base = atualizar_estado({}, pend, [], [], max_tentativas=3, erro="", agora=agora)
@@ -1112,7 +1173,7 @@ def main() -> int:
         return encerrar("OPENAI_API_KEY ausente no ambiente do workflow", contar_tentativa=False)
 
     model = os.environ.get("OPENAI_PUBLICOS_MODEL", os.environ.get("OPENAI_MODEL", DEFAULT_MODEL)).strip() or DEFAULT_MODEL
-    max_tool_calls = min(40, max(8, len(pendentes) * 6))
+    max_tool_calls = min(40, max(12, len(pendentes) * 7))
 
     print(f"Consultando {len(pendentes)} partida(s) com lacuna de público/renda (modelo {model}, até {max_tool_calls} buscas).")
     for p in pendentes:
@@ -1122,7 +1183,7 @@ def main() -> int:
     aceitos: list[dict[str, Any]] = []
     rejeitados: list[dict[str, Any]] = []
     fontes_web: set[str] = set()
-    web_diag: dict[str, Any] = {"web_search_calls": 0, "source_rows": 0, "urls": []}
+    web_diag: dict[str, Any] = {"web_search_calls": 0, "source_rows": 0, "search_queries": [], "urls": []}
     try:
         resposta = chamar_openai(montar_payload(pendentes, model, max_tool_calls), api_key)
         fontes_web = coletar_fontes(resposta)

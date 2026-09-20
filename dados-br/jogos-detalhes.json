@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-20T14:06:44.388612-03:00",
+  "gerado_em": "2026-09-20T16:29:02.418647-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 273,
   "total_com_estatisticas": 273,
-  "total_com_publico": 272,
+  "total_com_publico": 273,
   "total_com_eventos": 273,
   "total_com_jogadores": 273,
   "total_eventos_validados": 273,
@@ -1739,9 +1739,9 @@
       "placar_mandante": 1,
       "placar_visitante": 2,
       "estadio": "Mangueirão",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 23760,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.estadao.com.br/esportes/futebol/remo-x-santos-analise-29-rodada-brasileirao/",
       "arbitro": "Wilton Pereira Sampaio",
       "stats": [
         {
@@ -2304,7 +2304,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-20T13:21:07.605483-03:00"
+      "atualizado_em": "2026-09-20T13:21:07.605483-03:00",
+      "renda": 713080,
+      "dados_publico_fonte_adicional": "Estadão: ficha técnica pós-jogo (público e renda)"
     },
     "401841245": {
       "event_id": "401841245",
@@ -154073,5 +154075,5 @@
     }
   },
   "total_com_publico_pagante": 260,
-  "total_com_renda": 272
+  "total_com_renda": 273
 }
