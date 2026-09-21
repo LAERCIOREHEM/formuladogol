@@ -126,14 +126,14 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(state, /transmissoes_guardian/);
   const index = await read('cloudflare/orchestrator-worker/src/index.js');
   assert.match(index, /transmissionGuardian:\s*true/);
-  assert.match(index, /1\.8\.0/);
+  assert.match(index, /1\.9\.0/);
   assert.match(index, /transmissionGuardianNeedGate:\s*true/);
   assert.match(index, /transmissionNeedDrivenV2:\s*true/);
   assert.match(index, /adaptiveSlowPath:\s*true/);
   assert.match(index, /adaptiveSlowPathMaxSleepMinutes:\s*60/);
   assert.match(index, /transmissionTvOperationalWindowHours:\s*72/);
   assert.match(index, /transmissionYoutubeOnlyWhenRequired:\s*true/);
-  assert.match(index, /publicFirstAttemptAfterFinalMinutes:\s*360/);
+  assert.match(index, /publicFirstAttemptAfterFinalMinutes:\s*15/);
   assert.match(index, /transmissionGuardianBatching:\s*true/);
   assert.match(index, /targetedPublicResearch:\s*true/);
   assert.match(index, /continentalPhaseFingerprints:\s*true/);
@@ -153,6 +153,8 @@ test('public workflow is targetable and Guardian workflow supports batch event i
   assert.match(publicYml, /event_id:/);
   assert.match(publicYml, /--modo/);
   assert.match(publicYml, /--event-id/);
+  assert.match(publicYml, /dados-br\/correcoes\/publicos-verificados\.json/);
+  assert.match(publicYml, /push:/);
   assert.match(publicAi, /FDG_DIAGNOSTICO_JSON=/);
   assert.match(publicAi, /web_search/);
   assert.match(guardianYml, /event_ids:/);
@@ -219,7 +221,7 @@ test('Brasileirão source breaker blocks heavy retries and uses structured colle
 test('canonical operational config is aligned with Cloudflare transmission/public policy', async () => {
   const cfg = JSON.parse(await read('dados-br/config-orquestrador.json'));
   assert.equal(cfg.schema_version, 4);
-  assert.equal(cfg.publicos.primeira_tentativa_apos_final_minutos, 360);
+  assert.equal(cfg.publicos.primeira_tentativa_apos_final_minutos, 15);
   assert.equal(cfg.melhores_momentos.primeira_tentativa_apos_final_minutos, 360);
   assert.match(cfg.execucao_primaria.postgame_fastlane, /push/i);
   assert.equal(cfg.transmissoes.janela_operacional_tv_horas, 72);
@@ -228,7 +230,7 @@ test('canonical operational config is aligned with Cloudflare transmission/publi
   assert.deepEqual(cfg.transmissoes.guardiao_checkpoints_minutos, [-90, -15, 10]);
   assert.equal(cfg.execucao_primaria.cron, '*/5 * * * *');
   const logic = await read('cloudflare/orchestrator-worker/src/logic.js');
-  assert.match(logic, /firstAfterFinalMinutes:\s*360/);
+  assert.match(logic, /publicos:\s*\{[\s\S]*?firstAfterFinalMinutes:\s*15/);
   assert.match(logic, /tvCheckpointsMinutes:\s*\[-4320, -1440, -360\]/);
   assert.match(logic, /liveCheckpointsMinutes:\s*\[-90, -15, 10\]/);
   assert.match(logic, /guardianCheckpointsMinutes:\s*\[-90, -15, 10\]/);

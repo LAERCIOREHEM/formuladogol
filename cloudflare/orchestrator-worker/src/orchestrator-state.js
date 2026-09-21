@@ -186,7 +186,7 @@ export class OrchestratorState {
     return {
       ok: true,
       engine: 'fdg-cloudflare-orchestrator',
-      version: String(this.env.ORCHESTRATOR_VERSION || '1.8.0'),
+      version: String(this.env.ORCHESTRATOR_VERSION || '1.9.0'),
       mode: String(this.env.ORCHESTRATOR_MODE || 'shadow'),
       ...status,
       recentDecisions: history.slice(-10).reverse(),

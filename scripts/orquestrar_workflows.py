@@ -155,12 +155,14 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "manutencao_diaria_apos": "05:10",
     },
     "publicos": {
-        "primeira_tentativa_apos_final_minutos": 360,
+        "primeira_tentativa_apos_final_minutos": 15,
         "intervalos_retentativa": [
-            {"ate_horas": 12, "minutos": 360},
-            {"ate_horas": 24, "minutos": 720},
-            {"ate_horas": 48, "minutos": 1440},
-            {"ate_horas": 99999, "minutos": 1440},
+            {"ate_horas": 2, "minutos": 15},
+            {"ate_horas": 6, "minutos": 30},
+            {"ate_horas": 12, "minutos": 60},
+            {"ate_horas": 24, "minutos": 120},
+            {"ate_horas": 48, "minutos": 360},
+            {"ate_horas": 99999, "minutos": 720},
         ],
     },
     "melhores_momentos": {
@@ -1785,11 +1787,13 @@ def self_test() -> int:
 
     assert canonical_hash({"b": 2, "a": 1}) == canonical_hash({"a": 1, "b": 2})
 
-    assert public_retry_interval(7.0, config) == 360
-    assert public_retry_interval(20.0, config) == 720
-    assert public_retry_interval(30.0, config) == 1440
-    assert public_retry_interval(100.0, config) == 1440
-    assert public_retry_interval(500.0, config) == 1440
+    assert public_retry_interval(1.0, config) == 15
+    assert public_retry_interval(3.0, config) == 30
+    assert public_retry_interval(7.0, config) == 60
+    assert public_retry_interval(20.0, config) == 120
+    assert public_retry_interval(30.0, config) == 360
+    assert public_retry_interval(100.0, config) == 720
+    assert public_retry_interval(500.0, config) == 720
 
     # --- Contrato de hash entre orquestrador e gerador ----------------------
     # Este teste existe porque a divergência entre as duas formas de calcular o

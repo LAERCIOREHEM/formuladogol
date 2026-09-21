@@ -45,6 +45,7 @@ RESULTADOS = ROOT / "resultados.json"
 DETALHES = ROOT / "dados-br" / "jogos-detalhes.json"
 SAIDA = ROOT / "dados-br" / "publicos-complementares.json"
 AUDITORIA = ROOT / "dados-br" / "auditoria-publicos.json"
+CORRECOES_VERIFICADAS = ROOT / "dados-br" / "correcoes" / "publicos-verificados.json"
 FUSO_BRASILIA = timezone(timedelta(hours=-3))
 GE_SITEMAP_TEMPLATE = "https://ge.globo.com/sitemap/ge/{ano:04d}/{mes:02d}/{dia:02d}_{parte}.xml"
 GE_TEMPLATE = (
@@ -662,6 +663,75 @@ def _registrar_complemento(
         mapa[event_id] = novo
     return mudou, conflito
 
+def aplicar_correcoes_verificadas(
+    mapa: dict[str, dict[str, Any]],
+    correcoes: Any,
+) -> tuple[int, list[dict[str, Any]]]:
+    """Mescla fatos documentais curados por event_id e por campo.
+
+    A fonte verificada pode corrigir um valor anterior divergente, mas somente
+    para campos explicitamente presentes no arquivo de correções. Campos não
+    listados e jogos não listados permanecem intocados.
+    """
+    jogos = correcoes.get("jogos") if isinstance(correcoes, dict) else {}
+    if not isinstance(jogos, dict):
+        return 0, []
+    alteracoes = 0
+    conflitos: list[dict[str, Any]] = []
+    verificado_em = str(correcoes.get("verificado_em") or "") if isinstance(correcoes, dict) else ""
+    for raw_event_id, raw in jogos.items():
+        if not isinstance(raw, dict):
+            continue
+        event_id = str(raw_event_id or "").strip()
+        if not event_id:
+            continue
+        atual = dict(mapa.get(event_id) or {})
+        novo = dict(atual)
+
+        publico = numero_publico(raw.get("publico"))
+        pagantes = numero_publico(raw.get("pagantes"))
+        renda = numero_renda(raw.get("renda"))
+        if publico is not None and pagantes is not None and pagantes > publico:
+            raise RuntimeError(f"correção verificada inválida para {event_id}: pagantes > público")
+
+        field_pairs = []
+        if publico is not None:
+            field_pairs.extend([("publico", publico), ("publico_status", "divulgado"), ("tipo", str(raw.get("tipo") or "presente"))])
+        if pagantes is not None:
+            field_pairs.extend([("pagantes", pagantes), ("pagantes_status", "divulgado")])
+        if renda is not None:
+            field_pairs.extend([("renda", renda), ("renda_status", "divulgado")])
+        for status_key in ("publico_status", "pagantes_status", "renda_status"):
+            status = str(raw.get(status_key) or "").strip()
+            if status == "nao_divulgado" and ((status_key == "publico_status" and publico is None) or (status_key == "pagantes_status" and pagantes is None) or (status_key == "renda_status" and renda is None)):
+                field_pairs.append((status_key, status))
+
+        for key, value in field_pairs:
+            if key in atual and atual.get(key) not in (None, "") and atual.get(key) != value and key in {"publico", "pagantes", "renda"}:
+                conflitos.append({
+                    "event_id": event_id, "campo": key, "existente": atual.get(key),
+                    "verificado": value, "acao": "corrigido_por_fonte_documental_verificada"
+                })
+            if novo.get(key) != value:
+                novo[key] = value
+                alteracoes += 1
+
+        fontes = {
+            "fonte": str(raw.get("fonte_publico") or raw.get("fonte") or "").strip(),
+            "fonte_pagantes": str(raw.get("fonte_pagantes") or "").strip(),
+            "fonte_renda": str(raw.get("fonte_renda") or "").strip(),
+            "origem": str(raw.get("origem") or "correção documental verificada").strip(),
+            "verificado_em": verificado_em,
+        }
+        for key, value in fontes.items():
+            if value and novo.get(key) != value:
+                novo[key] = value
+                alteracoes += 1
+        if novo != atual:
+            mapa[event_id] = novo
+    return alteracoes, conflitos
+
+
 def propagar_duplicados(
     resultados: list[dict[str, Any]],
     mapa: dict[str, dict[str, Any]],
@@ -714,6 +784,8 @@ def executar_coleta(
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     jogos_mapa = payload.get("jogos") if isinstance(payload.get("jogos"), dict) else {}
     mapa: dict[str, dict[str, Any]] = {str(k): dict(v) for k, v in jogos_mapa.items() if isinstance(v, dict)}
+    correcoes = carregar_json(CORRECOES_VERIFICADAS, {"jogos": {}})
+    correcoes_aplicadas, conflitos_correcoes = aplicar_correcoes_verificadas(mapa, correcoes)
     fontes_rodadas = payload.get("fontes_rodadas") if isinstance(payload.get("fontes_rodadas"), dict) else {}
     fontes_rodadas = {str(k): v for k, v in fontes_rodadas.items()}
 
@@ -745,8 +817,8 @@ def executar_coleta(
     if max_rodadas > 0:
         rodadas_pendentes = rodadas_pendentes[:max_rodadas]
 
-    inseridos = 0
-    conflitos: list[dict[str, Any]] = []
+    inseridos = correcoes_aplicadas
+    conflitos: list[dict[str, Any]] = list(conflitos_correcoes)
     erros_fontes: list[dict[str, Any]] = []
     fontes_consultadas: list[dict[str, Any]] = []
 
@@ -837,7 +909,8 @@ def executar_coleta(
 
     comentario = (
         "Complemento documental de público presente, pagantes e renda. "
-        "Coleta automática prioritária no ge/Gato Mestre; público pagante nunca substitui "
+        "Correções verificadas por event_id são mescladas por campo antes da coleta; "
+        "a busca automática prioriza ge/Gato Mestre. Público pagante nunca substitui "
         "público presente e fontes avulsas podem cobrir jogos remarcados."
     )
     houve_mudanca_payload = (

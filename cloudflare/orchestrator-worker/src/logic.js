@@ -12,11 +12,11 @@ export const POLICY = Object.freeze({
   },
   slowEvalMinutes: 15,
   publicos: {
-    // O Fastlane do Push Worker pesquisa a cada poucos minutos. GitHub vira
-    // apenas consolidação/fallback tardio para reduzir Actions.
-    firstAfterFinalMinutes: 360,
+    // Fastlane continua primário a cada minuto; o GitHub entra cedo como segunda
+    // rota independente se público/renda ainda estiverem ausentes.
+    firstAfterFinalMinutes: 15,
     retryBands: [
-      [12, 360], [24, 720], [48, 1440], [99999, 1440],
+      [2, 15], [6, 30], [12, 60], [24, 120], [48, 360], [99999, 720],
     ],
   },
   melhoresMomentos: {

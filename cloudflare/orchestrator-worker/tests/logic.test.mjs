@@ -154,11 +154,14 @@ test('highlight GitHub fallback starts only after Fastlane window (+6h)', () => 
   assert.equal(pendingHighlights({ results, auto: { jogos: {} }, manual: { jogos: {} }, now: d('2026-09-03T18:00:00Z') }).length, 1);
 });
 
-test('public/renda backoff is sparse and never exhausts', () => {
-  assert.equal(publicRetryInterval(7), 360);
-  assert.equal(publicRetryInterval(20), 720);
-  assert.equal(publicRetryInterval(30), 1440);
-  assert.equal(publicRetryInterval(100), 1440);
+test('public/renda fallback starts at +15min and never exhausts', () => {
+  assert.equal(POLICY.publicos.firstAfterFinalMinutes, 15);
+  assert.equal(publicRetryInterval(1), 15);
+  assert.equal(publicRetryInterval(3), 30);
+  assert.equal(publicRetryInterval(7), 60);
+  assert.equal(publicRetryInterval(20), 120);
+  assert.equal(publicRetryInterval(30), 360);
+  assert.equal(publicRetryInterval(100), 720);
 });
 
 test('round editorial closes at 10 or after postponed-game rule', () => {
@@ -324,6 +327,13 @@ test('public trigger uses the small audit and detects a new final before the aud
   });
   assert.deepEqual(audited.map((x) => x.eventId), ['old']);
   assert.ok(audited[0].missingFields.includes('publico'));
+});
+
+test('public/renda GitHub fallback opens at 15 minutes, not before', () => {
+  const results = { resultados: [{ event_id: 'fresh', data_iso: '2026-09-03T10:00:00Z', finalizado_em: '2026-09-03T12:00:00Z' }] };
+  const audit = { gerado_em: '2026-09-03T11:00:00Z', sem_publico: [] };
+  assert.equal(pendingPublicsFromAudit({ results, audit, aiState: {}, now: d('2026-09-03T12:14:59Z') }).length, 0);
+  assert.equal(pendingPublicsFromAudit({ results, audit, aiState: {}, now: d('2026-09-03T12:15:00Z') }).length, 1);
 });
 
 test('rent-only audit gap remains eligible even when attendance is already known', () => {

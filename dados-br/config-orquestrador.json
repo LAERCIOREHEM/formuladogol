@@ -64,26 +64,34 @@
     "bloquear_se_writer_ativo": true
   },
   "publicos": {
-    "primeira_tentativa_apos_final_minutos": 360,
+    "primeira_tentativa_apos_final_minutos": 15,
     "intervalos_retentativa": [
       {
+        "ate_horas": 2,
+        "minutos": 15
+      },
+      {
+        "ate_horas": 6,
+        "minutos": 30
+      },
+      {
         "ate_horas": 12,
-        "minutos": 360
+        "minutos": 60
       },
       {
         "ate_horas": 24,
-        "minutos": 720
+        "minutos": 120
       },
       {
         "ate_horas": 48,
-        "minutos": 1440
+        "minutos": 360
       },
       {
         "ate_horas": 99999,
-        "minutos": 1440
+        "minutos": 720
       }
     ],
-    "politica": "Fastlane Cloudflare/OpenAI web_search persegue público/renda imediatamente e salva overlay no D1; GitHub só consolida/faz fallback após 6h. Campos continuam independentes e nunca são estimados."
+    "politica": "Fastlane Cloudflare/OpenAI web_search persegue público/renda imediatamente e salva overlay no D1; GitHub entra como fallback independente após 15 min e consolida o snapshot. Campos continuam independentes e nunca são estimados."
   },
   "backoff_falhas": {
     "ativo": true,

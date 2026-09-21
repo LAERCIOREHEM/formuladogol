@@ -4,6 +4,7 @@ const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
+const POSTGAME_POLICY_VERSION = 2;
 
 const CHANNELS = Object.freeze([
   { id: 'UCgCKagVhzGnZcuP9bSMgMCg', name: 'GE TV', source: 'GE TV / YouTube', embed: true, minAgeHours: 0 },
@@ -39,7 +40,7 @@ const POSITIVE_HIGHLIGHT_RE = /\b(melhores momentos|gols e melhores momentos|gol
 const NEGATIVE_HIGHLIGHT_RE = /\b(aquecimento|esquenta|pre[- ]?jogo|pré[- ]?jogo|pos[- ]?jogo|pós[- ]?jogo|sem imagens|audio apenas|áudio apenas|narra[cç][aã]o|radio|rádio|tempo real|lance a lance|lances ao vivo|watchalong|watch party|react|podcast)\b/i;
 
 const HIGHLIGHT_RETRY_MINUTES = [1, 2, 2, 5, 5, 5, 10, 15, 15, 30, 30, 60, 60, 120];
-const PUBLIC_RETRY_MINUTES = [5, 5, 10, 10, 20, 30, 30, 60, 60, 120, 120, 180];
+const PUBLIC_RETRY_MINUTES = [1, 2, 4, 7, 10, 15, 20, 30, 45, 60, 90, 120];
 
 const channelCache = new Map();
 
@@ -94,6 +95,32 @@ function normalizeUrl(value) {
   } catch (_) { return ''; }
 }
 
+function sourceUrlKey(value) {
+  const normalized = normalizeUrl(value);
+  if (!normalized) return '';
+  try {
+    const u = new URL(normalized);
+    const host = u.hostname.toLowerCase().replace(/^www\./, '');
+    let path = decodeURIComponent(u.pathname || '/').replace(/\/{2,}/g, '/');
+    path = path.replace(/^\/google\/amp\//i, '/');
+    path = path.replace(/\.amp\.(ghtml|html?)$/i, '.$1');
+    path = path.replace(/\/amp\/?$/i, '');
+    path = path.replace(/\/$/, '') || '/';
+    return `${host}${path}`.toLowerCase();
+  } catch (_) { return ''; }
+}
+
+function verifiedSource(rawUrl, sourceUrls) {
+  const candidate = normalizeUrl(rawUrl);
+  const key = sourceUrlKey(candidate);
+  if (!candidate || !key) return '';
+  for (const raw of sourceUrls || []) {
+    const actual = normalizeUrl(raw);
+    if (actual && sourceUrlKey(actual) === key) return actual;
+  }
+  return '';
+}
+
 function extractOpenAIText(response) {
   const parts = [];
   for (const item of response?.output || []) {
@@ -143,8 +170,8 @@ export function validatePublicPayload(payload, sourceUrls) {
   const usedSources = {};
   for (const [key, value, rawUrl] of fields) {
     if (value == null) continue;
-    const url = normalizeUrl(rawUrl);
-    if (!url || !sources.has(url)) continue;
+    const url = verifiedSource(rawUrl, sources);
+    if (!url) continue;
     accepted[key] = value;
     usedSources[key] = url;
   }
@@ -245,7 +272,7 @@ function publicSearchRequest(task, missing, env) {
       role: 'user',
       content: [{
         type: 'input_text',
-        text: `Pesquise na web dados documentais da partida ${matchup}, data ${date}, event_id ${text(task.event_id)}. Preciso exclusivamente de: ${missingText}. Faça consultas independentes em português, incluindo buscas literais com \"PÚBLICO\" e \"RENDA\", e consulte imprensa nacional/regional e sites oficiais. Não use memória. Não estime. Se um campo não estiver publicado, retorne null para ele. Público significa público presente/total; pagantes é campo separado. Cada número retornado precisa ter sua própria URL de fonte que tenha sido efetivamente lida pelo web_search.`,
+        text: `Pesquise na web dados documentais da partida ${matchup}, data ${date}, event_id ${text(task.event_id)}. Preciso exclusivamente de: ${missingText}. NÃO use memória e NÃO estime. Faça várias consultas independentes, em especial: \"${matchup} público renda\", \"${matchup} PÚBLICO RENDA\", \"${matchup} ficha técnica\", e procure também matérias de fechamento da rodada/Gato Mestre. Priorize clube/CBF/federação, ge, UOL/Estadão e imprensa regional confiável, mas não descarte outra ficha técnica documental. Se um campo não estiver publicado, retorne null. Público significa público presente/total; pagantes é campo separado. Confirme confronto, data e placar antes de usar a fonte. Cada número retornado precisa ter sua própria URL que tenha sido efetivamente lida pelo web_search.`,
       }]
     }],
     text: {
@@ -275,7 +302,7 @@ function publicSearchRequest(task, missing, env) {
       user_location: { type: 'approximate', country: 'BR', timezone: 'America/Sao_Paulo' }
     }],
     tool_choice: 'required',
-    max_tool_calls: 10,
+    max_tool_calls: 14,
     include: ['web_search_call.action.sources']
   };
 }
@@ -289,7 +316,7 @@ export async function searchPublicWithOpenAI(env, task) {
   if (!(Number(task.renda) > 0)) missing.push('renda');
   if (!missing.length) return { found: true, complete: true, values: {} };
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 28_000);
+  const timer = setTimeout(() => controller.abort(), 55_000);
   try {
     const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST', signal: controller.signal,
@@ -407,13 +434,15 @@ async function seedFromStatic(env, now = Date.now()) {
   const base = text(env?.SITE_BASE || DEFAULT_SITE_BASE).replace(/\/$/, '');
   try {
     const stamp = now;
-    const [results, publicData, mmAuto, mmManual] = await Promise.all([
+    const [results, publicData, verifiedData, mmAuto, mmManual] = await Promise.all([
       fetchJson(`${base}/resultados.json?t=${stamp}`, { cache: 'no-store' }, 10_000),
       fetchJson(`${base}/dados-br/publicos-complementares.json?t=${stamp}`, { cache: 'no-store' }, 10_000).catch(() => ({ jogos: {} })),
+      fetchJson(`${base}/dados-br/correcoes/publicos-verificados.json?t=${stamp}`, { cache: 'no-store' }, 10_000).catch(() => ({ jogos: {} })),
       fetchJson(`${base}/dados-br/melhores-momentos.json?t=${stamp}`, { cache: 'no-store' }, 10_000).catch(() => ({ jogos: {} })),
       fetchJson(`${base}/dados-br/melhores-momentos-manual.json?t=${stamp}`, { cache: 'no-store' }, 10_000).catch(() => ({ jogos: {} })),
     ]);
     const publicMap = publicData?.jogos && typeof publicData.jogos === 'object' ? publicData.jogos : {};
+    const verifiedMap = verifiedData?.jogos && typeof verifiedData.jogos === 'object' ? verifiedData.jogos : {};
     const mmMap = { ...(mmAuto?.jogos || {}), ...(mmManual?.jogos || {}) };
     let count = 0;
     for (const result of results?.resultados || []) {
@@ -423,13 +452,15 @@ async function seedFromStatic(env, now = Date.now()) {
       if (!concluded) continue;
       const kickoffMs = Date.parse(result?.data_iso || '');
       if (Number.isFinite(kickoffMs) && kickoffMs < now - RECENT_RESULT_WINDOW_MS) continue;
-      const pub = publicMap[eventId] || {};
+      const basePub = publicMap[eventId] || {};
+      const verifiedPub = verifiedMap[eventId] || {};
+      const pub = { ...basePub, ...verifiedPub };
       const mm = mmMap[eventId] || null;
       await upsertTask(env, result, {
         publico: pub.publico,
         publico_pagante: pub.pagantes ?? pub.publico_pagante,
         renda: pub.renda,
-        public_sources: pub.fonte ? { publico: pub.fonte, publico_pagante: pub.fonte, renda: pub.fonte } : null,
+        public_sources: (pub.fonte || pub.fonte_publico || pub.fonte_pagantes || pub.fonte_renda) ? { publico: pub.fonte_publico || pub.fonte, publico_pagante: pub.fonte_pagantes || pub.fonte_publico || pub.fonte, renda: pub.fonte_renda || pub.fonte_publico || pub.fonte } : null,
         highlight: mm,
       });
       count += 1;
@@ -449,7 +480,7 @@ function taskAgeHours(task, now = Date.now()) {
 async function claimDue(env, kind, now = Date.now()) {
   const prefix = kind === 'highlight' ? 'highlight' : 'public';
   const iso = nowIso(now);
-  const row = await env.DB.prepare(`SELECT * FROM postgame_fastlane WHERE ${prefix}_status<>'resolved' AND COALESCE(${prefix}_next_at,'1970-01-01T00:00:00.000Z')<=? ORDER BY final_at ASC LIMIT 1`).bind(iso).first();
+  const row = await env.DB.prepare(`SELECT * FROM postgame_fastlane WHERE ${prefix}_status<>'resolved' AND COALESCE(${prefix}_next_at,'1970-01-01T00:00:00.000Z')<=? ORDER BY COALESCE(${prefix}_last_at,'1970-01-01T00:00:00.000Z') ASC, final_at DESC LIMIT 1`).bind(iso).first();
   if (!row) return null;
   const currentNext = text(row[`${prefix}_next_at`]);
   const lockUntil = nowIso(now + 10 * 60_000);
@@ -497,12 +528,25 @@ async function processPublic(env, now = Date.now()) {
   return { attempted: true, resolved: complete, partial: found.found && !complete, eventId: task.event_id, retryMinutes: delay, reason: found.reason || '' };
 }
 
+async function ensurePolicyVersion(env, now = Date.now()) {
+  const current = Number(await metaGet(env, 'policy_version') || 0);
+  if (current >= POSTGAME_POLICY_VERSION) return false;
+  const iso = nowIso(now);
+  // Reabre imediatamente apenas tarefas ainda pendentes. Isso evita que o
+  // backoff antigo de horas sobreviva ao deploy da política nova.
+  await env.DB.prepare(`UPDATE postgame_fastlane SET public_next_at=?, updated_at=CURRENT_TIMESTAMP WHERE public_status<>'resolved'`).bind(iso).run();
+  await metaPut(env, 'static_seed_at', '1970-01-01T00:00:00.000Z');
+  await metaPut(env, 'policy_version', String(POSTGAME_POLICY_VERSION));
+  return true;
+}
+
 async function cleanup(env, now = Date.now()) {
   const cutoff = nowIso(now - CLEANUP_WINDOW_DAYS * 86400000);
   await env.DB.prepare(`DELETE FROM postgame_fastlane WHERE final_at<?`).bind(cutoff).run();
 }
 
 export async function runPostgameMaintenance(env, monitor, now = Date.now()) {
+  const policyMigrated = await ensurePolicyVersion(env, now);
   const seededMonitor = await seedFromMonitor(env, monitor);
   const seededStatic = await seedFromStatic(env, now);
   const [highlight, publico] = await Promise.all([processHighlight(env, now), processPublic(env, now)]);
@@ -511,7 +555,7 @@ export async function runPostgameMaintenance(env, monitor, now = Date.now()) {
     await cleanup(env, now);
     await metaPut(env, 'cleanup_at', nowIso(now));
   }
-  const summary = { at: nowIso(now), seededMonitor, seededStatic, highlight, publico };
+  const summary = { at: nowIso(now), policyVersion: POSTGAME_POLICY_VERSION, policyMigrated, seededMonitor, seededStatic, highlight, publico };
   await metaPut(env, 'last_run', JSON.stringify(summary));
   return summary;
 }
@@ -550,7 +594,7 @@ export async function postgameStatus(env) {
   return {
     ok: true,
     engine: 'cloudflare-postgame-fastlane',
-    version: 1,
+    version: 2,
     total: Number(counts?.total || 0),
     publicPending: Number(counts?.public_pending || 0),
     highlightPending: Number(counts?.highlight_pending || 0),

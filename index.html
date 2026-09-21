@@ -3406,10 +3406,16 @@ function postgameFastlaneArmar() {
 
 async function carregarJogosDetalhes(opcoes = {}) {
   try {
-    const resp = await fetch('dados-br/jogos-detalhes.json?t=' + Date.now(), { cache: 'no-store' });
+    const stamp = Date.now();
+    const [resp, corrResp] = await Promise.all([
+      fetch('dados-br/jogos-detalhes.json?t=' + stamp, { cache: 'no-store' }),
+      fetch('dados-br/correcoes/publicos-verificados.json?t=' + stamp, { cache: 'no-store' }).catch(() => null),
+    ]);
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
+    const correcoes = corrResp && corrResp.ok ? await corrResp.json().catch(() => ({})) : {};
     state.jogosDetalhes = data && data.jogos && typeof data.jogos === 'object' ? data.jogos : {};
+    state.publicosVerificados = correcoes && correcoes.jogos && typeof correcoes.jogos === 'object' ? correcoes.jogos : (state.publicosVerificados || {});
     state.jogosDetalhesMeta = {
       gerado_em: data.gerado_em || null,
       fonte: data.fonte || 'ESPN summary',
@@ -3438,9 +3444,20 @@ function detalhesDoJogo(j) {
       if (det && id && String(det.event_id || '') === id) { base = det; break; }
     }
   }
+  const verified = id ? ((state.publicosVerificados || {})[id] || null) : null;
   const fast = id ? postgameFastlaneDoJogo(j) : null;
-  if (!base && !fast) return null;
+  if (!base && !verified && !fast) return null;
   const merged = { ...(base || {}), event_id: id || (base && base.event_id) || '' };
+  // Correção documental curada tem precedência por campo. É deliberadamente
+  // pequena e versionada por event_id; não substitui o restante do detalhe.
+  if (Number(verified && verified.publico) > 0) merged.publico = Number(verified.publico);
+  if (Number(verified && (verified.pagantes ?? verified.publico_pagante)) > 0) merged.publico_pagante = Number(verified.pagantes ?? verified.publico_pagante);
+  if (Number(verified && verified.renda) > 0) merged.renda = Number(verified.renda);
+  if (verified) merged.fontes_publico_verificadas = {
+    publico: verified.fonte_publico || verified.fonte || '',
+    publico_pagante: verified.fonte_pagantes || verified.fonte_publico || verified.fonte || '',
+    renda: verified.fonte_renda || verified.fonte_publico || verified.fonte || '',
+  };
   if (!(Number(merged.publico) > 0) && Number(fast && fast.publico) > 0) merged.publico = Number(fast.publico);
   if (!(Number(merged.publico_pagante) > 0) && Number(fast && fast.publico_pagante) > 0) merged.publico_pagante = Number(fast.publico_pagante);
   if (!(Number(merged.renda) > 0) && Number(fast && fast.renda) > 0) merged.renda = Number(fast.renda);

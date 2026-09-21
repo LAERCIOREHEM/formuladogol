@@ -546,10 +546,14 @@ async function handleTest(request, env) {
 export default {
   async scheduled(controller, env, ctx) {
     const monitor = singletonMonitor(env);
-    ctx.waitUntil((async () => {
-      await runOperationalMaintenance(env, monitor);
-      await runPostgameMaintenance(env, monitor);
-    })());
+    // Isolamento operacional: uma falha de manutenção geral nunca pode impedir
+    // a coleta pós-jogo (público/renda e melhores momentos) no mesmo minuto.
+    ctx.waitUntil(runOperationalMaintenance(env, monitor).catch((error) => {
+      console.error(`operational maintenance failed: ${String(error?.message || error).slice(0, 500)}`);
+    }));
+    ctx.waitUntil(runPostgameMaintenance(env, monitor).catch((error) => {
+      console.error(`postgame fastlane failed: ${String(error?.message || error).slice(0, 500)}`);
+    }));
   },
 
   async queue(batch, env) {
@@ -577,7 +581,7 @@ export default {
         ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok) && Boolean(operational?.ok),
         service: 'formula-do-gol-push',
         version: 8,
-        revision: '6-R10R7-MONITOR-FACTS',
+        revision: '6-R10R7-MONITOR-FACTS-PG2',
         liveGatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
         liveStateContractVersion: LIVE_API_CONSTANTS.LIVE_STATE_CONTRACT_VERSION,
         liveFactsContractVersion: LIVE_API_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
@@ -596,7 +600,7 @@ export default {
         continentalStatsTargetMinPerTeam: LIVE_API_CONSTANTS.CONTINENTAL_STATS_TARGET,
         bestKnownStatsCache: true,
         postgameFastlane: true,
-        postgameFastlaneVersion: 1,
+        postgameFastlaneVersion: 2,
         sportsMonitorReady: Boolean(monitor?.ok),
         operationalState: operational?.state || 'unknown',
         sports: {
@@ -623,7 +627,7 @@ export default {
       if (url.pathname === '/v1/postgame' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'postgame-fastlane'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
         const ids = String(url.searchParams.get('event_ids') || '').split(',').map((v) => cleanId(v)).filter(Boolean);
-        return json(request, { ok: true, version: 1, rows: await readPostgameFastlane(env, ids) }, 200, { 'Cache-Control': 'no-store' });
+        return json(request, { ok: true, version: 2, rows: await readPostgameFastlane(env, ids) }, 200, { 'Cache-Control': 'no-store' });
       }
       if (url.pathname === '/v1/postgame/status' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'postgame-status'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
