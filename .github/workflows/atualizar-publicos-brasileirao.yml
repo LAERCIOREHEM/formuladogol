@@ -2,8 +2,15 @@ name: Atualizar públicos do Brasileirão
 run-name: Públicos · ${{ inputs.modo || 'automatico' }} · ${{ inputs.event_id || 'geral' }}
 
 on:
-  # Sem schedule próprio. O orquestrador dispara somente quando existe partida
-  # FINAL com lacuna de público/renda e o backoff da pendência venceu.
+  # O Orchestrator continua sendo a autoridade recorrente. O push abaixo existe
+  # apenas para aplicar imediatamente uma correção documental curada/alteração
+  # do coletor, sem criar workflow descartável.
+  push:
+    branches: [main]
+    paths:
+      - 'dados-br/correcoes/publicos-verificados.json'
+      - 'scripts/atualizar_publicos_brasileirao.py'
+      - '.github/workflows/atualizar-publicos-brasileirao.yml'
   workflow_dispatch:
     inputs:
       modo:
@@ -70,6 +77,7 @@ jobs:
           python -m json.tool resultados.json >/dev/null
           python -m json.tool dados-br/jogos-detalhes.json >/dev/null
           python -m json.tool dados-br/publicos-complementares.json >/dev/null
+          python -m json.tool dados-br/correcoes/publicos-verificados.json >/dev/null
           python -m json.tool dados-br/auditoria-publicos.json >/dev/null
 
       - name: Buscar lacunas de público e renda

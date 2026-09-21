@@ -157,10 +157,10 @@ jobs:
             p.adaptiveSlowPath === true &&
             p.transmissionTvOperationalWindowHours === 72 &&
             p.transmissionYoutubeOnlyWhenRequired === true &&
-            p.publicFirstAttemptAfterFinalMinutes === 360 &&
+            p.publicFirstAttemptAfterFinalMinutes === 15 &&
             p.postgameFastlanePrimary === true &&
             p.postgameFastlaneCronMinutes === 1 &&
-            p.githubPostgameFallbackHours === 6 &&
+            p.githubPostgameFallbackMinutes === 15 &&
             p.targetedPublicResearch === true &&
             p.continentalPhaseFingerprints === true &&
             p.continentalAgendaAware === true &&

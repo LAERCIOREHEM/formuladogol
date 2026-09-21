@@ -240,7 +240,7 @@ jobs:
           if (h.sportsMonitorFactsAuthority !== true) problems.push('sportsMonitorFactsAuthority!=true');
           if (Number(h.sportsMonitorFactsVersion) !== 1) problems.push(`sportsMonitorFactsVersion=${h.sportsMonitorFactsVersion}`);
           if (h.postgameFastlane !== true) problems.push('postgameFastlane!=true');
-          if (Number(h.postgameFastlaneVersion) !== 1) problems.push(`postgameFastlaneVersion=${h.postgameFastlaneVersion}`);
+          if (Number(h.postgameFastlaneVersion) !== 2) problems.push(`postgameFastlaneVersion=${h.postgameFastlaneVersion}`);
           if (h.liveStatePrimary !== 'worker-espn') problems.push(`liveStatePrimary=${h.liveStatePrimary}`);
           if (h.liveStateDirectFallback !== true) problems.push('liveStateDirectFallback!=true');
           if (h.theSportsDbStatsReady !== true) problems.push('theSportsDbStatsReady!=true');
@@ -275,7 +275,7 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const s = JSON.parse(fs.readFileSync('/tmp/fdg-postgame-status.json', 'utf8'));
-          if (s.ok !== true || s.engine !== 'cloudflare-postgame-fastlane' || Number(s.version) !== 1) {
+          if (s.ok !== true || s.engine !== 'cloudflare-postgame-fastlane' || Number(s.version) !== 2) {
             console.error('Fastlane pós-jogo não respondeu com o contrato esperado:', s);
             process.exit(1);
           }
