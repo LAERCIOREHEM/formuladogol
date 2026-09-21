@@ -1,5 +1,5 @@
 name: Buscar melhores momentos oficiais
-run-name: Melhores momentos · ${{ inputs.modo || 'incremental' }} · ${{ inputs.event_id || 'todos' }}
+run-name: Melhores momentos · ${{ inputs.modo || 'incremental' }} · ${{ inputs.event_ids || inputs.event_id || 'todos' }}
 
 on:
   workflow_dispatch:
@@ -16,6 +16,15 @@ on:
         description: "Opcional: buscar somente o jogo ESPN informado"
         required: false
         default: ""
+      event_ids:
+        description: "Opcional: lista CSV de event_id já encontrados pelo Fastlane"
+        required: false
+        default: ""
+      origem_fastlane:
+        description: "Consolidar vídeos concretos do Cloudflare sem nova busca no YouTube"
+        required: false
+        default: false
+        type: boolean
       rodada_inicio:
         description: "Rodada inicial. Vazio = usar config/rodadas recentes."
         required: false
@@ -67,13 +76,32 @@ jobs:
           python -m py_compile scripts/gerar_auditoria_cobertura_resultados.py
           python -m py_compile scripts/gerar_relatorio_fontes_melhores_momentos.py
           python -m py_compile scripts/sincronizar_midias_editoriais.py
+          python -m py_compile scripts/importar_postgame_fastlane.py
           python scripts/buscar_melhores_momentos_getv.py --dry-run --modo incremental
           python scripts/buscar_melhores_momentos_copa_do_brasil.py --self-test
           python scripts/substituir_fontes_preferidas_mm.py --selftest
           python scripts/sincronizar_midias_editoriais.py --self-test
+          python scripts/importar_postgame_fastlane.py --self-test
           python scripts/gerar_relatorio_fontes_melhores_momentos.py --dry-run
 
+      - name: Importar melhores momentos concretos do Cloudflare Fastlane
+        if: ${{ inputs.origem_fastlane == true }}
+        env:
+          INPUT_EVENT_ID: ${{ inputs.event_id }}
+          INPUT_EVENT_IDS: ${{ inputs.event_ids }}
+          FDG_PUSH_BASE_URL: https://push.formuladogol.com.br
+        shell: bash
+        run: |
+          set -euo pipefail
+          IDS="${INPUT_EVENT_IDS:-${INPUT_EVENT_ID:-}}"
+          if [[ -z "$IDS" ]]; then
+            echo "::error::origem_fastlane exige event_id ou event_ids."
+            exit 2
+          fi
+          python scripts/importar_postgame_fastlane.py --tipo melhores_momentos --event-ids "$IDS"
+
       - name: Buscar vídeos prioritários na GE TV por playlists
+        if: ${{ inputs.origem_fastlane != true }}
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           EVENT_NAME: ${{ github.event_name }}
@@ -105,6 +133,7 @@ jobs:
           "${CMD[@]}"
 
       - name: Sanear e buscar fontes preferidas com fallback UOL após 48h
+        if: ${{ inputs.origem_fastlane != true }}
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           EVENT_NAME: ${{ github.event_name }}
@@ -142,7 +171,7 @@ jobs:
           "${CMD[@]}"
 
       - name: Buscar melhores momentos oficiais da fase atual da Copa do Brasil
-        if: ${{ inputs.event_id == '' }}
+        if: ${{ inputs.origem_fastlane != true && inputs.event_id == '' && inputs.event_ids == '' }}
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: python scripts/buscar_melhores_momentos_copa_do_brasil.py

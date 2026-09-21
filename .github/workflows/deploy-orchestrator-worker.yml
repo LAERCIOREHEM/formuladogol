@@ -160,7 +160,11 @@ jobs:
             p.publicFirstAttemptAfterFinalMinutes === 15 &&
             p.postgameFastlanePrimary === true &&
             p.postgameFastlaneCronMinutes === 1 &&
-            p.githubPostgameFallbackMinutes === 15 &&
+            p.dormantMode === true &&
+            p.postgameConcreteGate === true &&
+            p.postgameAutomaticWindowHours === 24 &&
+            p.postgameGithubMaxDispatchesPerEvent === 2 &&
+            p.postgameHighlightsBatching === true &&
             p.targetedPublicResearch === true &&
             p.continentalPhaseFingerprints === true &&
             p.continentalAgendaAware === true &&

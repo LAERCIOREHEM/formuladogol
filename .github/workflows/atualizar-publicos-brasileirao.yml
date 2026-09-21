@@ -27,6 +27,11 @@ on:
         required: false
         default: ''
         type: string
+      origem_fastlane:
+        description: "Importar descoberta concreta do Cloudflare Fastlane sem nova pesquisa"
+        required: false
+        default: false
+        type: boolean
       reabrir_esgotados:
         description: "Compatibilidade: zerar manualmente o backoff de público/renda (normalmente desnecessário no schema v2)"
         type: boolean
@@ -71,9 +76,11 @@ jobs:
           python -m py_compile \
             scripts/atualizar_publicos_brasileirao.py \
             scripts/completar_publicos_ia.py \
-            scripts/gerar_estatisticas_competicao_brasileirao.py
+            scripts/gerar_estatisticas_competicao_brasileirao.py \
+            scripts/importar_postgame_fastlane.py
           python scripts/atualizar_publicos_brasileirao.py --self-test
           python scripts/completar_publicos_ia.py --self-test
+          python scripts/importar_postgame_fastlane.py --self-test
           python -m json.tool resultados.json >/dev/null
           python -m json.tool dados-br/jogos-detalhes.json >/dev/null
           python -m json.tool dados-br/publicos-complementares.json >/dev/null
@@ -89,6 +96,8 @@ jobs:
           REABRIR: ${{ inputs.reabrir_esgotados }}
           MODO: ${{ inputs.modo || 'automatico' }}
           EVENT_ID: ${{ inputs.event_id }}
+          ORIGEM_FASTLANE: ${{ inputs.origem_fastlane }}
+          FDG_PUSH_BASE_URL: https://push.formuladogol.com.br
         run: |
           set -euo pipefail
           cp dados-br/publicos-complementares.json /tmp/publicos-antes.json
@@ -99,6 +108,10 @@ jobs:
             exit 2
           fi
 
+          if [[ "${ORIGEM_FASTLANE:-false}" == "true" ]]; then
+            echo "Fastlane: importando somente dado concreto já descoberto no Cloudflare."
+            python scripts/importar_postgame_fastlane.py --tipo publicos --event-id "$EVENT_ID"
+          else
           # Fluxo correto: coletor determinístico PRIMEIRO; IA somente como fallback
           # para o que continuar faltando. A IA usa web_search amplo e obrigatório,
           # validando a URL efetivamente lida sem se limitar a uma lista fixa de domínios.
@@ -150,6 +163,8 @@ jobs:
           fi
           if grep -q "OPENAI_API_KEY ausente" /tmp/camada-ia.log; then
             echo "::error::OPENAI_API_KEY nao chegou ao runner. Cadastre em Settings > Secrets and variables > Actions > Repository secrets."
+          fi
+
           fi
 
           # A camada de IA grava complementos e propaga para jogos-detalhes, mas
@@ -273,10 +288,8 @@ jobs:
         id: publish
         env:
           NOVOS_PUBLICOS: ${{ steps.coleta.outputs.novos }}
-        # Commita também quando NÃO houve dado novo: o estado por campo contém o
-        # próximo backoff de público/renda e evita consultas em loop, sem abandonar
-        # definitivamente nenhuma lacuna documental.
-        if: ${{ inputs.dry_run != true }}
+        # No-op absoluto: tentativa sem dado factual novo não gera commit nem deploy.
+        if: ${{ inputs.dry_run != true && steps.coleta.outputs.novos == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -319,7 +332,8 @@ jobs:
             if [[ "${NOVOS_PUBLICOS:-false}" == "true" ]]; then
               MSG="Atualizar públicos do Brasileirão - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
             else
-              MSG="Registrar tentativa da camada de IA de público - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+              echo "Sem conteúdo factual novo; este ramo não deveria executar."
+              exit 0
             fi
             git commit -m "$MSG"
             if git push origin HEAD:main; then

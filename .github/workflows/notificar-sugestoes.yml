@@ -1,11 +1,8 @@
 name: Notificar sugestões por e-mail
 
 on:
-  # Roda de 2 em 2 horas todos os dias. UTC — não importa a hora, o script
-  # só processa linhas com enviado_email=false.
-  schedule:
-    - cron: '17 */2 * * *'
-  # Permite executar manualmente pela aba Actions (útil para testar).
+  # Fallback manual. A recorrência foi migrada para o Push Worker/Cloudflare,
+  # que consulta o Supabase e envia via Resend sem consumir GitHub Actions.
   workflow_dispatch:
 
 # Só leitura no repo (checkout). O script fala com Supabase e SMTP por rede.

@@ -27,6 +27,8 @@ jobs:
       FDG_PUSH_EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
       FDG_PUSH_API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
       FDG_PUSH_YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+      FDG_PUSH_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      FDG_PUSH_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     defaults:
       run:
         working-directory: cloudflare/push-worker
@@ -47,6 +49,8 @@ jobs:
           test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo 'ERRO: secret CLOUDFLARE_ACCOUNT_ID ausente.'; exit 1; }
           test -n "${FDG_PUSH_OPENAI_API_KEY:-}" || { echo 'ERRO: secret OPENAI_API_KEY ausente; o Guardião IA/Fastlane não pode operar.'; exit 1; }
           test -n "${FDG_PUSH_YOUTUBE_API_KEY:-}" || { echo 'ERRO: secret YOUTUBE_API_KEY ausente; o Fastlane de melhores momentos não pode operar.'; exit 1; }
+          test -n "${FDG_PUSH_SUPABASE_URL:-}" || { echo 'ERRO: secret SUPABASE_URL ausente; notificador de sugestões no Cloudflare não pode operar.'; exit 1; }
+          test -n "${FDG_PUSH_SUPABASE_SERVICE_ROLE_KEY:-}" || { echo 'ERRO: secret SUPABASE_SERVICE_ROLE_KEY ausente; notificador de sugestões no Cloudflare não pode operar.'; exit 1; }
 
           # Desde o fallback continental v3, API-Football é a camada
           # prioritária de enriquecimento quando a ESPN vem incompleta.
@@ -146,13 +150,19 @@ jobs:
           printf '%s' "$FDG_PUSH_API_FOOTBALL_KEY" | npx wrangler secret put API_FOOTBALL_KEY --config wrangler.generated.jsonc
           echo 'Secret API_FOOTBALL_KEY atualizado.'
 
+          printf '%s' "$FDG_PUSH_SUPABASE_URL" | npx wrangler secret put SUPABASE_URL --config wrangler.generated.jsonc
+          printf '%s' "$FDG_PUSH_SUPABASE_SERVICE_ROLE_KEY" | npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY --config wrangler.generated.jsonc
+          echo 'Segredos do Supabase atualizados para o notificador de sugestões.'
+
           # E-mail administrativo é opcional. Se os secrets não existirem no
           # GitHub, não envia valor vazio e não apaga eventual secret já salvo
           # diretamente no Cloudflare Worker.
-          if [ -n "${FDG_PUSH_RESEND_API_KEY:-}" ] && [ -n "${FDG_PUSH_EMAIL_DESTINO:-}" ]; then
+          if [ -n "${FDG_PUSH_RESEND_API_KEY:-}" ]; then
             printf '%s' "$FDG_PUSH_RESEND_API_KEY" | npx wrangler secret put RESEND_API_KEY --config wrangler.generated.jsonc
-            printf '%s' "$FDG_PUSH_EMAIL_DESTINO" | npx wrangler secret put EMAIL_DESTINO --config wrangler.generated.jsonc
-            echo 'Segredos de e-mail administrativo atualizados.'
+            if [ -n "${FDG_PUSH_EMAIL_DESTINO:-}" ]; then
+              printf '%s' "$FDG_PUSH_EMAIL_DESTINO" | npx wrangler secret put EMAIL_DESTINO --config wrangler.generated.jsonc
+            fi
+            echo 'Secret RESEND_API_KEY atualizado; destino usa EMAIL_DESTINO ou avisos@formuladogol.com.br.'
           else
             echo 'E-mail administrativo não configurado; preservando qualquer configuração já existente no Worker.'
           fi
@@ -213,6 +223,7 @@ jobs:
                  EXPECTED_STATE_CONTRACT="$EXPECTED_STATE_CONTRACT" \
                  EXPECTED_FACTS_CONTRACT="$EXPECTED_FACTS_CONTRACT" \
                  API_FOOTBALL_EXPECTED="${FDG_PUSH_API_FOOTBALL_KEY:+1}" \
+                 FEEDBACK_EXPECTED="${FDG_PUSH_RESEND_API_KEY:+1}" \
                  node <<'NODE'
           const fs = require('fs');
           const h = JSON.parse(fs.readFileSync('/tmp/fdg-push-health.json', 'utf8'));
@@ -241,6 +252,8 @@ jobs:
           if (Number(h.sportsMonitorFactsVersion) !== 1) problems.push(`sportsMonitorFactsVersion=${h.sportsMonitorFactsVersion}`);
           if (h.postgameFastlane !== true) problems.push('postgameFastlane!=true');
           if (Number(h.postgameFastlaneVersion) !== 2) problems.push(`postgameFastlaneVersion=${h.postgameFastlaneVersion}`);
+          if (h.feedbackNotifier !== true) problems.push('feedbackNotifier!=true');
+          if (process.env.FEEDBACK_EXPECTED === '1' && h.feedbackNotifierConfigured !== true) problems.push('feedbackNotifierConfigured!=true');
           if (h.liveStatePrimary !== 'worker-espn') problems.push(`liveStatePrimary=${h.liveStatePrimary}`);
           if (h.liveStateDirectFallback !== true) problems.push('liveStateDirectFallback!=true');
           if (h.theSportsDbStatsReady !== true) problems.push('theSportsDbStatsReady!=true');

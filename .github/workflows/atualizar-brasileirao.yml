@@ -87,7 +87,8 @@ jobs:
             scripts/gerar_analise_copa_do_brasil.py \
             scripts/buscar_melhores_momentos_copa_do_brasil.py \
             scripts/auditoria_ia_diaria.py \
-            scripts/validar_artefatos_analises.py
+            scripts/validar_artefatos_analises.py \
+            scripts/detectar_mudanca_material.py
           python scripts/validar_python_embutido_workflow.py --self-test
           python scripts/validar_python_embutido_workflow.py .github/workflows/atualizar-brasileirao.yml
           python atualizar_espn.py --selftest
@@ -112,6 +113,7 @@ jobs:
           python scripts/buscar_melhores_momentos_copa_do_brasil.py --self-test
           python scripts/auditoria_ia_diaria.py --self-test
           python scripts/validar_artefatos_analises.py
+          python scripts/detectar_mudanca_material.py --self-test
           python -m json.tool dados-br/config-transmissoes-tv.json > /dev/null
           python -m json.tool dados-br/auditoria-transmissoes-tv.json > /dev/null
           python -m json.tool dados-br/publicos-complementares.json > /dev/null
@@ -182,7 +184,7 @@ jobs:
         run: python atualizar_espn.py
 
       - name: Informar preservação por dessincronia temporária da ESPN
-        if: steps.espn.outputs.sincronizado != 'true'
+        if: steps.espn.outputs.sincronizado != 'true' && steps.material_independent.outputs.changed == 'true'
         env:
           ESPN_TENTATIVAS: ${{ steps.espn.outputs.tentativas }}
           ESPN_MOTIVO: ${{ steps.espn.outputs.motivo }}
@@ -1066,9 +1068,50 @@ jobs:
           print(f'Atualização independente validada: changed={changed}, af_updated={af_updated}.')
           PY
 
+      - name: Detectar mudança material independente
+        id: material_independent
+        if: steps.espn.outputs.sincronizado != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/detectar_mudanca_material.py --github-output "$GITHUB_OUTPUT" --paths \
+            dados-br/competicoes-af-previsao/copa-do-brasil.json \
+            dados-br/competicoes-af-previsao/libertadores.json \
+            dados-br/competicoes-af-previsao/sul-americana.json \
+            dados-br/agenda-clubes-br.json \
+            dados-br/transmissoes-tv.json \
+            dados-br/probabilidades-brasileirao.json \
+            dados-br/probabilidades-por-pontuacao.json \
+            dados-br/probabilidades-jogos.json \
+            dados-br/probabilidades-bolao.json \
+            dados-br/acuracia-af-previsao.json \
+            dados-br/marcos-af-previsao.json \
+            dados-br/analises.json analises sitemap.xml news-sitemap.xml feed.xml
+
+      - name: Detectar mudança material principal
+        id: material_main
+        if: steps.espn.outputs.sincronizado == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/detectar_mudanca_material.py --github-output "$GITHUB_OUTPUT" --paths \
+            tabela.json espn_eventos.json jogos.json resultados.json \
+            dados-br/transmissoes-tv.json dados-br/estatisticas.json \
+            dados-br/ranking-desempenho.json dados-br/historico-ranking-desempenho.json \
+            dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/jogos-detalhes.json \
+            dados-br/estatisticas-competicao.json dados-br/calendario-completo.json \
+            dados-br/competicoes-af-previsao/copa-do-brasil.json \
+            dados-br/competicoes-af-previsao/libertadores.json \
+            dados-br/competicoes-af-previsao/sul-americana.json dados-br/agenda-clubes-br.json \
+            dados-br/probabilidades-brasileirao.json dados-br/probabilidades-por-pontuacao.json \
+            dados-br/probabilidades-jogos.json dados-br/probabilidades-bolao.json \
+            dados-br/acuracia-af-previsao.json dados-br/marcos-af-previsao.json \
+            dados-br/melhores-momentos-copa-do-brasil.json dados-br/analises.json \
+            analises sitemap.xml news-sitemap.xml feed.xml
+
       - name: Commitar copas e AF mesmo com Brasileirão preservado
         id: publish_independent
-        if: steps.espn.outputs.sincronizado != 'true'
+        if: steps.espn.outputs.sincronizado != 'true' && steps.material_independent.outputs.changed == 'true'
         env:
           CONTINENTAL_READY: ${{ steps.continental.outputs.continental_ready }}
           CONTINENTAL_CHANGED: ${{ steps.continental.outputs.continental_changed }}
@@ -1161,7 +1204,7 @@ jobs:
       # de rebase em arquivos-artefato, mesmo sob concorrencia real.
       - name: Commitar JSONs juntos com push robusto
         id: publish_main
-        if: steps.espn.outputs.sincronizado == 'true'
+        if: steps.espn.outputs.sincronizado == 'true' && steps.material_main.outputs.changed == 'true'
         env:
           CONTINENTAL_READY: ${{ steps.continental.outputs.continental_ready }}
           CONTINENTAL_CHANGED: ${{ steps.continental.outputs.continental_changed }}
