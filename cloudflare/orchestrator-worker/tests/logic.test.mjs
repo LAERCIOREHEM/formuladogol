@@ -18,6 +18,7 @@ import {
   mmRetryInterval,
   normalizeAgenda,
   pendingHighlights,
+  pendingContinentalHighlights,
   pendingPublicsFromAudit,
   publicRetryInterval,
   publicPendingFingerprint,
@@ -408,4 +409,34 @@ test('next continental phase waits until every surviving Brazilian is materializ
     { event_id: 'sa2', data_iso: '2026-10-20T19:00:00-03:00', fase_ordem: 800, perna: 2, concluido: false, mandante: x('YA'), visitante: br('A') },
   ] };
   assert.equal(continentalBaselineReady({ libertadores: snap, sul_americana: { eventos: [] } }, 800), false);
+});
+
+
+test('continental highlights are a separate postgame action only for recent missing videos', () => {
+  const snap = { eventos: [{
+    event_id: 'cont-1', fase_ordem: 800, perna: 1,
+    data_iso: '2026-09-20T19:00:00-03:00', concluido: true,
+    mandante: { nome: 'Flamengo', serie_a_2026: true, espn_id: '819' },
+    visitante: { nome: 'Rival', serie_a_2026: false, espn_id: 'x' },
+  }] };
+  const now = d('2026-09-21T01:30:00Z'); // 22:30 BRT, ~1h40 após fim aproximado
+  const pending = pendingContinentalHighlights({ libertadores: snap, sul_americana: { eventos: [] } }, { jogos: {} }, now);
+  assert.equal(pending.length, 1);
+  assert.equal(pending[0].eventId, 'cont-1');
+  assert.equal(pending[0].rank, 800);
+  assert.equal(pendingContinentalHighlights(
+    { libertadores: snap, sul_americana: { eventos: [] } },
+    { jogos: { 'cont-1': { url: 'https://youtube.com/watch?v=ok' } } },
+    now,
+  ).length, 0);
+  assert.equal(pendingContinentalHighlights(
+    { libertadores: snap, sul_americana: { eventos: [] } }, { jogos: {} }, d('2026-09-23T03:00:00Z'),
+  ).length, 0);
+});
+
+test('continental highlights dispatch is targeted and independent from editorial', () => {
+  assert.deepEqual(dispatchSpec({ action: 'melhores_momentos_continentais', eventId: 'cont-1', phaseRank: 800 }), {
+    workflow: 'atualizar-melhores-momentos-continentais.yml',
+    inputs: { event_id: 'cont-1', fase_ordem: '800' },
+  });
 });

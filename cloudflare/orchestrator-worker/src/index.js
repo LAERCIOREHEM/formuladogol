@@ -48,7 +48,7 @@ export default {
       return json({
         ok: true,
         service: 'formula-do-gol-orchestrator',
-        version: String(env.ORCHESTRATOR_VERSION || '1.7.0'),
+        version: String(env.ORCHESTRATOR_VERSION || '1.8.0'),
         mode: String(env.ORCHESTRATOR_MODE || 'shadow'),
         cron: '*/5 * * * *',
         liveBrowserUntouched: true,
@@ -73,6 +73,8 @@ export default {
         continentalPhaseFingerprints: true,
         continentalAgendaAware: true,
         continentalStateIdempotency: true,
+        continentalEditorialSingleAuthority: true,
+        continentalHighlightsIndependent: true,
         continentalDailyFallbackMinutes: 1440,
         continentalJointBrazilianClosure: true,
         continentalPairPhaseReconciliation: true,

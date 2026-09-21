@@ -126,7 +126,7 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(state, /transmissoes_guardian/);
   const index = await read('cloudflare/orchestrator-worker/src/index.js');
   assert.match(index, /transmissionGuardian:\s*true/);
-  assert.match(index, /1\.7\.0/);
+  assert.match(index, /1\.8\.0/);
   assert.match(index, /transmissionGuardianNeedGate:\s*true/);
   assert.match(index, /transmissionNeedDrivenV2:\s*true/);
   assert.match(index, /adaptiveSlowPath:\s*true/);
@@ -244,4 +244,27 @@ test('live collector revalidates preserved players against the target game', asy
   const py = await read('scripts/buscar_transmissoes_aovivo_brasileirao.py');
   assert.match(py, /evaluate_candidate\(cand, game, config, aliases\)/);
   assert.match(py, /Nunca preservar só porque o vídeo continua live\/upcoming/);
+});
+
+
+test('continental editorial has a single dispatcher and no embedded video search', async () => {
+  const update = await read('.github/workflows/atualizar-brasileirao.yml');
+  const editorial = await read('.github/workflows/publicar-analise-continentais.yml');
+  const videos = await read('.github/workflows/atualizar-melhores-momentos-continentais.yml');
+  assert.doesNotMatch(update, /gh workflow run publicar-analise-continentais\.yml/);
+  assert.match(editorial, /--dispatch-decision/);
+  assert.doesNotMatch(editorial, /Buscar melhores momentos oficiais da CONMEBOL/);
+  assert.doesNotMatch(editorial, /buscar_melhores_momentos_continentais\.py --fase-ordem/);
+  assert.match(videos, /buscar_melhores_momentos_continentais\.py/);
+  assert.match(videos, /--sincronizar-videos/);
+  assert.match(videos, /group: repo-write-main/);
+});
+
+test('orchestrator health advertises continental single-authority governance', async () => {
+  const index = await read('cloudflare/orchestrator-worker/src/index.js');
+  const deploy = await read('.github/workflows/deploy-orchestrator-worker.yml');
+  assert.match(index, /continentalEditorialSingleAuthority:\s*true/);
+  assert.match(index, /continentalHighlightsIndependent:\s*true/);
+  assert.match(deploy, /continentalEditorialSingleAuthority/);
+  assert.match(deploy, /continentalHighlightsIndependent/);
 });

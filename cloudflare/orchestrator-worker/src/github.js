@@ -4,6 +4,7 @@ const WRITER_NAMES = new Set([
   'Auditar modelos AF-Previsão',
   'Auditoria IA diária',
   'Buscar melhores momentos oficiais',
+  'Atualizar melhores momentos continentais',
   'Atualizar públicos do Brasileirão',
   'Buscar transmissões dos clubes do Brasileirão',
   'Guardião IA de transmissões',
@@ -63,6 +64,11 @@ export function dispatchSpec(decision) {
       return { workflow: 'atualizar-publicos-brasileirao.yml', inputs: { modo: 'partida', event_id: decision.eventId || '' } };
     case 'melhores_momentos':
       return { workflow: 'buscar-melhores-momentos-getv.yml', inputs: { modo: 'incremental', event_id: decision.eventId || '' } };
+    case 'melhores_momentos_continentais':
+      return {
+        workflow: 'atualizar-melhores-momentos-continentais.yml',
+        inputs: { event_id: decision.eventId || '', fase_ordem: String(decision.phaseRank || 0) },
+      };
     case 'transmissao_aovivo':
       return { workflow: 'buscar-transmissoes-aovivo-brasileirao.yml', inputs: { modo: 'aovivo', event_id: decision.eventId || '' } };
     case 'transmissoes_guardian': {

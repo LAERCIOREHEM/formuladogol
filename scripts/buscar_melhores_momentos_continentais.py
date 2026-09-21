@@ -52,11 +52,14 @@ def effective_phase_rank(snapshot,e):
   if rank not in {600,700,800} or ow is None or ow>=when or when-ow>dt.timedelta(days=35):continue
   c.append((ow,rank))
  return max(c,key=lambda x:x[0])[1] if c else raw
-def completed_brazilian_events(snapshot,phase_rank=0):
+def completed_brazilian_events(snapshot,phase_rank=0,event_id=""):
  ranks=sorted({effective_phase_rank(snapshot,e) for e in snapshot.get('eventos') or [] if is_br(e) and effective_phase_rank(snapshot,e)>=600})
  if not ranks:return []
  rank=int(phase_rank or ranks[-1])
- return [e for e in snapshot.get('eventos') or [] if effective_phase_rank(snapshot,e)==rank and is_br(e) and e.get('concluido')]
+ rows=[e for e in snapshot.get('eventos') or [] if effective_phase_rank(snapshot,e)==rank and is_br(e) and e.get('concluido')]
+ if event_id:
+  rows=[e for e in rows if str(e.get('event_id') or '')==str(event_id)]
+ return rows
 def search_one(key,cid,e,comp):
  when=dt.datetime.fromisoformat(str(e.get('data_iso')).replace('Z','+00:00'))
  after=(when-dt.timedelta(days=1)).astimezone(dt.timezone.utc).isoformat().replace('+00:00','Z')
@@ -80,14 +83,14 @@ def stored_entry_ok(video,e,comp):
  title=str(video.get('titulo') or '')
  cid=str(video.get('channel_id') or '')
  return bool(str(video.get('url') or '').strip()) and candidate_ok(title,e,comp) and cid==OFFICIAL_CHANNEL_IDS.get(comp)
-def run(key,dry=False,phase_rank=0):
+def run(key,dry=False,phase_rank=0,event_id=""):
  old=load(OUT,{'schema_version':1,'temporada':2026,'competicoes':['libertadores','sul_americana'],'jogos':{}});games=dict(old.get('jogos') or {})
  channels={c:resolve_channel(key,h) for c,(h,_) in CHANNELS.items()}
  if not all(channels.values()):raise RuntimeError('não foi possível resolver os canais oficiais da CONMEBOL')
  found=0
  for comp,p in SNAPS.items():
   snap=load(p,{})
-  for e in completed_brazilian_events(snap,phase_rank):
+  for e in completed_brazilian_events(snap,phase_rank,event_id):
    eid=str(e.get('event_id') or '')
    current=games.get(eid) or {}
    # Override manual explicitamente verificado permanece soberano. Para vínculos
@@ -100,8 +103,13 @@ def run(key,dry=False,phase_rank=0):
    cand=search_one(key,channels[comp],e,comp)
    if cand:
     games[eid]=cand;found+=1
- payload={'schema_version':1,'temporada':2026,'competicoes':['libertadores','sul_americana'],'atualizado_em':dt.datetime.now(dt.timezone.utc).isoformat(),'canais_oficiais':{c:{'handle':CHANNELS[c][0],'channel_id':channels[c]} for c in channels},'jogos':games}
+ channels_payload={c:{'handle':CHANNELS[c][0],'channel_id':channels[c]} for c in channels}
+ semantic_changed=(games!=(old.get('jogos') or {}) or channels_payload!=(old.get('canais_oficiais') or {}))
+ payload={'schema_version':1,'temporada':2026,'competicoes':['libertadores','sul_americana'],'atualizado_em':(dt.datetime.now(dt.timezone.utc).isoformat() if semantic_changed else old.get('atualizado_em')),'canais_oficiais':channels_payload,'jogos':games}
  if dry:print(json.dumps(payload,ensure_ascii=False,indent=2));return 0
+ if not semantic_changed:
+  print(f'NONE: nenhum vínculo continental mudou; {len(games)} total.')
+  return 0
  OUT.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8');print(f'OK: {found} novo(s) vínculo(s) oficial(is); {len(games)} total.');return 0
 def self_test():
  e={'mandante':{'nome':'Flamengo','serie_a_2026':True,'espn_id':'819'},'visitante':{'nome':'Cruzeiro','serie_a_2026':True,'espn_id':'4771'}}
@@ -115,11 +123,12 @@ def self_test():
  snap={'eventos':[ida,volta]}
  assert effective_phase_rank(snap,volta)==700
  assert {x['event_id'] for x in completed_brazilian_events(snap,700)}=={'a','b'}
+ assert {x['event_id'] for x in completed_brazilian_events(snap,700,'b')}=={'b'}
  print('OK: self-test coletor continental.')
 def main():
- p=argparse.ArgumentParser();p.add_argument('--dry-run',action='store_true');p.add_argument('--self-test',action='store_true');p.add_argument('--fase-ordem',type=int,default=0);a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--dry-run',action='store_true');p.add_argument('--self-test',action='store_true');p.add_argument('--fase-ordem',type=int,default=0);p.add_argument('--event-id',default='');a=p.parse_args()
  if a.self_test:self_test();return 0
  key=os.environ.get('YOUTUBE_API_KEY','').strip()
  if not key:raise SystemExit('YOUTUBE_API_KEY ausente')
- return run(key,a.dry_run,a.fase_ordem)
+ return run(key,a.dry_run,a.fase_ordem,a.event_id)
 if __name__=='__main__':raise SystemExit(main())

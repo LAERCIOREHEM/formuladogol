@@ -20,6 +20,7 @@ import {
   normalizeAgenda,
   parseDate,
   pendingHighlights,
+  pendingContinentalHighlights,
   pendingPublicsFromAudit,
   publicRetryInterval,
   publicPendingFingerprint,
@@ -54,6 +55,7 @@ const SLOW_PATHS = [
   'dados-br/melhores-momentos-manual.json',
   'dados-br/auditoria-melhores-momentos.json',
   'dados-br/melhores-momentos-copa-do-brasil.json',
+  'dados-br/melhores-momentos-continentais.json',
   'dados-br/transmissoes-aovivo.json',
   'dados-br/transmissoes-aovivo-manual.json',
   'dados-br/transmissoes-tv.json',
@@ -184,7 +186,7 @@ export class OrchestratorState {
     return {
       ok: true,
       engine: 'fdg-cloudflare-orchestrator',
-      version: String(this.env.ORCHESTRATOR_VERSION || '1.7.0'),
+      version: String(this.env.ORCHESTRATOR_VERSION || '1.8.0'),
       mode: String(this.env.ORCHESTRATOR_MODE || 'shadow'),
       ...status,
       recentDecisions: history.slice(-10).reverse(),
@@ -480,6 +482,7 @@ export class OrchestratorState {
     const mmManual = data(bundle, 'dados-br/melhores-momentos-manual.json', { jogos: {} });
     const mmAudit = data(bundle, 'dados-br/auditoria-melhores-momentos.json', {});
     const cupHighlights = data(bundle, 'dados-br/melhores-momentos-copa-do-brasil.json', { jogos: {}, pendentes: [] });
+    const continentalHighlights = data(bundle, 'dados-br/melhores-momentos-continentais.json', { jogos: {} });
     const liveAuto = data(bundle, 'dados-br/transmissoes-aovivo.json', { jogos: {} });
     const liveManual = data(bundle, 'dados-br/transmissoes-aovivo-manual.json', { jogos: {} });
     const tv = data(bundle, 'dados-br/transmissoes-tv.json', { jogos: {} });
@@ -654,6 +657,41 @@ export class OrchestratorState {
           action: 'melhores_momentos', eventId: '',
           reason: `Copa do Brasil: melhores momentos ainda pendentes para ${item.eventId}.`,
           retryMinutes: Math.max(1, interval || 1), stateUpdates: { [`mmcup:${item.eventId}`]: now.toISOString() }, hints,
+        };
+      }
+    }
+
+    // 4c) CONMEBOL: vídeos são independentes do editorial. Só jogos
+    // continentais RECÉM-encerrados (janela de 24h) podem abrir este workflow;
+    // mudanças de vídeo nunca reabrem IA editorial.
+    const contMmReady = ready(
+      'dados-br/competicoes-af-previsao/libertadores.json',
+      'dados-br/competicoes-af-previsao/sul-americana.json',
+      'dados-br/melhores-momentos-continentais.json',
+    );
+    const contMmPending = contMmReady
+      ? pendingContinentalHighlights({ libertadores: lib, sul_americana: sula }, continentalHighlights, now)
+      : [];
+    if (contMmPending.length) {
+      const item = contMmPending[0];
+      const stateKey = `mmcont:${item.eventId}`;
+      const last = await this.storageDate(stateKey);
+      const interval = last ? mmRetryInterval(item.ageMinutes / 60) : 0;
+      if (!last || dueFromLast(last, now, interval)) {
+        hints.melhoresMomentosContinentais = {
+          pending: contMmPending.length,
+          eventId: item.eventId,
+          rank: item.rank,
+          nextDueAt: now.toISOString(),
+        };
+        return {
+          action: 'melhores_momentos_continentais',
+          eventId: item.eventId,
+          phaseRank: item.rank,
+          reason: `CONMEBOL: melhores momentos ainda ausentes para ${item.home || '?'} x ${item.away || '?'} (${item.eventId}); pipeline de vídeo independente do editorial.`,
+          retryMinutes: Math.max(1, interval || 1),
+          stateUpdates: { [stateKey]: now.toISOString() },
+          hints,
         };
       }
     }

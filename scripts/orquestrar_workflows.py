@@ -96,7 +96,6 @@ CONTINENTAL_EDITORIAL_GUARD_FILES = (
     "scripts/validar_artefatos_analises.py",
     "scripts/orquestrar_workflows.py",
     "scripts/editorial_ia.py",
-    "scripts/buscar_melhores_momentos_continentais.py",
     "cloudflare/orchestrator-worker/src/logic.js",
     "cloudflare/orchestrator-worker/src/orchestrator-state.js",
     "cloudflare/orchestrator-worker/src/sources.js",
@@ -104,6 +103,7 @@ CONTINENTAL_EDITORIAL_GUARD_FILES = (
 
 WORKFLOW_MAIN = "Atualizar Brasileirao (ESPN)"
 WORKFLOW_MM = "Buscar melhores momentos oficiais"
+WORKFLOW_MM_CONTINENTAIS = "Atualizar melhores momentos continentais"
 WORKFLOW_PUBLICOS = "Atualizar públicos do Brasileirão"
 WORKFLOW_TRANSMISSOES = "Buscar transmissões dos clubes do Brasileirão"
 WORKFLOW_GUARDIAN = "Guardião IA de transmissões"
@@ -117,6 +117,7 @@ REPO_WRITERS = {
     "Auditar modelos AF-Previsão",
     "Auditoria IA diária",
     "Buscar melhores momentos oficiais",
+    "Atualizar melhores momentos continentais",
     "Atualizar públicos do Brasileirão",
     "Buscar transmissões dos clubes do Brasileirão",
     "Guardião IA de transmissões",
@@ -1381,43 +1382,24 @@ def cup_editorial_decision() -> Decision | None:
 
 
 def continental_editorial_decision() -> Decision | None:
+    """Fallback Python segue a mesma regra do Cloudflare: vídeo não reabre editorial."""
     try:
         from gerar_analise_continental import (
-            SNAPS, MM_PATH, CONT_HISTORY_PATH, editorial_eligibility,
-            build_ties, build_article, load as continental_load, current_stats_marks, stats_dossier
+            SNAPS, CONT_HISTORY_PATH, MANIFEST, editorial_dispatch_decision,
+            load as continental_load,
         )
         snapshots = {key: continental_load(path, {}) for key, path in SNAPS.items()}
         history = continental_load(CONT_HISTORY_PATH, {"marcos": []}) or {"marcos": []}
-        eligibility = editorial_eligibility(snapshots, history)
-        action = str(eligibility.get("action") or "none")
-        rank = int(eligibility.get("rank") or 0)
-        if action == "none" or not rank:
-            return None
-        if action == "baseline":
-            return Decision(
-                "editorial_continentais",
-                f"{eligibility.get('reason') or 'Preservar fotografia estatística anterior às voltas.'}",
-            )
-        ties = [tie for comp, snap in snapshots.items() for tie in build_ties(comp, snap, rank)]
-        if not ties:
-            return None
-        highlights = continental_load(MM_PATH, {"jogos": {}}) or {"jogos": {}}
-        before, after, _ = current_stats_marks(rank, ties, history, snapshots)
-        stats = stats_dossier(before, after) if before and after else {}
-        expected = build_article(rank, ties, highlights, datetime.now(ZoneInfo("America/Sao_Paulo")).replace(microsecond=0), stats)
+        manifest = continental_load(MANIFEST, {"artigos": []}) or {"artigos": []}
+        decision = editorial_dispatch_decision(snapshots, history, manifest)
     except Exception:
         return None
-    manifest = load_json(ANALYSES_PATH, {})
-    article = next((item for item in (manifest.get("artigos") or []) if isinstance(item, Mapping) and item.get("id_editorial") == expected.get("id_editorial")), None)
-    if article is None:
-        return Decision("editorial_continentais", f"Fase continental {expected.get('fase_encerrada')} encerrada no recorte brasileiro e editorial ainda não existe.")
-    if (
-        str(article.get("hash_dossie") or "") != str(expected.get("hash_dossie") or "")
-        or str(article.get("hash_melhores_momentos") or "") != str(expected.get("hash_melhores_momentos") or "")
-        or str(article.get("hash_estatisticas") or "") != str(expected.get("hash_estatisticas") or "")
-    ):
-        return Decision("editorial_continentais", "Editorial continental publicado está desatualizado em relação aos confrontos, melhores momentos ou quadro estatístico.")
-    return None
+    action = str(decision.get("action") or "none")
+    rank = int(decision.get("rank") or 0)
+    if action == "none" or not rank:
+        return None
+    reason = str(decision.get("reason") or "Atualização continental elegível.")
+    return Decision("editorial_continentais", reason)
 
 def decide(
     *,

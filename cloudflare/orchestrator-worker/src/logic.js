@@ -582,6 +582,36 @@ export function phaseEvents(snapshot, rank) {
   return (snapshot?.eventos || []).filter((e) => effectiveContinentalPhaseRank(snapshot, e) === Number(rank) && (isBr(e?.mandante) || isBr(e?.visitante)));
 }
 
+export function pendingContinentalHighlights(snaps, highlights, now, { recentHours = 24, assumedDurationMinutes = 110 } = {}) {
+  const current = parseDate(now) || new Date();
+  const linked = highlights?.jogos && typeof highlights.jogos === 'object' ? highlights.jogos : {};
+  const out = [];
+  for (const [competition, snapshot] of Object.entries(snaps || {})) {
+    for (const event of snapshot?.eventos || []) {
+      if (!event?.concluido || !(isBr(event?.mandante) || isBr(event?.visitante))) continue;
+      const rank = effectiveContinentalPhaseRank(snapshot, event);
+      if (!CONT_PHASES[rank]) continue;
+      const eventId = String(event?.event_id || '').trim();
+      if (!eventId || String(linked?.[eventId]?.url || '').trim()) continue;
+      const kickoff = parseDate(event?.data_iso);
+      if (!kickoff || current.getTime() < kickoff.getTime()) continue;
+      const approximateEnd = new Date(kickoff.getTime() + assumedDurationMinutes * 60000);
+      const ageMinutes = Math.max(0, minutesBetween(approximateEnd, current));
+      if (ageMinutes > recentHours * 60) continue;
+      out.push({
+        eventId,
+        rank,
+        competition,
+        ageMinutes,
+        kickoff,
+        home: teamName(event?.mandante),
+        away: teamName(event?.visitante),
+      });
+    }
+  }
+  return out.sort((a, b) => a.ageMinutes - b.ageMinutes || a.eventId.localeCompare(b.eventId));
+}
+
 export function ranksWithBrazilians(snaps) {
   const set = new Set();
   for (const snap of Object.values(snaps || {})) for (const e of snap?.eventos || []) {

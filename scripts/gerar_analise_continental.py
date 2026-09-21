@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import html
 import json
@@ -1687,6 +1688,189 @@ def capture_baseline(rank: int, ties: Sequence[Mapping[str, Any]], history: dict
     return changed
 
 
+
+def published_article_needs_editorial(old: Mapping[str, Any], expected: Mapping[str, Any]) -> bool:
+    """Somente fatos/estatísticas podem reabrir um editorial publicado."""
+    old_facts = str(old.get('hash_fatos_fase') or '')
+    old_stats = str(old.get('hash_estatisticas_fase') or old.get('hash_estatisticas') or '')
+    current_facts = str(expected.get('hash_fatos_fase') or '')
+    current_stats = str(expected.get('hash_estatisticas_fase') or '')
+    if not old_facts or not old_stats:
+        return True
+    return old_facts != current_facts or old_stats != current_stats
+
+
+def editorial_dispatch_decision(
+    snaps: Mapping[str, Mapping[str, Any]] | None = None,
+    history: Mapping[str, Any] | None = None,
+    manifest: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Decisão idempotente de dispatch editorial.
+
+    Vídeos são deliberadamente excluídos da elegibilidade editorial. Uma fase já
+    publicada só volta a abrir o workflow quando os fatos esportivos ou o quadro
+    estatístico daquela fase mudarem. Melhores momentos têm pipeline próprio.
+    """
+    snaps = dict(snaps or {key: load(path, {}) or {} for key, path in SNAPS.items()})
+    history_dict = copy.deepcopy(dict(history or load_cont_history()))
+    eligibility = dict(editorial_eligibility(snaps, history_dict))
+    action = str(eligibility.get('action') or 'none')
+    rank = int(eligibility.get('rank') or 0)
+    if action != 'publish' or not rank:
+        return eligibility
+
+    manifest = dict(manifest or load(MANIFEST, {'artigos': []}) or {'artigos': []})
+    phase, slug_phase, _ = PHASES[rank]
+    article_id = f'continentais-2026-{slug_phase}-brasileiros'
+    old = next((item for item in (manifest.get('artigos') or []) if item.get('id_editorial') == article_id), None)
+    if old is None:
+        return eligibility
+
+    ties = [tie for comp, snap in snaps.items() for tie in build_ties(comp, snap, rank)]
+    if not ties or not all(all(event.get('concluido') for event in tie['pernas']) for tie in ties):
+        return {
+            **eligibility,
+            'action': 'none',
+            'reason': 'artigo já existe; fase não está factual e estruturalmente pronta para republicação',
+        }
+
+    before, after, _ = current_stats_marks(rank, ties, history_dict, snaps)
+    if not before or not after:
+        return {
+            **eligibility,
+            'action': 'none',
+            'reason': 'artigo já existe; marcos estatísticos incompletos, preservar publicação atual',
+        }
+    stats = stats_dossier(before, after)
+    # ``build_article`` calcula os fingerprints factual/estatístico sem depender
+    # dos vídeos. O conteúdo antigo evita qualquer efeito colateral editorial.
+    expected = build_article(
+        rank,
+        ties,
+        {'jogos': {}},
+        agora_br().replace(microsecond=0),
+        stats,
+        old.get('editorial') if isinstance(old.get('editorial'), Mapping) else None,
+        str(old.get('origem_editorial') or 'preservado'),
+    )
+    old_facts = str(old.get('hash_fatos_fase') or '')
+    old_stats = str(old.get('hash_estatisticas_fase') or old.get('hash_estatisticas') or '')
+    current_facts = str(expected.get('hash_fatos_fase') or '')
+    current_stats = str(expected.get('hash_estatisticas_fase') or '')
+
+    # Artigo legado sem fingerprints por fase faz uma única migração editorial;
+    # depois disso a decisão fica estritamente factual/estatística.
+    if not old_facts or not old_stats:
+        return {
+            **eligibility,
+            'reason': 'artigo publicado usa fingerprint legado; uma atualização controlada é necessária',
+            'article_id': article_id,
+        }
+    if not published_article_needs_editorial(old, expected):
+        return {
+            **eligibility,
+            'action': 'none',
+            'reason': 'editorial continental já publicado; fatos e estatísticas da fase não mudaram',
+            'article_id': article_id,
+            'video_changes_out_of_band': True,
+        }
+    return {
+        **eligibility,
+        'action': 'publish',
+        'reason': 'editorial continental publicado ficou desatualizado em fatos ou estatísticas da fase',
+        'article_id': article_id,
+        'changed': {
+            'facts': old_facts != current_facts,
+            'stats': old_stats != current_stats,
+        },
+    }
+
+
+def sync_videos_only(dry: bool = False, force_rank: int = 0) -> int:
+    """Atualiza somente melhores momentos de artigo continental já publicado.
+
+    Não chama IA, não altera texto editorial e falha fechada se fatos ou
+    estatísticas mudaram. Nesse caso, a atualização pertence ao workflow
+    editorial normal e não a este pipeline de vídeo.
+    """
+    snaps = {key: load(path, {}) or {} for key, path in SNAPS.items()}
+    history = load_cont_history()
+    manifest = load(MANIFEST, {'schema_version': 2, 'site': 'Fórmula do Gol', 'artigos': []}) or {'schema_version': 2, 'site': 'Fórmula do Gol', 'artigos': []}
+    articles = list(manifest.get('artigos') or [])
+
+    rank = int(force_rank or 0)
+    if not rank:
+        eligibility = editorial_eligibility(snaps, history)
+        rank = int(eligibility.get('rank') or 0)
+    if rank not in PHASES:
+        print('NONE: nenhuma fase continental identificada para sincronizar vídeos.')
+        return 0
+
+    _, slug_phase, _ = PHASES[rank]
+    article_id = f'continentais-2026-{slug_phase}-brasileiros'
+    old = next((item for item in articles if item.get('id_editorial') == article_id), None)
+    if old is None:
+        print(f'NONE: {article_id} ainda não foi publicado; vídeos ficarão disponíveis para o primeiro editorial.')
+        return 0
+
+    ties = [tie for comp, snap in snaps.items() for tie in build_ties(comp, snap, rank)]
+    if not ties or not all(all(event.get('concluido') for event in tie['pernas']) for tie in ties):
+        print('NONE: fase não está encerrada; não sincronizar vídeo em artigo publicado.')
+        return 0
+
+    history_shadow = copy.deepcopy(history)
+    before, after, _ = current_stats_marks(rank, ties, history_shadow, snaps)
+    if not before or not after:
+        print('NONE: marcos estatísticos incompletos; artigo atual preservado.')
+        return 0
+    stats = stats_dossier(before, after)
+    mm = load_verified_mm()
+    now = agora_br().replace(microsecond=0)
+    fresh = build_article(
+        rank,
+        ties,
+        mm,
+        now,
+        stats,
+        old.get('editorial') if isinstance(old.get('editorial'), Mapping) else None,
+        str(old.get('origem_editorial') or 'preservado'),
+    )
+
+    old_facts = str(old.get('hash_fatos_fase') or '')
+    old_stats = str(old.get('hash_estatisticas_fase') or old.get('hash_estatisticas') or '')
+    if not old_facts or not old_stats:
+        print('NONE: artigo usa fingerprint legado; aguardar workflow editorial para migrar com segurança.')
+        return 0
+    if old_facts != str(fresh.get('hash_fatos_fase') or '') or old_stats != str(fresh.get('hash_estatisticas_fase') or ''):
+        print('NONE: fatos/estatísticas mudaram; sincronização de vídeo não pode mascarar atualização editorial.')
+        return 0
+    if str(old.get('hash_videos_fase') or old.get('hash_melhores_momentos') or '') == str(fresh.get('hash_videos_fase') or ''):
+        print('NONE: melhores momentos da fase já estão sincronizados no artigo.')
+        return 0
+
+    fresh['publicado_em'] = old.get('publicado_em') or fresh['publicado_em']
+    fresh['modificado_em'] = now.isoformat()
+    articles = [fresh if item.get('id_editorial') == article_id else item for item in articles]
+    articles.sort(key=lambda item: str(item.get('publicado_em') or ''), reverse=True)
+    if dry:
+        print(json.dumps({
+            'article_id': article_id,
+            'before_video_hash': old.get('hash_videos_fase') or old.get('hash_melhores_momentos'),
+            'after_video_hash': fresh.get('hash_videos_fase'),
+            'melhores_momentos_vinculados': fresh.get('melhores_momentos_vinculados'),
+        }, ensure_ascii=False, indent=2))
+        return 0
+
+    manifest['artigos'] = articles
+    manifest['total_artigos'] = len(articles)
+    manifest['atualizado_em'] = now.isoformat()
+    MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    CAMINHO_ANALISES.mkdir(exist_ok=True)
+    gravar_texto(CAMINHO_ANALISES / fresh['slug'], render_page(fresh, ties, mm, articles, stats))
+    print(f"OK: vídeos sincronizados em {fresh['slug']} sem regenerar editorial; {fresh['melhores_momentos_vinculados']} vínculo(s).")
+    return 0
+
+
 def publish(dry: bool = False, force_rank: int = 0, usar_ia: bool = False, sem_ia: bool = False) -> int:
     snaps = {key: load(path, {}) or {} for key, path in SNAPS.items()}
     history = load_cont_history()
@@ -1796,6 +1980,15 @@ def publish(dry: bool = False, force_rank: int = 0, usar_ia: bool = False, sem_i
 
 
 def self_test() -> None:
+    # Regressão de governança: vídeo isolado nunca pode reabrir IA editorial.
+    old_fp = {'hash_fatos_fase': 'F', 'hash_estatisticas_fase': 'S', 'hash_videos_fase': 'V1'}
+    video_only = {'hash_fatos_fase': 'F', 'hash_estatisticas_fase': 'S', 'hash_videos_fase': 'V2'}
+    facts_changed = {'hash_fatos_fase': 'F2', 'hash_estatisticas_fase': 'S', 'hash_videos_fase': 'V2'}
+    stats_changed = {'hash_fatos_fase': 'F', 'hash_estatisticas_fase': 'S2', 'hash_videos_fase': 'V2'}
+    assert published_article_needs_editorial(old_fp, video_only) is False
+    assert published_article_needs_editorial(old_fp, facts_changed) is True
+    assert published_article_needs_editorial(old_fp, stats_changed) is True
+
     snaps = {key: load(path, {}) or {} for key, path in SNAPS.items()}
     # O corpus real serve como fixture histórica das oitavas já publicadas.
     # Não usamos latest_publishable(snaps) aqui: quando a fase seguinte começa a
@@ -1997,7 +2190,9 @@ def main() -> int:
     parser.add_argument('--fase-ordem', type=int, default=0)
     parser.add_argument('--usar-ia', action='store_true', help='Usa OpenAI somente quando o fechamento continental estiver elegível')
     parser.add_argument('--sem-ia', action='store_true', help='Força o fallback jornalístico determinístico')
-    parser.add_argument('--eligibility', action='store_true', help='Imprime a decisão de elegibilidade sem gerar ou alterar arquivos')
+    parser.add_argument('--eligibility', action='store_true', help='Imprime a decisão factual bruta de elegibilidade')
+    parser.add_argument('--dispatch-decision', action='store_true', help='Imprime a decisão idempotente usada para abrir o workflow editorial')
+    parser.add_argument('--sincronizar-videos', action='store_true', help='Atualiza somente vídeos de artigo já publicado, sem IA nem reescrita editorial')
     args = parser.parse_args()
     if args.self_test:
         self_test()
@@ -2007,6 +2202,11 @@ def main() -> int:
         history = load_cont_history()
         print(json.dumps(editorial_eligibility(snaps, history), ensure_ascii=False, sort_keys=True))
         return 0
+    if args.dispatch_decision:
+        print(json.dumps(editorial_dispatch_decision(), ensure_ascii=False, sort_keys=True))
+        return 0
+    if args.sincronizar_videos:
+        return sync_videos_only(args.dry_run, args.fase_ordem)
     return publish(args.dry_run, args.fase_ordem, args.usar_ia, args.sem_ia)
 
 
