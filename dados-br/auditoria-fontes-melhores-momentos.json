@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-09-20T19:26:19-03:00",
+  "atualizado_em": "2026-09-21T02:31:13-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
     "regra": "GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video e CazéTV são prioritários. UOL Esporte é aceito como fallback após 48 horas ou por vínculo manual conferido.",
@@ -13,18 +13,27 @@
     "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais."
   },
   "resumo": {
-    "jogos_resultados": 275,
-    "jogos_com_video": 275,
-    "ge_globo": 265,
+    "jogos_resultados": 277,
+    "jogos_com_video": 276,
+    "ge_globo": 266,
     "amazon_prime_video": 3,
     "cazetv": 4,
     "uol_esporte": 3,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 1,
     "percentual_fontes_preferidas": 100.0
   },
   "outros_sites_ainda_em_uso": [],
-  "sem_video": [],
+  "sem_video": [
+    {
+      "event_id": "401841238",
+      "rodada": 28,
+      "mandante": "Athletico-PR",
+      "visitante": "Bahia",
+      "placar_mandante": 2,
+      "placar_visitante": 1
+    }
+  ],
   "detalhamento": {
     "ge_globo": [
       {
@@ -4201,6 +4210,22 @@
         "channel_title": "",
         "titulo": "CORINTHIANS 1 X 3 FLUMINENSE | MELHORES MOMENTOS | 28ª RODADA | BRASILEIRÃO 2026 | ge.globo",
         "url": "https://www.youtube.com/watch?v=78rS30sszUM",
+        "confianca": 1.0
+      },
+      {
+        "event_id": "401841241",
+        "rodada": 28,
+        "mandante": "Flamengo",
+        "visitante": "Bragantino",
+        "placar_mandante": 2,
+        "placar_visitante": 1,
+        "categoria_fonte": "ge_globo",
+        "origem_vinculo": "automatico",
+        "fonte": "GE TV / YouTube",
+        "fonte_busca": "",
+        "channel_title": "",
+        "titulo": "FLAMENGO 2 X 1 BRAGANTINO | MELHORES MOMENTOS | 28ª RODADA | BRASILEIRÃO 2026 | ge.globo",
+        "url": "https://www.youtube.com/watch?v=Qw19l7_Tm1Q",
         "confianca": 1.0
       },
       {
