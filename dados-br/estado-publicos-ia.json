@@ -1,127 +1,15 @@
 {
   "schema_version": 2,
   "_comentario": "Estado por campo da camada IA de público/renda. Não há esgotamento definitivo: lacunas permanecem em backoff até serem resolvidas documentalmente.",
-  "gerado_em": "2026-09-20T18:56:36-03:00",
-  "jogos": {
-    "401841246": {
-      "schema_version": 2,
-      "rodada": 28,
-      "partida": "Grêmio x Palmeiras",
-      "campos": {
-        "publico": {
-          "status": "resolved",
-          "tentativas": 2,
-          "ultima_tentativa": "2026-09-20T14:06:36-03:00",
-          "resolvido_em": "2026-09-20T14:06:36-03:00",
-          "proxima_tentativa": ""
-        },
-        "renda": {
-          "status": "resolved",
-          "tentativas": 2,
-          "ultima_tentativa": "2026-09-20T14:06:36-03:00",
-          "resolvido_em": "2026-09-20T14:06:36-03:00",
-          "proxima_tentativa": ""
-        }
-      },
-      "esgotado": false,
-      "proxima_tentativa": ""
-    },
-    "401841240": {
-      "schema_version": 2,
-      "rodada": 28,
-      "partida": "Corinthians x Fluminense",
-      "campos": {
-        "publico": {
-          "status": "pending",
-          "tentativas": 1,
-          "ultima_tentativa": "2026-09-20T18:56:36-03:00",
-          "proxima_tentativa": "2026-09-20T19:26:36-03:00",
-          "backoff_minutos": 30
-        },
-        "renda": {
-          "status": "pending",
-          "tentativas": 1,
-          "ultima_tentativa": "2026-09-20T18:56:36-03:00",
-          "proxima_tentativa": "2026-09-20T19:26:36-03:00",
-          "backoff_minutos": 30
-        }
-      },
-      "esgotado": false,
-      "proxima_tentativa": "2026-09-20T19:26:36-03:00"
-    }
-  },
+  "gerado_em": "2026-09-20T23:10:41-03:00",
+  "jogos": {},
   "esgotados": [],
   "ultima_execucao": {
-    "pendentes_avaliados": 1,
+    "pendentes_avaliados": 0,
     "aceitos": 0,
     "rejeitados": 0,
-    "nao_encontrados": 1,
-    "erro": "",
-    "rejeicoes_detalhadas": [
-      {
-        "event_id": "401841240",
-        "motivos": [
-          "modelo declarou que não encontrou"
-        ],
-        "nao_e_erro": true
-      }
-    ],
-    "fontes_consultadas": [
-      "https://agenciagov.ebc.com.br/noticias/202609/radio-nacional-transmite-corinthians-x-fluminense-pelo-brasileirao-neste-domingo-20",
-      "https://auniao.pb.gov.br/servicos/copy_of_jornal-a-uniao/2026/abril/jornal-em-pdf-5-4-26-cdepc.pdf",
-      "https://bibdig.biblioteca.unesp.br/bitstreams/79df76ed-4e1f-4f70-9935-2742ebe95a51/download",
-      "https://bibdig.biblioteca.unesp.br/server/api/core/bitstreams/6358f661-df54-4854-b1bc-e7e8195e0871/content",
-      "https://cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/corinthians-x-fluminense/832164",
-      "https://corinthiansatual.blogspot.com/search",
-      "https://fluminense.com.br/noticia/brasileirao-2026-informacoes-de-ingressos-para-corinthians-x-fluminense",
-      "https://futebol80.com.br/links/times/corinthians/corinthiansft.htm",
-      "https://ge.globo.com/blogs/especial-blog/torcedor-do-corinthians/28.html",
-      "https://ge.globo.com/espiao-estatistico/noticia/2023/12/08/brasileirao-2023-tem-a-maior-media-de-publico-da-historia-da-competicao-veja-balanco.ghtml",
-      "https://ge.globo.com/futebol/times/corinthians/noticia/2024/05/18/meio-bilhao-de-renda-e-nove-milhoes-de-pessoas-veja-raio-x-dos-dez-anos-da-arena-do-corinthians.ghtml",
-      "https://ge.globo.com/gato-mestre/noticia/2025/12/09/campeao-flamengo-domina-rankings-de-publico-e-renda-do-brasileiro-2025-veja-balanco.ghtml",
-      "https://ge.globo.com/gato-mestre/noticia/2026/07/23/veja-os-publicos-da-19a-rodada-do-campeonato-brasileiro.ghtml",
-      "https://ge.globo.com/gato-mestre/noticia/2026/08/05/fluminense-x-vasco-registra-o-maior-publico-da-copa-do-brasil-2026-veja-ranking.ghtml",
-      "https://ge.globo.com/google/amp/gato-mestre/noticia/2026/09/13/flamengo-x-corinthians-tem-o-maior-publico-da-27a-rodada-do-brasileirao-veja-a-lista.ghtml",
-      "https://ge.globo.com/platb/teoria-dos-jogos/tag/ponte-preta",
-      "https://hemeroteca-pdf.bn.gov.br/119598/per119598_1955_00704.pdf",
-      "https://hemeroteca-pdf.bn.gov.br/194018/per194018_1979_00043.pdf",
-      "https://hemeroteca-pdf.bn.gov.br/761567/per761567_1960_03661.pdf",
-      "https://hemeroteca.ihgg.org/publicacoes/DIARIO_DA_MANHA/1992/06/DIARIO_DA_MANHA_1992_06_21.pdf",
-      "https://hemeroteca.ihgg.org/publicacoes/DIARIO_DA_MANHA/2000/10/DIARIO_DA_MANHA_2000_10_23.pdf",
-      "https://lance.com.br/lance-negocios/oitavas-da-copa-do-brasil-de-2026-registram-queda-de-publico-em-relacao-a-2025-outros-recordes-sao-batidos.html",
-      "https://lullyfm.com/veja-os-clubes-que-mais-arrecadaram-com-bilheteria-em-2026-ate-aqui",
-      "https://maringamais.com.br/wp-content/uploads/2025/08/JdoPovoQUA01cor_merged_compressed.pdf",
-      "https://media.portalagora.com/2026/01/aad7b071-jornal_agora_edicao_440_digital.pdf",
-      "https://memoria.pr.gov.br/pergamumweb/vinculos/0001da/0001da3e.pdf",
-      "https://pt.scribd.com/document/729519920/Guia-CBF-2015-net",
-      "https://pt.wikipedia.org/wiki/Cl%C3%A1ssico_Silvio_Santos",
-      "https://pt.wikipedia.org/wiki/Invas%C3%A3o_corintiana",
-      "https://pt.wikipedia.org/wiki/Lista_de_finais_do_Campeonato_Brasileiro_de_Futebol_da_S%C3%A9rie_A",
-      "https://radaronze.com.br/brasileirao/rodada/28/corinthians-x-fluminense-1492382",
-      "https://reddit.com/r/Corinthians/comments/1qaa1f5/que_tempo_bom_vcs_lembram_a_primeira_vez_que",
-      "https://reddit.com/r/Corinthians/comments/1wiiwg3/%C3%A9_muito_triste_ter_menos_tradi%C3%A7%C3%A3o_que_o",
-      "https://reddit.com/r/Corinthians/comments/1wl2ggn/empate_amanh%C3%A3_virou_um_resultado_p%C3%A9ssimo",
-      "https://reddit.com/r/Corinthians/comments/1wl5g9k/hoje_tem_tim%C3%A3o",
-      "https://reddit.com/r/Corinthians/comments/1wlopyc/match_thread_corinthians_x_fluminense",
-      "https://reddit.com/r/futebol/comments/1cfclah/match_thread_campeonato_brasileiro_corinthians_x",
-      "https://reddit.com/r/futebol/comments/1olor7x",
-      "https://reddit.com/r/futebol/comments/1r394pf/match_thread_campeonato_brasileiro_internacional",
-      "https://reddit.com/r/futebol/comments/1tr5jpm/sorteio_das_oitavas_da_libertadores_2026",
-      "https://reddit.com/r/futebol/comments/1wjeiga/tr%C3%AAs_semifinalistas_brasileiros_em_busca_da",
-      "https://reddit.com/r/futebol/comments/1wl5d3w/match_hub_jogos_do_dia_20_de_setembro",
-      "https://reddit.com/r/futebol/comments/1wlnzxf/match_thread_campeonato_brasileiro_corinthians_x",
-      "https://reddit.com/r/futebol/comments/1wlsr5l/postmatch_thread_campeonato_brasileiro",
-      "https://reddit.com/r/futebol/comments/r0c7a4",
-      "https://reddit.com/r/nense/comments/1wl5h85/hoje_tem_flu",
-      "https://reddit.com/r/nense/comments/1wlnzs6/match_thread_campeonato_brasileiro_corinthians_x",
-      "https://reddit.com/r/nense/comments/1wlsr6z/postmatch_thread_campeonato_brasileiro",
-      "https://sindesp-pa.com.br/PDF/ebooks/20250305143447000049.pdf",
-      "https://terra.com.br/amp/esportes/futebol/brasileiro-serie-a/cbf-reformula-horarios-dos-jogos-do-brasileirao%2C89328611cc55bf20248ae161a18744155zrqxtnk.html",
-      "https://terra.com.br/esportes/corinthians/corinthians-tem-lucro-liquido-de-r-58-mi-com-torcida%2C8c0e62e172dfa3d916098ec21839f46aui4j4epe.html",
-      "https://terra.com.br/esportes/futebol/brasileiro-serie-a/ao-vivo/corinthians-x-fluminense/96939",
-      "https://terra.com.br/esportes/futebol/brasileiro-serie-a/com-direito-a-gol-anulado-corinthians-e-fluminense-fazem-jogo-ruim-no-classico-silvio-santos%2C18a0a5b4fafa89b88a615bd8b7576ee93z8ykxmn.html",
-      "https://youtube.com/watch"
-    ]
+    "nao_encontrados": 0,
+    "erro": "Nenhuma lacuna elegível agora: público/renda já resolvidos ou aguardando o próximo backoff."
   },
   "migracao_schema_2": "Estados legados esgotados foram reabertos; registros já resolvidos foram descartados.",
   "search_policy_version": 4

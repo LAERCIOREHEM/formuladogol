@@ -1,6 +1,6 @@
 {
-  "_comentario": "Complemento documental de público presente, pagantes e renda. Coleta automática prioritária no ge/Gato Mestre; público pagante nunca substitui público presente e fontes avulsas podem cobrir jogos remarcados.",
-  "atualizado_em": "2026-09-20T14:06:44-03:00",
+  "_comentario": "Complemento documental de público presente, pagantes e renda. Correções verificadas por event_id são mescladas por campo antes da coleta; a busca automática prioriza ge/Gato Mestre. Público pagante nunca substitui público presente e fontes avulsas podem cobrir jogos remarcados.",
+  "atualizado_em": "2026-09-20T23:10:42.121759-03:00",
   "jogos": {
     "401840808": {
       "tipo": "presente",
@@ -3290,24 +3290,25 @@
       "fonte_preferida": true
     },
     "401841239": {
-      "origem": "openai:web_search",
-      "fonte_adicional": "Camada de IA sobre reportagem do jogo",
+      "origem": "ge/Gato Mestre",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
       "confianca": 0.99,
       "tipo": "presente",
-      "fonte": "https://atletico.com.br/galo-empata-com-a-chapecoense-na-arena-mrv",
+      "fonte": "https://ge.globo.com/gato-mestre/noticia/2026/09/20/flamengo-2-x-1-bragantino-tem-o-maior-publico-da-28a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "publico_status": "divulgado",
       "publico": 35844,
-      "renda": 1865150.25,
+      "renda": 1865150,
       "renda_status": "divulgado",
       "fonte_renda": "https://atletico.com.br/galo-empata-com-a-chapecoense-na-arena-mrv",
-      "fonte_preferida": true
+      "fonte_preferida": true,
+      "pagantes_status": "nao_divulgado"
     },
     "401841245": {
-      "origem": "openai:web_search",
-      "fonte_adicional": "Camada de IA sobre reportagem do jogo",
+      "origem": "ge/Gato Mestre",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
       "confianca": 0.98,
       "tipo": "presente",
-      "fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/09/19/mirassol-carimba-estreia-de-tite-vence-botafogo-e-segue-fora-do-z-4-do-brasileirao.htm",
+      "fonte": "https://ge.globo.com/gato-mestre/noticia/2026/09/20/flamengo-2-x-1-bragantino-tem-o-maior-publico-da-28a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "publico_status": "divulgado",
       "publico": 5899,
       "renda": 155736,
@@ -3316,11 +3317,11 @@
       "fonte_preferida": true
     },
     "401841247": {
-      "origem": "openai:web_search",
-      "fonte_adicional": "Camada de IA sobre reportagem do jogo",
+      "origem": "ge/Gato Mestre",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
       "confianca": 0.99,
-      "tipo": "total",
-      "fonte": "https://terra.com.br/amp/esportes/vasco/reforcos-brilham-e-vasco-arrasa-o-coxa-barreira-virou-baile%2Ceca509c8c705c13fdf820e8c83da1074tzon3l1t.html",
+      "tipo": "presente",
+      "fonte": "https://ge.globo.com/gato-mestre/noticia/2026/09/20/flamengo-2-x-1-bragantino-tem-o-maior-publico-da-28a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "publico_status": "divulgado",
       "publico": 19943,
       "pagantes": 19280,
@@ -3332,42 +3333,100 @@
     },
     "401841243": {
       "origem": "openai:web_search",
-      "fonte_adicional": "Camada de IA sobre reportagem do jogo",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
       "confianca": 0.99,
       "tipo": "presente",
       "fonte": "https://saopaulofc.net/no-morumbis-tricolor-derrota-o-internacional-pelo-campeonato-brasileiro",
       "publico_status": "divulgado",
       "publico": 25395,
-      "renda": 907260,
+      "renda": 907.26,
       "renda_status": "divulgado",
       "fonte_renda": "https://saopaulofc.net/no-morumbis-tricolor-derrota-o-internacional-pelo-campeonato-brasileiro",
       "fonte_preferida": true
     },
     "401841246": {
-      "origem": "openai:web_search",
-      "fonte_adicional": "Camada de IA sobre reportagem do jogo",
+      "origem": "ge/Gato Mestre",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
       "confianca": 0.98,
       "tipo": "presente",
-      "fonte": "https://esporte.ig.com.br/parceiros/jogada10/2026-09-20/com-brilho-de-weverton--gremio-segura-empate-contra-o-palmeiras.html",
+      "fonte": "https://ge.globo.com/gato-mestre/noticia/2026/09/20/flamengo-2-x-1-bragantino-tem-o-maior-publico-da-28a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "publico_status": "divulgado",
       "publico": 50694,
-      "renda": 3614527.2,
+      "renda": 3614527,
       "renda_status": "divulgado",
       "fonte_renda": "https://esporte.ig.com.br/parceiros/jogada10/2026-09-20/com-brilho-de-weverton--gremio-segura-empate-contra-o-palmeiras.html",
-      "fonte_preferida": false
+      "fonte_preferida": false,
+      "pagantes": 50392,
+      "pagantes_status": "divulgado"
     },
     "401841244": {
-      "origem": "fonte documental verificada",
-      "fonte_adicional": "Estadão: ficha técnica pós-jogo (público e renda)",
+      "origem": "ge/Gato Mestre",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
       "confianca": 0.99,
       "tipo": "presente",
-      "fonte": "https://www.estadao.com.br/esportes/futebol/remo-x-santos-analise-29-rodada-brasileirao/",
+      "fonte": "https://ge.globo.com/gato-mestre/noticia/2026/09/20/flamengo-2-x-1-bragantino-tem-o-maior-publico-da-28a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "publico_status": "divulgado",
       "publico": 23760,
       "renda": 713080,
       "renda_status": "divulgado",
       "fonte_renda": "https://www.estadao.com.br/esportes/futebol/remo-x-santos-analise-29-rodada-brasileirao/",
-      "fonte_preferida": true
+      "fonte_preferida": true,
+      "pagantes": 18033,
+      "pagantes_status": "divulgado"
+    },
+    "401841240": {
+      "publico": 38686,
+      "publico_status": "divulgado",
+      "tipo": "presente",
+      "pagantes": 38285,
+      "pagantes_status": "divulgado",
+      "renda": 2778221.57,
+      "renda_status": "divulgado",
+      "fonte": "https://www.correiobraziliense.com.br/esportes/2026/09/amp/7504602-hulk-faz-dois-fluminense-bate-o-corinthians-e-afunda-rival-em-crise.html",
+      "fonte_pagantes": "https://timaoweb.com.br/noticia/ficha-tecnica-corinthians-1-x-3-fluminense-pelo-brasileirao-2025",
+      "fonte_renda": "https://www.correiobraziliense.com.br/esportes/2026/09/amp/7504602-hulk-faz-dois-fluminense-bate-o-corinthians-e-afunda-rival-em-crise.html",
+      "origem": "correção documental verificada",
+      "verificado_em": "2026-09-20T22:43:00-03:00",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
+    },
+    "401841241": {
+      "publico": 66053,
+      "publico_status": "divulgado",
+      "tipo": "presente",
+      "pagantes": 62324,
+      "pagantes_status": "divulgado",
+      "renda": 5752960,
+      "renda_status": "divulgado",
+      "fonte": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/09/20/flamengo-vence-o-red-bull-bragantino-e-abre-3-pontos-de-vantagem-para-o-palmeiras.amp.htm",
+      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/09/20/flamengo-2-x-1-bragantino-tem-o-maior-publico-da-28a-rodada-do-brasileirao-veja-a-lista.ghtml",
+      "fonte_renda": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/09/20/flamengo-vence-o-red-bull-bragantino-e-abre-3-pontos-de-vantagem-para-o-palmeiras.amp.htm",
+      "origem": "correção documental verificada",
+      "verificado_em": "2026-09-20T22:43:00-03:00",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
+    },
+    "401841238": {
+      "publico": 27259,
+      "publico_status": "divulgado",
+      "tipo": "presente",
+      "renda": 1104820,
+      "renda_status": "divulgado",
+      "fonte": "https://ge.globo.com/gato-mestre/noticia/2026/09/20/flamengo-2-x-1-bragantino-tem-o-maior-publico-da-28a-rodada-do-brasileirao-veja-a-lista.ghtml",
+      "fonte_renda": "https://ge.globo.com/gato-mestre/noticia/2026/09/20/flamengo-2-x-1-bragantino-tem-o-maior-publico-da-28a-rodada-do-brasileirao-veja-a-lista.ghtml",
+      "origem": "correção documental verificada",
+      "verificado_em": "2026-09-20T22:43:00-03:00",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
+    },
+    "401841242": {
+      "publico": 12952,
+      "tipo": "presente",
+      "fonte": "https://ge.globo.com/gato-mestre/noticia/2026/09/20/flamengo-2-x-1-bragantino-tem-o-maior-publico-da-28a-rodada-do-brasileirao-veja-a-lista.ghtml",
+      "origem": "ge/Gato Mestre",
+      "pagantes": 12856,
+      "pagantes_status": "divulgado",
+      "renda": 323707,
+      "renda_status": "divulgado",
+      "publico_status": "divulgado",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     }
   },
   "fontes_rodadas": {
@@ -3477,6 +3536,10 @@
     },
     "27": {
       "url": "https://ge.globo.com/gato-mestre/noticia/2026/09/13/flamengo-x-corinthians-tem-o-maior-publico-da-27a-rodada-do-brasileirao-veja-a-lista.ghtml",
+      "fonte": "ge/Gato Mestre"
+    },
+    "28": {
+      "url": "https://ge.globo.com/gato-mestre/noticia/2026/09/20/flamengo-2-x-1-bragantino-tem-o-maior-publico-da-28a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "fonte": "ge/Gato Mestre"
     }
   }

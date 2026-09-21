@@ -1,86 +1,37 @@
 {
-  "gerado_em": "2026-09-20T18:56:48.159861-03:00",
+  "gerado_em": "2026-09-20T23:10:42.124222-03:00",
   "fonte_automatica": "ge/Gato Mestre (presente/total, pagantes e renda; pagantes nunca substituem público presente)",
-  "total_jogos_finalizados": 275,
-  "total_com_publico_ou_complemento": 273,
-  "total_sem_publico": 2,
-  "sem_publico": [
-    {
-      "event_id": "401841240",
-      "rodada": 28,
-      "data_iso": "2026-09-20T16:00",
-      "mandante": "Corinthians",
-      "visitante": "Fluminense",
-      "placar": "1 x 3"
-    },
-    {
-      "event_id": "401841242",
-      "rodada": 28,
-      "data_iso": "2026-09-20T16:00",
-      "mandante": "Vitória",
-      "visitante": "Cruzeiro",
-      "placar": "1 x 3"
-    }
-  ],
-  "total_com_publico_pagante": 260,
-  "total_sem_publico_pagante": 15,
-  "total_com_renda": 273,
-  "total_sem_renda": 2,
-  "sem_renda": [
-    {
-      "event_id": "401841240",
-      "rodada": 28,
-      "data_iso": "2026-09-20T16:00",
-      "mandante": "Corinthians",
-      "visitante": "Fluminense",
-      "placar": "1 x 3"
-    },
-    {
-      "event_id": "401841242",
-      "rodada": 28,
-      "data_iso": "2026-09-20T16:00",
-      "mandante": "Vitória",
-      "visitante": "Cruzeiro",
-      "placar": "1 x 3"
-    }
-  ],
-  "total_partidas_fisicas": 275,
-  "total_partidas_fisicas_com_publico": 273,
-  "total_partidas_fisicas_sem_publico": 2,
-  "partidas_fisicas_sem_publico": [
-    {
-      "event_ids": [
-        "401841240"
-      ],
-      "rodada": 28,
-      "data_iso": "2026-09-20T16:00",
-      "mandante": "Corinthians",
-      "visitante": "Fluminense",
-      "placar": "1 x 3"
-    },
-    {
-      "event_ids": [
-        "401841242"
-      ],
-      "rodada": 28,
-      "data_iso": "2026-09-20T16:00",
-      "mandante": "Vitória",
-      "visitante": "Cruzeiro",
-      "placar": "1 x 3"
-    }
-  ],
+  "total_jogos_finalizados": 277,
+  "total_com_publico_ou_complemento": 277,
+  "total_sem_publico": 0,
+  "sem_publico": [],
+  "total_com_publico_pagante": 265,
+  "total_sem_publico_pagante": 12,
+  "total_com_renda": 277,
+  "total_sem_renda": 0,
+  "sem_renda": [],
+  "total_partidas_fisicas": 277,
+  "total_partidas_fisicas_com_publico": 277,
+  "total_partidas_fisicas_sem_publico": 0,
+  "partidas_fisicas_sem_publico": [],
   "rodadas_pendentes_no_inicio": [
     28,
     21,
     4
   ],
-  "novos_complementos": 0,
+  "novos_complementos": 6,
   "fontes_consultadas": [],
   "erros_fontes": [],
-  "conflitos": [],
+  "conflitos": [
+    {
+      "event_id": "401841240",
+      "campo": "renda",
+      "existente": 2778222,
+      "verificado": 2778221.57,
+      "acao": "corrigido_por_fonte_documental_verificada"
+    }
+  ],
   "fontes_em_uso": {
-    "https://atletico.com.br/galo-empata-com-a-chapecoense-na-arena-mrv": 1,
-    "https://esporte.ig.com.br/parceiros/jogada10/2026-09-20/com-brilho-de-weverton--gremio-segura-empate-contra-o-palmeiras.html": 1,
     "https://ge.globo.com/gato-mestre/noticia/2026/01/29/veja-os-publicos-da-primeira-rodada-do-campeonato-brasileiro.ghtml": 9,
     "https://ge.globo.com/gato-mestre/noticia/2026/02/05/veja-os-publicos-da-segunda-rodada-do-campeonato-brasileiro.ghtml": 9,
     "https://ge.globo.com/gato-mestre/noticia/2026/02/12/veja-os-publicos-da-terceira-rodada-do-campeonato-brasileiro.ghtml": 8,
@@ -108,6 +59,7 @@
     "https://ge.globo.com/gato-mestre/noticia/2026/08/31/veja-os-publicos-da-25a-rodada-do-campeonato-brasileiro.ghtml": 8,
     "https://ge.globo.com/gato-mestre/noticia/2026/09/06/remo-0-x-1-flamengo-tem-o-maior-publico-da-26a-rodada-do-brasileirao-veja-a-lista.ghtml": 10,
     "https://ge.globo.com/gato-mestre/noticia/2026/09/13/flamengo-x-corinthians-tem-o-maior-publico-da-27a-rodada-do-brasileirao-veja-a-lista.ghtml": 10,
+    "https://ge.globo.com/gato-mestre/noticia/2026/09/20/flamengo-2-x-1-bragantino-tem-o-maior-publico-da-28a-rodada-do-brasileirao-veja-a-lista.ghtml": 9,
     "https://ge.globo.com/pr/futebol/times/athletico-pr/noticia/2026/08/31/athletico-x-fluminense-bate-recorde-de-publico-na-arena-da-baixada-no-brasileirao.ghtml": 1,
     "https://internacional.com.br/noticias/masculino/colorado-e-superado-no-beira-rio": 1,
     "https://internacional.com.br/noticias/masculino/cronica-internacional-x-cruzeiro-19-rodada-brasileirao-2026": 1,
@@ -121,16 +73,13 @@
     "https://itatiaia.com.br/esportes/futebol/futebol-nacional/futebol-paulista/corinthians/corinthians-registra-maior-publico-do-ano-em-classico-contra-o-santos": 1,
     "https://jornalheiros.blogspot.com/2026/04/ficha-tecnica-santos-2-x-3-fluminense.html": 1,
     "https://saopaulofc.net/no-morumbis-tricolor-derrota-o-internacional-pelo-campeonato-brasileiro": 1,
-    "https://terra.com.br/amp/esportes/vasco/reforcos-brilham-e-vasco-arrasa-o-coxa-barreira-virou-baile%2Ceca509c8c705c13fdf820e8c83da1074tzon3l1t.html": 1,
     "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/09/02/flamengo-bate-mirassol-em-jogo-atrasado-e-cola-no-lider-palmeiras.htm": 1,
     "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/09/16/sob-olhares-de-tite-botafogo-quebra-o-jejum-e-vence-o-gremio-em-jogo-atrasado-do-brasileirao.htm": 1,
-    "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/09/19/mirassol-carimba-estreia-de-tite-vence-botafogo-e-segue-fora-do-z-4-do-brasileirao.htm": 1,
     "https://www.athletico.com.br/": 1,
     "https://www.athletico.com.br/resumo_do_jogo/athletico-desperdica-chances-e-e-superado-pelo-corinthians/": 1,
     "https://www.bahianoticias.com.br/esportes/bahia/33848-confira-publico-e-renda-de-bahia-x-chapecoense-pelo-brasileirao": 1,
     "https://www.corinthians.com.br/noticias/corinthians-vence-red-bull-bragantino-por-2-a-0-na-neo-quimica-arena": 1,
     "https://www.esporteclubebahia.com.br/fichas-tecnicas/": 1,
-    "https://www.estadao.com.br/esportes/futebol/remo-x-santos-analise-29-rodada-brasileirao/": 1,
     "https://www.fogaonet.com/noticias-do-botafogo/publico-renda-botafogo-fluminense-brasileirao-2026/": 1,
     "https://www.internacional.com.br/noticias/masculino/inter-e-superado-no-beira-rio": 1,
     "https://www.internacional.com.br/noticias/masculino/reves-na-estreia-do-brasileirao": 1,
@@ -141,6 +90,6 @@
     "https://www.terra.com.br/esportes/botafogo/com-tempos-distintos-botafogo-e-internacional-empatam-no-mane-garrincha%2Cb3f76c9a57bdd93f0b3cbb129c120906z22ly4u2.html": 1,
     "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/07/23/botafogo-esbarra-no-goleiro-e-fica-no-0-a-0-contra-o-vitoria-em-jogo-atrasado-do-brasileirao.htm": 1
   },
-  "propagados_para_jogos_detalhes": 0,
+  "propagados_para_jogos_detalhes": 3,
   "conflitos_jogos_detalhes": []
 }
