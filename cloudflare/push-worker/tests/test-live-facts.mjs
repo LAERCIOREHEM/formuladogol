@@ -80,4 +80,4 @@ const vit={id:'3456',displayName:'Vitória'},cru={id:'2022',displayName:'Cruzeir
   assert.equal(afterVar.facts.goals.length,0);
 }
 
-console.log('PASS live-facts v2 / Live Facts v6');
+console.log('PASS live-facts v3 / Live Facts v7');

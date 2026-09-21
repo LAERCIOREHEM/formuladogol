@@ -1,6 +1,6 @@
 import { extractScoringPlays, mergeScoringPlayVariants, reconcileScoringPlays } from './sports-engine.js';
 
-const LIVE_FACTS_CONTRACT_VERSION = 2;
+const LIVE_FACTS_CONTRACT_VERSION = 3;
 const text = (value) => String(value == null ? '' : value).trim();
 const num = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 const normalized = (value) => text(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();

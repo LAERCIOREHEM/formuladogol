@@ -144,6 +144,14 @@ try {
   assert.equal(status.goalReconciliation[eventId].canonicalGoals, 1);
   assert.equal(status.goalReconciliation[eventId].state, 'canonical_score_match');
 
+  const liveFactsResponse = await monitor.fetch(new Request(`https://internal/live-facts?event=${eventId}`));
+  assert.equal(liveFactsResponse.status, 200);
+  const liveFactsPayload = await liveFactsResponse.json();
+  assert.equal(liveFactsPayload.facts.authority, 'sports-monitor-state');
+  assert.equal(liveFactsPayload.facts.integrity.expectedGoals, 1);
+  assert.equal(liveFactsPayload.facts.goals.length, 1);
+  assert.equal(liveFactsPayload.facts.goals[0].scorer, 'João Pedro');
+
   now += 10_000;
   await monitor.alarm();
   assert.equal(db.events.size, 1, 'poll posterior não duplica o evento');

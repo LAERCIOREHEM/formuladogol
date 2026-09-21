@@ -63,7 +63,7 @@ const workerPayload = {
     storage: { getItem: () => null, setItem: () => {} },
   });
   assert.equal(state.meta.source, 'worker-espn');
-  assert.equal(state.meta.liveStateVersion, '6');
+  assert.equal(state.meta.liveStateVersion, '7');
   assert.equal(Object.keys(state.liveMap).length, 2);
   assert.ok(calls[0].includes('/v1/live/state?league=bra.1'));
   assert.ok(!calls[0].includes('fresh=1'), 'fluxo normal compartilha o hot snapshot do Worker');
@@ -183,8 +183,8 @@ const workerPayload = {
 {
   const game = { eventId: 'live-hulk', estado: 'in', placarMandante: 1, placarVisitante: 0, mandante: 'Fluminense', visitante: 'Corinthians' };
   const envelope = {
-    ok: true, factsContractVersion: 2, fetchedAt: Date.now(), facts: {
-      contractVersion: 2, eventId: 'live-hulk', goals: [{ minute: "23'", teamId: '3445', team: 'Fluminense', side: 'home', scorer: 'Hulk', assists: ['John Kennedy'], ownGoal: false, scoreAfter: { home: 1, away: 0 } }],
+    ok: true, factsContractVersion: 3, fetchedAt: Date.now(), facts: {
+      contractVersion: 3, eventId: 'live-hulk', goals: [{ minute: "23'", teamId: '3445', team: 'Fluminense', side: 'home', scorer: 'Hulk', assists: ['John Kennedy'], ownGoal: false, scoreAfter: { home: 1, away: 0 } }],
       appearances: [{ name: 'Hulk', team: 'Fluminense' }, { name: 'John Kennedy', team: 'Fluminense' }],
       integrity: { expectedHome: 1, expectedAway: 0, expectedGoals: 1, observedGoalCount: 1, teamResolvedCount: 1, scorerResolvedCount: 1, usableGoalCount: 1, mathematicallyValid: true, scoreComplete: true, identityComplete: true, complete: true }
     }
@@ -241,4 +241,4 @@ const workerPayload = {
   assert.match(indexSource, /htmlSetaMovimento\(posBase\[t\.time\], t\.pos, true\)/);
 }
 
-console.log('OK: LiveState v6 — placar anti-regressão, Live Facts canônicos e dois jogos simultâneos.');
+console.log('OK: LiveState v7 — placar anti-regressão, Live Facts canônicos e dois jogos simultâneos.');

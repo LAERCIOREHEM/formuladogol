@@ -23,6 +23,7 @@ import { fetchEspnLivePlays, fetchEspnScorerEnrichment, fetchEspnScoreboardFresh
 import { buildHotEspnTestEvent, detectHotEspnMutation, HOT_ESPN_TEST_CONSTANTS, hotEspnSnapshot, publicHotEspnTest } from './hot-espn-test.js';
 import { buildHotMatchPrematchEvent, hotMatchNextPollDelay, hotMatchPrematchDue, hotMatchTargetEvent, HOT_MATCH_TEST_CONSTANTS, markHotMatchTechnicalEvent, publicHotMatchTest } from './hot-match-test.js';
 import { recordPostgameFinal } from './postgame-fastlane.js';
+import { buildSportsMonitorLiveFacts, SPORTS_MONITOR_FACTS_VERSION } from './monitor-live-facts.js';
 
 const AGENDA_URL = 'https://formuladogol.com.br/dados-br/agenda-clubes-br.json';
 const ALLOWED_LEAGUES = new Set(['bra.1', 'bra.copa_do_brazil', 'conmebol.libertadores', 'conmebol.sudamericana']);
@@ -1159,6 +1160,21 @@ export class SportsMonitor {
     const url = new URL(request.url);
     if (url.pathname === '/bootstrap' && request.method === 'POST') return Response.json(await this.bootstrap());
     if (url.pathname === '/poll' && request.method === 'POST') return Response.json(await this.pollOnce());
+    if (url.pathname === '/live-facts' && request.method === 'GET') {
+      const eventId = text(url.searchParams.get('event'));
+      if (!eventId) return Response.json({ ok: false, error: 'invalid_event' }, { status: 400 });
+      const matches = await this.state.storage.get('matches') || {};
+      const match = matches && typeof matches === 'object' ? matches[eventId] : null;
+      if (!match) return Response.json({ ok: false, error: 'match_not_tracked', eventId }, { status: 404 });
+      const facts = buildSportsMonitorLiveFacts(match);
+      return Response.json({
+        ok: Boolean(facts),
+        monitorFactsVersion: SPORTS_MONITOR_FACTS_VERSION,
+        eventId,
+        facts,
+        lastObservedAt: num(match?.lastObservedAt, 0)
+      });
+    }
     if (url.pathname === '/status' && request.method === 'GET') {
       const status = await this.state.storage.get('status') || {};
       const now = Date.now();

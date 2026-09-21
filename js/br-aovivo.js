@@ -16,6 +16,7 @@
   const LIVE_REFRESH_MS = 10000;
   const IDLE_REFRESH_MS = 30000;
   const SUMMARY_REFRESH_MS = 30000;
+  const MISSING_SCORER_REFRESH_MS = 5000;
   const TZ = "America/Sao_Paulo";
   const FINAL_RETENTION_BR_MS = 5 * 60000;
   const FINAL_RETENTION_OTHER_MS = 60 * 60000;
@@ -200,13 +201,15 @@
     try { sessionStorage.setItem(LIVE_STATS_CACHE_KEY, JSON.stringify(state.statsPorId || {})); } catch (_) {}
   }
 
+  const initialRequestedEvent = new URLSearchParams(window.location.search || "").get("event") || "";
   const state = {
     agenda: [],
     eventosLocais: [],
     diretos: [],
     transmissoes: {},
     transmissoesTv: {},
-    selecionado: new URLSearchParams(window.location.search || "").get("event") || "",
+    selecionado: initialRequestedEvent,
+    selectionOrigin: initialRequestedEvent ? "user" : "auto",
     resumoPorId: {},
     summaryFetchedAt: {},
     summaryScoreKey: {},
@@ -216,6 +219,7 @@
     summaryRequestSerial: 0,
     renderSerial: 0,
     summaryAbortController: null,
+    scorerRetryTimer: null,
     ultimaAtualizacao: null,
     ultimaTentativa: null,
     ultimoSucessoEspn: null,
@@ -810,7 +814,16 @@
         timeoutMs: DIRECT_ESPN_FALLBACK_TIMEOUT_MS,
         signal: options.signal || undefined
       });
-      if (direct && typeof direct === "object") direct.__fdgLiveMeta = { statsProvider: "espn-direct" };
+      if (direct && typeof direct === "object") {
+        const previousFacts = state.resumoPorId[eventId] && state.resumoPorId[eventId].__fdgLiveFacts;
+        const previousIntegrity = previousFacts && previousFacts.integrity || {};
+        const sameScore = Number(previousIntegrity.expectedHome) === expectedHome && Number(previousIntegrity.expectedAway) === expectedAway;
+        if (sameScore) {
+          direct.__fdgLiveFacts = previousFacts;
+          direct.__fdgLiveFactsIntegrity = previousIntegrity;
+        }
+        direct.__fdgLiveMeta = { statsProvider: "espn-direct", canonicalFactsPreserved: sameScore };
+      }
       return direct;
     } catch (directError) {
       if (isAbortError(directError)) throw directError;
@@ -1546,12 +1559,16 @@
       requestedState === "pre" ||
       (requestedState === "post" && isRecentlyFinished(requested))
     );
-    let selected = requestedEligible ? requested : priorities[0] || null;
+    const userPinned = state.selectionOrigin === "user" && requestedEligible;
+    // Seleção automática nunca fica presa ao jogo futuro escolhido antes do
+    // primeiro scoreboard. Assim que existem jogos IN, o primeiro deles é a
+    // tela principal; apenas um clique/URL explícito fixa outra partida.
+    let selected = userPinned ? requested : priorities[0] || (requestedEligible ? requested : null);
     if (selected && !priorities.some((g) => sameFixture(g, selected))) {
       priorities = [selected].concat(priorities).slice(0, 8);
     }
     if (selected && selected.id) state.selecionado = selected.id;
-    else state.selecionado = null;
+    else { state.selecionado = null; state.selectionOrigin = "auto"; }
     return { selected, priorities };
   }
 
@@ -2511,7 +2528,7 @@
     if (Number(integrity.expectedHome)!==expectedHome || Number(integrity.expectedAway)!==expectedAway || integrity.mathematicallyValid===false) return {home,away};
     const homeId=String(g.home.id||""), awayId=String(g.away.id||"");
     for (const goal of canonical.goals) {
-      const item={min:String(goal.minute||""),athlete:compactPlayerName(goal.scorer||"")||(goal.ownGoal?"Gol contra":"Gol")};
+      const item={min:String(goal.minute||""),athlete:compactPlayerName(goal.scorer||"")||(goal.ownGoal?"Gol contra":"Autor sendo confirmado")};
       const teamId=String(goal.teamId||"");
       // Identidade ESPN tem precedência absoluta sobre o side textual.
       if (teamId && teamId===homeId) home.push(item);
@@ -2628,6 +2645,7 @@
     switcher.querySelectorAll("[data-game-id]").forEach((btn) => {
       btn.addEventListener("click", async () => {
         state.selecionado = btn.getAttribute("data-game-id") || "";
+        state.selectionOrigin = "user";
         await renderPage();
         setTimeout(() => btn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }), 30);
       });
@@ -2745,6 +2763,18 @@
     document.dispatchEvent(new CustomEvent('fdg:live-game-changed', { detail: { eventId: app.dataset.eventId || '' } }));
   }
 
+  function scheduleMissingScorerRetry(eventId, summary) {
+    clearTimeout(state.scorerRetryTimer);
+    state.scorerRetryTimer = null;
+    const missing = Number(summary && summary.__fdgLiveFacts && summary.__fdgLiveFacts.integrity && summary.__fdgLiveFacts.integrity.missingScorers || 0);
+    if (!(missing > 0) || document.hidden) return;
+    state.scorerRetryTimer = setTimeout(() => {
+      const current = currentSelectedGame();
+      if (String(current && current.id || "") !== String(eventId || "") || document.hidden) return;
+      renderPage();
+    }, MISSING_SCORER_REFRESH_MS + 50);
+  }
+
   function renderPage(expectedRefreshGeneration = null) {
     const renderSerial=++state.renderSerial, all=allGames(), {selected,priorities}=chooseGame(all), switchGames=priorities.length?priorities:(selected?[selected]:[]);
     renderSwitcher(switchGames,selected);
@@ -2753,7 +2783,9 @@
     if(!selected||selected.source!=="espn"||!eventId)return;
     const scoreKey=`${numericScore(selected.home&&selected.home.score)??""}:${numericScore(selected.away&&selected.away.score)??""}`;
     const age=Date.now()-Number(state.summaryFetchedAt[eventId]||0), scoreChanged=state.summaryScoreKey[eventId]!==scoreKey;
-    if(cached&&!scoreChanged&&age<SUMMARY_REFRESH_MS)return;
+    const missingScorers=Number(cached&&cached.__fdgLiveFacts&&cached.__fdgLiveFacts.integrity&&cached.__fdgLiveFacts.integrity.missingScorers||0);
+    const summaryRefreshMs=missingScorers>0?MISSING_SCORER_REFRESH_MS:SUMMARY_REFRESH_MS;
+    if(cached&&!scoreChanged&&age<summaryRefreshMs)return;
     if(state.summaryLoadingKey[eventId]===scoreKey)return;
     state.summaryLoadingKey[eventId]=scoreKey;
     loadSummary(selected).then((summary)=>{
@@ -2761,6 +2793,7 @@
       if(String(current?.id||"")!==eventId)return;
       if(expectedRefreshGeneration!==null&&expectedRefreshGeneration!==state.refreshGeneration)return;
       renderMain(current,summary,allGames()); updateCountdowns(); updateFreshnessUi(current);
+      scheduleMissingScorerRetry(eventId, summary);
     }).catch(()=>{}).finally(()=>{if(state.summaryLoadingKey[eventId]===scoreKey)delete state.summaryLoadingKey[eventId];});
   }
 

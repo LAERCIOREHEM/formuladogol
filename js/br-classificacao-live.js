@@ -10,16 +10,16 @@
   const SUMMARY_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary";
   const LIVE_STATE_URL = "https://push.formuladogol.com.br/v1/live/state";
   const LIVE_SUMMARY_URL = "https://push.formuladogol.com.br/v1/live/summary";
-  const LIVE_STATE_VERSION = "6";
-  const LIVE_FACTS_CONTRACT_VERSION = 2;
+  const LIVE_STATE_VERSION = "7";
+  const LIVE_FACTS_CONTRACT_VERSION = 3;
   const FINAL_MINUTES_AFTER_START = 90;
   const WORKER_TIMEOUT_MS = 4500;
   const DIRECT_TIMEOUT_MS = 4500;
   const ACTIVE_CACHE_MAX_AGE_MS = 90000;
   const IDLE_CACHE_MAX_AGE_MS = 45000;
   const POST_CACHE_MAX_AGE_MS = 180000;
-  const STORAGE_KEY = "fdg.br.live-state.v6";
-  const FACTS_STORAGE_PREFIX = "fdg.br.live-facts.v2.";
+  const STORAGE_KEY = "fdg.br.live-state.v7";
+  const FACTS_STORAGE_PREFIX = "fdg.br.live-facts.v3.";
 
   function numberScore(value) {
     if (value === null || value === undefined || value === "" || value === "-") return null;
@@ -653,7 +653,7 @@
         const url=`${opts.workerSummaryUrl||LIVE_SUMMARY_URL}?league=bra.1&event=${id}&state=${encodeURIComponent(live.estado||opts.state||"in")}&expectedGoals=${expectedGoals}&expectedHome=${expectedScore.home}&expectedAway=${expectedScore.away}${opts.forceFresh===true?"&fresh=1":""}&_=${Date.now()}`;
         const envelope=await fetchJson(url,opts,Number(opts.workerTimeoutMs||WORKER_TIMEOUT_MS));
         if(Number(envelope?.factsContractVersion||envelope?.facts?.contractVersion||0)===LIVE_FACTS_CONTRACT_VERSION&&envelope?.facts){
-          best=finalizeFacts(envelope.facts,live,opts.canonicalize,{source:"worker-canonical-v2",fetchedAt:Number(envelope.fetchedAt||Date.now()),stale:envelope.stale===true,factsBestKnownApplied:envelope.factsBestKnownApplied===true});
+          best=finalizeFacts(envelope.facts,live,opts.canonicalize,{source:"worker-canonical-v3-monitor",fetchedAt:Number(envelope.fetchedAt||Date.now()),stale:envelope.stale===true,factsBestKnownApplied:envelope.factsBestKnownApplied===true});
           if(best.integrity.complete){writeFactsCache(eventId,expectedScore,best,opts); return best;}
         } else throw new Error("contrato canônico de fatos incompatível");
       }catch(error){errors.push(`worker=${String(error&&error.message||error)}`);}

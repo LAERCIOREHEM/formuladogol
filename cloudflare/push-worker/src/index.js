@@ -1,6 +1,7 @@
 import { buildPushPayload } from '@block65/webcrypto-web-push';
 import { PushState } from './push-state.js';
 import { SportsMonitor } from './sports-monitor.js';
+import { enrichSportsMonitorLiveFacts } from './monitor-live-facts.js';
 import { dispatchStatus, enqueueSportsEvent, handleQueueBatch } from './push-dispatch.js';
 import { opsStatus, runOperationalMaintenance } from './ops.js';
 import { probeEspnSources } from './espn-source.js';
@@ -575,12 +576,14 @@ export default {
       return json(request, {
         ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok) && Boolean(operational?.ok),
         service: 'formula-do-gol-push',
-        version: 7,
-        revision: '6-R10R6-PG1',
+        version: 8,
+        revision: '6-R10R7-MONITOR-FACTS',
         liveGatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
         liveStateContractVersion: LIVE_API_CONSTANTS.LIVE_STATE_CONTRACT_VERSION,
         liveFactsContractVersion: LIVE_API_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
         canonicalLiveFacts: true,
+        sportsMonitorFactsAuthority: true,
+        sportsMonitorFactsVersion: 1,
         liveStatePrimary: 'worker-espn',
         liveStateDirectFallback: true,
         liveStatsFallbackVersion: 5,
@@ -628,10 +631,75 @@ export default {
       }
       if (url.pathname === '/v1/live/summary' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'live-summary'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
-        const result = await resolveLiveSummary(url, {
+        const eventId = cleanId(url.searchParams.get('event'));
+        const monitorPromise = eventId
+          ? singletonMonitor(env).fetch(`https://internal/live-facts?event=${encodeURIComponent(eventId)}`).catch(() => null)
+          : Promise.resolve(null);
+        const resultPromise = resolveLiveSummary(url, {
           apiFootballKey: env.API_FOOTBALL_KEY,
           statsStore: createLiveStatsStore(env.DB)
         });
+        const [result, monitorResponse] = await Promise.all([resultPromise, monitorPromise]);
+        let monitorFacts = null;
+        if (monitorResponse && monitorResponse.ok) {
+          try {
+            const payload = await monitorResponse.json();
+            monitorFacts = payload?.facts || null;
+          } catch (_) { monitorFacts = null; }
+        }
+        const expectedHomeRaw = url.searchParams.get('expectedHome');
+        const expectedAwayRaw = url.searchParams.get('expectedAway');
+        const expectedHome = expectedHomeRaw != null && expectedHomeRaw !== '' && Number.isFinite(Number(expectedHomeRaw)) ? Number(expectedHomeRaw) : null;
+        const expectedAway = expectedAwayRaw != null && expectedAwayRaw !== '' && Number.isFinite(Number(expectedAwayRaw)) ? Number(expectedAwayRaw) : null;
+        const monitorMatchesRequest = monitorFacts && (expectedHome == null || expectedAway == null || (
+          Number(monitorFacts?.integrity?.expectedHome) === expectedHome && Number(monitorFacts?.integrity?.expectedAway) === expectedAway
+        ));
+        if (monitorMatchesRequest) {
+          const mergedFacts = enrichSportsMonitorLiveFacts(monitorFacts, result?.body?.facts || null);
+          if (result.status === 200 && result.body && typeof result.body === 'object') {
+            result.body = {
+              ...result.body,
+              factsContractVersion: LIVE_API_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
+              facts: mergedFacts,
+              factsIntegrity: mergedFacts?.integrity || null,
+              factsAuthority: 'sports-monitor-state',
+              factsMonitorVersion: Number(mergedFacts?.monitorFactsVersion || 1),
+              factsBestKnownApplied: false,
+              goalCount: Number(mergedFacts?.integrity?.observedGoalCount || 0),
+              complete: mergedFacts?.integrity?.scoreComplete === true
+            };
+          } else {
+            const fetchedAt = Number(mergedFacts?.lastObservedAt || mergedFacts?.meta?.lastObservedAt || Date.now());
+            result.status = 200;
+            result.body = {
+              ok: true,
+              gatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
+              source: 'sports_monitor_state',
+              sources: ['sports_monitor_state'],
+              fetchedAt,
+              stale: false,
+              cacheStatus: 'monitor-only',
+              factsContractVersion: LIVE_API_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
+              facts: mergedFacts,
+              factsIntegrity: mergedFacts?.integrity || null,
+              factsAuthority: 'sports-monitor-state',
+              factsMonitorVersion: Number(mergedFacts?.monitorFactsVersion || 1),
+              expectedHome: Number(mergedFacts?.integrity?.expectedHome || 0),
+              expectedAway: Number(mergedFacts?.integrity?.expectedAway || 0),
+              expectedGoals: Number(mergedFacts?.integrity?.expectedGoals || 0),
+              goalCount: Number(mergedFacts?.integrity?.observedGoalCount || 0),
+              complete: mergedFacts?.integrity?.scoreComplete === true,
+              statsProvider: 'sports-monitor-state',
+              statsCoverage: null,
+              statsQuality: 'CRITICAL',
+              statsBestKnownApplied: false,
+              requestedState: String(url.searchParams.get('state') || ''),
+              observedState: String(mergedFacts?.state || ''),
+              espnOnly: String(url.searchParams.get('league') || '') === 'bra.1',
+              data: {}
+            };
+          }
+        }
         return json(request, result.body, result.status, { 'Cache-Control': 'no-store', 'X-FDG-Live-Gateway': LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION });
       }
       if (url.pathname === '/v1/config' && request.method === 'GET') return handleConfig(request, env);

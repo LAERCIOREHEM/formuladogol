@@ -10,7 +10,7 @@ import { fetchApiFootballPlayerDefenseFallback, fetchApiFootballStatsFallback } 
 import { fetchTheSportsDbStatsFallback } from './thesportsdb-source.js';
 import { normalizeLiveFacts, chooseBestKnownLiveFacts, LIVE_FACTS_CONSTANTS } from './live-facts.js';
 
-const LIVE_GATEWAY_VERSION = '6';
+const LIVE_GATEWAY_VERSION = '7';
 const LIVE_STATE_CONTRACT_VERSION = 1;
 const SCOREBOARD_HOT_TTL_SECONDS = 8;
 const SCOREBOARD_FALLBACK_TTL_SECONDS = 180;
