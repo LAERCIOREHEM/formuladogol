@@ -1,36 +1,21 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "descricao": "Política determinística de contingência/manual. O orquestrador operacional primário roda no Cloudflare Worker; a IA não decide gatilhos.",
   "timezone": "America/Sao_Paulo",
   "atualizar_brasileirao": {
     "sondagem_antes_minutos": 45,
     "sondagem_depois_minutos": 240,
     "retentativa_final_pendente_minutos": 15,
-    "fallback_final_estimado_minutos": 130,
-    "manutencao_diaria_apos": "05:10"
+    "fallback_final_estimado_minutos": 130
   },
   "melhores_momentos": {
-    "primeira_tentativa_apos_final_minutos": 360,
-    "intervalos_retentativa": [
-      {
-        "ate_horas": 12,
-        "minutos": 360
-      },
-      {
-        "ate_horas": 24,
-        "minutos": 720
-      },
-      {
-        "ate_horas": 48,
-        "minutos": 1440
-      },
-      {
-        "ate_horas": 99999,
-        "minutos": 1440
-      }
-    ],
+    "primeira_tentativa_apos_final_minutos": 5,
+    "janela_automatica_horas": 24,
+    "max_dispatches_github_por_jogo": 2,
+    "retentativa_consolidacao_github_minutos": 30,
     "ignorar_rodada_zero": true,
-    "politica": "Fastlane Cloudflare/YouTube tenta imediatamente e com alta frequência; GitHub só consolida/faz fallback após 6h se o dado ainda não estiver versionado."
+    "politica": "Fastlane Cloudflare/YouTube persegue o vídeo desde o FINAL; GitHub só consolida vídeo concreto já encontrado no D1, em lote, nas primeiras 24h e no máximo 2 vezes por jogo.",
+    "github_fallback_automatico": false
   },
   "transmissoes": {
     "tv_diaria_apos": "06:30",
@@ -65,33 +50,11 @@
   },
   "publicos": {
     "primeira_tentativa_apos_final_minutos": 15,
-    "intervalos_retentativa": [
-      {
-        "ate_horas": 2,
-        "minutos": 15
-      },
-      {
-        "ate_horas": 6,
-        "minutos": 30
-      },
-      {
-        "ate_horas": 12,
-        "minutos": 60
-      },
-      {
-        "ate_horas": 24,
-        "minutos": 120
-      },
-      {
-        "ate_horas": 48,
-        "minutos": 360
-      },
-      {
-        "ate_horas": 99999,
-        "minutos": 720
-      }
-    ],
-    "politica": "Fastlane Cloudflare/OpenAI web_search persegue público/renda imediatamente e salva overlay no D1; GitHub entra como fallback independente após 15 min e consolida o snapshot. Campos continuam independentes e nunca são estimados."
+    "janela_automatica_horas": 24,
+    "max_dispatches_github_por_jogo": 2,
+    "retentativa_consolidacao_github_minutos": 30,
+    "politica": "Fastlane Cloudflare/OpenAI persegue público/renda e salva no D1; GitHub só consolida dado concreto já encontrado, nas primeiras 24h e no máximo 2 vezes por jogo. Pendência histórica continua auditável sem Action automática.",
+    "github_fallback_automatico": false
   },
   "backoff_falhas": {
     "ativo": true,
@@ -111,6 +74,8 @@
     "modo_inicial": "shadow",
     "cron_job_org": false,
     "github_orquestrador": "fallback manual apenas",
-    "postgame_fastlane": "formula-do-gol-push (cron 1 min + D1; sem GitHub para atualização imediata)"
+    "postgame_fastlane": "formula-do-gol-push (cron 1 min + D1; descoberta sem GitHub, consolidação concreta limitada)",
+    "modo_dormente": true,
+    "gate_github": "somente mudança esportiva real ou descoberta concreta pós-jogo"
   }
 }

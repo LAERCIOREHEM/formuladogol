@@ -279,3 +279,27 @@ export async function probeEspn(games) {
   return { states, errors, sources, attempts };
 }
 
+
+export async function fetchPostgameFastlane(env, eventIds = [], { timeoutMs = DEFAULT_TIMEOUT_MS } = {}) {
+  const ids = [...new Set((eventIds || []).map((value) => String(value || '').trim()).filter(Boolean))].slice(0, 40);
+  if (!ids.length) return { rows: [], error: '' };
+  const base = String(env.PUSH_WORKER_BASE || 'https://push.formuladogol.com.br');
+  const url = new URL('/v1/postgame', base.endsWith('/') ? base : `${base}/`);
+  url.searchParams.set('event_ids', ids.join(','));
+  try {
+    const response = await fetchWithTimeout(url.toString(), {
+      headers: {
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache',
+        'User-Agent': 'FormulaDoGol-Orchestrator/2.0',
+      },
+      cf: { cacheTtl: 0, cacheEverything: false },
+    }, timeoutMs);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const payload = await response.json();
+    if (payload?.ok !== true || !Array.isArray(payload?.rows)) throw new Error('payload inválido');
+    return { rows: payload.rows, error: '' };
+  } catch (error) {
+    return { rows: [], error: `${error?.name || 'Error'}: ${error?.message || error}` };
+  }
+}

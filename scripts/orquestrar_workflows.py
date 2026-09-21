@@ -12,18 +12,15 @@ Política resumida
 -----------------
 1. Primeira busca do player oficial tem prioridade perecível única; depois, Atualizar Brasileirão volta a ter prioridade máxima:
    - imediatamente quando a ESPN detectar FINAL ainda não incorporado;
-   - contingência pós-jogo se a sonda falhar;
-   - uma manutenção de segurança por dia.
+   - contingência pós-jogo se a sonda falhar.
+   Não existe manutenção diária cega.
    O início do jogo, sozinho, NÃO dispara atualização pesada.
    Placar/gol AO VIVO NÃO dispara pipeline pesado: a classificação live é
    calculada no navegador a partir do scoreboard ESPN.
-2. Públicos pendentes:
-   - Fastlane Cloudflare faz a busca imediata; GitHub só entra como fallback/consolidação após 6h;
-   - retentativas seguem o relógio por campo gravado pela própria camada de IA;
-   - erro técnico usa backoff curto e não vira fracasso documental.
-3. Melhores momentos:
-   - primeira busca 10 min após o FINAL;
-   - retentativas com backoff, sem rodar eternamente a cada 10 min.
+2. Públicos e melhores momentos pendentes:
+   - Fastlane Cloudflare faz a perseguição e grava descobertas concretas no D1;
+   - este fallback GitHub manual não pesquisa pós-jogo automaticamente;
+   - a consolidação automática é responsabilidade do Worker, limitada às primeiras 24h.
 4. Transmissão ao vivo:
    - apenas perto de jogo elegível, enquanto faltar player GE TV/SBT/CazéTV;
    - respeita grade exclusiva/estável já conhecida.
@@ -152,10 +149,12 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "sondagem_depois_minutos": 240,
         "retentativa_final_pendente_minutos": 15,
         "fallback_final_estimado_minutos": 130,
-        "manutencao_diaria_apos": "05:10",
     },
     "publicos": {
         "primeira_tentativa_apos_final_minutos": 15,
+        "janela_automatica_horas": 24,
+        "max_dispatches_github_por_jogo": 2,
+        "github_fallback_automatico": False,
         "intervalos_retentativa": [
             {"ate_horas": 2, "minutos": 15},
             {"ate_horas": 6, "minutos": 30},
@@ -166,7 +165,10 @@ DEFAULT_CONFIG: dict[str, Any] = {
         ],
     },
     "melhores_momentos": {
-        "primeira_tentativa_apos_final_minutos": 360,
+        "primeira_tentativa_apos_final_minutos": 5,
+        "janela_automatica_horas": 24,
+        "max_dispatches_github_por_jogo": 2,
+        "github_fallback_automatico": False,
         "intervalos_retentativa": [
             {"ate_horas": 12, "minutos": 360},
             {"ate_horas": 24, "minutos": 720},
@@ -740,15 +742,8 @@ def main_update_decision(
     # Tabela e Estatísticas consultam o scoreboard ESPN no navegador a cada 30 s.
 
     # O início de uma partida não justifica mais o pipeline pesado. Alterações
-    # factuais de calendário entram pela manutenção/sonda; AO VIVO segue direto
-    # da ESPN no navegador a cada 30 s.
-
-    maintenance_after = str(cfg.get("manutencao_diaria_apos") or "05:10")
-    if time_reached(now, maintenance_after) and (last_success is None or last_success.date() < now.date()):
-        return Decision(
-            "atualizar_brasileirao",
-            "Manutenção diária de segurança: ainda não houve atualização completa bem-sucedida hoje.",
-        )
+    # factuais entram pela sonda/agenda; AO VIVO segue direto da ESPN no navegador.
+    # Não existe manutenção diária cega neste fallback.
     return None
 
 
@@ -810,6 +805,7 @@ def pending_publics(config: Mapping[str, Any], now: datetime, tz: ZoneInfo) -> l
     if not isinstance(complements, Mapping):
         complements = {}
     min_age = int(config.get("publicos", {}).get("primeira_tentativa_apos_final_minutos") or 15)
+    max_age = float(config.get("publicos", {}).get("janela_automatica_horas") or 24) * 60
     pending: list[tuple[dict[str, Any], datetime]] = []
     for raw in rows or []:
         if not isinstance(raw, Mapping):
@@ -833,6 +829,8 @@ def pending_publics(config: Mapping[str, Any], now: datetime, tz: ZoneInfo) -> l
             continue
         ended = result_final_time(row, tz)
         if ended is None or now < ended + timedelta(minutes=min_age):
+            continue
+        if minutes_since(ended, now) > max_age:
             continue
         row["faltando_publicos"] = faltando
         pending.append((row, ended))
@@ -880,7 +878,11 @@ def public_state_due_info(
 
 
 def public_decision(config: Mapping[str, Any], now: datetime, tz: ZoneInfo, runs: Sequence[Mapping[str, Any]]) -> Decision | None:
-    del runs  # o relógio correto é o estado por campo, não a idade do último workflow.
+    del runs
+    # Fallback manual: não abre GitHub para pesquisar no escuro. A operação
+    # automática pós-jogo pertence ao Cloudflare Fastlane + D1.
+    if not bool(config.get("publicos", {}).get("github_fallback_automatico", False)):
+        return None
     pending = pending_publics(config, now, tz)
     if not pending:
         return None
@@ -950,7 +952,8 @@ def pending_mm(config: Mapping[str, Any], now: datetime, tz: ZoneInfo) -> list[t
     data = load_json(RESULTS_PATH, {})
     rows = data.get("resultados") if isinstance(data, Mapping) else []
     pending: list[tuple[dict[str, Any], datetime]] = []
-    min_age = int(config["melhores_momentos"].get("primeira_tentativa_apos_final_minutos") or 10)
+    min_age = int(config["melhores_momentos"].get("primeira_tentativa_apos_final_minutos") or 5)
+    max_age = float(config["melhores_momentos"].get("janela_automatica_horas") or 24) * 60
     ignore_zero = bool(config["melhores_momentos"].get("ignorar_rodada_zero", True))
     for raw in rows or []:
         if not isinstance(raw, Mapping):
@@ -968,6 +971,8 @@ def pending_mm(config: Mapping[str, Any], now: datetime, tz: ZoneInfo) -> list[t
         ended = result_final_time(row, tz)
         if ended is None or now < ended + timedelta(minutes=min_age):
             continue
+        if minutes_since(ended, now) > max_age:
+            continue
         pending.append((row, ended))
 
     # Copa do Brasil: o próprio arquivo de highlights enumera event_ids concluídos
@@ -984,7 +989,7 @@ def pending_mm(config: Mapping[str, Any], now: datetime, tz: ZoneInfo) -> list[t
                 continue
             kickoff = parse_dt(raw.get("data_iso"), tz)
             ended = kickoff + timedelta(minutes=115) if kickoff else now - timedelta(minutes=min_age)
-            if now >= ended + timedelta(minutes=min_age):
+            if now >= ended + timedelta(minutes=min_age) and minutes_since(ended, now) <= max_age:
                 row = {
                     "event_id": event_id,
                     "rodada": 0,
@@ -998,6 +1003,9 @@ def pending_mm(config: Mapping[str, Any], now: datetime, tz: ZoneInfo) -> list[t
 
 
 def mm_decisions(config: Mapping[str, Any], now: datetime, tz: ZoneInfo, runs: Sequence[Mapping[str, Any]]) -> tuple[Decision | None, Decision | None]:
+    # Fallback manual: o Worker só chama GitHub quando já existe vídeo concreto.
+    if not bool(config.get("melhores_momentos", {}).get("github_fallback_automatico", False)):
+        return None, None
     pending = pending_mm(config, now, tz)
     if not pending:
         return None, None

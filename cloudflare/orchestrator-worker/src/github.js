@@ -61,9 +61,16 @@ export function dispatchSpec(decision) {
     case 'atualizar_brasileirao':
       return { workflow: 'atualizar-brasileirao.yml', inputs: {} };
     case 'publicos':
-      return { workflow: 'atualizar-publicos-brasileirao.yml', inputs: { modo: 'partida', event_id: decision.eventId || '' } };
-    case 'melhores_momentos':
-      return { workflow: 'buscar-melhores-momentos-getv.yml', inputs: { modo: 'incremental', event_id: decision.eventId || '' } };
+      return { workflow: 'atualizar-publicos-brasileirao.yml', inputs: { modo: 'partida', event_id: decision.eventId || '', origem_fastlane: decision.fastlane ? 'true' : 'false' } };
+    case 'melhores_momentos': {
+      const eventIds = Array.isArray(decision.eventIds) ? [...new Set(decision.eventIds.map(String).filter(Boolean))].sort() : [];
+      return {
+        workflow: 'buscar-melhores-momentos-getv.yml',
+        inputs: eventIds.length > 1
+          ? { modo: 'incremental', event_ids: eventIds.join(','), origem_fastlane: decision.fastlane ? 'true' : 'false' }
+          : { modo: 'incremental', event_id: eventIds[0] || decision.eventId || '', origem_fastlane: decision.fastlane ? 'true' : 'false' },
+      };
+    }
     case 'melhores_momentos_continentais':
       return {
         workflow: 'atualizar-melhores-momentos-continentais.yml',

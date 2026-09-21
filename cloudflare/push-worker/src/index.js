@@ -8,6 +8,7 @@ import { probeEspnSources } from './espn-source.js';
 import { LIVE_API_CONSTANTS, resolveLiveScoreboard, resolveLiveSummary } from './live-api.js';
 import { createLiveStatsStore } from './live-stats-store.js';
 import { postgameStatus, readPostgameFastlane, runPostgameMaintenance } from './postgame-fastlane.js';
+import { feedbackNotifierConfigured, runFeedbackNotifier } from './feedback-notifier.js';
 
 export { PushState, SportsMonitor };
 
@@ -554,6 +555,9 @@ export default {
     ctx.waitUntil(runPostgameMaintenance(env, monitor).catch((error) => {
       console.error(`postgame fastlane failed: ${String(error?.message || error).slice(0, 500)}`);
     }));
+    ctx.waitUntil(runFeedbackNotifier(env).catch((error) => {
+      console.error(`feedback notifier failed: ${String(error?.message || error).slice(0, 500)}`);
+    }));
   },
 
   async queue(batch, env) {
@@ -581,7 +585,7 @@ export default {
         ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok) && Boolean(operational?.ok),
         service: 'formula-do-gol-push',
         version: 8,
-        revision: '6-R10R7-MONITOR-FACTS-PG2',
+        revision: '6-R10R8-DORMANT-FEEDBACK',
         liveGatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
         liveStateContractVersion: LIVE_API_CONSTANTS.LIVE_STATE_CONTRACT_VERSION,
         liveFactsContractVersion: LIVE_API_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
@@ -601,6 +605,8 @@ export default {
         bestKnownStatsCache: true,
         postgameFastlane: true,
         postgameFastlaneVersion: 2,
+        feedbackNotifier: true,
+        feedbackNotifierConfigured: feedbackNotifierConfigured(env),
         sportsMonitorReady: Boolean(monitor?.ok),
         operationalState: operational?.state || 'unknown',
         sports: {

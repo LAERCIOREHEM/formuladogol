@@ -1,7 +1,6 @@
 import {
   POLICY,
   actionKey,
-  brDateKey,
   brasileiraoSourceGate,
   continentalAgendaSignature,
   continentalDecision,
@@ -22,18 +21,15 @@ import {
   pendingHighlights,
   pendingContinentalHighlights,
   pendingPublicsFromAudit,
-  publicRetryInterval,
   publicPendingFingerprint,
   relevantSportsGames,
   resultFinalTime,
   espnDay,
-  timeReached,
   tvCoverage,
-  tvIntervalHours,
   tvCheckpointDue,
 } from './logic.js';
 import { activeWriter, dispatchSpec, dispatchWorkflow } from './github.js';
-import { fetchSiteBundle, probeEspn, probeEspnAvailability, repositoryFallbacks } from './sources.js';
+import { fetchPostgameFastlane, fetchSiteBundle, probeEspn, probeEspnAvailability, repositoryFallbacks } from './sources.js';
 
 // O Worker acorda a cada 5 minutos. O caminho rápido continua compacto:
 // agenda + status operacional autoritativo. O status permite interromper
@@ -151,10 +147,59 @@ function cupPendingHighlights(cup, cupHighlights, now) {
     if (!eventId || !pendingIds.has(eventId) || !event?.concluido) continue;
     const kickoff = parseDate(event?.data_iso);
     const ended = kickoff ? new Date(kickoff.getTime() + 115 * 60000) : new Date(parseDate(now).getTime() - POLICY.melhoresMomentos.firstAfterFinalMinutes * 60000);
-    if (minutesBetween(ended, now) < POLICY.melhoresMomentos.firstAfterFinalMinutes) continue;
-    rows.push({ eventId, ended, ageMinutes: minutesBetween(ended, now), row: event, round: 0 });
+    const ageMinutes = minutesBetween(ended, now);
+    if (ageMinutes < POLICY.melhoresMomentos.firstAfterFinalMinutes) continue;
+    if (ageMinutes > POLICY.melhoresMomentos.automaticWindowMinutes) continue;
+    rows.push({ eventId, ended, ageMinutes, row: event, round: 0 });
   }
   return rows;
+}
+
+function nextRelevantGame(games, now) {
+  const t = parseDate(now)?.getTime() ?? Date.now();
+  return (games || [])
+    .filter((game) => game?.kickoff && !game.concluded && game.kickoff.getTime() >= t)
+    .sort((a, b) => a.kickoff - b.kickoff)[0] || null;
+}
+
+function fastlaneRowsById(rows) {
+  return new Map((rows || []).map((row) => [String(row?.event_id || ''), row]).filter(([id]) => id));
+}
+
+function positiveNumber(value) {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+function concretePublicPayload(item, fastlaneRow) {
+  if (!fastlaneRow || typeof fastlaneRow !== 'object') return null;
+  const missing = new Set((item?.missingFields || []).map(String));
+  const values = {};
+  if (missing.has('publico')) {
+    const value = positiveNumber(fastlaneRow.publico);
+    if (value != null) values.publico = value;
+  }
+  if (missing.has('renda')) {
+    const value = positiveNumber(fastlaneRow.renda);
+    if (value != null) values.renda = value;
+  }
+  const paid = Number(fastlaneRow.publico_pagante);
+  if (Number.isFinite(paid) && paid >= 0) values.publico_pagante = paid;
+  const material = Object.keys(values).some((key) => key === 'publico' || key === 'renda');
+  if (!material) return null;
+  return {
+    values,
+    sources: fastlaneRow.public_sources || {},
+    fingerprint: JSON.stringify({ values, sources: fastlaneRow.public_sources || {} }),
+  };
+}
+
+function concreteHighlightPayload(fastlaneRow) {
+  const highlight = fastlaneRow?.highlight;
+  const url = String(highlight?.url || '').trim();
+  if (!url) return null;
+  const videoId = String(highlight?.video_id || '').trim();
+  return { highlight, fingerprint: `${videoId}|${url}` };
 }
 
 export class OrchestratorState {
@@ -186,7 +231,7 @@ export class OrchestratorState {
     return {
       ok: true,
       engine: 'fdg-cloudflare-orchestrator',
-      version: String(this.env.ORCHESTRATOR_VERSION || '1.9.0'),
+      version: String(this.env.ORCHESTRATOR_VERSION || '2.0.0'),
       mode: String(this.env.ORCHESTRATOR_MODE || 'shadow'),
       ...status,
       recentDecisions: history.slice(-10).reverse(),
@@ -208,6 +253,74 @@ export class OrchestratorState {
   async storageDate(key) {
     const value = await this.state.storage.get(key);
     return parseDate(value);
+  }
+
+  async postgameLedger(eventId) {
+    const key = `postgame-ledger:${String(eventId || '')}`;
+    const value = (await this.state.storage.get(key)) || {};
+    return { key, value: value && typeof value === 'object' ? value : {} };
+  }
+
+  async postgameDispatchAllowed(eventId, kind) {
+    const { value } = await this.postgameLedger(eventId);
+    const slot = value?.[kind] && typeof value[kind] === 'object' ? value[kind] : {};
+    return {
+      allowed: slot.resolved !== true && Number(slot.dispatches || 0) < Number(POLICY[kind === 'public' ? 'publicos' : 'melhoresMomentos'].maxGithubDispatchesPerEvent || 2),
+      dispatches: Number(slot.dispatches || 0),
+      resolved: slot.resolved === true,
+    };
+  }
+
+  async notePostgameDispatch(candidate, now) {
+    const kind = String(candidate?.ledgerKind || '');
+    if (!['public', 'highlight'].includes(kind)) return;
+    const ids = Array.isArray(candidate?.eventIds) && candidate.eventIds.length
+      ? candidate.eventIds.map(String)
+      : [String(candidate?.eventId || '')].filter(Boolean);
+    for (const eventId of ids) {
+      const { key, value } = await this.postgameLedger(eventId);
+      const slot = value?.[kind] && typeof value[kind] === 'object' ? value[kind] : {};
+      const fingerprint = String(candidate?.ledgerFingerprints?.[eventId] || candidate?.fingerprint || '');
+      const next = {
+        ...value,
+        eventId,
+        [kind]: {
+          ...slot,
+          resolved: false,
+          dispatches: Number(slot.dispatches || 0) + 1,
+          lastDispatchedAt: now.toISOString(),
+          lastFingerprint: fingerprint,
+        },
+      };
+      await this.state.storage.put(key, next);
+    }
+  }
+
+  async reconcilePostgameLedgers(publicPendingIds, highlightPendingIds) {
+    if (typeof this.state.storage.list !== 'function') return;
+    const rows = await this.state.storage.list({ prefix: 'postgame-ledger:' });
+    for (const [key, raw] of rows.entries()) {
+      const value = raw && typeof raw === 'object' ? { ...raw } : {};
+      const eventId = String(value.eventId || key.slice('postgame-ledger:'.length));
+      let changed = false;
+      if (value.public && value.public.resolved !== true && !publicPendingIds.has(eventId)) {
+        value.public = { ...value.public, resolved: true, resolvedAt: new Date().toISOString() };
+        changed = true;
+      }
+      if (value.highlight && value.highlight.resolved !== true && !highlightPendingIds.has(eventId)) {
+        value.highlight = { ...value.highlight, resolved: true, resolvedAt: new Date().toISOString() };
+        changed = true;
+      }
+      if (changed) await this.state.storage.put(key, value);
+    }
+  }
+
+  async githubDispatchesLast24h(now, currentResult = '') {
+    const history = (await this.state.storage.get('history')) || [];
+    const floor = now.getTime() - 24 * 60 * 60 * 1000;
+    let count = history.filter((item) => item?.result === 'dispatched' && (parseDate(item?.at)?.getTime() || 0) >= floor).length;
+    if (currentResult === 'dispatched') count += 1;
+    return count;
   }
 
   async candidateAllowedByRetry(candidate, now) {
@@ -245,6 +358,7 @@ export class OrchestratorState {
 
     const spec = dispatchSpec(candidate);
     await dispatchWorkflow(this.env, spec.workflow, spec.inputs);
+    await this.notePostgameDispatch(candidate, now);
     const updates = { [retry.key]: now.toISOString() };
     for (const [key, value] of Object.entries(candidate.stateUpdates || {})) updates[key] = value;
     await Promise.all(Object.entries(updates).map(([key, value]) => this.state.storage.put(key, value)));
@@ -431,14 +545,32 @@ export class OrchestratorState {
         lastProbeSource: brSource.lastProbeSource || '', halfOpenDispatched: brSource.halfOpenDispatched === true,
       };
 
+      const nextGame = nextRelevantGame(games, now);
+      const pendingPostgameTasks = Number(hints?.publicos?.automaticPending || 0)
+        + Number(hints?.melhoresMomentos?.automaticPending || 0);
+      const hoursToNext = nextGame ? minutesBetween(now, nextGame.kickoff) / 60 : Infinity;
+      const workloadMode = candidate
+        ? 'active'
+        : relevantCount > 0
+          ? 'live_window'
+          : pendingPostgameTasks > 0
+            ? 'postgame'
+            : (!nextGame || hoursToNext > POLICY.transmissoes.tvWindowHours ? 'dormant' : 'pre_game');
+      const githubDispatchesLast24h = await this.githubDispatchesLast24h(now, dispatchResult.result);
+
       const status = {
         lastTickAt: now.toISOString(),
         mode,
+        workloadMode,
+        nextRelevantMatchAt: nextGame?.kickoff?.toISOString?.() || '',
+        pendingPostgameTasks,
+        githubDispatchesLast24h,
         relevantSportsGames: relevantCount,
         slowEvaluated,
         candidate: candidate ? {
           action: candidate.action,
           eventId: candidate.eventId || '',
+          eventIds: candidate.eventIds || [],
           round: candidate.round || '',
           checkpoint: candidate.checkpoint ?? null,
           reason: candidate.reason,
@@ -502,21 +634,8 @@ export class OrchestratorState {
     const repositorySources = [...repositoryFallbacks(bundle), ...repositoryFallbacks(fastBundle)];
     if (repositorySources.length) hints.fontesRepositorio = repositorySources.slice(0, 20);
 
-    // 1) Manutenção diária: apenas se o snapshot publicado ainda não registra sucesso hoje.
-    const lastMainSuccess = parseDate(statusUpdate?.ultimo_sucesso || statusUpdate?.atualizado_em);
-    const today = brDateKey(now);
-    if (ready('dados-br/status-atualizacao.json') && !brSource.blocked && timeReached(now, POLICY.sports.dailyAfter) && (!lastMainSuccess || brDateKey(lastMainSuccess) !== today)) {
-      const key = `daily-main:${today}`;
-      const last = await this.storageDate(key);
-      if (!last || minutesBetween(last, now) >= POLICY.sports.dailyRetryMinutes) {
-        return {
-          action: 'atualizar_brasileirao', reason: 'Manutenção diária: ainda não há atualização completa bem-sucedida hoje.',
-          retryMinutes: POLICY.sports.dailyRetryMinutes,
-          brSourceSensitive: true,
-          stateUpdates: { [key]: now.toISOString() }, hints,
-        };
-      }
-    }
+    // 1) Sem manutenção diária cega. O pipeline pesado só nasce de mudança
+    // esportiva observável ou de uma tarefa concreta abaixo.
 
     // 2) Player oficial: NEED-DRIVEN. O relógio só define quando tentar;
     // a elegibilidade factual vem da grade TV. Premiere/SporTV/Globo/Record/
@@ -587,62 +706,98 @@ export class OrchestratorState {
       };
     }
 
-    // 3) Públicos: GitHub é fallback/consolidação após +6h. O Fastlane do Push Worker
-    // faz a perseguição imediata via Cloudflare + OpenAI sem abrir Actions.
+    // 3/4) Pós-jogo do Brasileirão: o Cloudflare Fastlane faz toda a
+    // perseguição. GitHub só consolida descoberta concreta já gravada no D1,
+    // dentro das primeiras 24h e com teto de dois dispatches por jogo/tipo.
     const publicSourcesReady = ready(
       'resultados.json', 'dados-br/estado-publicos-ia.json', 'dados-br/auditoria-publicos.json',
     );
-    const publics = publicSourcesReady ? pendingPublicsFromAudit({ results, audit: publicAudit, aiState, now }) : [];
-    const publicAuditTime = parseDate(publicAudit?.gerado_em || publicAudit?.atualizado_em);
-    let nextPublicDue = null;
-    for (const item of publics) {
-      let last = await this.storageDate(`public:${item.eventId}`);
-      if (!last && publicAuditTime && isAfter(publicAuditTime, item.ended)) last = publicAuditTime;
-      const interval = last ? publicRetryInterval(item.ageMinutes / 60) : 0;
-      const due = last ? new Date(last.getTime() + interval * 60000) : item.ended;
-      if (!nextPublicDue || due < nextPublicDue) nextPublicDue = due;
-      if (!last || dueFromLast(last, now, interval)) {
-        const fingerprint = publicPendingFingerprint(item);
-        hints.publicos = { pending: publics.length, nextDueAt: now.toISOString(), target: item.eventId, faltando: fingerprint };
-        return {
-          action: 'publicos', eventId: item.eventId, missingFields: item.missingFields || [], fingerprint,
-          reason: last
-            ? `Retentativa direcionada de público/renda para ${item.eventId}; faltando=${fingerprint}; backoff ${interval} min.`
-            : `Primeira busca direcionada de público/renda para ${item.eventId}; FINAL há ${Math.round(item.ageMinutes)} min; faltando=${fingerprint}.`,
-          retryMinutes: Math.max(1, interval || 1),
-          stateUpdates: { [`public:${item.eventId}`]: now.toISOString() }, hints,
-        };
-      }
-    }
-    if (nextPublicDue) hints.publicos = { pending: publics.length, nextDueAt: nextPublicDue.toISOString() };
+    const publicsAll = publicSourcesReady ? pendingPublicsFromAudit({ results, audit: publicAudit, aiState, now }) : [];
+    const publicAutomatic = publicsAll.filter((item) => item.ageMinutes <= POLICY.publicos.automaticWindowMinutes);
 
-    // 4) Melhores momentos: GitHub é fallback/consolidação após +6h. O Fastlane
-    // do Push Worker varre uploads oficiais a cada poucos minutos desde o FINAL.
     const mmSourcesReady = ready(
       'resultados.json', 'dados-br/melhores-momentos.json', 'dados-br/melhores-momentos-manual.json',
       'dados-br/auditoria-melhores-momentos.json',
     );
-    const mmPending = mmSourcesReady ? pendingHighlights({ results, auto: mmAuto, manual: mmManual, now }) : [];
+    const mmPendingAll = mmSourcesReady ? pendingHighlights({ results, auto: mmAuto, manual: mmManual, now }) : [];
+    const mmAutomatic = mmPendingAll.filter((item) => item.ageMinutes <= POLICY.melhoresMomentos.automaticWindowMinutes);
     const mmAuditTime = parseDate(mmAudit?.atualizado_em || mmAudit?.gerado_em);
-    let nextMmDue = null;
-    for (const item of mmPending) {
-      let last = await this.storageDate(`mm:${item.eventId}`);
-      if (!last && mmAuditTime && isAfter(mmAuditTime, item.ended)) last = mmAuditTime;
-      const interval = last ? mmRetryInterval(item.ageMinutes / 60) : 0;
-      const due = last ? new Date(last.getTime() + interval * 60000) : item.ended;
-      if (!nextMmDue || due < nextMmDue) nextMmDue = due;
-      if (!last || dueFromLast(last, now, interval)) {
-        hints.melhoresMomentos = { pending: mmPending.length, nextDueAt: now.toISOString() };
-        return {
-          action: 'melhores_momentos', eventId: item.eventId,
-          reason: last
-            ? `Melhores momentos ainda ausentes para ${item.eventId}; backoff atual ${interval} min.`
-            : `Primeira busca dirigida de melhores momentos para ${item.eventId}.`,
-          retryMinutes: Math.max(1, interval || 1), stateUpdates: { [`mm:${item.eventId}`]: now.toISOString() }, hints,
-        };
-      }
+
+    const postgameIds = [...new Set([
+      ...publicAutomatic.map((item) => String(item.eventId)),
+      ...mmAutomatic.map((item) => String(item.eventId)),
+    ])];
+    const fastlane = postgameIds.length ? await fetchPostgameFastlane(this.env, postgameIds) : { rows: [], error: '' };
+    const fastlaneById = fastlaneRowsById(fastlane.rows);
+    hints.postgameFastlane = { queried: postgameIds.length, rows: fastlane.rows.length, error: fastlane.error || '' };
+
+    await this.reconcilePostgameLedgers(
+      new Set(publicsAll.map((item) => String(item.eventId))),
+      new Set(mmPendingAll.map((item) => String(item.eventId))),
+    );
+
+    let publicConcreteReady = 0;
+    let publicCapped = 0;
+    for (const item of publicAutomatic) {
+      const eventId = String(item.eventId);
+      const concrete = concretePublicPayload(item, fastlaneById.get(eventId));
+      if (!concrete) continue;
+      publicConcreteReady += 1;
+      const ledger = await this.postgameDispatchAllowed(eventId, 'public');
+      if (!ledger.allowed) { publicCapped += 1; continue; }
+      hints.publicos = {
+        pending: publicsAll.length,
+        automaticPending: publicAutomatic.length,
+        historicalPending: Math.max(0, publicsAll.length - publicAutomatic.length),
+        concreteReady: publicConcreteReady, capped: publicCapped, target: eventId, nextDueAt: now.toISOString(),
+      };
+      return {
+        action: 'publicos', eventId, eventIds: [eventId], fastlane: true, ledgerKind: 'public',
+        ledgerFingerprints: { [eventId]: concrete.fingerprint }, fingerprint: concrete.fingerprint,
+        missingFields: item.missingFields || [],
+        reason: `Fastlane encontrou dado concreto de público/renda para ${eventId}; consolidar uma única vez no repositório.`,
+        retryMinutes: POLICY.publicos.githubRetryMinutes, hints,
+      };
     }
-    if (nextMmDue) hints.melhoresMomentos = { pending: mmPending.length, nextDueAt: nextMmDue.toISOString() };
+    hints.publicos = {
+      pending: publicsAll.length,
+      automaticPending: publicAutomatic.length,
+      historicalPending: Math.max(0, publicsAll.length - publicAutomatic.length),
+      concreteReady: publicConcreteReady, capped: publicCapped,
+    };
+
+    const mmConcrete = [];
+    let mmCapped = 0;
+    for (const item of mmAutomatic) {
+      const eventId = String(item.eventId);
+      const concrete = concreteHighlightPayload(fastlaneById.get(eventId));
+      if (!concrete) continue;
+      const ledger = await this.postgameDispatchAllowed(eventId, 'highlight');
+      if (!ledger.allowed) { mmCapped += 1; continue; }
+      mmConcrete.push({ eventId, concrete });
+    }
+    if (mmConcrete.length) {
+      const batch = mmConcrete.slice(0, 8);
+      const eventIds = batch.map((item) => item.eventId);
+      const ledgerFingerprints = Object.fromEntries(batch.map((item) => [item.eventId, item.concrete.fingerprint]));
+      const fingerprint = eventIds.map((id) => `${id}:${ledgerFingerprints[id]}`).sort().join(';');
+      hints.melhoresMomentos = {
+        pending: mmPendingAll.length, automaticPending: mmAutomatic.length,
+        historicalPending: Math.max(0, mmPendingAll.length - mmAutomatic.length),
+        concreteReady: mmConcrete.length, capped: mmCapped, nextDueAt: now.toISOString(),
+      };
+      return {
+        action: 'melhores_momentos', eventIds, eventId: eventIds.length === 1 ? eventIds[0] : '',
+        fastlane: true, ledgerKind: 'highlight', ledgerFingerprints, fingerprint,
+        reason: `Fastlane encontrou melhores momentos concretos para ${eventIds.length} jogo(s); consolidar em lote no repositório.`,
+        retryMinutes: POLICY.melhoresMomentos.githubRetryMinutes, hints,
+      };
+    }
+    hints.melhoresMomentos = {
+      pending: mmPendingAll.length, automaticPending: mmAutomatic.length,
+      historicalPending: Math.max(0, mmPendingAll.length - mmAutomatic.length),
+      concreteReady: 0, capped: mmCapped,
+    };
 
     const cupMmSourcesReady = ready('dados-br/competicoes-af-previsao/copa-do-brasil.json',
       'dados-br/melhores-momentos-copa-do-brasil.json', 'dados-br/auditoria-melhores-momentos.json');

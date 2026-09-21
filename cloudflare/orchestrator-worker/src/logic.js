@@ -6,26 +6,26 @@ export const POLICY = Object.freeze({
     afterMinutes: 240,
     fallbackFinalMinutes: 115,
     finalRetryMinutes: 15,
-    dailyAfter: '05:10',
-    dailyRetryMinutes: 360,
     sourceProbeMinutes: 5,
   },
   slowEvalMinutes: 15,
   publicos: {
-    // Fastlane continua primário a cada minuto; o GitHub entra cedo como segunda
-    // rota independente se público/renda ainda estiverem ausentes.
+    // O Fastlane Cloudflare faz a descoberta. GitHub só consolida quando há
+    // valor concreto no D1 e apenas dentro da janela pós-jogo automática.
     firstAfterFinalMinutes: 15,
-    retryBands: [
-      [2, 15], [6, 30], [12, 60], [24, 120], [48, 360], [99999, 720],
-    ],
+    automaticWindowMinutes: 24 * 60,
+    maxGithubDispatchesPerEvent: 2,
+    githubRetryMinutes: 30,
+    retryBands: [[24, 120]],
   },
   melhoresMomentos: {
-    // O Fastlane Cloudflare assume a perseguição imediata. A Action fica como
-    // consolidação/versionamento apenas se o dado ainda faltar após 6 horas.
-    firstAfterFinalMinutes: 360,
-    retryBands: [
-      [12, 360], [24, 720], [48, 1440], [99999, 1440],
-    ],
+    // O Fastlane Cloudflare assume a perseguição imediata. GitHub não pesquisa
+    // no escuro: apenas consolida vídeo concreto encontrado no D1.
+    firstAfterFinalMinutes: 5,
+    automaticWindowMinutes: 24 * 60,
+    maxGithubDispatchesPerEvent: 2,
+    githubRetryMinutes: 30,
+    retryBands: [[24, 120]],
   },
   transmissoes: {
     // Need-driven: nenhum player é procurado se a grade não exigir GE TV/SBT/CazéTV.

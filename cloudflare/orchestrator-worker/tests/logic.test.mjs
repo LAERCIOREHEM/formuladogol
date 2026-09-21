@@ -145,23 +145,21 @@ test('TV coverage ignores games beyond 72h and only treats near gaps as operatio
   assert.equal(tvIntervalHours(coverage), 168);
 });
 
-test('highlight GitHub fallback starts only after Fastlane window (+6h)', () => {
-  assert.equal(POLICY.melhoresMomentos.firstAfterFinalMinutes, 360);
-  assert.equal(mmRetryInterval(7), 360);
-    assert.equal(mmRetryInterval(30), 1440);
-          const results = { resultados: [{ event_id: 'x', rodada: 22, data_iso: '2026-09-03T10:00:00Z', finalizado_em: '2026-09-03T12:00:00Z' }] };
-  assert.equal(pendingHighlights({ results, auto: { jogos: {} }, manual: { jogos: {} }, now: d('2026-09-03T17:59:00Z') }).length, 0);
-  assert.equal(pendingHighlights({ results, auto: { jogos: {} }, manual: { jogos: {} }, now: d('2026-09-03T18:00:00Z') }).length, 1);
+test('highlight Fastlane opens at +5min and automatic GitHub consolidation is bounded', () => {
+  assert.equal(POLICY.melhoresMomentos.firstAfterFinalMinutes, 5);
+  assert.equal(POLICY.melhoresMomentos.automaticWindowMinutes, 24 * 60);
+  assert.equal(POLICY.melhoresMomentos.maxGithubDispatchesPerEvent, 2);
+  assert.equal(POLICY.melhoresMomentos.githubRetryMinutes, 30);
+  const results = { resultados: [{ event_id: 'x', rodada: 22, data_iso: '2026-09-03T10:00:00Z', finalizado_em: '2026-09-03T12:00:00Z' }] };
+  assert.equal(pendingHighlights({ results, auto: { jogos: {} }, manual: { jogos: {} }, now: d('2026-09-03T12:04:59Z') }).length, 0);
+  assert.equal(pendingHighlights({ results, auto: { jogos: {} }, manual: { jogos: {} }, now: d('2026-09-03T12:05:00Z') }).length, 1);
 });
 
-test('public/renda fallback starts at +15min and never exhausts', () => {
+test('public/renda Fastlane opens at +15min and automatic GitHub consolidation is bounded', () => {
   assert.equal(POLICY.publicos.firstAfterFinalMinutes, 15);
-  assert.equal(publicRetryInterval(1), 15);
-  assert.equal(publicRetryInterval(3), 30);
-  assert.equal(publicRetryInterval(7), 60);
-  assert.equal(publicRetryInterval(20), 120);
-  assert.equal(publicRetryInterval(30), 360);
-  assert.equal(publicRetryInterval(100), 720);
+  assert.equal(POLICY.publicos.automaticWindowMinutes, 24 * 60);
+  assert.equal(POLICY.publicos.maxGithubDispatchesPerEvent, 2);
+  assert.equal(POLICY.publicos.githubRetryMinutes, 30);
 });
 
 test('round editorial closes at 10 or after postponed-game rule', () => {
@@ -355,11 +353,17 @@ test('public pending fingerprint tracks only the fields that are still missing',
 });
 test('dispatch mapping is targeted and deterministic', () => {
   assert.deepEqual(dispatchSpec({ action: 'melhores_momentos', eventId: '401' }), {
-    workflow: 'buscar-melhores-momentos-getv.yml', inputs: { modo: 'incremental', event_id: '401' },
+    workflow: 'buscar-melhores-momentos-getv.yml', inputs: { modo: 'incremental', event_id: '401', origem_fastlane: 'false' },
+  });
+  assert.deepEqual(dispatchSpec({ action: 'melhores_momentos', eventIds: ['402', '401', '401'], fastlane: true }), {
+    workflow: 'buscar-melhores-momentos-getv.yml', inputs: { modo: 'incremental', event_ids: '401,402', origem_fastlane: 'true' },
   });
   assert.equal(dispatchSpec({ action: 'editorial_rodada', round: 22 }).inputs.rodada, '22');
   assert.deepEqual(dispatchSpec({ action: 'publicos', eventId: '401' }), {
-    workflow: 'atualizar-publicos-brasileirao.yml', inputs: { modo: 'partida', event_id: '401' },
+    workflow: 'atualizar-publicos-brasileirao.yml', inputs: { modo: 'partida', event_id: '401', origem_fastlane: 'false' },
+  });
+  assert.deepEqual(dispatchSpec({ action: 'publicos', eventId: '401', fastlane: true }), {
+    workflow: 'atualizar-publicos-brasileirao.yml', inputs: { modo: 'partida', event_id: '401', origem_fastlane: 'true' },
   });
   assert.deepEqual(dispatchSpec({ action: 'transmissoes_guardian', eventId: '401', checkpoint: -90 }), {
     workflow: 'auditar-transmissoes-ia.yml', inputs: { event_id: '401', checkpoint: '-90' },

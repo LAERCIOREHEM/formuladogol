@@ -43,7 +43,9 @@ test('targeted highlights input reaches both BR scripts and skips Cup broad scan
   const substitute = await read('scripts/substituir_fontes_preferidas_mm.py');
   assert.match(yml, /event_id:/);
   assert.match(yml, /--event-id/);
-  assert.match(yml, /if: \$\{\{ inputs\.event_id == '' \}\}/);
+  assert.match(yml, /event_ids:/);
+  assert.match(yml, /origem_fastlane:/);
+  assert.match(yml, /inputs\.origem_fastlane != true && inputs\.event_id == '' && inputs\.event_ids == ''/);
   assert.match(yml, /published == 'true'.*cup_changed == 'true'/);
   assert.match(getv, /--event-id/);
   assert.match(substitute, /--event-id/);
@@ -126,7 +128,7 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(state, /transmissoes_guardian/);
   const index = await read('cloudflare/orchestrator-worker/src/index.js');
   assert.match(index, /transmissionGuardian:\s*true/);
-  assert.match(index, /1\.9\.0/);
+  assert.match(index, /2\.0\.0/);
   assert.match(index, /transmissionGuardianNeedGate:\s*true/);
   assert.match(index, /transmissionNeedDrivenV2:\s*true/);
   assert.match(index, /adaptiveSlowPath:\s*true/);
@@ -134,6 +136,11 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(index, /transmissionTvOperationalWindowHours:\s*72/);
   assert.match(index, /transmissionYoutubeOnlyWhenRequired:\s*true/);
   assert.match(index, /publicFirstAttemptAfterFinalMinutes:\s*15/);
+  assert.match(index, /dormantMode:\s*true/);
+  assert.match(index, /postgameConcreteGate:\s*true/);
+  assert.match(index, /postgameAutomaticWindowHours:\s*24/);
+  assert.match(index, /postgameGithubMaxDispatchesPerEvent:\s*2/);
+  assert.match(index, /postgameHighlightsBatching:\s*true/);
   assert.match(index, /transmissionGuardianBatching:\s*true/);
   assert.match(index, /targetedPublicResearch:\s*true/);
   assert.match(index, /continentalPhaseFingerprints:\s*true/);
@@ -220,9 +227,16 @@ test('Brasileirão source breaker blocks heavy retries and uses structured colle
 
 test('canonical operational config is aligned with Cloudflare transmission/public policy', async () => {
   const cfg = JSON.parse(await read('dados-br/config-orquestrador.json'));
-  assert.equal(cfg.schema_version, 4);
+  assert.equal(cfg.schema_version, 5);
   assert.equal(cfg.publicos.primeira_tentativa_apos_final_minutos, 15);
-  assert.equal(cfg.melhores_momentos.primeira_tentativa_apos_final_minutos, 360);
+  assert.equal(cfg.publicos.janela_automatica_horas, 24);
+  assert.equal(cfg.publicos.max_dispatches_github_por_jogo, 2);
+  assert.equal(cfg.publicos.github_fallback_automatico, false);
+  assert.equal(cfg.melhores_momentos.primeira_tentativa_apos_final_minutos, 5);
+  assert.equal(cfg.melhores_momentos.janela_automatica_horas, 24);
+  assert.equal(cfg.melhores_momentos.max_dispatches_github_por_jogo, 2);
+  assert.equal(cfg.melhores_momentos.github_fallback_automatico, false);
+  assert.equal(cfg.execucao_primaria.modo_dormente, true);
   assert.match(cfg.execucao_primaria.postgame_fastlane, /push/i);
   assert.equal(cfg.transmissoes.janela_operacional_tv_horas, 72);
   assert.deepEqual(cfg.transmissoes.tv_checkpoints_minutos, [-4320, -1440, -360]);
