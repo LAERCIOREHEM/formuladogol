@@ -1,10 +1,40 @@
+import { fetchEspnSummary } from './espn-source.js';
+
 const DEFAULT_SITE_BASE = 'https://formuladogol.com.br';
+// Fase definitiva (uma única chamada por partida). O Sol é reservado a ela e aos editoriais.
 const DEFAULT_MODEL = 'gpt-5.6-sol';
+// Fase de varredura: o modelo mais barato com web_search.
+const DEFAULT_MINI_MODEL = 'gpt-4o-mini';
 const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
-const POSTGAME_POLICY_VERSION = 2;
+const POSTGAME_POLICY_VERSION = 3;
+
+/*
+ * Política de público/renda v3 — contada a partir do fim da partida:
+ *   0–30 min   ESPN (grátis) a cada 2 min. Nenhuma chamada de IA.
+ *   30 min     1ª busca com o modelo econômico.
+ *   30–60 min  novas buscas econômicas a cada 3 min (30, 33 … 57: 10 no total, 1 web_search cada).
+ *   60 min     UMA chamada definitiva com o Sol.
+ *   depois     não encontrou → e-mail e encerra. Correção manual entra pelo
+ *              publicos-verificados.json e é aplicada pelo seed estático.
+ * A ESPN é consultada antes de toda chamada de IA: se ela já trouxer o público,
+ * a IA só procura o que ainda falta.
+ */
+export const PUBLIC_POLICY = Object.freeze({
+  aiStartMinutes: 30,
+  solAtMinutes: 60,
+  deterministicEveryMinutes: 2,
+  miniEveryMinutes: 3,
+  miniMaxAttempts: 10,
+  miniMaxToolCalls: 1,
+  solMaxToolCalls: 6,
+  solMaxAttempts: 3,
+  solRetryMinutes: 5,
+  batchPerRun: 6,
+  legacyCutoffHours: 24,
+});
 
 const CHANNELS = Object.freeze([
   { id: 'UCgCKagVhzGnZcuP9bSMgMCg', name: 'GE TV', source: 'GE TV / YouTube', embed: true, minAgeHours: 0 },
@@ -40,6 +70,8 @@ const POSITIVE_HIGHLIGHT_RE = /\b(melhores momentos|gols e melhores momentos|gol
 const NEGATIVE_HIGHLIGHT_RE = /\b(aquecimento|esquenta|pre[- ]?jogo|pré[- ]?jogo|pos[- ]?jogo|pós[- ]?jogo|sem imagens|audio apenas|áudio apenas|narra[cç][aã]o|radio|rádio|tempo real|lance a lance|lances ao vivo|watchalong|watch party|react|podcast)\b/i;
 
 const HIGHLIGHT_RETRY_MINUTES = [1, 2, 2, 5, 5, 5, 10, 15, 15, 30, 30, 60, 60, 120];
+// Legado: mantido apenas para retryMinutes('public') continuar compatível.
+// A política de público vigente é PUBLIC_POLICY.
 const PUBLIC_RETRY_MINUTES = [1, 2, 4, 7, 10, 15, 20, 30, 45, 60, 90, 120];
 
 const channelCache = new Map();
@@ -260,21 +292,24 @@ export async function findOfficialHighlight(env, task, now = Date.now()) {
   return { found: false, reason: errors.length ? errors.join('; ').slice(0, 1000) : 'not_found' };
 }
 
-function publicSearchRequest(task, missing, env) {
-  const model = text(env?.POSTGAME_OPENAI_MODEL || env?.OPENAI_MODEL || DEFAULT_MODEL) || DEFAULT_MODEL;
+function isReasoningModel(model) {
+  return /^(o\d|gpt-5)/i.test(text(model));
+}
+
+export function publicSearchRequest(task, missing, env, phase = 'sol') {
+  const isSol = phase === 'sol';
+  const model = isSol
+    ? (text(env?.POSTGAME_OPENAI_MODEL) || DEFAULT_MODEL)
+    : (text(env?.POSTGAME_OPENAI_MINI_MODEL) || DEFAULT_MINI_MODEL);
   const matchup = `${text(task.home)} x ${text(task.away)}`;
   const date = text(task.kickoff).slice(0, 10);
   const missingText = missing.join(', ');
-  return {
+  const instruction = isSol
+    ? `Pesquise na web dados documentais da partida ${matchup}, data ${date}, event_id ${text(task.event_id)}. Preciso exclusivamente de: ${missingText}. NÃO use memória e NÃO estime. Faça consultas independentes, em especial: "${matchup} público renda", "${matchup} ficha técnica" e matérias de fechamento da rodada. Priorize clube/CBF/federação, ge, UOL/Estadão e imprensa regional confiável. Se um campo não estiver publicado, retorne null. Público significa público presente/total; pagantes é campo separado. Confirme confronto, data e placar antes de usar a fonte. Cada número retornado precisa ter sua própria URL efetivamente lida pelo web_search.`
+    : `Faça UMA busca na web: "${matchup} público renda ${date}". Preciso de: ${missingText}. Use somente o que a busca retornar; NÃO use memória e NÃO estime. Se o número não aparecer, retorne null. Público é o presente/total; pagantes é campo separado. Cada número precisa da URL da página em que aparece.`;
+  const body = {
     model,
-    reasoning: { effort: 'medium' },
-    input: [{
-      role: 'user',
-      content: [{
-        type: 'input_text',
-        text: `Pesquise na web dados documentais da partida ${matchup}, data ${date}, event_id ${text(task.event_id)}. Preciso exclusivamente de: ${missingText}. NÃO use memória e NÃO estime. Faça várias consultas independentes, em especial: \"${matchup} público renda\", \"${matchup} PÚBLICO RENDA\", \"${matchup} ficha técnica\", e procure também matérias de fechamento da rodada/Gato Mestre. Priorize clube/CBF/federação, ge, UOL/Estadão e imprensa regional confiável, mas não descarte outra ficha técnica documental. Se um campo não estiver publicado, retorne null. Público significa público presente/total; pagantes é campo separado. Confirme confronto, data e placar antes de usar a fonte. Cada número retornado precisa ter sua própria URL que tenha sido efetivamente lida pelo web_search.`,
-      }]
-    }],
+    input: [{ role: 'user', content: [{ type: 'input_text', text: instruction }] }],
     text: {
       format: {
         type: 'json_schema',
@@ -298,43 +333,111 @@ function publicSearchRequest(task, missing, env) {
       }
     },
     tools: [{
-      type: 'web_search', search_context_size: 'high',
+      type: 'web_search', search_context_size: isSol ? 'medium' : 'low',
       user_location: { type: 'approximate', country: 'BR', timezone: 'America/Sao_Paulo' }
     }],
     tool_choice: 'required',
-    max_tool_calls: 14,
+    max_tool_calls: isSol ? PUBLIC_POLICY.solMaxToolCalls : PUBLIC_POLICY.miniMaxToolCalls,
+    max_output_tokens: isReasoningModel(model) ? 4000 : 800,
     include: ['web_search_call.action.sources']
   };
+  // Parâmetro de raciocínio só existe em modelos de raciocínio; enviá-lo ao
+  // gpt-4o-mini devolveria HTTP 400.
+  if (isReasoningModel(model)) body.reasoning = { effort: isSol ? 'medium' : 'low' };
+  return body;
 }
 
-export async function searchPublicWithOpenAI(env, task) {
-  const apiKey = text(env?.OPENAI_API_KEY);
-  if (!apiKey) return { found: false, reason: 'openai_key_missing' };
+function missingPublicFields(values) {
   const missing = [];
-  if (!(Number(task.publico) > 0)) missing.push('público presente');
-  if (!(Number(task.publico_pagante) > 0)) missing.push('público pagante');
-  if (!(Number(task.renda) > 0)) missing.push('renda');
-  if (!missing.length) return { found: true, complete: true, values: {} };
+  if (!(Number(values.publico) > 0)) missing.push('público presente');
+  if (!(Number(values.publico_pagante) > 0)) missing.push('público pagante');
+  if (!(Number(values.renda) > 0)) missing.push('renda');
+  return missing;
+}
+
+export async function searchPublicWithOpenAI(env, task, phase = 'sol') {
+  const apiKey = text(env?.OPENAI_API_KEY);
+  const missing = missingPublicFields(task);
+  if (!missing.length) return { found: true, responded: false, complete: true, values: {}, model: '' };
+  const request = publicSearchRequest(task, missing, env, phase);
+  const model = request.model;
+  if (!apiKey) return { found: false, responded: false, reason: 'openai_key_missing', model };
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 55_000);
+  const timer = setTimeout(() => controller.abort(), phase === 'sol' ? 55_000 : 30_000);
   try {
     const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST', signal: controller.signal,
       headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
-      body: JSON.stringify(publicSearchRequest(task, missing, env))
+      body: JSON.stringify(request)
     });
-    if (!response.ok) return { found: false, reason: `openai_http_${response.status}` };
+    if (!response.ok) {
+      const detail = text(await response.text().catch(() => '')).slice(0, 200);
+      return { found: false, responded: false, reason: `openai_http_${response.status}${detail ? `:${detail}` : ''}`, model };
+    }
     const raw = await response.json();
     const output = extractOpenAIText(raw);
-    if (!output) return { found: false, reason: 'openai_empty_output' };
+    if (!output) return { found: false, responded: true, reason: 'openai_empty_output', model };
     const parsed = safeJson(output, null);
-    if (!parsed) return { found: false, reason: 'openai_invalid_json' };
+    if (!parsed) return { found: false, responded: true, reason: 'openai_invalid_json', model };
     const verified = validatePublicPayload(parsed, extractOpenAISources(raw));
-    if (!verified.accepted) return { found: false, reason: verified.reason };
-    return { found: true, ...verified };
+    if (!verified.accepted) return { found: false, responded: true, reason: verified.reason, model };
+    return { found: true, responded: true, model, ...verified };
   } catch (error) {
-    return { found: false, reason: `openai_error:${text(error?.message || error).slice(0, 240)}` };
+    return { found: false, responded: false, reason: `openai_error:${text(error?.message || error).slice(0, 240)}`, model };
   } finally { clearTimeout(timer); }
+}
+
+// ------------------------------------------------------------------------
+// ESPN: fonte gratuita. Mesmo critério do coletor Python
+// (buscar_detalhes_jogos_brasileirao.parse_publico): varre o summary atrás de
+// chaves de público e fica com o maior valor plausível.
+// ------------------------------------------------------------------------
+function attendanceNumber(value) {
+  if (value && typeof value === 'object') {
+    for (const key of ['value', 'displayValue', 'formattedValue', 'text', 'shortText', 'name']) {
+      const found = attendanceNumber(value[key]);
+      if (found != null) return found;
+    }
+    return null;
+  }
+  if (typeof value === 'number' && Number.isFinite(value)) return clampInt(value, 500, 150000);
+  const digits = text(value).replace(/\D/g, '');
+  if (!digits) return null;
+  return clampInt(Number(digits), 500, 150000);
+}
+
+export function parseEspnAttendance(summary) {
+  const found = [];
+  const seen = new Set();
+  const walk = (node, depth) => {
+    if (!node || typeof node !== 'object' || depth > 12 || seen.has(node)) return;
+    seen.add(node);
+    if (Array.isArray(node)) { for (const item of node) walk(item, depth + 1); return; }
+    for (const [key, value] of Object.entries(node)) {
+      const k = normalizeText(key).replace(/\s+/g, '');
+      if (k === 'attendance' || k === 'crowd' || k === 'publico' || k === 'spectators' || k.includes('attendance') || k.includes('spectator')) {
+        const n = attendanceNumber(value);
+        if (n != null) found.push(n);
+      }
+      if (value && typeof value === 'object') walk(value, depth + 1);
+    }
+  };
+  walk(summary, 0);
+  return found.length ? Math.max(...found) : null;
+}
+
+async function fetchEspnAttendance(task) {
+  const league = text(task.league) || 'bra.1';
+  const eventId = text(task.event_id);
+  if (!eventId) return { publico: null, error: 'event_id_missing' };
+  try {
+    const summary = await fetchEspnSummary(league, eventId);
+    const publico = parseEspnAttendance(summary?.data);
+    if (publico == null) return { publico: null, error: '' };
+    return { publico, source: `https://www.espn.com.br/futebol/partida/_/jogoId/${encodeURIComponent(eventId)}`, error: '' };
+  } catch (error) {
+    return { publico: null, error: `espn:${text(error?.message || error).slice(0, 160)}` };
+  }
 }
 
 async function metaGet(env, key) {
@@ -480,7 +583,7 @@ function taskAgeHours(task, now = Date.now()) {
 async function claimDue(env, kind, now = Date.now()) {
   const prefix = kind === 'highlight' ? 'highlight' : 'public';
   const iso = nowIso(now);
-  const row = await env.DB.prepare(`SELECT * FROM postgame_fastlane WHERE ${prefix}_status<>'resolved' AND COALESCE(${prefix}_next_at,'1970-01-01T00:00:00.000Z')<=? ORDER BY COALESCE(${prefix}_last_at,'1970-01-01T00:00:00.000Z') ASC, final_at DESC LIMIT 1`).bind(iso).first();
+  const row = await env.DB.prepare(`SELECT * FROM postgame_fastlane WHERE ${prefix}_status NOT IN ('resolved','gave_up') AND COALESCE(${prefix}_next_at,'1970-01-01T00:00:00.000Z')<=? ORDER BY COALESCE(${prefix}_last_at,'1970-01-01T00:00:00.000Z') ASC, final_at DESC LIMIT 1`).bind(iso).first();
   if (!row) return null;
   const currentNext = text(row[`${prefix}_next_at`]);
   const lockUntil = nowIso(now + 10 * 60_000);
@@ -505,36 +608,252 @@ async function processHighlight(env, now = Date.now()) {
   return { attempted: true, resolved: false, eventId: task.event_id, retryMinutes: delay, reason: found.reason };
 }
 
-async function processPublic(env, now = Date.now()) {
-  const task = await claimDue(env, 'public', now);
-  if (!task) return { attempted: false };
-  const attempt = Number(task.public_attempts || 0) + 1;
-  const found = await searchPublicWithOpenAI(env, task);
-  let nextTask = { ...task };
-  let sources = safeJson(task.public_sources_json, {}) || {};
-  if (found.found && found.values) {
-    if (found.values.publico != null) nextTask.publico = found.values.publico;
-    if (found.values.publico_pagante != null) nextTask.publico_pagante = found.values.publico_pagante;
-    if (found.values.renda != null) nextTask.renda = found.values.renda;
-    sources = { ...sources, ...(found.sources || {}) };
+// ------------------------------------------------------------------------
+// Estado da busca por IA. Tabela lateral (migration 0010) porque o deploy
+// reaplica todas as migrations a cada execução e ALTER TABLE não é idempotente.
+// ------------------------------------------------------------------------
+async function readPublicAiState(env, eventId) {
+  const row = await env.DB.prepare('SELECT * FROM postgame_public_ai WHERE event_id=?').bind(eventId).first();
+  return {
+    deterministic_checks: Number(row?.deterministic_checks || 0),
+    mini_attempts: Number(row?.mini_attempts || 0),
+    sol_attempts: Number(row?.sol_attempts || 0),
+    sol_completed: Number(row?.sol_completed || 0),
+    last_phase: text(row?.last_phase),
+    last_model: text(row?.last_model),
+    mini_last_error: text(row?.mini_last_error),
+    alert_at: text(row?.alert_at),
+    alert_status: text(row?.alert_status),
+  };
+}
+
+async function writePublicAiState(env, eventId, state) {
+  await env.DB.prepare(`INSERT INTO postgame_public_ai (
+      event_id,deterministic_checks,mini_attempts,sol_attempts,sol_completed,last_phase,last_model,mini_last_error,alert_at,alert_status,created_at,updated_at
+    ) VALUES (?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
+    ON CONFLICT(event_id) DO UPDATE SET
+      deterministic_checks=excluded.deterministic_checks, mini_attempts=excluded.mini_attempts,
+      sol_attempts=excluded.sol_attempts, sol_completed=excluded.sol_completed,
+      last_phase=excluded.last_phase, last_model=excluded.last_model, mini_last_error=excluded.mini_last_error,
+      alert_at=excluded.alert_at, alert_status=excluded.alert_status, updated_at=CURRENT_TIMESTAMP`)
+    .bind(
+      eventId, Number(state.deterministic_checks || 0), Number(state.mini_attempts || 0), Number(state.sol_attempts || 0),
+      Number(state.sol_completed || 0), text(state.last_phase), text(state.last_model), text(state.mini_last_error).slice(0, 500),
+      text(state.alert_at) || null, text(state.alert_status)
+    ).run();
+}
+
+export function taskEndMs(task, now = Date.now()) {
+  const finalAt = Date.parse(task?.final_at || '');
+  if (Number.isFinite(finalAt)) return finalAt;
+  const kickoff = Date.parse(task?.kickoff || '');
+  if (Number.isFinite(kickoff)) return kickoff + 115 * 60_000;
+  return now;
+}
+
+export function isPublicComplete(values) {
+  return Number(values?.publico) > 0 && Number(values?.renda) > 0;
+}
+
+// Decide a fase da PRÓXIMA ação para a partida. Função pura: testável sem D1.
+export function planPublicStep(task, ai, now = Date.now()) {
+  const P = PUBLIC_POLICY;
+  const ageMinutes = (now - taskEndMs(task, now)) / 60_000;
+  const mini = Number(ai?.mini_attempts || 0);
+  const sol = Number(ai?.sol_attempts || 0);
+  if (Number(ai?.sol_completed || 0) > 0 || sol >= P.solMaxAttempts) return { phase: 'give_up', ageMinutes };
+  if (ageMinutes < P.aiStartMinutes) return { phase: 'deterministic', ageMinutes };
+  // A chamada definitiva exige ao menos uma busca econômica antes: uma partida
+  // semeada tarde não pula direto para o modelo caro.
+  if (mini >= 1 && (ageMinutes >= P.solAtMinutes || mini >= P.miniMaxAttempts)) return { phase: 'sol', ageMinutes };
+  return { phase: 'mini', ageMinutes };
+}
+
+// Próximo horário de tentativa quando a partida continua sem público/renda.
+export function nextPublicAttemptMs(task, phaseDone, nextPlan, now = Date.now()) {
+  const P = PUBLIC_POLICY;
+  const end = taskEndMs(task, now);
+  const floor = now + 60_000;
+  if (nextPlan.phase === 'deterministic') return Math.max(floor, Math.min(now + P.deterministicEveryMinutes * 60_000, end + P.aiStartMinutes * 60_000));
+  if (nextPlan.phase === 'mini') return Math.max(floor, Math.min(now + P.miniEveryMinutes * 60_000, end + P.solAtMinutes * 60_000));
+  // Próxima fase é a definitiva. Se a anterior já foi Sol, só pode ter sido
+  // falha técnica (resposta válida encerra o fluxo): espera um pouco mais.
+  if (phaseDone === 'sol') return now + P.solRetryMinutes * 60_000;
+  return Math.max(floor, Math.min(now + P.miniEveryMinutes * 60_000, end + P.solAtMinutes * 60_000));
+}
+
+function brDateTime(value) {
+  const ms = Date.parse(text(value));
+  if (!Number.isFinite(ms)) return text(value) || 'não informado';
+  try {
+    return new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' }).format(new Date(ms)) + ' (Brasília)';
+  } catch (_) { return new Date(ms).toISOString(); }
+}
+
+function fmtInt(value) {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? Math.round(n).toLocaleString('pt-BR') : '';
+}
+
+export function publicAlertMessage(task, values, sources, ai, lastError, env = {}) {
+  const home = text(task.home), away = text(task.away);
+  const score = (task.home_score != null && task.away_score != null) ? ` ${task.home_score} x ${task.away_score} ` : ' x ';
+  const line = (label, value, source, money = false) => {
+    if (!(Number(value) > 0)) return `- ${label}: NÃO ENCONTRADO`;
+    const shown = money ? `R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : fmtInt(value);
+    return `- ${label}: ${shown}${source ? ` (${source})` : ''}`;
+  };
+  const miniModel = text(env?.POSTGAME_OPENAI_MINI_MODEL) || DEFAULT_MINI_MODEL;
+  const solModel = text(env?.POSTGAME_OPENAI_MODEL) || DEFAULT_MODEL;
+  const subject = `⚠️ Fórmula do Gol: público/renda não localizados — ${home} x ${away}`;
+  const body = [
+    'A busca automática terminou sem encontrar público e renda completos.',
+    '',
+    `Partida: ${home}${score}${away}`,
+    `Início: ${brDateTime(task.kickoff)}`,
+    `Fim registrado: ${brDateTime(task.final_at)}`,
+    `event_id: ${text(task.event_id)}`,
+    '',
+    'O que foi encontrado:',
+    line('Público', values.publico, sources?.publico),
+    line('Pagantes', values.publico_pagante, sources?.publico_pagante),
+    line('Renda', values.renda, sources?.renda, true),
+    '',
+    'Tentativas realizadas:',
+    `- ESPN (gratuita): ${Number(ai.deterministic_checks || 0)} consulta(s)`,
+    `- IA econômica (${miniModel}): ${Number(ai.mini_attempts || 0)} busca(s)`,
+    `- IA definitiva (${solModel}): ${Number(ai.sol_attempts || 0)} chamada(s)`,
+    `Último erro: ${text(lastError) || 'nenhum — a informação não foi publicada nas fontes consultadas'}`,
+    ...(text(ai.mini_last_error) && /^openai_(http|error)/.test(text(ai.mini_last_error))
+      ? [`ATENÇÃO — a IA econômica falhou tecnicamente: ${text(ai.mini_last_error)}. Verifique a variável POSTGAME_OPENAI_MINI_MODEL.`]
+      : []),
+    '',
+    'Nenhuma nova busca automática será feita para esta partida.',
+    'Para completar manualmente, adicione a partida em dados-br/correcoes/publicos-verificados.json.',
+    'O Worker aplica o valor em até 10 minutos.'
+  ].join('\n');
+  return { subject, body };
+}
+
+async function sendPublicNotFoundEmail(env, message) {
+  const apiKey = text(env?.RESEND_API_KEY);
+  const to = text(env?.EMAIL_DESTINO);
+  if (!apiKey || !to) return 'not_configured';
+  const from = text(env?.EMAIL_REMETENTE || 'Fórmula do Gol <onboarding@resend.dev>');
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ from, to: [to], subject: message.subject, text: message.body })
+    });
+    return response.ok ? 'sent' : `http_${response.status}`;
+  } catch (error) {
+    return `error:${text(error?.message || error).slice(0, 120)}`;
   }
-  const complete = Number(nextTask.publico) > 0 && Number(nextTask.renda) > 0;
-  const delay = complete ? null : retryMinutes('public', attempt, taskAgeHours(task, now));
+}
+
+async function processPublicTask(env, task, now = Date.now()) {
+  const eventId = text(task.event_id);
+  const ai = await readPublicAiState(env, eventId);
+  const plan = planPublicStep(task, ai, now);
+  const values = { publico: num(task.publico), publico_pagante: num(task.publico_pagante), renda: num(task.renda) };
+  let sources = safeJson(task.public_sources_json, {}) || {};
+  const next = { ...ai, last_phase: plan.phase };
+  let lastError = '';
+
+  // 1) Sempre a fonte gratuita antes de qualquer IA.
+  if (plan.phase !== 'give_up' && !(Number(values.publico) > 0)) {
+    const espn = await fetchEspnAttendance(task);
+    next.deterministic_checks = Number(next.deterministic_checks || 0) + 1;
+    if (espn.publico) {
+      values.publico = espn.publico;
+      sources = { ...sources, publico: espn.source };
+    } else if (espn.error) {
+      lastError = espn.error;
+    }
+  }
+
+  // 2) IA somente nas fases previstas e somente para o que ainda falta.
+  if (!isPublicComplete(values) && (plan.phase === 'mini' || plan.phase === 'sol')) {
+    const found = await searchPublicWithOpenAI(env, { ...task, ...values }, plan.phase);
+    next.last_model = text(found.model);
+    if (plan.phase === 'mini') {
+      next.mini_attempts = Number(next.mini_attempts || 0) + 1;
+      next.mini_last_error = found.found ? '' : text(found.reason);
+    } else {
+      next.sol_attempts = Number(next.sol_attempts || 0) + 1;
+      // Resposta válida da API encerra o fluxo; falha técnica permite repetir.
+      if (found.responded) next.sol_completed = 1;
+    }
+    if (found.found && found.values) {
+      for (const key of ['publico', 'publico_pagante', 'renda']) {
+        if (found.values[key] != null && !(Number(values[key]) > 0)) values[key] = found.values[key];
+      }
+      sources = { ...sources, ...(found.sources || {}) };
+    } else {
+      lastError = text(found.reason) || lastError;
+    }
+  }
+
+  const complete = isPublicComplete(values);
+  let status = complete ? 'resolved' : 'pending';
+  let nextAt = null;
+  if (!complete) {
+    const nextPlan = planPublicStep(task, next, now);
+    if (nextPlan.phase === 'give_up') {
+      status = 'gave_up';
+      if (!next.alert_at) {
+        next.alert_status = await sendPublicNotFoundEmail(env, publicAlertMessage(task, values, sources, next, lastError, env));
+        next.alert_at = nowIso(now);
+      }
+    } else {
+      let nextMs = nextPublicAttemptMs(task, plan.phase, nextPlan, now);
+      if (nextPlan.phase === 'deterministic' && Number(values.publico) > 0) {
+        // A ESPN já entregou o público e nunca publica renda: não há o que
+        // consultar de graça até a janela da IA abrir.
+        nextMs = Math.max(now + 60_000, taskEndMs(task, now) + PUBLIC_POLICY.aiStartMinutes * 60_000);
+      }
+      nextAt = nowIso(nextMs);
+    }
+  }
+
   await env.DB.prepare(`UPDATE postgame_fastlane SET publico=?,publico_pagante=?,renda=?,public_sources_json=?,public_status=?,public_attempts=?,public_last_at=?,public_next_at=?,public_last_error=?,updated_at=CURRENT_TIMESTAMP WHERE event_id=?`)
     .bind(
-      num(nextTask.publico), num(nextTask.publico_pagante), num(nextTask.renda), JSON.stringify(sources), complete ? 'resolved' : 'pending',
-      attempt, nowIso(now), delay == null ? null : nowIso(now + delay * 60_000), found.found ? '' : text(found.reason).slice(0, 1000), task.event_id
+      num(values.publico), num(values.publico_pagante), num(values.renda), JSON.stringify(sources), status,
+      Number(task.public_attempts || 0) + 1, nowIso(now), nextAt, complete ? '' : text(lastError).slice(0, 1000), eventId
     ).run();
-  return { attempted: true, resolved: complete, partial: found.found && !complete, eventId: task.event_id, retryMinutes: delay, reason: found.reason || '' };
+  await writePublicAiState(env, eventId, next);
+  return { eventId, phase: plan.phase, status, nextAt, model: next.last_model || '', alert: status === 'gave_up' ? next.alert_status : '', reason: complete ? '' : lastError };
+}
+
+async function processPublic(env, now = Date.now()) {
+  const tasks = [];
+  for (let i = 0; i < PUBLIC_POLICY.batchPerRun; i += 1) {
+    const task = await claimDue(env, 'public', now);
+    if (!task) break;
+    tasks.push(task);
+  }
+  if (!tasks.length) return { attempted: false };
+  const results = await Promise.all(tasks.map((task) => processPublicTask(env, task, now).catch((error) => ({
+    eventId: text(task.event_id), status: 'error', reason: text(error?.message || error).slice(0, 300)
+  }))));
+  return { attempted: true, processed: results.length, results };
 }
 
 async function ensurePolicyVersion(env, now = Date.now()) {
   const current = Number(await metaGet(env, 'policy_version') || 0);
   if (current >= POSTGAME_POLICY_VERSION) return false;
   const iso = nowIso(now);
-  // Reabre imediatamente apenas tarefas ainda pendentes. Isso evita que o
-  // backoff antigo de horas sobreviva ao deploy da política nova.
-  await env.DB.prepare(`UPDATE postgame_fastlane SET public_next_at=?, updated_at=CURRENT_TIMESTAMP WHERE public_status<>'resolved'`).bind(iso).run();
+  const legacyCutoff = nowIso(now - PUBLIC_POLICY.legacyCutoffHours * 3_600_000);
+  // Política v3: pendências com mais de 24h já foram pesquisadas muitas vezes
+  // pela política antiga. Elas encerram em silêncio — sem nova IA e sem uma
+  // rajada de e-mails no deploy. Correção manual continua entrando pelo seed.
+  await env.DB.prepare(`UPDATE postgame_fastlane SET public_status='gave_up', public_next_at=NULL, public_last_error='encerrada_na_migracao_v3', updated_at=CURRENT_TIMESTAMP
+    WHERE public_status NOT IN ('resolved','gave_up') AND final_at<>'' AND final_at<?`).bind(legacyCutoff).run();
+  await env.DB.prepare(`INSERT OR IGNORE INTO postgame_public_ai (event_id,last_phase,alert_at,alert_status)
+    SELECT event_id,'legacy',?, 'suppressed_legacy' FROM postgame_fastlane WHERE public_status='gave_up'`).bind(iso).run();
+  // As recentes entram na política nova imediatamente.
+  await env.DB.prepare(`UPDATE postgame_fastlane SET public_next_at=?, updated_at=CURRENT_TIMESTAMP WHERE public_status NOT IN ('resolved','gave_up')`).bind(iso).run();
   await metaPut(env, 'static_seed_at', '1970-01-01T00:00:00.000Z');
   await metaPut(env, 'policy_version', String(POSTGAME_POLICY_VERSION));
   return true;
@@ -543,6 +862,7 @@ async function ensurePolicyVersion(env, now = Date.now()) {
 async function cleanup(env, now = Date.now()) {
   const cutoff = nowIso(now - CLEANUP_WINDOW_DAYS * 86400000);
   await env.DB.prepare(`DELETE FROM postgame_fastlane WHERE final_at<?`).bind(cutoff).run();
+  await env.DB.prepare(`DELETE FROM postgame_public_ai WHERE event_id NOT IN (SELECT event_id FROM postgame_fastlane)`).run();
 }
 
 export async function runPostgameMaintenance(env, monitor, now = Date.now()) {
@@ -567,6 +887,11 @@ function publicRow(row) {
     publico: num(row.publico), publico_pagante: num(row.publico_pagante), renda: num(row.renda),
     public_status: text(row.public_status), public_attempts: Number(row.public_attempts || 0), public_next_at: text(row.public_next_at),
     public_sources: safeJson(row.public_sources_json, {}) || {},
+    public_ai: {
+      phase: text(row.ai_last_phase), model: text(row.ai_last_model),
+      espn_checks: Number(row.ai_deterministic_checks || 0), mini_attempts: Number(row.ai_mini_attempts || 0),
+      sol_attempts: Number(row.ai_sol_attempts || 0), alert_at: text(row.ai_alert_at), alert_status: text(row.ai_alert_status)
+    },
     highlight: highlight && highlight.url ? highlight : null,
     highlight_status: text(row.highlight_status), highlight_attempts: Number(row.highlight_attempts || 0), highlight_next_at: text(row.highlight_next_at),
     updated_at: text(row.updated_at)
@@ -578,9 +903,9 @@ export async function readPostgameFastlane(env, eventIds = []) {
   let result;
   if (ids.length) {
     const placeholders = ids.map(() => '?').join(',');
-    result = await env.DB.prepare(`SELECT * FROM postgame_fastlane WHERE event_id IN (${placeholders}) ORDER BY final_at DESC`).bind(...ids).all();
+    result = await env.DB.prepare(`SELECT p.*, a.last_phase AS ai_last_phase, a.last_model AS ai_last_model, a.deterministic_checks AS ai_deterministic_checks, a.mini_attempts AS ai_mini_attempts, a.sol_attempts AS ai_sol_attempts, a.alert_at AS ai_alert_at, a.alert_status AS ai_alert_status FROM postgame_fastlane p LEFT JOIN postgame_public_ai a ON a.event_id=p.event_id WHERE p.event_id IN (${placeholders}) ORDER BY p.final_at DESC`).bind(...ids).all();
   } else {
-    result = await env.DB.prepare(`SELECT * FROM postgame_fastlane ORDER BY final_at DESC LIMIT 20`).all();
+    result = await env.DB.prepare(`SELECT p.*, a.last_phase AS ai_last_phase, a.last_model AS ai_last_model, a.deterministic_checks AS ai_deterministic_checks, a.mini_attempts AS ai_mini_attempts, a.sol_attempts AS ai_sol_attempts, a.alert_at AS ai_alert_at, a.alert_status AS ai_alert_status FROM postgame_fastlane p LEFT JOIN postgame_public_ai a ON a.event_id=p.event_id ORDER BY p.final_at DESC LIMIT 20`).all();
   }
   return (result?.results || []).map(publicRow);
 }
@@ -588,15 +913,18 @@ export async function readPostgameFastlane(env, eventIds = []) {
 export async function postgameStatus(env) {
   const counts = await env.DB.prepare(`SELECT
     COUNT(*) AS total,
-    SUM(CASE WHEN public_status<>'resolved' THEN 1 ELSE 0 END) AS public_pending,
+    SUM(CASE WHEN public_status NOT IN ('resolved','gave_up') THEN 1 ELSE 0 END) AS public_pending,
+    SUM(CASE WHEN public_status='gave_up' THEN 1 ELSE 0 END) AS public_gave_up,
     SUM(CASE WHEN highlight_status<>'resolved' THEN 1 ELSE 0 END) AS highlight_pending
     FROM postgame_fastlane`).first();
   return {
     ok: true,
     engine: 'cloudflare-postgame-fastlane',
-    version: 2,
+    version: POSTGAME_POLICY_VERSION,
+    publicPolicy: PUBLIC_POLICY,
     total: Number(counts?.total || 0),
     publicPending: Number(counts?.public_pending || 0),
+    publicGaveUp: Number(counts?.public_gave_up || 0),
     highlightPending: Number(counts?.highlight_pending || 0),
     lastRun: safeJson(await metaGet(env, 'last_run'), null),
     staticSeedError: await metaGet(env, 'static_seed_error')

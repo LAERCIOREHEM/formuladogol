@@ -124,6 +124,13 @@ PREFERRED_WEB_DOMAINS = (
 )
 
 MIN_CONFIANCA = 0.90
+
+# A busca paga de público/renda roda SOMENTE no Cloudflare Worker (postgame
+# fastlane, política v3). Esta camada importa, sem custo, o que o Worker já
+# encontrou e grava nos JSONs do repositório pelo mesmo validador de sempre.
+# A busca antiga por OpenAI a partir do GitHub só volta com PUBLICOS_IA_GITHUB=on.
+WORKER_POSTGAME_URL = os.environ.get("FDG_POSTGAME_URL", "https://push.formuladogol.com.br/v1/postgame").strip()
+WORKER_JUSTIFICATIVA = "Importado do Cloudflare postgame fastlane: número com URL verificada pelo web_search do Worker."
 MAX_PUBLICO = 250_000
 GRACE_HORAS_PADRAO = 0.5
 MAX_TENTATIVAS_PADRAO = 0  # compatibilidade CLI; não existe mais esgotamento definitivo
@@ -408,6 +415,55 @@ def pendencias(
 # --------------------------------------------------------------------------- #
 # camada OpenAI
 # --------------------------------------------------------------------------- #
+def propostas_do_worker(linhas: Sequence[Mapping[str, Any]]) -> tuple[list[dict[str, Any]], set[str]]:
+    """Converte linhas do /v1/postgame no formato de proposta aceito por validar()."""
+    propostas: list[dict[str, Any]] = []
+    fontes: set[str] = set()
+    for linha in linhas or []:
+        if not isinstance(linha, Mapping):
+            continue
+        event_id = str(linha.get("event_id") or "").strip()
+        fontes_linha = linha.get("public_sources") if isinstance(linha.get("public_sources"), Mapping) else {}
+        publico = linha.get("publico")
+        renda = linha.get("renda")
+        pagantes = linha.get("publico_pagante")
+        fonte_pub = str(fontes_linha.get("publico") or "").strip()
+        fonte_renda = str(fontes_linha.get("renda") or "").strip()
+        tem_publico = numero_publico(publico) is not None and bool(normalizar_url(fonte_pub))
+        tem_renda = numero_renda(renda) is not None and bool(normalizar_url(fonte_renda))
+        if not event_id or not (tem_publico or tem_renda):
+            continue
+        for url in (fonte_pub, fonte_renda, str(fontes_linha.get("publico_pagante") or "")):
+            alvo = normalizar_url(url)
+            if alvo:
+                fontes.add(alvo)
+        propostas.append({
+            "event_id": event_id,
+            "encontrado": True,
+            "publico": numero_publico(publico) if tem_publico else None,
+            "tipo": "presente" if tem_publico else "indefinido",
+            "pagantes": numero_publico(pagantes) if tem_publico else None,
+            "renda": numero_renda(renda) if tem_renda else None,
+            "fonte_url": fonte_pub if tem_publico else "",
+            "fonte_url_renda": fonte_renda if tem_renda else "",
+            "confianca": 0.95,
+            "justificativa": WORKER_JUSTIFICATIVA,
+        })
+    return propostas, fontes
+
+
+def buscar_linhas_worker(event_ids: Sequence[str], timeout: int = 20) -> list[dict[str, Any]]:
+    ids = [str(e).strip() for e in event_ids if str(e).strip()][:40]
+    if not ids or not WORKER_POSTGAME_URL:
+        return []
+    url = f"{WORKER_POSTGAME_URL}?event_ids={urllib.parse.quote(','.join(ids), safe=',')}"
+    req = urllib.request.Request(url, headers={"User-Agent": "FormulaDoGol-Importador/1.0", "Accept": "application/json"})
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        dados = json.loads(resp.read().decode("utf-8"))
+    linhas = dados.get("rows") if isinstance(dados, Mapping) else None
+    return [dict(x) for x in linhas or [] if isinstance(x, Mapping)]
+
+
 def schema_resposta() -> dict[str, Any]:
     item = {
         "type": "object",
@@ -1061,6 +1117,22 @@ def self_test() -> int:
     assert vazio["ultima_execucao"]["erro"] == "OPENAI_API_KEY ausente"
     assert vazio["gerado_em"] == agora.isoformat()
 
+    # Importador do Worker: converte, respeita fontes e passa pelo validador real.
+    linhas = [
+        {"event_id": "1", "publico": 42317, "publico_pagante": 40100, "renda": 2150000.0,
+         "public_sources": {"publico": "https://www.espn.com.br/futebol/partida/_/jogoId/1",
+                            "renda": "https://ge.globo.com/futebol/jogo.ghtml"}},
+        {"event_id": "2", "publico": None, "renda": None, "public_sources": {}},
+        {"event_id": "3", "publico": 30000, "renda": None, "public_sources": {}},
+    ]
+    props, fontes_w = propostas_do_worker(linhas)
+    assert [p["event_id"] for p in props] == ["1"], "sem fonte ou sem número não vira proposta"
+    assert props[0]["publico"] == 42317 and props[0]["renda"] == 2150000.0
+    assert normalizar_url("https://ge.globo.com/futebol/jogo.ghtml") in fontes_w
+    pend_w = [{"event_id": "1", "faltando": ["publico", "renda"]}]
+    ok_w, rej_w = validar(props, pend_w, fontes_w)
+    assert len(ok_w) == 1 and not rej_w, (ok_w, rej_w)
+
     print("Self-test completar_publicos_ia: OK")
     return 0
 
@@ -1165,6 +1237,9 @@ def main() -> int:
             contar_tentativa=False,
         )
 
+    if os.environ.get("PUBLICOS_IA_GITHUB", "").strip().lower() not in {"1", "true", "on", "sim"}:
+        return importar_do_worker(args, pendentes, estado, agora, alvo)
+
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not api_key:
         print("ERRO DE CONFIGURAÇÃO: OPENAI_API_KEY não chegou ao runner.", file=sys.stderr)
@@ -1236,6 +1311,42 @@ def main() -> int:
         "aceitos": [str(x.get("event_id") or "") for x in aceitos],
         "rejeitados": [{"event_id": str(x.get("event_id") or ""), "motivos": list(x.get("motivos") or [])} for x in rejeitados],
         "resultado": "dados_novos" if gravados else "nao_encontrado_ou_sem_alteracao",
+    })
+    print(f"novos={'true' if gravados else 'false'}")
+    return 0
+
+
+def importar_do_worker(args: argparse.Namespace, pendentes: Sequence[Mapping[str, Any]], estado: Mapping[str, Any], agora: datetime, alvo: str) -> int:
+    """Caminho padrão: zero OpenAI. Traz do Worker o que ele já validou."""
+    ids = [str(p.get("event_id") or "") for p in pendentes]
+    print(f"Importando do Cloudflare Worker {len(ids)} partida(s) com lacuna de público/renda (sem chamada de IA).")
+    erro = ""
+    try:
+        linhas = buscar_linhas_worker(ids)
+    except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
+        linhas = []
+        erro = f"worker_indisponivel: {str(exc)[:200]}"
+        print(f"Worker indisponível: {erro}", file=sys.stderr)
+    propostas, fontes = propostas_do_worker(linhas)
+    aceitos, rejeitados = validar(propostas, pendentes, fontes)
+    gravados = aplicar(aceitos) if (aceitos and not args.dry_run) else 0
+    for item in aceitos:
+        reg = item.get("registro") or {}
+        print(f"  IMPORTADO {item['event_id']}: público={reg.get('publico')} renda={reg.get('renda')}")
+    if not args.dry_run:
+        if erro:
+            novo = atualizar_estado_erro_tecnico(dict(estado), pendentes, erro, agora)
+        else:
+            novo = atualizar_estado(dict(estado), pendentes, aceitos, rejeitados, args.max_tentativas, "", agora)
+        salvar_json(ESTADO, novo)
+    emitir_diagnostico({
+        "modo": args.modo, "event_id": alvo, "openai_called": False, "model": "",
+        "web_search": False, "web_search_calls": 0, "source_rows": len(linhas), "urls": sorted(fontes)[:20],
+        "origem": "cloudflare-postgame-fastlane",
+        "pendentes": ids,
+        "aceitos": [str(x.get("event_id") or "") for x in aceitos],
+        "rejeitados": [{"event_id": str(x.get("event_id") or ""), "motivos": list(x.get("motivos") or [])} for x in rejeitados],
+        "resultado": "erro_tecnico" if erro else ("dados_novos" if gravados else "nao_encontrado_ou_sem_alteracao"),
     })
     print(f"novos={'true' if gravados else 'false'}")
     return 0
