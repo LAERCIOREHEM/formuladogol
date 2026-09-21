@@ -16,6 +16,33 @@ class Parser(HTMLParser):
     pass
 
 
+META_LEAK_PATTERNS = (
+    "schema editorial_fdg_",
+    "editorial_fdg_",
+    "solicitado pelo usuário",
+    "solicitada pelo usuário",
+    "desenvolvedor responsável",
+    "nesta conversa digital",
+    "nesta conversa",
+    "api estruturada",
+    "json compatível com o schema",
+    "compatível com o schema",
+    "instruções detalhadas de redação",
+    "instruções do sistema",
+    "prompt do sistema",
+    "prompt do desenvolvedor",
+)
+
+
+def assert_no_internal_leak(value: object, label: str) -> None:
+    if isinstance(value, str):
+        blob = value.casefold()
+    else:
+        blob = json.dumps(value, ensure_ascii=False, separators=(",", ":")).casefold()
+    hit = next((pattern for pattern in META_LEAK_PATTERNS if pattern in blob), None)
+    assert not hit, f"{label}: vazamento de instrução/metadado interno ({hit})"
+
+
 def editorial_id(article: dict) -> str:
     value = str(article.get("id_editorial") or "").strip()
     if value:
@@ -65,9 +92,15 @@ def validate(root: Path) -> None:
         ids.add(identifier); slugs.add(slug); urls.add(url)
         assert article.get("hash_editorial"), f"{slug}: hash editorial ausente"
         assert isinstance(article.get("editorial"), dict), f"{slug}: conteúdo editorial ausente"
+        assert_no_internal_leak(article.get("editorial"), f"{slug} manifesto")
+        for section in (article.get("editorial") or {}).get("secoes") or []:
+            for paragraph in section.get("paragrafos") or []:
+                clean = str(paragraph or "").rstrip()
+                assert clean and clean[-1] in ('.', '!', '?', '…', '"', "'"), f"{slug}: parágrafo editorial truncado/sem pontuação final"
         assert article.get("rotulo_menu") and article.get("categoria"), f"{slug}: metadados de navegação ausentes"
         page = root / "analises" / slug
         text = page.read_text(encoding="utf-8")
+        assert_no_internal_leak(text, f"{slug} HTML")
         Parser().feed(text)
         assert '"@type":"NewsArticle"' in text, f"{slug}: NewsArticle ausente"
         assert f'data-fdg-editorial-id="{identifier}"' in text, f"{slug}: marcador editorial genérico ausente"

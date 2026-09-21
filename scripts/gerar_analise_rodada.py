@@ -682,6 +682,29 @@ def editorial_gerado_pela_openai(origem: Any) -> bool:
     return str(origem or "").startswith("openai:")
 
 
+def editorial_reutilizavel(origem: Any) -> bool:
+    valor = str(origem or "").strip().casefold()
+    return valor.startswith("openai:") or valor.startswith("editorial_curado") or valor.startswith("editorial-curado")
+
+
+META_LEAK_PATTERNS = (
+    "schema editorial_fdg_",
+    "editorial_fdg_",
+    "solicitado pelo usuário",
+    "solicitada pelo usuário",
+    "desenvolvedor responsável",
+    "nesta conversa digital",
+    "nesta conversa",
+    "api estruturada",
+    "json compatível com o schema",
+    "compatível com o schema",
+    "instruções detalhadas de redação",
+    "instruções do sistema",
+    "prompt do sistema",
+    "prompt do desenvolvedor",
+)
+
+
 def validar_editorial(editorial: dict[str, Any], dossie: dict[str, Any]) -> None:
     if set(editorial) != {"titulo", "linha_fina", "secoes"}:
         raise ErroAnalise("Editorial fora do schema esperado")
@@ -697,9 +720,20 @@ def validar_editorial(editorial: dict[str, Any], dossie: dict[str, Any]) -> None
     if not all(isinstance(x, str) and x.strip() for x in campos):
         raise ErroAnalise("Editorial incompleto")
     texto = " ".join(campos)
+    texto_cf = texto.casefold()
     proibidos = ["vale destacar", "a narrativa", "mergulhar", "jornada", "o futebol nos ensina", "mais do que nunca", "dossiê factual", "snapshot"]
-    if any(frase in texto.casefold() for frase in proibidos):
+    if any(frase in texto_cf for frase in proibidos):
         raise ErroAnalise("Editorial contém linguagem artificial proibida")
+    vazamento = next((frase for frase in META_LEAK_PATTERNS if frase in texto_cf), None)
+    if vazamento:
+        raise ErroAnalise(f"Editorial contém vazamento de instrução/metadado interno: {vazamento}")
+    for secao in secoes:
+        for paragrafo in secao.get("paragrafos") or []:
+            limpo = paragrafo.rstrip()
+            if not limpo or limpo[-1] not in ('.', '!', '?', '…', '"', "'"):
+                raise ErroAnalise("Editorial contém parágrafo truncado ou sem pontuação final")
+            if len(re.findall(r"\b[\wÀ-ÿ-]+\b", limpo)) > 220:
+                raise ErroAnalise("Editorial contém parágrafo anormalmente longo")
     clubes = {c["clube"] for c in dossie["clubes"]}
     conhecidos = [c for c in clubes if c.casefold() in texto.casefold()]
     if not conhecidos:
@@ -1391,21 +1425,31 @@ def executar(args: argparse.Namespace) -> int:
     manifesto = carregar_manifesto()
     artigos = manifesto.get("artigos") or []
     anterior = next((a for a in artigos if int(a.get("rodada") or 0) == rodada), None)
-    anterior_com_ia = bool(anterior and editorial_gerado_pela_openai(anterior.get("origem_editorial")))
+    anterior_reutilizavel = bool(anterior and editorial_reutilizavel(anterior.get("origem_editorial")))
+    editorial_anterior = anterior.get("editorial") if anterior else None
+    anterior_valido = False
+    if anterior and isinstance(editorial_anterior, dict):
+        try:
+            validar_editorial(editorial_anterior, dossie)
+            anterior_valido = True
+        except ErroAnalise as exc:
+            print(f"::warning title=Editorial existente reprovado::R{rodada} será regenerada em vez de reutilizada. {exc}")
+
     if (
         anterior
         and anterior.get("hash_dossie") == hash_dossie
         and not args.forcar
-        and (anterior_com_ia or args.sem_ia)
+        and anterior_valido
+        and (anterior_reutilizavel or args.sem_ia)
     ):
-        print(f"Rodada {rodada} já publicada com o mesmo dossiê; API e arquivos não foram acionados.")
+        print(f"Rodada {rodada} já publicada com o mesmo dossiê e editorial validado; API e arquivos não foram acionados.")
         return 0
 
-    editorial_anterior = anterior.get("editorial") if anterior else None
     reutilizar_editorial = bool(
         anterior
         and not args.forcar
-        and (anterior_com_ia or args.sem_ia)
+        and anterior_valido
+        and (anterior_reutilizavel or args.sem_ia)
         and anterior.get("hash_editorial") == hash_fatos_editoriais
         and isinstance(editorial_anterior, dict)
     )
@@ -1465,6 +1509,36 @@ def executar(args: argparse.Namespace) -> int:
 def self_test() -> int:
     assert editorial_gerado_pela_openai("openai:gpt-5.6-terra")
     assert not editorial_gerado_pela_openai("editorial_curado")
+    assert editorial_reutilizavel("openai:gpt-5.6-sol:editorial-dedicado-v5:copydesk")
+    assert editorial_reutilizavel("editorial_curado:correcao-r28-v1")
+    teste_dossie = {"clubes": [{"clube": "Flamengo"}]}
+    p1 = " ".join(["Flamengo"] * 190) + "."
+    p2 = " ".join(["Flamengo"] * 190) + "."
+    teste_editorial = {
+        "titulo": "Rodada 28: Flamengo em destaque",
+        "linha_fina": "Flamengo encerra a rodada em evidência.",
+        "secoes": [
+            {"titulo": "Cenário", "paragrafos": [p1]},
+            {"titulo": "Consequências", "paragrafos": [p2]},
+        ],
+    }
+    validar_editorial(teste_editorial, teste_dossie)
+    contaminado = json.loads(json.dumps(teste_editorial, ensure_ascii=False))
+    contaminado["secoes"][0]["paragrafos"][0] = p1[:-1] + " conforme solicitado pelo usuário no schema editorial_fdg_brasileirao."
+    try:
+        validar_editorial(contaminado, teste_dossie)
+    except ErroAnalise:
+        pass
+    else:
+        raise AssertionError("validador não bloqueou vazamento interno")
+    truncado = json.loads(json.dumps(teste_editorial, ensure_ascii=False))
+    truncado["secoes"][0]["paragrafos"][0] = p1[:-1]
+    try:
+        validar_editorial(truncado, teste_dossie)
+    except ErroAnalise:
+        pass
+    else:
+        raise AssertionError("validador não bloqueou parágrafo truncado")
     assert percentual(0) == "0%"
     assert percentual(0, True) == "<0,001%"
     assert percentual(0, False) == "0%"
