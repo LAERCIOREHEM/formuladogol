@@ -1309,43 +1309,6 @@ jobs:
           gh workflow run deploy.yml --ref main
           echo "Deploy do site disparado para o main recém-publicado."
 
-      - name: Disparar editorial continental assim que o fechamento brasileiro estiver pronto
-        if: ${{ always() && steps.continental.outcome == 'success' }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          # Lê exatamente o main que acabou de ser publicado. Isso elimina a
-          # dependência de o Orchestrator/Pages perceberem a mudança primeiro.
-          git fetch origin main
-          git reset --hard origin/main
-
-          python scripts/gerar_analise_continental.py --eligibility > /tmp/continental-after-update.json
-          cat /tmp/continental-after-update.json
-          action="$(python - <<'PY'
-          import json
-          data = json.load(open('/tmp/continental-after-update.json', encoding='utf-8'))
-          print(str(data.get('action') or 'none'))
-          PY
-          )"
-
-          if [[ "$action" != "publish" ]]; then
-            echo "Editorial continental ainda não elegível: action=$action."
-            exit 0
-          fi
-
-          # Evita duplicar run se outro ciclo já o colocou na fila. O próprio
-          # workflow editorial continua idempotente e revalida todos os fatos.
-          busy="$(gh run list --workflow publicar-analise-continentais.yml --branch main --limit 10 --json status --jq '[.[] | select(.status == "queued" or .status == "in_progress")] | length')"
-          if [[ "${busy:-0}" -gt 0 ]]; then
-            echo "Editorial continental já está queued/in_progress; sem dispatch duplicado."
-            exit 0
-          fi
-
-          gh workflow run publicar-analise-continentais.yml --ref main
-          echo "Editorial continental disparado diretamente após sincronização factual + AF."
 
   # Alerta integrado ao próprio workflow. Substitui o antigo workflow
   # "Monitorar Atualizar Brasileirao" e evita uma execução cinza a cada hora.

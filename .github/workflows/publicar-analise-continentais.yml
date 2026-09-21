@@ -64,7 +64,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python scripts/gerar_analise_continental.py --eligibility > /tmp/continental-eligibility.json
+          python scripts/gerar_analise_continental.py --dispatch-decision > /tmp/continental-eligibility.json
           cat /tmp/continental-eligibility.json
           python - <<'PY'
           import json
@@ -99,23 +99,9 @@ jobs:
         if: steps.breaker.outputs.blocked != 'true' && steps.readiness.outputs.action != 'none'
         run: |
           set -euo pipefail
-          python -m py_compile scripts/editorial_ia.py scripts/gerar_analise_continental.py scripts/buscar_melhores_momentos_continentais.py
+          python -m py_compile scripts/editorial_ia.py scripts/gerar_analise_continental.py
           python scripts/editorial_ia.py --self-test
           python scripts/gerar_analise_continental.py --self-test
-          python scripts/buscar_melhores_momentos_continentais.py --self-test
-
-      - name: Buscar melhores momentos oficiais da CONMEBOL
-        if: steps.breaker.outputs.blocked != 'true' && steps.readiness.outputs.action == 'publish'
-        env:
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ -n "${YOUTUBE_API_KEY:-}" ]]; then
-            python scripts/buscar_melhores_momentos_continentais.py --fase-ordem "${{ steps.readiness.outputs.rank }}"
-          else
-            echo "::warning title=YouTube API ausente::Preservando vínculos já publicados; o editorial não será bloqueado."
-          fi
 
       - name: Auditar fatos com IA e gerar editorial continental
         if: steps.breaker.outputs.blocked != 'true' && steps.readiness.outputs.action != 'none'
@@ -143,7 +129,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          FILES=(analises dados-br/analises.json dados-br/melhores-momentos-continentais.json dados-br/historico-probabilidades-continentais.json sitemap.xml news-sitemap.xml feed.xml)
+          FILES=(analises dados-br/analises.json dados-br/historico-probabilidades-continentais.json sitemap.xml news-sitemap.xml feed.xml)
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "Nenhuma alteração editorial necessária."

@@ -1,0 +1,135 @@
+name: Atualizar melhores momentos continentais
+run-name: Melhores momentos CONMEBOL · ${{ inputs.event_id || 'fase' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      event_id:
+        description: 'ESPN event_id específico (vazio = fase inteira)'
+        required: false
+        type: string
+      fase_ordem:
+        description: '600=oitavas, 700=quartas, 800=semi, 900=final (0=detectar)'
+        required: false
+        default: '0'
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: repo-write-main
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Baixar main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validar pipeline continental de vídeos
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/buscar_melhores_momentos_continentais.py scripts/gerar_analise_continental.py
+          python scripts/buscar_melhores_momentos_continentais.py --self-test
+
+      - name: Buscar somente o que está pendente
+        id: collect
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          EVENT_ID: ${{ inputs.event_id }}
+          PHASE_RANK: ${{ inputs.fase_ordem || '0' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${YOUTUBE_API_KEY:-}" ]]; then
+            echo "::warning title=YouTube API ausente::Nenhuma busca continental foi executada."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          BEFORE="$(sha256sum dados-br/melhores-momentos-continentais.json | awk '{print $1}')"
+          ARGS=(--fase-ordem "${PHASE_RANK:-0}")
+          if [[ -n "${EVENT_ID:-}" ]]; then
+            ARGS+=(--event-id "$EVENT_ID")
+          fi
+          python scripts/buscar_melhores_momentos_continentais.py "${ARGS[@]}"
+          AFTER="$(sha256sum dados-br/melhores-momentos-continentais.json | awk '{print $1}')"
+          if [[ "$BEFORE" == "$AFTER" ]]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Nenhum vínculo continental mudou."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Arquivo de melhores momentos continentais mudou."
+          fi
+
+      - name: Sincronizar vídeo no artigo sem regenerar editorial
+        if: steps.collect.outputs.changed == 'true'
+        env:
+          PHASE_RANK: ${{ inputs.fase_ordem || '0' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/gerar_analise_continental.py --sincronizar-videos --fase-ordem "${PHASE_RANK:-0}"
+
+      - name: Validar artefatos
+        if: steps.collect.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          python -m json.tool dados-br/melhores-momentos-continentais.json >/dev/null
+          python -m json.tool dados-br/analises.json >/dev/null
+          python scripts/validar_artefatos_analises.py
+
+      - name: Publicar alterações
+        if: steps.collect.outputs.changed == 'true'
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          FILES=(dados-br/melhores-momentos-continentais.json dados-br/analises.json analises)
+          git add -- "${FILES[@]}"
+          if git diff --cached --quiet; then
+            echo "published=false" >> "$GITHUB_OUTPUT"
+            echo "Nenhuma alteração publicável depois da sincronização."
+            exit 0
+          fi
+
+          git commit -m "Atualizar melhores momentos continentais"
+          for i in 1 2 3 4 5; do
+            if git push origin HEAD:main; then
+              echo "published=true" >> "$GITHUB_OUTPUT"
+              echo "Push OK na tentativa $i."
+              exit 0
+            fi
+            echo "Push rejeitado; reaplicando commit sobre origin/main (tentativa $i)."
+            git fetch origin main
+            git rebase origin/main
+            sleep 2
+          done
+          echo "ERRO: push falhou após 5 tentativas."
+          exit 1
+
+      - name: Disparar deploy do site
+        if: steps.publish.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run deploy.yml --ref main
+          echo "Deploy do site disparado; nenhuma IA editorial foi chamada."
