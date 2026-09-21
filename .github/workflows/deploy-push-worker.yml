@@ -237,6 +237,8 @@ jobs:
             problems.push(`liveFactsContractVersion=${h.liveFactsContractVersion} esperado=${expectedFactsContract}`);
           }
           if (h.canonicalLiveFacts !== true) problems.push('canonicalLiveFacts!=true');
+          if (h.sportsMonitorFactsAuthority !== true) problems.push('sportsMonitorFactsAuthority!=true');
+          if (Number(h.sportsMonitorFactsVersion) !== 1) problems.push(`sportsMonitorFactsVersion=${h.sportsMonitorFactsVersion}`);
           if (h.postgameFastlane !== true) problems.push('postgameFastlane!=true');
           if (Number(h.postgameFastlaneVersion) !== 1) problems.push(`postgameFastlaneVersion=${h.postgameFastlaneVersion}`);
           if (h.liveStatePrimary !== 'worker-espn') problems.push(`liveStatePrimary=${h.liveStatePrimary}`);
