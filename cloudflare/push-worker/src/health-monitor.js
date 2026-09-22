@@ -5,6 +5,7 @@ const SITE = 'https://formuladogol.com.br';
 const ORCH = 'https://orchestrator.formuladogol.com.br';
 const SNAPSHOT_TTL_MS = 5 * 60_000;
 const DAILY_HOUR_BRT = 8;
+const HEALTH_POLICY_VERSION = 2;
 
 function text(v) { return String(v ?? '').trim(); }
 function n(v) { const x = Number(v); return Number.isFinite(x) ? x : 0; }
@@ -30,9 +31,27 @@ function indicator(id,label,severity,detail=''){ return {id,label,severity,detai
 function worst(indicators){ return indicators.some(x=>x.severity==='red')?'red':indicators.some(x=>x.severity==='yellow')?'yellow':'green'; }
 function icon(s){ return s==='red'?'🔴':s==='yellow'?'🟡':'🟢'; }
 
+export function githubActionsSeverity({ dormant=false, dispatches=0, previousDispatches=0, pendingPostgameTasks=0, hoursToNext=Infinity, hasPrevious=false } = {}) {
+  const current=n(dispatches);
+  const previous=n(previousDispatches);
+  const increased=hasPrevious && current>previous;
+  const quietWindow=dormant && n(pendingPostgameTasks)===0 && Number(hoursToNext)>72;
+  if (quietWindow && increased) {
+    const delta=current-previous;
+    return {severity:'red',detail:`${current} dispatch(es) /24h · +${delta} novo(s) em modo dormant sem tarefa pendente`};
+  }
+  if (current>8) return {severity:'yellow',detail:`${current} dispatch(es) nas últimas 24h · volume elevado, sem evidência de loop atual`};
+  if (quietWindow) return {severity:'green',detail:`${current} dispatch(es) nas últimas 24h · estável; nenhum novo dispatch anômalo em modo dormant`};
+  return {severity:'green',detail:`${current} dispatch(es) nas últimas 24h`};
+}
+
+export function isDailyDigestDue(br,lastDate){
+  return Number(br?.hour)===DAILY_HOUR_BRT && text(lastDate)!==text(br?.date);
+}
+
 export async function collectHealthSnapshot(env, monitor = null, now = Date.now(), force = false) {
   const previous = safeJson(await metaGet(env,'snapshot'),null);
-  if (!force && previous && now-(Date.parse(previous.at)||0)<SNAPSHOT_TTL_MS) return previous;
+  if (!force && previous && Number(previous.policyVersion) === HEALTH_POLICY_VERSION && now-(Date.parse(previous.at)||0)<SNAPSHOT_TTL_MS) return previous;
   const [site, orchHealth, orchStatus, ai, post] = await Promise.all([
     fetchJson(`${text(env.SITE_BASE)||SITE}/`), fetchJson(`${ORCH}/health`), fetchJson(`${ORCH}/status`), aiUsageSummary(env,24),
     env.DB.prepare(`SELECT COUNT(*) total,
@@ -47,6 +66,13 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   const os=orchStatus?.body||{};
   const dispatches=n(os.githubDispatchesLast24h);
   const dormant=text(os.workloadMode)==='dormant';
+  const pendingOrchestrator=n(os.pendingPostgameTasks);
+  const previousDispatches=n(previous?.orchestrator?.githubDispatchesLast24h);
+  const nextRelevantMs=Date.parse(text(os.nextRelevantMatchAt));
+  const hoursToNext=Number.isFinite(nextRelevantMs)?(nextRelevantMs-now)/3_600_000:Infinity;
+  const githubSeverity=githubActionsSeverity({
+    dormant, dispatches, previousDispatches, pendingPostgameTasks:pendingOrchestrator, hoursToNext, hasPrevious:Boolean(previous)
+  });
   const active=n(m.activeGames);
   const lastPoll=n(m.lastPollAt);
   const staleLive=active>0 && (!lastPoll || now-lastPoll>3*60_000);
@@ -57,7 +83,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   const indicators=[
     indicator('site','Site / Pages',site.ok?'green':'red',site.ok?`HTTP ${site.status}`:`indisponível (HTTP ${site.status||'erro'})`),
     indicator('orchestrator','Orchestrator',orchHealth.ok&&orchStatus.ok?'green':'red',orchHealth.ok?`${text(os.workloadMode)||'modo desconhecido'} · próximo: ${fmtDate(os.nextRelevantMatchAt)}`:'health/status indisponível'),
-    indicator('github','GitHub Actions',dormant&&dispatches>3?'red':dispatches>8?'yellow':'green',`${dispatches} dispatch(es) nas últimas 24h${dormant?' · modo dormant':''}`),
+    indicator('github','GitHub Actions',githubSeverity.severity,githubSeverity.detail),
     indicator('brasileirao','Brasileirão / ESPN',m.ok===false?'red':'green',m.ok===false?'Sports Monitor reportou falha':'monitor esportivo operacional'),
     indicator('live','Ao Vivo',n(m.readinessRed)>0||staleLive?'red':'green',active?`${active} jogo(s) ativo(s) · readinessRed ${n(m.readinessRed)}`:'nenhum jogo ativo'),
     indicator('postgame','Pós-jogo',gave>0?'red':postPending>0?'yellow':'green',`${postPending} pendência(s) · ${gave} encerrada(s) sem solução em 24h`),
@@ -66,7 +92,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     indicator('infra','Infraestrutura / SMTP',!cfg.configured||probe?.ok===false?'red':'green',`${cfg.transport} · ${maskAddress(cfg.to)}${probe?` · probe ${probe.ok?'OK':'FALHOU'}`:''}`),
     indicator('openai','OpenAI / Web Search',perEventAnomaly?'red':ai.failures>3?'yellow':'green',`${ai.calls} chamada(s), ${ai.webSearches} web search(es), ${ai.failures} falha(s) /24h${perEventAnomaly?` · anomalia event ${text(perEventAnomaly.event_id)}`:''}`),
   ];
-  const snapshot={at:iso(now),state:worst(indicators),indicators,ai,orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:n(os.pendingPostgameTasks),githubDispatchesLast24h:dispatches},postgame:{pending:postPending,gaveUp24h:gave,highlightPending:highlight},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to)}};
+  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches},postgame:{pending:postPending,gaveUp24h:gave,highlightPending:highlight},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to)}};
   await metaPut(env,'snapshot',JSON.stringify(snapshot));
   return snapshot;
 }
@@ -119,7 +145,7 @@ export async function runHealthMonitor(env, monitor=null, now=Date.now()){
   await syncIncidents(env,snapshot,now);
   const br=brParts(now); const last=await metaGet(env,'daily_digest_date');
   let daily='not_due';
-  if(br.hour>=DAILY_HOUR_BRT && last!==br.date){
+  if(isDailyDigestDue(br,last)){
     daily=await sendMail(env,digestMessage(snapshot,now));
     if(daily==='sent') await metaPut(env,'daily_digest_date',br.date);
   }
