@@ -25,6 +25,7 @@ import { buildHotMatchPrematchEvent, hotMatchNextPollDelay, hotMatchPrematchDue,
 import { recordPostgameFinal } from './postgame-fastlane.js';
 import { buildSportsMonitorLiveFacts, SPORTS_MONITOR_FACTS_VERSION } from './monitor-live-facts.js';
 import { sendMail, mailConfig } from './mailer.js';
+import { countWebSearchCalls, recordAiUsage } from './ai-usage.js';
 
 const AGENDA_URL = 'https://formuladogol.com.br/dados-br/agenda-clubes-br.json';
 const ALLOWED_LEAGUES = new Set(['bra.1', 'bra.copa_do_brazil', 'conmebol.libertadores', 'conmebol.sudamericana']);
@@ -717,27 +718,35 @@ export class SportsMonitor {
     if (!apiKey) return { attempted: false, recovered: false, resolved: null, reason: 'openai_key_missing' };
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 25_000);
+    const startedAt = Date.now();
+    let httpStatus = null, webSearchCalls = 0;
+    const usage = async (ok, responded, detail='') => recordAiUsage(this.env, {
+      purpose:'readiness_guardian', eventId:game?.eventId, model:'gpt-5.6-sol', phase:String(checkpoint||''),
+      webSearchCalls, responded, ok, httpStatus, durationMs:Date.now()-startedAt, detail
+    });
     try {
       const response = await fetch('https://api.openai.com/v1/responses', {
         method: 'POST', signal: controller.signal,
         headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
         body: JSON.stringify(aiResolverRequest(game, checkpoint))
       });
-      if (!response.ok) return { attempted: true, recovered: false, resolved: null, reason: `openai_http_${response.status}` };
-      const parsed = parseOpenAIJson(await response.json());
+      httpStatus = response.status;
+      if (!response.ok) { await usage(false,false,`openai_http_${response.status}`); return { attempted:true,recovered:false,resolved:null,reason:`openai_http_${response.status}` }; }
+      const raw=await response.json(); webSearchCalls=countWebSearchCalls(raw);
+      const parsed = parseOpenAIJson(raw);
       const candidate = text(parsed?.candidate_event_id);
-      if (!candidate) return { attempted: true, recovered: false, resolved: null, reason: text(parsed?.status || 'no_candidate') };
+      if (!candidate) { const reason=text(parsed?.status||'no_candidate'); await usage(true,true,reason); return {attempted:true,recovered:false,resolved:null,reason}; }
       const summary = await fetchEspnSummary(game.league, candidate, globalThis.fetch, 0);
       const comp = summary?.data?.header?.competitions?.[0] || summary?.data?.competitions?.[0];
-      if (!comp) return { attempted: true, recovered: false, resolved: null, reason: 'candidate_without_espn_competition' };
-      const raw = { id: candidate, date: comp.date || summary?.data?.header?.competitions?.[0]?.date || game.kickoff, competitions: [comp] };
-      const validated = resolveScoreboardEvent([raw], game);
-      if (!validated || text(validated.sourceEventId) !== candidate) {
-        return { attempted: true, recovered: false, resolved: null, reason: 'candidate_failed_espn_identity_validation' };
-      }
-      return { attempted: true, recovered: true, resolved: { ...validated, strategy: 'ai_resolved_espn_validated' }, reason: '' };
+      if (!comp) { await usage(true,true,'candidate_without_espn_competition'); return {attempted:true,recovered:false,resolved:null,reason:'candidate_without_espn_competition'}; }
+      const rawEvent = { id: candidate, date: comp.date || summary?.data?.header?.competitions?.[0]?.date || game.kickoff, competitions: [comp] };
+      const validated = resolveScoreboardEvent([rawEvent], game);
+      if (!validated || text(validated.sourceEventId) !== candidate) { await usage(true,true,'candidate_failed_espn_identity_validation'); return {attempted:true,recovered:false,resolved:null,reason:'candidate_failed_espn_identity_validation'}; }
+      await usage(true,true,'recovered');
+      return { attempted:true,recovered:true,resolved:{...validated,strategy:'ai_resolved_espn_validated'},reason:'' };
     } catch (error) {
-      return { attempted: true, recovered: false, resolved: null, reason: text(error?.message || error).slice(0,300) };
+      const reason=text(error?.message||error).slice(0,300); await usage(false,false,reason);
+      return { attempted:true,recovered:false,resolved:null,reason };
     } finally { clearTimeout(timer); }
   }
 

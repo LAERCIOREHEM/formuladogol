@@ -1,5 +1,6 @@
 import { fetchEspnSummary } from './espn-source.js';
 import { sendMail, probeMail, mailConfig, maskAddress } from './mailer.js';
+import { countWebSearchCalls, recordAiUsage } from './ai-usage.js';
 
 const DEFAULT_SITE_BASE = 'https://formuladogol.com.br';
 // Fase definitiva (uma única chamada por partida). O Sol é reservado a ela e aos editoriais.
@@ -10,25 +11,22 @@ const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
-const POSTGAME_POLICY_VERSION = 3;
+const POSTGAME_POLICY_VERSION = 4;
 
 /*
- * Política de público/renda v3 — contada a partir do fim da partida:
- *   0–30 min   ESPN (grátis) a cada 2 min. Nenhuma chamada de IA.
- *   30 min     1ª busca com o modelo econômico.
- *   30–60 min  novas buscas econômicas a cada 3 min (30, 33 … 57: 10 no total, 1 web_search cada).
- *   60 min     UMA chamada definitiva com o Sol.
- *   depois     não encontrou → e-mail e encerra. Correção manual entra pelo
- *              publicos-verificados.json e é aplicada pelo seed estático.
- * A ESPN é consultada antes de toda chamada de IA: se ela já trouxer o público,
- * a IA só procura o que ainda falta.
+ * Política de público/renda v4 — agressiva no tempo, econômica em IA:
+ *   0–45 min   ESPN/fonte determinística a cada 2 min.
+ *   +5, +12, +22 e +35 min: no máximo 4 buscas econômicas (1 web_search cada).
+ *   +45 min    UMA investigação definitiva com Sol; só repete em falha técnica.
+ *   encontrou público + renda → encerra imediatamente e nunca reabre o event_id.
+ *   resposta válida do Sol sem dado → e-mail e encerra; sem loop caro.
  */
 export const PUBLIC_POLICY = Object.freeze({
-  aiStartMinutes: 30,
-  solAtMinutes: 60,
+  aiStartMinutes: 5,
+  miniScheduleMinutes: [5, 12, 22, 35],
+  solAtMinutes: 45,
   deterministicEveryMinutes: 2,
-  miniEveryMinutes: 3,
-  miniMaxAttempts: 10,
+  miniMaxAttempts: 4,
   miniMaxToolCalls: 1,
   solMaxToolCalls: 6,
   solMaxAttempts: 3,
@@ -365,26 +363,34 @@ export async function searchPublicWithOpenAI(env, task, phase = 'sol') {
   if (!apiKey) return { found: false, responded: false, reason: 'openai_key_missing', model };
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), phase === 'sol' ? 55_000 : 30_000);
+  const startedAt = Date.now();
+  let httpStatus = null;
   try {
     const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST', signal: controller.signal,
       headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
       body: JSON.stringify(request)
     });
+    httpStatus = response.status;
     if (!response.ok) {
       const detail = text(await response.text().catch(() => '')).slice(0, 200);
+      await recordAiUsage(env, { purpose:'postgame_public', eventId:task.event_id, model, phase, webSearchCalls:0, responded:false, ok:false, httpStatus:response.status, durationMs:Date.now()-startedAt, detail });
       return { found: false, responded: false, reason: `openai_http_${response.status}${detail ? `:${detail}` : ''}`, model };
     }
     const raw = await response.json();
+    const webSearchCalls = countWebSearchCalls(raw);
     const output = extractOpenAIText(raw);
-    if (!output) return { found: false, responded: true, reason: 'openai_empty_output', model };
+    if (!output) { await recordAiUsage(env,{purpose:'postgame_public',eventId:task.event_id,model,phase,webSearchCalls,responded:true,ok:false,httpStatus,durationMs:Date.now()-startedAt,detail:'openai_empty_output'}); return { found:false,responded:true,reason:'openai_empty_output',model }; }
     const parsed = safeJson(output, null);
-    if (!parsed) return { found: false, responded: true, reason: 'openai_invalid_json', model };
+    if (!parsed) { await recordAiUsage(env,{purpose:'postgame_public',eventId:task.event_id,model,phase,webSearchCalls,responded:true,ok:false,httpStatus,durationMs:Date.now()-startedAt,detail:'openai_invalid_json'}); return { found:false,responded:true,reason:'openai_invalid_json',model }; }
     const verified = validatePublicPayload(parsed, extractOpenAISources(raw));
-    if (!verified.accepted) return { found: false, responded: true, reason: verified.reason, model };
+    if (!verified.accepted) { await recordAiUsage(env,{purpose:'postgame_public',eventId:task.event_id,model,phase,webSearchCalls,responded:true,ok:true,httpStatus,durationMs:Date.now()-startedAt,detail:verified.reason}); return { found:false,responded:true,reason:verified.reason,model }; }
+    await recordAiUsage(env,{purpose:'postgame_public',eventId:task.event_id,model,phase,webSearchCalls,responded:true,ok:true,httpStatus,durationMs:Date.now()-startedAt,detail:'accepted'});
     return { found: true, responded: true, model, ...verified };
   } catch (error) {
-    return { found: false, responded: false, reason: `openai_error:${text(error?.message || error).slice(0, 240)}`, model };
+    const detail=text(error?.message||error).slice(0,240);
+    await recordAiUsage(env,{purpose:'postgame_public',eventId:task.event_id,model,phase,webSearchCalls:0,responded:false,ok:false,httpStatus,durationMs:Date.now()-startedAt,detail});
+    return { found: false, responded: false, reason: `openai_error:${detail}`, model };
   } finally { clearTimeout(timer); }
 }
 
@@ -664,23 +670,29 @@ export function planPublicStep(task, ai, now = Date.now()) {
   const sol = Number(ai?.sol_attempts || 0);
   if (Number(ai?.sol_completed || 0) > 0 || sol >= P.solMaxAttempts) return { phase: 'give_up', ageMinutes };
   if (ageMinutes < P.aiStartMinutes) return { phase: 'deterministic', ageMinutes };
-  // A chamada definitiva exige ao menos uma busca econômica antes: uma partida
-  // semeada tarde não pula direto para o modelo caro.
-  if (mini >= 1 && (ageMinutes >= P.solAtMinutes || mini >= P.miniMaxAttempts)) return { phase: 'sol', ageMinutes };
-  return { phase: 'mini', ageMinutes };
+  // Partida semeada tarde faz ao menos uma busca econômica antes do Sol.
+  if (mini === 0) return { phase: 'mini', ageMinutes };
+  if (ageMinutes >= P.solAtMinutes || mini >= P.miniMaxAttempts) return { phase: 'sol', ageMinutes };
+  const dueAt = P.miniScheduleMinutes[Math.min(mini, P.miniScheduleMinutes.length - 1)];
+  if (ageMinutes >= dueAt) return { phase: 'mini', ageMinutes };
+  return { phase: 'deterministic', ageMinutes };
 }
 
-// Próximo horário de tentativa quando a partida continua sem público/renda.
-export function nextPublicAttemptMs(task, phaseDone, nextPlan, now = Date.now()) {
+// Próximo horário exato da política v4. `ai` é opcional para compatibilidade.
+export function nextPublicAttemptMs(task, phaseDone, nextPlan, now = Date.now(), ai = {}) {
   const P = PUBLIC_POLICY;
   const end = taskEndMs(task, now);
   const floor = now + 60_000;
-  if (nextPlan.phase === 'deterministic') return Math.max(floor, Math.min(now + P.deterministicEveryMinutes * 60_000, end + P.aiStartMinutes * 60_000));
-  if (nextPlan.phase === 'mini') return Math.max(floor, Math.min(now + P.miniEveryMinutes * 60_000, end + P.solAtMinutes * 60_000));
-  // Próxima fase é a definitiva. Se a anterior já foi Sol, só pode ter sido
-  // falha técnica (resposta válida encerra o fluxo): espera um pouco mais.
-  if (phaseDone === 'sol') return now + P.solRetryMinutes * 60_000;
-  return Math.max(floor, Math.min(now + P.miniEveryMinutes * 60_000, end + P.solAtMinutes * 60_000));
+  if (phaseDone === 'sol' && nextPlan.phase === 'sol') return now + P.solRetryMinutes * 60_000;
+  if (nextPlan.phase === 'sol') return Math.max(floor, end + P.solAtMinutes * 60_000);
+  if (nextPlan.phase === 'mini') {
+    const idx = Math.min(Number(ai?.mini_attempts || 0), P.miniScheduleMinutes.length - 1);
+    return Math.max(floor, end + P.miniScheduleMinutes[idx] * 60_000);
+  }
+  const mini = Number(ai?.mini_attempts || 0);
+  const nextMini = P.miniScheduleMinutes[Math.min(mini, P.miniScheduleMinutes.length - 1)];
+  const boundary = mini < P.miniMaxAttempts ? end + nextMini * 60_000 : end + P.solAtMinutes * 60_000;
+  return Math.max(floor, Math.min(now + P.deterministicEveryMinutes * 60_000, boundary));
 }
 
 function brDateTime(value) {
@@ -821,11 +833,12 @@ async function processPublicTask(env, task, now = Date.now()) {
         next.alert_at = nowIso(now);
       }
     } else {
-      let nextMs = nextPublicAttemptMs(task, plan.phase, nextPlan, now);
+      let nextMs = nextPublicAttemptMs(task, plan.phase, nextPlan, now, next);
       if (nextPlan.phase === 'deterministic' && Number(values.publico) > 0) {
         // A ESPN já entregou o público e nunca publica renda: não há o que
         // consultar de graça até a janela da IA abrir.
-        nextMs = Math.max(now + 60_000, taskEndMs(task, now) + PUBLIC_POLICY.aiStartMinutes * 60_000);
+        const idx = Math.min(Number(next.mini_attempts || 0), PUBLIC_POLICY.miniScheduleMinutes.length - 1);
+        nextMs = Math.max(now + 60_000, taskEndMs(task, now) + PUBLIC_POLICY.miniScheduleMinutes[idx] * 60_000);
       }
       nextAt = nowIso(nextMs);
     }

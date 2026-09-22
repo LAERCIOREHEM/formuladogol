@@ -9,6 +9,7 @@ import { LIVE_API_CONSTANTS, resolveLiveScoreboard, resolveLiveSummary } from '.
 import { createLiveStatsStore } from './live-stats-store.js';
 import { postgameStatus, readPostgameFastlane, runPostgameMaintenance } from './postgame-fastlane.js';
 import { feedbackNotifierConfigured, runFeedbackNotifier } from './feedback-notifier.js';
+import { healthMonitorStatus, runHealthMonitor } from './health-monitor.js';
 
 export { PushState, SportsMonitor };
 
@@ -558,6 +559,10 @@ export default {
     ctx.waitUntil(runFeedbackNotifier(env).catch((error) => {
       console.error(`feedback notifier failed: ${String(error?.message || error).slice(0, 500)}`);
     }));
+    ctx.waitUntil((async()=>{
+      let status=null; try { const r=await monitor.fetch('https://internal/status'); if(r.ok) status=await r.json(); } catch(_) {}
+      return runHealthMonitor(env,status);
+    })().catch((error)=>{ console.error(`health monitor failed: ${String(error?.message||error).slice(0,500)}`); }));
   },
 
   async queue(batch, env) {
@@ -584,8 +589,8 @@ export default {
       return json(request, {
         ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok) && Boolean(operational?.ok),
         service: 'formula-do-gol-push',
-        version: 8,
-        revision: '6-R10R8-DORMANT-FEEDBACK',
+        version: 9,
+        revision: '6-R10R9-HEALTH-EMAIL-AI-BUDGET',
         liveGatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
         liveStateContractVersion: LIVE_API_CONSTANTS.LIVE_STATE_CONTRACT_VERSION,
         liveFactsContractVersion: LIVE_API_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
@@ -604,9 +609,12 @@ export default {
         continentalStatsTargetMinPerTeam: LIVE_API_CONSTANTS.CONTINENTAL_STATS_TARGET,
         bestKnownStatsCache: true,
         postgameFastlane: true,
-        postgameFastlaneVersion: 2,
+        postgameFastlaneVersion: 4,
         feedbackNotifier: true,
         feedbackNotifierConfigured: feedbackNotifierConfigured(env),
+        healthEmailMonitor: true,
+        healthEmailDailyBrt: '08:00',
+        healthEmailNoOpenAI: true,
         sportsMonitorReady: Boolean(monitor?.ok),
         operationalState: operational?.state || 'unknown',
         sports: {
@@ -634,6 +642,10 @@ export default {
         if (!(await allowStatusRead(request, env, 'postgame-fastlane'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
         const ids = String(url.searchParams.get('event_ids') || '').split(',').map((v) => cleanId(v)).filter(Boolean);
         return json(request, { ok: true, version: 2, rows: await readPostgameFastlane(env, ids) }, 200, { 'Cache-Control': 'no-store' });
+      }
+      if (url.pathname === '/v1/health-monitor/status' && request.method === 'GET') {
+        if (!(await allowStatusRead(request, env, 'health-monitor-status'))) return json(request, { ok:false, error:'rate_limited' }, 429);
+        return json(request, await healthMonitorStatus(env), 200, { 'Cache-Control':'no-store' });
       }
       if (url.pathname === '/v1/postgame/status' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'postgame-status'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
