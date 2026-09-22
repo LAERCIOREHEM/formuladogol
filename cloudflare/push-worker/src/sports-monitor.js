@@ -24,6 +24,7 @@ import { buildHotEspnTestEvent, detectHotEspnMutation, HOT_ESPN_TEST_CONSTANTS, 
 import { buildHotMatchPrematchEvent, hotMatchNextPollDelay, hotMatchPrematchDue, hotMatchTargetEvent, HOT_MATCH_TEST_CONSTANTS, markHotMatchTechnicalEvent, publicHotMatchTest } from './hot-match-test.js';
 import { recordPostgameFinal } from './postgame-fastlane.js';
 import { buildSportsMonitorLiveFacts, SPORTS_MONITOR_FACTS_VERSION } from './monitor-live-facts.js';
+import { sendMail, mailConfig } from './mailer.js';
 
 const AGENDA_URL = 'https://formuladogol.com.br/dados-br/agenda-clubes-br.json';
 const ALLOWED_LEAGUES = new Set(['bra.1', 'bra.copa_do_brazil', 'conmebol.libertadores', 'conmebol.sudamericana']);
@@ -690,10 +691,9 @@ export class SportsMonitor {
   }
 
   async notifyReadinessIncident(game, checkpoint, readiness, incidentKey) {
-    const apiKey = text(this.env.RESEND_API_KEY);
-    const to = text(this.env.EMAIL_DESTINO);
-    if (!apiKey || !to) return false;
-    const from = text(this.env.EMAIL_REMETENTE || 'Fórmula do Gol <onboarding@resend.dev>');
+    // E-mail pelo módulo único do Worker: SMTP (Zoho) com os secrets do
+    // aviso de sugestões; Resend só se existir. sendMail nunca lança exceção.
+    if (!mailConfig(this.env).configured) return false;
     const subject = `🚨 FDG Push ${String(checkpoint || '').toUpperCase()}: jogo não está READY`;
     const body = [
       `${text(game?.home?.name)} x ${text(game?.away?.name)}`,
@@ -703,19 +703,13 @@ export class SportsMonitor {
       `Fonte ESPN: ${text(readiness?.sourceEventId) || 'não resolvida'}`,
       `Audiência simulada: ${JSON.stringify(readiness?.audience || {})}`
     ].join('\n');
+    const status = await sendMail(this.env, { subject, body });
     try {
-      const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST', headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
-        body: JSON.stringify({ from, to: [to], subject, text: body })
-      });
       await this.env.DB.prepare(`UPDATE monitor_incidents SET email_status=?, updated_at=CURRENT_TIMESTAMP WHERE incident_key=?`)
-        .bind(response.ok ? 'sent' : `http_${response.status}`, incidentKey).run();
-      return response.ok;
-    } catch (error) {
-      await this.env.DB.prepare(`UPDATE monitor_incidents SET email_status=?, updated_at=CURRENT_TIMESTAMP WHERE incident_key=?`)
-        .bind(`error:${text(error?.message || error).slice(0,120)}`, incidentKey).run();
-      return false;
-    }
+        .bind(String(status).slice(0, 200), incidentKey).run();
+    } catch (_) {}
+    return status === 'sent';
+
   }
 
   async resolveWithAi(game, checkpoint) {

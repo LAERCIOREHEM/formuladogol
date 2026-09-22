@@ -1,4 +1,5 @@
 import { fetchEspnSummary } from './espn-source.js';
+import { sendMail, probeMail, mailConfig, maskAddress } from './mailer.js';
 
 const DEFAULT_SITE_BASE = 'https://formuladogol.com.br';
 // Fase definitiva (uma única chamada por partida). O Sol é reservado a ela e aos editoriais.
@@ -736,19 +737,32 @@ export function publicAlertMessage(task, values, sources, ai, lastError, env = {
 }
 
 async function sendPublicNotFoundEmail(env, message) {
-  const apiKey = text(env?.RESEND_API_KEY);
-  const to = text(env?.EMAIL_DESTINO);
-  if (!apiKey || !to) return 'not_configured';
-  const from = text(env?.EMAIL_REMETENTE || 'Fórmula do Gol <onboarding@resend.dev>');
+  return sendMail(env, message);
+}
+
+// Login SMTP sem envio, no máximo uma vez por dia e sempre que a configuração
+// mudar. Mostra em /v1/postgame/status se o e-mail vai funcionar ANTES de o
+// primeiro alerta real ser necessário.
+async function configFingerprint(env) {
+  const cfg = mailConfig(env);
+  const raw = [cfg.transport, cfg.smtp.host, cfg.smtp.port, cfg.smtp.user, cfg.to, cfg.smtp.pass].join('|');
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
+  return [...new Uint8Array(digest)].slice(0, 8).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function maybeProbeMailer(env, now = Date.now()) {
   try {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
-      body: JSON.stringify({ from, to: [to], subject: message.subject, text: message.body })
-    });
-    return response.ok ? 'sent' : `http_${response.status}`;
+    if (mailConfig(env).transport !== 'smtp') return null;
+    const fingerprint = await configFingerprint(env);
+    const previous = safeJson(await metaGet(env, 'mailer_probe'), null);
+    const fresh = previous && previous.fingerprint === fingerprint && now - (Date.parse(previous.at) || 0) < 24 * 3_600_000;
+    if (fresh) return null;
+    const result = await probeMail(env);
+    const record = { at: nowIso(now), fingerprint, ok: result.ok, status: result.status };
+    await metaPut(env, 'mailer_probe', JSON.stringify(record));
+    return record;
   } catch (error) {
-    return `error:${text(error?.message || error).slice(0, 120)}`;
+    return { ok: false, status: `probe_error:${text(error?.message || error).slice(0, 160)}` };
   }
 }
 
@@ -875,7 +889,8 @@ export async function runPostgameMaintenance(env, monitor, now = Date.now()) {
     await cleanup(env, now);
     await metaPut(env, 'cleanup_at', nowIso(now));
   }
-  const summary = { at: nowIso(now), policyVersion: POSTGAME_POLICY_VERSION, policyMigrated, seededMonitor, seededStatic, highlight, publico };
+  const mailer = await maybeProbeMailer(env, now);
+  const summary = { at: nowIso(now), policyVersion: POSTGAME_POLICY_VERSION, policyMigrated, seededMonitor, seededStatic, highlight, publico, mailerProbe: mailer };
   await metaPut(env, 'last_run', JSON.stringify(summary));
   return summary;
 }
@@ -911,6 +926,7 @@ export async function readPostgameFastlane(env, eventIds = []) {
 }
 
 export async function postgameStatus(env) {
+  const probeRaw = await metaGet(env, 'mailer_probe');
   const counts = await env.DB.prepare(`SELECT
     COUNT(*) AS total,
     SUM(CASE WHEN public_status NOT IN ('resolved','gave_up') THEN 1 ELSE 0 END) AS public_pending,
@@ -927,6 +943,11 @@ export async function postgameStatus(env) {
     publicGaveUp: Number(counts?.public_gave_up || 0),
     highlightPending: Number(counts?.highlight_pending || 0),
     lastRun: safeJson(await metaGet(env, 'last_run'), null),
+    mailer: (() => {
+      const cfg = mailConfig(env);
+      return { transport: cfg.transport, configured: cfg.configured, destino: maskAddress(cfg.to) };
+    })(),
+    mailerProbe: (() => { const p = safeJson(probeRaw, null); return p ? { at: p.at, ok: p.ok, status: p.status } : null; })(),
     staticSeedError: await metaGet(env, 'static_seed_error')
   };
 }
