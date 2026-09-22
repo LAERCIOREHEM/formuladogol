@@ -250,6 +250,7 @@ jobs:
                  EXPECTED_STATS_FALLBACK="$EXPECTED_STATS_FALLBACK" \
                  EXPECTED_STATE_CONTRACT="$EXPECTED_STATE_CONTRACT" \
                  EXPECTED_FACTS_CONTRACT="$EXPECTED_FACTS_CONTRACT" \
+                 EXPECTED_POSTGAME="$EXPECTED_POSTGAME" \
                  API_FOOTBALL_EXPECTED="${FDG_PUSH_API_FOOTBALL_KEY:+1}" \
                  FEEDBACK_EXPECTED="${FDG_PUSH_RESEND_API_KEY:+1}" \
                  node <<'NODE'
@@ -260,6 +261,7 @@ jobs:
           const expectedFallback = Number(process.env.EXPECTED_STATS_FALLBACK);
           const expectedStateContract = Number(process.env.EXPECTED_STATE_CONTRACT);
           const expectedFactsContract = Number(process.env.EXPECTED_FACTS_CONTRACT);
+          const expectedPostgame = Number(process.env.EXPECTED_POSTGAME);
           const problems = [];
           if (h.ok !== true) problems.push(`ok=${h.ok}`);
           if (h.revision !== expectedRevision) problems.push(`revision=${h.revision} esperado=${expectedRevision}`);
@@ -279,7 +281,10 @@ jobs:
           if (h.sportsMonitorFactsAuthority !== true) problems.push('sportsMonitorFactsAuthority!=true');
           if (Number(h.sportsMonitorFactsVersion) !== 1) problems.push(`sportsMonitorFactsVersion=${h.sportsMonitorFactsVersion}`);
           if (h.postgameFastlane !== true) problems.push('postgameFastlane!=true');
-          if (Number(h.postgameFastlaneVersion) !== 2) problems.push(`postgameFastlaneVersion=${h.postgameFastlaneVersion}`);
+          if (Number(h.postgameFastlaneVersion) !== expectedPostgame) problems.push(`postgameFastlaneVersion=${h.postgameFastlaneVersion} esperado=${expectedPostgame}`);
+          if (h.healthEmailMonitor !== true) problems.push('healthEmailMonitor!=true');
+          if (h.healthEmailDailyBrt !== '08:00') problems.push(`healthEmailDailyBrt=${h.healthEmailDailyBrt}`);
+          if (h.healthEmailNoOpenAI !== true) problems.push('healthEmailNoOpenAI!=true');
           if (h.feedbackNotifier !== true) problems.push('feedbackNotifier!=true');
           if (process.env.FEEDBACK_EXPECTED === '1' && h.feedbackNotifierConfigured !== true) problems.push('feedbackNotifierConfigured!=true');
           if (h.liveStatePrimary !== 'worker-espn') problems.push(`liveStatePrimary=${h.liveStatePrimary}`);
@@ -327,6 +332,17 @@ jobs:
           } else {
             console.log(`E-mail do Worker: ${s.mailer ? s.mailer.transport : 'indefinido'}`);
           }
+          NODE
+
+          curl -fsS --max-time 10 'https://push.formuladogol.com.br/v1/health-monitor/status' >/tmp/fdg-health-monitor-status.json
+          node <<'NODE'
+          const fs = require('fs');
+          const h = JSON.parse(fs.readFileSync('/tmp/fdg-health-monitor-status.json', 'utf8'));
+          if (h.ok !== true) {
+            console.error('Health Monitor não respondeu com contrato esperado:', h);
+            process.exit(1);
+          }
+          console.log('Health Monitor por e-mail saudável.');
           NODE
 
           TODAY_UTC="$(date -u +%Y%m%d)"
