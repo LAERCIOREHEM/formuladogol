@@ -32,7 +32,7 @@ import urllib.request
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Mapping, Sequence
-from ai_gateway import openai_responses_url, gateway_metadata
+from ai_gateway import OpenAITransportError, post_openai_responses
 from zoneinfo import ZoneInfo
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -672,20 +672,16 @@ def collect_web_metadata(response: Mapping[str, Any]) -> tuple[int, int, set[str
 
 
 def call_openai_once(payload: Mapping[str, Any], api_key: str) -> dict[str, Any]:
-    request = urllib.request.Request(
-        openai_responses_url(),
-        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json", "cf-aig-collect-log-payload": "false", "cf-aig-no-wholesale": "true", "cf-aig-metadata": gateway_metadata("daily-audit", "audit-search")},
-        method="POST",
-    )
     try:
-        with urllib.request.urlopen(request, timeout=210) as raw:
-            response = json.loads(raw.read().decode("utf-8"))
-    except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")[:900]
-        raise DailyAuditError(f"OpenAI HTTP {exc.code}: {detail}") from exc
-    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
-        raise DailyAuditError(f"Falha única na chamada OpenAI: {exc}") from exc
+        response = post_openai_responses(
+            payload,
+            api_key,
+            timeout=210,
+            component="daily-audit",
+            purpose="audit-search",
+        )
+    except OpenAITransportError as exc:
+        raise DailyAuditError(str(exc)) from exc
     if not isinstance(response, dict):
         raise DailyAuditError("OpenAI não devolveu objeto JSON")
     if response.get("status") == "incomplete":
@@ -1078,8 +1074,28 @@ def html_escape(value: Any) -> str:
     )
 
 
+def recoverable_gateway_1010(previous: Mapping[str, Any], moment: datetime) -> bool:
+    if str(previous.get("data_brt") or "") != moment.date().isoformat():
+        return False
+    openai_state = previous.get("openai") or {}
+    error = str(openai_state.get("erro") or "").lower()
+    return (
+        "1010" in error
+        and "403" in error
+        and int(openai_state.get("web_tool_calls") or 0) == 0
+        and not bool(previous.get("resultado_ia"))
+    )
+
+
 def already_attempted_today(previous: Mapping[str, Any], moment: datetime) -> bool:
-    return str(previous.get("data_brt") or "") == moment.date().isoformat() and bool((previous.get("openai") or {}).get("tentativa_efetuada"))
+    attempted = (
+        str(previous.get("data_brt") or "") == moment.date().isoformat()
+        and bool((previous.get("openai") or {}).get("tentativa_efetuada"))
+    )
+    # 403/1010 acontece no edge da Cloudflare antes do provedor. Não deve
+    # consumir a única tentativa lógica do dia. O workflow permite UMA
+    # recuperação manual depois do hotfix.
+    return attempted and not recoverable_gateway_1010(previous, moment)
 
 
 def run(*, dry_run: bool = False, moment: datetime | None = None) -> dict[str, Any]:
@@ -1194,6 +1210,7 @@ def run(*, dry_run: bool = False, moment: datetime | None = None) -> dict[str, A
             "web_tool_calls": tool_count,
             "web_acoes": web_actions,
             "fontes_web": sorted(source_urls),
+            "transport": dict(response.get("_fdg_transport") or {}) if response else {},
         },
         "resultado_ia": parsed,
         "correcoes": {
@@ -1386,6 +1403,13 @@ def self_test() -> int:
     assert should_send_alert(previous, "critico", ["x"], datetime.fromisoformat("2026-08-05T12:00:00-03:00"))
     same_day = {"data_brt": "2026-08-09", "openai": {"tentativa_efetuada": True}}
     assert already_attempted_today(same_day, datetime.fromisoformat("2026-08-09T08:45:00-03:00"))
+    recoverable = {
+        "data_brt": "2026-08-09",
+        "openai": {"tentativa_efetuada": True, "erro": "OpenAI HTTP 403: error code: 1010", "web_tool_calls": 0},
+        "resultado_ia": {},
+    }
+    assert recoverable_gateway_1010(recoverable, datetime.fromisoformat("2026-08-09T08:45:00-03:00"))
+    assert not already_attempted_today(recoverable, datetime.fromisoformat("2026-08-09T08:45:00-03:00"))
     print("Self-test auditoria IA diária: OK")
     return 0
 

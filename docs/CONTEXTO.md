@@ -351,3 +351,9 @@ Antes de mudar o projeto:
 - Quando presente, o Push Worker consulta somente leitura do uso faturável da conta Cloudflare e inclui o custo do período no e-mail diário.
 - O deploy **não** reutiliza `CLOUDFLARE_API_TOKEN` para essa leitura, evitando ampliar a exposição do token de deploy.
 - Se o secret não existir, o Health Report continua funcional e informa que o custo Cloudflare exato não está configurado.
+
+### Hotfix AI Gateway 403/1010 — 23/09/2026
+- Chamadas Python via `urllib` ao AI Gateway agora enviam `User-Agent` explícito do Fórmula do Gol; o default `Python-urllib/x.y` pode ser bloqueado pela Cloudflare com HTTP 403 / error 1010 antes de chegar ao provedor.
+- Em 403/1010 **somente**, o helper central `scripts/ai_gateway.py` faz um único fallback direto para `api.openai.com`, preservando o editorial/auditoria sem criar retry pago para outros erros.
+- Auditoria diária permite uma recuperação manual no mesmo dia quando a tentativa anterior foi 403/1010 sem tool call, mesmo que o lock diário já exista.
+- GPT-5.6 Sol editorial permanece inalterado; o fallback é de transporte, não de modelo.

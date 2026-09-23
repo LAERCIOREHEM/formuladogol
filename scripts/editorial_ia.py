@@ -21,8 +21,7 @@ from typing import Any, Mapping, Sequence
 DEFAULT_MODEL = "gpt-5.6-sol"
 DEFAULT_REASONING = "high"
 DEFAULT_MAX_OUTPUT_TOKENS = 12000
-from ai_gateway import openai_responses_url, gateway_metadata
-OPENAI_URL = openai_responses_url()
+from ai_gateway import OpenAITransportError, post_openai_responses
 
 
 class EditorialAIError(RuntimeError):
@@ -240,21 +239,16 @@ def _call_structured(payload: Mapping[str, Any]) -> tuple[dict[str, Any], str]:
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not api_key:
         raise EditorialAIError("OPENAI_API_KEY não configurada")
-    body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-    request = urllib.request.Request(
-        OPENAI_URL,
-        data=body,
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json", "cf-aig-collect-log-payload": "false", "cf-aig-no-wholesale": "true", "cf-aig-metadata": gateway_metadata("editorial", "editorial-sol")},
-        method="POST",
-    )
     try:
-        with urllib.request.urlopen(request, timeout=180) as raw:
-            response = json.loads(raw.read().decode("utf-8"))
-    except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")[:2000]
-        raise EditorialAIError(f"OpenAI HTTP {exc.code}: {detail}") from exc
-    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
-        raise EditorialAIError(f"falha ao chamar OpenAI: {exc}") from exc
+        response = post_openai_responses(
+            payload,
+            api_key,
+            timeout=180,
+            component="editorial",
+            purpose="editorial-sol",
+        )
+    except OpenAITransportError as exc:
+        raise EditorialAIError(str(exc)) from exc
     if not isinstance(response, dict):
         raise EditorialAIError("resposta OpenAI em formato inesperado")
     if response.get("status") == "incomplete":
@@ -308,7 +302,6 @@ def self_test() -> int:
     assert payload["text"]["format"]["strict"] is True
     assert "não complete lacunas" in payload["input"][1]["content"]
     assert "avançar à final" in payload["input"][0]["content"]
-    assert OPENAI_URL.endswith("/openai/responses") or "api.openai.com" in OPENAI_URL
     assert _review_enabled("brasileirao")
     assert _review_enabled("continentais")
     try:

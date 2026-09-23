@@ -887,3 +887,6 @@ Este arquivo foi reconstruído em 10/08/2026 a partir do conteúdo real do repos
 - Quando presente, o Push Worker consulta somente leitura do uso faturável da conta Cloudflare e inclui o custo do período no e-mail diário.
 - O deploy **não** reutiliza `CLOUDFLARE_API_TOKEN` para essa leitura, evitando ampliar a exposição do token de deploy.
 - Se o secret não existir, o Health Report continua funcional e informa que o custo Cloudflare exato não está configurado.
+
+### Transporte OpenAI via AI Gateway — proteção 1010 (23/09/2026)
+Todas as rotas Python de OpenAI usam `scripts/ai_gateway.py`. O helper adiciona `User-Agent: FormulaDoGol-Automation/...`, mantém `cf-aig-no-wholesale=true`, `cf-aig-collect-log-payload=false` e metadata do componente. Se o AI Gateway responder especificamente HTTP 403 com Cloudflare error 1010, a requisição é repetida **uma única vez** diretamente em `https://api.openai.com/v1/responses`. Nenhum outro erro aciona fallback automático, evitando duplicidade de custo. A auditoria diária trata 1010 sem `web_tool_calls` como falha pré-provedor e permite uma recuperação manual no mesmo dia.

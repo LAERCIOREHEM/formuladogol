@@ -58,8 +58,7 @@ ESTADO = ROOT / "dados-br" / "estado-publicos-ia.json"
 CONFIG_ORQ = ROOT / "dados-br" / "config-orquestrador.json"
 
 FUSO_BRASILIA = timezone(timedelta(hours=-3))
-from ai_gateway import openai_responses_url, gateway_metadata
-OPENAI_URL = openai_responses_url()
+from ai_gateway import OpenAITransportError, post_openai_responses
 DIAG_PREFIX = "FDG_DIAGNOSTICO_JSON="
 DEFAULT_MODEL = "gpt-5.6-sol"
 
@@ -663,20 +662,16 @@ def emitir_diagnostico(payload: Mapping[str, Any]) -> None:
 
 
 def chamar_openai(payload: Mapping[str, Any], api_key: str, timeout: int = 210) -> dict[str, Any]:
-    req = urllib.request.Request(
-        OPENAI_URL,
-        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json", "cf-aig-collect-log-payload": "false", "cf-aig-no-wholesale": "true", "cf-aig-metadata": gateway_metadata("publicos-github-fallback", "attendance-search")},
-        method="POST",
-    )
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as bruto:
-            resposta = json.loads(bruto.read().decode("utf-8"))
-    except urllib.error.HTTPError as exc:
-        detalhe = exc.read().decode("utf-8", errors="replace")[:600]
-        raise PublicoIAError(f"OpenAI HTTP {exc.code}: {detalhe}") from exc
-    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
-        raise PublicoIAError(f"Falha na chamada OpenAI: {exc}") from exc
+        resposta = post_openai_responses(
+            payload,
+            api_key,
+            timeout=timeout,
+            component="publicos-github-fallback",
+            purpose="attendance-search",
+        )
+    except OpenAITransportError as exc:
+        raise PublicoIAError(str(exc)) from exc
     if not isinstance(resposta, dict):
         raise PublicoIAError("OpenAI não devolveu objeto JSON")
     if resposta.get("status") == "incomplete":

@@ -39,8 +39,7 @@ if str(ROOT) not in sys.path:
 from atualizar_transmissoes_tv_brasileirao import ALLOWED_CHANNELS, access_options_for_game  # noqa: E402
 
 TZ = ZoneInfo("America/Sao_Paulo")
-from ai_gateway import openai_responses_url, gateway_metadata
-OPENAI_URL = openai_responses_url()
+from ai_gateway import OpenAITransportError, post_openai_responses
 AGENDA = ROOT / "dados-br" / "agenda-clubes-br.json"
 TV = ROOT / "dados-br" / "transmissoes-tv.json"
 LIVE = ROOT / "dados-br" / "transmissoes-aovivo.json"
@@ -310,20 +309,16 @@ def collect_source_urls(response: Mapping[str, Any]) -> set[str]:
 
 
 def call_openai(payload: Mapping[str, Any], api_key: str, timeout: int = 210) -> dict[str, Any]:
-    req = urllib.request.Request(
-        OPENAI_URL,
-        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json", "cf-aig-collect-log-payload": "false", "cf-aig-no-wholesale": "true", "cf-aig-metadata": gateway_metadata("transmission-guardian", "transmission-search")},
-        method="POST",
-    )
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as raw:
-            response = json.loads(raw.read().decode("utf-8"))
-    except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")[:900]
-        raise GuardianError(f"OpenAI HTTP {exc.code}: {detail}") from exc
-    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
-        raise GuardianError(f"Falha na chamada OpenAI: {exc}") from exc
+        response = post_openai_responses(
+            payload,
+            api_key,
+            timeout=timeout,
+            component="transmission-guardian",
+            purpose="transmission-search",
+        )
+    except OpenAITransportError as exc:
+        raise GuardianError(str(exc)) from exc
     if not isinstance(response, dict):
         raise GuardianError("OpenAI não devolveu objeto JSON")
     if response.get("status") == "incomplete":
