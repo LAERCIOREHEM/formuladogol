@@ -92,6 +92,8 @@ jobs:
         shell: bash
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FDG_AI_GATEWAY_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          FDG_AI_GATEWAY_ID: ${{ vars.FDG_AI_GATEWAY_ID || 'default' }}
           OPENAI_PUBLICOS_MODEL: ${{ vars.OPENAI_PUBLICOS_MODEL || vars.OPENAI_MODEL || 'gpt-5.6-sol' }}
           REABRIR: ${{ inputs.reabrir_esgotados }}
           MODO: ${{ inputs.modo || 'automatico' }}

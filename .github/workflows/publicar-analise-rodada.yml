@@ -56,6 +56,8 @@ jobs:
           RODADA: ${{ inputs.rodada }}
           FORCAR: ${{ inputs.forcar }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FDG_AI_GATEWAY_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          FDG_AI_GATEWAY_ID: ${{ vars.FDG_AI_GATEWAY_ID || 'default' }}
           OPENAI_EDITORIAL_MODEL: ${{ vars.OPENAI_EDITORIAL_MODEL || 'gpt-5.6-sol' }}
           OPENAI_EDITORIAL_REASONING: high
         shell: bash
