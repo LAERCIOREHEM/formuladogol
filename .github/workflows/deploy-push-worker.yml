@@ -24,6 +24,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       FDG_PUSH_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       FDG_PUSH_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      FDG_PUSH_AI_GATEWAY_TOKEN: ${{ secrets.FDG_AI_GATEWAY_TOKEN }}
       FDG_PUSH_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       FDG_PUSH_EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
       FDG_PUSH_EMAIL_DESTINO_SUGESTOES: ${{ secrets.EMAIL_DESTINO_SUGESTOES }}
@@ -152,6 +153,12 @@ jobs:
           printf '%s' "$FDG_PUSH_OPENAI_API_KEY" | npx wrangler secret put OPENAI_API_KEY --config wrangler.generated.jsonc
           printf '%s' "$FDG_PUSH_GEMINI_API_KEY" | npx wrangler secret put GEMINI_API_KEY --config wrangler.generated.jsonc
           echo 'Secret GEMINI_API_KEY atualizado para Google Search Grounding.'
+          if [ -n "${FDG_PUSH_AI_GATEWAY_TOKEN:-}" ]; then
+            printf '%s' "$FDG_PUSH_AI_GATEWAY_TOKEN" | npx wrangler secret put AI_GATEWAY_TOKEN --config wrangler.generated.jsonc
+            echo 'Secret AI_GATEWAY_TOKEN atualizado para autenticação do Cloudflare AI Gateway.'
+          else
+            echo 'AVISO: FDG_AI_GATEWAY_TOKEN ausente; Gemini/OpenAI usarão fallback direto se o Gateway autenticado recusar a chamada.'
+          fi
           if [ -n "${FDG_PUSH_CF_BILLING_READ_TOKEN:-}" ]; then
             printf '%s' "$FDG_PUSH_CF_BILLING_READ_TOKEN" | npx wrangler secret put CLOUDFLARE_BILLING_READ_TOKEN --config wrangler.generated.jsonc
             echo 'Secret opcional CLOUDFLARE_BILLING_READ_TOKEN atualizado (somente leitura de custos Cloudflare).'
@@ -262,6 +269,7 @@ jobs:
                  EXPECTED_STATE_CONTRACT="$EXPECTED_STATE_CONTRACT" \
                  EXPECTED_FACTS_CONTRACT="$EXPECTED_FACTS_CONTRACT" \
                  EXPECTED_POSTGAME="$EXPECTED_POSTGAME" \
+                 AIG_AUTH_EXPECTED="${FDG_PUSH_AI_GATEWAY_TOKEN:+1}" \
                  API_FOOTBALL_EXPECTED="${FDG_PUSH_API_FOOTBALL_KEY:+1}" \
                  FEEDBACK_EXPECTED="${FDG_PUSH_RESEND_API_KEY:+1}" \
                  node <<'NODE'
@@ -294,6 +302,7 @@ jobs:
           if (h.postgameFastlane !== true) problems.push('postgameFastlane!=true');
           if (Number(h.postgameFastlaneVersion) !== expectedPostgame) problems.push(`postgameFastlaneVersion=${h.postgameFastlaneVersion} esperado=${expectedPostgame}`);
           if (h.aiGateway !== 'default') problems.push(`aiGateway=${h.aiGateway}`);
+          if (process.env.AIG_AUTH_EXPECTED === '1' && h.aiGatewayAuthenticated !== true) problems.push('aiGatewayAuthenticated!=true');
           if (h.geminiSearch !== true) problems.push('geminiSearch!=true');
           if (h.workersAiExtraction !== true) problems.push('workersAiExtraction!=true');
           if (h.healthEmailMonitor !== true) problems.push('healthEmailMonitor!=true');
