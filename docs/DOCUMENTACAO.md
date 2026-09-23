@@ -918,3 +918,11 @@ Todas as rotas Python de OpenAI usam `scripts/ai_gateway.py`. O helper adiciona 
 - O Service Worker permanece sem interceptar `fetch`; dados esportivos dinâmicos não são congelados em cache pelo PWA.
 - Cache busting da Home: `20260923-pwa-home-install-v4` em manifest/CSS/JS.
 - Validação automática: `scripts/validar_pwa_instalacao.mjs`; `.github/workflows/deploy.yml` executa a validação antes de montar/publicar o GitHub Pages.
+
+
+## PWA Home — hotfix v5 (2026-09-23)
+- A rota `/` do Fórmula do Gol redireciona imediatamente para `/estatisticas.html`; por isso a v4 não permanecia na raiz tempo suficiente para exibir o convite de instalação.
+- `/estatisticas.html` passa a ser tratada como **landing page efetiva da Home** pelo `js/br-pwa.js`.
+- No primeiro acesso mobile, após 4 s, o card de instalação aparece também nessa landing page; iOS recebe instruções `Compartilhar → Adicionar à Tela de Início` e Android usa o prompt nativo quando disponível.
+- `Agora não` continua silenciando por 30 dias e o modo standalone continua suprimindo o convite.
+- Cache-busting da Home/landing: `20260923-pwa-home-install-v5`.

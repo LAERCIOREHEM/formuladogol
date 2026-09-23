@@ -6,6 +6,7 @@ function must(condition, message) {
 
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
 const index = fs.readFileSync('index.html', 'utf8');
+const estatisticas = fs.readFileSync('estatisticas.html', 'utf8');
 const pwa = fs.readFileSync('js/br-pwa.js', 'utf8');
 const css = fs.readFileSync('css/br-pwa.css', 'utf8');
 
@@ -17,10 +18,12 @@ const iconSizes = new Set((manifest.icons || []).map((icon) => String(icon.sizes
 must(iconSizes.has('192x192'), 'manifest sem ícone 192x192');
 must(iconSizes.has('512x512'), 'manifest sem ícone 512x512');
 
-const version = '20260923-pwa-home-install-v4';
+const version = '20260923-pwa-home-install-v5';
 must(index.includes(`/manifest.webmanifest?v=${version}`), 'Home sem cache-busting do manifest PWA');
 must(index.includes(`/css/br-pwa.css?v=${version}`), 'Home sem CSS PWA atualizado');
 must(index.includes(`/js/br-pwa.js?v=${version}`), 'Home sem JS PWA atualizado');
+must(estatisticas.includes(`/js/br-pwa.js?v=${version}`), 'Landing efetiva /estatisticas.html sem JS PWA atualizado');
+must(index.includes("window.location.replace('/estatisticas.html'"), 'Validador esperava redirecionamento da raiz para Estatísticas');
 
 must(pwa.includes(`const VERSION = '${version}'`), 'versão do br-pwa.js inconsistente');
 must(pwa.includes('30 * 24 * 60 * 60 * 1000'), 'silenciamento deve durar 30 dias');
@@ -31,6 +34,7 @@ must(pwa.includes('Adicionar à Tela de Início'), 'instruções iOS ausentes');
 must(pwa.includes('isAndroid()'), 'fallback Android ausente');
 must(pwa.includes('fdg_pwa_install_completed_v1'), 'persistência de instalação ausente');
 must(pwa.includes('br-pwa-home-install'), 'prompt mobile da Home ausente');
+must(pwa.includes("path === '/estatisticas.html'"), 'PWA não reconhece /estatisticas.html como landing efetiva da Home');
 
 must(css.includes('.br-pwa-home-install'), 'CSS do prompt mobile ausente');
 must(css.includes('env(safe-area-inset-bottom)'), 'prompt sem safe area do iPhone');
@@ -57,4 +61,4 @@ for (const stale of stalePwaVersions) {
   must(offenders.length === 0, `referência PWA antiga ${stale}: ${offenders.join(', ')}`);
 }
 
-console.log('OK: PWA Home — Android nativo, iOS guiado, 4s de atraso, 30 dias de silêncio e start_url na Home.');
+console.log('OK: PWA Home v5 — landing /estatisticas.html reconhecida, Android nativo, iOS guiado, 4s de atraso e 30 dias de silêncio.');

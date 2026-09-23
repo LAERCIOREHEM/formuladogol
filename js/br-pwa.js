@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '20260923-pwa-home-install-v4';
+  const VERSION = '20260923-pwa-home-install-v5';
   const ONBOARDING_DISMISS_KEY = 'fdg_pwa_install_dismissed_until_v1';
   const INSTALL_COMPLETED_KEY = 'fdg_pwa_install_completed_v1';
   const ONBOARDING_DISMISS_MS = 30 * 24 * 60 * 60 * 1000;
@@ -47,7 +47,10 @@
 
   function isHomePage() {
     const path = String(window.location.pathname || '/').replace(/\/+$/, '') || '/';
-    return path === '/' || path === '/index.html';
+    // A raiz do FDG redireciona imediatamente para /estatisticas.html.
+    // Portanto, Estatísticas é também a landing page efetiva da Home e deve
+    // receber o onboarding de instalação no primeiro acesso mobile.
+    return path === '/' || path === '/index.html' || path === '/estatisticas.html';
   }
 
   function supportsServiceWorker() {

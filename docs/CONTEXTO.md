@@ -381,3 +381,11 @@ Antes de mudar o projeto:
 - `Agora não`/`×` silenciam por 30 dias (`fdg_pwa_install_dismissed_until_v1`). Instalação conhecida usa `fdg_pwa_install_completed_v1`.
 - O manifest abre a Home (`/?source=pwa`) em modo `standalone`; SW continua sem cache de fetch esportivo.
 - Alterações PWA de produção devem manter `scripts/validar_pwa_instalacao.mjs` verde; `Deploy site (GitHub Pages)` executa esse check automaticamente.
+
+
+## PWA Home — hotfix v5 (2026-09-23)
+- A rota `/` do Fórmula do Gol redireciona imediatamente para `/estatisticas.html`; por isso a v4 não permanecia na raiz tempo suficiente para exibir o convite de instalação.
+- `/estatisticas.html` passa a ser tratada como **landing page efetiva da Home** pelo `js/br-pwa.js`.
+- No primeiro acesso mobile, após 4 s, o card de instalação aparece também nessa landing page; iOS recebe instruções `Compartilhar → Adicionar à Tela de Início` e Android usa o prompt nativo quando disponível.
+- `Agora não` continua silenciando por 30 dias e o modo standalone continua suprimindo o convite.
+- Cache-busting da Home/landing: `20260923-pwa-home-install-v5`.
