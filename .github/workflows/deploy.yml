@@ -1,4 +1,4 @@
-# DEPLOY_SCHEMA: social-footer-v1-2026-08-11
+# DEPLOY_SCHEMA: pwa-home-install-v4-2026-09-23
 name: Deploy site (GitHub Pages)
 
 on:
@@ -74,6 +74,7 @@ on:
       - 'scripts/gerar_hubs_competicoes.py'
       - 'scripts/gerar_fechamento_organico.py'
       - 'scripts/validar_org_final.py'
+      - 'scripts/validar_pwa_instalacao.mjs'
       - 'css/br-clube.css'
       - 'css/br-jogo.css'
       - 'css/br-competicoes.css'
@@ -131,6 +132,13 @@ jobs:
           grep -q 'br-estatisticas.js?v=20260920-live-facts-v6' estatisticas.html
           grep -q 'br-aovivo.js?v=20260920-monitor-facts-v7' aovivo.html
           echo 'OK: Ao Vivo, Tabela e Estatísticas usam LiveState v6 + Live Facts v2.'
+
+      - name: Validar instalação PWA da Home
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check js/br-pwa.js
+          node scripts/validar_pwa_instalacao.mjs
 
       - name: Montar site público
         shell: bash
