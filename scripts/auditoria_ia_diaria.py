@@ -1074,17 +1074,31 @@ def html_escape(value: Any) -> str:
     )
 
 
-def recoverable_gateway_1010(previous: Mapping[str, Any], moment: datetime) -> bool:
+def recoverable_gateway_preprovider(previous: Mapping[str, Any], moment: datetime) -> bool:
+    """Retorna True somente para falhas comprovadamente anteriores ao provedor.
+
+    Cloudflare AI Gateway pode rejeitar a chamada antes de OpenAI por:
+    - 403 / error 1010 (assinatura/User-Agent no edge);
+    - 401 / AiGatewayError / code 2009 (autenticação do próprio Gateway).
+
+    Em ambos os casos, sem web_tool_call e sem resultado IA, a tentativa não
+    deve consumir a única chamada lógica diária. Isso precisa espelhar a mesma
+    regra usada pelo workflow ``auditoria-ia-diaria.yml``.
+    """
     if str(previous.get("data_brt") or "") != moment.date().isoformat():
         return False
     openai_state = previous.get("openai") or {}
     error = str(openai_state.get("erro") or "").lower()
-    return (
-        "1010" in error
-        and "403" in error
-        and int(openai_state.get("web_tool_calls") or 0) == 0
-        and not bool(previous.get("resultado_ia"))
-    )
+    tool_calls = int(openai_state.get("web_tool_calls") or 0)
+    no_result = not bool(previous.get("resultado_ia"))
+    cloudflare_1010 = "403" in error and "1010" in error
+    gateway_2009 = "401" in error and "aigatewayerror" in error and "2009" in error
+    return tool_calls == 0 and no_result and (cloudflare_1010 or gateway_2009)
+
+
+def recoverable_gateway_1010(previous: Mapping[str, Any], moment: datetime) -> bool:
+    """Compatibilidade com o nome antigo; use recoverable_gateway_preprovider."""
+    return recoverable_gateway_preprovider(previous, moment)
 
 
 def already_attempted_today(previous: Mapping[str, Any], moment: datetime) -> bool:
@@ -1092,10 +1106,9 @@ def already_attempted_today(previous: Mapping[str, Any], moment: datetime) -> bo
         str(previous.get("data_brt") or "") == moment.date().isoformat()
         and bool((previous.get("openai") or {}).get("tentativa_efetuada"))
     )
-    # 403/1010 acontece no edge da Cloudflare antes do provedor. Não deve
-    # consumir a única tentativa lógica do dia. O workflow permite UMA
-    # recuperação manual depois do hotfix.
-    return attempted and not recoverable_gateway_1010(previous, moment)
+    # Falhas 403/1010 e 401/AiGatewayError 2009 acontecem no Cloudflare antes
+    # do provedor. Não devem consumir a única tentativa lógica do dia.
+    return attempted and not recoverable_gateway_preprovider(previous, moment)
 
 
 def run(*, dry_run: bool = False, moment: datetime | None = None) -> dict[str, Any]:
@@ -1408,8 +1421,27 @@ def self_test() -> int:
         "openai": {"tentativa_efetuada": True, "erro": "OpenAI HTTP 403: error code: 1010", "web_tool_calls": 0},
         "resultado_ia": {},
     }
+    assert recoverable_gateway_preprovider(recoverable, datetime.fromisoformat("2026-08-09T08:45:00-03:00"))
     assert recoverable_gateway_1010(recoverable, datetime.fromisoformat("2026-08-09T08:45:00-03:00"))
     assert not already_attempted_today(recoverable, datetime.fromisoformat("2026-08-09T08:45:00-03:00"))
+    recoverable_2009 = {
+        "data_brt": "2026-08-09",
+        "openai": {
+            "tentativa_efetuada": True,
+            "erro": 'OpenAI HTTP 401: {"name":"AiGatewayError","internalCode":2009,"message":"Unauthorized"}',
+            "web_tool_calls": 0,
+        },
+        "resultado_ia": {},
+    }
+    assert recoverable_gateway_preprovider(recoverable_2009, datetime.fromisoformat("2026-08-09T08:45:00-03:00"))
+    assert not already_attempted_today(recoverable_2009, datetime.fromisoformat("2026-08-09T08:45:00-03:00"))
+    provider_401 = {
+        "data_brt": "2026-08-09",
+        "openai": {"tentativa_efetuada": True, "erro": "OpenAI HTTP 401: invalid_api_key", "web_tool_calls": 0},
+        "resultado_ia": {},
+    }
+    assert not recoverable_gateway_preprovider(provider_401, datetime.fromisoformat("2026-08-09T08:45:00-03:00"))
+    assert already_attempted_today(provider_401, datetime.fromisoformat("2026-08-09T08:45:00-03:00"))
     print("Self-test auditoria IA diária: OK")
     return 0
 

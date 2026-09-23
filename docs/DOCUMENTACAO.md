@@ -899,3 +899,10 @@ Todas as rotas Python de OpenAI usam `scripts/ai_gateway.py`. O helper adiciona 
 - Proteção de continuidade: 401 `AiGatewayError`/código 2009 e 403/1010 são tratados como falha **pré-provedor**; há no máximo um fallback direto ao provedor. 401 de chave OpenAI/Gemini inválida **não** entra nesse fallback.
 - Auditoria diária permite uma recuperação manual no mesmo dia quando o registro anterior comprova falha pré-provedor e `web_tool_calls=0`.
 - `/health` expõe apenas `aiGatewayAuthenticated: true|false`, nunca o token. O e-mail diário marca IA/Custos como atenção se a autenticação do Gateway não estiver configurada.
+
+
+### Hotfix auditoria diária — R5 (23/09/2026)
+- Corrigida a trava interna de `scripts/auditoria_ia_diaria.py`: a regra de recuperação agora espelha o workflow e trata **401 / AiGatewayError / código 2009** e **403 / 1010** como falhas pré-provedor quando `web_tool_calls=0` e não há `resultado_ia`.
+- Antes do R5, o workflow autorizava a recuperação manual de 2009, mas o script Python ainda reconhecia apenas 1010; por isso devolvia o JSON antigo sem nova chamada e o último step sinalizava a falha persistente novamente.
+- Um 401 real do provedor (`invalid_api_key`) continua **não recuperável** e não ganha segunda tentativa automática.
+- Não há deploy Cloudflare neste hotfix; basta publicar os arquivos no `main` e executar **Auditoria IA diária** uma vez manualmente para limpar o estado antigo se a chamada atual for bem-sucedida.
