@@ -18,8 +18,13 @@
   "vars": {
     "SITE_BASE": "https://formuladogol.com.br",
     "POSTGAME_OPENAI_MODEL": "gpt-5.6-sol",
-    "POSTGAME_OPENAI_MINI_MODEL": "gpt-4o-mini"
+    "POSTGAME_OPENAI_MINI_MODEL": "gemini-3.5-flash-lite",
+    "GEMINI_SEARCH_MODEL": "gemini-3.5-flash-lite",
+    "WORKERS_AI_EXTRACT_MODEL": "@cf/meta/llama-3.1-8b-instruct",
+    "AI_GATEWAY_ID": "default",
+    "AI_GATEWAY_ACCOUNT_ID": "__CLOUDFLARE_ACCOUNT_ID__"
   },
+  "ai": { "binding": "AI" },
   "observability": {
     "enabled": true
   },

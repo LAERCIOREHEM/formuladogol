@@ -328,3 +328,26 @@ Antes de mudar o projeto:
 - módulo Copa 2026;
 - SEO, Analytics, deploy e IndexNow;
 - secrets, testes, operação manual e diagnóstico.
+
+
+## Arquitetura IA multi-provider — 23/09/2026
+
+- **Editorial permanece em OpenAI GPT-5.6 Sol**; esta é uma decisão de qualidade e não deve ser rebaixada automaticamente.
+- Pós-jogo público/renda usa política v5: ESPN/fontes determinísticas desde o FINAL; URLs descobertas são revisitadas diretamente; **Workers AI** extrai números de páginas já localizadas; **Gemini + Google Search Grounding** é a primeira camada de descoberta em +5, +12, +22 e +35 min; **OpenAI GPT-5.6 Sol + web_search** entra somente como fallback final em +45 min.
+- Encontrou **público + renda**: o `event_id` fica `resolved` e não reabre. Público pagante é complementar e não bloqueia o encerramento.
+- Todas as chamadas do Push Worker passam pelo **Cloudflare AI Gateway `default`**, com metadata de projeto/componente/finalidade/evento. O gateway `default` é criado automaticamente na primeira chamada suportada.
+- O Push Worker possui binding `AI` para Workers AI. Modelo padrão de extração: `@cf/meta/llama-3.1-8b-instruct`; modelo pode ser alterado por `WORKERS_AI_EXTRACT_MODEL`.
+- Gemini usa `GEMINI_SEARCH_MODEL`, default `gemini-3.5-flash-lite`, e secret `GEMINI_API_KEY`. A chave nunca deve ser documentada ou commitada.
+- OpenAI mantém `OPENAI_API_KEY` e `POSTGAME_OPENAI_MODEL=gpt-5.6-sol`. No Worker ela é fallback do pós-jogo; nos workflows editoriais o GPT-5.6 Sol permanece dedicado. Quando `FDG_AI_GATEWAY_ACCOUNT_ID` está presente, ambos usam o endpoint OpenAI do AI Gateway para observabilidade, sem trocar o modelo nem a chave do provedor.
+- `AI_GATEWAY_ACCOUNT_ID` vem do `CLOUDFLARE_ACCOUNT_ID` no deploy; `AI_GATEWAY_ID=default`.
+- D1 `ai_provider_ledger` registra provider, finalidade, `event_id`, modelo, buscas, tokens, falhas e latência; `postgame_source_cache` guarda URLs para reconsulta barata.
+- O e-mail diário de saúde inclui IA multi-provider (Workers AI/Gemini/OpenAI), buscas, tokens e falhas. O faturamento final continua sendo conferido nos dashboards Cloudflare/Google/OpenAI; o Worker não inventa custo quando a resposta não expõe valor exato.
+- O Orchestrator continua **determinístico**: ele não usa LLM para decidir se deve abrir GitHub Actions. Ele conhece a política v5 e só consolida no GitHub quando o Fastlane já encontrou dado concreto.
+- Deploy: `.github/workflows/deploy-push-worker.yml` valida `GEMINI_API_KEY`, aplica migrations D1, publica binding AI/secrets e executa smoke test da política v5. Alterações do Orchestrator/config também acionam `Deploy Orchestrator Worker`/Pages conforme paths do repositório.
+
+
+### Cloudflare Billing no Health Report
+- Opcional: secret GitHub `FDG_CF_BILLING_READ_TOKEN`, criado com permissão **Account > Billing > Read**.
+- Quando presente, o Push Worker consulta somente leitura do uso faturável da conta Cloudflare e inclui o custo do período no e-mail diário.
+- O deploy **não** reutiliza `CLOUDFLARE_API_TOKEN` para essa leitura, evitando ampliar a exposição do token de deploy.
+- Se o secret não existir, o Health Report continua funcional e informa que o custo Cloudflare exato não está configurado.

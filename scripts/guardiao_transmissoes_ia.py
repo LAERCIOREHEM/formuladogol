@@ -39,7 +39,8 @@ if str(ROOT) not in sys.path:
 from atualizar_transmissoes_tv_brasileirao import ALLOWED_CHANNELS, access_options_for_game  # noqa: E402
 
 TZ = ZoneInfo("America/Sao_Paulo")
-OPENAI_URL = "https://api.openai.com/v1/responses"
+from ai_gateway import openai_responses_url, gateway_metadata
+OPENAI_URL = openai_responses_url()
 AGENDA = ROOT / "dados-br" / "agenda-clubes-br.json"
 TV = ROOT / "dados-br" / "transmissoes-tv.json"
 LIVE = ROOT / "dados-br" / "transmissoes-aovivo.json"
@@ -312,7 +313,7 @@ def call_openai(payload: Mapping[str, Any], api_key: str, timeout: int = 210) ->
     req = urllib.request.Request(
         OPENAI_URL,
         data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json", "cf-aig-collect-log-payload": "false", "cf-aig-no-wholesale": "true", "cf-aig-metadata": gateway_metadata("transmission-guardian", "transmission-search")},
         method="POST",
     )
     try:

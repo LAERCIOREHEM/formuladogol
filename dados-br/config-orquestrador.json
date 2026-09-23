@@ -53,7 +53,7 @@
     "janela_automatica_horas": 24,
     "max_dispatches_github_por_jogo": 2,
     "retentativa_consolidacao_github_minutos": 30,
-    "politica": "Fastlane Cloudflare/OpenAI persegue público/renda e salva no D1; GitHub só consolida dado concreto já encontrado, nas primeiras 24h e no máximo 2 vezes por jogo. Pendência histórica continua auditável sem Action automática.",
+    "politica": "Fastlane Cloudflare v5 persegue público/renda: ESPN/fontes diretas -> Workers AI para extração -> Gemini + Google Search Grounding em +5/+12/+22/+35 -> OpenAI GPT-5.6 Sol apenas como fallback em +45. AI Gateway centraliza observabilidade. GitHub só consolida dado concreto já encontrado, nas primeiras 24h e no máximo 2 vezes por jogo.",
     "github_fallback_automatico": false
   },
   "backoff_falhas": {

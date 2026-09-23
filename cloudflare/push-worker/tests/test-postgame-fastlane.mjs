@@ -65,7 +65,7 @@ assert.equal(canonicalUol.values.renda, 5752960);
 
 console.log('postgame-fastlane tests: PASS');
 
-// ============================ Política v4 ============================
+// ============================ Política v5 ============================
 import {
   PUBLIC_POLICY, planPublicStep, nextPublicAttemptMs, publicSearchRequest,
   parseEspnAttendance, isPublicComplete, publicAlertMessage, taskEndMs
@@ -77,28 +77,27 @@ const at=(min)=>END+min*60_000;
 const zero={mini_attempts:0,sol_attempts:0,sol_completed:0};
 assert.equal(planPublicStep(task,zero,at(1)).phase,'deterministic');
 assert.equal(planPublicStep(task,zero,at(4.9)).phase,'deterministic');
-assert.equal(planPublicStep(task,zero,at(5)).phase,'mini');
+assert.equal(planPublicStep(task,zero,at(5)).phase,'gemini');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(6)).phase,'deterministic');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(12)).phase,'mini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:2},at(22)).phase,'mini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:3},at(35)).phase,'mini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:4},at(35.1)).phase,'sol');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(45)).phase,'sol');
-assert.equal(planPublicStep(task,zero,at(180)).phase,'mini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(181)).phase,'sol');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(12)).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:2},at(22)).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:3},at(35)).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:4},at(35.1)).phase,'deterministic');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:4},at(45)).phase,'openai');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(45)).phase,'openai');
+assert.equal(planPublicStep(task,zero,at(180)).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(181)).phase,'openai');
 assert.equal(planPublicStep(task,{mini_attempts:4,sol_attempts:1,sol_completed:1},at(46)).phase,'give_up');
 assert.equal(planPublicStep(task,{mini_attempts:4,sol_attempts:3,sol_completed:0},at(60)).phase,'give_up');
 assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'deterministic'},at(2),zero),at(4));
-assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'mini'},at(4),zero),at(5));
-assert.equal(nextPublicAttemptMs(task,'mini',{phase:'deterministic'},at(5),{...zero,mini_attempts:1}),at(7));
-assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'mini'},at(11),{...zero,mini_attempts:1}),at(12));
-assert.equal(nextPublicAttemptMs(task,'mini',{phase:'sol'},at(35),{...zero,mini_attempts:4}),at(45));
-assert.equal(nextPublicAttemptMs(task,'sol',{phase:'sol'},at(46),{mini_attempts:4,sol_attempts:1}),at(51));
-assert.deepEqual(PUBLIC_POLICY.miniScheduleMinutes,[5,12,22,35]);
-assert.equal(PUBLIC_POLICY.miniMaxAttempts,4);
-const mini=publicSearchRequest(task,['renda'],{},'mini');
-assert.equal(mini.model,'gpt-4o-mini'); assert.equal(mini.max_tool_calls,1); assert.equal('reasoning' in mini,false);
-const sol=publicSearchRequest(task,['renda'],{POSTGAME_OPENAI_MODEL:'gpt-5.6-sol'},'sol');
+assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'gemini'},at(4),zero),at(5));
+assert.equal(nextPublicAttemptMs(task,'gemini',{phase:'deterministic'},at(5),{...zero,mini_attempts:1}),at(7));
+assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'gemini'},at(11),{...zero,mini_attempts:1}),at(12));
+assert.equal(nextPublicAttemptMs(task,'gemini',{phase:'openai'},at(35),{...zero,mini_attempts:4}),at(45));
+assert.equal(nextPublicAttemptMs(task,'openai',{phase:'openai'},at(46),{mini_attempts:4,sol_attempts:1}),at(51));
+assert.deepEqual(PUBLIC_POLICY.geminiScheduleMinutes,[5,12,22,35]);
+assert.equal(PUBLIC_POLICY.geminiMaxAttempts,4);
+const sol=publicSearchRequest(task,['renda'],{POSTGAME_OPENAI_MODEL:'gpt-5.6-sol'},'openai');
 assert.equal(sol.model,'gpt-5.6-sol'); assert.equal(sol.max_tool_calls,6); assert.equal(sol.reasoning.effort,'medium');
 assert.equal(parseEspnAttendance({gameInfo:{attendance:42317}}),42317);
 assert.equal(parseEspnAttendance({gameInfo:{attendance:'61.532'}}),61532);
@@ -107,5 +106,5 @@ assert.equal(isPublicComplete({publico:42000,renda:1500000}),true);
 assert.equal(isPublicComplete({publico:42000,renda:null}),false);
 assert.equal(taskEndMs({kickoff:'2026-09-20T18:00:00.000Z'}),Date.parse('2026-09-20T19:55:00.000Z'));
 const msg=publicAlertMessage(task,{publico:42317,publico_pagante:null,renda:null},{publico:'https://espn'},{deterministic_checks:15,mini_attempts:4,sol_attempts:1},'not_found',{});
-assert.match(msg.body,/IA econômica \(gpt-4o-mini\): 4/);
-console.log('postgame-fastlane v4 policy tests: PASS');
+assert.match(msg.body,/Gemini \+ Google Search \(gemini-3.5-flash-lite\): 4/);
+console.log('postgame-fastlane v5 policy tests: PASS');

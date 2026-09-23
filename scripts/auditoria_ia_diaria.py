@@ -32,6 +32,7 @@ import urllib.request
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Mapping, Sequence
+from ai_gateway import openai_responses_url, gateway_metadata
 from zoneinfo import ZoneInfo
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -672,9 +673,9 @@ def collect_web_metadata(response: Mapping[str, Any]) -> tuple[int, int, set[str
 
 def call_openai_once(payload: Mapping[str, Any], api_key: str) -> dict[str, Any]:
     request = urllib.request.Request(
-        "https://api.openai.com/v1/responses",
+        openai_responses_url(),
         data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json", "cf-aig-collect-log-payload": "false", "cf-aig-no-wholesale": "true", "cf-aig-metadata": gateway_metadata("daily-audit", "audit-search")},
         method="POST",
     )
     try:
@@ -1353,7 +1354,7 @@ def self_test() -> int:
     # em tempo quase real, porque a matéria consolidada da rodada no ge só sai
     # depois que a rodada inteira termina — janela em que o site ficaria sem o
     # dado de público que alimenta as Estatísticas.
-    OPENAI_CONSUMIDORES = {"auditoria_ia_diaria.py", "completar_publicos_ia.py", "editorial_ia.py", "guardiao_transmissoes_ia.py"}
+    OPENAI_CONSUMIDORES = {"ai_gateway.py", "auditoria_ia_diaria.py"}
     # deploy-push-worker.yml consta aqui porque grava OPENAI_API_KEY como secret
     # do Worker via `wrangler secret put`; quem consome a chave em runtime é o
     # sports-monitor.js. O workflow não chama a OpenAI diretamente.
@@ -1368,7 +1369,7 @@ def self_test() -> int:
         if "api.openai.com/v1/responses" in text:
             direct_api.append(script.name)
     assert set(direct_api) <= OPENAI_CONSUMIDORES, f"chamada OpenAI fora dos consumidores autorizados: {sorted(set(direct_api) - OPENAI_CONSUMIDORES)}"
-    assert Path(__file__).name in direct_api, "auditoria diária deveria manter sua própria chamada OpenAI"
+    assert "ai_gateway.py" in direct_api, "helper central do AI Gateway deveria manter o fallback OpenAI direto"
     workflow_secret_refs = []
     for workflow in (ROOT / ".github" / "workflows").glob("*.yml"):
         try:

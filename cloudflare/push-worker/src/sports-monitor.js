@@ -25,7 +25,8 @@ import { buildHotMatchPrematchEvent, hotMatchNextPollDelay, hotMatchPrematchDue,
 import { recordPostgameFinal } from './postgame-fastlane.js';
 import { buildSportsMonitorLiveFacts, SPORTS_MONITOR_FACTS_VERSION } from './monitor-live-facts.js';
 import { sendMail, mailConfig } from './mailer.js';
-import { countWebSearchCalls, recordAiUsage } from './ai-usage.js';
+import { countWebSearchCalls, recordAiUsage, recordProviderUsage } from './ai-usage.js';
+import { openAiGatewayResponsesUrl, openAiUsage } from './ai-router.js';
 
 const AGENDA_URL = 'https://formuladogol.com.br/dados-br/agenda-clubes-br.json';
 const ALLOWED_LEAGUES = new Set(['bra.1', 'bra.copa_do_brazil', 'conmebol.libertadores', 'conmebol.sudamericana']);
@@ -725,14 +726,14 @@ export class SportsMonitor {
       webSearchCalls, responded, ok, httpStatus, durationMs:Date.now()-startedAt, detail
     });
     try {
-      const response = await fetch('https://api.openai.com/v1/responses', {
+      const response = await fetch(openAiGatewayResponsesUrl(this.env), {
         method: 'POST', signal: controller.signal,
-        headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
+        headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json', 'cf-aig-metadata': JSON.stringify({project:'formula-do-gol',component:'readiness',purpose:'event-resolution',eventId:text(game?.eventId),provider:'openai'}) },
         body: JSON.stringify(aiResolverRequest(game, checkpoint))
       });
       httpStatus = response.status;
       if (!response.ok) { await usage(false,false,`openai_http_${response.status}`); return { attempted:true,recovered:false,resolved:null,reason:`openai_http_${response.status}` }; }
-      const raw=await response.json(); webSearchCalls=countWebSearchCalls(raw);
+      const raw=await response.json(); webSearchCalls=countWebSearchCalls(raw); const pu=openAiUsage(raw); await recordProviderUsage(this.env,{provider:'openai',purpose:'readiness_guardian',eventId:game?.eventId,model:'gpt-5.6-sol',phase:String(checkpoint||''),searchCalls:webSearchCalls,inputTokens:pu.input,outputTokens:pu.output,totalTokens:pu.total,responded:true,ok:true,httpStatus:response.status,durationMs:Date.now()-startedAt,detail:'response'});
       const parsed = parseOpenAIJson(raw);
       const candidate = text(parsed?.candidate_event_id);
       if (!candidate) { const reason=text(parsed?.status||'no_candidate'); await usage(true,true,reason); return {attempted:true,recovered:false,resolved:null,reason}; }

@@ -58,7 +58,8 @@ ESTADO = ROOT / "dados-br" / "estado-publicos-ia.json"
 CONFIG_ORQ = ROOT / "dados-br" / "config-orquestrador.json"
 
 FUSO_BRASILIA = timezone(timedelta(hours=-3))
-OPENAI_URL = "https://api.openai.com/v1/responses"
+from ai_gateway import openai_responses_url, gateway_metadata
+OPENAI_URL = openai_responses_url()
 DIAG_PREFIX = "FDG_DIAGNOSTICO_JSON="
 DEFAULT_MODEL = "gpt-5.6-sol"
 
@@ -665,7 +666,7 @@ def chamar_openai(payload: Mapping[str, Any], api_key: str, timeout: int = 210) 
     req = urllib.request.Request(
         OPENAI_URL,
         data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json", "cf-aig-collect-log-payload": "false", "cf-aig-no-wholesale": "true", "cf-aig-metadata": gateway_metadata("publicos-github-fallback", "attendance-search")},
         method="POST",
     )
     try:

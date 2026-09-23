@@ -1,11 +1,11 @@
 import { sendMail, mailConfig, maskAddress } from './mailer.js';
-import { aiUsageSummary } from './ai-usage.js';
+import { aiUsageSummary, providerUsageSummary } from './ai-usage.js';
 
 const SITE = 'https://formuladogol.com.br';
 const ORCH = 'https://orchestrator.formuladogol.com.br';
 const SNAPSHOT_TTL_MS = 5 * 60_000;
 const DAILY_HOUR_BRT = 8;
-const HEALTH_POLICY_VERSION = 2;
+const HEALTH_POLICY_VERSION = 3;
 
 function text(v) { return String(v ?? '').trim(); }
 function n(v) { const x = Number(v); return Number.isFinite(x) ? x : 0; }
@@ -27,6 +27,37 @@ async function fetchJson(url, timeout=10000) {
   try { const r=await fetch(url,{cache:'no-store',signal:c.signal}); const body=await r.json().catch(()=>null); return {ok:r.ok,status:r.status,body}; }
   catch(e){ return {ok:false,status:0,error:text(e?.message||e)}; } finally { clearTimeout(t); }
 }
+
+async function cloudflareBillingSummary(env, now=Date.now()) {
+  const token=text(env.CLOUDFLARE_BILLING_READ_TOKEN);
+  const account=text(env.AI_GATEWAY_ACCOUNT_ID);
+  if(!token||!account) return {configured:false,ok:false,reason:'not_configured'};
+  const cache=safeJson(await metaGet(env,'cloudflare_billing_cache'),null);
+  if(cache&&now-(Date.parse(cache.at)||0)<6*60*60_000) return cache;
+  try {
+    const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/billable-usage`,{headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},cache:'no-store'});
+    const raw=await r.json().catch(()=>null);
+    const rows=Array.isArray(raw?.result)?raw.result:[];
+    if(!r.ok||raw?.success===false){
+      const out={configured:true,ok:false,at:iso(now),reason:`http_${r.status}`};
+      await metaPut(env,'cloudflare_billing_cache',JSON.stringify(out)); return out;
+    }
+    let billed=0; let currency='USD'; const products={};
+    for(const row of rows){
+      billed+=n(row?.BilledCost); currency=text(row?.BillingCurrency)||currency;
+      const family=text(row?.ServiceName||row?.ServiceFamilyName||row?.x_ProductFamilyName||'Cloudflare');
+      const key=family||'Cloudflare';
+      const item=products[key]||(products[key]={billedCost:0,metrics:[]}); item.billedCost+=n(row?.BilledCost);
+      if(item.metrics.length<8) item.metrics.push({name:text(row?.x_BillableMetricName||row?.ChargeDescription),quantity:n(row?.ConsumedQuantity),unit:text(row?.ConsumedUnit)});
+    }
+    const out={configured:true,ok:true,at:iso(now),currency,billedCost:Number(billed.toFixed(6)),rows:rows.length,products};
+    await metaPut(env,'cloudflare_billing_cache',JSON.stringify(out)); return out;
+  } catch(e){
+    const out={configured:true,ok:false,at:iso(now),reason:text(e?.message||e).slice(0,160)};
+    await metaPut(env,'cloudflare_billing_cache',JSON.stringify(out)); return out;
+  }
+}
+
 function indicator(id,label,severity,detail=''){ return {id,label,severity,detail}; }
 function worst(indicators){ return indicators.some(x=>x.severity==='red')?'red':indicators.some(x=>x.severity==='yellow')?'yellow':'green'; }
 function icon(s){ return s==='red'?'🔴':s==='yellow'?'🟡':'🟢'; }
@@ -52,13 +83,14 @@ export function isDailyDigestDue(br,lastDate){
 export async function collectHealthSnapshot(env, monitor = null, now = Date.now(), force = false) {
   const previous = safeJson(await metaGet(env,'snapshot'),null);
   if (!force && previous && Number(previous.policyVersion) === HEALTH_POLICY_VERSION && now-(Date.parse(previous.at)||0)<SNAPSHOT_TTL_MS) return previous;
-  const [site, orchHealth, orchStatus, ai, post] = await Promise.all([
-    fetchJson(`${text(env.SITE_BASE)||SITE}/`), fetchJson(`${ORCH}/health`), fetchJson(`${ORCH}/status`), aiUsageSummary(env,24),
+  const [site, orchHealth, orchStatus, ai, providers, post, cfBilling] = await Promise.all([
+    fetchJson(`${text(env.SITE_BASE)||SITE}/`), fetchJson(`${ORCH}/health`), fetchJson(`${ORCH}/status`), aiUsageSummary(env,24), providerUsageSummary(env,24),
     env.DB.prepare(`SELECT COUNT(*) total,
       COALESCE(SUM(CASE WHEN public_status NOT IN ('resolved','gave_up') THEN 1 ELSE 0 END),0) public_pending,
       COALESCE(SUM(CASE WHEN public_status='gave_up' AND updated_at>=datetime('now','-24 hours') THEN 1 ELSE 0 END),0) public_gave_up_24h,
       COALESCE(SUM(CASE WHEN highlight_status<>'resolved' THEN 1 ELSE 0 END),0) highlight_pending
-      FROM postgame_fastlane`).first()
+      FROM postgame_fastlane`).first(),
+    cloudflareBillingSummary(env,now)
   ]);
   const cfg=mailConfig(env);
   let probe=null; try { const row=await env.DB.prepare("SELECT value FROM postgame_meta WHERE key='mailer_probe'").first(); probe=safeJson(row?.value,null); } catch(_) {}
@@ -79,7 +111,10 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   const postPending=n(post?.public_pending);
   const gave=n(post?.public_gave_up_24h);
   const highlight=n(post?.highlight_pending);
-  const perEventAnomaly=(ai.byEvent||[]).find(r=>n(r.web_searches)>7);
+  const perEventAnomaly=(providers.byEvent||[]).find(r=>n(r.searches)>8);
+  const providerFailures=n(providers.failures);
+  const geminiReady=Boolean(text(env.GEMINI_API_KEY)&&text(env.AI_GATEWAY_ACCOUNT_ID));
+  const workersAiReady=Boolean(env.AI);
   const indicators=[
     indicator('site','Site / Pages',site.ok?'green':'red',site.ok?`HTTP ${site.status}`:`indisponível (HTTP ${site.status||'erro'})`),
     indicator('orchestrator','Orchestrator',orchHealth.ok&&orchStatus.ok?'green':'red',orchHealth.ok?`${text(os.workloadMode)||'modo desconhecido'} · próximo: ${fmtDate(os.nextRelevantMatchAt)}`:'health/status indisponível'),
@@ -90,9 +125,9 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     indicator('highlights','Melhores Momentos',highlight>0?'yellow':'green',`${highlight} pendência(s)`),
     indicator('editorial','Editorial / Transmissões',Array.isArray(os.errors)&&os.errors.length?'yellow':'green',Array.isArray(os.errors)&&os.errors.length?`${os.errors.length} erro(s) no último ciclo`:'sem erro reportado pelo Orchestrator'),
     indicator('infra','Infraestrutura / SMTP',!cfg.configured||probe?.ok===false?'red':'green',`${cfg.transport} · ${maskAddress(cfg.to)}${probe?` · probe ${probe.ok?'OK':'FALHOU'}`:''}`),
-    indicator('openai','OpenAI / Web Search',perEventAnomaly?'red':ai.failures>3?'yellow':'green',`${ai.calls} chamada(s), ${ai.webSearches} web search(es), ${ai.failures} falha(s) /24h${perEventAnomaly?` · anomalia event ${text(perEventAnomaly.event_id)}`:''}`),
+    indicator('openai','IA / Custos',!geminiReady||!workersAiReady?'yellow':perEventAnomaly?'red':providerFailures>3?'yellow':'green',`${providers.calls} chamada(s) multi-provider · ${providers.searches} busca(s) web · ${providerFailures} falha(s) /24h · Gateway ${text(env.AI_GATEWAY_ID)||'default'}${perEventAnomaly?` · anomalia event ${text(perEventAnomaly.event_id)}`:''}`),
   ];
-  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches},postgame:{pending:postPending,gaveUp24h:gave,highlightPending:highlight},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to)}};
+  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY))},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches},postgame:{pending:postPending,gaveUp24h:gave,highlightPending:highlight},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to)},cloudflareBilling:cfBilling};
   await metaPut(env,'snapshot',JSON.stringify(snapshot));
   return snapshot;
 }
@@ -105,8 +140,10 @@ function digestMessage(snapshot, now=Date.now()) {
     ...snapshot.indicators.map(x=>`${icon(x.severity)} ${x.label}: ${x.detail}`), '',
     'ORQUESTRADOR', `Modo: ${snapshot.orchestrator.workloadMode||'—'}`, `Próximo jogo relevante: ${fmtDate(snapshot.orchestrator.nextRelevantMatchAt)}`,
     `Dispatches GitHub 24h: ${snapshot.orchestrator.githubDispatchesLast24h}`, `Pendências pós-jogo: ${snapshot.postgame.pending}`, '',
-    'OPENAI / WEB SEARCH — últimas 24h', `Chamadas registradas no Worker: ${snapshot.ai.calls}`, `Web searches registradas: ${snapshot.ai.webSearches}`, `Falhas: ${snapshot.ai.failures}`,
-    ...(snapshot.ai.byPurpose||[]).map(r=>`- ${r.purpose}: ${r.calls} chamada(s), ${r.web_searches} web search(es)`), '',
+    'IA / AI GATEWAY — últimas 24h', `Gateway: ${snapshot.aiStack?.gateway||'default'}`, `Chamadas registradas: ${snapshot.providers?.calls||0}`, `Buscas web registradas: ${snapshot.providers?.searches||0}`, `Tokens registrados: ${snapshot.providers?.totalTokens||0}`, `Falhas: ${snapshot.providers?.failures||0}`,
+    ...(snapshot.providers?.byProvider||[]).map(r=>`- ${r.provider}: ${r.calls} chamada(s), ${r.searches} busca(s), ${r.total_tokens||0} tokens, ${r.failures||0} falha(s)`),
+    `Cloudflare uso faturável (período): ${snapshot.cloudflareBilling?.configured?(snapshot.cloudflareBilling?.ok?`${snapshot.cloudflareBilling.currency||'USD'} ${Number(snapshot.cloudflareBilling.billedCost||0).toFixed(2)}`:'indisponível'):'token Billing Read não configurado'}`,
+    'Custos Gemini/OpenAI: consultar AI Gateway/Google/OpenAI para faturamento final; o e-mail não inventa preço quando a resposta não expõe custo exato.', '',
     snapshot.state==='green'?'Nenhuma ação necessária.':'Verifique os itens amarelos/vermelhos acima. Alertas críticos são enviados separadamente.'
   ];
   return {subject:`[Fórmula do GOL] ${title}`,body:lines.join('\n')};
@@ -114,7 +151,7 @@ function digestMessage(snapshot, now=Date.now()) {
 function incidentMessage(indicator,snapshot,recovered=false){
   return {
     subject: recovered?`[FDG][RECUPERADO] ✅ ${indicator.label}`:`[FDG][CRÍTICO] 🔴 ${indicator.label}`,
-    body:[recovered?'Incidente normalizado.':'Problema confirmado pelo Health Monitor.', '', `Indicador: ${indicator.label}`, `Detalhe: ${indicator.detail}`, `Detectado/validado: ${fmtDate(snapshot.at)}`, '', `Estado geral: ${snapshot.state.toUpperCase()}`, `OpenAI 24h: ${snapshot.ai.calls} chamadas / ${snapshot.ai.webSearches} web searches`, '', recovered?'Nenhuma intervenção adicional é necessária se o estado permanecer verde.':'O Health Monitor não usa OpenAI para diagnosticar este alerta.'].join('\n')
+    body:[recovered?'Incidente normalizado.':'Problema confirmado pelo Health Monitor.', '', `Indicador: ${indicator.label}`, `Detalhe: ${indicator.detail}`, `Detectado/validado: ${fmtDate(snapshot.at)}`, '', `Estado geral: ${snapshot.state.toUpperCase()}`, `IA 24h: ${snapshot.providers?.calls||0} chamadas / ${snapshot.providers?.searches||0} buscas web`, '', recovered?'Nenhuma intervenção adicional é necessária se o estado permanecer verde.':'O Health Monitor não usa OpenAI para diagnosticar este alerta.'].join('\n')
   };
 }
 
