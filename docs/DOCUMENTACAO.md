@@ -906,3 +906,15 @@ Todas as rotas Python de OpenAI usam `scripts/ai_gateway.py`. O helper adiciona 
 - Antes do R5, o workflow autorizava a recuperação manual de 2009, mas o script Python ainda reconhecia apenas 1010; por isso devolvia o JSON antigo sem nova chamada e o último step sinalizava a falha persistente novamente.
 - Um 401 real do provedor (`invalid_api_key`) continua **não recuperável** e não ganha segunda tentativa automática.
 - Não há deploy Cloudflare neste hotfix; basta publicar os arquivos no `main` e executar **Auditoria IA diária** uma vez manualmente para limpar o estado antigo se a chamada atual for bem-sucedida.
+
+### Instalação PWA na Home — 23/09/2026
+- A Home mostra um convite de instalação **somente em contexto mobile**, após **4 segundos**, desde que o site ainda não esteja instalado e o usuário não tenha recusado recentemente.
+- Android/Chrome/Edge: `beforeinstallprompt` é capturado pelo `js/br-pwa.js`; quando disponível, o botão **Instalar** abre diretamente o prompt nativo do navegador. Se o prompt nativo não estiver disponível, o modal informa o caminho pelo menu do navegador (`Instalar app` / `Adicionar à tela inicial`).
+- iPhone/iPad: o navegador não expõe o mesmo prompt programático. O botão abre instruções visuais: Safari → **Compartilhar** → **Adicionar à Tela de Início** → **Adicionar**. Safari é o fluxo recomendado.
+- `Agora não` e o botão `×` gravam `fdg_pwa_install_dismissed_until_v1` no `localStorage` e silenciam o convite por **30 dias** no navegador/aparelho.
+- Instalação confirmada grava `fdg_pwa_install_completed_v1`; execução em `display-mode: standalone` também consolida esse estado. O convite não volta a aparecer naquele armazenamento enquanto a instalação for conhecida.
+- O prompt da Home não aparece em desktop e não bloqueia navegação/conteúdo. A área `alertas.html` continua com onboarding próprio, reutilizando a mesma política de instalação e silêncio.
+- `manifest.webmanifest` usa `display: standalone`, ícones 192/512 e `start_url: /?source=pwa`, fazendo o atalho instalado abrir a Home do Fórmula do Gol.
+- O Service Worker permanece sem interceptar `fetch`; dados esportivos dinâmicos não são congelados em cache pelo PWA.
+- Cache busting da Home: `20260923-pwa-home-install-v4` em manifest/CSS/JS.
+- Validação automática: `scripts/validar_pwa_instalacao.mjs`; `.github/workflows/deploy.yml` executa a validação antes de montar/publicar o GitHub Pages.

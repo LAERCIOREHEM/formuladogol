@@ -373,3 +373,11 @@ Antes de mudar o projeto:
 - Antes do R5, o workflow autorizava a recuperação manual de 2009, mas o script Python ainda reconhecia apenas 1010; por isso devolvia o JSON antigo sem nova chamada e o último step sinalizava a falha persistente novamente.
 - Um 401 real do provedor (`invalid_api_key`) continua **não recuperável** e não ganha segunda tentativa automática.
 - Não há deploy Cloudflare neste hotfix; basta publicar os arquivos no `main` e executar **Auditoria IA diária** uma vez manualmente para limpar o estado antigo se a chamada atual for bem-sucedida.
+
+### PWA / instalação na tela inicial — 23/09/2026
+- A Home possui onboarding mobile de instalação semelhante a um app: surge após 4 s somente no primeiro ciclo elegível; não aparece se já instalado/standalone.
+- Android: instalação nativa via `beforeinstallprompt`; fallback orienta `Instalar app` / `Adicionar à tela inicial`.
+- iOS/iPadOS: tutorial Safari `Compartilhar → Adicionar à Tela de Início → Adicionar`.
+- `Agora não`/`×` silenciam por 30 dias (`fdg_pwa_install_dismissed_until_v1`). Instalação conhecida usa `fdg_pwa_install_completed_v1`.
+- O manifest abre a Home (`/?source=pwa`) em modo `standalone`; SW continua sem cache de fetch esportivo.
+- Alterações PWA de produção devem manter `scripts/validar_pwa_instalacao.mjs` verde; `Deploy site (GitHub Pages)` executa esse check automaticamente.

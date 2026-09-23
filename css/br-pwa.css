@@ -311,3 +311,206 @@ html.br-pwa-modal-open body {
   }
 }
 
+
+/* PWA mobile onboarding da Home — 2026-09-23 */
+.br-pwa-home-install[hidden] {
+  display: none !important;
+}
+
+.br-pwa-home-install {
+  position: fixed;
+  left: max(14px, env(safe-area-inset-left));
+  right: max(14px, env(safe-area-inset-right));
+  bottom: calc(14px + env(safe-area-inset-bottom));
+  z-index: 99990;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 13px;
+  align-items: center;
+  max-width: 720px;
+  margin: 0 auto;
+  border: 1px solid rgba(16, 185, 129, 0.34);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 7% 20%, rgba(16, 185, 129, 0.16), transparent 35%),
+    rgba(8, 18, 25, 0.97);
+  color: #f8fafc;
+  box-shadow: 0 22px 62px rgba(0, 0, 0, 0.48);
+  padding: 15px 46px 15px 15px;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 180ms ease, transform 180ms ease;
+  backdrop-filter: blur(12px);
+}
+
+.br-pwa-home-install.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.br-pwa-home-install-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid rgba(16, 185, 129, 0.38);
+  border-radius: 16px;
+  background: rgba(16, 185, 129, 0.1);
+  overflow: hidden;
+}
+
+.br-pwa-home-install-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.br-pwa-home-install-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.br-pwa-home-install-copy strong {
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.br-pwa-home-install-copy span {
+  color: #b8c5ce;
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.br-pwa-home-install-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.br-pwa-home-install-primary,
+.br-pwa-home-install-secondary,
+.br-pwa-home-install-close {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.br-pwa-home-install-primary,
+.br-pwa-home-install-secondary {
+  min-height: 40px;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  padding: 9px 13px;
+  white-space: nowrap;
+}
+
+.br-pwa-home-install-primary {
+  border: 1px solid #10b981;
+  background: #10b981;
+  color: #04100b;
+  box-shadow: 0 8px 22px rgba(16, 185, 129, 0.18);
+}
+
+.br-pwa-home-install-secondary {
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  background: transparent;
+  color: #e7eef3;
+}
+
+.br-pwa-home-install-close {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #94a3af;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.br-pwa-home-install-primary:hover,
+.br-pwa-home-install-primary:focus-visible,
+.br-pwa-home-install-secondary:hover,
+.br-pwa-home-install-secondary:focus-visible,
+.br-pwa-home-install-close:hover,
+.br-pwa-home-install-close:focus-visible {
+  outline: 2px solid #6ee7b7;
+  outline-offset: 2px;
+}
+
+.br-pwa-ios-steps {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 !important;
+  list-style: none;
+}
+
+.br-pwa-ios-steps li {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  margin: 0 !important;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.055);
+  padding: 12px;
+}
+
+.br-pwa-step-number {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: #10b981;
+  color: #04100b;
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+@media (max-width: 680px) {
+  .br-pwa-home-install {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 14px 42px 14px 14px;
+  }
+
+  .br-pwa-home-install-actions {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    width: 100%;
+  }
+
+  .br-pwa-home-install-primary {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .br-pwa-home-install-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+
+  .br-pwa-home-install-copy strong {
+    font-size: 0.96rem;
+  }
+
+  .br-pwa-home-install-copy span {
+    font-size: 0.82rem;
+  }
+}
+
+@media (min-width: 901px) {
+  .br-pwa-home-install {
+    display: none !important;
+  }
+}

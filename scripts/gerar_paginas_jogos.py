@@ -425,7 +425,7 @@ def render_page(
   <meta property="article:modified_time" content="{esc(updated_at)}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#10b981">
-  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="manifest" href="/manifest.webmanifest?v=20260923-pwa-home-install-v4">
   <link rel="stylesheet" href="/css/br-institucional.css?v=20260722-evolucao-af-score-v1">
   <link rel="stylesheet" href="/css/br-global.css?v=20260801-footer-institucional-v1">
   <link rel="stylesheet" href="/css/br-alertas.css?v=20260905-push-resiliencia-v1">
