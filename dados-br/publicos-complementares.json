@@ -1,6 +1,6 @@
 {
   "_comentario": "Complemento documental de público presente, pagantes e renda. Correções verificadas por event_id são mescladas por campo antes da coleta; a busca automática prioriza ge/Gato Mestre. Público pagante nunca substitui público presente e fontes avulsas podem cobrir jogos remarcados.",
-  "atualizado_em": "2026-09-20T23:10:42.121759-03:00",
+  "atualizado_em": "2026-09-23T12:25:23.178657-03:00",
   "jogos": {
     "401840808": {
       "tipo": "presente",
@@ -3314,7 +3314,9 @@
       "renda": 155736,
       "renda_status": "divulgado",
       "fonte_renda": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/09/19/mirassol-carimba-estreia-de-tite-vence-botafogo-e-segue-fora-do-z-4-do-brasileirao.htm",
-      "fonte_preferida": true
+      "fonte_preferida": true,
+      "pagantes": 5889,
+      "pagantes_status": "divulgado"
     },
     "401841247": {
       "origem": "ge/Gato Mestre",
@@ -3332,17 +3334,19 @@
       "fonte_preferida": true
     },
     "401841243": {
-      "origem": "openai:web_search",
+      "origem": "ge/Gato Mestre",
       "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
       "confianca": 0.99,
       "tipo": "presente",
-      "fonte": "https://saopaulofc.net/no-morumbis-tricolor-derrota-o-internacional-pelo-campeonato-brasileiro",
+      "fonte": "https://ge.globo.com/gato-mestre/noticia/2026/09/20/flamengo-2-x-1-bragantino-tem-o-maior-publico-da-28a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "publico_status": "divulgado",
       "publico": 25395,
-      "renda": 907.26,
+      "renda": 907260,
       "renda_status": "divulgado",
       "fonte_renda": "https://saopaulofc.net/no-morumbis-tricolor-derrota-o-internacional-pelo-campeonato-brasileiro",
-      "fonte_preferida": true
+      "fonte_preferida": true,
+      "pagantes": 25373,
+      "pagantes_status": "divulgado"
     },
     "401841246": {
       "origem": "ge/Gato Mestre",

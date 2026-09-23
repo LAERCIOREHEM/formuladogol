@@ -1,6 +1,6 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-21T05:11:53.728912-03:00",
+  "gerado_em": "2026-09-23T12:25:23.183542-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 277,
   "total_com_estatisticas": 277,
@@ -2943,7 +2943,7 @@
       "estadio": "Estádio Cícero Pompeu de Toledo",
       "publico": 25395,
       "publico_tipo": "presente",
-      "publico_fonte": "https://saopaulofc.net/no-morumbis-tricolor-derrota-o-internacional-pelo-campeonato-brasileiro",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/09/20/flamengo-2-x-1-bragantino-tem-o-maior-publico-da-28a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "arbitro": "Bruno Arleu de Araujo",
       "stats": [
         {
@@ -3481,8 +3481,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-21T05:11:44.287970-03:00",
-      "renda": 907.26,
-      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
+      "renda": 907260,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 25373
     },
     "401841247": {
       "event_id": "401841247",
@@ -5182,7 +5183,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-21T05:11:51.176121-03:00",
       "renda": 155736,
-      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 5889
     },
     "401841239": {
       "event_id": "401841239",
@@ -156408,5 +156410,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 267,
+  "total_com_renda": 277
 }
