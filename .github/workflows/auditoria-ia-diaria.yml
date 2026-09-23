@@ -62,6 +62,7 @@ jobs:
             scripts/gerar_estatisticas_competicao_brasileirao.py \
             scripts/validar_artefatos_analises.py \
             scripts/validar_python_embutido_workflow.py
+          python scripts/ai_gateway.py
           python scripts/auditoria_ia_diaria.py --self-test
           python scripts/gerar_analise_rodada.py --self-test
           python scripts/gerar_marcos_af_previsao.py --self-test
@@ -99,7 +100,23 @@ jobs:
             [[ -f "$LOCK" ]] && [[ "$(jq -r '.data_brt // ""' "$LOCK" 2>/dev/null || true)" == "$DATA_BRT" ]]
           }
 
+          recoverable_1010_hoje() {
+            [[ -f dados-br/auditoria-ia.json ]] || return 1
+            [[ "$(jq -r '.data_brt // ""' dados-br/auditoria-ia.json 2>/dev/null || true)" == "$DATA_BRT" ]] || return 1
+            ERRO_ATUAL="$(jq -r '.openai.erro // ""' dados-br/auditoria-ia.json 2>/dev/null || true)"
+            TOOL_CALLS="$(jq -r '.openai.web_tool_calls // 0' dados-br/auditoria-ia.json 2>/dev/null || echo 0)"
+            [[ "$ERRO_ATUAL" == *"403"* && "$ERRO_ATUAL" == *"1010"* && "$TOOL_CALLS" == "0" ]]
+          }
+
           if lock_eh_de_hoje; then
+            # O 403/1010 é recusado no edge da Cloudflare antes do provedor.
+            # Depois do hotfix de User-Agent, permitimos UMA recuperação manual
+            # no mesmo dia sem considerar a tentativa bloqueada como chamada paga.
+            if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" ]] && recoverable_1010_hoje; then
+              echo "run_daily=true" >> "$GITHUB_OUTPUT"
+              echo "Recuperação manual autorizada: tentativa anterior foi bloqueada por Cloudflare 1010 antes da OpenAI."
+              exit 0
+            fi
             echo "run_daily=false" >> "$GITHUB_OUTPUT"
             echo "A chamada de ${DATA_BRT} já foi reservada por outro run; nova tentativa bloqueada antes da API."
             exit 0
