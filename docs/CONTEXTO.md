@@ -335,10 +335,10 @@ Antes de mudar o projeto:
 - **Editorial permanece em OpenAI GPT-5.6 Sol**; esta é uma decisão de qualidade e não deve ser rebaixada automaticamente.
 - Pós-jogo público/renda usa política v5: ESPN/fontes determinísticas desde o FINAL; URLs descobertas são revisitadas diretamente; **Workers AI** extrai números de páginas já localizadas; **Gemini + Google Search Grounding** é a primeira camada de descoberta em +5, +12, +22 e +35 min; **OpenAI GPT-5.6 Sol + web_search** entra somente como fallback final em +45 min.
 - Encontrou **público + renda**: o `event_id` fica `resolved` e não reabre. Público pagante é complementar e não bloqueia o encerramento.
-- Todas as chamadas do Push Worker passam pelo **Cloudflare AI Gateway `default`**, com metadata de projeto/componente/finalidade/evento. O gateway `default` é criado automaticamente na primeira chamada suportada.
+- As chamadas Gemini/OpenAI usam o **Cloudflare AI Gateway `default`** com metadata de projeto/componente/finalidade/evento. Quando o Gateway autenticado está ativo, o secret `FDG_AI_GATEWAY_TOKEN` é enviado em `cf-aig-authorization`; o `Authorization`/`x-goog-api-key` continua reservado à credencial do provedor. Workers AI usa o binding nativo do Worker e já é autenticado pela conta.
 - O Push Worker possui binding `AI` para Workers AI. Modelo padrão de extração: `@cf/meta/llama-3.1-8b-instruct`; modelo pode ser alterado por `WORKERS_AI_EXTRACT_MODEL`.
 - Gemini usa `GEMINI_SEARCH_MODEL`, default `gemini-3.5-flash-lite`, e secret `GEMINI_API_KEY`. A chave nunca deve ser documentada ou commitada.
-- OpenAI mantém `OPENAI_API_KEY` e `POSTGAME_OPENAI_MODEL=gpt-5.6-sol`. No Worker ela é fallback do pós-jogo; nos workflows editoriais o GPT-5.6 Sol permanece dedicado. Quando `FDG_AI_GATEWAY_ACCOUNT_ID` está presente, ambos usam o endpoint OpenAI do AI Gateway para observabilidade, sem trocar o modelo nem a chave do provedor.
+- OpenAI mantém `OPENAI_API_KEY` e `POSTGAME_OPENAI_MODEL=gpt-5.6-sol`. No Worker ela é fallback do pós-jogo; nos workflows editoriais o GPT-5.6 Sol permanece dedicado. Quando `FDG_AI_GATEWAY_ACCOUNT_ID` está presente, usa o endpoint OpenAI do AI Gateway; `FDG_AI_GATEWAY_TOKEN` autentica o Gateway sem substituir a chave OpenAI. Falha pré-provedor do Gateway (401/AiGatewayError 2009 ou 403/1010) permite **uma única** tentativa direta no provedor para preservar a operação, sem retry duplicado em erros do provedor.
 - `AI_GATEWAY_ACCOUNT_ID` vem do `CLOUDFLARE_ACCOUNT_ID` no deploy; `AI_GATEWAY_ID=default`.
 - D1 `ai_provider_ledger` registra provider, finalidade, `event_id`, modelo, buscas, tokens, falhas e latência; `postgame_source_cache` guarda URLs para reconsulta barata.
 - O e-mail diário de saúde inclui IA multi-provider (Workers AI/Gemini/OpenAI), buscas, tokens e falhas. O faturamento final continua sendo conferido nos dashboards Cloudflare/Google/OpenAI; o Worker não inventa custo quando a resposta não expõe valor exato.
@@ -357,3 +357,12 @@ Antes de mudar o projeto:
 - Em 403/1010 **somente**, o helper central `scripts/ai_gateway.py` faz um único fallback direto para `api.openai.com`, preservando o editorial/auditoria sem criar retry pago para outros erros.
 - Auditoria diária permite uma recuperação manual no mesmo dia quando a tentativa anterior foi 403/1010 sem tool call, mesmo que o lock diário já exista.
 - GPT-5.6 Sol editorial permanece inalterado; o fallback é de transporte, não de modelo.
+
+
+### Hotfix AI Gateway autenticado — R4 (23/09/2026)
+- O Gateway `default` está configurado como autenticado. Endpoints provider-native (`gateway.ai.cloudflare.com`) exigem `cf-aig-authorization: Bearer ...` além da credencial do provedor.
+- Secret GitHub/produção: `FDG_AI_GATEWAY_TOKEN`; no Push Worker ele é instalado como secret `AI_GATEWAY_TOKEN`. Nunca documentar ou commitar o valor.
+- Workflows Python, Gemini pós-jogo e OpenAI do Worker enviam o token quando disponível.
+- Proteção de continuidade: 401 `AiGatewayError`/código 2009 e 403/1010 são tratados como falha **pré-provedor**; há no máximo um fallback direto ao provedor. 401 de chave OpenAI/Gemini inválida **não** entra nesse fallback.
+- Auditoria diária permite uma recuperação manual no mesmo dia quando o registro anterior comprova falha pré-provedor e `web_tool_calls=0`.
+- `/health` expõe apenas `aiGatewayAuthenticated: true|false`, nunca o token. O e-mail diário marca IA/Custos como atenção se a autenticação do Gateway não estiver configurada.

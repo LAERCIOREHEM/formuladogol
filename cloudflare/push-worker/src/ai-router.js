@@ -8,8 +8,11 @@ function tokenUsageGemini(raw){ const u=raw?.usageMetadata||{}; return {input:Nu
 function tokenUsageOpenAI(raw){ const u=raw?.usage||{}; return {input:Number(u.input_tokens||0),output:Number(u.output_tokens||0),total:Number(u.total_tokens||0)}; }
 export function aiGatewayId(env){ return text(env?.AI_GATEWAY_ID)||'default'; }
 export function gatewayBase(env,provider){ const account=text(env?.AI_GATEWAY_ACCOUNT_ID); if(!account) return ''; return `https://gateway.ai.cloudflare.com/v1/${account}/${encodeURIComponent(aiGatewayId(env))}/${provider}`; }
-export function geminiConfigured(env){ return Boolean(text(env?.GEMINI_API_KEY)&&text(env?.AI_GATEWAY_ACCOUNT_ID)); }
+export function aiGatewayAuthConfigured(env){ return Boolean(text(env?.AI_GATEWAY_TOKEN)); }
+export function aiGatewayAuthHeaders(env){ const token=text(env?.AI_GATEWAY_TOKEN); return token?{'cf-aig-authorization':`Bearer ${token}`}:{ }; }
+export function geminiConfigured(env){ return Boolean(text(env?.GEMINI_API_KEY)); }
 export function workersAiConfigured(env){ return Boolean(env?.AI); }
+export function isAiGatewayPreProviderFailure(status,detail){ const s=String(detail||'').toLowerCase(); return (Number(status)===401 && ((s.includes('"code":2009')||s.includes('"internalcode":2009')||s.includes('"name":"aigatewayerror"')))) || (Number(status)===403 && s.includes('1010')); }
 
 function publicSchemaInstruction(task,missing){
  const matchup=`${text(task.home)} x ${text(task.away)}`; const date=text(task.kickoff).slice(0,10);
@@ -24,20 +27,41 @@ export function geminiGroundingSources(raw){
 export function geminiSearchCount(raw){ let n=0; for(const c of raw?.candidates||[]) n += Array.isArray(c?.groundingMetadata?.webSearchQueries)?c.groundingMetadata.webSearchQueries.length:0; return n; }
 export function geminiText(raw){ const parts=[]; for(const c of raw?.candidates||[]) for(const p of c?.content?.parts||[]) if(p?.text) parts.push(String(p.text)); return parts.join(''); }
 
+async function fetchGemini(env,url,body,{gateway=false}={}){
+  const headers={'content-type':'application/json','x-goog-api-key':text(env.GEMINI_API_KEY)};
+  if(gateway) Object.assign(headers,aiGatewayAuthHeaders(env),{'cf-aig-metadata':JSON.stringify({project:'formula-do-gol',component:'postgame',purpose:'attendance-search',provider:'gemini'}),'cf-aig-collect-log-payload':'false','cf-aig-no-wholesale':'true'});
+  return fetch(url,{method:'POST',headers,body:JSON.stringify(body)});
+}
+
 export async function searchPublicWithGemini(env,task,missing){
  const model=text(env?.GEMINI_SEARCH_MODEL)||'gemini-3.5-flash-lite';
  if(!geminiConfigured(env)) return {found:false,responded:false,reason:'gemini_not_configured',model,sources:[]};
- const base=gatewayBase(env,'google-ai-studio'); const url=`${base}/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+ const gateway=gatewayBase(env,'google-ai-studio');
+ const gatewayUrl=gateway?`${gateway}/v1beta/models/${encodeURIComponent(model)}:generateContent`:'';
+ const directUrl=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
  const body={contents:[{role:'user',parts:[{text:publicSchemaInstruction(task,missing)}]}],tools:[{google_search:{}}],generationConfig:{temperature:0,maxOutputTokens:900}};
- const started=Date.now(); let status=null;
+ const started=Date.now(); let status=null; let route=gatewayUrl?'ai_gateway':'direct';
  try{
-   const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':text(env.GEMINI_API_KEY),'cf-aig-metadata':JSON.stringify({project:'formula-do-gol',component:'postgame',purpose:'attendance-search',eventId:text(task.event_id),provider:'gemini'}),'cf-aig-collect-log-payload':'false','cf-aig-no-wholesale':'true'},body:JSON.stringify(body)});
-   status=r.status; const raw=await r.json().catch(()=>null); const searches=geminiSearchCount(raw); const usage=tokenUsageGemini(raw);
-   if(!r.ok||!raw){ await recordProviderUsage(env,{provider:'gemini',purpose:'postgame_public',eventId:task.event_id,model,phase:'search',searchCalls:searches,...{inputTokens:usage.input,outputTokens:usage.output,totalTokens:usage.total},responded:false,ok:false,httpStatus:status,durationMs:Date.now()-started,detail:`gemini_http_${status}`}); return {found:false,responded:false,reason:`gemini_http_${status}`,model,sources:[]}; }
+   let r=await fetchGemini(env,gatewayUrl||directUrl,body,{gateway:Boolean(gatewayUrl)});
+   status=r.status;
+   if(!r.ok && gatewayUrl){
+     const detail=await r.text().catch(()=> '');
+     if(isAiGatewayPreProviderFailure(r.status,detail)){
+       route='direct_fallback_gateway_preprovider';
+       r=await fetchGemini(env,directUrl,body,{gateway:false});
+       status=r.status;
+     }else{
+       const raw=safeJson(detail,null); const searches=geminiSearchCount(raw); const usage=tokenUsageGemini(raw);
+       await recordProviderUsage(env,{provider:'gemini',purpose:'postgame_public',eventId:task.event_id,model,phase:'search',searchCalls:searches,inputTokens:usage.input,outputTokens:usage.output,totalTokens:usage.total,responded:false,ok:false,httpStatus:status,durationMs:Date.now()-started,detail:`gemini_http_${status}:${text(detail).slice(0,120)}`});
+       return {found:false,responded:false,reason:`gemini_http_${status}`,model,sources:[]};
+     }
+   }
+   const raw=await r.json().catch(()=>null); const searches=geminiSearchCount(raw); const usage=tokenUsageGemini(raw);
+   if(!r.ok||!raw){ await recordProviderUsage(env,{provider:'gemini',purpose:'postgame_public',eventId:task.event_id,model,phase:'search',searchCalls:searches,inputTokens:usage.input,outputTokens:usage.output,totalTokens:usage.total,responded:false,ok:false,httpStatus:status,durationMs:Date.now()-started,detail:`${route}:gemini_http_${status}`}); return {found:false,responded:false,reason:`gemini_http_${status}`,model,sources:[]}; }
    const parsed=safeJson(cleanModelText(geminiText(raw)),null); const sources=geminiGroundingSources(raw);
-   await recordProviderUsage(env,{provider:'gemini',purpose:'postgame_public',eventId:task.event_id,model,phase:'search',searchCalls:searches,inputTokens:usage.input,outputTokens:usage.output,totalTokens:usage.total,responded:true,ok:Boolean(parsed),httpStatus:status,durationMs:Date.now()-started,detail:parsed?'grounded_response':'invalid_json'});
-   if(!parsed) return {found:false,responded:true,reason:'gemini_invalid_json',model,sources};
-   return {found:parsed.encontrado===true,responded:true,model,parsed,sources,searchCalls:searches};
+   await recordProviderUsage(env,{provider:'gemini',purpose:'postgame_public',eventId:task.event_id,model,phase:'search',searchCalls:searches,inputTokens:usage.input,outputTokens:usage.output,totalTokens:usage.total,responded:true,ok:Boolean(parsed),httpStatus:status,durationMs:Date.now()-started,detail:`${route}:${parsed?'grounded_response':'invalid_json'}`});
+   if(!parsed) return {found:false,responded:true,reason:'gemini_invalid_json',model,sources,route};
+   return {found:parsed.encontrado===true,responded:true,model,parsed,sources,searchCalls:searches,route};
  }catch(e){ const detail=text(e?.message||e).slice(0,240); await recordProviderUsage(env,{provider:'gemini',purpose:'postgame_public',eventId:task.event_id,model,phase:'search',responded:false,ok:false,httpStatus:status,durationMs:Date.now()-started,detail}); return {found:false,responded:false,reason:`gemini_error:${detail}`,model,sources:[]}; }
 }
 
@@ -63,3 +87,22 @@ export async function extractPublicWithWorkersAI(env,task,source){
 
 export function openAiGatewayResponsesUrl(env){ const base=gatewayBase(env,'openai'); return base?`${base}/responses`:'https://api.openai.com/v1/responses'; }
 export function openAiUsage(raw){ return tokenUsageOpenAI(raw); }
+
+export async function fetchOpenAiResponses(env,payload,{signal=null,metadata={}}={}){
+  const apiKey=text(env?.OPENAI_API_KEY);
+  if(!apiKey) throw new Error('openai_key_missing');
+  const gatewayUrl=openAiGatewayResponsesUrl(env);
+  const viaGateway=gatewayUrl.startsWith('https://gateway.ai.cloudflare.com/');
+  const providerHeaders={authorization:`Bearer ${apiKey}`,'content-type':'application/json'};
+  const gatewayHeaders={...providerHeaders,...aiGatewayAuthHeaders(env),'cf-aig-metadata':JSON.stringify({project:'formula-do-gol',...metadata,provider:'openai'}),'cf-aig-collect-log-payload':'false','cf-aig-no-wholesale':'true'};
+  let response=await fetch(gatewayUrl,{method:'POST',signal,headers:viaGateway?gatewayHeaders:providerHeaders,body:JSON.stringify(payload)});
+  if(viaGateway && !response.ok){
+    const gatewayStatus=response.status;
+    const detail=await response.clone().text().catch(()=> '');
+    if(isAiGatewayPreProviderFailure(gatewayStatus,detail)){
+      response=await fetch('https://api.openai.com/v1/responses',{method:'POST',signal,headers:providerHeaders,body:JSON.stringify(payload)});
+      return {response,route:'direct_fallback_gateway_preprovider',gatewayFallback:true,gatewayStatus,detail:text(detail).slice(0,400)};
+    }
+  }
+  return {response,route:viaGateway?'ai_gateway':'direct',gatewayFallback:false};
+}

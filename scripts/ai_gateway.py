@@ -49,6 +49,23 @@ def is_cloudflare_1010(status: int | None, detail: str) -> bool:
     )
 
 
+def is_gateway_unauthorized(status: int | None, detail: str) -> bool:
+    text = str(detail or "").lower()
+    return int(status or 0) == 401 and (
+        '"code":2009' in text
+        or '"internalcode":2009' in text
+        or '"name":"aigatewayerror"' in text
+    )
+
+
+def is_gateway_preprovider_failure(status: int | None, detail: str) -> bool:
+    return is_cloudflare_1010(status, detail) or is_gateway_unauthorized(status, detail)
+
+
+def gateway_auth_token() -> str:
+    return (os.environ.get("FDG_AI_GATEWAY_TOKEN") or "").strip()
+
+
 def openai_headers(api_key: str, component: str, purpose: str, *, gateway: bool) -> dict[str, str]:
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -66,6 +83,11 @@ def openai_headers(api_key: str, component: str, purpose: str, *, gateway: bool)
                 "cf-aig-metadata": gateway_metadata(component, purpose),
             }
         )
+        token = gateway_auth_token()
+        if token:
+            # Provider-native endpoints do AI Gateway auth in this header;
+            # Authorization remains reserved for the provider (OpenAI).
+            headers["cf-aig-authorization"] = f"Bearer {token}"
     return headers
 
 
@@ -114,12 +136,12 @@ def post_openai_responses(
     component: str,
     purpose: str,
 ) -> dict[str, Any]:
-    """Chama OpenAI via AI Gateway, com proteção específica para CF 1010.
+    """Chama OpenAI via AI Gateway e preserva a operação em falha pré-provedor.
 
-    403/error 1010 é um bloqueio de assinatura/User-Agent no edge da Cloudflare,
-    antes de chegar ao provedor. Nesse caso específico, a chamada é repetida UMA
-    vez diretamente em api.openai.com para preservar a operação. Outros erros não
-    acionam fallback, evitando chamadas pagas duplicadas.
+    O Gateway autenticado exige ``cf-aig-authorization``. Se o edge recusar a
+    chamada antes do provedor (401/AiGatewayError 2009 ou 403/1010), repetimos
+    UMA vez diretamente em api.openai.com. Erros do provedor não acionam esse
+    fallback, evitando chamadas pagas duplicadas.
     """
     primary = openai_responses_url()
     try:
@@ -139,7 +161,7 @@ def post_openai_responses(
     except OpenAITransportError as exc:
         status = getattr(exc, "status", None)
         detail = getattr(exc, "detail", str(exc))
-        if not (is_gateway_url(primary) and is_cloudflare_1010(status, detail)):
+        if not (is_gateway_url(primary) and is_gateway_preprovider_failure(status, detail)):
             raise
 
         response = _post_json(
@@ -151,7 +173,7 @@ def post_openai_responses(
             purpose=purpose,
         )
         response["_fdg_transport"] = {
-            "route": "direct_fallback_cf1010",
+            "route": "direct_fallback_gateway_preprovider",
             "gatewayFallback": True,
             "gatewayStatus": int(status or 0),
             "gatewayError": str(detail)[:500],
@@ -168,6 +190,9 @@ def self_test() -> int:
     direct_headers = openai_headers("sk-test", "self-test", "transport", gateway=False)
     assert "cf-aig-no-wholesale" not in direct_headers
     assert is_cloudflare_1010(403, "error code: 1010")
+    assert is_gateway_unauthorized(401, '{"name":"AiGatewayError","internalCode":2009,"message":"Unauthorized"}')
+    assert is_gateway_preprovider_failure(401, '{"code":2009,"name":"AiGatewayError"}')
+    assert not is_gateway_unauthorized(401, '{"error":{"code":"invalid_api_key"}}')
     assert not is_cloudflare_1010(403, "invalid_api_key")
     assert not is_cloudflare_1010(429, "1010")
     print("Self-test AI Gateway transport: OK")

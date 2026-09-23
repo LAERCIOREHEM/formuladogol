@@ -1,7 +1,7 @@
 import { fetchEspnSummary } from './espn-source.js';
 import { sendMail, probeMail, mailConfig, maskAddress } from './mailer.js';
 import { countWebSearchCalls, recordAiUsage, recordProviderUsage } from './ai-usage.js';
-import { searchPublicWithGemini, fetchSourceText, extractPublicWithWorkersAI, openAiGatewayResponsesUrl, openAiUsage } from './ai-router.js';
+import { searchPublicWithGemini, fetchSourceText, extractPublicWithWorkersAI, fetchOpenAiResponses, openAiUsage } from './ai-router.js';
 
 const DEFAULT_SITE_BASE = 'https://formuladogol.com.br';
 // Fase definitiva (uma única chamada por partida). O Sol é reservado a ela e aos editoriais.
@@ -335,11 +335,11 @@ export async function searchPublicWithOpenAI(env, task, phase = 'sol') {
   const startedAt = Date.now();
   let httpStatus = null;
   try {
-    const response = await fetch(openAiGatewayResponsesUrl(env), {
-      method: 'POST', signal: controller.signal,
-      headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json', 'cf-aig-metadata': JSON.stringify({project:'formula-do-gol',component:'postgame',purpose:'attendance-fallback',eventId:text(task.event_id),provider:'openai'}), 'cf-aig-collect-log-payload': 'false', 'cf-aig-no-wholesale': 'true' },
-      body: JSON.stringify(request)
+    const routed = await fetchOpenAiResponses(env, request, {
+      signal: controller.signal,
+      metadata: { component:'postgame', purpose:'attendance-fallback', eventId:text(task.event_id) }
     });
+    const response = routed.response;
     httpStatus = response.status;
     if (!response.ok) {
       const detail = text(await response.text().catch(() => '')).slice(0, 200);
