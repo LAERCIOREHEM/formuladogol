@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-23",
-  "executado_em": "2026-09-23T13:31:02-03:00",
+  "data_brt": "2026-09-24",
+  "executado_em": "2026-09-24T12:55:01-03:00",
   "status": "critico",
-  "resumo": "O processamento determinístico principal está sem sucesso há 56,3 horas. Há avisos de falha em 2 fontes de transmissão, mas sem perda crítica de cobertura; não há pendências elegíveis de público, renda, transmissão ou melhores momentos.",
+  "resumo": "A auditoria identificou indisponibilidade crítica do fluxo determinístico principal: o último sucesso ocorreu há 79,7 horas. Não há pendências elegíveis de público/renda, transmissão ou melhores momentos. Os avisos de falhas em fontes de transmissão não causaram perda crítica de cobertura.",
   "triagem": {
-    "data_hora_brt": "2026-09-23T13:31:02-03:00",
+    "data_hora_brt": "2026-09-24T12:55:01-03:00",
     "saude": {
       "status_deterministico": "critico",
       "criticos": [
-        "último sucesso principal ocorreu há 56.3 h"
+        "último sucesso principal ocorreu há 79.7 h"
       ],
       "avisos": [
         "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura"
@@ -23,7 +23,7 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 56.3
+        "ultimo_sucesso_horas": 79.7
       }
     },
     "pendencias": {
@@ -65,19 +65,19 @@
   },
   "resultado_ia": {
     "status_geral": "critico",
-    "resumo": "O processamento determinístico principal está sem sucesso há 56,3 horas. Há avisos de falha em 2 fontes de transmissão, mas sem perda crítica de cobertura; não há pendências elegíveis de público, renda, transmissão ou melhores momentos.",
+    "resumo": "A auditoria identificou indisponibilidade crítica do fluxo determinístico principal: o último sucesso ocorreu há 79,7 horas. Não há pendências elegíveis de público/renda, transmissão ou melhores momentos. Os avisos de falhas em fontes de transmissão não causaram perda crítica de cobertura.",
     "problemas": [
       {
-        "categoria": "outro",
+        "categoria": "fonte",
         "severidade": "critico",
-        "mensagem": "Último sucesso do processamento determinístico principal ocorreu há 56,3 horas; requer normalização operacional.",
+        "mensagem": "O coletor determinístico principal está sem sucesso há 79,7 horas, excedendo uma janela operacional aceitável e requerendo verificação e recuperação do pipeline.",
         "event_id": "",
         "requer_intervencao": true
       },
       {
-        "categoria": "fonte",
+        "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "Duas fontes de transmissão falharam, sem perda crítica de cobertura ou lacuna de dados finais.",
+        "mensagem": "Duas fontes de transmissão falharam, mas o dossiê informa que não houve perda crítica de cobertura. Monitorar as fontes sem tratar como incidente crítico.",
         "event_id": "",
         "requer_intervencao": true
       }
@@ -95,8 +95,8 @@
     "editoriais_aplicados": []
   },
   "criticos_nao_resolvidos": [
-    "último sucesso principal ocorreu há 56.3 h",
-    "Último sucesso do processamento determinístico principal ocorreu há 56,3 horas; requer normalização operacional."
+    "último sucesso principal ocorreu há 79.7 h",
+    "O coletor determinístico principal está sem sucesso há 79,7 horas, excedendo uma janela operacional aceitável e requerendo verificação e recuperação do pipeline."
   ],
   "alerta": {
     "ultimo_fingerprint": "",
@@ -673,6 +673,22 @@
       "criticos": [
         "último sucesso principal ocorreu há 56.3 h",
         "Último sucesso do processamento determinístico principal ocorreu há 56,3 horas; requer normalização operacional."
+      ],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-24",
+      "executado_em": "2026-09-24T12:55:01-03:00",
+      "status": "critico",
+      "resumo": "A auditoria identificou indisponibilidade crítica do fluxo determinístico principal: o último sucesso ocorreu há 79,7 horas. Não há pendências elegíveis de público/renda, transmissão ou melhores momentos. Os avisos de falhas em fontes de transmissão não causaram perda crítica de cobertura.",
+      "chamadas_openai": 1,
+      "web_searches": 0,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [
+        "último sucesso principal ocorreu há 79.7 h",
+        "O coletor determinístico principal está sem sucesso há 79,7 horas, excedendo uma janela operacional aceitável e requerendo verificação e recuperação do pipeline."
       ],
       "email_enviado": false
     }
