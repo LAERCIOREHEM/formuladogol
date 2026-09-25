@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-24",
-  "executado_em": "2026-09-24T12:55:01-03:00",
+  "data_brt": "2026-09-25",
+  "executado_em": "2026-09-25T12:55:38-03:00",
   "status": "critico",
-  "resumo": "A auditoria identificou indisponibilidade crítica do fluxo determinístico principal: o último sucesso ocorreu há 79,7 horas. Não há pendências elegíveis de público/renda, transmissão ou melhores momentos. Os avisos de falhas em fontes de transmissão não causaram perda crítica de cobertura.",
+  "resumo": "A integridade dos dados finais está preservada, sem falhas críticas em estatísticas, calendário, detalhes ou cobertura de transmissões. Contudo, o coletor principal está sem sucesso há 103,7 horas e requer intervenção operacional. Os avisos de falha em duas fontes de transmissão não configuram incidente adicional, pois não houve perda crítica de cobertura.",
   "triagem": {
-    "data_hora_brt": "2026-09-24T12:55:01-03:00",
+    "data_hora_brt": "2026-09-25T12:55:38-03:00",
     "saude": {
       "status_deterministico": "critico",
       "criticos": [
-        "último sucesso principal ocorreu há 79.7 h"
+        "último sucesso principal ocorreu há 103.7 h"
       ],
       "avisos": [
         "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura"
@@ -23,7 +23,7 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 79.7
+        "ultimo_sucesso_horas": 103.7
       }
     },
     "pendencias": {
@@ -65,21 +65,21 @@
   },
   "resultado_ia": {
     "status_geral": "critico",
-    "resumo": "A auditoria identificou indisponibilidade crítica do fluxo determinístico principal: o último sucesso ocorreu há 79,7 horas. Não há pendências elegíveis de público/renda, transmissão ou melhores momentos. Os avisos de falhas em fontes de transmissão não causaram perda crítica de cobertura.",
+    "resumo": "A integridade dos dados finais está preservada, sem falhas críticas em estatísticas, calendário, detalhes ou cobertura de transmissões. Contudo, o coletor principal está sem sucesso há 103,7 horas e requer intervenção operacional. Os avisos de falha em duas fontes de transmissão não configuram incidente adicional, pois não houve perda crítica de cobertura.",
     "problemas": [
       {
         "categoria": "fonte",
         "severidade": "critico",
-        "mensagem": "O coletor determinístico principal está sem sucesso há 79,7 horas, excedendo uma janela operacional aceitável e requerendo verificação e recuperação do pipeline.",
+        "mensagem": "O último sucesso do processo principal ocorreu há 103,7 horas. É necessária intervenção operacional para restabelecer a execução e evitar desatualização futura.",
         "event_id": "",
         "requer_intervencao": true
       },
       {
         "categoria": "transmissao",
-        "severidade": "atencao",
-        "mensagem": "Duas fontes de transmissão falharam, mas o dossiê informa que não houve perda crítica de cobertura. Monitorar as fontes sem tratar como incidente crítico.",
+        "severidade": "info",
+        "mensagem": "Duas fontes de transmissão falharam, mas a cobertura final permaneceu íntegra; não há correção de transmissão pendente.",
         "event_id": "",
-        "requer_intervencao": true
+        "requer_intervencao": false
       }
     ],
     "correcoes_publico": [],
@@ -95,8 +95,8 @@
     "editoriais_aplicados": []
   },
   "criticos_nao_resolvidos": [
-    "último sucesso principal ocorreu há 79.7 h",
-    "O coletor determinístico principal está sem sucesso há 79,7 horas, excedendo uma janela operacional aceitável e requerendo verificação e recuperação do pipeline."
+    "último sucesso principal ocorreu há 103.7 h",
+    "O último sucesso do processo principal ocorreu há 103,7 horas. É necessária intervenção operacional para restabelecer a execução e evitar desatualização futura."
   ],
   "alerta": {
     "ultimo_fingerprint": "",
@@ -689,6 +689,22 @@
       "criticos": [
         "último sucesso principal ocorreu há 79.7 h",
         "O coletor determinístico principal está sem sucesso há 79,7 horas, excedendo uma janela operacional aceitável e requerendo verificação e recuperação do pipeline."
+      ],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-25",
+      "executado_em": "2026-09-25T12:55:38-03:00",
+      "status": "critico",
+      "resumo": "A integridade dos dados finais está preservada, sem falhas críticas em estatísticas, calendário, detalhes ou cobertura de transmissões. Contudo, o coletor principal está sem sucesso há 103,7 horas e requer intervenção operacional. Os avisos de falha em duas fontes de transmissão não configuram incidente adicional, pois não houve perda crítica de cobertura.",
+      "chamadas_openai": 1,
+      "web_searches": 0,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [
+        "último sucesso principal ocorreu há 103.7 h",
+        "O último sucesso do processo principal ocorreu há 103,7 horas. É necessária intervenção operacional para restabelecer a execução e evitar desatualização futura."
       ],
       "email_enviado": false
     }
