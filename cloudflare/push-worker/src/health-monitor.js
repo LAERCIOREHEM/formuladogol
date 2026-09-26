@@ -196,14 +196,24 @@ export function dailyDigestDecision(br,lastDate,{lastAttemptAt='',now=Date.now()
 export async function collectHealthSnapshot(env, monitor = null, now = Date.now(), force = false) {
   const previous = safeJson(await metaGet(env,'snapshot'),null);
   if (!force && previous && Number(previous.policyVersion) === HEALTH_POLICY_VERSION && now-(Date.parse(previous.at)||0)<SNAPSHOT_TTL_MS) return previous;
-  const [site, orchHealth, orchStatus, ai, providers, post, cfBilling] = await Promise.all([
+  const [site, orchHealth, orchStatus, ai, providers, post, cfBilling, pushMetrics] = await Promise.all([
     fetchJson(`${text(env.SITE_BASE)||SITE}/`), fetchJson(`${ORCH}/health`), fetchJson(`${ORCH}/status`), aiUsageSummary(env,24), providerUsageSummary(env,24),
     env.DB.prepare(`SELECT COUNT(*) total,
       COALESCE(SUM(CASE WHEN public_status NOT IN ('resolved','gave_up') THEN 1 ELSE 0 END),0) public_pending,
       COALESCE(SUM(CASE WHEN public_status='gave_up' AND updated_at>=datetime('now','-24 hours') THEN 1 ELSE 0 END),0) public_gave_up_24h,
       COALESCE(SUM(CASE WHEN highlight_status<>'resolved' THEN 1 ELSE 0 END),0) highlight_pending
       FROM postgame_fastlane`).first(),
-    cloudflareBillingSummary(env,now)
+    cloudflareBillingSummary(env,now),
+    env.DB.prepare(`SELECT
+      (SELECT COUNT(*) FROM push_subscriptions WHERE active=1) AS active_subs,
+      (SELECT COUNT(*) FROM push_deliveries WHERE status='sent'  AND updated_at>=datetime('now','-24 hours')) AS sent24h,
+      (SELECT COUNT(*) FROM push_deliveries WHERE status='retry' AND updated_at>=datetime('now','-24 hours')) AS retry24h,
+      (SELECT COUNT(*) FROM push_deliveries WHERE status='failed'AND updated_at>=datetime('now','-24 hours')) AS failed24h,
+      (SELECT COUNT(*) FROM push_deliveries WHERE status='gone'  AND updated_at>=datetime('now','-24 hours')) AS gone24h,
+      (SELECT COUNT(*) FROM push_event_dispatch WHERE status IN ('pending','enqueued') AND updated_at<datetime('now','-10 minutes')) AS stuck_dispatch,
+      (SELECT COUNT(*) FROM push_deliveries WHERE status IN ('sending','retry') AND updated_at<datetime('now','-5 minutes')) AS stuck_delivery,
+      (SELECT MAX(sent_at) FROM push_deliveries WHERE status='sent') AS last_push_at
+    `).first().catch(()=>null)
   ]);
   const cfg=mailConfig(env);
   let probe=null; try { const row=await env.DB.prepare("SELECT value FROM postgame_meta WHERE key='mailer_probe'").first(); probe=safeJson(row?.value,null); } catch(_) {}
@@ -242,7 +252,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     indicator('openai','IA / Custos',!geminiReady||!workersAiReady||!gatewayAuthReady?'yellow':perEventAnomaly?'red':providerFailures>3?'yellow':'green',`${providers.calls} chamada(s) multi-provider · ${providers.searches} busca(s) web · ${providerFailures} falha(s) /24h · Gateway ${text(env.AI_GATEWAY_ID)||'default'} · auth ${gatewayAuthReady?'OK':'pendente'}${perEventAnomaly?` · anomalia event ${text(perEventAnomaly.event_id)}`:''}`),
     indicator('cloudflare','Cloudflare / CPU & Requests',cloudflareSeverity(cfBilling),cloudflareDetail(cfBilling)),
   ];
-  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY))},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches},postgame:{pending:postPending,gaveUp24h:gave,highlightPending:highlight},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to)},cloudflareBilling:cfBilling};
+  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY))},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches},postgame:{pending:postPending,gaveUp24h:gave,highlightPending:highlight},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to)},cloudflareBilling:cfBilling,push:{activeSubs:n(pushMetrics?.active_subs),sent24h:n(pushMetrics?.sent24h),retry24h:n(pushMetrics?.retry24h),failed24h:n(pushMetrics?.failed24h),gone24h:n(pushMetrics?.gone24h),stuckDispatch:n(pushMetrics?.stuck_dispatch),stuckDelivery:n(pushMetrics?.stuck_delivery),lastPushAt:iso(pushMetrics?.last_push_at)}};
   await metaPut(env,'snapshot',JSON.stringify(snapshot));
   return snapshot;
 }
@@ -267,6 +277,17 @@ function cloudflareDigestLines(cf){
   ];
 }
 
+function pushDigestLines(push) {
+  if (!push) return ['PUSH / NOTIFICAÇÕES', 'Dados indisponíveis.'];
+  const stuck = n(push.stuckDispatch) + n(push.stuckDelivery);
+  return [
+    'PUSH / NOTIFICAÇÕES — últimas 24h',
+    `Assinaturas ativas: ${fmtNum(push.activeSubs)}`,
+    `Entregas: ${fmtNum(push.sent24h)} enviadas · ${fmtNum(push.retry24h)} em retry · ${fmtNum(push.failed24h)} falhas · ${fmtNum(push.gone24h)} subscrições expiradas`,
+    `Queue travada: ${stuck === 0 ? 'nenhuma' : `⚠️ ${n(push.stuckDispatch)} dispatch(es) + ${n(push.stuckDelivery)} delivery(ies)`}`,
+    `Último push enviado: ${push.lastPushAt ? fmtDate(push.lastPushAt) : '—'}`
+  ];
+}
 function digestMessage(snapshot, now=Date.now()) {
   const title=snapshot.state==='green'?'✅ Saúde diária — tudo normal':snapshot.state==='yellow'?'⚠️ Saúde diária — atenção':'🚨 Saúde diária — problema detectado';
   const total=snapshot.indicators.length; const green=snapshot.indicators.filter(x=>x.severity==='green').length;
@@ -278,6 +299,7 @@ function digestMessage(snapshot, now=Date.now()) {
     `Dispatches GitHub 24h: ${snapshot.orchestrator.githubDispatchesLast24h}`, `Pendências pós-jogo: ${snapshot.postgame.pending}`, '',
     'IA / AI GATEWAY — últimas 24h', `Gateway: ${snapshot.aiStack?.gateway||'default'}`, `Chamadas registradas: ${snapshot.providers?.calls||0}`, `Buscas web registradas: ${snapshot.providers?.searches||0}`, `Tokens registrados: ${snapshot.providers?.totalTokens||0}`, `Falhas: ${snapshot.providers?.failures||0}`,
     ...(snapshot.providers?.byProvider||[]).map(r=>`- ${r.provider}: ${r.calls} chamada(s), ${r.searches} busca(s), ${r.total_tokens||0} tokens, ${r.failures||0} falha(s)`), '',
+    ...pushDigestLines(snapshot.push), '',
     ...cloudflareDigestLines(snapshot.cloudflareBilling), '',
     'Custos Gemini/OpenAI: consultar AI Gateway/Google/OpenAI para faturamento final; o e-mail não inventa preço quando a resposta não expõe custo exato.', '',
     snapshot.state==='green'?'Nenhuma ação necessária.':'Verifique os itens amarelos/vermelhos acima. Alertas críticos são enviados separadamente.'
