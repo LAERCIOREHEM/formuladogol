@@ -548,8 +548,23 @@ async function handleTest(request, env) {
 export default {
   async scheduled(controller, env, ctx) {
     const monitor = singletonMonitor(env);
-    // Isolamento operacional: uma falha de manutenção geral nunca pode impedir
-    // a coleta pós-jogo (público/renda e melhores momentos) no mesmo minuto.
+    const cron = String(controller?.cron || '');
+
+    // HOTFIX 2026-09-26: Health Monitor em invocação própria.
+    // O cron */5 não divide mais o mesmo orçamento de CPU com manutenção
+    // operacional, pós-jogo e feedback. Isso também torna a entrega do e-mail
+    // diário independente do caminho esportivo de 1 minuto.
+    if (cron === '*/5 * * * *') {
+      ctx.waitUntil((async()=>{
+        let status=null;
+        try { const r=await monitor.fetch('https://internal/status'); if(r.ok) status=await r.json(); } catch(_) {}
+        return runHealthMonitor(env,status);
+      })().catch((error)=>{ console.error(`health monitor failed: ${String(error?.message||error).slice(0,500)}`); }));
+      return;
+    }
+
+    // Lane operacional de 1 minuto. Falhas são isoladas entre si.
+    // Cron vazio é aceito como fallback de desenvolvimento/manual.
     ctx.waitUntil(runOperationalMaintenance(env, monitor).catch((error) => {
       console.error(`operational maintenance failed: ${String(error?.message || error).slice(0, 500)}`);
     }));
@@ -559,10 +574,6 @@ export default {
     ctx.waitUntil(runFeedbackNotifier(env).catch((error) => {
       console.error(`feedback notifier failed: ${String(error?.message || error).slice(0, 500)}`);
     }));
-    ctx.waitUntil((async()=>{
-      let status=null; try { const r=await monitor.fetch('https://internal/status'); if(r.ok) status=await r.json(); } catch(_) {}
-      return runHealthMonitor(env,status);
-    })().catch((error)=>{ console.error(`health monitor failed: ${String(error?.message||error).slice(0,500)}`); }));
   },
 
   async queue(batch, env) {
@@ -618,7 +629,8 @@ export default {
         feedbackNotifier: true,
         feedbackNotifierConfigured: feedbackNotifierConfigured(env),
         healthEmailMonitor: true,
-        healthEmailDailyBrt: '08:00',
+        healthEmailDailyBrt: '08:00 (recuperação até 11:59)',
+        healthMonitorCron: '*/5 * * * *',
         healthEmailNoOpenAI: true,
         sportsMonitorReady: Boolean(monitor?.ok),
         operationalState: operational?.state || 'unknown',

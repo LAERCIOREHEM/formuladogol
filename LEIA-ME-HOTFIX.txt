@@ -1,0 +1,46 @@
+FÓRMULA DO GOL — HOTFIX HEALTH + CPU R6 — 26/09/2026
+
+OBJETIVO
+1) Recuperar o relatório diário perdido, com janela 08:00–11:59 BRT.
+2) Separar Health Monitor (*/5 min) do cron operacional esportivo (* * * * *).
+3) Retry controlado do e-mail a cada 15 min dentro da janela.
+4) Persistir diagnóstico de envio: SENT / RETRYING / MISSED.
+5) Mostrar no e-mail o uso agregado da conta Cloudflare Workers Paid:
+   - CPU do dia;
+   - CPU do ciclo / 30.000.000 CPU-ms e percentual usado/restante;
+   - requests do dia;
+   - requests do ciclo / 10.000.000 e percentual usado/restante;
+   - projeção linear até o fechamento;
+   - excedente atual/projetado;
+   - uso faturável adicional retornado pela API Cloudflare.
+6) Heartbeat do próprio Health Monitor no endpoint /v1/health-monitor/status.
+
+ARQUIVOS ALTERADOS
+- cloudflare/push-worker/src/health-monitor.js
+- cloudflare/push-worker/src/index.js
+- cloudflare/push-worker/tests/test-health-monitor.mjs
+- cloudflare/push-worker/wrangler.template.jsonc
+- cloudflare/push-worker/package.json
+
+NÃO HÁ MIGRAÇÃO D1 NOVA.
+Os novos estados usam a tabela key/value health_monitor_meta já existente.
+
+COMO SUBIR
+Substitua os 5 arquivos acima no GitHub mantendo exatamente os mesmos caminhos e faça commit em main.
+O workflow "Deploy Push Worker" deve iniciar automaticamente. Se não iniciar, execute-o manualmente uma vez.
+
+VALIDAÇÃO APÓS O DEPLOY VERDE
+1) Aguarde o próximo múltiplo de 5 minutos.
+2) Abra:
+   https://push.formuladogol.com.br/v1/health-monitor/status
+3) Esperado para o dia 26/09, se ainda estiver antes de 12:00 BRT:
+   dailyDigestDate = 2026-09-26
+   dailyDelivery.state = SENT
+   dailyDelivery.lastAttemptStatus = SENT
+   scheduler.stale = false
+4) O e-mail deve conter o novo bloco "CLOUDFLARE WORKERS — uso agregado da conta".
+
+OBSERVAÇÕES
+- A franquia Workers Paid é mensal; a CPU "Hoje" é apenas informativa.
+- Dados de billing da Cloudflare podem ter atraso de processamento.
+- O hotfix não altera cpu_ms dos demais Workers e não mexe na lógica esportiva.
