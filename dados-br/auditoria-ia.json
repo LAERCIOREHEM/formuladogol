@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-25",
-  "executado_em": "2026-09-25T12:55:38-03:00",
+  "data_brt": "2026-09-26",
+  "executado_em": "2026-09-26T12:06:16-03:00",
   "status": "critico",
-  "resumo": "A integridade dos dados finais está preservada, sem falhas críticas em estatísticas, calendário, detalhes ou cobertura de transmissões. Contudo, o coletor principal está sem sucesso há 103,7 horas e requer intervenção operacional. Os avisos de falha em duas fontes de transmissão não configuram incidente adicional, pois não houve perda crítica de cobertura.",
+  "resumo": "A auditoria identificou criticidade operacional: o último sucesso principal ocorreu há 126,9 horas. Não há pendências elegíveis de público/renda, transmissão ou melhores momentos no dossiê. Os avisos de falha em duas fontes de transmissão não configuram perda crítica de cobertura.",
   "triagem": {
-    "data_hora_brt": "2026-09-25T12:55:38-03:00",
+    "data_hora_brt": "2026-09-26T12:06:16-03:00",
     "saude": {
       "status_deterministico": "critico",
       "criticos": [
-        "último sucesso principal ocorreu há 103.7 h"
+        "último sucesso principal ocorreu há 126.9 h"
       ],
       "avisos": [
         "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura"
@@ -23,7 +23,7 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 103.7
+        "ultimo_sucesso_horas": 126.9
       }
     },
     "pendencias": {
@@ -65,21 +65,21 @@
   },
   "resultado_ia": {
     "status_geral": "critico",
-    "resumo": "A integridade dos dados finais está preservada, sem falhas críticas em estatísticas, calendário, detalhes ou cobertura de transmissões. Contudo, o coletor principal está sem sucesso há 103,7 horas e requer intervenção operacional. Os avisos de falha em duas fontes de transmissão não configuram incidente adicional, pois não houve perda crítica de cobertura.",
+    "resumo": "A auditoria identificou criticidade operacional: o último sucesso principal ocorreu há 126,9 horas. Não há pendências elegíveis de público/renda, transmissão ou melhores momentos no dossiê. Os avisos de falha em duas fontes de transmissão não configuram perda crítica de cobertura.",
     "problemas": [
       {
         "categoria": "fonte",
         "severidade": "critico",
-        "mensagem": "O último sucesso do processo principal ocorreu há 103,7 horas. É necessária intervenção operacional para restabelecer a execução e evitar desatualização futura.",
+        "mensagem": "O último sucesso principal ocorreu há 126,9 horas, indicando desatualização ou indisponibilidade prolongada do fluxo principal de coleta.",
         "event_id": "",
         "requer_intervencao": true
       },
       {
         "categoria": "transmissao",
-        "severidade": "info",
-        "mensagem": "Duas fontes de transmissão falharam, mas a cobertura final permaneceu íntegra; não há correção de transmissão pendente.",
+        "severidade": "atencao",
+        "mensagem": "Duas fontes de transmissão falharam, mas o dossiê informa que não houve perda crítica de cobertura. Monitorar a recuperação das fontes.",
         "event_id": "",
-        "requer_intervencao": false
+        "requer_intervencao": true
       }
     ],
     "correcoes_publico": [],
@@ -95,8 +95,8 @@
     "editoriais_aplicados": []
   },
   "criticos_nao_resolvidos": [
-    "último sucesso principal ocorreu há 103.7 h",
-    "O último sucesso do processo principal ocorreu há 103,7 horas. É necessária intervenção operacional para restabelecer a execução e evitar desatualização futura."
+    "último sucesso principal ocorreu há 126.9 h",
+    "O último sucesso principal ocorreu há 126,9 horas, indicando desatualização ou indisponibilidade prolongada do fluxo principal de coleta."
   ],
   "alerta": {
     "ultimo_fingerprint": "",
@@ -705,6 +705,22 @@
       "criticos": [
         "último sucesso principal ocorreu há 103.7 h",
         "O último sucesso do processo principal ocorreu há 103,7 horas. É necessária intervenção operacional para restabelecer a execução e evitar desatualização futura."
+      ],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-26",
+      "executado_em": "2026-09-26T12:06:16-03:00",
+      "status": "critico",
+      "resumo": "A auditoria identificou criticidade operacional: o último sucesso principal ocorreu há 126,9 horas. Não há pendências elegíveis de público/renda, transmissão ou melhores momentos no dossiê. Os avisos de falha em duas fontes de transmissão não configuram perda crítica de cobertura.",
+      "chamadas_openai": 1,
+      "web_searches": 0,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [
+        "último sucesso principal ocorreu há 126.9 h",
+        "O último sucesso principal ocorreu há 126,9 horas, indicando desatualização ou indisponibilidade prolongada do fluxo principal de coleta."
       ],
       "email_enviado": false
     }
