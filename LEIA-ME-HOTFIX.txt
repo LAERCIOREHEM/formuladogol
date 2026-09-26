@@ -44,3 +44,11 @@ OBSERVAÇÕES
 - A franquia Workers Paid é mensal; a CPU "Hoje" é apenas informativa.
 - Dados de billing da Cloudflare podem ter atraso de processamento.
 - O hotfix não altera cpu_ms dos demais Workers e não mexe na lógica esportiva.
+
+
+R6.1 — CORREÇÃO DO DEPLOY/SMOKE TEST
+- Inclui .github/workflows/deploy-push-worker.yml.
+- Mantém healthEmailDailyBrt='08:00' como contrato estável.
+- Adiciona healthEmailRecoveryUntilBrt='11:59'.
+- O smoke test valida também healthMonitorCron='*/5 * * * *'.
+- Corrige a falha em que o Worker já estava publicado, mas o workflow antigo rejeitava o novo texto do healthcheck.
