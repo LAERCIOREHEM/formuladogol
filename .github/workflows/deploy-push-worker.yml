@@ -307,6 +307,8 @@ jobs:
           if (h.workersAiExtraction !== true) problems.push('workersAiExtraction!=true');
           if (h.healthEmailMonitor !== true) problems.push('healthEmailMonitor!=true');
           if (h.healthEmailDailyBrt !== '08:00') problems.push(`healthEmailDailyBrt=${h.healthEmailDailyBrt}`);
+          if (h.healthEmailRecoveryUntilBrt !== '11:59') problems.push(`healthEmailRecoveryUntilBrt=${h.healthEmailRecoveryUntilBrt}`);
+          if (h.healthMonitorCron !== '*/5 * * * *') problems.push(`healthMonitorCron=${h.healthMonitorCron}`);
           if (h.healthEmailNoOpenAI !== true) problems.push('healthEmailNoOpenAI!=true');
           if (h.feedbackNotifier !== true) problems.push('feedbackNotifier!=true');
           if (process.env.FEEDBACK_EXPECTED === '1' && h.feedbackNotifierConfigured !== true) problems.push('feedbackNotifierConfigured!=true');
