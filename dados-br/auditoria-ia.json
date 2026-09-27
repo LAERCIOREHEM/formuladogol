@@ -1,18 +1,19 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-26",
-  "executado_em": "2026-09-26T12:06:16-03:00",
+  "data_brt": "2026-09-27",
+  "executado_em": "2026-09-27T12:47:33-03:00",
   "status": "critico",
-  "resumo": "A auditoria identificou criticidade operacional: o último sucesso principal ocorreu há 126,9 horas. Não há pendências elegíveis de público/renda, transmissão ou melhores momentos no dossiê. Os avisos de falha em duas fontes de transmissão não configuram perda crítica de cobertura.",
+  "resumo": "Auditoria concluída com uma pendência de transmissão sem correção proposta: a busca disponível não trouxe fonte autorizada que declarasse diretamente os canais do evento 401841168. O estado geral permanece crítico exclusivamente pela ausência de sucesso principal há 151,6 horas; os avisos isolados de fontes de transmissão não foram escalados a incidente crítico.",
   "triagem": {
-    "data_hora_brt": "2026-09-26T12:06:16-03:00",
+    "data_hora_brt": "2026-09-27T12:47:33-03:00",
     "saude": {
       "status_deterministico": "critico",
       "criticos": [
-        "último sucesso principal ocorreu há 126.9 h"
+        "último sucesso principal ocorreu há 151.6 h"
       ],
       "avisos": [
-        "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura"
+        "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura",
+        "1 transmissão(ões) ainda elegíveis para complementação"
       ],
       "indicadores": {
         "estatisticas_erros_criticos": 0,
@@ -23,12 +24,22 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 126.9
+        "ultimo_sucesso_horas": 151.6
       }
     },
     "pendencias": {
       "publicos": [],
-      "transmissoes": [],
+      "transmissoes": [
+        {
+          "event_id": "401841168",
+          "rodada": 21,
+          "data_iso": "2026-10-03T18:30:00-03:00",
+          "mandante": "",
+          "visitante": "",
+          "nivel": "aviso",
+          "horas_ate_jogo": 149.7
+        }
+      ],
       "melhores_momentos_apos_24h": []
     },
     "politica": {
@@ -53,11 +64,31 @@
     "limite_chamadas_dia": 1,
     "falhas_consecutivas": 0,
     "erro": "",
-    "web_habilitada": false,
-    "web_searches": 0,
-    "web_tool_calls": 0,
-    "web_acoes": [],
-    "fontes_web": [],
+    "web_habilitada": true,
+    "web_searches": 1,
+    "web_tool_calls": 1,
+    "web_acoes": [
+      {
+        "type": "search",
+        "queries": [
+          "401841168 transmissão 3 outubro 2026 18h30"
+        ]
+      }
+    ],
+    "fontes_web": [
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/05/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-26a-rodada.ghtml",
+      "https://gremio.net/noticias/detalhes/26421",
+      "https://gremio.net/noticias/detalhes/30424/gremiotv-transmite-grenal-pela-copa-do-brasil-feminina-",
+      "https://s3.static.brasilescola.uol.com.br/be/2026/02/portaria-pe-de-meia-datas-2026.pdf",
+      "https://www.palmeiras.com.br/jogo",
+      "https://www.palmeiras.com.br/trasmissao/cbf-tv",
+      "https://www.palmeiras.com.br/trasmissao/tnt",
+      "https://www.palmeiras.com.br/trasmissao/tnt-sports-brasil",
+      "https://www.palmeiras.com.br/trasmissao/uol",
+      "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/08/31/cbf-rodadas-brasileirao.ghtm",
+      "https://www.uol.com.br/splash/noticias/estadao-conteudo/2026/06/30/globo-muda-programacao-mas-mantem-novelas-na-grade-desta-terca-feira-confira-os-horarios.htm"
+    ],
     "transport": {
       "route": "ai_gateway",
       "gatewayFallback": false
@@ -65,21 +96,21 @@
   },
   "resultado_ia": {
     "status_geral": "critico",
-    "resumo": "A auditoria identificou criticidade operacional: o último sucesso principal ocorreu há 126,9 horas. Não há pendências elegíveis de público/renda, transmissão ou melhores momentos no dossiê. Os avisos de falha em duas fontes de transmissão não configuram perda crítica de cobertura.",
+    "resumo": "Auditoria concluída com uma pendência de transmissão sem correção proposta: a busca disponível não trouxe fonte autorizada que declarasse diretamente os canais do evento 401841168. O estado geral permanece crítico exclusivamente pela ausência de sucesso principal há 151,6 horas; os avisos isolados de fontes de transmissão não foram escalados a incidente crítico.",
     "problemas": [
       {
         "categoria": "fonte",
         "severidade": "critico",
-        "mensagem": "O último sucesso principal ocorreu há 126,9 horas, indicando desatualização ou indisponibilidade prolongada do fluxo principal de coleta.",
+        "mensagem": "O último sucesso do coletor principal ocorreu há 151,6 horas. Requer intervenção operacional para restabelecer a atualização determinística.",
         "event_id": "",
         "requer_intervencao": true
       },
       {
         "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "Duas fontes de transmissão falharam, mas o dossiê informa que não houve perda crítica de cobertura. Monitorar a recuperação das fontes.",
-        "event_id": "",
-        "requer_intervencao": true
+        "mensagem": "O evento 401841168 permanece elegível para complementação, mas não foi localizada, dentro do limite diário de consulta, uma fonte permitida que informe diretamente seus canais de transmissão. Nenhuma correção segura foi proposta.",
+        "event_id": "401841168",
+        "requer_intervencao": false
       }
     ],
     "correcoes_publico": [],
@@ -95,8 +126,8 @@
     "editoriais_aplicados": []
   },
   "criticos_nao_resolvidos": [
-    "último sucesso principal ocorreu há 126.9 h",
-    "O último sucesso principal ocorreu há 126,9 horas, indicando desatualização ou indisponibilidade prolongada do fluxo principal de coleta."
+    "último sucesso principal ocorreu há 151.6 h",
+    "O último sucesso do coletor principal ocorreu há 151,6 horas. Requer intervenção operacional para restabelecer a atualização determinística."
   ],
   "alerta": {
     "ultimo_fingerprint": "",
@@ -721,6 +752,22 @@
       "criticos": [
         "último sucesso principal ocorreu há 126.9 h",
         "O último sucesso principal ocorreu há 126,9 horas, indicando desatualização ou indisponibilidade prolongada do fluxo principal de coleta."
+      ],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-27",
+      "executado_em": "2026-09-27T12:47:33-03:00",
+      "status": "critico",
+      "resumo": "Auditoria concluída com uma pendência de transmissão sem correção proposta: a busca disponível não trouxe fonte autorizada que declarasse diretamente os canais do evento 401841168. O estado geral permanece crítico exclusivamente pela ausência de sucesso principal há 151,6 horas; os avisos isolados de fontes de transmissão não foram escalados a incidente crítico.",
+      "chamadas_openai": 1,
+      "web_searches": 1,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [
+        "último sucesso principal ocorreu há 151.6 h",
+        "O último sucesso do coletor principal ocorreu há 151,6 horas. Requer intervenção operacional para restabelecer a atualização determinística."
       ],
       "email_enviado": false
     }
