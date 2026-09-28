@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-27",
-  "executado_em": "2026-09-27T12:47:33-03:00",
+  "data_brt": "2026-09-28",
+  "executado_em": "2026-09-28T15:43:34-03:00",
   "status": "critico",
-  "resumo": "Auditoria concluída com uma pendência de transmissão sem correção proposta: a busca disponível não trouxe fonte autorizada que declarasse diretamente os canais do evento 401841168. O estado geral permanece crítico exclusivamente pela ausência de sucesso principal há 151,6 horas; os avisos isolados de fontes de transmissão não foram escalados a incidente crítico.",
+  "resumo": "A saúde determinística permanece crítica porque o último sucesso principal ocorreu há 178,5 horas. A única pendência elegível de transmissão foi verificada, mas não houve fonte autorizada que declarasse diretamente os canais para o event_id 401841168; nenhuma correção foi proposta. Não há pendências de público/renda nem de melhores momentos.",
   "triagem": {
-    "data_hora_brt": "2026-09-27T12:47:33-03:00",
+    "data_hora_brt": "2026-09-28T15:43:34-03:00",
     "saude": {
       "status_deterministico": "critico",
       "criticos": [
-        "último sucesso principal ocorreu há 151.6 h"
+        "último sucesso principal ocorreu há 178.5 h"
       ],
       "avisos": [
         "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura",
@@ -24,7 +24,7 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 151.6
+        "ultimo_sucesso_horas": 178.5
       }
     },
     "pendencias": {
@@ -37,7 +37,7 @@
           "mandante": "",
           "visitante": "",
           "nivel": "aviso",
-          "horas_ate_jogo": 149.7
+          "horas_ate_jogo": 122.8
         }
       ],
       "melhores_momentos_apos_24h": []
@@ -71,23 +71,26 @@
       {
         "type": "search",
         "queries": [
-          "401841168 transmissão 3 outubro 2026 18h30"
+          "401841168 transmissão 3 outubro 2026 futebol"
         ]
       }
     ],
     "fontes_web": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/05/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-26a-rodada.ghtml",
-      "https://gremio.net/noticias/detalhes/26421",
-      "https://gremio.net/noticias/detalhes/30424/gremiotv-transmite-grenal-pela-copa-do-brasil-feminina-",
-      "https://s3.static.brasilescola.uol.com.br/be/2026/02/portaria-pe-de-meia-datas-2026.pdf",
-      "https://www.palmeiras.com.br/jogo",
+      "https://edicao.correiobraziliense.com.br/correiobraziliense/2025/10/01/all.pdf",
+      "https://images.flamengo.com.br/public/arquivos/transparencia/78/171743715909.pdf",
+      "https://palmeiras.com.br/futebol",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/atletico-mineiro-x-red-bull-bragantino/832095",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
+      "https://www.palmeiras.com.br/futebol",
+      "https://www.palmeiras.com.br/time/atletico-nacional",
+      "https://www.palmeiras.com.br/time/inter-de-milao-ita",
+      "https://www.palmeiras.com.br/time/internacional-2",
+      "https://www.palmeiras.com.br/time/manchester-united-ing",
       "https://www.palmeiras.com.br/trasmissao/cbf-tv",
+      "https://www.palmeiras.com.br/trasmissao/premiere",
       "https://www.palmeiras.com.br/trasmissao/tnt",
-      "https://www.palmeiras.com.br/trasmissao/tnt-sports-brasil",
-      "https://www.palmeiras.com.br/trasmissao/uol",
-      "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/08/31/cbf-rodadas-brasileirao.ghtm",
-      "https://www.uol.com.br/splash/noticias/estadao-conteudo/2026/06/30/globo-muda-programacao-mas-mantem-novelas-na-grade-desta-terca-feira-confira-os-horarios.htm"
+      "https://www.palmeiras.com.br/wp-content/uploads/2026/03/Relatorio-Palmeiras-2026-WEB.pdf",
+      "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/08/31/cbf-rodadas-brasileirao.ghtm"
     ],
     "transport": {
       "route": "ai_gateway",
@@ -96,21 +99,28 @@
   },
   "resultado_ia": {
     "status_geral": "critico",
-    "resumo": "Auditoria concluída com uma pendência de transmissão sem correção proposta: a busca disponível não trouxe fonte autorizada que declarasse diretamente os canais do evento 401841168. O estado geral permanece crítico exclusivamente pela ausência de sucesso principal há 151,6 horas; os avisos isolados de fontes de transmissão não foram escalados a incidente crítico.",
+    "resumo": "A saúde determinística permanece crítica porque o último sucesso principal ocorreu há 178,5 horas. A única pendência elegível de transmissão foi verificada, mas não houve fonte autorizada que declarasse diretamente os canais para o event_id 401841168; nenhuma correção foi proposta. Não há pendências de público/renda nem de melhores momentos.",
     "problemas": [
-      {
-        "categoria": "fonte",
-        "severidade": "critico",
-        "mensagem": "O último sucesso do coletor principal ocorreu há 151,6 horas. Requer intervenção operacional para restabelecer a atualização determinística.",
-        "event_id": "",
-        "requer_intervencao": true
-      },
       {
         "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "O evento 401841168 permanece elegível para complementação, mas não foi localizada, dentro do limite diário de consulta, uma fonte permitida que informe diretamente seus canais de transmissão. Nenhuma correção segura foi proposta.",
+        "mensagem": "A pendência de transmissão do event_id 401841168 permanece sem complementação: a consulta localizou a partida em 03/10/2026 às 18h30, mas não uma declaração direta e inequívoca dos canais de transmissão aplicável ao evento. Manter sem sobrescrita até haver fonte declaratória.",
         "event_id": "401841168",
+        "requer_intervencao": true
+      },
+      {
+        "categoria": "fonte",
+        "severidade": "info",
+        "mensagem": "As falhas isoladas de duas fontes de transmissão não configuram incidente crítico, pois o dossiê não indica perda crítica de cobertura.",
+        "event_id": "",
         "requer_intervencao": false
+      },
+      {
+        "categoria": "outro",
+        "severidade": "critico",
+        "mensagem": "O último sucesso principal ocorreu há 178,5 horas, ultrapassando o patamar de saúde aceitável do pipeline determinístico.",
+        "event_id": "",
+        "requer_intervencao": true
       }
     ],
     "correcoes_publico": [],
@@ -126,8 +136,8 @@
     "editoriais_aplicados": []
   },
   "criticos_nao_resolvidos": [
-    "último sucesso principal ocorreu há 151.6 h",
-    "O último sucesso do coletor principal ocorreu há 151,6 horas. Requer intervenção operacional para restabelecer a atualização determinística."
+    "último sucesso principal ocorreu há 178.5 h",
+    "O último sucesso principal ocorreu há 178,5 horas, ultrapassando o patamar de saúde aceitável do pipeline determinístico."
   ],
   "alerta": {
     "ultimo_fingerprint": "",
@@ -768,6 +778,22 @@
       "criticos": [
         "último sucesso principal ocorreu há 151.6 h",
         "O último sucesso do coletor principal ocorreu há 151,6 horas. Requer intervenção operacional para restabelecer a atualização determinística."
+      ],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-28",
+      "executado_em": "2026-09-28T15:43:34-03:00",
+      "status": "critico",
+      "resumo": "A saúde determinística permanece crítica porque o último sucesso principal ocorreu há 178,5 horas. A única pendência elegível de transmissão foi verificada, mas não houve fonte autorizada que declarasse diretamente os canais para o event_id 401841168; nenhuma correção foi proposta. Não há pendências de público/renda nem de melhores momentos.",
+      "chamadas_openai": 1,
+      "web_searches": 1,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [
+        "último sucesso principal ocorreu há 178.5 h",
+        "O último sucesso principal ocorreu há 178,5 horas, ultrapassando o patamar de saúde aceitável do pipeline determinístico."
       ],
       "email_enviado": false
     }
