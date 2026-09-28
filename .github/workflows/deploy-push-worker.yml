@@ -369,11 +369,19 @@ jobs:
             console.error('Health Monitor não respondeu com contrato esperado:', h);
             process.exit(1);
           }
+          // O snapshot do Health Monitor tem TTL próprio de 5 minutos. Logo após
+          // o deploy ele pode, legitimamente, ainda refletir o transporte da versão
+          // anterior (por exemplo, SMTP), mesmo quando o Worker novo já está ativo.
+          // O /v1/postgame/status acima valida o mailer AO VIVO e já confirmou
+          // cloudflare-email; aqui não transformamos cache antigo em falso negativo.
           if (h.snapshot?.mail?.transport && h.snapshot.mail.transport !== 'cloudflare-email') {
-            console.error('Health Monitor ainda não está usando Cloudflare Email Service:', h.snapshot.mail);
+            console.log(`Snapshot do Health Monitor ainda em cache (${h.snapshot.mail.transport}); o próximo cron */5 fará a renovação.`);
+          }
+          if (h.scheduler?.stale === true) {
+            console.error('Scheduler do Health Monitor está stale:', h.scheduler);
             process.exit(1);
           }
-          console.log('Health Monitor por e-mail saudável.');
+          console.log('Health Monitor saudável; cache antigo de transporte, se houver, não bloqueia o deploy.');
           NODE
 
           TODAY_UTC="$(date -u +%Y%m%d)"
