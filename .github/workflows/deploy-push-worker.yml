@@ -309,6 +309,8 @@ jobs:
           if (h.healthEmailDailyBrt !== '08:00') problems.push(`healthEmailDailyBrt=${h.healthEmailDailyBrt}`);
           if (h.healthEmailRecoveryUntilBrt !== '11:59') problems.push(`healthEmailRecoveryUntilBrt=${h.healthEmailRecoveryUntilBrt}`);
           if (h.healthMonitorCron !== '*/5 * * * *') problems.push(`healthMonitorCron=${h.healthMonitorCron}`);
+          if (h.healthEmailTransport !== 'cloudflare-email') problems.push(`healthEmailTransport=${h.healthEmailTransport}`);
+          if (h.healthEmailSender !== 'saude@formuladogol.com.br') problems.push(`healthEmailSender=${h.healthEmailSender}`);
           if (h.healthEmailNoOpenAI !== true) problems.push('healthEmailNoOpenAI!=true');
           if (h.feedbackNotifier !== true) problems.push('feedbackNotifier!=true');
           if (process.env.FEEDBACK_EXPECTED === '1' && h.feedbackNotifierConfigured !== true) problems.push('feedbackNotifierConfigured!=true');
@@ -343,7 +345,7 @@ jobs:
           fi
 
           curl -fsS --max-time 10 'https://push.formuladogol.com.br/v1/postgame/status' >/tmp/fdg-postgame-status.json
-          EXPECTED_POSTGAME="$EXPECTED_POSTGAME" SMTP_EXPECTED="${FDG_PUSH_SMTP_HOST:+1}" node <<'NODE'
+          EXPECTED_POSTGAME="$EXPECTED_POSTGAME" node <<'NODE'
           const fs = require('fs');
           const s = JSON.parse(fs.readFileSync('/tmp/fdg-postgame-status.json', 'utf8'));
           const expectedPostgame = Number(process.env.EXPECTED_POSTGAME);
@@ -352,11 +354,11 @@ jobs:
             process.exit(1);
           }
           console.log(`Fastlane pós-jogo OK: total=${Number(s.total || 0)} publicPending=${Number(s.publicPending || 0)} highlightPending=${Number(s.highlightPending || 0)}`);
-          if (process.env.SMTP_EXPECTED === '1' && !(s.mailer && s.mailer.transport === 'smtp' && s.mailer.configured === true)) {
-            console.log(`::warning::E-mail do Worker ainda não aparece configurado (pode ser propagação): ${JSON.stringify(s.mailer || null)}`);
-          } else {
-            console.log(`E-mail do Worker: ${s.mailer ? s.mailer.transport : 'indefinido'}`);
+          if (!(s.mailer && s.mailer.transport === 'cloudflare-email' && s.mailer.configured === true)) {
+            console.error(`Email Service nativo não aparece como transporte primário: ${JSON.stringify(s.mailer || null)}`);
+            process.exit(1);
           }
+          console.log(`E-mail do Worker: ${s.mailer.transport} (fallbacks: ${(s.mailer.fallbacks||[]).join(', ') || 'nenhum'})`);
           NODE
 
           curl -fsS --max-time 10 'https://push.formuladogol.com.br/v1/health-monitor/status' >/tmp/fdg-health-monitor-status.json
@@ -365,6 +367,10 @@ jobs:
           const h = JSON.parse(fs.readFileSync('/tmp/fdg-health-monitor-status.json', 'utf8'));
           if (h.ok !== true) {
             console.error('Health Monitor não respondeu com contrato esperado:', h);
+            process.exit(1);
+          }
+          if (h.snapshot?.mail?.transport && h.snapshot.mail.transport !== 'cloudflare-email') {
+            console.error('Health Monitor ainda não está usando Cloudflare Email Service:', h.snapshot.mail);
             process.exit(1);
           }
           console.log('Health Monitor por e-mail saudável.');
@@ -447,4 +453,38 @@ jobs:
           console.log('Hardening operacional E6 saudável.');
           NODE
 
-          echo 'OK: deploy e smoke test do Push Worker concluídos.'
+          # Se o deploy ocorrer entre 08:00 e 11:59 BRT e o relatório do dia
+          # ainda não tiver sido enviado, aguarda o cron */5 confirmar SENT.
+          # Isso faz o hotfix recuperar automaticamente o e-mail do próprio dia.
+          BRT_DATE="$(TZ=America/Sao_Paulo date +%F)"
+          BRT_HOUR="$(TZ=America/Sao_Paulo date +%H)"
+          if [ "$BRT_HOUR" -ge 8 ] && [ "$BRT_HOUR" -lt 12 ]; then
+            echo "Janela de relatório diário ativa (${BRT_DATE} BRT); aguardando confirmação de envio..."
+            DAILY_OK=0
+            for i in $(seq 1 16); do
+              curl -fsS --max-time 10 'https://push.formuladogol.com.br/v1/health-monitor/status' >/tmp/fdg-health-daily.json || true
+              if BRT_DATE="$BRT_DATE" node <<'NODE'
+          const fs = require('fs');
+          let h={}; try { h=JSON.parse(fs.readFileSync('/tmp/fdg-health-daily.json','utf8')); } catch (_) {}
+          const today=process.env.BRT_DATE;
+          const sent=h?.dailyDigestDate===today && h?.dailyDelivery?.state==='SENT';
+          if (!sent) process.exit(1);
+          console.log(`Relatório diário ${today} confirmado como SENT via ${h?.snapshot?.mail?.transport || 'mailer'}.`);
+          NODE
+              then
+                DAILY_OK=1
+                break
+              fi
+              echo "Aguardando cron do Health Monitor (${i}/16)..."
+              sleep 30
+            done
+            if [ "$DAILY_OK" -ne 1 ]; then
+              echo 'ERRO: relatório diário não foi confirmado como SENT durante a janela de recuperação.'
+              cat /tmp/fdg-health-daily.json 2>/dev/null || true
+              exit 1
+            fi
+          else
+            echo "Fora da janela 08:00-11:59 BRT; confirmação imediata do digest não se aplica."
+          fi
+
+          echo 'OK: deploy, smoke test e validação de e-mail do Push Worker concluídos.'
