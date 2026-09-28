@@ -919,9 +919,14 @@ export async function postgameStatus(env) {
     lastRun: safeJson(await metaGet(env, 'last_run'), null),
     mailer: (() => {
       const cfg = mailConfig(env);
-      return { transport: cfg.transport, configured: cfg.configured, destino: maskAddress(cfg.to) };
+      return { transport: cfg.transport, configured: cfg.configured, destino: maskAddress(cfg.to), remetente: cfg.from, fallbacks: cfg.fallbacks || [] };
     })(),
-    mailerProbe: (() => { const p = safeJson(probeRaw, null); return p ? { at: p.at, ok: p.ok, status: p.status } : null; })(),
+    mailerProbe: (() => {
+      const cfg = mailConfig(env);
+      if (cfg.transport === 'cloudflare-email') return { at: nowIso(), ok: true, status: 'binding_ready', transport: 'cloudflare-email' };
+      const p = safeJson(probeRaw, null);
+      return p ? { at: p.at, ok: p.ok, status: p.status, transport: 'smtp' } : null;
+    })(),
     staticSeedError: await metaGet(env, 'static_seed_error')
   };
 }

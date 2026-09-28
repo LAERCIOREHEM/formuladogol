@@ -1,10 +1,10 @@
 // Envio de e-mail do Worker.
 //
-// Transporte principal: SMTP direto (SSL na 465, ou STARTTLS nas demais portas)
-// pela API de sockets TCP da Cloudflare, reaproveitando os mesmos secrets que já
-// entregam os avisos de sugestão pelo GitHub (Zoho): SMTP_HOST, SMTP_PORT,
-// SMTP_USER, SMTP_PASS. Destino: EMAIL_DESTINO ou EMAIL_DESTINO_SUGESTOES.
-// Transporte alternativo: Resend, só se RESEND_API_KEY existir.
+// Transporte principal: Cloudflare Email Service via binding nativo `EMAIL`.
+// Fallback 1: SMTP direto (SSL na 465, ou STARTTLS nas demais portas),
+// reaproveitando SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS.
+// Fallback 2: Resend, quando RESEND_API_KEY existir.
+// Destino: EMAIL_DESTINO ou EMAIL_DESTINO_SUGESTOES.
 //
 // `cloudflare:sockets` é importado sob demanda: assim este módulo continua
 // carregável pelos testes em Node, que injetam o próprio `connect`.
@@ -19,11 +19,15 @@ function text(value) { return String(value ?? '').trim(); }
 
 export function mailConfig(env = {}) {
   const to = text(env.EMAIL_DESTINO) || text(env.EMAIL_DESTINO_SUGESTOES);
+  const from = text(env.EMAIL_REMETENTE) || 'saude@formuladogol.com.br';
   const port = Number(text(env.SMTP_PORT) || 465) || 465;
   const smtp = { host: text(env.SMTP_HOST), port, user: text(env.SMTP_USER), pass: text(env.SMTP_PASS) };
+  const cloudflareReady = Boolean(to && env?.EMAIL && typeof env.EMAIL.send === 'function');
   const smtpReady = Boolean(smtp.host && smtp.user && smtp.pass && to);
   const resendReady = Boolean(text(env.RESEND_API_KEY) && to);
-  return { to, smtp, transport: smtpReady ? 'smtp' : (resendReady ? 'resend' : 'none'), configured: smtpReady || resendReady };
+  const transport = cloudflareReady ? 'cloudflare-email' : (smtpReady ? 'smtp' : (resendReady ? 'resend' : 'none'));
+  const fallbacks = [smtpReady ? 'smtp' : '', resendReady ? 'resend' : ''].filter(Boolean);
+  return { to, from, smtp, cloudflareReady, smtpReady, resendReady, transport, fallbacks, configured: cloudflareReady || smtpReady || resendReady };
 }
 
 export function maskAddress(value) {
@@ -200,39 +204,72 @@ export async function sendMail(env, message, deps = {}) {
   const cfg = mailConfig(env);
   const subject = text(message?.subject);
   const body = String(message?.body ?? '');
-  if (cfg.transport === 'smtp') {
+  const errors = [];
+
+  // 1) Cloudflare Email Service — transporte nativo, sem socket SMTP.
+  if (cfg.cloudflareReady) {
     try {
-      const raw = buildMime({ from: cfg.smtp.user, to: cfg.to, subject, body });
-      return await smtpDeliver(cfg.smtp, { to: cfg.to, raw }, deps);
+      await env.EMAIL.send({
+        to: cfg.to,
+        from: { email: cfg.from, name: FROM_NAME },
+        subject,
+        text: body,
+      });
+      return 'sent';
     } catch (error) {
-      return `smtp_error:${text(error?.message || error).replaceAll(cfg.smtp.pass, '***').slice(0, 200)}`;
+      const code = text(error?.code || 'error');
+      const msg = text(error?.message || error).slice(0, 140);
+      errors.push(`cloudflare_email:${code}:${msg}`);
     }
   }
-  if (cfg.transport === 'resend') {
+
+  // 2) Fallback SMTP — mantém a contingência existente (Zoho).
+  if (cfg.smtpReady) {
+    try {
+      const raw = buildMime({ from: cfg.smtp.user, to: cfg.to, subject, body });
+      const status = await smtpDeliver(cfg.smtp, { to: cfg.to, raw }, deps);
+      if (status === 'sent') return 'sent';
+      errors.push(`smtp:${text(status)}`);
+    } catch (error) {
+      errors.push(`smtp:${text(error?.message || error).replaceAll(cfg.smtp.pass, '***').slice(0, 180)}`);
+    }
+  }
+
+  // 3) Último fallback: Resend via HTTPS, quando configurado.
+  if (cfg.resendReady) {
     try {
       const fetchImpl = deps.fetch || globalThis.fetch;
-      const from = text(env.EMAIL_REMETENTE || `${FROM_NAME} <onboarding@resend.dev>`);
+      const from = text(env.EMAIL_REMETENTE_RESEND || env.EMAIL_REMETENTE || `${FROM_NAME} <onboarding@resend.dev>`);
       const response = await fetchImpl('https://api.resend.com/emails', {
         method: 'POST',
         headers: { authorization: `Bearer ${text(env.RESEND_API_KEY)}`, 'content-type': 'application/json' },
         body: JSON.stringify({ from, to: [cfg.to], subject, text: body })
       });
-      return response.ok ? 'sent' : `http_${response.status}`;
+      if (response.ok) return 'sent';
+      errors.push(`resend:http_${response.status}`);
     } catch (error) {
-      return `error:${text(error?.message || error).slice(0, 120)}`;
+      errors.push(`resend:${text(error?.message || error).slice(0, 120)}`);
     }
   }
-  return 'not_configured';
+
+  if (!cfg.configured) return 'not_configured';
+  return `mail_error:${errors.join('|').slice(0, 420) || 'sem_transporte_disponivel'}`;
 }
 
-// Valida transporte e credenciais sem enviar e-mail.
+// Probe sem envio: o binding nativo é considerado pronto quando está presente.
+// SMTP só é testado ativamente quando ele é o transporte primário.
 export async function probeMail(env, deps = {}) {
   const cfg = mailConfig(env);
-  if (cfg.transport !== 'smtp') return { transport: cfg.transport, ok: cfg.transport === 'resend', status: cfg.transport === 'resend' ? 'resend_nao_testado' : 'not_configured' };
+  if (cfg.cloudflareReady) {
+    return { transport: 'cloudflare-email', ok: true, status: 'binding_ready', fallbacks: cfg.fallbacks };
+  }
+  if (cfg.transport !== 'smtp') {
+    return { transport: cfg.transport, ok: cfg.transport === 'resend', status: cfg.transport === 'resend' ? 'resend_ready' : 'not_configured', fallbacks: cfg.fallbacks };
+  }
   try {
     const status = await smtpDeliver(cfg.smtp, null, deps);
-    return { transport: 'smtp', ok: status === 'probe_ok', status };
+    return { transport: 'smtp', ok: status === 'probe_ok', status, fallbacks: cfg.fallbacks };
   } catch (error) {
-    return { transport: 'smtp', ok: false, status: `smtp_error:${text(error?.message || error).replaceAll(cfg.smtp.pass, '***').slice(0, 200)}` };
+    return { transport: 'smtp', ok: false, status: `smtp_error:${text(error?.message || error).replaceAll(cfg.smtp.pass, '***').slice(0, 200)}`, fallbacks: cfg.fallbacks };
   }
 }

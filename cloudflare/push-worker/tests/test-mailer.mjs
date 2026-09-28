@@ -40,9 +40,37 @@ assert.ok(ok.log.commands.includes('MAIL FROM:<avisos@formuladogol.com.br>'), 'r
 assert.ok(ok.log.commands.includes('RCPT TO:<dono@exemplo.com>'), 'destino = EMAIL_DESTINO_SUGESTOES');
 assert.match(ok.log.data, /Content-Type: text\/plain; charset=UTF-8/);
 
+
+// Cloudflare Email Service é o transporte primário quando o binding existe.
+const nativeLog = [];
+const nativeEnv = {
+  ...env,
+  EMAIL: { send: async (message) => { nativeLog.push(message); return { messageId: 'msg_123' }; } },
+  EMAIL_REMETENTE: 'saude@formuladogol.com.br'
+};
+assert.equal(mailConfig(nativeEnv).transport, 'cloudflare-email');
+assert.deepEqual(mailConfig(nativeEnv).fallbacks, ['smtp']);
+assert.equal(await sendMail(nativeEnv, { subject: 'Health diário', body: 'Tudo certo.' }), 'sent');
+assert.equal(nativeLog.length, 1);
+assert.equal(nativeLog[0].to, 'dono@exemplo.com');
+assert.deepEqual(nativeLog[0].from, { email: 'saude@formuladogol.com.br', name: 'Fórmula do Gol' });
+const nativeProbe = await probeMail(nativeEnv);
+assert.equal(nativeProbe.ok, true);
+assert.equal(nativeProbe.transport, 'cloudflare-email');
+assert.equal(nativeProbe.status, 'binding_ready');
+
+// Se o Email Service falhar, SMTP continua sendo contingência automática.
+const fallbackSmtp = fakeSmtp();
+const fallbackEnv = {
+  ...nativeEnv,
+  EMAIL: { send: async () => { const e = new Error('falha temporária'); e.code = 'E_INTERNAL_SERVER_ERROR'; throw e; } }
+};
+assert.equal(await sendMail(fallbackEnv, { subject: 'Fallback', body: 'Teste.' }, { connect: fallbackSmtp.connect }), 'sent');
+assert.ok(fallbackSmtp.log.commands.includes('MAIL FROM:<avisos@formuladogol.com.br>'));
+
 const bad = fakeSmtp();
 const status = await sendMail({ ...env, SMTP_PASS: 'outra' }, { subject: 'x', body: 'y' }, { connect: bad.connect });
-assert.match(status, /^smtp_error:auth:535/);
+assert.match(status, /^mail_error:smtp:auth:535/);
 assert.ok(!status.includes('outra'));
 
 const probe = fakeSmtp();

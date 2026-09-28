@@ -1,54 +1,59 @@
-FÓRMULA DO GOL — HOTFIX HEALTH + CPU R6 — 26/09/2026
+FÓRMULA DO GOL — HOTFIX R7 — CLOUDFLARE EMAIL SERVICE
+Data: 28/09/2026
 
 OBJETIVO
-1) Recuperar o relatório diário perdido, com janela 08:00–11:59 BRT.
-2) Separar Health Monitor (*/5 min) do cron operacional esportivo (* * * * *).
-3) Retry controlado do e-mail a cada 15 min dentro da janela.
-4) Persistir diagnóstico de envio: SENT / RETRYING / MISSED.
-5) Mostrar no e-mail o uso agregado da conta Cloudflare Workers Paid:
-   - CPU do dia;
-   - CPU do ciclo / 30.000.000 CPU-ms e percentual usado/restante;
-   - requests do dia;
-   - requests do ciclo / 10.000.000 e percentual usado/restante;
-   - projeção linear até o fechamento;
-   - excedente atual/projetado;
-   - uso faturável adicional retornado pela API Cloudflare.
-6) Heartbeat do próprio Health Monitor no endpoint /v1/health-monitor/status.
+- Trocar o transporte principal do Health Report de SMTP TCP para o Cloudflare Email Service nativo.
+- Manter SMTP como fallback automático; Resend continua como último fallback quando configurado.
+- Recuperar automaticamente o relatório de HOJE se o deploy terminar entre 08:00 e 11:59 BRT.
+- A partir de amanhã, continuar o relatório diário a partir das 08:00 BRT pelo cron */5.
 
-ARQUIVOS ALTERADOS
-- cloudflare/push-worker/src/health-monitor.js
-- cloudflare/push-worker/src/index.js
-- cloudflare/push-worker/tests/test-health-monitor.mjs
-- cloudflare/push-worker/wrangler.template.jsonc
-- cloudflare/push-worker/package.json
+ARQUIVOS DO PATCH
+.github/workflows/deploy-push-worker.yml
+cloudflare/push-worker/src/index.js
+cloudflare/push-worker/src/mailer.js
+cloudflare/push-worker/src/health-monitor.js
+cloudflare/push-worker/src/postgame-fastlane.js
+cloudflare/push-worker/tests/test-mailer.mjs
+cloudflare/push-worker/tests/test-health-monitor.mjs
+cloudflare/push-worker/wrangler.template.jsonc
+cloudflare/push-worker/package.json
 
-NÃO HÁ MIGRAÇÃO D1 NOVA.
-Os novos estados usam a tabela key/value health_monitor_meta já existente.
+DEPLOY
+1. Descompacte o ZIP.
+2. No GitHub, Add files > Upload files.
+3. Arraste TODO o conteúdo do pacote, incluindo a pasta .github.
+4. Grave em main.
+5. O workflow correto é SOMENTE: Deploy Push Worker.
+6. Se ele disparar automaticamente, não rode outro workflow.
+7. Se não disparar, Actions > Deploy Push Worker > Run workflow.
 
-COMO SUBIR
-Substitua os 5 arquivos acima no GitHub mantendo exatamente os mesmos caminhos e faça commit em main.
-O workflow "Deploy Push Worker" deve iniciar automaticamente. Se não iniciar, execute-o manualmente uma vez.
+O QUE O DEPLOY VALIDA
+- binding nativo EMAIL criado no Worker;
+- /health informa healthEmailTransport=cloudflare-email;
+- /v1/postgame/status informa mailer.transport=cloudflare-email;
+- Health Monitor continua em */5;
+- horário diário continua 08:00 BRT com recuperação até 11:59;
+- se o deploy estiver dentro dessa janela e o e-mail do dia ainda não tiver sido enviado,
+  o próprio workflow aguarda o cron e só fica verde depois de dailyDelivery.state=SENT.
 
-VALIDAÇÃO APÓS O DEPLOY VERDE
-1) Aguarde o próximo múltiplo de 5 minutos.
-2) Abra:
-   https://push.formuladogol.com.br/v1/health-monitor/status
-3) Esperado para o dia 26/09, se ainda estiver antes de 12:00 BRT:
-   dailyDigestDate = 2026-09-26
-   dailyDelivery.state = SENT
-   dailyDelivery.lastAttemptStatus = SENT
-   scheduler.stale = false
-4) O e-mail deve conter o novo bloco "CLOUDFLARE WORKERS — uso agregado da conta".
+REMETENTE
+Fórmula do Gol <saude@formuladogol.com.br>
 
-OBSERVAÇÕES
-- A franquia Workers Paid é mensal; a CPU "Hoje" é apenas informativa.
-- Dados de billing da Cloudflare podem ter atraso de processamento.
-- O hotfix não altera cpu_ms dos demais Workers e não mexe na lógica esportiva.
+FALLBACKS
+1. Cloudflare Email Service (principal)
+2. SMTP atual (fallback)
+3. Resend (fallback adicional, se RESEND_API_KEY estiver configurada)
 
+STATUS ESPERADO APÓS O DEPLOY
+/health:
+  healthEmailTransport: cloudflare-email
+  healthEmailSender: saude@formuladogol.com.br
 
-R6.1 — CORREÇÃO DO DEPLOY/SMOKE TEST
-- Inclui .github/workflows/deploy-push-worker.yml.
-- Mantém healthEmailDailyBrt='08:00' como contrato estável.
-- Adiciona healthEmailRecoveryUntilBrt='11:59'.
-- O smoke test valida também healthMonitorCron='*/5 * * * *'.
-- Corrige a falha em que o Worker já estava publicado, mas o workflow antigo rejeitava o novo texto do healthcheck.
+/v1/health-monitor/status:
+  snapshot.mail.transport: cloudflare-email
+  dailyDigestDate: data de hoje
+  dailyDelivery.state: SENT
+
+OBSERVAÇÃO
+O domínio formuladogol.com.br já precisa aparecer em Cloudflare > Email Service > Email Sending
+como Sending status Enabled e DNS records Configured. O print enviado em 28/09/2026 mostra esse estado.
