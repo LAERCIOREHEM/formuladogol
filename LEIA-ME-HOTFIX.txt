@@ -1,4 +1,4 @@
-FÓRMULA DO GOL — HOTFIX R7 — CLOUDFLARE EMAIL SERVICE
+FÓRMULA DO GOL — HOTFIX R7.1 — CLOUDFLARE EMAIL SERVICE
 Data: 28/09/2026
 
 OBJETIVO
@@ -57,3 +57,14 @@ STATUS ESPERADO APÓS O DEPLOY
 OBSERVAÇÃO
 O domínio formuladogol.com.br já precisa aparecer em Cloudflare > Email Service > Email Sending
 como Sending status Enabled e DNS records Configured. O print enviado em 28/09/2026 mostra esse estado.
+
+
+R7.1 — CORREÇÃO DO SMOKE TEST
+- O deploy R7 já publicava corretamente o Worker e o /v1/postgame/status confirmava
+  cloudflare-email como transporte principal.
+- O workflow falhava depois porque /v1/health-monitor/status podia devolver por até
+  5 minutos o snapshot anterior (SMTP), que é cache persistido do Health Monitor.
+- O R7.1 não trata mais esse cache antigo como falha de deploy. O mailer ao vivo é
+  validado no postgame/status; o scheduler continua sendo validado; e a etapa final
+  ainda exige que o relatório do dia fique SENT dentro da janela 08:00-11:59 BRT.
+- .github/workflows/deploy-push-worker.yml está incluído obrigatoriamente.
