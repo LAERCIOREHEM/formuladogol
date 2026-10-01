@@ -1,18 +1,19 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-30",
-  "executado_em": "2026-09-30T14:00:22-03:00",
+  "data_brt": "2026-10-01",
+  "executado_em": "2026-10-01T14:29:47-03:00",
   "status": "critico",
-  "resumo": "A auditoria determinística está em estado crítico porque o último sucesso principal ocorreu há 224,8 horas. Não há pendências de público, renda, transmissão ou melhores momentos elegíveis para intervenção.",
+  "resumo": "A saúde determinística permanece crítica porque o último sucesso principal ocorreu há 249,3 horas. A única pendência de transmissão não recebeu correção: a fonte oficial localizada confirma que a 29ª rodada tem transmissões detalhadas, mas não permite associar inequivocamente os canais ao event_id 401841252 sem mandante e visitante no dossiê.",
   "triagem": {
-    "data_hora_brt": "2026-09-30T14:00:22-03:00",
+    "data_hora_brt": "2026-10-01T14:29:47-03:00",
     "saude": {
       "status_deterministico": "critico",
       "criticos": [
-        "último sucesso principal ocorreu há 224.8 h"
+        "último sucesso principal ocorreu há 249.3 h"
       ],
       "avisos": [
-        "4 fonte(s) de transmissão falharam, sem perda crítica de cobertura"
+        "4 fonte(s) de transmissão falharam, sem perda crítica de cobertura",
+        "1 transmissão(ões) ainda elegíveis para complementação"
       ],
       "indicadores": {
         "estatisticas_erros_criticos": 0,
@@ -23,12 +24,22 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 224.8
+        "ultimo_sucesso_horas": 249.3
       }
     },
     "pendencias": {
       "publicos": [],
-      "transmissoes": [],
+      "transmissoes": [
+        {
+          "event_id": "401841252",
+          "rodada": 29,
+          "data_iso": "2026-10-07T19:30:00-03:00",
+          "mandante": "",
+          "visitante": "",
+          "nivel": "aviso",
+          "horas_ate_jogo": 149.0
+        }
+      ],
       "melhores_momentos_apos_24h": []
     },
     "politica": {
@@ -53,11 +64,31 @@
     "limite_chamadas_dia": 1,
     "falhas_consecutivas": 0,
     "erro": "",
-    "web_habilitada": false,
-    "web_searches": 0,
-    "web_tool_calls": 0,
-    "web_acoes": [],
-    "fontes_web": [],
+    "web_habilitada": true,
+    "web_searches": 1,
+    "web_tool_calls": 1,
+    "web_acoes": [
+      {
+        "type": "search",
+        "queries": [
+          "401841252 transmissão 7 de outubro de 2026 futebol"
+        ]
+      }
+    ],
+    "fontes_web": [
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
+      "https://www.itatiaia.com.br/esportes/futebol/futebol-internacional/quando-comecam-e-onde-assistir-os-principais-campeonatos-europeus-em-2026",
+      "https://www.palmeiras.com.br/allianz",
+      "https://www.palmeiras.com.br/futebol",
+      "https://www.palmeiras.com.br/jogo",
+      "https://www.palmeiras.com.br/modalidade/futebol",
+      "https://www.palmeiras.com.br/programacao-semanal",
+      "https://www.palmeiras.com.br/time/inter-de-milao-ita",
+      "https://www.palmeiras.com.br/time/internacional-2",
+      "https://www.palmeiras.com.br/trasmissao/cbf-tv",
+      "https://www.palmeiras.com.br/trasmissao/globo",
+      "https://www.palmeiras.com.br/trasmissao/sportv"
+    ],
     "transport": {
       "route": "ai_gateway",
       "gatewayFallback": false
@@ -65,21 +96,21 @@
   },
   "resultado_ia": {
     "status_geral": "critico",
-    "resumo": "A auditoria determinística está em estado crítico porque o último sucesso principal ocorreu há 224,8 horas. Não há pendências de público, renda, transmissão ou melhores momentos elegíveis para intervenção.",
+    "resumo": "A saúde determinística permanece crítica porque o último sucesso principal ocorreu há 249,3 horas. A única pendência de transmissão não recebeu correção: a fonte oficial localizada confirma que a 29ª rodada tem transmissões detalhadas, mas não permite associar inequivocamente os canais ao event_id 401841252 sem mandante e visitante no dossiê.",
     "problemas": [
       {
         "categoria": "fonte",
         "severidade": "critico",
-        "mensagem": "Último sucesso do processo principal ocorreu há 224,8 horas; é necessária intervenção operacional para restabelecer a execução.",
+        "mensagem": "Último sucesso principal há 249,3 horas; requer intervenção operacional na fonte/coletor principal.",
         "event_id": "",
         "requer_intervencao": true
       },
       {
         "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "Quatro fontes de transmissão falharam, porém sem perda crítica de cobertura conforme os indicadores determinísticos.",
-        "event_id": "",
-        "requer_intervencao": true
+        "mensagem": "Há transmissão elegível para complementação no event_id 401841252, mas o dossiê não informa mandante ou visitante e a evidência consultada não permite vincular canais ao evento com segurança. Sem correção automática.",
+        "event_id": "401841252",
+        "requer_intervencao": false
       }
     ],
     "correcoes_publico": [],
@@ -95,8 +126,8 @@
     "editoriais_aplicados": []
   },
   "criticos_nao_resolvidos": [
-    "último sucesso principal ocorreu há 224.8 h",
-    "Último sucesso do processo principal ocorreu há 224,8 horas; é necessária intervenção operacional para restabelecer a execução."
+    "último sucesso principal ocorreu há 249.3 h",
+    "Último sucesso principal há 249,3 horas; requer intervenção operacional na fonte/coletor principal."
   ],
   "alerta": {
     "ultimo_fingerprint": "",
@@ -785,6 +816,22 @@
       "criticos": [
         "último sucesso principal ocorreu há 224.8 h",
         "Último sucesso do processo principal ocorreu há 224,8 horas; é necessária intervenção operacional para restabelecer a execução."
+      ],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-10-01",
+      "executado_em": "2026-10-01T14:29:47-03:00",
+      "status": "critico",
+      "resumo": "A saúde determinística permanece crítica porque o último sucesso principal ocorreu há 249,3 horas. A única pendência de transmissão não recebeu correção: a fonte oficial localizada confirma que a 29ª rodada tem transmissões detalhadas, mas não permite associar inequivocamente os canais ao event_id 401841252 sem mandante e visitante no dossiê.",
+      "chamadas_openai": 1,
+      "web_searches": 1,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [
+        "último sucesso principal ocorreu há 249.3 h",
+        "Último sucesso principal há 249,3 horas; requer intervenção operacional na fonte/coletor principal."
       ],
       "email_enviado": false
     }
