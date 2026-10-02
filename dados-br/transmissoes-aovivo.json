@@ -13,43 +13,6 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "jogos": {
-    "401841242": {
-      "event_id": "401841242",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "espn_league": "bra.1",
-      "mandante": "Vitória",
-      "visitante": "Cruzeiro",
-      "data_iso": "2026-09-20T16:00:00-03:00",
-      "estadio": "Estadio Manoel Barradas",
-      "origem": "automático",
-      "principal": {
-        "fonte": "getv",
-        "nome": "GE TV",
-        "video_id": "gGpphhcxZPU",
-        "url": "https://www.youtube.com/watch?v=gGpphhcxZPU",
-        "status": "live",
-        "inicio_programado": "2026-09-20T14:30:00-03:00",
-        "inicio_real": "2026-09-20T14:30:37-03:00",
-        "titulo": "VITÓRIA X CRUZEIRO | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
-        "canal": "ge tv",
-        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
-        "thumbnail": "https://i.ytimg.com/vi/gGpphhcxZPU/maxresdefault_live.jpg",
-        "confianca": 0.925,
-        "motivos": [
-          "os dois clubes aparecem no título",
-          "identifica Brasileirão/competição",
-          "identifica transmissão ao vivo",
-          "transmissão já está ao vivo",
-          "horário compatível (90 min de diferença)"
-        ],
-        "origem_busca": "uploads",
-        "escopo": "partida",
-        "embeddable": true
-      },
-      "alternativas": []
-    },
     "401841255": {
       "event_id": "401841255",
       "rodada": 29,
@@ -67,20 +30,20 @@
         "video_id": "7uq9nMdsVFU",
         "url": "https://www.youtube.com/watch?v=7uq9nMdsVFU",
         "status": "upcoming",
-        "inicio_programado": "2026-10-07T18:30:00-03:00",
+        "inicio_programado": "2026-10-07T18:00:00-03:00",
         "inicio_real": "",
         "titulo": "AO VIVO: INTERNACIONAL X CORINTHIANS | BRASILEIRÃO 2026 | 29ª RODADA",
         "canal": "CazéTV",
         "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
         "thumbnail": "https://i.ytimg.com/vi/7uq9nMdsVFU/maxresdefault_live.jpg",
-        "confianca": 0.9,
+        "confianca": 0.875,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
           "identifica transmissão ao vivo",
-          "horário compatível (60 min de diferença)"
+          "horário compatível (90 min de diferença)"
         ],
-        "origem_busca": "uploads",
+        "origem_busca": "validação-direta",
         "escopo": "partida",
         "embeddable": false
       },
@@ -139,12 +102,48 @@
         "video_id": "90fW7TbZ9sg",
         "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg",
         "status": "upcoming",
-        "inicio_programado": "2026-10-10T17:00:00-03:00",
+        "inicio_programado": "2026-10-10T15:30:00-03:00",
         "inicio_real": "",
         "titulo": "AO VIVO: VASCO X REMO | BRASILEIRÃO 2026 | 30ª RODADA",
         "canal": "CazéTV",
         "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
         "thumbnail": "https://i.ytimg.com/vi/90fW7TbZ9sg/maxresdefault_live.jpg",
+        "confianca": 0.875,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (90 min de diferença)"
+        ],
+        "origem_busca": "validação-direta",
+        "escopo": "partida",
+        "embeddable": false
+      },
+      "alternativas": []
+    },
+    "401841268": {
+      "event_id": "401841268",
+      "rodada": 31,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Botafogo",
+      "visitante": "Chapecoense",
+      "data_iso": "2026-10-17T18:00:00-03:00",
+      "estadio": "Joao Havelange Stadium",
+      "origem": "automático",
+      "principal": {
+        "fonte": "cazetv",
+        "nome": "CazéTV",
+        "video_id": "-x1MQjpr02Y",
+        "url": "https://www.youtube.com/watch?v=-x1MQjpr02Y",
+        "status": "upcoming",
+        "inicio_programado": "2026-10-17T18:00:00-03:00",
+        "inicio_real": "",
+        "titulo": "AO VIVO: BOTAFOGO X CHAPECOENSE | BRASILEIRÃO 2026 | 31ª RODADA",
+        "canal": "CazéTV",
+        "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
+        "thumbnail": "https://i.ytimg.com/vi/-x1MQjpr02Y/maxresdefault_live.jpg",
         "confianca": 0.95,
         "motivos": [
           "os dois clubes aparecem no título",
@@ -157,7 +156,147 @@
         "embeddable": false
       },
       "alternativas": []
+    },
+    "401841281": {
+      "event_id": "401841281",
+      "rodada": 32,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Vasco da Gama",
+      "visitante": "Corinthians",
+      "data_iso": "2026-10-24T18:30:00-03:00",
+      "estadio": "Estádio São Januário",
+      "origem": "automático",
+      "principal": {
+        "fonte": "cazetv",
+        "nome": "CazéTV",
+        "video_id": "FDo01YVDsNE",
+        "url": "https://www.youtube.com/watch?v=FDo01YVDsNE",
+        "status": "upcoming",
+        "inicio_programado": "2026-10-24T18:30:00-03:00",
+        "inicio_real": "",
+        "titulo": "AO VIVO: VASCO X CORINTHIANS | BRASILEIRÃO 2026 | 32ª RODADA",
+        "canal": "CazéTV",
+        "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
+        "thumbnail": "https://i.ytimg.com/vi/FDo01YVDsNE/maxresdefault_live.jpg",
+        "confianca": 0.95,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (0 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": false
+      },
+      "alternativas": []
+    },
+    "401841289": {
+      "event_id": "401841289",
+      "rodada": 33,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Fluminense",
+      "visitante": "Internacional",
+      "data_iso": "2026-10-28T19:30:00-03:00",
+      "estadio": "Estadio do Maracana",
+      "origem": "automático",
+      "principal": {
+        "fonte": "cazetv",
+        "nome": "CazéTV",
+        "video_id": "t4pf4qZ0c14",
+        "url": "https://www.youtube.com/watch?v=t4pf4qZ0c14",
+        "status": "upcoming",
+        "inicio_programado": "2026-10-28T19:30:00-03:00",
+        "inicio_real": "",
+        "titulo": "AO VIVO: FLUMINENSE X INTERNACIONAL | BRASILEIRÃO 2026 | 33ª RODADA",
+        "canal": "CazéTV",
+        "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
+        "thumbnail": "https://i.ytimg.com/vi/t4pf4qZ0c14/maxresdefault_live.jpg",
+        "confianca": 0.95,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (0 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": false
+      },
+      "alternativas": []
+    },
+    "401841306": {
+      "event_id": "401841306",
+      "rodada": 34,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Athletico-PR",
+      "visitante": "Vasco da Gama",
+      "data_iso": "2026-11-04T19:30:00-03:00",
+      "estadio": "Arena da Baixada",
+      "origem": "automático",
+      "principal": {
+        "fonte": "cazetv",
+        "nome": "CazéTV",
+        "video_id": "cOjixSohLkY",
+        "url": "https://www.youtube.com/watch?v=cOjixSohLkY",
+        "status": "upcoming",
+        "inicio_programado": "2026-11-04T19:30:00-03:00",
+        "inicio_real": "",
+        "titulo": "AO VIVO: ATHLETICO X VASCO | BRASILEIRÃO 2026 | 34ª RODADA",
+        "canal": "CazéTV",
+        "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
+        "thumbnail": "https://i.ytimg.com/vi/cOjixSohLkY/maxresdefault_live.jpg",
+        "confianca": 0.95,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (0 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": false
+      },
+      "alternativas": []
+    },
+    "401913108": {
+      "event_id": "401913108",
+      "rodada": 0,
+      "competicao_chave": "copa_do_brasil",
+      "competicao_nome": "Copa do Brasil",
+      "espn_league": "bra.copa_do_brazil",
+      "mandante": "Atlético-MG",
+      "visitante": "Grêmio",
+      "data_iso": "2026-11-08T17:00:00-03:00",
+      "estadio": "",
+      "origem": "manual",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "89tPGaf7W4s",
+        "url": "https://www.youtube.com/watch?v=89tPGaf7W4s",
+        "status": "live",
+        "inicio_programado": "2026-11-08T17:00:00-03:00",
+        "inicio_real": "",
+        "titulo": "ATLÉTICO-MG X GRÊMIO | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "",
+        "confianca": 1.0,
+        "motivos": [
+          "link manual com prioridade absoluta"
+        ],
+        "origem_busca": "manual",
+        "embeddable": true
+      },
+      "alternativas": []
     }
   },
-  "atualizado_em": "2026-09-20T15:40:47-03:00"
+  "atualizado_em": "2026-10-02T18:36:23-03:00"
 }
