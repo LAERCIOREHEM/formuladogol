@@ -301,6 +301,11 @@ jobs:
           if (Number(h.sportsMonitorFactsVersion) !== 1) problems.push(`sportsMonitorFactsVersion=${h.sportsMonitorFactsVersion}`);
           if (h.postgameFastlane !== true) problems.push('postgameFastlane!=true');
           if (Number(h.postgameFastlaneVersion) !== expectedPostgame) problems.push(`postgameFastlaneVersion=${h.postgameFastlaneVersion} esperado=${expectedPostgame}`);
+          if (Number(h.postgameAttendanceHunterVersion) !== 6) problems.push(`postgameAttendanceHunterVersion=${h.postgameAttendanceHunterVersion}`);
+          if (h.postgamePublicPersistentUntilResolved !== true) problems.push('postgamePublicPersistentUntilResolved!=true');
+          if (Number(h.postgamePublicSlaMinutes) !== 120) problems.push(`postgamePublicSlaMinutes=${h.postgamePublicSlaMinutes}`);
+          if (h.postgamePublicHourlyAfterSla !== true) problems.push('postgamePublicHourlyAfterSla!=true');
+          if (h.postgamePublicBudgetGuard !== true) problems.push('postgamePublicBudgetGuard!=true');
           if (h.aiGateway !== 'default') problems.push(`aiGateway=${h.aiGateway}`);
           if (process.env.AIG_AUTH_EXPECTED === '1' && h.aiGatewayAuthenticated !== true) problems.push('aiGatewayAuthenticated!=true');
           if (h.geminiSearch !== true) problems.push('geminiSearch!=true');
@@ -349,11 +354,11 @@ jobs:
           const fs = require('fs');
           const s = JSON.parse(fs.readFileSync('/tmp/fdg-postgame-status.json', 'utf8'));
           const expectedPostgame = Number(process.env.EXPECTED_POSTGAME);
-          if (s.ok !== true || s.engine !== 'cloudflare-postgame-fastlane' || Number(s.version) !== expectedPostgame) {
+          if (s.ok !== true || s.engine !== 'cloudflare-postgame-fastlane' || Number(s.version) !== expectedPostgame || s.publicPersistentUntilResolved !== true || Number(s.publicGaveUp || 0) !== 0) {
             console.error('Fastlane pós-jogo não respondeu com o contrato esperado:', s);
             process.exit(1);
           }
-          console.log(`Fastlane pós-jogo OK: total=${Number(s.total || 0)} publicPending=${Number(s.publicPending || 0)} highlightPending=${Number(s.highlightPending || 0)}`);
+          console.log(`Fastlane Hunter v${s.version} OK: total=${Number(s.total || 0)} publicPending=${Number(s.publicPending || 0)} overdue=${Number(s.publicOverdue || 0)} budgetGuard=${Number(s.publicBudgetGuard || 0)} gaveUp=${Number(s.publicGaveUp || 0)} highlightPending=${Number(s.highlightPending || 0)}`);
           if (!(s.mailer && s.mailer.transport === 'cloudflare-email' && s.mailer.configured === true)) {
             console.error(`Email Service nativo não aparece como transporte primário: ${JSON.stringify(s.mailer || null)}`);
             process.exit(1);

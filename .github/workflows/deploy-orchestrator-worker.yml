@@ -162,7 +162,10 @@ jobs:
             p.postgameFastlaneCronMinutes === 1 &&
             p.dormantMode === true &&
             p.postgameConcreteGate === true &&
-            p.postgameAutomaticWindowHours === 24 &&
+            p.postgameAutomaticWindowHours === null &&
+            p.postgamePublicPersistentUntilResolved === true &&
+            p.postgamePublicSlaMinutes === 120 &&
+            p.postgameAiRoutingVersion === 6 &&
             p.postgameGithubMaxDispatchesPerEvent === 2 &&
             p.postgameHighlightsBatching === true &&
             p.targetedPublicResearch === true &&

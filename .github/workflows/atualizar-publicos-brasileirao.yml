@@ -95,7 +95,7 @@ jobs:
           FDG_AI_GATEWAY_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           FDG_AI_GATEWAY_ID: ${{ vars.FDG_AI_GATEWAY_ID || 'default' }}
           FDG_AI_GATEWAY_TOKEN: ${{ secrets.FDG_AI_GATEWAY_TOKEN }}
-          OPENAI_PUBLICOS_MODEL: ${{ vars.OPENAI_PUBLICOS_MODEL || vars.OPENAI_MODEL || 'gpt-5.6-sol' }}
+          OPENAI_PUBLICOS_MODEL: ${{ vars.OPENAI_PUBLICOS_MODEL || vars.OPENAI_MODEL || 'gpt-5.6-terra' }}
           REABRIR: ${{ inputs.reabrir_esgotados }}
           MODO: ${{ inputs.modo || 'automatico' }}
           EVENT_ID: ${{ inputs.event_id }}
@@ -105,13 +105,24 @@ jobs:
           set -euo pipefail
           cp dados-br/publicos-complementares.json /tmp/publicos-antes.json
 
-          case "${MODO:-automatico}" in automatico|partida|backlog) ;; *) echo "::error::Modo inválido: $MODO"; exit 2 ;; esac
+          # Push de correção documental já curada NÃO abre pesquisa de IA. Apenas
+          # propaga o JSON verificado para os derivados. Isso evita uma chamada
+          # paga redundante justamente quando a informação já veio no commit.
+          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+            echo "Push de correção curada: consolidação offline, sem rede e sem IA."
+            python scripts/atualizar_publicos_brasileirao.py --sem-rede
+            MODO="curated_push"
+          fi
+
+          case "${MODO:-automatico}" in automatico|partida|backlog|curated_push) ;; *) echo "::error::Modo inválido: $MODO"; exit 2 ;; esac
           if [[ "${MODO:-automatico}" == "partida" && -z "${EVENT_ID:-}" ]]; then
             echo "::error::O modo partida exige event_id."
             exit 2
           fi
 
-          if [[ "${ORIGEM_FASTLANE:-false}" == "true" ]]; then
+          if [[ "${MODO:-automatico}" == "curated_push" ]]; then
+            echo "Correção curada já consolidada; pulando rede/IA."
+          elif [[ "${ORIGEM_FASTLANE:-false}" == "true" ]]; then
             echo "Fastlane: importando somente dado concreto já descoberto no Cloudflare."
             python scripts/importar_postgame_fastlane.py --tipo publicos --event-id "$EVENT_ID"
           else
