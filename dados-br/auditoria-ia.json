@@ -1,16 +1,14 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-10-02",
-  "executado_em": "2026-10-02T13:49:34-03:00",
-  "status": "critico",
-  "resumo": "Status crítico exclusivamente pela ausência de sucesso do coletor principal há 272,6 horas. A complementação de transmissão confirmou inequivocamente um dos dois jogos pendentes; a outra pendência não recebeu correção por falta de identificação inequívoca entre o event_id e a partida consultada.",
+  "data_brt": "2026-10-03",
+  "executado_em": "2026-10-03T12:14:44-03:00",
+  "status": "atencao",
+  "resumo": "Sem falhas críticas nos dados determinísticos. Há duas pendências de transmissão futuras; foi encontrada confirmação direta para uma delas. A outra permanece sem complementação inequívoca nesta auditoria.",
   "triagem": {
-    "data_hora_brt": "2026-10-02T13:49:34-03:00",
+    "data_hora_brt": "2026-10-03T12:14:44-03:00",
     "saude": {
-      "status_deterministico": "critico",
-      "criticos": [
-        "último sucesso principal ocorreu há 272.6 h"
-      ],
+      "status_deterministico": "atencao",
+      "criticos": [],
       "avisos": [
         "4 fonte(s) de transmissão falharam, sem perda crítica de cobertura",
         "2 transmissão(ões) ainda elegíveis para complementação"
@@ -24,7 +22,7 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 272.6
+        "ultimo_sucesso_horas": 14.0
       }
     },
     "pendencias": {
@@ -37,7 +35,7 @@
           "mandante": "",
           "visitante": "",
           "nivel": "aviso",
-          "horas_ate_jogo": 125.7
+          "horas_ate_jogo": 103.3
         },
         {
           "event_id": "401841248",
@@ -46,7 +44,7 @@
           "mandante": "",
           "visitante": "",
           "nivel": "aviso",
-          "horas_ate_jogo": 151.7
+          "horas_ate_jogo": 129.3
         }
       ],
       "melhores_momentos_apos_24h": []
@@ -80,22 +78,17 @@
       {
         "type": "search",
         "queries": [
-          "401841252 401841248 transmissão 7 outubro 2026 8 outubro 2026"
+          "401841252 transmissão 7 outubro 2026",
+          "401841248 transmissão 8 outubro 2026"
         ]
       }
     ],
     "fontes_web": [
       "https://s3.static.brasilescola.uol.com.br/be/2026/02/portaria-pe-de-meia-datas-2026.pdf",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/cruzeiro-x-sao-paulo/832176",
-      "https://www.espn.com.br/futebol/resultados/_/liga/bra.1/data/20261007",
-      "https://www.palmeiras.com.br/allianz-parque-2",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
+      "https://www.espn.com.br/futebol/time/calendario/_/id/9169/liga/BRA.1",
       "https://www.palmeiras.com.br/jogo",
-      "https://www.palmeiras.com.br/time/milan-ita",
-      "https://www.palmeiras.com.br/trasmissao/band-sports",
-      "https://www.palmeiras.com.br/trasmissao/sbt",
-      "https://www.palmeiras.com.br/trasmissao/sportv",
-      "https://www.palmeiras.com.br/trasmissao/tnt-sports-brasil",
-      "https://www.palmeiras.com.br/trasmissao/uol"
+      "https://www.palmeiras.com.br/trasmissao/sbt"
     ],
     "transport": {
       "route": "ai_gateway",
@@ -103,34 +96,27 @@
     }
   },
   "resultado_ia": {
-    "status_geral": "critico",
-    "resumo": "Status crítico exclusivamente pela ausência de sucesso do coletor principal há 272,6 horas. A complementação de transmissão confirmou inequivocamente um dos dois jogos pendentes; a outra pendência não recebeu correção por falta de identificação inequívoca entre o event_id e a partida consultada.",
+    "status_geral": "atencao",
+    "resumo": "Sem falhas críticas nos dados determinísticos. Há duas pendências de transmissão futuras; foi encontrada confirmação direta para uma delas. A outra permanece sem complementação inequívoca nesta auditoria.",
     "problemas": [
       {
-        "categoria": "fonte",
-        "severidade": "critico",
-        "mensagem": "O último sucesso do coletor principal ocorreu há 272,6 horas; requer investigação e restabelecimento operacional.",
-        "event_id": "",
-        "requer_intervencao": true
-      },
-      {
         "categoria": "transmissao",
-        "severidade": "atencao",
-        "mensagem": "Transmissão confirmada diretamente pelo clube para Palmeiras x Bahia, em 08/10/2026 às 21h30: Globo, Premiere e ge tv.",
+        "severidade": "info",
+        "mensagem": "A pendência 401841248 tem transmissão oficialmente declarada para a partida de 08/10/2026 às 21h30; complementação segura disponível.",
         "event_id": "401841248",
         "requer_intervencao": false
       },
       {
         "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "Não foi possível associar inequivocamente o event_id à partida consultada; nenhuma correção proposta para evitar vínculo incorreto.",
+        "mensagem": "A pendência 401841252 permanece sem canais confirmados por fonte direta e inequívoca consultada nesta auditoria.",
         "event_id": "401841252",
-        "requer_intervencao": true
+        "requer_intervencao": false
       },
       {
         "categoria": "fonte",
         "severidade": "info",
-        "mensagem": "As falhas isoladas de fontes de transmissão não configuram incidente crítico de cobertura, pois o dossiê não registra transmissões críticas.",
+        "mensagem": "As quatro falhas isoladas de fontes de transmissão não configuram incidente crítico, pois não houve perda crítica de cobertura e os dados finais determinísticos permanecem íntegros.",
         "event_id": "",
         "requer_intervencao": false
       }
@@ -144,9 +130,9 @@
           "Premiere",
           "ge tv"
         ],
-        "fonte_url": "https://www.palmeiras.com.br/jogo/?idjogo=1295",
-        "confianca": 0.99,
-        "justificativa": "A página oficial do Palmeiras declara diretamente a transmissão de Palmeiras x Bahia, em 08/10/2026 às 21h30, por Globo, Premiere e ge tv."
+        "fonte_url": "https://www.palmeiras.com.br/trasmissao/sbt/",
+        "confianca": 0.97,
+        "justificativa": "A página oficial do Palmeiras declara diretamente, para o jogo de 08/10/2026 às 21h30, os canais Globo, Premiere e ge tv."
       }
     ],
     "melhores_momentos_pendentes": []
@@ -168,9 +154,9 @@
             "Premiere",
             "ge tv"
           ],
-          "fonte_url": "https://www.palmeiras.com.br/jogo/?idjogo=1295",
-          "confianca": 0.99,
-          "justificativa": "A página oficial do Palmeiras declara diretamente a transmissão de Palmeiras x Bahia, em 08/10/2026 às 21h30, por Globo, Premiere e ge tv."
+          "fonte_url": "https://www.palmeiras.com.br/trasmissao/sbt/",
+          "confianca": 0.97,
+          "justificativa": "A página oficial do Palmeiras declara diretamente, para o jogo de 08/10/2026 às 21h30, os canais Globo, Premiere e ge tv."
         }
       }
     ],
@@ -178,15 +164,12 @@
     "transmissoes_aplicadas": [],
     "editoriais_aplicados": []
   },
-  "criticos_nao_resolvidos": [
-    "último sucesso principal ocorreu há 272.6 h",
-    "O último sucesso do coletor principal ocorreu há 272,6 horas; requer investigação e restabelecimento operacional."
-  ],
+  "criticos_nao_resolvidos": [],
   "alerta": {
     "ultimo_fingerprint": "",
     "ultimo_enviado_em": "",
     "envio_nesta_execucao": false,
-    "detalhe": "RESEND_API_KEY/EMAIL_DESTINO não configurados"
+    "detalhe": "não necessário"
   },
   "historico": [
     {
@@ -902,6 +885,19 @@
         "último sucesso principal ocorreu há 272.6 h",
         "O último sucesso do coletor principal ocorreu há 272,6 horas; requer investigação e restabelecimento operacional."
       ],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-10-03",
+      "executado_em": "2026-10-03T12:14:44-03:00",
+      "status": "atencao",
+      "resumo": "Sem falhas críticas nos dados determinísticos. Há duas pendências de transmissão futuras; foi encontrada confirmação direta para uma delas. A outra permanece sem complementação inequívoca nesta auditoria.",
+      "chamadas_openai": 1,
+      "web_searches": 1,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [],
       "email_enviado": false
     }
   ]
