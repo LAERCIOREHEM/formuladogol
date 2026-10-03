@@ -52,6 +52,20 @@ const ESSENTIAL_EVENT_TYPES = new Set(['prematch_15', 'goal', 'goal_overturned',
 function text(value) { return String(value == null ? '' : value).trim(); }
 function num(value, fallback = 0) { const n = Number(value); return Number.isFinite(n) ? n : fallback; }
 
+function latestReadinessState(state = {}) {
+  // Ordem de autoridade temporal: T+3 > T-10 > T-30.
+  return state?.tplus3 || state?.t10 || state?.t30 || null;
+}
+
+function countReadinessPending(preflight = {}) {
+  let count = 0;
+  for (const state of Object.values(preflight || {})) {
+    const latest = latestReadinessState(state || {});
+    if (latest && latest.readiness === 'red') count += 1;
+  }
+  return count;
+}
+
 function teamFromAgenda(value) {
   const item = value || {};
   return { id: text(item.espn_id || item.id), name: text(item.nome || item.name), abbreviation: text(item.sigla || item.abbreviation) };
@@ -665,7 +679,7 @@ export class SportsMonitor {
     return Object.fromEntries(pairs);
   }
 
-  async persistPreflight(game, checkpoint, readiness, aiAttempted = false, aiRecovered = false) {
+  async persistPreflight(game, checkpoint, readiness, aiAttempted = false, aiRecovered = false, allowNotify = true) {
     await this.env.DB.prepare(`
       INSERT INTO monitor_preflight (
         event_id,checkpoint,league,kickoff,readiness,source_event_id,resolution_strategy,source_state,
@@ -682,36 +696,76 @@ export class SportsMonitor {
       readiness?.monitorInitialized ? 1 : 0, JSON.stringify(readiness?.audience || {}), JSON.stringify(readiness?.reasons || []),
       aiAttempted ? 1 : 0, aiRecovered ? 1 : 0, text(readiness?.checkedAt || new Date().toISOString())
     ).run();
-    if (readiness?.ready) return;
-    const incidentKey = `push_readiness:${text(game?.eventId)}:${text(checkpoint)}`;
+
+    // R10.1: todos os checkpoints da mesma partida compartilham um único incidente.
+    // T-30 apenas observa; T-10 avisa; T+3 só envia nova mensagem se houver
+    // escalada real para crítico. Isso elimina T30/T10/T+3 duplicados.
+    const incidentKey = `push_readiness:${text(game?.eventId)}`;
+    let current = null;
+    try {
+      current = await this.env.DB.prepare(`SELECT * FROM monitor_incidents WHERE incident_key=?`).bind(incidentKey).first();
+    } catch (_) {}
     const detail = JSON.stringify({ readiness, matchup: `${text(game?.home?.name)} x ${text(game?.away?.name)}` });
-    const inserted = await this.env.DB.prepare(`
-      INSERT OR IGNORE INTO monitor_incidents (incident_key,event_id,checkpoint,severity,detail,email_status)
-      VALUES (?,?,?,?,?,'pending')
-    `).bind(incidentKey, text(game?.eventId), text(checkpoint), 'error', detail).run();
-    if (Number(inserted?.meta?.changes || 0) > 0) await this.notifyReadinessIncident(game, checkpoint, readiness, incidentKey);
+
+    if (readiness?.ready) {
+      if (current && !String(current?.email_status || '').startsWith('resolved')) {
+        await this.env.DB.prepare(`
+          UPDATE monitor_incidents SET checkpoint=?,severity='resolved',detail=?,email_status='resolved_silent',updated_at=CURRENT_TIMESTAMP
+          WHERE incident_key=?
+        `).bind(text(checkpoint), detail, incidentKey).run().catch(()=>{});
+      }
+      return;
+    }
+
+    const severity = checkpoint === 'tplus3' ? 'critical' : checkpoint === 't10' ? 'warning' : 'observing';
+    if (!current) {
+      await this.env.DB.prepare(`
+        INSERT OR IGNORE INTO monitor_incidents (incident_key,event_id,checkpoint,severity,detail,email_status)
+        VALUES (?,?,?,?,?,'observing')
+      `).bind(incidentKey, text(game?.eventId), text(checkpoint), severity, detail).run();
+      current = { incident_key: incidentKey, email_status: 'observing', severity, checkpoint };
+    } else {
+      await this.env.DB.prepare(`
+        UPDATE monitor_incidents SET checkpoint=?,severity=?,detail=?,updated_at=CURRENT_TIMESTAMP WHERE incident_key=?
+      `).bind(text(checkpoint), severity, detail, incidentKey).run();
+    }
+
+    if (!allowNotify || checkpoint === 't30') return;
+    const previousStatus = String(current?.email_status || '');
+    if (checkpoint === 't10' && /^(warning_sent|critical_sent)/.test(previousStatus)) return;
+    if (checkpoint === 'tplus3' && /^critical_sent/.test(previousStatus)) return;
+
+    const sentStatus = await this.notifyReadinessIncident(game, checkpoint, readiness, severity);
+    const marker = sentStatus === 'sent' ? `${severity}_sent` : `${severity}_${String(sentStatus || 'failed').slice(0, 120)}`;
+    try {
+      await this.env.DB.prepare(`UPDATE monitor_incidents SET email_status=?, updated_at=CURRENT_TIMESTAMP WHERE incident_key=?`)
+        .bind(marker, incidentKey).run();
+    } catch (_) {}
   }
 
-  async notifyReadinessIncident(game, checkpoint, readiness, incidentKey) {
-    // E-mail pelo módulo único do Worker: SMTP (Zoho) com os secrets do
-    // aviso de sugestões; Resend só se existir. sendMail nunca lança exceção.
-    if (!mailConfig(this.env).configured) return false;
-    const subject = `🚨 FDG Push ${String(checkpoint || '').toUpperCase()}: jogo não está READY`;
+  async notifyReadinessIncident(game, checkpoint, readiness, severity = 'warning') {
+    if (!mailConfig(this.env).configured) return 'mail_not_configured';
+    const critical = severity === 'critical';
+    const subject = critical
+      ? `🚨 FDG Push T+3: jogo não está READY`
+      : `⚠️ FDG Push T-10: jogo ainda não está READY`;
+    const warnings = Array.isArray(readiness?.warnings) && readiness.warnings.length
+      ? `\nAvisos não bloqueantes: ${readiness.warnings.join(', ')}` : '';
     const body = [
       `${text(game?.home?.name)} x ${text(game?.away?.name)}`,
       `Evento: ${text(game?.eventId)} · ${text(game?.league)}`,
       `Início: ${text(game?.kickoff)}`,
-      `Motivos: ${(readiness?.reasons || []).join(', ') || 'não informado'}`,
+      `Checkpoint: ${String(checkpoint || '').toUpperCase()}`,
+      `Motivos: ${(readiness?.reasons || []).join(', ') || 'não informado'}${warnings}`,
       `Fonte ESPN: ${text(readiness?.sourceEventId) || 'não resolvida'}`,
-      `Audiência simulada: ${JSON.stringify(readiness?.audience || {})}`
+      `Autoridade de identidade: ${text(readiness?.identityAuthority) || 'não confirmada'}`,
+      `Audiência simulada: ${JSON.stringify(readiness?.audience || {})}`,
+      '',
+      critical
+        ? 'Incidente único por partida. Novos polls não gerarão novos e-mails enquanto a causa permanecer a mesma.'
+        : 'O monitor continuará verificando. Só haverá novo e-mail se a situação piorar para crítico em T+3.'
     ].join('\n');
-    const status = await sendMail(this.env, { subject, body });
-    try {
-      await this.env.DB.prepare(`UPDATE monitor_incidents SET email_status=?, updated_at=CURRENT_TIMESTAMP WHERE incident_key=?`)
-        .bind(String(status).slice(0, 200), incidentKey).run();
-    } catch (_) {}
-    return status === 'sent';
-
+    return await sendMail(this.env, { subject, body });
   }
 
   async resolveWithAi(game, checkpoint) {
@@ -843,12 +897,15 @@ export class SportsMonitor {
           let audience = {};
           try { audience = await this.audienceDryRun(game); } catch (error) { sourceWarnings.push(`${game.eventId}/audience: ${text(error?.message || error)}`); }
           const nextPreflight = { ...preflightState };
+          const alertCheckpoint = dueCheckpoints.at(-1)?.key || '';
+          let gameReadinessRed = false;
           for (const cp of dueCheckpoints) {
             const readiness = readinessSnapshot(game, null, matches[game.eventId], audience, cp.key, startedAt);
-            readinessRed += 1;
-            await this.persistPreflight(game, cp.key, readiness, aiAttempted, aiRecovered);
+            if (!readiness.ready) gameReadinessRed = true;
+            await this.persistPreflight(game, cp.key, readiness, aiAttempted, aiRecovered, cp.key === alertCheckpoint);
             nextPreflight[cp.key] = { completedAt: startedAt, ...readiness, aiAttempted, aiRecovered };
           }
+          if (gameReadinessRed) readinessRed += 1;
           preflight[game.eventId] = nextPreflight;
         }
         continue;
@@ -1038,15 +1095,51 @@ export class SportsMonitor {
         let audience = {};
         try { audience = await this.audienceDryRun(game); } catch (error) { sourceWarnings.push(`${game.eventId}/audience: ${text(error?.message || error)}`); }
         const nextPreflight = { ...preflightState };
+        const alertCheckpoint = dueCheckpoints.at(-1)?.key || '';
+        let gameReadinessRed = false;
         for (const cp of dueCheckpoints) {
           const readiness = readinessSnapshot(game, resolved, nextMatch, audience, cp.key, startedAt);
-          if (!readiness.ready) readinessRed += 1;
-          await this.persistPreflight(game, cp.key, readiness, aiAttempted, aiRecovered);
+          if (!readiness.ready) gameReadinessRed = true;
+          await this.persistPreflight(game, cp.key, readiness, aiAttempted, aiRecovered, cp.key === alertCheckpoint);
           nextPreflight[cp.key] = { completedAt: startedAt, ...readiness, aiAttempted, aiRecovered };
         }
+        if (gameReadinessRed) readinessRed += 1;
         preflight[game.eventId] = nextPreflight;
       }
+
+      // Se T+3 falhou, o incidente não pode sumir no poll seguinte só porque o
+      // checkpoint já foi consumido. Reavaliamos silenciosamente em cada poll e
+      // exigimos duas leituras verdes consecutivas antes de fechar o incidente.
+      const trackedPreflight = preflight[game.eventId] || preflightState;
+      const trackedTplus3 = trackedPreflight?.tplus3;
+      if (!dueCheckpoints.length && trackedTplus3?.readiness === 'red') {
+        const follow = readinessSnapshot(game, resolved, nextMatch, trackedTplus3?.audience || {}, 'tplus3', startedAt);
+        if (follow.ready) {
+          const recoveryStreak = num(trackedTplus3?.recoveryStreak, 0) + 1;
+          if (recoveryStreak >= 2) {
+            await this.persistPreflight(game, 'tplus3', follow, false, false, false);
+            preflight[game.eventId] = {
+              ...trackedPreflight,
+              tplus3: { ...trackedTplus3, ...follow, completedAt: trackedTplus3.completedAt, lastRecheckAt: startedAt, recoveryStreak }
+            };
+          } else {
+            preflight[game.eventId] = {
+              ...trackedPreflight,
+              tplus3: { ...trackedTplus3, lastRecheckAt: startedAt, recoveryStreak, recoveryCandidate: 'green' }
+            };
+          }
+        } else {
+          preflight[game.eventId] = {
+            ...trackedPreflight,
+            tplus3: { ...trackedTplus3, ...follow, completedAt: trackedTplus3.completedAt, lastRecheckAt: startedAt, recoveryStreak: 0 }
+          };
+        }
+      }
     }
+
+    // readinessRed representa partidas realmente pendentes, não apenas falhas
+    // observadas neste poll. Isso impede CRÍTICO→RECUPERADO falso no poll seguinte.
+    readinessRed = countReadinessPending(preflight);
 
     let recentEvents = [...snapshot.recentEvents, ...newlyEmitted];
     if (recentEvents.length > MAX_RECENT_EVENTS) recentEvents = recentEvents.slice(-MAX_RECENT_EVENTS);

@@ -92,7 +92,9 @@ export function assessOperationalHealth(input, nowMs = Date.now()) {
   if (num(dispatch.stuckDeliveries, 0) > 0) errors.push('entregas_push_travadas');
   if (num(dispatch.retry, 0) > 0) warnings.push('entregas_em_retry');
   if (num(dispatch.failed24h, 0) > 0) warnings.push('falhas_permanentes_nas_ultimas_24h');
-  if (num(monitor.readinessRed, 0) > 0) errors.push('jogo_sem_prontidao_push');
+  // Readiness tem incidente/e-mail dedicado. Não degradar todo o Worker nem
+  // provocar um segundo alerta do Health Monitor pela mesma partida.
+  if (num(monitor.readinessRed, 0) > 0) warnings.push('jogo_com_readiness_pendente');
 
   const state = errors.length ? 'degraded' : warnings.length ? 'warning' : activeGames > 0 ? 'live' : 'healthy';
   return { ok: errors.length === 0, state, warnings, errors };

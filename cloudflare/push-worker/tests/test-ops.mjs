@@ -33,8 +33,10 @@ health = assessOperationalHealth({
   monitor: { watchCount: 1, activeGames: 0, lastBootstrapAt: now - 30_000, readinessRed: 1 },
   dispatch: { stuckDispatches: 0, stuckDeliveries: 0, retry: 0, failed24h: 0 }
 }, now);
-assert.equal(health.ok, false);
-assert.ok(health.errors.includes('jogo_sem_prontidao_push'));
+assert.equal(health.ok, true);
+assert.equal(health.state, 'warning');
+assert.ok(health.warnings.includes('jogo_com_readiness_pendente'));
+assert.ok(!health.errors.includes('jogo_sem_prontidao_push'));
 
 class FakeDB {
   constructor(rows) { this.rows = rows; this.updates = 0; }

@@ -1,5 +1,5 @@
 const MINUTE = 60_000;
-export const READINESS_VERSION = '6-R10';
+export const READINESS_VERSION = '6-R10.1';
 export const PRECHECK_FROM_MS = 35 * MINUTE;
 export const PRECHECK_POLL_MS = 60_000;
 export const RED_CONFIRM_MS = 60_000;
@@ -301,20 +301,36 @@ export function readinessSnapshot(game, resolved, match, audience = {}, checkpoi
   const rawState = norm(raw?.status?.type?.state || eventCompetition(raw)?.status?.type?.state || '');
   const teamsOk = Boolean(raw && teamMatches(game?.home, rawTeams.home) && teamMatches(game?.away, rawTeams.away));
   const found = Boolean(raw);
+  const sourceEventId = text(resolved?.sourceEventId || raw?.id || eventCompetition(raw)?.id);
+  const expectedIds = new Set([text(game?.sourceEventId), text(game?.eventId)].filter(Boolean));
+  const exactEventId = Boolean(sourceEventId && expectedIds.has(sourceEventId));
+  const rawKickoff = Date.parse(raw?.date || eventCompetition(raw)?.date || '');
+  const kickoffDeltaMinutes = Number.isFinite(kickoff) && Number.isFinite(rawKickoff)
+    ? Math.round(Math.abs(rawKickoff - kickoff) / MINUTE * 10) / 10
+    : null;
+
+  // R10.1: quando o próprio event_id da ESPN coincide com o evento monitorado,
+  // essa identidade é autoritativa. Variações editoriais de nome/sigla como
+  // "Bragantino" x "Red Bull Bragantino" viram warning, nunca NOT READY.
+  const identityOk = Boolean(found && (teamsOk || exactEventId));
   const initialized = Boolean(match?.initialized);
   const afterStartGate = checkpoint === 'tplus3';
   const startedOk = !afterStartGate || ['in', 'post'].includes(rawState);
-  const ready = found && teamsOk && initialized && startedOk;
+  const ready = found && identityOk && initialized && startedOk;
   const reasons = [];
+  const warnings = [];
   if (!found) reasons.push('espn_event_not_found');
-  if (found && !teamsOk) reasons.push('team_identity_mismatch');
+  if (found && !identityOk) reasons.push('team_identity_mismatch');
+  if (found && exactEventId && !teamsOk) warnings.push('team_identity_alias_warning');
+  if (exactEventId && kickoffDeltaMinutes != null && kickoffDeltaMinutes > 180) warnings.push('kickoff_time_mismatch_warning');
   if (!initialized) reasons.push('monitor_not_initialized');
   if (!startedOk) reasons.push('espn_still_pre_after_tplus3');
   return {
     version: READINESS_VERSION, checkpoint, readiness: ready ? 'green' : 'red', ready,
-    eventId: text(game?.eventId), sourceEventId: text(resolved?.sourceEventId), strategy: text(resolved?.strategy), league: text(game?.league),
+    eventId: text(game?.eventId), sourceEventId, strategy: text(resolved?.strategy), league: text(game?.league),
     kickoff: text(game?.kickoff), checkedAt: new Date(now).toISOString(), minutesToKickoff: Number.isFinite(kickoff) ? Math.round((kickoff - now) / MINUTE * 10) / 10 : null,
-    sourceState: rawState, teamsOk, monitorInitialized: initialized, reasons,
+    sourceState: rawState, teamsOk, identityOk, identityAuthority: exactEventId ? 'event_id' : (teamsOk ? 'team_match' : ''),
+    teamIdentityWarning: Boolean(exactEventId && !teamsOk), kickoffDeltaMinutes, monitorInitialized: initialized, reasons, warnings,
     audience: audience && typeof audience === 'object' ? audience : {}
   };
 }

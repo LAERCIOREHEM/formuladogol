@@ -18,14 +18,29 @@ class FakeDB {
           if (/FROM push_subscriptions s/.test(sql)) return { results:[{subscription_id:'s1',installation_id:'inst-sp'}] };
           return {results:[]};
         },
-        async first(){ return null; },
+        async first(){
+          if (/SELECT \* FROM monitor_incidents/.test(sql)) return self.incidents.get(args[0]) || null;
+          return null;
+        },
         async run(){
           let changes=1;
           if (/INSERT OR IGNORE INTO essential_match_events/.test(sql)) {
             if (self.essential.has(args[0])) changes=0; else self.essential.set(args[0],args);
           }
           if (/INSERT INTO monitor_preflight/.test(sql)) self.preflight.set(`${args[0]}:${args[1]}`,args);
-          if (/INSERT OR IGNORE INTO monitor_incidents/.test(sql)) { if(self.incidents.has(args[0])) changes=0; else self.incidents.set(args[0],args); }
+          if (/INSERT OR IGNORE INTO monitor_incidents/.test(sql)) {
+            if(self.incidents.has(args[0])) changes=0;
+            else self.incidents.set(args[0],{incident_key:args[0],event_id:args[1],checkpoint:args[2],severity:args[3],detail:args[4],email_status:'observing'});
+          }
+          if (/UPDATE monitor_incidents SET checkpoint=\?,severity=\?,detail=\?/.test(sql)) {
+            const row=self.incidents.get(args[3]); if(row) self.incidents.set(args[3],{...row,checkpoint:args[0],severity:args[1],detail:args[2]});
+          }
+          if (/UPDATE monitor_incidents SET email_status=\?/.test(sql)) {
+            const row=self.incidents.get(args[1]); if(row) self.incidents.set(args[1],{...row,email_status:args[0]});
+          }
+          if (/severity='resolved'/.test(sql)) {
+            const row=self.incidents.get(args[2]); if(row) self.incidents.set(args[2],{...row,checkpoint:args[0],severity:'resolved',detail:args[1],email_status:'resolved_silent'});
+          }
           return {meta:{changes}};
         }
       }; },
@@ -91,5 +106,17 @@ try {
   const starts=[...db.essential.values()].filter((r)=>r[2]==='match_start');
   assert.equal(starts.length,1,'transição pre→in precisa persistir um único alerta de início');
   assert.ok(queue.some((x)=>x.kind==='event_dispatch' && String(x.eventKey).startsWith('match_start:')),'início precisa entrar na fila');
+
+  // R10.1: T-30/T-10/T+3 da mesma partida precisam compartilhar um único
+  // incidente. Mesmo que a causa persista, não podem nascer três linhas/e-mails.
+  const bad={ready:false,readiness:'red',reasons:['espn_event_not_found'],warnings:[],sourceEventId:'',strategy:'',sourceState:'',teamsOk:false,monitorInitialized:true,audience:{},checkedAt:new Date(now).toISOString()};
+  const incidentGame={eventId:'dedup-1',league:'bra.1',kickoff,home:{name:'Time A'},away:{name:'Time B'}};
+  await monitor.persistPreflight(incidentGame,'t30',bad,false,false,true);
+  await monitor.persistPreflight(incidentGame,'t10',bad,false,false,true);
+  await monitor.persistPreflight(incidentGame,'tplus3',bad,false,false,true);
+  assert.equal(db.incidents.size,1,'readiness deve ter um único incidente por partida');
+  assert.ok(db.incidents.has('push_readiness:dedup-1'));
+  assert.equal(db.incidents.get('push_readiness:dedup-1').checkpoint,'tplus3');
+
   console.log('readiness-monitor Boca-SaoPaulo regression: PASS');
 } finally { Date.now=realNow; globalThis.fetch=realFetch; }

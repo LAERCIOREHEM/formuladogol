@@ -12,7 +12,7 @@ const CF_WORKERS_CPU_INCLUDED_MS = 30_000_000;
 const CF_WORKERS_REQUESTS_INCLUDED = 10_000_000;
 const CF_CPU_OVERAGE_PER_MILLION_USD = 0.02;
 const CF_REQUEST_OVERAGE_PER_MILLION_USD = 0.30;
-const HEALTH_POLICY_VERSION = 6;
+const HEALTH_POLICY_VERSION = 7;
 
 function text(v) { return String(v ?? '').trim(); }
 function n(v) { const x = Number(v); return Number.isFinite(x) ? x : 0; }
@@ -286,7 +286,18 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     indicator('orchestrator','Orchestrator',orchHealth.ok&&orchStatus.ok?'green':'red',orchHealth.ok?`${text(os.workloadMode)||'modo desconhecido'} · próximo: ${fmtDate(os.nextRelevantMatchAt)}`:'health/status indisponível'),
     indicator('github','GitHub Actions',githubSeverity.severity,githubSeverity.detail),
     indicator('brasileirao','Brasileirão / ESPN',m.ok===false?'red':'green',m.ok===false?'Sports Monitor reportou falha':'monitor esportivo operacional'),
-    indicator('live','Ao Vivo',n(m.readinessRed)>0||staleLive?'red':'green',active?`${active} jogo(s) ativo(s) · readinessRed ${n(m.readinessRed)}`:'nenhum jogo ativo'),
+    // R10.1: readiness possui alerta dedicado por partida. O Health Monitor não
+    // abre um segundo incidente CRÍTICO para a mesma causa. Só monitor ao vivo
+    // realmente stale continua vermelho; readiness pendente aparece amarelo.
+    indicator(
+      'live','Ao Vivo',
+      staleLive?'red':n(m.readinessRed)>0?'yellow':'green',
+      staleLive
+        ? `${active} jogo(s) ativo(s) · poll ao vivo stale`
+        : n(m.readinessRed)>0
+          ? `${active} jogo(s) ativo(s) · ${n(m.readinessRed)} partida(s) com readiness pendente · alerta dedicado ativo`
+          : active?`${active} jogo(s) ativo(s) · readiness OK`:'nenhum jogo ativo'
+    ),
     // OVERDUE é amarelo: o Hunter já envia um alerta específico em T+2h e
     // continua pesquisando. Vermelho fica reservado ao budget guard.
     indicator('postgame','Pós-jogo',postBudget>0?'red':postPending>0?'yellow':'green',`${postPending} pendência(s) · ${postOverdue} >2h · ${postBudget} budget guard · busca persistente`),

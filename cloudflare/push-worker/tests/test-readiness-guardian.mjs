@@ -33,7 +33,7 @@ function raw(id='401912542', state='pre') {
   };
 }
 
-assert.equal(READINESS_VERSION, '6-R10');
+assert.equal(READINESS_VERSION, '6-R10.1');
 assert.deepEqual(CHECKPOINTS.map((x) => x.key), ['t30','t10','tplus3']);
 assert.deepEqual(deriveScheduleEvents({}, {}, Date.now(), true), [], 'alertas legados de agenda precisam permanecer desativados');
 
@@ -65,6 +65,27 @@ assert.equal(readiness.ready, false);
 assert.ok(readiness.reasons.includes('espn_still_pre_after_tplus3'));
 readiness = readinessSnapshot(game, resolveScoreboardEvent([raw('401912542','in')], game), initialized, {}, 'tplus3', Date.parse(kickoff)+3*60_000);
 assert.equal(readiness.ready, true);
+
+// Regressão R10.1: event_id ESPN exato é autoridade de identidade. Diferença
+// editorial/alias de clube não pode derrubar a partida para NOT READY.
+const aliasGame = {
+  eventId:'401841168', league:'bra.1', kickoff:'2026-10-03T21:30:00.000Z',
+  home:{id:'7632',name:'Atlético-MG',abbreviation:'CAM'},
+  away:{id:'old-rbb',name:'Bragantino',abbreviation:'BRA'}
+};
+const aliasRaw = {
+  id:'401841168', date:'2026-10-03T21:30:00.000Z', status:{type:{state:'in'}},
+  competitions:[{status:{type:{state:'in'}},competitors:[
+    {homeAway:'home',team:{id:'7632',displayName:'Atlético Mineiro',abbreviation:'CAM'},score:'0'},
+    {homeAway:'away',team:{id:'99999',displayName:'Red Bull Bragantino',abbreviation:'RBB'},score:'0'}
+  ]}]
+};
+readiness = readinessSnapshot(aliasGame, resolveScoreboardEvent([aliasRaw], aliasGame), initialized, {}, 'tplus3', Date.parse(aliasGame.kickoff)+3*60_000);
+assert.equal(readiness.ready, true);
+assert.equal(readiness.identityAuthority, 'event_id');
+assert.equal(readiness.teamIdentityWarning, true);
+assert.ok(readiness.warnings.includes('team_identity_alias_warning'));
+assert.ok(!readiness.reasons.includes('team_identity_mismatch'));
 
 // Cartão vermelho: precisa de duas observações e 60 s de estabilidade.
 const redObservation = {
