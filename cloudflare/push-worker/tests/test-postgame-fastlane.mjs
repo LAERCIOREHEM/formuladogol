@@ -65,46 +65,74 @@ assert.equal(canonicalUol.values.renda, 5752960);
 
 console.log('postgame-fastlane tests: PASS');
 
-// ============================ Política v5 ============================
+// ============================ Política v6 ============================
 import {
   PUBLIC_POLICY, planPublicStep, nextPublicAttemptMs, publicSearchRequest,
-  parseEspnAttendance, isPublicComplete, publicAlertMessage, taskEndMs
+  parseEspnAttendance, isPublicComplete, publicAlertMessage, taskEndMs,
+  publicBudgetDecision, sourceQuality
 } from '../src/postgame-fastlane.js';
 
-const END = Date.parse('2026-09-20T20:00:00.000Z');
-const task = { event_id:'401841200', league:'bra.1', home:'Flamengo', away:'Bragantino', kickoff:'2026-09-20T18:00:00.000Z', final_at:'2026-09-20T20:00:00.000Z', home_score:2, away_score:1 };
+const END = Date.parse('2026-10-02T23:53:00.000Z');
+const task = { event_id:'401841169', league:'bra.1', home:'São Paulo', away:'Santos', kickoff:'2026-10-02T23:00:00.000Z', final_at:'2026-10-02T23:53:00.000Z', home_score:1, away_score:2, round:21, stadium:'Morumbis' };
 const at=(min)=>END+min*60_000;
 const zero={mini_attempts:0,sol_attempts:0,sol_completed:0};
-assert.equal(planPublicStep(task,zero,at(1)).phase,'deterministic');
-assert.equal(planPublicStep(task,zero,at(4.9)).phase,'deterministic');
-assert.equal(planPublicStep(task,zero,at(5)).phase,'gemini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(6)).phase,'deterministic');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(12)).phase,'gemini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:2},at(22)).phase,'gemini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:3},at(35)).phase,'gemini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:4},at(35.1)).phase,'deterministic');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:4},at(45)).phase,'openai');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(45)).phase,'openai');
-assert.equal(planPublicStep(task,zero,at(180)).phase,'gemini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(181)).phase,'openai');
-assert.equal(planPublicStep(task,{mini_attempts:4,sol_attempts:1,sol_completed:1},at(46)).phase,'give_up');
-assert.equal(planPublicStep(task,{mini_attempts:4,sol_attempts:3,sol_completed:0},at(60)).phase,'give_up');
-assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'deterministic'},at(2),zero),at(4));
+const fullBudget={allowGemini:true,allowOpenAI:true};
+
+assert.equal(planPublicStep(task,zero,at(1),fullBudget).phase,'deterministic');
+assert.equal(planPublicStep(task,zero,at(5),fullBudget).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(14),fullBudget).phase,'deterministic');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(15),fullBudget).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:2},at(30),fullBudget).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:3},at(45),fullBudget).phase,'openai');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:3,sol_attempts:1},at(60),fullBudget).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:4,sol_attempts:1},at(90),fullBudget).phase,'openai');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:4,sol_attempts:2},at(120),fullBudget).phase,'openai');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:4,sol_attempts:3},at(120),fullBudget).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:5,sol_attempts:3},at(180),fullBudget).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:6,sol_attempts:3},at(300),fullBudget).phase,'openai');
+assert.notEqual(planPublicStep(task,{mini_attempts:99,sol_attempts:99,sol_completed:1},at(24*60),fullBudget).phase,'give_up');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:3},at(45),{allowGemini:true,allowOpenAI:false}).phase,'budget_guard');
+
+assert.deepEqual(PUBLIC_POLICY.geminiScheduleMinutes,[5,15,30,60,120]);
+assert.deepEqual(PUBLIC_POLICY.openaiScheduleMinutes,[45,90,120]);
+assert.equal(PUBLIC_POLICY.overdueMinutes,120);
+assert.equal(PUBLIC_POLICY.overdueGeminiEveryMinutes,60);
+assert.equal(PUBLIC_POLICY.overdueOpenaiEveryMinutes,180);
+assert.equal(PUBLIC_POLICY.eventBudgetUsd,0.25);
+assert.equal(PUBLIC_POLICY.monthlyBudgetUsd,10);
+
 assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'gemini'},at(4),zero),at(5));
-assert.equal(nextPublicAttemptMs(task,'gemini',{phase:'deterministic'},at(5),{...zero,mini_attempts:1}),at(7));
-assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'gemini'},at(11),{...zero,mini_attempts:1}),at(12));
-assert.equal(nextPublicAttemptMs(task,'gemini',{phase:'openai'},at(35),{...zero,mini_attempts:4}),at(45));
-assert.equal(nextPublicAttemptMs(task,'openai',{phase:'openai'},at(46),{mini_attempts:4,sol_attempts:1}),at(51));
-assert.deepEqual(PUBLIC_POLICY.geminiScheduleMinutes,[5,12,22,35]);
-assert.equal(PUBLIC_POLICY.geminiMaxAttempts,4);
+assert.equal(nextPublicAttemptMs(task,'gemini',{phase:'deterministic'},at(5),{...zero,mini_attempts:1}),at(10));
+assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'budget_guard'},at(46),{mini_attempts:3,sol_attempts:0}),at(51));
+assert.equal(nextPublicAttemptMs(task,'gemini',{phase:'deterministic'},at(181),{mini_attempts:6,sol_attempts:3}),at(240));
+
+const terra=publicSearchRequest(task,['renda'],{},'openai');
+assert.equal(terra.model,'gpt-5.6-terra'); assert.equal(terra.max_tool_calls,6); assert.equal(terra.reasoning.effort,'low');
 const sol=publicSearchRequest(task,['renda'],{POSTGAME_OPENAI_MODEL:'gpt-5.6-sol'},'openai');
-assert.equal(sol.model,'gpt-5.6-sol'); assert.equal(sol.max_tool_calls,6); assert.equal(sol.reasoning.effort,'medium');
+assert.equal(sol.model,'gpt-5.6-sol');
+assert.match(JSON.stringify(terra),/site oficial de clube/);
+assert.match(JSON.stringify(terra),/rodada=21/);
+
+assert.equal(sourceQuality('https://www.gazetaesportiva.com/campeonatos/x'),'robust');
+assert.equal(sourceQuality('https://ge.globo.com/futebol/x'),'robust');
+assert.equal(sourceQuality('https://www.saopaulofc.net/noticias/x'),'unverified');
+assert.equal(sourceQuality('https://x.com/qualquer/status/1'),'rejected');
+
+const decision=publicBudgetDecision({POSTGAME_PUBLIC_EVENT_BUDGET_USD:'0.25',POSTGAME_PUBLIC_MONTHLY_BUDGET_USD:'10',POSTGAME_PUBLIC_MONTHLY_WARNING_PCT:'80'}, {event:{estimatedUsd:0.26},month:{estimatedUsd:1}});
+assert.equal(decision.allowOpenAI,false);
+assert.equal(decision.allowGemini,true);
+assert.equal(decision.reason,'event_budget_openai_guard');
+const hard=publicBudgetDecision({}, {event:{estimatedUsd:0.01},month:{estimatedUsd:10.1}});
+assert.equal(hard.allowOpenAI,false); assert.equal(hard.allowGemini,false); assert.equal(hard.hardStop,true);
+
 assert.equal(parseEspnAttendance({gameInfo:{attendance:42317}}),42317);
 assert.equal(parseEspnAttendance({gameInfo:{attendance:'61.532'}}),61532);
 assert.equal(parseEspnAttendance({}),null);
 assert.equal(isPublicComplete({publico:42000,renda:1500000}),true);
 assert.equal(isPublicComplete({publico:42000,renda:null}),false);
 assert.equal(taskEndMs({kickoff:'2026-09-20T18:00:00.000Z'}),Date.parse('2026-09-20T19:55:00.000Z'));
-const msg=publicAlertMessage(task,{publico:42317,publico_pagante:null,renda:null},{publico:'https://espn'},{deterministic_checks:15,mini_attempts:4,sol_attempts:1},'not_found',{});
-assert.match(msg.body,/Gemini \+ Google Search \(gemini-3.5-flash-lite\): 4/);
-console.log('postgame-fastlane v5 policy tests: PASS');
+const msg=publicAlertMessage(task,{publico:null,publico_pagante:null,renda:null},{},{deterministic_checks:15,mini_attempts:5,sol_attempts:2},'not_found',{}, {event:{estimatedUsd:0.06},month:{estimatedUsd:1.84}}, new Date(at(180)).toISOString());
+assert.match(msg.body,/busca automática CONTINUA/);
+assert.match(msg.body,/Depois de 2h o Hunter tenta novamente a cada 1h/);
+assert.doesNotMatch(msg.body,/Nenhuma nova busca automática será feita/);
+console.log('postgame-fastlane v6 policy tests: PASS');

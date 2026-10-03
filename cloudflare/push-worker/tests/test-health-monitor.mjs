@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { countWebSearchCalls } from '../src/ai-usage.js';
-import { dailyDigestDecision, githubActionsSeverity, isDailyDigestDue, summarizeCloudflareWorkersUsage } from '../src/health-monitor.js';
+import { countWebSearchCalls, estimateProviderCost } from '../src/ai-usage.js';
+import { dailyDigestDecision, githubActionsSeverity, isDailyDigestDue, summarizeCloudflareWorkersUsage, postgameDigestLines } from '../src/health-monitor.js';
 
 assert.equal(countWebSearchCalls({output:[{type:'web_search_call'},{type:'message'},{type:'web_search_call'}]}),2);
 assert.equal(countWebSearchCalls({}),0);
@@ -57,5 +57,19 @@ assert.equal(Number(usage.requestUsedPct.toFixed(3)),0.449);
 assert.equal(usage.billedCost,0); // R2 não entra no bloco Workers.
 assert.equal(usage.currentOverageUsd,0);
 assert.ok(usage.projectedCpuMs>usage.cpuMs);
+
+
+const openaiCost=estimateProviderCost({provider:'openai',model:'gpt-5.6-terra',searches:2,input_tokens:1000,output_tokens:500},{});
+assert.ok(openaiCost.knownUsd>0.02);
+const hunterLines=postgameDigestLines({
+  pending:1,searching:0,overdue:1,budgetGuard:0,resolved:277,persistentUntilResolved:true,
+  pendingRows:[{eventId:'401841169',home:'São Paulo',away:'Santos',homeScore:1,awayScore:2,round:21,finalAt:'2026-10-02T23:53:00Z',publico:null,renda:null,status:'overdue',espnChecks:12,geminiAttempts:5,openaiAttempts:2,sourcesFound:4,estimatedUsd:0.06,lastAt:'2026-10-03T10:00:00Z',nextAt:'2026-10-03T11:00:00Z'}],
+  cost:{last24h:{estimatedUsd:0.07},month:{estimatedUsd:1.84,byProvider:[{provider:'gemini',model:'gemini-3.5-flash-lite',calls:5,searches:5,estimatedUsd:0.07}]},budget:{monthlyBudgetUsd:10,warningPct:80}}
+},Date.parse('2026-10-03T11:00:00Z'));
+const hunterText=hunterLines.join('\n');
+assert.match(hunterText,/PÓS-JOGO — PÚBLICO & RENDA/);
+assert.match(hunterText,/São Paulo 1 x 2 Santos/);
+assert.match(hunterText,/não existe GAVE_UP/);
+assert.match(hunterText,/US\$ 1\.8400 \/ US\$ 10\.00/);
 
 console.log('health-monitor/ai-usage tests: PASS');

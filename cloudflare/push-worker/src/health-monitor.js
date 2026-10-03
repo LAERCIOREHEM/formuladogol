@@ -1,5 +1,5 @@
 import { sendMail, mailConfig, maskAddress } from './mailer.js';
-import { aiUsageSummary, providerUsageSummary } from './ai-usage.js';
+import { aiUsageSummary, providerUsageSummary, postgamePublicCostSummary } from './ai-usage.js';
 
 const SITE = 'https://formuladogol.com.br';
 const ORCH = 'https://orchestrator.formuladogol.com.br';
@@ -12,7 +12,7 @@ const CF_WORKERS_CPU_INCLUDED_MS = 30_000_000;
 const CF_WORKERS_REQUESTS_INCLUDED = 10_000_000;
 const CF_CPU_OVERAGE_PER_MILLION_USD = 0.02;
 const CF_REQUEST_OVERAGE_PER_MILLION_USD = 0.30;
-const HEALTH_POLICY_VERSION = 5;
+const HEALTH_POLICY_VERSION = 6;
 
 function text(v) { return String(v ?? '').trim(); }
 function n(v) { const x = Number(v); return Number.isFinite(x) ? x : 0; }
@@ -23,6 +23,16 @@ function pct(v,total){ return total>0?(n(v)/n(total))*100:0; }
 function fmtNum(v){ return new Intl.NumberFormat('pt-BR',{maximumFractionDigits:0}).format(n(v)); }
 function fmtPct(v){ return `${n(v).toFixed(2).replace('.',',')}%`; }
 function fmtUsd(v){ return `US$ ${n(v).toFixed(2)}`; }
+function fmtUsd4(v){ return `US$ ${n(v).toFixed(4)}`; }
+function ageLabel(value,now=Date.now()){
+  const ms=Date.parse(text(value)); if(!Number.isFinite(ms)) return '—';
+  const mins=Math.max(0,Math.floor((now-ms)/60_000)); const h=Math.floor(mins/60); const m=mins%60;
+  return h>0?`${h}h${String(m).padStart(2,'0')}`:`${m}min`;
+}
+function missingPublicLabel(row){
+  const missing=[]; if(!(n(row?.publico)>0)) missing.push('público'); if(!(n(row?.renda)>0)) missing.push('renda');
+  return missing.join(' + ')||'nenhum';
+}
 function brParts(now = Date.now()) {
   const parts = new Intl.DateTimeFormat('en-CA', { timeZone:'America/Sao_Paulo', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23' }).formatToParts(new Date(now));
   const g = (t) => parts.find((p) => p.type === t)?.value || '';
@@ -196,13 +206,25 @@ export function dailyDigestDecision(br,lastDate,{lastAttemptAt='',now=Date.now()
 export async function collectHealthSnapshot(env, monitor = null, now = Date.now(), force = false) {
   const previous = safeJson(await metaGet(env,'snapshot'),null);
   if (!force && previous && Number(previous.policyVersion) === HEALTH_POLICY_VERSION && now-(Date.parse(previous.at)||0)<SNAPSHOT_TTL_MS) return previous;
-  const [site, orchHealth, orchStatus, ai, providers, post, cfBilling] = await Promise.all([
-    fetchJson(`${text(env.SITE_BASE)||SITE}/`), fetchJson(`${ORCH}/health`), fetchJson(`${ORCH}/status`), aiUsageSummary(env,24), providerUsageSummary(env,24),
+  const [site, publicAudit, orchHealth, orchStatus, ai, providers, post, postRowsRaw, postCost, cfBilling] = await Promise.all([
+    fetchJson(`${text(env.SITE_BASE)||SITE}/`), fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/auditoria-publicos.json`), fetchJson(`${ORCH}/health`), fetchJson(`${ORCH}/status`), aiUsageSummary(env,24), providerUsageSummary(env,24),
     env.DB.prepare(`SELECT COUNT(*) total,
-      COALESCE(SUM(CASE WHEN public_status NOT IN ('resolved','gave_up') THEN 1 ELSE 0 END),0) public_pending,
-      COALESCE(SUM(CASE WHEN public_status='gave_up' AND updated_at>=datetime('now','-24 hours') THEN 1 ELSE 0 END),0) public_gave_up_24h,
+      COALESCE(SUM(CASE WHEN public_status='resolved' THEN 1 ELSE 0 END),0) public_resolved,
+      COALESCE(SUM(CASE WHEN public_status='pending' THEN 1 ELSE 0 END),0) public_searching,
+      COALESCE(SUM(CASE WHEN public_status='overdue' THEN 1 ELSE 0 END),0) public_overdue,
+      COALESCE(SUM(CASE WHEN public_status='budget_guard' THEN 1 ELSE 0 END),0) public_budget_guard,
+      COALESCE(SUM(CASE WHEN public_status<>'resolved' THEN 1 ELSE 0 END),0) public_pending,
       COALESCE(SUM(CASE WHEN highlight_status<>'resolved' THEN 1 ELSE 0 END),0) highlight_pending
       FROM postgame_fastlane`).first(),
+    env.DB.prepare(`SELECT p.event_id,p.home,p.away,p.home_score,p.away_score,p.kickoff,p.final_at,
+      p.publico,p.publico_pagante,p.renda,p.public_status,p.public_attempts,p.public_last_at,p.public_next_at,p.public_last_error,
+      c.round,c.stadium,a.deterministic_checks,a.mini_attempts,a.sol_attempts,a.last_model,a.last_phase,
+      (SELECT COUNT(*) FROM postgame_source_cache sc WHERE sc.event_id=p.event_id) source_count
+      FROM postgame_fastlane p
+      LEFT JOIN postgame_public_ai a ON a.event_id=p.event_id
+      LEFT JOIN postgame_match_context c ON c.event_id=p.event_id
+      WHERE p.public_status<>'resolved' ORDER BY p.final_at ASC LIMIT 20`).all(),
+    postgamePublicCostSummary(env,now),
     cloudflareBillingSummary(env,now)
   ]);
   const cfg=mailConfig(env);
@@ -220,34 +242,61 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   const previousDispatches=n(previous?.orchestrator?.githubDispatchesLast24h);
   const nextRelevantMs=Date.parse(text(os.nextRelevantMatchAt));
   const hoursToNext=Number.isFinite(nextRelevantMs)?(nextRelevantMs-now)/3_600_000:Infinity;
-  const githubSeverity=githubActionsSeverity({
-    dormant, dispatches, previousDispatches, pendingPostgameTasks:pendingOrchestrator, hoursToNext, hasPrevious:Boolean(previous)
-  });
+  const githubSeverity=githubActionsSeverity({ dormant, dispatches, previousDispatches, pendingPostgameTasks:pendingOrchestrator, hoursToNext, hasPrevious:Boolean(previous) });
   const active=n(m.activeGames);
   const lastPoll=n(m.lastPollAt);
   const staleLive=active>0 && (!lastPoll || now-lastPoll>3*60_000);
   const postPending=n(post?.public_pending);
-  const gave=n(post?.public_gave_up_24h);
+  const postSearching=n(post?.public_searching);
+  const postOverdue=n(post?.public_overdue);
+  const postBudget=n(post?.public_budget_guard);
+  const postResolved=n(post?.public_resolved);
   const highlight=n(post?.highlight_pending);
   const perEventAnomaly=(providers.byEvent||[]).find(r=>n(r.searches)>8);
   const providerFailures=n(providers.failures);
   const geminiReady=Boolean(text(env.GEMINI_API_KEY));
   const gatewayAuthReady=Boolean(text(env.AI_GATEWAY_TOKEN));
   const workersAiReady=Boolean(env.AI);
+  const monthlyBudgetUsd=Number(env.POSTGAME_PUBLIC_MONTHLY_BUDGET_USD||10)||10;
+  const eventBudgetUsd=Number(env.POSTGAME_PUBLIC_EVENT_BUDGET_USD||0.25)||0.25;
+  const warningPct=Number(env.POSTGAME_PUBLIC_MONTHLY_WARNING_PCT||80)||80;
+  const hunterMonthUsd=n(postCost?.month?.estimatedUsd);
+  const hunterBudgetPct=monthlyBudgetUsd>0?hunterMonthUsd/monthlyBudgetUsd*100:0;
+  const eventCosts=new Map((postCost?.events||[]).map((r)=>[text(r.eventId),r]));
+  const auditBody=publicAudit?.ok&&publicAudit?.body&&typeof publicAudit.body==='object'?publicAudit.body:{};
+  const seasonCoverage={
+    finalizados:n(auditBody.total_jogos_finalizados),
+    comPublico:n(auditBody.total_com_publico_ou_complemento),
+    semPublico:n(auditBody.total_sem_publico),
+    comRenda:n(auditBody.total_com_renda),
+    semRenda:n(auditBody.total_sem_renda),
+    atualizadoEm:text(auditBody.gerado_em)
+  };
+  const pendingRows=(postRowsRaw?.results||[]).map((r)=>({
+    eventId:text(r.event_id),home:text(r.home),away:text(r.away),homeScore:r.home_score,awayScore:r.away_score,
+    kickoff:text(r.kickoff),finalAt:text(r.final_at),round:r.round==null?null:Number(r.round),stadium:text(r.stadium),
+    publico:r.publico==null?null:Number(r.publico),renda:r.renda==null?null:Number(r.renda),status:text(r.public_status)||'pending',
+    attempts:Number(r.public_attempts||0),lastAt:text(r.public_last_at),nextAt:text(r.public_next_at),lastError:text(r.public_last_error),
+    espnChecks:Number(r.deterministic_checks||0),geminiAttempts:Number(r.mini_attempts||0),openaiAttempts:Number(r.sol_attempts||0),
+    lastModel:text(r.last_model),lastPhase:text(r.last_phase),sourcesFound:Number(r.source_count||0),
+    estimatedUsd:n(eventCosts.get(text(r.event_id))?.estimatedUsd)
+  }));
   const indicators=[
     indicator('site','Site / Pages',site.ok?'green':'red',site.ok?`HTTP ${site.status}`:`indisponível (HTTP ${site.status||'erro'})`),
     indicator('orchestrator','Orchestrator',orchHealth.ok&&orchStatus.ok?'green':'red',orchHealth.ok?`${text(os.workloadMode)||'modo desconhecido'} · próximo: ${fmtDate(os.nextRelevantMatchAt)}`:'health/status indisponível'),
     indicator('github','GitHub Actions',githubSeverity.severity,githubSeverity.detail),
     indicator('brasileirao','Brasileirão / ESPN',m.ok===false?'red':'green',m.ok===false?'Sports Monitor reportou falha':'monitor esportivo operacional'),
     indicator('live','Ao Vivo',n(m.readinessRed)>0||staleLive?'red':'green',active?`${active} jogo(s) ativo(s) · readinessRed ${n(m.readinessRed)}`:'nenhum jogo ativo'),
-    indicator('postgame','Pós-jogo',gave>0?'red':postPending>0?'yellow':'green',`${postPending} pendência(s) · ${gave} encerrada(s) sem solução em 24h`),
+    // OVERDUE é amarelo: o Hunter já envia um alerta específico em T+2h e
+    // continua pesquisando. Vermelho fica reservado ao budget guard.
+    indicator('postgame','Pós-jogo',postBudget>0?'red':postPending>0?'yellow':'green',`${postPending} pendência(s) · ${postOverdue} >2h · ${postBudget} budget guard · busca persistente`),
     indicator('highlights','Melhores Momentos',highlight>0?'yellow':'green',`${highlight} pendência(s)`),
     indicator('editorial','Editorial / Transmissões',Array.isArray(os.errors)&&os.errors.length?'yellow':'green',Array.isArray(os.errors)&&os.errors.length?`${os.errors.length} erro(s) no último ciclo`:'sem erro reportado pelo Orchestrator'),
     indicator('infra','Infraestrutura / E-mail',!cfg.configured||probe?.ok===false?'red':'green',`${cfg.transport} · ${maskAddress(cfg.to)}${probe?` · ${probe.status||`probe ${probe.ok?'OK':'FALHOU'}`}`:''}${cfg.fallbacks?.length?` · fallback ${cfg.fallbacks.join(' + ')}`:''}`),
-    indicator('openai','IA / Custos',!geminiReady||!workersAiReady||!gatewayAuthReady?'yellow':perEventAnomaly?'red':providerFailures>3?'yellow':'green',`${providers.calls} chamada(s) multi-provider · ${providers.searches} busca(s) web · ${providerFailures} falha(s) /24h · Gateway ${text(env.AI_GATEWAY_ID)||'default'} · auth ${gatewayAuthReady?'OK':'pendente'}${perEventAnomaly?` · anomalia event ${text(perEventAnomaly.event_id)}`:''}`),
+    indicator('openai','IA / Custos',hunterBudgetPct>=100?'red':hunterBudgetPct>=warningPct?'yellow':!geminiReady||!workersAiReady||!gatewayAuthReady?'yellow':perEventAnomaly?'yellow':providerFailures>3?'yellow':'green',`${providers.calls} chamada(s) multi-provider · ${providers.searches} busca(s) web · Hunter ${fmtUsd(hunterMonthUsd)}/${fmtUsd(monthlyBudgetUsd)} (${fmtPct(hunterBudgetPct)}) · ${providerFailures} falha(s) /24h`),
     indicator('cloudflare','Cloudflare / CPU & Requests',cloudflareSeverity(cfBilling),cloudflareDetail(cfBilling)),
   ];
-  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY))},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches},postgame:{pending:postPending,gaveUp24h:gave,highlightPending:highlight},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
+  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY))},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches},postgame:{pending:postPending,searching:postSearching,overdue:postOverdue,budgetGuard:postBudget,resolved:postResolved,seasonCoverage,highlightPending:highlight,persistentUntilResolved:true,pendingRows,cost:{...postCost,budget:{monthlyBudgetUsd,eventBudgetUsd,warningPct,monthPct:hunterBudgetPct}}},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
   await metaPut(env,'snapshot',JSON.stringify(snapshot));
   return snapshot;
 }
@@ -272,6 +321,41 @@ function cloudflareDigestLines(cf){
   ];
 }
 
+export function postgameDigestLines(postgame={}, now=Date.now()) {
+  const pending=n(postgame.pending), searching=n(postgame.searching), overdue=n(postgame.overdue), guard=n(postgame.budgetGuard), resolved=n(postgame.resolved);
+  const cost=postgame.cost||{}; const budget=cost.budget||{}; const monthUsd=n(cost?.month?.estimatedUsd); const dayUsd=n(cost?.last24h?.estimatedUsd); const monthlyBudget=n(budget.monthlyBudgetUsd)||10; const monthPct=monthlyBudget>0?monthUsd/monthlyBudget*100:0;
+  const rows=Array.isArray(postgame.pendingRows)?postgame.pendingRows:[];
+  const cov=postgame.seasonCoverage||{};
+  const coverageLine=n(cov.finalizados)>0?`Cobertura do Brasileirão: público ${n(cov.comPublico)}/${n(cov.finalizados)} · renda ${n(cov.comRenda)}/${n(cov.finalizados)}`:'Cobertura do Brasileirão: indisponível';
+  const lines=[
+    'PÓS-JOGO — PÚBLICO & RENDA',
+    coverageLine,
+    `✅ Resolvidos na fila monitorada: ${resolved}`,
+    `🟡 Em busca (<2h): ${searching}`,
+    `🔴 Atrasados (>2h): ${overdue}`,
+    `🛑 Budget guard: ${guard}`,
+    `Persistência: ${postgame.persistentUntilResolved?'ATIVA — não existe GAVE_UP':'—'}`,
+  ];
+  if(rows.length){
+    lines.push('', 'PENDÊNCIAS ANALÍTICAS');
+    for(const r of rows){
+      const score=(r.homeScore!=null&&r.awayScore!=null)?`${r.homeScore} x ${r.awayScore}`:'x';
+      lines.push(
+        `${r.status==='budget_guard'?'🛑':r.status==='overdue'?'🔴':'🟡'} ${r.home} ${score} ${r.away}${r.round?` · R${r.round}`:''} · ${fmtDateOnly(r.finalAt||r.kickoff)}`,
+        `   Faltando: ${missingPublicLabel(r)} · em busca há ${ageLabel(r.finalAt||r.kickoff,now)}`,
+        `   ESPN/cache ${n(r.espnChecks)} · Gemini ${n(r.geminiAttempts)} · OpenAI ${n(r.openaiAttempts)} · fontes ${n(r.sourcesFound)}`,
+        `   Custo estimado da partida no mês: ${fmtUsd4(r.estimatedUsd)} · última ${fmtDate(r.lastAt)} · próxima ${fmtDate(r.nextAt)}`
+      );
+    }
+  }
+  lines.push('', 'CUSTO ESTIMADO — ATTENDANCE/REVENUE HUNTER',
+    `Últimas 24h: ${fmtUsd4(dayUsd)} · mês: ${fmtUsd4(monthUsd)} / ${fmtUsd(monthlyBudget)} (${fmtPct(monthPct)})`,
+    ...((cost?.month?.byProvider||[]).map((r)=>`- ${r.provider}${r.model?`/${r.model}`:''}: ${n(r.calls)} chamada(s), ${n(r.searches)} busca(s), ${r.estimatedUsd==null?'USD no billing Cloudflare':fmtUsd4(r.estimatedUsd)}`)),
+    'Estimativa conservadora: não desconta franquia gratuita do Google Search; Workers AI é acompanhado pelo billing Cloudflare.'
+  );
+  return lines;
+}
+
 function digestMessage(snapshot, now=Date.now()) {
   const title=snapshot.state==='green'?'✅ Saúde diária — tudo normal':snapshot.state==='yellow'?'⚠️ Saúde diária — atenção':'🚨 Saúde diária — problema detectado';
   const total=snapshot.indicators.length; const green=snapshot.indicators.filter(x=>x.severity==='green').length;
@@ -280,15 +364,16 @@ function digestMessage(snapshot, now=Date.now()) {
     `ESTADO GERAL: ${icon(snapshot.state)} ${snapshot.state.toUpperCase()} — ${green}/${total} verdes`, '',
     ...snapshot.indicators.map(x=>`${icon(x.severity)} ${x.label}: ${x.detail}`), '',
     'ORQUESTRADOR', `Modo: ${snapshot.orchestrator.workloadMode||'—'}`, `Próximo jogo relevante: ${fmtDate(snapshot.orchestrator.nextRelevantMatchAt)}`,
-    `Dispatches GitHub 24h: ${snapshot.orchestrator.githubDispatchesLast24h}`, `Pendências pós-jogo: ${snapshot.postgame.pending}`, '',
+    `Dispatches GitHub 24h: ${snapshot.orchestrator.githubDispatchesLast24h}`, '',
+    ...postgameDigestLines(snapshot.postgame,now), '',
     'IA / AI GATEWAY — últimas 24h', `Gateway: ${snapshot.aiStack?.gateway||'default'}`, `Chamadas registradas: ${snapshot.providers?.calls||0}`, `Buscas web registradas: ${snapshot.providers?.searches||0}`, `Tokens registrados: ${snapshot.providers?.totalTokens||0}`, `Falhas: ${snapshot.providers?.failures||0}`,
     ...(snapshot.providers?.byProvider||[]).map(r=>`- ${r.provider}: ${r.calls} chamada(s), ${r.searches} busca(s), ${r.total_tokens||0} tokens, ${r.failures||0} falha(s)`), '',
     ...cloudflareDigestLines(snapshot.cloudflareBilling), '',
-    'Custos Gemini/OpenAI: consultar AI Gateway/Google/OpenAI para faturamento final; o e-mail não inventa preço quando a resposta não expõe custo exato.', '',
-    snapshot.state==='green'?'Nenhuma ação necessária.':'Verifique os itens amarelos/vermelhos acima. Alertas críticos são enviados separadamente.'
+    snapshot.state==='green'?'Nenhuma ação necessária.':'Verifique os itens amarelos/vermelhos acima. Alertas de SLA do Hunter são enviados separadamente e não encerram a busca.'
   ];
   return {subject:`[Fórmula do GOL] ${title}`,body:lines.join('\n')};
 }
+
 function incidentMessage(indicator,snapshot,recovered=false){
   return {
     subject: recovered?`[FDG][RECUPERADO] ✅ ${indicator.label}`:`[FDG][CRÍTICO] 🔴 ${indicator.label}`,

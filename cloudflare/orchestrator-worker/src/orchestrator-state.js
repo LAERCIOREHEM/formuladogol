@@ -707,13 +707,14 @@ export class OrchestratorState {
     }
 
     // 3/4) Pós-jogo do Brasileirão: o Cloudflare Fastlane faz toda a
-    // perseguição. GitHub só consolida descoberta concreta já gravada no D1,
-    // dentro das primeiras 24h e com teto de dois dispatches por jogo/tipo.
+    // perseguição. GitHub só consolida descoberta concreta já gravada no D1.
+    // Público/renda permanece elegível até resolver; o teto de dois dispatches
+    // por jogo/tipo continua protegendo o GitHub Actions.
     const publicSourcesReady = ready(
       'resultados.json', 'dados-br/estado-publicos-ia.json', 'dados-br/auditoria-publicos.json',
     );
     const publicsAll = publicSourcesReady ? pendingPublicsFromAudit({ results, audit: publicAudit, aiState, now }) : [];
-    const publicAutomatic = publicsAll.filter((item) => item.ageMinutes <= POLICY.publicos.automaticWindowMinutes);
+    const publicAutomatic = publicsAll;
 
     const mmSourcesReady = ready(
       'resultados.json', 'dados-br/melhores-momentos.json', 'dados-br/melhores-momentos-manual.json',
@@ -748,7 +749,7 @@ export class OrchestratorState {
       hints.publicos = {
         pending: publicsAll.length,
         automaticPending: publicAutomatic.length,
-        historicalPending: Math.max(0, publicsAll.length - publicAutomatic.length),
+        historicalPending: 0,
         concreteReady: publicConcreteReady, capped: publicCapped, target: eventId, nextDueAt: now.toISOString(),
       };
       return {
@@ -762,7 +763,7 @@ export class OrchestratorState {
     hints.publicos = {
       pending: publicsAll.length,
       automaticPending: publicAutomatic.length,
-      historicalPending: Math.max(0, publicsAll.length - publicAutomatic.length),
+      historicalPending: 0,
       concreteReady: publicConcreteReady, capped: publicCapped,
     };
 

@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-02T22:11:32.389867-03:00",
+  "gerado_em": "2026-10-03T08:34:42.862940-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 278,
   "total_com_estatisticas": 278,
-  "total_com_publico": 277,
+  "total_com_publico": 278,
   "total_com_eventos": 278,
   "total_com_jogadores": 278,
   "total_eventos_validados": 278,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 2,
       "estadio": "Estádio Cícero Pompeu de Toledo",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 43398,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.gazetaesportiva.com/campeonatos/brasileiro-serie-a/sao-paulo-x-santos-brasileirao-2026/",
       "arbitro": "",
       "stats": [
         {
@@ -577,7 +577,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-02T22:11:32.304335-03:00"
+      "atualizado_em": "2026-10-02T22:11:32.304335-03:00",
+      "renda": 2034540
     },
     "401841238": {
       "event_id": "401841238",
@@ -156979,5 +156980,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 267,
+  "total_com_renda": 278
 }

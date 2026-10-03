@@ -18,13 +18,16 @@
   },
   "vars": {
     "SITE_BASE": "https://formuladogol.com.br",
-    "POSTGAME_OPENAI_MODEL": "gpt-5.6-sol",
+    "POSTGAME_OPENAI_MODEL": "gpt-5.6-terra",
     "POSTGAME_OPENAI_MINI_MODEL": "gemini-3.5-flash-lite",
     "GEMINI_SEARCH_MODEL": "gemini-3.5-flash-lite",
     "WORKERS_AI_EXTRACT_MODEL": "@cf/meta/llama-3.1-8b-instruct",
     "AI_GATEWAY_ID": "default",
     "AI_GATEWAY_ACCOUNT_ID": "__CLOUDFLARE_ACCOUNT_ID__",
-    "EMAIL_REMETENTE": "saude@formuladogol.com.br"
+    "EMAIL_REMETENTE": "saude@formuladogol.com.br",
+    "POSTGAME_PUBLIC_EVENT_BUDGET_USD": "0.25",
+    "POSTGAME_PUBLIC_MONTHLY_BUDGET_USD": "10",
+    "POSTGAME_PUBLIC_MONTHLY_WARNING_PCT": "80"
   },
   "ai": { "binding": "AI" },
   "send_email": [

@@ -157,7 +157,7 @@ test('highlight Fastlane opens at +5min and automatic GitHub consolidation is bo
 
 test('public/renda Fastlane opens at +15min and automatic GitHub consolidation is bounded', () => {
   assert.equal(POLICY.publicos.firstAfterFinalMinutes, 15);
-  assert.equal(POLICY.publicos.automaticWindowMinutes, 24 * 60);
+  assert.equal(POLICY.publicos.persistentUntilResolved, true);
   assert.equal(POLICY.publicos.maxGithubDispatchesPerEvent, 2);
   assert.equal(POLICY.publicos.githubRetryMinutes, 30);
 });

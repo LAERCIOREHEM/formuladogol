@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "_comentario": "Correções documentais verificadas manualmente. O coletor mescla somente os event_ids e campos explicitamente listados; não substitui o restante do snapshot.",
-  "verificado_em": "2026-09-20T22:43:00-03:00",
+  "verificado_em": "2026-10-03T08:34:42-03:00",
   "jogos": {
     "401841240": {
       "confronto": "Corinthians 1 x 3 Fluminense",
@@ -37,6 +37,17 @@
       "fonte_renda": "https://ge.globo.com/gato-mestre/noticia/2026/09/20/flamengo-2-x-1-bragantino-tem-o-maior-publico-da-28a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "origem": "correção documental verificada",
       "nota": "O ge/Gato Mestre informa R$ 1.104.820; fichas sindicadas do Estadão/UOL/Band publicaram R$ 1.104.000. O projeto prioriza o levantamento específico de públicos/rendas do ge para este campo."
+    },
+    "401841169": {
+      "confronto": "São Paulo 1 x 2 Santos",
+      "rodada": 21,
+      "publico": 43398,
+      "renda": 2034540.0,
+      "tipo": "presente",
+      "fonte_publico": "https://www.gazetaesportiva.com/campeonatos/brasileiro-serie-a/sao-paulo-x-santos-brasileirao-2026/",
+      "fonte_renda": "https://www.gazetaesportiva.com/campeonatos/brasileiro-serie-a/sao-paulo-x-santos-brasileirao-2026/",
+      "origem": "correção documental verificada",
+      "nota": "Ficha técnica da Gazeta Esportiva, publicada em 02/10/2026 às 22:05 e atualizada às 23:00, registra público de 43.398 e renda de R$ 2.034.540,00. Pagantes não inferidos."
     }
   }
 }

@@ -11,9 +11,10 @@ export const POLICY = Object.freeze({
   slowEvalMinutes: 15,
   publicos: {
     // O Fastlane Cloudflare faz a descoberta. GitHub só consolida quando há
-    // valor concreto no D1 e apenas dentro da janela pós-jogo automática.
+    // valor concreto no D1. Público/renda permanece automático até resolver;
+    // não existe mais janela de 24h nem abandono por idade.
     firstAfterFinalMinutes: 15,
-    automaticWindowMinutes: 24 * 60,
+    persistentUntilResolved: true,
     maxGithubDispatchesPerEvent: 2,
     githubRetryMinutes: 30,
     retryBands: [[24, 120]],

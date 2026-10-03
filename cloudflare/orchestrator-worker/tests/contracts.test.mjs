@@ -128,7 +128,7 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(state, /transmissoes_guardian/);
   const index = await read('cloudflare/orchestrator-worker/src/index.js');
   assert.match(index, /transmissionGuardian:\s*true/);
-  assert.match(index, /2\.0\.0/);
+  assert.match(index, /2\.1\.0/);
   assert.match(index, /transmissionGuardianNeedGate:\s*true/);
   assert.match(index, /transmissionNeedDrivenV2:\s*true/);
   assert.match(index, /adaptiveSlowPath:\s*true/);
@@ -138,7 +138,10 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(index, /publicFirstAttemptAfterFinalMinutes:\s*15/);
   assert.match(index, /dormantMode:\s*true/);
   assert.match(index, /postgameConcreteGate:\s*true/);
-  assert.match(index, /postgameAutomaticWindowHours:\s*24/);
+  assert.match(index, /postgameAutomaticWindowHours:\s*null/);
+  assert.match(index, /postgamePublicPersistentUntilResolved:\s*true/);
+  assert.match(index, /postgamePublicSlaMinutes:\s*120/);
+  assert.match(index, /postgameAiRoutingVersion:\s*6/);
   assert.match(index, /postgameGithubMaxDispatchesPerEvent:\s*2/);
   assert.match(index, /postgameHighlightsBatching:\s*true/);
   assert.match(index, /transmissionGuardianBatching:\s*true/);

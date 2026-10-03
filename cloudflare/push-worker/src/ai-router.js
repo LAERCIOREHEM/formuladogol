@@ -15,8 +15,22 @@ export function workersAiConfigured(env){ return Boolean(env?.AI); }
 export function isAiGatewayPreProviderFailure(status,detail){ const s=String(detail||'').toLowerCase(); return (Number(status)===401 && ((s.includes('"code":2009')||s.includes('"internalcode":2009')||s.includes('"name":"aigatewayerror"')))) || (Number(status)===403 && s.includes('1010')); }
 
 function publicSchemaInstruction(task,missing){
- const matchup=`${text(task.home)} x ${text(task.away)}`; const date=text(task.kickoff).slice(0,10);
- return `Pesquise na web APENAS dados documentais da partida ${matchup}, em ${date}, event_id ${text(task.event_id)}. Preciso exclusivamente de: ${missing.join(', ')}. Não estime e não use memória. Confirme confronto, data e placar. Público = público presente/total; pagantes é separado. Renda em reais. Priorize clube/CBF/federação, ge, UOL/Estadão e imprensa regional confiável. Se não estiver publicado, use null. Responda SOMENTE JSON válido, sem markdown, neste formato: {"encontrado":true|false,"publico":integer|null,"publico_pagante":integer|null,"renda":number|null,"confianca":number,"observacao":"texto"}.`;
+ const matchup=`${text(task.home)} x ${text(task.away)}`;
+ const date=text(task.kickoff).slice(0,10);
+ const score=(task.home_score!=null&&task.away_score!=null)?`${task.home_score} x ${task.away_score}`:'não informado';
+ const round=text(task.round||task.rodada)||'não informada';
+ const stadium=text(task.stadium||task.estadio)||'não informado';
+ const queries=[
+   `"${matchup}" "público" "renda" "${date}"`,
+   `"${text(task.home)} ${score} ${text(task.away)}" público renda`,
+   `"${matchup}" "público pagante" "renda bruta"`,
+   `"${matchup}" "ficha técnica" público renda "${date}"`,
+   `"${matchup}" bilheteria público renda`,
+ ];
+ if(round!=='não informada') queries.push(`"${matchup}" "rodada ${round}" público renda`);
+ if(stadium!=='não informado') queries.push(`"${matchup}" "${stadium}" público renda`);
+ const queryPack=queries.join(' ; ');
+ return `Você é um pesquisador factual de pós-jogo. Pesquise na web APENAS dados documentais da partida ${matchup}. DOSSIÊ: data real=${date}; placar=${score}; rodada=${round}; estádio=${stadium}; event_id=${text(task.event_id)}. Preciso exclusivamente de: ${missing.join(', ')}. Use as combinações de busca a seguir como ponto de partida e reformule se necessário: ${queryPack}. NÃO estime, NÃO use memória e NÃO confunda com outro confronto/data/rodada. Público = público presente/total; pagantes é campo separado; renda em reais. Priorize veículos esportivos/jornalísticos robustos (ex.: ge, ESPN, UOL, Gazeta Esportiva, Lance, Terra, Estadão, Folha, O Globo, CNN Brasil, Band/R7/Correio Braziliense esportes) e fontes institucionais da competição. NÃO use sites oficiais de clubes, blogs de torcida, fóruns, redes sociais, casas de apostas ou agregadores sem origem editorial. Cada número precisa ter sua própria URL realmente encontrada no grounding. Se um campo não estiver publicado em fonte robusta, use null. Responda SOMENTE JSON válido, sem markdown, neste formato: {"encontrado":true|false,"publico":integer|null,"publico_pagante":integer|null,"renda":number|null,"fonte_publico":string|null,"fonte_publico_pagante":string|null,"fonte_renda":string|null,"confianca":number,"observacao":"texto"}.`;
 }
 
 export function geminiGroundingSources(raw){
