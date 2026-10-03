@@ -317,6 +317,10 @@ jobs:
           if (h.healthEmailTransport !== 'cloudflare-email') problems.push(`healthEmailTransport=${h.healthEmailTransport}`);
           if (h.healthEmailSender !== 'saude@formuladogol.com.br') problems.push(`healthEmailSender=${h.healthEmailSender}`);
           if (h.healthEmailNoOpenAI !== true) problems.push('healthEmailNoOpenAI!=true');
+          if (h.readinessAlertPolicyVersion !== 'R10.1') problems.push(`readinessAlertPolicyVersion=${h.readinessAlertPolicyVersion}`);
+          if (h.readinessIncidentDedup !== true) problems.push('readinessIncidentDedup!=true');
+          if (h.readinessExactEventIdAuthority !== true) problems.push('readinessExactEventIdAuthority!=true');
+          if (h.readinessHealthDuplicateSuppression !== true) problems.push('readinessHealthDuplicateSuppression!=true');
           if (h.feedbackNotifier !== true) problems.push('feedbackNotifier!=true');
           if (process.env.FEEDBACK_EXPECTED === '1' && h.feedbackNotifierConfigured !== true) problems.push('feedbackNotifierConfigured!=true');
           if (h.liveStatePrimary !== 'worker-espn') problems.push(`liveStatePrimary=${h.liveStatePrimary}`);
@@ -419,7 +423,7 @@ jobs:
             goalScorerEnrichmentPolicyVersion: '6-R9',
             goalRecoveryPolicyVersion: '6-R10R4',
             essentialAlertPolicyVersion: '6-R10R4',
-            readinessVersion: '6-R10',
+            readinessVersion: '6-R10.1',
             fastPollMs: 10000,
           };
           const problems = [];
