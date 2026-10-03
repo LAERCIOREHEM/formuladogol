@@ -4907,75 +4907,95 @@
       ],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: São Paulo x Santos, Brasileirão Série A 2026, jogo adiado da 21ª rodada, nesta sexta-feira, 2 de outubro de 2026, às 20h (horário de Brasília), no MorumBIS. A transmissão integral é de SporTV e Premiere. GE TV não entra na grade da partida: o URL do dossiê é identificado como “Aquecimento ao Vivo”, portanto é conteúdo de pré-jogo, não exibição completa do confronto."
+    },
+    {
+      "event_id": "401841168",
+      "jogo": "Atlético-MG x Bragantino",
+      "data_iso": "2026-10-03T18:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-10-03T17:03:29-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Premiere"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/atletico-mg-x-bragantino-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
+        "https://ge.globo.com/pe/futebol/brasileirao-serie-b/noticia/2026/09/14/serie-b-cbf-define-datas-e-horarios-das-rodadas-31-a-34.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/15/athletico-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/08/22/internacional-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://globoplay.globo.com/v/10918118",
+        "https://globoplay.globo.com/v/12054247",
+        "https://globoplay.globo.com/v/12664746",
+        "https://globoplay.globo.com/v/15011065",
+        "https://globoplay.globo.com/v/5344228",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/atletico-mineiro-x-red-bull-bragantino/832095",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-serie-a/serie-a-sao-paulo-x-santos-e-atletico-mg-x-bragantino-se-enfrentam-em-jogos-adiados-da-21-rodada",
+        "https://www.youtube.com/watch?v=WjBMAJwN7ng",
+        "https://www.youtube.com/watch?v=r6_KBIvzT6U"
+      ],
+      "canais_depois": [
+        "Premiere"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/atletico-mineiro-x-red-bull-bragantino/832095",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-serie-a/serie-a-sao-paulo-x-santos-e-atletico-mg-x-bragantino-se-enfrentam-em-jogos-adiados-da-21-rodada",
+        "https://globoplay.globo.com/v/15011065"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Atlético-MG x Red Bull Bragantino, Brasileirão Série A 2026, fase única, rodada 21 (jogo adiado), sábado, 3 de outubro de 2026, às 18h30 (BRT), na Arena MRV, em Belo Horizonte. A transmissão integral é do Premiere. Não há evidência consultada de transmissão simultânea por outro canal permitido; portanto, exclusividade não foi afirmada."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841169",
-    "jogo": "São Paulo x Santos",
-    "data_iso": "2026-10-02T20:00:00-03:00",
+    "event_id": "401841168",
+    "jogo": "Atlético-MG x Bragantino",
+    "data_iso": "2026-10-03T18:30:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-10-02T18:38:11-03:00",
+    "executado_em": "2026-10-03T17:03:29-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "GE TV",
-      "Premiere",
-      "SporTV"
+      "Premiere"
     ],
-    "status": "corrigido",
+    "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://cbf-hml.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/20008",
-      "https://credencial.cbf.com.br/competicoes/listar/42/1",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/03/21/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-8a-rodada.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/07/29/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-21a-rodada.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/15/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-23a-rodada.ghtml",
-      "https://ge.globo.com/futebol/copa-do-mundo/noticia/2026/07/05/quando-volta-o-brasileirao-eliminacao-do-brasil-faz-torcedores-virarem-a-chave-em-2026.ghtml",
-      "https://ge.globo.com/google/amp/ce/futebol/copa-do-brasil/noticia/2026/04/01/copa-do-brasil-2026-veja-datas-e-horarios-dos-confrontos-da-quinta-fase.ghtml",
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/atletico-mg-x-bragantino-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
+      "https://ge.globo.com/pe/futebol/brasileirao-serie-b/noticia/2026/09/14/serie-b-cbf-define-datas-e-horarios-das-rodadas-31-a-34.ghtml",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/15/athletico-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
       "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/copa-do-brasil/noticia/2026/09/02/santos-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/times/santos/noticia/2026/09/15/cbf-marca-classico-entre-sao-paulo-e-santos-para-o-dia-2-de-outubro.ghtml",
-      "https://sports.sbt.com.br/noticia/sbt-sports/brasileirao-veja-onde-assistir-todos-os-jogos-da-25-rodada-1",
-      "https://www.bol.uol.com.br/esporte/2026/10/02/sao-paulo-x-santos-horario-e-onde-assistir-ao-jogo-do-brasileirao.ghtm",
-      "https://www.cbf.com.br/a-cbf/arbitragem/arbitros/1308/2026",
-      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/337830",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/santos-fc-x-sao-paulo/831901",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/sao-paulo-x-santos-fc/832092",
+      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/08/22/internacional-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://globoplay.globo.com/v/10918118",
+      "https://globoplay.globo.com/v/12054247",
+      "https://globoplay.globo.com/v/12664746",
+      "https://globoplay.globo.com/v/15011065",
+      "https://globoplay.globo.com/v/5344228",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/atletico-mineiro-x-red-bull-bragantino/832095",
       "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-serie-a/serie-a-sao-paulo-x-santos-e-atletico-mg-x-bragantino-se-enfrentam-em-jogos-adiados-da-21-rodada",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil/sub17/com-classico-san-sao-segunda-rodada-do-brasileirao-se-inicia-nesta-quarta",
-      "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/sub-20/2026/20008",
-      "https://www.cnnbrasil.com.br/esportes/brasileirao/sao-paulo-x-santos-horario-e-onde-assistir-ao-jogo-do-brasileirao-2",
-      "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/10/02/calleri-perde-novo-jogo-de-peso-e-deixa-sao-paulo-na-mao-com-suspensao.amp.htm",
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/10/02/jogo-do-santos-hoje-pelo-brasileirao-que-horas-comeca-e-onde-assistir.ghtm",
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/10/02/jogo-do-sao-paulo-hoje-pelo-brasileirao-que-horas-comeca-e-onde-assistir.amp.htm",
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/10/02/onde-vai-passar-sao-paulo-x-santos-pelo-brasileirao-como-assistir-ao-vivo.amp.htm",
-      "https://www.youtube.com/watch?v=MxEmsbr8nJY",
-      "https://www.youtube.com/watch?v=XJvxi5OUtts"
+      "https://www.youtube.com/watch?v=WjBMAJwN7ng",
+      "https://www.youtube.com/watch?v=r6_KBIvzT6U"
     ],
     "canais_depois": [
-      "Premiere",
-      "SporTV"
+      "Premiere"
     ],
     "exclusivo": false,
-    "confianca": 0.98,
+    "confianca": 0.99,
     "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/sao-paulo-x-santos-fc/832092",
-      "https://www.cnnbrasil.com.br/esportes/brasileirao/sao-paulo-x-santos-horario-e-onde-assistir-ao-jogo-do-brasileirao-2",
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/10/02/onde-vai-passar-sao-paulo-x-santos-pelo-brasileirao-como-assistir-ao-vivo.amp.htm"
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/atletico-mineiro-x-red-bull-bragantino/832095",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-serie-a/serie-a-sao-paulo-x-santos-e-atletico-mg-x-bragantino-se-enfrentam-em-jogos-adiados-da-21-rodada",
+      "https://globoplay.globo.com/v/15011065"
     ],
-    "youtube": [
-      {
-        "url": "https://www.youtube.com/watch?v=EJQPkfJBgOE",
-        "scope": "pre_game",
-        "valid_for_match": false,
-        "reason": "O título informado no dossiê é “SÃO PAULO X SANTOS | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026”, caracterizando cobertura de aquecimento/pré-jogo. Não há evidência de transmissão integral da partida nesse URL."
-      }
-    ],
-    "youtube_removidos": [
-      "https://www.youtube.com/watch?v=EJQPkfJBgOE"
-    ],
+    "youtube": [],
+    "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: São Paulo x Santos, Brasileirão Série A 2026, jogo adiado da 21ª rodada, nesta sexta-feira, 2 de outubro de 2026, às 20h (horário de Brasília), no MorumBIS. A transmissão integral é de SporTV e Premiere. GE TV não entra na grade da partida: o URL do dossiê é identificado como “Aquecimento ao Vivo”, portanto é conteúdo de pré-jogo, não exibição completa do confronto."
+    "resumo": "Confirmado para o Brasil: Atlético-MG x Red Bull Bragantino, Brasileirão Série A 2026, fase única, rodada 21 (jogo adiado), sábado, 3 de outubro de 2026, às 18h30 (BRT), na Arena MRV, em Belo Horizonte. A transmissão integral é do Premiere. Não há evidência consultada de transmissão simultânea por outro canal permitido; portanto, exclusividade não foi afirmada."
   },
-  "atualizado_em": "2026-10-02T18:38:11-03:00"
+  "atualizado_em": "2026-10-03T17:03:29-03:00"
 }
