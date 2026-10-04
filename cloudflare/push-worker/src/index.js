@@ -1,7 +1,7 @@
 import { buildPushPayload } from '@block65/webcrypto-web-push';
 import { PushState } from './push-state.js';
 import { SportsMonitor } from './sports-monitor.js';
-import { enrichSportsMonitorLiveFacts } from './monitor-live-facts.js';
+import { enrichSportsMonitorLiveFacts, SPORTS_MONITOR_FACTS_VERSION } from './monitor-live-facts.js';
 import { dispatchStatus, enqueueSportsEvent, handleQueueBatch } from './push-dispatch.js';
 import { opsStatus, runOperationalMaintenance } from './ops.js';
 import { probeEspnSources } from './espn-source.js';
@@ -601,13 +601,15 @@ export default {
         ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok) && Boolean(operational?.ok),
         service: 'formula-do-gol-push',
         version: 9,
-        revision: '6-R10R9-POSTGAME-HUNTER-R8-READINESS-R10.1',
+        revision: '6-R10R9-POSTGAME-HUNTER-R8-READINESS-R10.1-SCORER-R10R5',
         liveGatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
         liveStateContractVersion: LIVE_API_CONSTANTS.LIVE_STATE_CONTRACT_VERSION,
         liveFactsContractVersion: LIVE_API_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
         canonicalLiveFacts: true,
         sportsMonitorFactsAuthority: true,
-        sportsMonitorFactsVersion: 1,
+        sportsMonitorFactsVersion: SPORTS_MONITOR_FACTS_VERSION,
+        sportsMonitorScorerRetention: true,
+        sportsMonitorSummaryScorerRecovery: true,
         liveStatePrimary: 'worker-espn',
         liveStateDirectFallback: true,
         liveStatsFallbackVersion: 5,
@@ -707,15 +709,18 @@ export default {
         ));
         if (monitorMatchesRequest) {
           const mergedFacts = enrichSportsMonitorLiveFacts(monitorFacts, result?.body?.facts || null);
+          const supplementalFactsApplied = mergedFacts?.meta?.supplementalDetailsApplied === true;
+          const supplementalScorerApplied = mergedFacts?.meta?.supplementalScorerApplied === true;
+          const factsAuthority = supplementalScorerApplied ? 'sports-monitor-state+summary-enrichment' : 'sports-monitor-state';
           if (result.status === 200 && result.body && typeof result.body === 'object') {
             result.body = {
               ...result.body,
               factsContractVersion: LIVE_API_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
               facts: mergedFacts,
               factsIntegrity: mergedFacts?.integrity || null,
-              factsAuthority: 'sports-monitor-state',
-              factsMonitorVersion: Number(mergedFacts?.monitorFactsVersion || 1),
-              factsBestKnownApplied: false,
+              factsAuthority,
+              factsMonitorVersion: Number(mergedFacts?.monitorFactsVersion || SPORTS_MONITOR_FACTS_VERSION),
+              factsBestKnownApplied: supplementalFactsApplied,
               goalCount: Number(mergedFacts?.integrity?.observedGoalCount || 0),
               complete: mergedFacts?.integrity?.scoreComplete === true
             };
@@ -733,8 +738,8 @@ export default {
               factsContractVersion: LIVE_API_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
               facts: mergedFacts,
               factsIntegrity: mergedFacts?.integrity || null,
-              factsAuthority: 'sports-monitor-state',
-              factsMonitorVersion: Number(mergedFacts?.monitorFactsVersion || 1),
+              factsAuthority,
+              factsMonitorVersion: Number(mergedFacts?.monitorFactsVersion || SPORTS_MONITOR_FACTS_VERSION),
               expectedHome: Number(mergedFacts?.integrity?.expectedHome || 0),
               expectedAway: Number(mergedFacts?.integrity?.expectedAway || 0),
               expectedGoals: Number(mergedFacts?.integrity?.expectedGoals || 0),

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { buildSportsMonitorLiveFacts, enrichSportsMonitorLiveFacts } from '../src/monitor-live-facts.js';
+import { buildSportsMonitorLiveFacts, enrichSportsMonitorLiveFacts, SPORTS_MONITOR_FACTS_VERSION } from '../src/monitor-live-facts.js';
 import { LIVE_FACTS_CONSTANTS } from '../src/live-facts.js';
 
 function match(scoreHome, scoreAway, plays = {}) {
@@ -17,6 +17,8 @@ function match(scoreHome, scoreAway, plays = {}) {
     bogus: { key: 'bogus', status: 'confirmed', teamId: 'home-1', side: 'home', athleteName: 'Guillermo Varela', homeScoreAfter: 1, awayScoreAfter: 0 }
   }));
   assert.equal(facts.contractVersion, LIVE_FACTS_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION);
+  assert.equal(facts.monitorFactsVersion, SPORTS_MONITOR_FACTS_VERSION);
+  assert.equal(SPORTS_MONITOR_FACTS_VERSION, 2);
   assert.equal(facts.goals.length, 0);
   assert.equal(facts.integrity.expectedGoals, 0);
   assert.equal(facts.integrity.complete, true);
@@ -87,6 +89,67 @@ function match(scoreHome, scoreAway, plays = {}) {
   const enriched = enrichSportsMonitorLiveFacts(base, supplemental);
   assert.equal(enriched.goals[0].scorer, 'Hulk');
   assert.deepEqual(enriched.goals[0].assists, []);
+}
+
+// R10R5 — caso Bernard/CAM x RBB: o monitor já conhece a transição 1x0,
+// mas perdeu o nome. O summary canônico do MESMO placar/equipe pode reidratar
+// a autoria e a integridade precisa ser recalculada no mesmo response.
+{
+  const base = buildSportsMonitorLiveFacts(match(1, 0, {
+    g1: { key: 'g1', status: 'confirmed', teamId: 'home-1', side: 'home', athleteName: '', minute: "18'", homeScoreAfter: 1, awayScoreAfter: 0 }
+  }));
+  assert.equal(base.integrity.status, 'identity-pending');
+  assert.equal(base.integrity.missingScorers, 1);
+  const supplemental = {
+    integrity: { expectedHome: 1, expectedAway: 0, mathematicallyValid: true },
+    goals: [{ teamId: 'home-1', side: 'home', scorerId: 'bernard-1', scorer: 'Bernard', minute: "18'", assists: [], scoreAfter: { home: 1, away: 0 }, sources: ['espn_core_plays'] }]
+  };
+  const enriched = enrichSportsMonitorLiveFacts(base, supplemental);
+  assert.equal(enriched.monitorFactsVersion, 2);
+  assert.equal(enriched.goals[0].scorer, 'Bernard');
+  assert.equal(enriched.goals[0].scorerId, 'bernard-1');
+  assert.equal(enriched.goals[0].identityPending, false);
+  assert.ok(enriched.goals[0].sources.includes('espn-summary-details'));
+  assert.equal(enriched.integrity.scorerResolvedCount, 1);
+  assert.equal(enriched.integrity.missingScorers, 0);
+  assert.equal(enriched.integrity.identityComplete, true);
+  assert.equal(enriched.integrity.complete, true);
+  assert.equal(enriched.integrity.status, 'complete');
+  assert.equal(enriched.meta.supplementalScorerApplied, true);
+  assert.equal(enriched.meta.supplementalScorersApplied, 1);
+  assert.equal(enriched.meta.supplementalDetailsApplied, true);
+}
+
+// Segurança: scorer de outra equipe/lado para a mesma transição não pode ser
+// usado para preencher um placeholder do monitor.
+{
+  const base = buildSportsMonitorLiveFacts(match(1, 0, {
+    g1: { key: 'g1', status: 'confirmed', teamId: 'home-1', side: 'home', athleteName: '', homeScoreAfter: 1, awayScoreAfter: 0 }
+  }));
+  const enriched = enrichSportsMonitorLiveFacts(base, {
+    integrity: { expectedHome: 1, expectedAway: 0, mathematicallyValid: true },
+    goals: [{ teamId: 'away-1', side: 'away', scorer: 'Jogador Visitante', scoreAfter: { home: 1, away: 0 } }]
+  });
+  assert.equal(enriched.goals[0].scorer, '');
+  assert.equal(enriched.integrity.missingScorers, 1);
+}
+
+// Segurança: se duas identidades diferentes disputarem a mesma transição, o
+// sistema conserva o estado pendente em vez de escolher um nome por acaso.
+{
+  const base = buildSportsMonitorLiveFacts(match(1, 0, {
+    g1: { key: 'g1', status: 'confirmed', teamId: 'home-1', side: 'home', athleteName: '', homeScoreAfter: 1, awayScoreAfter: 0 }
+  }));
+  const enriched = enrichSportsMonitorLiveFacts(base, {
+    integrity: { expectedHome: 1, expectedAway: 0, mathematicallyValid: true },
+    goals: [
+      { teamId: 'home-1', side: 'home', scorer: 'Bernard', scoreAfter: { home: 1, away: 0 } },
+      { teamId: 'home-1', side: 'home', scorer: 'Hulk', scoreAfter: { home: 1, away: 0 } }
+    ]
+  });
+  assert.equal(enriched.goals[0].scorer, '');
+  assert.equal(enriched.integrity.status, 'identity-pending');
+  assert.equal(enriched.meta.supplementalScorerApplied, false);
 }
 
 console.log('monitor-live-facts: PASS');

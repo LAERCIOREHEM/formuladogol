@@ -1164,7 +1164,42 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
     const firstSeenAt = existing.firstSeenAt;
     const confirmedAt = existing.confirmedAt;
     const wasScoreFallback = existing.scoreFallback === true;
+
+    // R10R5: detalhes de um gol confirmado são monotônicos. A ESPN pode
+    // alternar entre superfícies ricas e pobres para a mesma transição de
+    // placar; um poll posterior sem athlete jamais pode apagar um marcador
+    // que já foi conhecido/persistido (caso real: Bernard, CAM x RBB).
+    //
+    // Mantemos os campos operacionais mais recentes do play (ordem/período
+    // etc.), mas a identidade e os melhores detalhes passam pela mesma fusão
+    // conservadora usada na reconciliação multi-superfície.
+    const mergedDetails = mergeGoalDetails(existing, play);
+    const existingScorer = text(existing.athleteName);
+    const incomingScorer = text(play.athleteName);
     Object.assign(existing, play, { key: canonicalKey });
+    Object.assign(existing, {
+      athleteId: text(mergedDetails.athleteId),
+      athleteName: text(mergedDetails.athleteName),
+      athleteStructured: mergedDetails.athleteStructured === true,
+      athleteSource: text(mergedDetails.athleteSource),
+      sourceName: text(mergedDetails.sourceName),
+      sources: mergeSourceLists(mergedDetails.sources, []),
+      description: text(mergedDetails.description),
+      ownGoal: mergedDetails.ownGoal === true,
+      penalty: mergedDetails.penalty === true,
+      scoreFallback: mergedDetails.scoreFallback === true
+    });
+    if (!text(existing.teamId) && text(mergedDetails.teamId)) existing.teamId = text(mergedDetails.teamId);
+    if (!text(existing.side) && text(mergedDetails.side)) existing.side = text(mergedDetails.side);
+    if (!text(existing.minute) && text(mergedDetails.minute)) existing.minute = text(mergedDetails.minute);
+    if (!text(existing.sourceId) && text(mergedDetails.sourceId)) existing.sourceId = text(mergedDetails.sourceId);
+    if (mergedDetails.scorerConflict === true) existing.scorerConflict = true;
+    if (Array.isArray(mergedDetails.scorerCandidates) && mergedDetails.scorerCandidates.length) {
+      existing.scorerCandidates = [...mergedDetails.scorerCandidates];
+    }
+    if (existingScorer && !incomingScorer && text(existing.athleteName)) {
+      existing.scorerIdentityPreservedAt = now;
+    }
     existing.firstSeenAt = firstSeenAt;
     existing.confirmedAt = confirmedAt;
     existing.status = preservedStatus;
@@ -1339,7 +1374,7 @@ export const SPORTS_ENGINE_CONSTANTS = Object.freeze({
   OVERTURN_POLICY_VERSION: '6-R10R4',
   GOAL_DETECTION_POLICY_VERSION: '6-R8',
   GOAL_RECONCILIATION_POLICY_VERSION: '6-R9-R1',
-  GOAL_SCORER_ENRICHMENT_POLICY_VERSION: '6-R9',
+  GOAL_SCORER_ENRICHMENT_POLICY_VERSION: '6-R10R5',
   GOAL_RECOVERY_POLICY_VERSION: '6-R10R4',
   ESSENTIAL_ALERT_POLICY_VERSION: '6-R10R4'
 });

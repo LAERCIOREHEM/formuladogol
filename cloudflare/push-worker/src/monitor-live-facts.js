@@ -3,7 +3,7 @@ import { LIVE_FACTS_CONSTANTS } from './live-facts.js';
 function text(value) { return String(value == null ? '' : value).trim(); }
 function num(value, fallback = 0) { const n = Number(value); return Number.isFinite(n) ? n : fallback; }
 
-export const SPORTS_MONITOR_FACTS_VERSION = 1;
+export const SPORTS_MONITOR_FACTS_VERSION = 2;
 function normPlayer(value) {
   return text(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
 }
@@ -130,27 +130,86 @@ function sameGoalState(a, b) {
   return finiteScore(a?.scoreAfter?.home) === finiteScore(b?.scoreAfter?.home)
     && finiteScore(a?.scoreAfter?.away) === finiteScore(b?.scoreAfter?.away);
 }
+function supplementalGoalCompatible(goal, item) {
+  if (!sameGoalState(goal, item)) return false;
+  const itemTeamId = text(item?.teamId);
+  if (itemTeamId && text(goal?.teamId) && itemTeamId !== text(goal.teamId)) return false;
+  const itemSide = text(item?.side);
+  if (itemSide && text(goal?.side) && itemSide !== text(goal.side)) return false;
+  return true;
+}
 function enrichMonitorGoals(goals, supplementalFacts) {
   if (!supplementalFacts || supplementalFacts?.integrity?.mathematicallyValid === false) return goals;
   const supplemental = Array.isArray(supplementalFacts?.goals) ? supplementalFacts.goals : [];
   return goals.map((goal) => {
-    const match = supplemental.find((item) => {
-      if (!sameGoalState(goal, item)) return false;
-      const itemTeamId = text(item?.teamId);
-      if (itemTeamId && text(goal?.teamId) && itemTeamId !== text(goal.teamId)) return false;
-      const itemSide = text(item?.side);
-      if (itemSide && itemSide !== text(goal?.side)) return false;
-      if (!goal?.scorer || !item?.scorer) return false;
-      return normPlayer(goal.scorer) === normPlayer(item.scorer);
-    });
+    const candidates = supplemental.filter((item) => supplementalGoalCompatible(goal, item));
+    if (!candidates.length) return goal;
+
+    const currentScorer = text(goal?.scorer);
+    let match = null;
+    if (currentScorer) {
+      // O monitor stateful continua soberano quando já conhece o autor. O summary
+      // apenas complementa minuto/assistências se concordar com a mesma pessoa.
+      match = candidates.find((item) => text(item?.scorer) && normPlayer(item.scorer) === normPlayer(currentScorer)) || null;
+    } else if (goal?.scorerConflict !== true) {
+      // R10R5: se o monitor conhece matematicamente a transição/equipe mas perdeu
+      // a autoria, o summary canônico pode reidratar o nome. Exigimos identidade
+      // inequívoca: todos os candidatos nomeados compatíveis devem apontar para
+      // o mesmo jogador. Conflito ou ambiguidade mantém o placeholder.
+      const named = candidates.filter((item) => item?.scorerConflict !== true && text(item?.scorer));
+      const byName = new Map();
+      for (const item of named) {
+        const key = normPlayer(item.scorer);
+        if (key && !byName.has(key)) byName.set(key, item);
+      }
+      if (byName.size === 1) match = [...byName.values()][0];
+    }
     if (!match) return goal;
+
+    const scorer = currentScorer || text(match.scorer);
+    const sameScorer = scorer && text(match.scorer) && normPlayer(scorer) === normPlayer(match.scorer);
     return {
       ...goal,
       minute: text(goal.minute || match.minute),
-      assists: Array.isArray(match.assists) ? match.assists.map(text).filter(Boolean) : [],
+      scorerId: currentScorer ? text(goal.scorerId) : text(match.scorerId),
+      scorer,
+      scorerConflict: false,
+      identityPending: !(goal?.ownGoal === true || scorer),
+      assists: sameScorer && Array.isArray(match.assists) ? match.assists.map(text).filter(Boolean) : [],
       sources: [...new Set([...(goal.sources || []), ...(Array.isArray(match.sources) ? match.sources : []), 'espn-summary-details'])]
     };
   });
+}
+
+function integrityForMonitorGoals(goals, baseIntegrity = {}) {
+  const expectedHome = Math.max(0, num(baseIntegrity?.expectedHome, 0));
+  const expectedAway = Math.max(0, num(baseIntegrity?.expectedAway, 0));
+  const expectedGoals = expectedHome + expectedAway;
+  const scorerResolvedCount = goals.filter((goal) => goal?.ownGoal === true || text(goal?.scorer)).length;
+  const teamResolvedCount = goals.filter((goal) => text(goal?.teamId) && text(goal?.team)).length;
+  const observedGoalCount = goals.length;
+  const scoreComplete = observedGoalCount === expectedGoals;
+  const identityComplete = scoreComplete && teamResolvedCount === expectedGoals && scorerResolvedCount === expectedGoals;
+  const mathematicallyValid = scoreComplete && goals.every((goal, index) => {
+    const home = finiteScore(goal?.scoreAfter?.home), away = finiteScore(goal?.scoreAfter?.away);
+    return home != null && away != null && home + away === index + 1 && home <= expectedHome && away <= expectedAway;
+  });
+  return {
+    ...baseIntegrity,
+    expectedHome, expectedAway, expectedGoals,
+    observedGoalCount,
+    teamResolvedCount,
+    scorerResolvedCount,
+    usableGoalCount: scorerResolvedCount,
+    scoreComplete,
+    identityComplete,
+    complete: scoreComplete && identityComplete,
+    mathematicallyValid,
+    missingGoals: Math.max(0, expectedGoals - observedGoalCount),
+    missingTeams: Math.max(0, expectedGoals - teamResolvedCount),
+    missingScorers: Math.max(0, expectedGoals - scorerResolvedCount),
+    status: scoreComplete ? (identityComplete ? 'complete' : 'identity-pending') : 'summary-pending'
+  };
 }
 
 export function buildSportsMonitorLiveFacts(match, supplementalFacts = null) {
@@ -160,32 +219,17 @@ export function buildSportsMonitorLiveFacts(match, supplementalFacts = null) {
   const expectedGoals = expectedHome + expectedAway;
   const rawGoals = buildMonitorScorePath(match);
   const goals = enrichMonitorGoals(rawGoals, supplementalFacts);
-  const scorerResolvedCount = goals.filter((goal) => goal.ownGoal || text(goal.scorer)).length;
-  const teamResolvedCount = goals.filter((goal) => text(goal.teamId) && text(goal.team)).length;
-  const observedGoalCount = goals.length;
-  const scoreComplete = observedGoalCount === expectedGoals;
-  const identityComplete = scoreComplete && teamResolvedCount === expectedGoals && scorerResolvedCount === expectedGoals;
-  const integrity = {
+  const rawGoalVariants = Object.values(match?.plays || {}).filter((play) => play && !play.shootout).length;
+  const integrity = integrityForMonitorGoals(goals, {
     expectedHome, expectedAway, expectedGoals,
-    observedGoalCount,
-    teamResolvedCount,
-    scorerResolvedCount,
-    usableGoalCount: scorerResolvedCount,
-    rawGoalVariants: Object.values(match?.plays || {}).filter((play) => play && !play.shootout).length,
-    discardedGoalVariants: Math.max(0, Object.values(match?.plays || {}).filter((play) => play && !play.shootout).length - observedGoalCount),
-    reconciliationState: 'sports_monitor_persistent_score_path',
-    scoreComplete,
-    identityComplete,
-    complete: scoreComplete && identityComplete,
-    mathematicallyValid: scoreComplete && goals.every((goal, index) => {
-      const h = finiteScore(goal?.scoreAfter?.home), a = finiteScore(goal?.scoreAfter?.away);
-      return h != null && a != null && h + a === index + 1 && h <= expectedHome && a <= expectedAway;
-    }),
-    missingGoals: Math.max(0, expectedGoals - observedGoalCount),
-    missingTeams: Math.max(0, expectedGoals - teamResolvedCount),
-    missingScorers: Math.max(0, expectedGoals - scorerResolvedCount),
-    status: scoreComplete ? (identityComplete ? 'complete' : 'identity-pending') : 'summary-pending'
-  };
+    rawGoalVariants,
+    discardedGoalVariants: Math.max(0, rawGoalVariants - goals.length),
+    reconciliationState: 'sports_monitor_persistent_score_path'
+  });
+  const supplementalScorersApplied = goals.reduce((count, goal, index) => {
+    return count + (!text(rawGoals[index]?.scorer) && text(goal?.scorer) ? 1 : 0);
+  }, 0);
+  const supplementalAssistDetailsApplied = goals.some((goal) => Array.isArray(goal.assists) && goal.assists.length > 0);
   return {
     contractVersion: LIVE_FACTS_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
     monitorFactsVersion: SPORTS_MONITOR_FACTS_VERSION,
@@ -203,7 +247,9 @@ export function buildSportsMonitorLiveFacts(match, supplementalFacts = null) {
       stateful: true,
       source: 'sports-monitor-state',
       lastObservedAt: num(match.lastObservedAt, 0),
-      supplementalDetailsApplied: goals.some((goal) => Array.isArray(goal.assists) && goal.assists.length > 0)
+      supplementalDetailsApplied: supplementalScorersApplied > 0 || supplementalAssistDetailsApplied,
+      supplementalScorerApplied: supplementalScorersApplied > 0,
+      supplementalScorersApplied
     }
   };
 }
@@ -213,12 +259,27 @@ export function enrichSportsMonitorLiveFacts(monitorFacts, supplementalFacts) {
   if (!supplementalFacts || typeof supplementalFacts !== 'object') return monitorFacts;
   const mi = monitorFacts.integrity || {}, si = supplementalFacts.integrity || {};
   if (Number(mi.expectedHome) !== Number(si.expectedHome) || Number(mi.expectedAway) !== Number(si.expectedAway)) return monitorFacts;
-  const goals = enrichMonitorGoals(Array.isArray(monitorFacts.goals) ? monitorFacts.goals : [], supplementalFacts);
+  const originalGoals = Array.isArray(monitorFacts.goals) ? monitorFacts.goals : [];
+  const goals = enrichMonitorGoals(originalGoals, supplementalFacts);
+  const integrity = integrityForMonitorGoals(goals, mi);
+  const supplementalScorersApplied = goals.reduce((count, goal, index) => {
+    return count + (!text(originalGoals[index]?.scorer) && text(goal?.scorer) ? 1 : 0);
+  }, 0);
+  const supplementalAssistDetailsApplied = goals.some((goal, index) => {
+    return (goal?.assists?.length || 0) > (originalGoals[index]?.assists?.length || 0);
+  });
   return {
     ...monitorFacts,
+    monitorFactsVersion: SPORTS_MONITOR_FACTS_VERSION,
     goals,
     appearances: factsAppearances(goals, supplementalFacts),
-    meta: { ...(monitorFacts.meta || {}), supplementalDetailsApplied: goals.some((goal) => Array.isArray(goal.assists) && goal.assists.length > 0) }
+    integrity,
+    meta: {
+      ...(monitorFacts.meta || {}),
+      supplementalDetailsApplied: supplementalScorersApplied > 0 || supplementalAssistDetailsApplied,
+      supplementalScorerApplied: supplementalScorersApplied > 0,
+      supplementalScorersApplied
+    }
   };
 }
 

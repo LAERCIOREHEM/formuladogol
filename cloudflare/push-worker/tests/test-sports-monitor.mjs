@@ -137,7 +137,7 @@ try {
   assert.equal(row[14], 'João Pedro');
   status = await monitor.publicStatus();
   assert.equal(status.goalReconciliationPolicyVersion, '6-R9-R1');
-  assert.equal(status.goalScorerEnrichmentPolicyVersion, '6-R9');
+  assert.equal(status.goalScorerEnrichmentPolicyVersion, '6-R10R5');
   assert.equal(status.scorerMissingAtDispatch, 0, 'R9 não deve despachar sem autor quando CORE já o publicou');
   assert.ok(numForTest(status.scorerSources.espn_core_plays) >= 1, 'telemetria deve atribuir a autoria ao CORE');
   assert.equal(status.goalReconciliation[eventId].scoreboardGoals, 1);
@@ -147,6 +147,8 @@ try {
   const liveFactsResponse = await monitor.fetch(new Request(`https://internal/live-facts?event=${eventId}`));
   assert.equal(liveFactsResponse.status, 200);
   const liveFactsPayload = await liveFactsResponse.json();
+  assert.equal(liveFactsPayload.monitorFactsVersion, 2);
+  assert.equal(liveFactsPayload.facts.monitorFactsVersion, 2);
   assert.equal(liveFactsPayload.facts.authority, 'sports-monitor-state');
   assert.equal(liveFactsPayload.facts.integrity.expectedGoals, 1);
   assert.equal(liveFactsPayload.facts.goals.length, 1);

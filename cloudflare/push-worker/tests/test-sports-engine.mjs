@@ -263,7 +263,23 @@ assert.doesNotMatch(scorerStep.emitted[0].notificationDraft.body, /Autoria aguar
 assert.match(scorerStep.emitted[0].notificationDraft.body, /63'/);
 const knownScorer = extractScoringPlays(summary(goal('scorer', '2022', 'p3', "63'", 0, 1)), scorerOne);
 scorerStep = applyObservation(scorerState, scorerOne, knownScorer, t0 + 41_000);
+scorerState = scorerStep.match;
 assert.equal(scorerStep.emitted.length, 0, 'autoria tardia atualiza estado sem duplicar o gol');
+assert.equal(scorerState.plays[`${game.eventId}:scorer`].athleteName, 'Lucas Lima');
+
+// R10R5 — regressão Bernard/CAM x RBB: depois de aprender o autor, uma
+// superfície ESPN mais pobre para o MESMO gol não pode apagar a identidade.
+const poorScorerPoll = extractScoringPlays(summary({
+  id: 'scorer', scoringPlay: true, team: { id: '2022' },
+  clock: { displayValue: "63'" }, homeScore: 0, awayScore: 1,
+  text: 'Goal', type: { text: 'Goal' }
+}), scorerOne, 'espn_cdn_league_playbyplay');
+scorerStep = applyObservation(scorerState, scorerOne, poorScorerPoll, t0 + 51_000);
+scorerState = scorerStep.match;
+assert.equal(scorerStep.emitted.length, 0, 'poll pobre não duplica o gol confirmado');
+assert.equal(scorerState.plays[`${game.eventId}:scorer`].athleteName, 'Lucas Lima', 'autor conhecido não pode regredir para vazio');
+assert.equal(scorerState.plays[`${game.eventId}:scorer`].athleteId, 'p3', 'ID estruturado do autor também deve ser preservado');
+assert.equal(scorerState.plays[`${game.eventId}:scorer`].scorerIdentityPreservedAt, t0 + 51_000);
 
 // R8: quando a ESPN ainda não entrega athlete estruturado, tentamos enriquecer
 // a autoria pelo texto da jogada durante a própria janela anti-VAR.
@@ -524,7 +540,7 @@ assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_LATE_SUPPRESS_MS, 180_000);
 assert.equal(SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION, '6-R10R4');
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION, '6-R8');
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_RECONCILIATION_POLICY_VERSION, '6-R9-R1');
-assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_SCORER_ENRICHMENT_POLICY_VERSION, '6-R9');
+assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_SCORER_ENRICHMENT_POLICY_VERSION, '6-R10R5');
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_RECOVERY_POLICY_VERSION, '6-R10R4');
 assert.equal(SPORTS_ENGINE_CONSTANTS.ESSENTIAL_ALERT_POLICY_VERSION, '6-R10R4');
 
