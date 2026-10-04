@@ -247,6 +247,18 @@ jobs:
           NODE
           )"
 
+          EXPECTED_MONITOR_FACTS="$(node --input-type=module <<'NODE'
+          import { SPORTS_MONITOR_FACTS_VERSION } from './src/monitor-live-facts.js';
+          process.stdout.write(String(SPORTS_MONITOR_FACTS_VERSION));
+          NODE
+          )"
+
+          EXPECTED_SCORER_POLICY="$(node --input-type=module <<'NODE'
+          import { SPORTS_ENGINE_CONSTANTS } from './src/sports-engine.js';
+          process.stdout.write(String(SPORTS_ENGINE_CONSTANTS.GOAL_SCORER_ENRICHMENT_POLICY_VERSION));
+          NODE
+          )"
+
           # Versão da política pós-jogo lida do próprio código publicado.
           EXPECTED_POSTGAME="$(node <<'NODE'
           const fs = require('fs');
@@ -257,7 +269,7 @@ jobs:
           NODE
           )"
 
-          echo "Esperado pelo código local: revision=${EXPECTED_REVISION}; gateway=${EXPECTED_GATEWAY}; stateContract=${EXPECTED_STATE_CONTRACT}; factsContract=${EXPECTED_FACTS_CONTRACT}; statsFallback=${EXPECTED_STATS_FALLBACK}; postgame=${EXPECTED_POSTGAME}"
+          echo "Esperado pelo código local: revision=${EXPECTED_REVISION}; gateway=${EXPECTED_GATEWAY}; stateContract=${EXPECTED_STATE_CONTRACT}; factsContract=${EXPECTED_FACTS_CONTRACT}; monitorFacts=${EXPECTED_MONITOR_FACTS}; scorerPolicy=${EXPECTED_SCORER_POLICY}; statsFallback=${EXPECTED_STATS_FALLBACK}; postgame=${EXPECTED_POSTGAME}"
 
           READY=0
           for i in 1 2 3 4 5 6 7 8 9 10; do
@@ -268,6 +280,7 @@ jobs:
                  EXPECTED_STATS_FALLBACK="$EXPECTED_STATS_FALLBACK" \
                  EXPECTED_STATE_CONTRACT="$EXPECTED_STATE_CONTRACT" \
                  EXPECTED_FACTS_CONTRACT="$EXPECTED_FACTS_CONTRACT" \
+                 EXPECTED_MONITOR_FACTS="$EXPECTED_MONITOR_FACTS" \
                  EXPECTED_POSTGAME="$EXPECTED_POSTGAME" \
                  AIG_AUTH_EXPECTED="${FDG_PUSH_AI_GATEWAY_TOKEN:+1}" \
                  API_FOOTBALL_EXPECTED="${FDG_PUSH_API_FOOTBALL_KEY:+1}" \
@@ -280,6 +293,7 @@ jobs:
           const expectedFallback = Number(process.env.EXPECTED_STATS_FALLBACK);
           const expectedStateContract = Number(process.env.EXPECTED_STATE_CONTRACT);
           const expectedFactsContract = Number(process.env.EXPECTED_FACTS_CONTRACT);
+          const expectedMonitorFacts = Number(process.env.EXPECTED_MONITOR_FACTS);
           const expectedPostgame = Number(process.env.EXPECTED_POSTGAME);
           const problems = [];
           if (h.ok !== true) problems.push(`ok=${h.ok}`);
@@ -298,7 +312,9 @@ jobs:
           }
           if (h.canonicalLiveFacts !== true) problems.push('canonicalLiveFacts!=true');
           if (h.sportsMonitorFactsAuthority !== true) problems.push('sportsMonitorFactsAuthority!=true');
-          if (Number(h.sportsMonitorFactsVersion) !== 1) problems.push(`sportsMonitorFactsVersion=${h.sportsMonitorFactsVersion}`);
+          if (Number(h.sportsMonitorFactsVersion) !== expectedMonitorFacts) problems.push(`sportsMonitorFactsVersion=${h.sportsMonitorFactsVersion} esperado=${expectedMonitorFacts}`);
+          if (h.sportsMonitorScorerRetention !== true) problems.push('sportsMonitorScorerRetention!=true');
+          if (h.sportsMonitorSummaryScorerRecovery !== true) problems.push('sportsMonitorSummaryScorerRecovery!=true');
           if (h.postgameFastlane !== true) problems.push('postgameFastlane!=true');
           if (Number(h.postgameFastlaneVersion) !== expectedPostgame) problems.push(`postgameFastlaneVersion=${h.postgameFastlaneVersion} esperado=${expectedPostgame}`);
           if (Number(h.postgameAttendanceHunterVersion) !== 6) problems.push(`postgameAttendanceHunterVersion=${h.postgameAttendanceHunterVersion}`);
@@ -412,7 +428,7 @@ jobs:
           NODE
 
           curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status >/tmp/fdg-monitor-status.json
-          node <<'NODE'
+          EXPECTED_SCORER_POLICY="$EXPECTED_SCORER_POLICY" node <<'NODE'
           const fs = require('fs');
           const m = JSON.parse(fs.readFileSync('/tmp/fdg-monitor-status.json', 'utf8'));
           const expected = {
@@ -420,7 +436,7 @@ jobs:
             overturnPolicyVersion: '6-R10R4',
             livePolicyVersion: '6-R10',
             goalReconciliationPolicyVersion: '6-R9-R1',
-            goalScorerEnrichmentPolicyVersion: '6-R9',
+            goalScorerEnrichmentPolicyVersion: process.env.EXPECTED_SCORER_POLICY,
             goalRecoveryPolicyVersion: '6-R10R4',
             essentialAlertPolicyVersion: '6-R10R4',
             readinessVersion: '6-R10.1',
