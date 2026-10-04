@@ -57,6 +57,8 @@ on:
       - 'js/br-estatisticas.js'
       - 'js/br-estatisticas-ordem.js'
       - 'js/br-classificacao-live.js'
+      - 'js/br-resultados-freshness.js'
+      - 'cloudflare/push-worker/tests/test-resultados-freshness.mjs'
       - 'tests/test-br-classificacao-live.mjs'
       - 'js/br-acuracia.js'
       - 'js/br-feedback.js'
@@ -126,8 +128,11 @@ jobs:
           node --check js/br-classificacao-live.js
           node --check js/br-estatisticas.js
           node --check js/br-aovivo.js
+          node --check js/br-resultados-freshness.js
           node tests/test-br-classificacao-live.mjs
+          node cloudflare/push-worker/tests/test-resultados-freshness.mjs
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' index.html
+          grep -q 'br-resultados-freshness.js?v=20261004-r10r9' index.html
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' estatisticas.html
           grep -q 'br-estatisticas.js?v=20260920-live-facts-v6' estatisticas.html
           grep -q 'br-aovivo.js?v=20260920-monitor-facts-v7' aovivo.html
@@ -213,6 +218,7 @@ jobs:
             js/br-estatisticas.js
             js/br-estatisticas-ordem.js
             js/br-classificacao-live.js
+            js/br-resultados-freshness.js
             js/br-acuracia.js
             js/br-feedback.js
             js/br-menu.js

@@ -338,11 +338,15 @@ jobs:
           if (h.postgameOfficialClubSourcesScoped !== true) problems.push('postgameOfficialClubSourcesScoped!=true');
           if (h.postgameRegionalEditorialSources !== true) problems.push('postgameRegionalEditorialSources!=true');
           if (h.postgameDeterministicFichaTecnicaExtraction !== true) problems.push('postgameDeterministicFichaTecnicaExtraction!=true');
-          if (h.postgamePendingRequeueOnV9 !== true) problems.push('postgamePendingRequeueOnV9!=true');
+          if (h.postgamePendingRequeueOnV10 !== true) problems.push('postgamePendingRequeueOnV10!=true');
           if (h.postgameGeminiInteractionsApi !== true) problems.push('postgameGeminiInteractionsApi!=true');
           if (h.postgameGeminiInteractionsDirect !== true) problems.push('postgameGeminiInteractionsDirect!=true');
           if (h.postgameGeminiAiGatewayBypassForWebSearch !== true) problems.push('postgameGeminiAiGatewayBypassForWebSearch!=true');
           if (h.postgameGeminiSearchObservedFromSteps !== true) problems.push('postgameGeminiSearchObservedFromSteps!=true');
+          if (h.postgameGeminiDiscoveryOnly !== true) problems.push('postgameGeminiDiscoveryOnly!=true');
+          if (h.postgameGeminiStructuredOutputDuringSearch !== false) problems.push('postgameGeminiStructuredOutputDuringSearch!=false');
+          if (h.postgameGeminiCircuitBreaker !== true) problems.push('postgameGeminiCircuitBreaker!=true');
+          if (h.postgameGeminiSearchProbe !== true) problems.push('postgameGeminiSearchProbe!=true');
           if (h.postgameGeminiGenerateContentDirectFallback !== true) problems.push('postgameGeminiGenerateContentDirectFallback!=true');
           if (h.postgameOpenAiImmediateFallbackAfterGeminiFailure !== true) problems.push('postgameOpenAiImmediateFallbackAfterGeminiFailure!=true');
           if (h.postgameOpenAiRequiredWebSearch !== true) problems.push('postgameOpenAiRequiredWebSearch!=true');
@@ -399,7 +403,7 @@ jobs:
             exit 1
           fi
 
-          # Hunter v9 precisa não apenas estar publicado: o cron de 1 minuto deve
+          # Hunter v10 precisa não apenas estar publicado: o cron de 1 minuto deve
           # ter executado a política nova e reaberto imediatamente as pendências.
           POSTGAME_READY=0
           for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
@@ -424,6 +428,10 @@ jobs:
           if (s.geminiInteractionsDirect !== true) problems.push('geminiInteractionsDirect!=true');
           if (s.geminiAiGatewayBypassForWebSearch !== true) problems.push('geminiAiGatewayBypassForWebSearch!=true');
           if (s.geminiSearchObservedFromSteps !== true) problems.push('geminiSearchObservedFromSteps!=true');
+          if (s.geminiDiscoveryOnly !== true) problems.push('geminiDiscoveryOnly!=true');
+          if (s.geminiStructuredOutputDuringSearch !== false) problems.push('geminiStructuredOutputDuringSearch!=false');
+          if (s.geminiCircuitBreaker !== true) problems.push('geminiCircuitBreaker!=true');
+          if (!s.geminiCircuit || !['open','closed'].includes(s.geminiCircuit.state)) problems.push('geminiCircuit ausente/inválido');
           if (s.geminiGenerateContentDirectFallback !== true) problems.push('geminiGenerateContentDirectFallback!=true');
           if (s.openAiImmediateFallbackAfterGeminiFailure !== true) problems.push('openAiImmediateFallbackAfterGeminiFailure!=true');
           if (s.openAiRequiredWebSearch !== true) problems.push('openAiRequiredWebSearch!=true');
@@ -432,7 +440,7 @@ jobs:
           if (s.publicPersistentUntilResolved !== true) problems.push('publicPersistentUntilResolved!=true');
           if (Number(s.publicGaveUp || 0) !== 0) problems.push(`publicGaveUp=${s.publicGaveUp}`);
           if (!(s.mailer && s.mailer.transport === 'cloudflare-email' && s.mailer.configured === true)) problems.push(`mailer=${JSON.stringify(s.mailer||null)}`);
-          if (problems.length) { console.error('Hunter v9 ainda não executou o contrato novo: ' + problems.join(' | ')); process.exit(1); }
+          if (problems.length) { console.error('Hunter v10 ainda não executou o contrato novo: ' + problems.join(' | ')); process.exit(1); }
           console.log(`Hunter v${s.version} EXECUTADO: storedPolicy=${s.storedPolicyVersion}; searchProfile=${s.searchProfileVersion}; total=${Number(s.total||0)} pending=${Number(s.publicPending||0)} overdue=${Number(s.publicOverdue||0)} budgetGuard=${Number(s.publicBudgetGuard||0)}.`);
           console.log(`E-mail do Worker: ${s.mailer.transport} (fallbacks: ${(s.mailer.fallbacks||[]).join(', ') || 'nenhum'})`);
           NODE
@@ -441,16 +449,40 @@ jobs:
                 break
               fi
             fi
-            echo "Aguardando primeiro cron do Attendance Hunter v9 (${i}/15)..."
+            echo "Aguardando primeiro cron do Attendance Hunter v10 (${i}/15)..."
             sleep 6
           done
           if [ "$POSTGAME_READY" -ne 1 ]; then
-            echo 'ERRO: Attendance Hunter v9 foi publicado, mas o cron novo não concluiu uma execução dentro da janela de smoke test.'
+            echo 'ERRO: Attendance Hunter v10 foi publicado, mas o cron novo não concluiu uma execução dentro da janela de smoke test.'
             cat /tmp/fdg-postgame-status.json 2>/dev/null || true
             exit 1
           fi
 
-          # Prova que a telemetria de diagnóstico v9 existe e que o endpoint já
+          # PROVA LIVE independente de pendências: executa (ou reutiliza por até 15 min)
+          # uma pesquisa Gemini real e exige google_search observado + fonte citada.
+          PROBE_HTTP="$(curl -sS --max-time 45 -o /tmp/fdg-gemini-probe.json -w '%{http_code}' 'https://push.formuladogol.com.br/v1/postgame/search-probe' || true)"
+          PROBE_HTTP="$PROBE_HTTP" EXPECTED_POSTGAME="$EXPECTED_POSTGAME" node <<'NODE'
+          const fs = require('fs');
+          let p = null;
+          try { p = JSON.parse(fs.readFileSync('/tmp/fdg-gemini-probe.json', 'utf8')); } catch (_) {}
+          const problems = [];
+          if (process.env.PROBE_HTTP !== '200') problems.push(`http=${process.env.PROBE_HTTP}`);
+          if (!p || p.ok !== true) problems.push(`ok=${p?.ok}`);
+          if (Number(p?.policyVersion) !== Number(process.env.EXPECTED_POSTGAME || 0)) problems.push(`policyVersion=${p?.policyVersion}`);
+          if (p?.searchObserved !== true) problems.push('searchObserved!=true');
+          if (Number(p?.searchCalls || 0) < 1) problems.push(`searchCalls=${p?.searchCalls}`);
+          if (Number(p?.sourcesFound || 0) < 1) problems.push(`sourcesFound=${p?.sourcesFound}`);
+          if (p?.circuit?.open === true) problems.push(`circuit=open até ${p?.circuit?.openUntil}`);
+          if (problems.length) {
+            console.error('PROVA GEMINI SEARCH FALHOU: ' + problems.join(' | '));
+            console.error(JSON.stringify(p, null, 2));
+            process.exit(1);
+          }
+          console.log(`PROVA GEMINI SEARCH OK: calls=${p.searchCalls}; sources=${p.sourcesFound}; route=${p.route}; cached=${p.cached}.`);
+          console.log(`Fontes-amostra: ${(p.sampleSources || []).join(' | ')}`);
+          NODE
+
+          # Prova que a telemetria de diagnóstico v10 existe e que o endpoint já
           # expõe contadores de busca real por provedor.
           curl -fsS --max-time 10 'https://push.formuladogol.com.br/v1/postgame' >/tmp/fdg-postgame-rows.json
           node <<'NODE'
@@ -462,7 +494,7 @@ jobs:
           }
           for (const row of p.rows.slice(0, 3)) {
             if (!row.public_search || !row.public_search.gemini || !row.public_search.openai) {
-              console.error('Telemetria v9 ausente no /v1/postgame:', row.event_id);
+              console.error('Telemetria v10 ausente no /v1/postgame:', row.event_id);
               process.exit(1);
             }
           }
