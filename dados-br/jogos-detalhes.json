@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-03T20:41:43.966857-03:00",
+  "gerado_em": "2026-10-04T04:11:30.503682-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 279,
   "total_com_estatisticas": 279,
-  "total_com_publico": 278,
+  "total_com_publico": 279,
   "total_com_eventos": 279,
   "total_com_jogadores": 279,
   "total_eventos_validados": 279,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Arena MRV",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 22159,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/03/atletico-mg-vence-o-red-bull-bragantino-em-jogo-com-lance-dramatico-na-arena-mrv.htm",
       "arbitro": "",
       "stats": [
         {
@@ -553,7 +553,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-03T20:41:41.655718-03:00"
+      "atualizado_em": "2026-10-03T20:41:41.655718-03:00",
+      "renda": 1002775.79
     },
     "401841169": {
       "event_id": "401841169",
@@ -157525,5 +157526,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 267,
+  "total_com_renda": 279
 }
