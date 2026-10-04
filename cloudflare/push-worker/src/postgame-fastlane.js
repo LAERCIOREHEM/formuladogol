@@ -2,7 +2,7 @@ import { fetchEspnSummary } from './espn-source.js';
 import { sendMail, probeMail, mailConfig, maskAddress } from './mailer.js';
 import { countWebSearchCalls, recordAiUsage, recordProviderUsage, postgamePublicCostSummary } from './ai-usage.js';
 import { searchPublicWithGemini, fetchSourceText, extractPublicWithWorkersAI, fetchOpenAiResponses, openAiUsage } from './ai-router.js';
-import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, sourceTextMatchesTask, buildAttendanceSearchQueries, attendanceSourcePolicyText, PREFERRED_EDITORIAL_SOURCE_SUFFIXES } from './postgame-search-profile.js';
+import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, sourceTextMatchesTask, buildAttendanceSearchQueries, attendanceSourcePolicyText, officialClubDomainsForTask, PREFERRED_EDITORIAL_SOURCE_SUFFIXES } from './postgame-search-profile.js';
 
 const DEFAULT_SITE_BASE = 'https://formuladogol.com.br';
 // Fase definitiva (uma única chamada por partida). O Sol é reservado a ela e aos editoriais.
@@ -13,21 +13,21 @@ const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
-const POSTGAME_POLICY_VERSION = 8;
+const POSTGAME_POLICY_VERSION = 9;
 
 /*
- * Attendance/Revenue Hunter v8 — Forced Web Search + Source Recovery:
- *   - Reutiliza aliases de TODOS os clubes no Gemini e no OpenAI.
- *   - Aceita imprensa nacional/regional + sites oficiais SOMENTE dos dois clubes
- *     participantes, exclusivamente para fatos documentais de ficha técnica.
- *   - Parser determinístico extrai rótulos explícitos de público/pagantes/renda
- *     antes de gastar Workers AI.
- *   - Gemini reforçado entre T+20 e T+70; OpenAI segue como fallback controlado.
- *   - Gemini Interactions API exige uma chamada real ao Google Search e expõe passos/fontes.
- *   - Resposta do Gateway sem busca/fontes força retry direto; generateContent fica só como contingência.
- *   - Toda URL descoberta pelo OpenAI é cacheada mesmo quando o payload numérico é rejeitado.
- *   - Diagnóstico por provedor separa API calls, buscas reais, fontes e último resultado.
- *   - Upgrade v8 reabre imediatamente toda pendência para validar o algoritmo novo.
+ * Attendance/Revenue Hunter v9 — Direct Gemini + Immediate OpenAI Failover:
+ *   - Mantém aliases de TODOS os clubes, imprensa nacional/regional e sites oficiais
+ *     SOMENTE dos dois participantes para fatos documentais de ficha técnica.
+ *   - Gemini Interactions usa diretamente o endpoint oficial Google, com payload
+ *     mínimo documentado; sem AI Gateway, tool_choice forçado ou sampling legado.
+ *   - Se Gemini não executar busca real, não expuser fontes ou não resolver o jogo
+ *     após T+45, OpenAI Web Search entra NO MESMO CICLO (respeitando budget).
+ *   - OpenAI usa tool_choice=required e allowlist de domínios editoriais/oficiais.
+ *   - Qualquer URL encontrada é cacheada antes da validação dos números e passa pelo
+ *     parser determinístico; Workers AI só extrai páginas que o parser não resolver.
+ *   - Erros HTTP reais do Gemini ficam visíveis na telemetria, sem serem apagados.
+ *   - Upgrade v9 reabre imediatamente toda pendência para executar a nova cascata.
  *   - Nunca existe GAVE_UP para público/renda.
  */
 export const PUBLIC_POLICY = Object.freeze({
@@ -363,7 +363,8 @@ export function publicSearchRequest(task, missing, env, phase = 'openai') {
       properties:{encontrado:{type:'boolean'},publico:{type:['integer','null']},publico_pagante:{type:['integer','null']},renda:{type:['number','null']},fonte_publico:{type:['string','null']},fonte_publico_pagante:{type:['string','null']},fonte_renda:{type:['string','null']},confianca:{type:'number'},observacao:{type:'string'}},
       required:['encontrado','publico','publico_pagante','renda','fonte_publico','fonte_publico_pagante','fonte_renda','confianca','observacao']
     } } },
-    tools:[{type:'web_search',search_context_size:'medium',user_location:{type:'approximate',country:'BR',timezone:'America/Sao_Paulo'}}],
+    tools:[{type:'web_search',search_context_size:'medium',filters:{allowed_domains:[...new Set([...PREFERRED_EDITORIAL_SOURCE_SUFFIXES,...officialClubDomainsForTask(task)])].slice(0,100)},user_location:{type:'approximate',country:'BR',timezone:'America/Sao_Paulo'}}],
+    // OpenAI Responses documenta `required` quando a busca precisa realmente rodar.
     tool_choice:'required', max_tool_calls:PUBLIC_POLICY.openaiMaxToolCalls, max_output_tokens:3000,
     include:['web_search_call.action.sources'], reasoning:{effort:'low'}
   };
@@ -411,7 +412,7 @@ export async function searchPublicWithOpenAI(env, task, phase = 'openai') {
     }
     const raw = await response.json();
     const webSearchCalls = countWebSearchCalls(raw);
-    // IMPORTANTE v8: captura TODAS as URLs descobertas antes de validar o JSON.
+    // IMPORTANTE v9: captura TODAS as URLs descobertas antes de validar o JSON.
     // Mesmo que o modelo erre um número/URL de campo, o cache poderá abrir a
     // matéria e resolver a ficha de forma determinística no próximo passo.
     const discoveredSources=[...extractOpenAISources(raw)];
@@ -912,6 +913,15 @@ export function planPublicStep(task, ai, now = Date.now(), budget = { allowGemin
   return{phase:'deterministic',ageMinutes};
 }
 
+export function shouldImmediateOpenAiFallback({ageMinutes=0,forcedV9=false,budget={allowOpenAI:true},complete=false}={}) {
+  // Se depois do Gemini ainda faltam público OU renda, a partir de T+45 a
+  // contingência OpenAI entra no mesmo ciclo. Na primeira passada da v9,
+  // `forcedV9` antecipa essa regra para qualquer pendência elegível. Não usamos
+  // `found`/`sources` como trava: um resultado parcial também precisa de fallback.
+  if(complete || budget?.allowOpenAI===false) return false;
+  return Boolean(forcedV9) || Number(ageMinutes||0)>=45;
+}
+
 export function nextPublicAttemptMs(task, phaseDone, nextPlan, now=Date.now(), ai={}) {
   const end=taskEndMs(task,now); const ageMinutes=Math.max(0,(now-end)/60_000); const floor=now+60_000;
   if(nextPlan.phase==='openai'||nextPlan.phase==='gemini') return floor;
@@ -1024,28 +1034,27 @@ async function processPublicTask(env, task, now = Date.now()) {
   const values={publico:num(task.publico),publico_pagante:num(task.publico_pagante),renda:num(task.renda)};
   let sources=safeJson(task.public_sources_json,{})||{};
   let next={...ai,sol_completed:0};
-  // v8: não apaga diagnóstico útil só porque uma passada determinística não
+  // v9: não apaga diagnóstico útil só porque uma passada determinística não
   // produziu erro. O último erro só some quando público+renda forem resolvidos.
   let lastError=text(task.public_last_error);
   let costSummary=null;
   let budget={allowGemini:true,allowOpenAI:true,hardStop:false,reason:''};
   const ageMinutesAtStart=Math.max(0,(now-taskEndMs(task,now))/60_000);
 
-  // A primeira execução v8 de cada pendência DEVE comprovar uma busca Google
-  // real. A tabela 0014 nasce vazia, portanto isso independe dos contadores
-  // históricos da v7 e não exige editar manualmente a partida.
-  const forceGeminiV8=ageMinutesAtStart>=PUBLIC_POLICY.aiStartMinutes && Number(diag.gemini_search_calls||0)<1;
-  let plan=forceGeminiV8?{phase:'gemini',ageMinutes:ageMinutesAtStart,forcedV8:true}:planPublicStep(task,ai,now,budget);
+  // O upgrade v9 marca cada pendência no próprio row. Assim a primeira passada
+  // executa a cascata nova mesmo que existam contadores históricos de v7/v8.
+  const forceGeminiV9=ageMinutesAtStart>=PUBLIC_POLICY.aiStartMinutes && text(task.public_last_error)==='requeued_attendance_hunter_v9_direct_gemini_openai_failover';
+  let plan=forceGeminiV9?{phase:'gemini',ageMinutes:ageMinutesAtStart,forcedV9:true}:planPublicStep(task,ai,now,budget);
 
   // Antes de uma busca paga/grounded, avalia o budget usando o ledger real.
   if(plan.phase==='gemini'||plan.phase==='openai'){
     costSummary=await postgamePublicCostSummary(env,now,eventId);
     budget=publicBudgetDecision(env,costSummary);
-    if(plan.forcedV8){
-      if(budget.allowGemini===false) plan={phase:'budget_guard',ageMinutes:ageMinutesAtStart,forcedV8:true};
+    if(plan.forcedV9){
+      if(budget.allowGemini===false) plan={phase:'budget_guard',ageMinutes:ageMinutesAtStart,forcedV9:true};
     }else plan=planPublicStep(task,ai,now,budget);
   }
-  next.last_phase=plan.phase+(plan.forcedV8?':forced-v8':'');
+  next.last_phase=plan.phase+(plan.forcedV9?':forced-v9':'');
 
   // ESPN continua sendo consultada enquanto faltar público. É gratuita e pode
   // resolver o campo sem gastar busca web.
@@ -1063,6 +1072,7 @@ async function processPublicTask(env, task, now = Date.now()) {
   }
 
   let forceRetrySoon=false;
+  let immediateOpenAiFallback=false;
   if(!isPublicComplete(values)&&plan.phase==='gemini'){
     const missing=missingPublicFields(values);
     const found=await searchPublicWithGemini(env,{...task,...values},missing);
@@ -1097,15 +1107,22 @@ async function processPublicTask(env, task, now = Date.now()) {
       : refreshed.foundAny?'source_recovery_partial':'sources_cached_no_values';
     await recordSearchDiag(env,eventId,'gemini',found,outcome,now);
     if(!isPublicComplete(values)) lastError=text(found.reason)||text(refreshed.lastError)||outcome||lastError;
-    if(plan.forcedV8&&Number(found.searchCalls||0)<1)forceRetrySoon=true;
+
+    // Failover no MESMO ciclo: para partidas com >=45min, qualquer busca Gemini
+    // que não resolva público+renda aciona OpenAI. Na primeira execução v9 isso
+    // também vale imediatamente para pendências antigas, como a que motivou o hotfix.
+    const geminiInfraFailure=Number(found.searchCalls||0)<1 || discovered.length<1 || Number(found.httpStatus||0)>=400;
+    immediateOpenAiFallback=shouldImmediateOpenAiFallback({ageMinutes:ageMinutesAtStart,forcedV9:plan.forcedV9===true,budget,geminiResult:found,discoveredCount:discovered.length,refreshedFoundAny:refreshed.foundAny,complete:isPublicComplete(values)});
+    if(!isPublicComplete(values)&&geminiInfraFailure&&!immediateOpenAiFallback) forceRetrySoon=true;
   }
 
-  if(!isPublicComplete(values)&&plan.phase==='openai'){
-    const found=await searchPublicWithOpenAI(env,{...task,...values},'openai');
+  if(!isPublicComplete(values)&&(plan.phase==='openai'||immediateOpenAiFallback)){
+    const openAiPhase=immediateOpenAiFallback?'openai:fallback-after-gemini':'openai';
+    const found=await searchPublicWithOpenAI(env,{...task,...values},openAiPhase);
     next.last_model=text(found.model);
     next.sol_attempts=Number(next.sol_attempts||0)+1;
 
-    // v8: URLs do web_search são persistidas SEM depender da aprovação do JSON.
+    // v9: URLs do web_search são persistidas SEM depender da aprovação do JSON.
     // Assim uma matéria correta nunca se perde só porque o modelo formatou um
     // número ou fonte de campo de maneira imperfeita.
     const discovered=found.discoveredSources||found.rawSources||Object.values(found.sources||{});
@@ -1128,12 +1145,14 @@ async function processPublicTask(env, task, now = Date.now()) {
       : discovered.length<1?'real_search_no_sources'
       : refreshed.foundAny?'source_recovery_partial':'sources_cached_no_values';
     await recordSearchDiag(env,eventId,'openai',found,outcome,now);
+    if(immediateOpenAiFallback) next.last_phase=`${plan.phase}${plan.forcedV9?':forced-v9':''}->openai:fallback`;
     if(!isPublicComplete(values)) lastError=text(found.reason)||text(refreshed.lastError)||outcome||lastError;
+    if(!isPublicComplete(values)&&Number(found.searchCalls||0)<1) forceRetrySoon=true;
   }
 
   // Recalcula custo após qualquer tentativa cara para o próximo agendamento e
   // para o alerta de SLA.
-  if(plan.phase==='gemini'||plan.phase==='openai'||taskEndMs(task,now)+PUBLIC_POLICY.overdueMinutes*60_000<=now){
+  if(plan.phase==='gemini'||plan.phase==='openai'||immediateOpenAiFallback||taskEndMs(task,now)+PUBLIC_POLICY.overdueMinutes*60_000<=now){
     costSummary=await postgamePublicCostSummary(env,now,eventId);
     budget=publicBudgetDecision(env,costSummary);
   }
@@ -1182,19 +1201,19 @@ async function ensurePolicyVersion(env, now = Date.now()) {
   if (current >= POSTGAME_POLICY_VERSION) return false;
   const isoNow = nowIso(now);
 
-  // v8 reaplica imediatamente o novo algoritmo a TODA pendência. A nova tabela
-  // de diagnóstico nasce vazia e força uma busca Google real na primeira passada,
-  // independentemente dos contadores históricos da v7.
+  // v9 reaplica imediatamente a nova cascata a TODA pendência. O marcador
+  // no próprio row força Gemini direto + failover OpenAI no primeiro ciclo elegível,
+  // independentemente dos contadores históricos de v7/v8.
   await env.DB.prepare(`UPDATE postgame_fastlane SET
       public_status=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN 'resolved' ELSE 'overdue' END,
       public_next_at=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN NULL ELSE ? END,
-      public_last_error='requeued_attendance_hunter_v8_forced_web_search',
+      public_last_error='requeued_attendance_hunter_v9_direct_gemini_openai_failover',
       updated_at=CURRENT_TIMESTAMP
     WHERE public_status<>'resolved'`).bind(isoNow).run();
 
   // Preserva contadores de custo/telemetria; sol_completed continua não terminal.
   await env.DB.prepare(`UPDATE postgame_public_ai SET sol_completed=0,
-      last_phase='migrated_v8_forced_web_search',
+      last_phase='migrated_v9_direct_gemini_openai_failover',
       updated_at=CURRENT_TIMESTAMP`).run();
 
   await metaPut(env, 'static_seed_at', '1970-01-01T00:00:00.000Z');
@@ -1316,8 +1335,12 @@ export async function postgameStatus(env) {
     regionalEditorialSources: true,
     deterministicFichaTecnicaExtraction: true,
     geminiInteractionsApi: true,
-    geminiForcedGoogleSearch: true,
-    geminiDirectFallbackOnNoGrounding: true,
+    geminiInteractionsDirect: true,
+    geminiAiGatewayBypassForWebSearch: true,
+    geminiSearchObservedFromSteps: true,
+    geminiGenerateContentDirectFallback: true,
+    openAiImmediateFallbackAfterGeminiFailure: true,
+    openAiRequiredWebSearch: true,
     openAiSourceRecovery: true,
     searchDiagnostics: true,
     preferredEditorialSourceCount: PREFERRED_EDITORIAL_SOURCE_SUFFIXES.length,

@@ -42,7 +42,7 @@ assert.doesNotMatch(prompt,/NÃO use sites oficiais de clubes/);
 
 
 
-// Hunter v8: a Interactions API precisa expor busca real e URLs utilizáveis.
+// Hunter v9: Interactions direto precisa expor busca real e URLs utilizáveis.
 const interactionRaw={
   status:'completed',
   steps:[
@@ -67,33 +67,59 @@ assert.deepEqual(geminiInteractionSources(interactionLegacy),['https://www.estad
 assert.match(geminiInteractionText(interactionLegacy),/encontrado/);
 const interactionRequest=geminiInteractionRequest(hunterTask,['público presente','renda']);
 assert.equal(interactionRequest.tools[0].type,'google_search');
-assert.equal(interactionRequest.generation_config.tool_choice,'any');
 assert.equal(interactionRequest.response_format.mime_type,'application/json');
+assert.deepEqual(interactionRequest.tools,[{type:'google_search'}]);
+assert.equal(interactionRequest.generation_config,undefined);
+assert.equal('search_types' in interactionRequest.tools[0],false);
 
-// Se o AI Gateway responder 200 porém SEM google_search_call/fontes, o v8
-// precisa repetir DIRETO no Google e retornar as fontes do retry.
+// R10R8: Interactions vai DIRETO ao Google. Se não houver busca real/fontes,
+// o fallback generateContent direto usa google_search com payload sem sampling legado.
 {
   const previousFetch=globalThis.fetch;
   const calls=[];
+  const legacyRaw={
+    candidates:[{
+      content:{parts:[{text:'{"encontrado":true,"publico":22159,"publico_pagante":null,"renda":1002775.79,"fonte_publico":"https://www.uol.com.br/esporte/ficha.htm","fonte_publico_pagante":null,"fonte_renda":"https://www.uol.com.br/esporte/ficha.htm","confianca":1,"observacao":"ficha"}'}]},
+      groundingMetadata:{webSearchQueries:['Atlético-MG Red Bull Bragantino público renda'],groundingChunks:[{web:{uri:'https://www.uol.com.br/esporte/ficha.htm'}}]}
+    }],
+    usageMetadata:{promptTokenCount:10,candidatesTokenCount:10,totalTokenCount:20}
+  };
   try{
     globalThis.fetch=async (url,opts={})=>{
       calls.push({url:String(url),body:JSON.parse(String(opts.body||'{}'))});
       if(calls.length===1){
         return new Response(JSON.stringify({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:'{"encontrado":false,"publico":null,"publico_pagante":null,"renda":null,"fonte_publico":null,"fonte_publico_pagante":null,"fonte_renda":null,"confianca":0,"observacao":"sem busca"}'}]}],usage:{total_input_tokens:10,total_output_tokens:10,total_tokens:20}}),{status:200,headers:{'content-type':'application/json'}});
       }
-      return new Response(JSON.stringify(interactionRaw),{status:200,headers:{'content-type':'application/json'}});
+      return new Response(JSON.stringify(legacyRaw),{status:200,headers:{'content-type':'application/json'}});
     };
-    const forced=await searchPublicWithGemini({AI_GATEWAY_ACCOUNT_ID:'abc',AI_GATEWAY_ID:'default',AI_GATEWAY_TOKEN:'cf',GEMINI_API_KEY:'gem-test'},hunterTask,['público presente','renda']);
-    assert.equal(forced.forcedSearch,true);
-    assert.equal(forced.searchCalls,1);
-    assert.equal(forced.apiCalls,2);
-    assert.equal(forced.found,true);
-    assert.ok(forced.sources.includes('https://www.uol.com.br/esporte/ficha.htm'));
-    assert.match(forced.route,/ai_gateway_interactions/);
-    assert.match(forced.route,/direct_fallback_gateway_no_grounding/);
-    assert.ok(calls[0].url.includes('/google-ai-studio/v1beta/interactions'));
-    assert.equal(calls[0].body.generation_config.tool_choice,'any');
-    assert.equal(calls[1].url,'https://generativelanguage.googleapis.com/v1beta/interactions');
+    const routed=await searchPublicWithGemini({AI_GATEWAY_ACCOUNT_ID:'abc',AI_GATEWAY_ID:'default',AI_GATEWAY_TOKEN:'cf',GEMINI_API_KEY:'gem-test'},hunterTask,['público presente','renda']);
+    assert.equal(routed.searchObserved,true);
+    assert.equal(routed.searchCalls,1);
+    assert.equal(routed.apiCalls,2);
+    assert.equal(routed.found,true);
+    assert.ok(routed.sources.includes('https://www.uol.com.br/esporte/ficha.htm'));
+    assert.equal(routed.route,'direct_interactions_v9 -> direct_generateContent_grounding_v9');
+    assert.equal(calls[0].url,'https://generativelanguage.googleapis.com/v1beta/interactions');
+    assert.equal(calls[0].body.generation_config,undefined);
+    assert.deepEqual(calls[0].body.tools,[{type:'google_search'}]);
+    assert.ok(calls[1].url.includes(':generateContent'));
+    assert.equal(calls[1].body.generationConfig.temperature,undefined);
+    assert.deepEqual(calls[1].body.tools,[{google_search:{}}]);
+  } finally { globalThis.fetch=previousFetch; }
+}
+
+// Se os dois endpoints Gemini forem rejeitados, o motivo precisa carregar o
+// HTTP real para a telemetria e permitir que o Fastlane acione OpenAI no ciclo.
+{
+  const previousFetch=globalThis.fetch;
+  try{
+    globalThis.fetch=async ()=>new Response(JSON.stringify({error:{code:400,message:'Invalid request payload'}}),{status:400,headers:{'content-type':'application/json'}});
+    const failed=await searchPublicWithGemini({GEMINI_API_KEY:'gem-test'},hunterTask,['público presente','renda']);
+    assert.equal(failed.searchCalls,0);
+    assert.equal(failed.apiCalls,2);
+    assert.match(failed.reason,/gemini_no_real_search:http_400:/);
+    assert.equal(failed.attempts.length,2);
+    assert.match(failed.attempts[1].error,/Invalid request payload/);
   } finally { globalThis.fetch=previousFetch; }
 }
 const originalFetch=globalThis.fetch;
@@ -116,6 +142,58 @@ try {
   assert.equal(calls[1].headers.authorization,'Bearer sk-test');
 } finally {
   globalThis.fetch=originalFetch;
+}
+
+// Gateway 400 por incompatibilidade/proxy também deve repetir DIRETO no OpenAI.
+{
+  const previousFetch=globalThis.fetch;
+  const calls=[];
+  try {
+    globalThis.fetch=async (url,opts={})=>{
+      calls.push(String(url));
+      if(calls.length===1) return new Response('{"error":{"message":"unsupported field at gateway"}}',{status:400});
+      return new Response(JSON.stringify({id:'resp_direct',usage:{input_tokens:1,output_tokens:1,total_tokens:2}}),{status:200,headers:{'content-type':'application/json'}});
+    };
+    const routed=await fetchOpenAiResponses({AI_GATEWAY_ACCOUNT_ID:'abc',AI_GATEWAY_ID:'default',OPENAI_API_KEY:'sk-test'},{model:'gpt-test',input:'x'});
+    assert.equal(routed.route,'direct_fallback_gateway_error');
+    assert.equal(routed.apiCalls,2);
+    assert.equal(calls[1],'https://api.openai.com/v1/responses');
+  } finally { globalThis.fetch=previousFetch; }
+}
+
+// Gateway 429 também tenta direto: pode ser limite do próprio Gateway; se for
+// rate limit do provedor, a resposta direta continuará 429 sem aceitar dado falso.
+{
+  const previousFetch=globalThis.fetch;
+  const calls=[];
+  try {
+    globalThis.fetch=async (url,opts={})=>{
+      calls.push(String(url));
+      if(calls.length===1) return new Response('{"error":{"message":"gateway rate limit"}}',{status:429});
+      return new Response(JSON.stringify({id:'resp_direct_429',usage:{input_tokens:1,output_tokens:1,total_tokens:2}}),{status:200,headers:{'content-type':'application/json'}});
+    };
+    const routed=await fetchOpenAiResponses({AI_GATEWAY_ACCOUNT_ID:'abc',AI_GATEWAY_ID:'default',OPENAI_API_KEY:'sk-test'},{model:'gpt-test',input:'x'});
+    assert.equal(routed.route,'direct_fallback_gateway_error');
+    assert.equal(routed.apiCalls,2);
+    assert.equal(calls[1],'https://api.openai.com/v1/responses');
+  } finally { globalThis.fetch=previousFetch; }
+}
+
+// Erro de rede no Gateway também cai diretamente no endpoint oficial.
+{
+  const previousFetch=globalThis.fetch;
+  const calls=[];
+  try {
+    globalThis.fetch=async (url,opts={})=>{
+      calls.push(String(url));
+      if(calls.length===1) throw new Error('gateway transport failed');
+      return new Response(JSON.stringify({id:'resp_direct_network',usage:{input_tokens:1,output_tokens:1,total_tokens:2}}),{status:200,headers:{'content-type':'application/json'}});
+    };
+    const routed=await fetchOpenAiResponses({AI_GATEWAY_ACCOUNT_ID:'abc',AI_GATEWAY_ID:'default',OPENAI_API_KEY:'sk-test'},{model:'gpt-test',input:'x'});
+    assert.equal(routed.route,'direct_fallback_gateway_network');
+    assert.equal(routed.apiCalls,2);
+    assert.match(routed.detail,/gateway transport failed/);
+  } finally { globalThis.fetch=previousFetch; }
 }
 
 console.log('ai-router tests: PASS');

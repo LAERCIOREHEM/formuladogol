@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources } from '../src/postgame-fastlane.js';
+import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI } from '../src/postgame-fastlane.js';
 
 assert.equal(highlightTitleValid('FLAMENGO 1 X 0 BRAGANTINO | MELHORES MOMENTOS | BRASILEIRÃO 2026', 'Flamengo', 'Bragantino'), true);
 assert.equal(highlightTitleValid('FLAMENGO X BRAGANTINO | AQUECIMENTO AO VIVO | BRASILEIRÃO', 'Flamengo', 'Bragantino'), false);
@@ -83,7 +83,7 @@ assert.equal(validatePublicPayload(officialPayload,['https://www.saopaulofc.net/
 
 
 
-// v8 Source Recovery: as URLs do web_search existem independentemente de o
+// v9 Source Recovery: as URLs do web_search existem independentemente de o
 // JSON numérico final ser aceito. O pipeline deve poder cacheá-las e abrir a
 // página com o parser determinístico.
 const openAiSourceFixture={output:[
@@ -95,11 +95,39 @@ assert.deepEqual([...extractOpenAISources(openAiSourceFixture)].sort(),[
   'https://www.r7.com/esportes/ficha',
   'https://www.uol.com.br/esporte/ficha.htm'
 ].sort());
+
+// R10R8: prova unitária do fallback OpenAI com busca realmente executada e
+// números do caso de regressão. Nenhum dado é gravado em produção neste teste.
+{
+  const previousFetch=globalThis.fetch;
+  try {
+    globalThis.fetch=async (url,opts={})=>{
+      assert.equal(String(url),'https://api.openai.com/v1/responses');
+      const body=JSON.parse(String(opts.body||'{}'));
+      assert.equal(body.tool_choice,'required');
+      assert.ok(body.tools[0].filters.allowed_domains.includes('uol.com.br'));
+      return new Response(JSON.stringify({
+        id:'resp_attendance',
+        output:[
+          {type:'web_search_call',action:{type:'search',sources:[{url:'https://www.uol.com.br/esporte/ficha.htm',title:'Ficha técnica'}]}},
+          {type:'message',content:[{type:'output_text',text:'{"encontrado":true,"publico":22159,"publico_pagante":null,"renda":1002775.79,"fonte_publico":"https://www.uol.com.br/esporte/ficha.htm","fonte_publico_pagante":null,"fonte_renda":"https://www.uol.com.br/esporte/ficha.htm","confianca":1,"observacao":"ficha técnica"}',annotations:[{type:'url_citation',url:'https://www.uol.com.br/esporte/ficha.htm'}]}]}
+        ],
+        usage:{input_tokens:100,output_tokens:40,total_tokens:140}
+      }),{status:200,headers:{'content-type':'application/json'}});
+    };
+    const found=await searchPublicWithOpenAI({OPENAI_API_KEY:'sk-test'},{event_id:'401841168',home:'Atlético-MG',away:'Bragantino',kickoff:'2026-10-03T21:30:00.000Z',home_score:1,away_score:0,round:21,stadium:'Arena MRV',publico:null,publico_pagante:null,renda:null},'openai:fallback-after-gemini');
+    assert.equal(found.found,true);
+    assert.equal(found.searchCalls,1);
+    assert.equal(found.values.publico,22159);
+    assert.equal(found.values.renda,1002775.79);
+    assert.ok(found.discoveredSources.includes('https://www.uol.com.br/esporte/ficha.htm'));
+  } finally { globalThis.fetch=previousFetch; }
+}
 console.log('postgame-fastlane tests: PASS');
 
-// ============================ Política v8 ============================
+// ============================ Política v9 ============================
 import {
-  PUBLIC_POLICY, planPublicStep, nextPublicAttemptMs, publicSearchRequest,
+  PUBLIC_POLICY, planPublicStep, nextPublicAttemptMs, publicSearchRequest, shouldImmediateOpenAiFallback,
   parseEspnAttendance, isPublicComplete, publicAlertMessage, taskEndMs,
   publicBudgetDecision, sourceQuality
 } from '../src/postgame-fastlane.js';
@@ -141,6 +169,11 @@ assert.equal(nextPublicAttemptMs(task,'gemini',{phase:'deterministic'},at(181),{
 
 const terra=publicSearchRequest(task,['renda'],{},'openai');
 assert.equal(terra.model,'gpt-5.6-terra'); assert.equal(terra.max_tool_calls,6); assert.equal(terra.reasoning.effort,'low');
+assert.equal(terra.tool_choice,'required');
+assert.ok(terra.tools[0].filters.allowed_domains.includes('uol.com.br'));
+assert.ok(terra.tools[0].filters.allowed_domains.includes('saopaulofc.net'));
+assert.ok(terra.tools[0].filters.allowed_domains.includes('santosfc.com.br'));
+assert.ok(terra.tools[0].filters.allowed_domains.length <= 100);
 const sol=publicSearchRequest(task,['renda'],{POSTGAME_OPENAI_MODEL:'gpt-5.6-sol'},'openai');
 assert.equal(sol.model,'gpt-5.6-sol');
 assert.match(JSON.stringify(terra),/sites oficiais dos clubes participantes/);
@@ -169,4 +202,12 @@ const msg=publicAlertMessage(task,{publico:null,publico_pagante:null,renda:null}
 assert.match(msg.body,/busca automática CONTINUA/);
 assert.match(msg.body,/Depois de 2h o Hunter tenta novamente a cada 1h/);
 assert.doesNotMatch(msg.body,/Nenhuma nova busca automática será feita/);
-console.log('postgame-fastlane v8 policy tests: PASS');
+
+// R10R8: falha Gemini em jogo >=45min precisa acionar OpenAI NO MESMO CICLO.
+assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),true);
+assert.equal(shouldImmediateOpenAiFallback({ageMinutes:20,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),false);
+assert.equal(shouldImmediateOpenAiFallback({ageMinutes:20,forcedV9:true,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),true);
+assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:false},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),false);
+assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:1,httpStatus:200,found:true},discoveredCount:2,refreshedFoundAny:true,complete:true}),false);
+assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:1,httpStatus:200,found:true},discoveredCount:2,refreshedFoundAny:true,complete:false}),true);
+console.log('postgame-fastlane v9 policy tests: PASS');

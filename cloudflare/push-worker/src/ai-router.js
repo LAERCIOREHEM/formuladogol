@@ -56,7 +56,7 @@ export function geminiGroundingSources(raw){
 export function geminiSearchCount(raw){ let n=0; for(const c of raw?.candidates||[]) n += Array.isArray(c?.groundingMetadata?.webSearchQueries)?c.groundingMetadata.webSearchQueries.length:0; return n; }
 export function geminiText(raw){ const parts=[]; for(const c of raw?.candidates||[]) for(const p of c?.content?.parts||[]) if(p?.text) parts.push(String(p.text)); return parts.join(''); }
 
-// ---------- Gemini Interactions API: busca observável/forçada ----------
+// ---------- Gemini Interactions API: busca observável (payload mínimo documentado) ----------
 export function geminiInteractionSearchCount(raw){
   let count=0;
   // Schema atual (maio/2026+): execução observável em steps.
@@ -102,12 +102,14 @@ export function geminiInteractionText(raw){
 }
 
 export function geminiInteractionRequest(task,missing,model='gemini-3.5-flash-lite'){
+  // R10R8: replica o shape REST documentado pelo Google para Interactions +
+  // Google Search + structured output. Evita campos opcionais que já causaram
+  // HTTP 400 em produção (tool_choice/search_types/sampling no payload antigo).
   return {
     model,
     input: publicSchemaInstruction(task,missing),
-    tools:[{type:'google_search',search_types:['web_search']}],
+    tools:[{type:'google_search'}],
     response_format:{type:'text',mime_type:'application/json',schema:PUBLIC_RESPONSE_SCHEMA},
-    generation_config:{max_output_tokens:900,thinking_level:'minimal',tool_choice:'any'},
     store:false,
   };
 }
@@ -116,7 +118,9 @@ function geminiLegacyRequest(task,missing){
   return {
     contents:[{role:'user',parts:[{text:publicSchemaInstruction(task,missing)}]}],
     tools:[{google_search:{}}],
-    generationConfig:{temperature:0,maxOutputTokens:900,responseMimeType:'application/json',responseSchema:PUBLIC_RESPONSE_SCHEMA},
+    // Gemini 3.5 Flash-Lite não deve receber parâmetros de sampling legados
+    // como temperature/top_p/top_k. O fallback mantém apenas controles aceitos.
+    generationConfig:{maxOutputTokens:900,responseMimeType:'application/json',responseSchema:PUBLIC_RESPONSE_SCHEMA},
   };
 }
 
@@ -150,9 +154,7 @@ async function runGeminiCall(env,{url,body,gateway,kind,route,model,task,started
 
 export async function searchPublicWithGemini(env,task,missing){
  const model=text(env?.GEMINI_SEARCH_MODEL)||'gemini-3.5-flash-lite';
- if(!geminiConfigured(env)) return {found:false,responded:false,reason:'gemini_not_configured',model,sources:[],searchCalls:0,apiCalls:0,forcedSearch:true};
- const gateway=gatewayBase(env,'google-ai-studio');
- const gatewayInteractionUrl=gateway?`${gateway}/v1beta/interactions`:'';
+ if(!geminiConfigured(env)) return {found:false,responded:false,reason:'gemini_not_configured',model,sources:[],searchCalls:0,apiCalls:0,searchObserved:false};
  const directInteractionUrl='https://generativelanguage.googleapis.com/v1beta/interactions';
  const directLegacyUrl=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
  const interactionBody=geminiInteractionRequest(task,missing,model);
@@ -169,27 +171,18 @@ export async function searchPublicWithGemini(env,task,missing){
  };
 
  try{
-   let first;
-   if(gatewayInteractionUrl){
-     first=await run({url:gatewayInteractionUrl,body:interactionBody,gateway:true,kind:'interaction',route:'ai_gateway_interactions'});
-     const gatewayNeedsDirect=!first.response?.ok||first.searches<1||first.sources.length<1||!first.parsed;
-     const gatewayCanDirect=first.response?.ok||retryDirectForGatewayStatus(first.status,first.detail);
-     if(gatewayNeedsDirect&&gatewayCanDirect){
-       await run({url:directInteractionUrl,body:interactionBody,gateway:false,kind:'interaction',route:first.response?.ok?'direct_fallback_gateway_no_grounding':'direct_fallback_gateway_error'});
-     }
-   }else{
-     first=await run({url:directInteractionUrl,body:interactionBody,gateway:false,kind:'interaction',route:'direct_interactions'});
-   }
+   // R10R8: Gemini Web Search pula o AI Gateway. Cloudflare documenta o proxy
+   // Google AI Studio principalmente para endpoints generateContent; a Interactions
+   // API nova é chamada diretamente para eliminar uma camada de incompatibilidade.
+   await run({url:directInteractionUrl,body:interactionBody,gateway:false,kind:'interaction',route:'direct_interactions_v9'});
 
    let totalSearches=attempts.reduce((sum,a)=>sum+Number(a.searches||0),0);
-   // Compatibilidade defensiva: se a Interactions API responder sem qualquer
-   // busca observável/fonte, fazemos UMA última chamada direta ao endpoint
-   // generateContent com google_search. Não substitui a busca forçada; apenas
-   // evita regressão operacional caso o endpoint novo esteja indisponível.
+   // Se a Interactions API falhar, não pesquisar ou não expor nenhuma fonte,
+   // tentamos UMA vez o generateContent direto com google_search. Sem sampling.
    if(totalSearches<1||aggregateSources.length<1){
      const last=attempts.at(-1);
      if(Number(last?.status)!==429){
-       await run({url:directLegacyUrl,body:legacyBody,gateway:false,kind:'legacy',route:'direct_legacy_grounding_fallback'});
+       await run({url:directLegacyUrl,body:legacyBody,gateway:false,kind:'legacy',route:'direct_generateContent_grounding_v9'});
        totalSearches=attempts.reduce((sum,a)=>sum+Number(a.searches||0),0);
      }
    }
@@ -197,22 +190,25 @@ export async function searchPublicWithGemini(env,task,missing){
    const apiCalls=attempts.length;
    const responded=attempts.some((a)=>Boolean(a.raw));
    const last=attempts.at(-1)||{};
+   const httpFailure=[...attempts].reverse().find((a)=>a.status!=null && !a.response?.ok);
    let reason='';
-   if(totalSearches<1) reason='gemini_no_real_search';
-   else if(aggregateSources.length<1) reason='gemini_no_sources';
+   if(totalSearches<1){
+     const suffix=httpFailure?`:http_${httpFailure.status}:${text(httpFailure.detail).slice(0,260)}`:'';
+     reason=`gemini_no_real_search${suffix}`;
+   } else if(aggregateSources.length<1) reason='gemini_no_sources';
    else if(!parsed) reason='gemini_invalid_json';
    else if(parsed.encontrado!==true) reason='gemini_not_found';
    return {
      found:Boolean(parsed?.encontrado===true),responded,reason,model,parsed,
      sources:aggregateSources,discoveredSources:aggregateSources,
-     searchCalls:totalSearches,apiCalls,forcedSearch:true,
+     searchCalls:totalSearches,apiCalls,searchObserved:totalSearches>0,
      route:attempts.map((a)=>a.route).join(' -> '),
      httpStatus:last.status??null,
-     attempts:attempts.map((a)=>({route:a.route,kind:a.kind,httpStatus:a.status,searchCalls:a.searches,sources:a.sources.length,parsed:Boolean(a.parsed)})),
+     attempts:attempts.map((a)=>({route:a.route,kind:a.kind,httpStatus:a.status,searchCalls:a.searches,sources:a.sources.length,parsed:Boolean(a.parsed),error:!a.response?.ok?text(a.detail).slice(0,300):''})),
    };
  }catch(e){
    const detail=text(e?.message||e).slice(0,240);
-   return {found:false,responded:false,reason:`gemini_error:${detail}`,model,sources:aggregateSources,discoveredSources:aggregateSources,searchCalls:attempts.reduce((s,a)=>s+Number(a.searches||0),0),apiCalls:attempts.length,forcedSearch:true,route:attempts.map((a)=>a.route).join(' -> ')};
+   return {found:false,responded:false,reason:`gemini_error:${detail}`,model,sources:aggregateSources,discoveredSources:aggregateSources,searchCalls:attempts.reduce((s,a)=>s+Number(a.searches||0),0),apiCalls:attempts.length,searchObserved:false,route:attempts.map((a)=>a.route).join(' -> '),attempts:attempts.map((a)=>({route:a.route,kind:a.kind,httpStatus:a.status,error:text(a.detail).slice(0,300)}))};
  }
 }
 
@@ -246,13 +242,23 @@ export async function fetchOpenAiResponses(env,payload,{signal=null,metadata={}}
   const viaGateway=gatewayUrl.startsWith('https://gateway.ai.cloudflare.com/');
   const providerHeaders={authorization:`Bearer ${apiKey}`,'content-type':'application/json'};
   const gatewayHeaders={...providerHeaders,...aiGatewayAuthHeaders(env),'cf-aig-metadata':JSON.stringify({project:'formula-do-gol',...metadata,provider:'openai'}),'cf-aig-collect-log-payload':'false','cf-aig-no-wholesale':'true'};
-  let response=await fetch(gatewayUrl,{method:'POST',signal,headers:viaGateway?gatewayHeaders:providerHeaders,body:JSON.stringify(payload)});
+  const body=JSON.stringify(payload);
+  let response;
+  try{
+    response=await fetch(gatewayUrl,{method:'POST',signal,headers:viaGateway?gatewayHeaders:providerHeaders,body});
+  }catch(error){
+    if(!viaGateway) throw error;
+    // Falha de transporte do Gateway não pode impedir a contingência final.
+    response=await fetch('https://api.openai.com/v1/responses',{method:'POST',signal,headers:providerHeaders,body});
+    return {response,route:'direct_fallback_gateway_network',gatewayFallback:true,gatewayStatus:null,detail:text(error?.message||error).slice(0,400),apiCalls:2};
+  }
   if(viaGateway && !response.ok){
     const gatewayStatus=response.status;
     const detail=await response.clone().text().catch(()=> '');
-    if(isAiGatewayPreProviderFailure(gatewayStatus,detail)){
-      response=await fetch('https://api.openai.com/v1/responses',{method:'POST',signal,headers:providerHeaders,body:JSON.stringify(payload)});
-      return {response,route:'direct_fallback_gateway_preprovider',gatewayFallback:true,gatewayStatus,detail:text(detail).slice(0,400),apiCalls:2};
+    const retryDirect=isAiGatewayPreProviderFailure(gatewayStatus,detail)||[400,404,405,408,429,500,502,503,504].includes(Number(gatewayStatus));
+    if(retryDirect){
+      response=await fetch('https://api.openai.com/v1/responses',{method:'POST',signal,headers:providerHeaders,body});
+      return {response,route:isAiGatewayPreProviderFailure(gatewayStatus,detail)?'direct_fallback_gateway_preprovider':'direct_fallback_gateway_error',gatewayFallback:true,gatewayStatus,detail:text(detail).slice(0,400),apiCalls:2};
     }
   }
   return {response,route:viaGateway?'ai_gateway':'direct',gatewayFallback:false,apiCalls:1};
