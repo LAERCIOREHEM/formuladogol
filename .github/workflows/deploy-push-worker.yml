@@ -1,4 +1,5 @@
 name: Deploy Push Worker
+run-name: Deploy Push Worker · ${{ github.event_name == 'workflow_dispatch' && 'MANUAL' || 'AUTO' }} · ${{ github.sha }}
 
 on:
   workflow_dispatch:
@@ -43,6 +44,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      # O usuário faz upload em dois commits próximos (código e depois workflow).
+      # A concorrência cancela o deploy antigo; esta pequena janela evita gastar
+      # testes/deploy num commit intermediário que será substituído segundos depois.
+      - name: Consolidar uploads sequenciais
+        if: github.event_name == 'push'
+        run: |
+          echo 'Aguardando 45s para consolidar commits consecutivos via Add files...'
+          sleep 45
 
       - name: Node
         uses: actions/setup-node@v4
@@ -328,7 +338,12 @@ jobs:
           if (h.postgameOfficialClubSourcesScoped !== true) problems.push('postgameOfficialClubSourcesScoped!=true');
           if (h.postgameRegionalEditorialSources !== true) problems.push('postgameRegionalEditorialSources!=true');
           if (h.postgameDeterministicFichaTecnicaExtraction !== true) problems.push('postgameDeterministicFichaTecnicaExtraction!=true');
-          if (h.postgamePendingRequeueOnV7 !== true) problems.push('postgamePendingRequeueOnV7!=true');
+          if (h.postgamePendingRequeueOnV8 !== true) problems.push('postgamePendingRequeueOnV8!=true');
+          if (h.postgameGeminiInteractionsApi !== true) problems.push('postgameGeminiInteractionsApi!=true');
+          if (h.postgameGeminiForcedGoogleSearch !== true) problems.push('postgameGeminiForcedGoogleSearch!=true');
+          if (h.postgameGeminiDirectFallbackOnNoGrounding !== true) problems.push('postgameGeminiDirectFallbackOnNoGrounding!=true');
+          if (h.postgameOpenAiSourceRecovery !== true) problems.push('postgameOpenAiSourceRecovery!=true');
+          if (h.postgameSearchDiagnostics !== true) problems.push('postgameSearchDiagnostics!=true');
           if (h.postgamePublicPersistentUntilResolved !== true) problems.push('postgamePublicPersistentUntilResolved!=true');
           if (Number(h.postgamePublicSlaMinutes) !== 120) problems.push(`postgamePublicSlaMinutes=${h.postgamePublicSlaMinutes}`);
           if (h.postgamePublicHourlyAfterSla !== true) problems.push('postgamePublicHourlyAfterSla!=true');
@@ -380,7 +395,7 @@ jobs:
             exit 1
           fi
 
-          # Hunter v7 precisa não apenas estar publicado: o cron de 1 minuto deve
+          # Hunter v8 precisa não apenas estar publicado: o cron de 1 minuto deve
           # ter executado a política nova e reaberto imediatamente as pendências.
           POSTGAME_READY=0
           for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
@@ -401,10 +416,15 @@ jobs:
           if (s.officialClubSourcesScopedToParticipants !== true) problems.push('officialClubSourcesScopedToParticipants!=true');
           if (s.regionalEditorialSources !== true) problems.push('regionalEditorialSources!=true');
           if (s.deterministicFichaTecnicaExtraction !== true) problems.push('deterministicFichaTecnicaExtraction!=true');
+          if (s.geminiInteractionsApi !== true) problems.push('geminiInteractionsApi!=true');
+          if (s.geminiForcedGoogleSearch !== true) problems.push('geminiForcedGoogleSearch!=true');
+          if (s.geminiDirectFallbackOnNoGrounding !== true) problems.push('geminiDirectFallbackOnNoGrounding!=true');
+          if (s.openAiSourceRecovery !== true) problems.push('openAiSourceRecovery!=true');
+          if (s.searchDiagnostics !== true) problems.push('searchDiagnostics!=true');
           if (s.publicPersistentUntilResolved !== true) problems.push('publicPersistentUntilResolved!=true');
           if (Number(s.publicGaveUp || 0) !== 0) problems.push(`publicGaveUp=${s.publicGaveUp}`);
           if (!(s.mailer && s.mailer.transport === 'cloudflare-email' && s.mailer.configured === true)) problems.push(`mailer=${JSON.stringify(s.mailer||null)}`);
-          if (problems.length) { console.error('Hunter v7 ainda não executou o contrato novo: ' + problems.join(' | ')); process.exit(1); }
+          if (problems.length) { console.error('Hunter v8 ainda não executou o contrato novo: ' + problems.join(' | ')); process.exit(1); }
           console.log(`Hunter v${s.version} EXECUTADO: storedPolicy=${s.storedPolicyVersion}; searchProfile=${s.searchProfileVersion}; total=${Number(s.total||0)} pending=${Number(s.publicPending||0)} overdue=${Number(s.publicOverdue||0)} budgetGuard=${Number(s.publicBudgetGuard||0)}.`);
           console.log(`E-mail do Worker: ${s.mailer.transport} (fallbacks: ${(s.mailer.fallbacks||[]).join(', ') || 'nenhum'})`);
           NODE
@@ -413,14 +433,38 @@ jobs:
                 break
               fi
             fi
-            echo "Aguardando primeiro cron do Attendance Hunter v7 (${i}/15)..."
+            echo "Aguardando primeiro cron do Attendance Hunter v8 (${i}/15)..."
             sleep 6
           done
           if [ "$POSTGAME_READY" -ne 1 ]; then
-            echo 'ERRO: Attendance Hunter v7 foi publicado, mas o cron novo não concluiu uma execução dentro da janela de smoke test.'
+            echo 'ERRO: Attendance Hunter v8 foi publicado, mas o cron novo não concluiu uma execução dentro da janela de smoke test.'
             cat /tmp/fdg-postgame-status.json 2>/dev/null || true
             exit 1
           fi
+
+          # Prova que a migration de diagnóstico v8 existe e que o endpoint já
+          # expõe contadores de busca real por provedor.
+          curl -fsS --max-time 10 'https://push.formuladogol.com.br/v1/postgame' >/tmp/fdg-postgame-rows.json
+          node <<'NODE'
+          const fs = require('fs');
+          const p = JSON.parse(fs.readFileSync('/tmp/fdg-postgame-rows.json', 'utf8'));
+          if (p.ok !== true || !Array.isArray(p.rows)) {
+            console.error('Endpoint /v1/postgame não respondeu com contrato válido:', p);
+            process.exit(1);
+          }
+          for (const row of p.rows.slice(0, 3)) {
+            if (!row.public_search || !row.public_search.gemini || !row.public_search.openai) {
+              console.error('Telemetria v8 ausente no /v1/postgame:', row.event_id);
+              process.exit(1);
+            }
+          }
+          const recentPending = p.rows.find((row) => row.public_status !== 'resolved' && Date.parse(row.final_at || '') <= Date.now() - 5*60*1000);
+          if (recentPending) {
+            console.log(`Pendência recente ${recentPending.event_id}: Gemini API=${recentPending.public_search.gemini.api_calls}, buscas reais=${recentPending.public_search.gemini.search_calls}, fontes=${recentPending.public_search.gemini.sources_found}, cache=${recentPending.source_cache_count}.`);
+          } else {
+            console.log('Sem pendência recente elegível para prova live; contrato de diagnóstico v8 validado.');
+          }
+          NODE
 
           curl -fsS --max-time 10 'https://push.formuladogol.com.br/v1/health-monitor/status' >/tmp/fdg-health-monitor-status.json
           node <<'NODE'
