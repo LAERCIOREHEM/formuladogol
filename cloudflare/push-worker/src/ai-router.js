@@ -17,22 +17,6 @@ export function geminiConfigured(env){ return Boolean(text(env?.GEMINI_API_KEY))
 export function workersAiConfigured(env){ return Boolean(env?.AI); }
 export function isAiGatewayPreProviderFailure(status,detail){ const s=String(detail||'').toLowerCase(); return (Number(status)===401 && ((s.includes('"code":2009')||s.includes('"internalcode":2009')||s.includes('"name":"aigatewayerror"')))) || (Number(status)===403 && s.includes('1010')); }
 
-const PUBLIC_RESPONSE_SCHEMA=Object.freeze({
-  type:'object',additionalProperties:false,
-  properties:{
-    encontrado:{type:'boolean'},
-    publico:{type:['integer','null']},
-    publico_pagante:{type:['integer','null']},
-    renda:{type:['number','null']},
-    fonte_publico:{type:['string','null']},
-    fonte_publico_pagante:{type:['string','null']},
-    fonte_renda:{type:['string','null']},
-    confianca:{type:'number'},
-    observacao:{type:'string'},
-  },
-  required:['encontrado','publico','publico_pagante','renda','fonte_publico','fonte_publico_pagante','fonte_renda','confianca','observacao'],
-});
-
 export function publicSchemaInstruction(task,missing){
  const matchup=`${text(task.home)} x ${text(task.away)}`;
  const date=text(task.kickoff).slice(0,10);
@@ -102,25 +86,26 @@ export function geminiInteractionText(raw){
 }
 
 export function geminiInteractionRequest(task,missing,model='gemini-3.5-flash-lite'){
-  // R10R8: replica o shape REST documentado pelo Google para Interactions +
-  // Google Search + structured output. Evita campos opcionais que já causaram
-  // HTTP 400 em produção (tool_choice/search_types/sampling no payload antigo).
+  // R10R9: Gemini é DESCOBRIDOR DE FONTES, não extrator estruturado.
+  // O payload segue a Interactions API atual: google_search + tool_choice no
+  // generation_config. A remoção completa de response_format/responseSchema
+  // elimina a incompatibilidade HTTP 400 observada em produção no v9 e consolidada no v10.
   return {
     model,
-    input: publicSchemaInstruction(task,missing),
+    input: publicSchemaInstruction(task,missing) + ' Sua função nesta etapa é PESQUISAR e citar as melhores URLs encontradas. Não é necessário devolver JSON.',
     tools:[{type:'google_search'}],
-    response_format:{type:'text',mime_type:'application/json',schema:PUBLIC_RESPONSE_SCHEMA},
+    generation_config:{max_output_tokens:600,tool_choice:'any'},
     store:false,
   };
 }
 
 function geminiLegacyRequest(task,missing){
   return {
-    contents:[{role:'user',parts:[{text:publicSchemaInstruction(task,missing)}]}],
+    contents:[{role:'user',parts:[{text:publicSchemaInstruction(task,missing) + ' Execute Google Search e responda com uma síntese factual citando as fontes encontradas. Não use JSON estruturado nesta etapa.'}]}],
     tools:[{google_search:{}}],
-    // Gemini 3.5 Flash-Lite não deve receber parâmetros de sampling legados
-    // como temperature/top_p/top_k. O fallback mantém apenas controles aceitos.
-    generationConfig:{maxOutputTokens:900,responseMimeType:'application/json',responseSchema:PUBLIC_RESPONSE_SCHEMA},
+    // Fallback legado também opera apenas como descoberta. Sem responseSchema,
+    // sem responseMimeType e sem sampling: o parser local faz a extração depois.
+    generationConfig:{maxOutputTokens:600},
   };
 }
 
@@ -147,8 +132,8 @@ async function runGeminiCall(env,{url,body,gateway,kind,route,model,task,started
   const output=kind==='interaction'?geminiInteractionText(raw):geminiText(raw);
   const parsed=safeJson(cleanModelText(output),null);
   const usage=kind==='interaction'?tokenUsageGeminiInteraction(raw):tokenUsageGeminiLegacy(raw);
-  const ok=Boolean(response?.ok&&raw&&parsed&&searches>0);
-  await recordProviderUsage(env,{provider:'gemini',purpose:'postgame_public',eventId:task.event_id,model,phase:'search',searchCalls:searches,inputTokens:usage.input,outputTokens:usage.output,totalTokens:usage.total,responded:Boolean(raw),ok,httpStatus:status,durationMs:Date.now()-started,detail:`${route}:${kind}:searches=${searches}:sources=${sources.length}:${parsed?'parsed':'invalid_json'}${response?.ok?'':`:http_${status||0}`}`});
+  const ok=Boolean(response?.ok&&raw&&searches>0&&sources.length>0);
+  await recordProviderUsage(env,{provider:'gemini',purpose:'postgame_public',eventId:task.event_id,model,phase:'search',searchCalls:searches,inputTokens:usage.input,outputTokens:usage.output,totalTokens:usage.total,responded:Boolean(raw),ok,httpStatus:status,durationMs:Date.now()-started,detail:`${route}:${kind}:searches=${searches}:sources=${sources.length}:${parsed?'json_optional':'discovery_text'}${response?.ok?'':`:http_${status||0}`}`});
   return {response,raw,detail,status,searches,sources,parsed,output,usage,ok,route,kind};
 }
 
@@ -174,7 +159,7 @@ export async function searchPublicWithGemini(env,task,missing){
    // R10R8: Gemini Web Search pula o AI Gateway. Cloudflare documenta o proxy
    // Google AI Studio principalmente para endpoints generateContent; a Interactions
    // API nova é chamada diretamente para eliminar uma camada de incompatibilidade.
-   await run({url:directInteractionUrl,body:interactionBody,gateway:false,kind:'interaction',route:'direct_interactions_v9'});
+   await run({url:directInteractionUrl,body:interactionBody,gateway:false,kind:'interaction',route:'direct_interactions_v10_discovery'});
 
    let totalSearches=attempts.reduce((sum,a)=>sum+Number(a.searches||0),0);
    // Se a Interactions API falhar, não pesquisar ou não expor nenhuma fonte,
@@ -182,7 +167,7 @@ export async function searchPublicWithGemini(env,task,missing){
    if(totalSearches<1||aggregateSources.length<1){
      const last=attempts.at(-1);
      if(Number(last?.status)!==429){
-       await run({url:directLegacyUrl,body:legacyBody,gateway:false,kind:'legacy',route:'direct_generateContent_grounding_v9'});
+       await run({url:directLegacyUrl,body:legacyBody,gateway:false,kind:'legacy',route:'direct_generateContent_grounding_v10_discovery'});
        totalSearches=attempts.reduce((sum,a)=>sum+Number(a.searches||0),0);
      }
    }
@@ -196,9 +181,12 @@ export async function searchPublicWithGemini(env,task,missing){
      const suffix=httpFailure?`:http_${httpFailure.status}:${text(httpFailure.detail).slice(0,260)}`:'';
      reason=`gemini_no_real_search${suffix}`;
    } else if(aggregateSources.length<1) reason='gemini_no_sources';
-   else if(!parsed) reason='gemini_invalid_json';
-   else if(parsed.encontrado!==true) reason='gemini_not_found';
+   else if(parsed?.encontrado===true) reason='';
+   else reason='gemini_sources_discovered';
    return {
+     // `found` significa apenas que o modelo, opcionalmente, devolveu valores
+     // estruturados válidos. No R10R9 a condição principal de sucesso do Gemini
+     // é searchCalls>0 + URLs; os números são extraídos depois pelo nosso código.
      found:Boolean(parsed?.encontrado===true),responded,reason,model,parsed,
      sources:aggregateSources,discoveredSources:aggregateSources,
      searchCalls:totalSearches,apiCalls,searchObserved:totalSearches>0,

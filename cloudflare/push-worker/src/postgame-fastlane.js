@@ -13,21 +13,23 @@ const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
-const POSTGAME_POLICY_VERSION = 9;
+const POSTGAME_POLICY_VERSION = 10;
 
 /*
- * Attendance/Revenue Hunter v9 — Direct Gemini + Immediate OpenAI Failover:
+ * Attendance/Revenue Hunter v10 — Gemini Search Discovery + Circuit Breaker:
  *   - Mantém aliases de TODOS os clubes, imprensa nacional/regional e sites oficiais
  *     SOMENTE dos dois participantes para fatos documentais de ficha técnica.
- *   - Gemini Interactions usa diretamente o endpoint oficial Google, com payload
- *     mínimo documentado; sem AI Gateway, tool_choice forçado ou sampling legado.
+ *   - Gemini Interactions vira DESCOBRIDOR DE FONTES: google_search real, sem JSON
+ *     Schema/responseSchema na etapa de busca. URLs -> cache -> parser determinístico.
+ *   - Interactions usa direto o endpoint oficial Google e o fallback generateContent
+ *     também opera sem structured output, eliminando o HTTP 400 do Hunter v9.
+ *   - Circuit breaker global abre por 30 min em erro estrutural 4xx e evita centenas
+ *     de chamadas repetidas; OpenAI assume imediatamente enquanto o circuito está aberto.
  *   - Se Gemini não executar busca real, não expuser fontes ou não resolver o jogo
  *     após T+45, OpenAI Web Search entra NO MESMO CICLO (respeitando budget).
- *   - OpenAI usa tool_choice=required e allowlist de domínios editoriais/oficiais.
- *   - Qualquer URL encontrada é cacheada antes da validação dos números e passa pelo
- *     parser determinístico; Workers AI só extrai páginas que o parser não resolver.
- *   - Erros HTTP reais do Gemini ficam visíveis na telemetria, sem serem apagados.
- *   - Upgrade v9 reabre imediatamente toda pendência para executar a nova cascata.
+ *   - OpenAI usa tool_choice=required e qualquer URL encontrada é cacheada antes da
+ *     validação; Workers AI só extrai páginas que o parser local não resolver.
+ *   - Upgrade v10 reabre imediatamente pendências e zera o circuito antigo.
  *   - Nunca existe GAVE_UP para público/renda.
  */
 export const PUBLIC_POLICY = Object.freeze({
@@ -38,12 +40,46 @@ export const PUBLIC_POLICY = Object.freeze({
   overdueMinutes: 120,
   overdueGeminiEveryMinutes: 60,
   overdueOpenaiEveryMinutes: 180,
+  geminiCircuitStructuralMinutes: 30,
+  geminiCircuitSoftMinutes: 15,
+  geminiProbeCacheMinutes: 15,
   openaiMaxToolCalls: 6,
   batchPerRun: 6,
   eventBudgetUsd: 0.25,
   monthlyBudgetUsd: 10.00,
   monthlyWarningPct: 80,
 });
+
+const GEMINI_CIRCUIT_META_KEY = 'gemini_search_circuit_v10';
+const GEMINI_PROBE_META_KEY = 'gemini_search_probe_v10';
+
+export function geminiCircuitState(record, now = Date.now()) {
+  const r = record && typeof record === 'object' ? record : {};
+  const untilMs = Date.parse(text(r.openUntil));
+  const open = Number.isFinite(untilMs) && untilMs > now;
+  return {
+    version: 10,
+    state: open ? 'open' : 'closed',
+    open,
+    openUntil: open ? new Date(untilMs).toISOString() : '',
+    remainingMs: open ? Math.max(0, untilMs - now) : 0,
+    consecutiveFailures: Number(r.consecutiveFailures || 0),
+    lastFailureAt: text(r.lastFailureAt),
+    lastFailure: text(r.lastFailure),
+    lastSuccessAt: text(r.lastSuccessAt)
+  };
+}
+
+export function geminiStructuralFailure(result) {
+  const status = Number(result?.httpStatus || 0);
+  const searches = Number(result?.searchCalls || 0);
+  const sources = Number((result?.discoveredSources || result?.sources || []).length || 0);
+  if (status >= 400 && status < 500 && status !== 408 && status !== 429) return 'provider_4xx';
+  if (status >= 500) return 'provider_5xx';
+  if (searches < 1) return 'no_real_search';
+  if (sources < 1) return 'no_sources';
+  return '';
+}
 
 const CHANNELS = Object.freeze([
   { id: 'UCgCKagVhzGnZcuP9bSMgMCg', name: 'GE TV', source: 'GE TV / YouTube', embed: true, minAgeHours: 0 },
@@ -412,7 +448,7 @@ export async function searchPublicWithOpenAI(env, task, phase = 'openai') {
     }
     const raw = await response.json();
     const webSearchCalls = countWebSearchCalls(raw);
-    // IMPORTANTE v9: captura TODAS as URLs descobertas antes de validar o JSON.
+    // IMPORTANTE v10: captura TODAS as URLs descobertas antes de validar o JSON.
     // Mesmo que o modelo erre um número/URL de campo, o cache poderá abrir a
     // matéria e resolver a ficha de forma determinística no próximo passo.
     const discoveredSources=[...extractOpenAISources(raw)];
@@ -501,6 +537,51 @@ async function metaGet(env, key) {
 async function metaPut(env, key, value) {
   await env.DB.prepare(`INSERT INTO postgame_meta(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP)
     ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=CURRENT_TIMESTAMP`).bind(key, text(value)).run();
+}
+
+async function readGeminiCircuit(env, now = Date.now()) {
+  return geminiCircuitState(safeJson(await metaGet(env, GEMINI_CIRCUIT_META_KEY), {}), now);
+}
+
+async function writeGeminiCircuit(env, value) {
+  await metaPut(env, GEMINI_CIRCUIT_META_KEY, JSON.stringify(value || {}));
+}
+
+async function updateGeminiCircuitAfterResult(env, result, now = Date.now()) {
+  const currentRaw = safeJson(await metaGet(env, GEMINI_CIRCUIT_META_KEY), {}) || {};
+  const failure = geminiStructuralFailure(result);
+  if (!failure) {
+    const closed = {
+      version: 10,
+      state: 'closed',
+      openUntil: '',
+      consecutiveFailures: 0,
+      lastFailureAt: text(currentRaw.lastFailureAt),
+      lastFailure: text(currentRaw.lastFailure),
+      lastSuccessAt: nowIso(now)
+    };
+    await writeGeminiCircuit(env, closed);
+    return geminiCircuitState(closed, now);
+  }
+
+  const status = Number(result?.httpStatus || 0);
+  const hard4xx = status >= 400 && status < 500 && status !== 408 && status !== 429;
+  const failures = Number(currentRaw.consecutiveFailures || 0) + 1;
+  const shouldOpen = hard4xx || status >= 500 || failures >= 2;
+  const minutes = hard4xx || status >= 500
+    ? PUBLIC_POLICY.geminiCircuitStructuralMinutes
+    : PUBLIC_POLICY.geminiCircuitSoftMinutes;
+  const opened = {
+    version: 10,
+    state: shouldOpen ? 'open' : 'closed',
+    openUntil: shouldOpen ? nowIso(now + minutes * 60_000) : '',
+    consecutiveFailures: failures,
+    lastFailureAt: nowIso(now),
+    lastFailure: `${failure}${status ? `:http_${status}` : ''}:${text(result?.reason).slice(0,320)}`,
+    lastSuccessAt: text(currentRaw.lastSuccessAt)
+  };
+  await writeGeminiCircuit(env, opened);
+  return geminiCircuitState(opened, now);
 }
 
 async function upsertTask(env, row, staticData = {}) {
@@ -913,13 +994,13 @@ export function planPublicStep(task, ai, now = Date.now(), budget = { allowGemin
   return{phase:'deterministic',ageMinutes};
 }
 
-export function shouldImmediateOpenAiFallback({ageMinutes=0,forcedV9=false,budget={allowOpenAI:true},complete=false}={}) {
+export function shouldImmediateOpenAiFallback({ageMinutes=0,forcedUpgrade=false,budget={allowOpenAI:true},complete=false}={}) {
   // Se depois do Gemini ainda faltam público OU renda, a partir de T+45 a
-  // contingência OpenAI entra no mesmo ciclo. Na primeira passada da v9,
-  // `forcedV9` antecipa essa regra para qualquer pendência elegível. Não usamos
+  // contingência OpenAI entra no mesmo ciclo. Na primeira passada da v10,
+  // `forcedUpgrade` antecipa essa regra para qualquer pendência elegível. Não usamos
   // `found`/`sources` como trava: um resultado parcial também precisa de fallback.
   if(complete || budget?.allowOpenAI===false) return false;
-  return Boolean(forcedV9) || Number(ageMinutes||0)>=45;
+  return Boolean(forcedUpgrade) || Number(ageMinutes||0)>=45;
 }
 
 export function nextPublicAttemptMs(task, phaseDone, nextPlan, now=Date.now(), ai={}) {
@@ -1034,27 +1115,37 @@ async function processPublicTask(env, task, now = Date.now()) {
   const values={publico:num(task.publico),publico_pagante:num(task.publico_pagante),renda:num(task.renda)};
   let sources=safeJson(task.public_sources_json,{})||{};
   let next={...ai,sol_completed:0};
-  // v9: não apaga diagnóstico útil só porque uma passada determinística não
+  // v10: não apaga diagnóstico útil só porque uma passada determinística não
   // produziu erro. O último erro só some quando público+renda forem resolvidos.
   let lastError=text(task.public_last_error);
   let costSummary=null;
   let budget={allowGemini:true,allowOpenAI:true,hardStop:false,reason:''};
   const ageMinutesAtStart=Math.max(0,(now-taskEndMs(task,now))/60_000);
 
-  // O upgrade v9 marca cada pendência no próprio row. Assim a primeira passada
+  // O upgrade v10 marca cada pendência no próprio row. Assim a primeira passada
   // executa a cascata nova mesmo que existam contadores históricos de v7/v8.
-  const forceGeminiV9=ageMinutesAtStart>=PUBLIC_POLICY.aiStartMinutes && text(task.public_last_error)==='requeued_attendance_hunter_v9_direct_gemini_openai_failover';
-  let plan=forceGeminiV9?{phase:'gemini',ageMinutes:ageMinutesAtStart,forcedV9:true}:planPublicStep(task,ai,now,budget);
+  const forceGeminiV10=ageMinutesAtStart>=PUBLIC_POLICY.aiStartMinutes && text(task.public_last_error)==='requeued_attendance_hunter_v10_gemini_discovery_circuit';
+  let plan=forceGeminiV10?{phase:'gemini',ageMinutes:ageMinutesAtStart,forcedV10:true}:planPublicStep(task,ai,now,budget);
 
   // Antes de uma busca paga/grounded, avalia o budget usando o ledger real.
   if(plan.phase==='gemini'||plan.phase==='openai'){
     costSummary=await postgamePublicCostSummary(env,now,eventId);
     budget=publicBudgetDecision(env,costSummary);
-    if(plan.forcedV9){
-      if(budget.allowGemini===false) plan={phase:'budget_guard',ageMinutes:ageMinutesAtStart,forcedV9:true};
+    if(plan.forcedV10){
+      if(budget.allowGemini===false) plan={phase:'budget_guard',ageMinutes:ageMinutesAtStart,forcedV10:true};
     }else plan=planPublicStep(task,ai,now,budget);
   }
-  next.last_phase=plan.phase+(plan.forcedV9?':forced-v9':'');
+
+  // Circuit breaker global: se o Gemini acabou de provar uma falha estrutural,
+  // nenhuma outra partida desperdiça chamadas até a janela de recuperação.
+  // OpenAI assume o mesmo slot quando o budget permitir.
+  let geminiCircuit=await readGeminiCircuit(env,now);
+  if(plan.phase==='gemini'&&geminiCircuit.open){
+    plan=budget.allowOpenAI!==false
+      ? {phase:'openai',ageMinutes:ageMinutesAtStart,geminiCircuitOpen:true,forcedV10:plan.forcedV10===true}
+      : {phase:'budget_guard',ageMinutes:ageMinutesAtStart,geminiCircuitOpen:true,forcedV10:plan.forcedV10===true};
+  }
+  next.last_phase=plan.phase+(plan.forcedV10?':forced-v10':'')+(plan.geminiCircuitOpen?':gemini-circuit-open':'');
 
   // ESPN continua sendo consultada enquanto faltar público. É gratuita e pode
   // resolver o campo sem gastar busca web.
@@ -1106,13 +1197,14 @@ async function processPublicTask(env, task, now = Date.now()) {
       : discovered.length<1?'real_search_no_sources'
       : refreshed.foundAny?'source_recovery_partial':'sources_cached_no_values';
     await recordSearchDiag(env,eventId,'gemini',found,outcome,now);
+    geminiCircuit=await updateGeminiCircuitAfterResult(env,found,now);
     if(!isPublicComplete(values)) lastError=text(found.reason)||text(refreshed.lastError)||outcome||lastError;
 
     // Failover no MESMO ciclo: para partidas com >=45min, qualquer busca Gemini
-    // que não resolva público+renda aciona OpenAI. Na primeira execução v9 isso
+    // que não resolva público+renda aciona OpenAI. Na primeira execução v10 isso
     // também vale imediatamente para pendências antigas, como a que motivou o hotfix.
     const geminiInfraFailure=Number(found.searchCalls||0)<1 || discovered.length<1 || Number(found.httpStatus||0)>=400;
-    immediateOpenAiFallback=shouldImmediateOpenAiFallback({ageMinutes:ageMinutesAtStart,forcedV9:plan.forcedV9===true,budget,geminiResult:found,discoveredCount:discovered.length,refreshedFoundAny:refreshed.foundAny,complete:isPublicComplete(values)});
+    immediateOpenAiFallback=shouldImmediateOpenAiFallback({ageMinutes:ageMinutesAtStart,forcedUpgrade:plan.forcedV10===true,budget,geminiResult:found,discoveredCount:discovered.length,refreshedFoundAny:refreshed.foundAny,complete:isPublicComplete(values)});
     if(!isPublicComplete(values)&&geminiInfraFailure&&!immediateOpenAiFallback) forceRetrySoon=true;
   }
 
@@ -1122,7 +1214,7 @@ async function processPublicTask(env, task, now = Date.now()) {
     next.last_model=text(found.model);
     next.sol_attempts=Number(next.sol_attempts||0)+1;
 
-    // v9: URLs do web_search são persistidas SEM depender da aprovação do JSON.
+    // v10: URLs do web_search são persistidas SEM depender da aprovação do JSON.
     // Assim uma matéria correta nunca se perde só porque o modelo formatou um
     // número ou fonte de campo de maneira imperfeita.
     const discovered=found.discoveredSources||found.rawSources||Object.values(found.sources||{});
@@ -1145,7 +1237,7 @@ async function processPublicTask(env, task, now = Date.now()) {
       : discovered.length<1?'real_search_no_sources'
       : refreshed.foundAny?'source_recovery_partial':'sources_cached_no_values';
     await recordSearchDiag(env,eventId,'openai',found,outcome,now);
-    if(immediateOpenAiFallback) next.last_phase=`${plan.phase}${plan.forcedV9?':forced-v9':''}->openai:fallback`;
+    if(immediateOpenAiFallback) next.last_phase=`${plan.phase}${plan.forcedV10?':forced-v10':''}->openai:fallback`;
     if(!isPublicComplete(values)) lastError=text(found.reason)||text(refreshed.lastError)||outcome||lastError;
     if(!isPublicComplete(values)&&Number(found.searchCalls||0)<1) forceRetrySoon=true;
   }
@@ -1201,21 +1293,25 @@ async function ensurePolicyVersion(env, now = Date.now()) {
   if (current >= POSTGAME_POLICY_VERSION) return false;
   const isoNow = nowIso(now);
 
-  // v9 reaplica imediatamente a nova cascata a TODA pendência. O marcador
-  // no próprio row força Gemini direto + failover OpenAI no primeiro ciclo elegível,
-  // independentemente dos contadores históricos de v7/v8.
+  // v10 reaplica imediatamente a nova cascata a TODA pendência. O marcador
+  // força uma prova Gemini discovery-only no primeiro ciclo elegível; se houver
+  // falha estrutural, o circuit breaker abre e OpenAI assume sem repetição cega.
   await env.DB.prepare(`UPDATE postgame_fastlane SET
       public_status=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN 'resolved' ELSE 'overdue' END,
       public_next_at=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN NULL ELSE ? END,
-      public_last_error='requeued_attendance_hunter_v9_direct_gemini_openai_failover',
+      public_last_error='requeued_attendance_hunter_v10_gemini_discovery_circuit',
       updated_at=CURRENT_TIMESTAMP
     WHERE public_status<>'resolved'`).bind(isoNow).run();
 
   // Preserva contadores de custo/telemetria; sol_completed continua não terminal.
   await env.DB.prepare(`UPDATE postgame_public_ai SET sol_completed=0,
-      last_phase='migrated_v9_direct_gemini_openai_failover',
+      last_phase='migrated_v10_gemini_discovery_circuit',
       updated_at=CURRENT_TIMESTAMP`).run();
 
+  // Nova versão deve comprovar o Gemini do zero: circuito/probe anteriores não
+  // podem mascarar o resultado do deploy.
+  await writeGeminiCircuit(env, {version:10,state:'closed',openUntil:'',consecutiveFailures:0,lastFailureAt:'',lastFailure:'',lastSuccessAt:''});
+  await metaPut(env, GEMINI_PROBE_META_KEY, '');
   await metaPut(env, 'static_seed_at', '1970-01-01T00:00:00.000Z');
   await metaPut(env, 'policy_version', String(POSTGAME_POLICY_VERSION));
   return true;
@@ -1281,7 +1377,8 @@ function publicRow(row) {
       }
     },
     highlight: highlight && highlight.url ? highlight : null,
-    highlight_status: text(row.highlight_status), highlight_attempts: Number(row.highlight_attempts || 0), highlight_next_at: text(row.highlight_next_at),
+    highlight_status: text(row.highlight_status), highlight_attempts: Number(row.highlight_attempts || 0),
+    highlight_last_at: text(row.highlight_last_at), highlight_next_at: text(row.highlight_next_at),
     updated_at: text(row.updated_at)
   };
 }
@@ -1310,6 +1407,48 @@ export async function readPostgameFastlane(env, eventIds = []) {
   return (result?.results || []).map(publicRow);
 }
 
+export async function postgameSearchProbe(env, now = Date.now()) {
+  const cached = safeJson(await metaGet(env, GEMINI_PROBE_META_KEY), null);
+  const cachedAt = Date.parse(text(cached?.at));
+  const cacheMs = PUBLIC_POLICY.geminiProbeCacheMinutes * 60_000;
+  if (cached && Number(cached.policyVersion) === POSTGAME_POLICY_VERSION && Number.isFinite(cachedAt) && now - cachedAt < cacheMs) {
+    return { ...cached, cached: true, circuit: await readGeminiCircuit(env, now) };
+  }
+
+  // Prova sintética, somente leitura: utiliza uma partida já encerrada e pública
+  // para validar Google Search real mesmo quando NÃO existe pendência no Hunter.
+  const task = {
+    event_id: 'probe-gemini-search-v10', league: 'bra.1',
+    home: 'Atlético-MG', away: 'Red Bull Bragantino',
+    kickoff: '2026-10-03T21:30:00.000Z', final_at: '2026-10-03T23:31:43.752Z',
+    home_score: 1, away_score: 0, round: 21, stadium: 'Arena MRV'
+  };
+  const result = await searchPublicWithGemini(env, task, ['público presente', 'renda']);
+  const urls = [...new Set((result.discoveredSources || result.sources || []).map((u) => text(u)).filter(Boolean))];
+  const searchCalls = Number(result.searchCalls || 0);
+  const httpStatus = result.httpStatus == null ? null : Number(result.httpStatus);
+  const ok = searchCalls > 0 && urls.length > 0 && !(httpStatus >= 400);
+  const circuit = await updateGeminiCircuitAfterResult(env, result, now);
+  const payload = {
+    ok,
+    probe: 'gemini-google-search',
+    probeVersion: 1,
+    policyVersion: POSTGAME_POLICY_VERSION,
+    at: nowIso(now),
+    model: text(result.model),
+    searchObserved: searchCalls > 0,
+    searchCalls,
+    sourcesFound: urls.length,
+    sampleSources: urls.slice(0, 5),
+    route: text(result.route),
+    httpStatus,
+    result: ok ? 'real_search_with_sources' : 'probe_failed',
+    error: ok ? '' : text(result.reason).slice(0, 700)
+  };
+  await metaPut(env, GEMINI_PROBE_META_KEY, JSON.stringify(payload));
+  return { ...payload, cached: false, circuit };
+}
+
 export async function postgameStatus(env) {
   const probeRaw = await metaGet(env, 'mailer_probe');
   const counts = await env.DB.prepare(`SELECT
@@ -1323,6 +1462,8 @@ export async function postgameStatus(env) {
     FROM postgame_fastlane`).first();
   const cfg = mailConfig(env);
   const storedPolicyVersion = Number(await metaGet(env, 'policy_version') || 0);
+  const geminiCircuit = await readGeminiCircuit(env);
+  const geminiProbe = safeJson(await metaGet(env, GEMINI_PROBE_META_KEY), null);
   return {
     ok: true,
     engine: 'cloudflare-postgame-fastlane',
@@ -1338,6 +1479,11 @@ export async function postgameStatus(env) {
     geminiInteractionsDirect: true,
     geminiAiGatewayBypassForWebSearch: true,
     geminiSearchObservedFromSteps: true,
+    geminiDiscoveryOnly: true,
+    geminiStructuredOutputDuringSearch: false,
+    geminiCircuitBreaker: true,
+    geminiCircuit,
+    geminiSearchProbe: geminiProbe,
     geminiGenerateContentDirectFallback: true,
     openAiImmediateFallbackAfterGeminiFailure: true,
     openAiRequiredWebSearch: true,

@@ -7,7 +7,7 @@ import { opsStatus, runOperationalMaintenance } from './ops.js';
 import { probeEspnSources } from './espn-source.js';
 import { LIVE_API_CONSTANTS, resolveLiveScoreboard, resolveLiveSummary } from './live-api.js';
 import { createLiveStatsStore } from './live-stats-store.js';
-import { postgameStatus, readPostgameFastlane, runPostgameMaintenance } from './postgame-fastlane.js';
+import { postgameSearchProbe, postgameStatus, readPostgameFastlane, runPostgameMaintenance } from './postgame-fastlane.js';
 import { feedbackNotifierConfigured, runFeedbackNotifier } from './feedback-notifier.js';
 import { healthMonitorStatus, runHealthMonitor } from './health-monitor.js';
 
@@ -600,8 +600,8 @@ export default {
       return json(request, {
         ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok) && Boolean(operational?.ok),
         service: 'formula-do-gol-push',
-        version: 9,
-        revision: '6-R10R11-POSTGAME-HUNTER-V9-DIRECT-GEMINI-OPENAI-FAILOVER-READINESS-R10.1-SCORER-R10R5',
+        version: 10,
+        revision: '6-R10R12-POSTGAME-HUNTER-V10-GEMINI-DISCOVERY-CIRCUIT-RESULTS-FRESHNESS-R10R9-READINESS-R10.1-SCORER-R10R5',
         liveGatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
         liveStateContractVersion: LIVE_API_CONSTANTS.LIVE_STATE_CONTRACT_VERSION,
         liveFactsContractVersion: LIVE_API_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
@@ -622,8 +622,8 @@ export default {
         continentalStatsTargetMinPerTeam: LIVE_API_CONSTANTS.CONTINENTAL_STATS_TARGET,
         bestKnownStatsCache: true,
         postgameFastlane: true,
-        postgameFastlaneVersion: 9,
-        postgameAttendanceHunterVersion: 9,
+        postgameFastlaneVersion: 10,
+        postgameAttendanceHunterVersion: 10,
         postgamePublicPersistentUntilResolved: true,
         postgamePublicSlaMinutes: 120,
         postgamePublicHourlyAfterSla: true,
@@ -636,17 +636,21 @@ export default {
         postgameGeminiInteractionsDirect: true,
         postgameGeminiAiGatewayBypassForWebSearch: true,
         postgameGeminiSearchObservedFromSteps: true,
+        postgameGeminiDiscoveryOnly: true,
+        postgameGeminiStructuredOutputDuringSearch: false,
+        postgameGeminiCircuitBreaker: true,
+        postgameGeminiSearchProbe: true,
         postgameGeminiGenerateContentDirectFallback: true,
         postgameOpenAiImmediateFallbackAfterGeminiFailure: true,
         postgameOpenAiRequiredWebSearch: true,
         postgameOpenAiSourceRecovery: true,
         postgameSearchDiagnostics: true,
-        postgamePendingRequeueOnV9: true,
+        postgamePendingRequeueOnV10: true,
           aiGateway: String(env.AI_GATEWAY_ID || 'default'),
           aiGatewayAuthenticated: Boolean(env.AI_GATEWAY_TOKEN),
           geminiSearch: Boolean(env.GEMINI_API_KEY),
           workersAiExtraction: Boolean(env.AI),
-          postgameAiRouting: 'ESPN/cache -> Gemini Interactions DIRECT + observed Google Search -> direct generateContent fallback -> OpenAI REQUIRED web_search same-cycle failover -> source cache + deterministic ficha parser -> Workers AI extraction',
+          postgameAiRouting: 'ESPN/cache -> Gemini Interactions DIRECT discovery-only + observed Google Search -> source cache + deterministic parser -> circuit breaker -> OpenAI REQUIRED web_search same-cycle failover -> Workers AI extraction',
         feedbackNotifier: true,
         feedbackNotifierConfigured: feedbackNotifierConfigured(env),
         healthEmailMonitor: true,
@@ -695,6 +699,11 @@ export default {
       if (url.pathname === '/v1/postgame/status' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'postgame-status'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
         return json(request, await postgameStatus(env), 200, { 'Cache-Control': 'no-store' });
+      }
+      if (url.pathname === '/v1/postgame/search-probe' && request.method === 'GET') {
+        if (!(await allowStatusRead(request, env, 'postgame-search-probe'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
+        const probe = await postgameSearchProbe(env);
+        return json(request, probe, probe.ok ? 200 : 503, { 'Cache-Control': 'no-store' });
       }
       if (url.pathname === '/v1/live/summary' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'live-summary'))) return json(request, { ok: false, error: 'rate_limited' }, 429);

@@ -42,7 +42,7 @@ assert.doesNotMatch(prompt,/NÃO use sites oficiais de clubes/);
 
 
 
-// Hunter v9: Interactions direto precisa expor busca real e URLs utilizáveis.
+// Hunter v10: Interactions direto precisa expor busca real e URLs utilizáveis.
 const interactionRaw={
   status:'completed',
   steps:[
@@ -67,9 +67,10 @@ assert.deepEqual(geminiInteractionSources(interactionLegacy),['https://www.estad
 assert.match(geminiInteractionText(interactionLegacy),/encontrado/);
 const interactionRequest=geminiInteractionRequest(hunterTask,['público presente','renda']);
 assert.equal(interactionRequest.tools[0].type,'google_search');
-assert.equal(interactionRequest.response_format.mime_type,'application/json');
+assert.equal(interactionRequest.response_format,undefined);
 assert.deepEqual(interactionRequest.tools,[{type:'google_search'}]);
-assert.equal(interactionRequest.generation_config,undefined);
+assert.equal(interactionRequest.generation_config.tool_choice,'any');
+assert.equal(interactionRequest.generation_config.max_output_tokens,600);
 assert.equal('search_types' in interactionRequest.tools[0],false);
 
 // R10R8: Interactions vai DIRETO ao Google. Se não houver busca real/fontes,
@@ -98,13 +99,39 @@ assert.equal('search_types' in interactionRequest.tools[0],false);
     assert.equal(routed.apiCalls,2);
     assert.equal(routed.found,true);
     assert.ok(routed.sources.includes('https://www.uol.com.br/esporte/ficha.htm'));
-    assert.equal(routed.route,'direct_interactions_v9 -> direct_generateContent_grounding_v9');
+    assert.equal(routed.route,'direct_interactions_v10_discovery -> direct_generateContent_grounding_v10_discovery');
     assert.equal(calls[0].url,'https://generativelanguage.googleapis.com/v1beta/interactions');
-    assert.equal(calls[0].body.generation_config,undefined);
+    assert.equal(calls[0].body.generation_config.tool_choice,'any');
+    assert.equal(calls[0].body.response_format,undefined);
     assert.deepEqual(calls[0].body.tools,[{type:'google_search'}]);
     assert.ok(calls[1].url.includes(':generateContent'));
     assert.equal(calls[1].body.generationConfig.temperature,undefined);
+    assert.equal(calls[1].body.generationConfig.responseSchema,undefined);
+    assert.equal(calls[1].body.generationConfig.responseMimeType,undefined);
     assert.deepEqual(calls[1].body.tools,[{google_search:{}}]);
+  } finally { globalThis.fetch=previousFetch; }
+}
+
+// R10R9: sucesso de descoberta NÃO depende de JSON estruturado. Texto livre +
+// google_search_call + URL citada já é uma busca útil para o source recovery.
+{
+  const previousFetch=globalThis.fetch;
+  try{
+    globalThis.fetch=async ()=>new Response(JSON.stringify({
+      status:'completed',
+      steps:[
+        {type:'google_search_call',arguments:{queries:['Atlético-MG Bragantino público renda']}},
+        {type:'model_output',content:[{type:'text',text:'Encontrei a ficha técnica no UOL.',annotations:[{type:'url_citation',url:'https://www.uol.com.br/esporte/ficha-real.htm'}]}]}
+      ],
+      usage:{total_input_tokens:12,total_output_tokens:8,total_tokens:20}
+    }),{status:200,headers:{'content-type':'application/json'}});
+    const discovered=await searchPublicWithGemini({GEMINI_API_KEY:'gem-test'},hunterTask,['público presente','renda']);
+    assert.equal(discovered.searchObserved,true);
+    assert.equal(discovered.searchCalls,1);
+    assert.equal(discovered.apiCalls,1);
+    assert.equal(discovered.found,false);
+    assert.equal(discovered.reason,'gemini_sources_discovered');
+    assert.deepEqual(discovered.sources,['https://www.uol.com.br/esporte/ficha-real.htm']);
   } finally { globalThis.fetch=previousFetch; }
 }
 

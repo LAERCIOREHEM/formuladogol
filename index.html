@@ -2955,6 +2955,7 @@ body > .container > section.hero > img {
 
 <script src="js/br-estatisticas-ordem.js?v=20260816-ordem-canonica-v1"></script>
 <script src="js/br-classificacao-live.js?v=20260920-monitor-facts-v7"></script>
+<script src="js/br-resultados-freshness.js?v=20261004-r10r9"></script>
 <script>
 const BR_PUBLIC_ONLY = true;
 
@@ -3090,8 +3091,13 @@ async function carregarMelhoresMomentos(opcoes = {}) {
     state.melhoresMomentos = { ...autoJogos, ...manualJogos };
     const totalAuto = auto && auto.total_vinculados ? Number(auto.total_vinculados) : Object.keys(autoJogos).length;
     const totalManual = Object.keys(manualJogos).length;
+    const freshness = window.BRResultadosFreshness;
     state.melhoresMomentosMeta = {
-      atualizado_em: (manual && manual.atualizado_em) || (auto && auto.atualizado_em) || null,
+      // Conteúdo manual continua tendo precedência sobre o automático, mas a
+      // hora exibida deve ser a MAIS RECENTE entre os dois arquivos.
+      atualizado_em: freshness
+        ? freshness.latestTimestamp([(manual && manual.atualizado_em), (auto && auto.atualizado_em)])
+        : ((manual && manual.atualizado_em) || (auto && auto.atualizado_em) || null),
       fonte: totalManual ? 'Fontes oficiais no YouTube + fallback manual' : ((auto && auto.fonte) || 'Fontes oficiais no YouTube'),
       total_vinculados: Object.keys(state.melhoresMomentos).length || totalAuto || 0,
       total_automaticos: totalAuto || 0,
@@ -6174,14 +6180,17 @@ function renderResultados() {
   let html = '<div class="resultados-header">';
   html += '<div class="resultados-titulo-area">';
   html += `<h2 style="font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin: 0;">Resultados${filtroTime ? ' · ' + filtroTime : ''}</h2>`;
-  if (meta.atualizado_em_br) {
+  const freshnessResultados = window.BRResultadosFreshness
+    ? window.BRResultadosFreshness.effectiveUpdate(state)
+    : { br: meta.atualizado_em_br || '', source: 'resultado-br-fallback' };
+  if (freshnessResultados.br) {
     const consolidados = Array.isArray(state.resultados) ? state.resultados.length : 0;
     const esperadoResultados = Number(meta.total_resultados) || consolidados;
     const provisoriosEspn = resultadosDisponiveis.filter(r => r && r._provisorioESPN).length;
     const statusResultados = provisoriosEspn
       ? `${coberturaJogosBr(consolidados, esperadoResultados || consolidados)} jogos consolidados · +${provisoriosEspn} ${provisoriosEspn === 1 ? 'resultado recém-finalizado' : 'resultados recém-finalizados'} ESPN`
       : `${coberturaJogosBr(resultadosDisponiveis.length, esperadoResultados || resultadosDisponiveis.length)} jogos finalizados listados`;
-    html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">Atualizado ${brEscapeHtml(meta.atualizado_em_br)} · ${brEscapeHtml(statusResultados)}<span class="br-update-status-dot" role="img" aria-label="Status da atualização do Brasileirão" title="Status da atualização do Brasileirão"></span></span>`;
+    html += `<span style="font-size:11px;color:var(--accent);font-weight:700;" data-resultados-freshness-source="${brEscapeAttr(freshnessResultados.source || '')}">Atualizado ${brEscapeHtml(freshnessResultados.br)} · ${brEscapeHtml(statusResultados)}<span class="br-update-status-dot" role="img" aria-label="Status da atualização do Brasileirão" title="Status da atualização do Brasileirão"></span></span>`;
   }
   html += '</div>';
 

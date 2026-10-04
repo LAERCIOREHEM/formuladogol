@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI } from '../src/postgame-fastlane.js';
+import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI, geminiCircuitState, geminiStructuralFailure } from '../src/postgame-fastlane.js';
 
 assert.equal(highlightTitleValid('FLAMENGO 1 X 0 BRAGANTINO | MELHORES MOMENTOS | BRASILEIRÃO 2026', 'Flamengo', 'Bragantino'), true);
 assert.equal(highlightTitleValid('FLAMENGO X BRAGANTINO | AQUECIMENTO AO VIVO | BRASILEIRÃO', 'Flamengo', 'Bragantino'), false);
@@ -125,7 +125,7 @@ assert.deepEqual([...extractOpenAISources(openAiSourceFixture)].sort(),[
 }
 console.log('postgame-fastlane tests: PASS');
 
-// ============================ Política v9 ============================
+// ============================ Política v10 ============================
 import {
   PUBLIC_POLICY, planPublicStep, nextPublicAttemptMs, publicSearchRequest, shouldImmediateOpenAiFallback,
   parseEspnAttendance, isPublicComplete, publicAlertMessage, taskEndMs,
@@ -161,6 +161,20 @@ assert.equal(PUBLIC_POLICY.overdueGeminiEveryMinutes,60);
 assert.equal(PUBLIC_POLICY.overdueOpenaiEveryMinutes,180);
 assert.equal(PUBLIC_POLICY.eventBudgetUsd,0.25);
 assert.equal(PUBLIC_POLICY.monthlyBudgetUsd,10);
+assert.equal(PUBLIC_POLICY.geminiCircuitStructuralMinutes,30);
+assert.equal(PUBLIC_POLICY.geminiCircuitSoftMinutes,15);
+assert.equal(PUBLIC_POLICY.geminiProbeCacheMinutes,15);
+
+// R10R9: circuit breaker impede repetição cega de erro estrutural do Gemini.
+assert.equal(geminiStructuralFailure({httpStatus:400,searchCalls:0,sources:[]}), 'provider_4xx');
+assert.equal(geminiStructuralFailure({httpStatus:200,searchCalls:0,sources:[]}), 'no_real_search');
+assert.equal(geminiStructuralFailure({httpStatus:200,searchCalls:1,sources:['https://uol.com.br/x']}), '');
+const circuitNow=Date.parse('2026-10-04T07:30:00.000Z');
+const circuitOpen=geminiCircuitState({openUntil:'2026-10-04T07:45:00.000Z',consecutiveFailures:1,lastFailure:'provider_4xx'},circuitNow);
+assert.equal(circuitOpen.open,true);
+assert.equal(circuitOpen.state,'open');
+assert.equal(circuitOpen.remainingMs,15*60_000);
+assert.equal(geminiCircuitState({openUntil:'2026-10-04T07:20:00.000Z'},circuitNow).open,false);
 
 assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'gemini'},at(4),zero),at(5));
 assert.equal(nextPublicAttemptMs(task,'gemini',{phase:'deterministic'},at(5),{...zero,mini_attempts:1}),at(10));
@@ -203,11 +217,11 @@ assert.match(msg.body,/busca automática CONTINUA/);
 assert.match(msg.body,/Depois de 2h o Hunter tenta novamente a cada 1h/);
 assert.doesNotMatch(msg.body,/Nenhuma nova busca automática será feita/);
 
-// R10R8: falha Gemini em jogo >=45min precisa acionar OpenAI NO MESMO CICLO.
+// R10R9: falha Gemini em jogo >=45min precisa acionar OpenAI NO MESMO CICLO.
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),true);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:20,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),false);
-assert.equal(shouldImmediateOpenAiFallback({ageMinutes:20,forcedV9:true,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),true);
+assert.equal(shouldImmediateOpenAiFallback({ageMinutes:20,forcedUpgrade:true,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),true);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:false},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),false);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:1,httpStatus:200,found:true},discoveredCount:2,refreshedFoundAny:true,complete:true}),false);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:1,httpStatus:200,found:true},discoveredCount:2,refreshedFoundAny:true,complete:false}),true);
-console.log('postgame-fastlane v9 policy tests: PASS');
+console.log('postgame-fastlane v10 policy + circuit tests: PASS');
