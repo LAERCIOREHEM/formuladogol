@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { aiGatewayId, gatewayBase, aiGatewayAuthHeaders, aiGatewayAuthConfigured, geminiConfigured, geminiGroundingSources, geminiSearchCount, isAiGatewayPreProviderFailure, fetchOpenAiResponses, publicSchemaInstruction } from '../src/ai-router.js';
+import { aiGatewayId, gatewayBase, aiGatewayAuthHeaders, aiGatewayAuthConfigured, geminiConfigured, geminiGroundingSources, geminiSearchCount, geminiInteractionSearchCount, geminiInteractionSources, geminiInteractionText, geminiInteractionRequest, searchPublicWithGemini, isAiGatewayPreProviderFailure, fetchOpenAiResponses, publicSchemaInstruction } from '../src/ai-router.js';
 import { POSTGAME_SEARCH_PROFILE_VERSION, TEAM_SEARCH_PROFILES, buildAttendanceSearchQueries, officialClubDomainsForTask, attendanceSourceQuality } from '../src/postgame-search-profile.js';
 
 assert.equal(aiGatewayId({}), 'default');
@@ -40,6 +40,62 @@ assert.match(prompt,/site:uol\.com\.br/);
 assert.match(prompt,/atletico\.com\.br/);
 assert.doesNotMatch(prompt,/NÃO use sites oficiais de clubes/);
 
+
+
+// Hunter v8: a Interactions API precisa expor busca real e URLs utilizáveis.
+const interactionRaw={
+  status:'completed',
+  steps:[
+    {type:'google_search_call',id:'search_1',arguments:{query:'Atlético-MG Red Bull Bragantino público renda'}},
+    {type:'google_search_result',call_id:'search_1',result:[{title:'Ficha',url:'https://www.uol.com.br/esporte/ficha.htm',snippet:'PÚBLICO 22.159'}]},
+    {type:'model_output',content:[{type:'text',text:'{"encontrado":true,"publico":22159,"publico_pagante":null,"renda":1002775.79,"fonte_publico":"https://www.uol.com.br/esporte/ficha.htm","fonte_publico_pagante":null,"fonte_renda":"https://www.uol.com.br/esporte/ficha.htm","confianca":1,"observacao":"ficha"}',annotations:[{type:'url_citation',uri:'https://www.uol.com.br/esporte/ficha.htm'}]}]},
+  ],
+  usage:{total_input_tokens:100,total_output_tokens:50,total_tokens:150,grounding_tool_count:[{type:'google_search',count:1}]}
+};
+assert.equal(geminiInteractionSearchCount(interactionRaw),1);
+assert.deepEqual(geminiInteractionSources(interactionRaw),['https://www.uol.com.br/esporte/ficha.htm']);
+assert.match(geminiInteractionText(interactionRaw),/22159/);
+// Compatibilidade defensiva com o schema anterior `outputs`, caso um gateway
+// ainda transcodifique a resposta da Interactions API dessa forma.
+const interactionLegacy={outputs:[
+  {type:'google_search_call',id:'gs_old',arguments:{queries:['q']}},
+  {type:'google_search_result',call_id:'gs_old',result:[{url:'https://www.estadao.com.br/esportes/futebol/ficha'}]},
+  {type:'text',text:'{"encontrado":false}',annotations:[{source:'https://www.estadao.com.br/esportes/futebol/ficha'}]}
+]};
+assert.equal(geminiInteractionSearchCount(interactionLegacy),1);
+assert.deepEqual(geminiInteractionSources(interactionLegacy),['https://www.estadao.com.br/esportes/futebol/ficha']);
+assert.match(geminiInteractionText(interactionLegacy),/encontrado/);
+const interactionRequest=geminiInteractionRequest(hunterTask,['público presente','renda']);
+assert.equal(interactionRequest.tools[0].type,'google_search');
+assert.equal(interactionRequest.generation_config.tool_choice,'any');
+assert.equal(interactionRequest.response_format.mime_type,'application/json');
+
+// Se o AI Gateway responder 200 porém SEM google_search_call/fontes, o v8
+// precisa repetir DIRETO no Google e retornar as fontes do retry.
+{
+  const previousFetch=globalThis.fetch;
+  const calls=[];
+  try{
+    globalThis.fetch=async (url,opts={})=>{
+      calls.push({url:String(url),body:JSON.parse(String(opts.body||'{}'))});
+      if(calls.length===1){
+        return new Response(JSON.stringify({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:'{"encontrado":false,"publico":null,"publico_pagante":null,"renda":null,"fonte_publico":null,"fonte_publico_pagante":null,"fonte_renda":null,"confianca":0,"observacao":"sem busca"}'}]}],usage:{total_input_tokens:10,total_output_tokens:10,total_tokens:20}}),{status:200,headers:{'content-type':'application/json'}});
+      }
+      return new Response(JSON.stringify(interactionRaw),{status:200,headers:{'content-type':'application/json'}});
+    };
+    const forced=await searchPublicWithGemini({AI_GATEWAY_ACCOUNT_ID:'abc',AI_GATEWAY_ID:'default',AI_GATEWAY_TOKEN:'cf',GEMINI_API_KEY:'gem-test'},hunterTask,['público presente','renda']);
+    assert.equal(forced.forcedSearch,true);
+    assert.equal(forced.searchCalls,1);
+    assert.equal(forced.apiCalls,2);
+    assert.equal(forced.found,true);
+    assert.ok(forced.sources.includes('https://www.uol.com.br/esporte/ficha.htm'));
+    assert.match(forced.route,/ai_gateway_interactions/);
+    assert.match(forced.route,/direct_fallback_gateway_no_grounding/);
+    assert.ok(calls[0].url.includes('/google-ai-studio/v1beta/interactions'));
+    assert.equal(calls[0].body.generation_config.tool_choice,'any');
+    assert.equal(calls[1].url,'https://generativelanguage.googleapis.com/v1beta/interactions');
+  } finally { globalThis.fetch=previousFetch; }
+}
 const originalFetch=globalThis.fetch;
 try {
   const calls=[];

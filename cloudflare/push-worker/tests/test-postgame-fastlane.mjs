@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic } from '../src/postgame-fastlane.js';
+import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources } from '../src/postgame-fastlane.js';
 
 assert.equal(highlightTitleValid('FLAMENGO 1 X 0 BRAGANTINO | MELHORES MOMENTOS | BRASILEIRÃO 2026', 'Flamengo', 'Bragantino'), true);
 assert.equal(highlightTitleValid('FLAMENGO X BRAGANTINO | AQUECIMENTO AO VIVO | BRASILEIRÃO', 'Flamengo', 'Bragantino'), false);
@@ -81,9 +81,23 @@ const officialPayload = {encontrado:true,publico:42000,publico_pagante:null,rend
 assert.equal(validatePublicPayload(officialPayload,['https://www.saopaulofc.net/noticias/ficha'],officialSp).accepted,true);
 assert.equal(validatePublicPayload(officialPayload,['https://www.saopaulofc.net/noticias/ficha'],{home:'Flamengo',away:'Santos'}).accepted,false);
 
+
+
+// v8 Source Recovery: as URLs do web_search existem independentemente de o
+// JSON numérico final ser aceito. O pipeline deve poder cacheá-las e abrir a
+// página com o parser determinístico.
+const openAiSourceFixture={output:[
+  {type:'web_search_call',action:{sources:[{url:'https://www.uol.com.br/esporte/ficha.htm'},{url:'https://www.estadao.com.br/esportes/ficha'}]}},
+  {type:'message',content:[{type:'output_text',text:'{}',annotations:[{type:'url_citation',url:'https://www.r7.com/esportes/ficha'}]}]}
+]};
+assert.deepEqual([...extractOpenAISources(openAiSourceFixture)].sort(),[
+  'https://www.estadao.com.br/esportes/ficha',
+  'https://www.r7.com/esportes/ficha',
+  'https://www.uol.com.br/esporte/ficha.htm'
+].sort());
 console.log('postgame-fastlane tests: PASS');
 
-// ============================ Política v7 ============================
+// ============================ Política v8 ============================
 import {
   PUBLIC_POLICY, planPublicStep, nextPublicAttemptMs, publicSearchRequest,
   parseEspnAttendance, isPublicComplete, publicAlertMessage, taskEndMs,
@@ -155,4 +169,4 @@ const msg=publicAlertMessage(task,{publico:null,publico_pagante:null,renda:null}
 assert.match(msg.body,/busca automática CONTINUA/);
 assert.match(msg.body,/Depois de 2h o Hunter tenta novamente a cada 1h/);
 assert.doesNotMatch(msg.body,/Nenhuma nova busca automática será feita/);
-console.log('postgame-fastlane v7 policy tests: PASS');
+console.log('postgame-fastlane v8 policy tests: PASS');

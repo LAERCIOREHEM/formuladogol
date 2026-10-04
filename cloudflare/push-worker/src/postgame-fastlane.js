@@ -13,17 +13,21 @@ const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
-const POSTGAME_POLICY_VERSION = 7;
+const POSTGAME_POLICY_VERSION = 8;
 
 /*
- * Attendance/Revenue Hunter v7 — recuperação ativa e genérica:
+ * Attendance/Revenue Hunter v8 — Forced Web Search + Source Recovery:
  *   - Reutiliza aliases de TODOS os clubes no Gemini e no OpenAI.
  *   - Aceita imprensa nacional/regional + sites oficiais SOMENTE dos dois clubes
  *     participantes, exclusivamente para fatos documentais de ficha técnica.
  *   - Parser determinístico extrai rótulos explícitos de público/pagantes/renda
  *     antes de gastar Workers AI.
  *   - Gemini reforçado entre T+20 e T+70; OpenAI segue como fallback controlado.
- *   - Upgrade v7 reabre imediatamente toda pendência para validar o algoritmo novo.
+ *   - Gemini Interactions API exige uma chamada real ao Google Search e expõe passos/fontes.
+ *   - Resposta do Gateway sem busca/fontes força retry direto; generateContent fica só como contingência.
+ *   - Toda URL descoberta pelo OpenAI é cacheada mesmo quando o payload numérico é rejeitado.
+ *   - Diagnóstico por provedor separa API calls, buscas reais, fontes e último resultado.
+ *   - Upgrade v8 reabre imediatamente toda pendência para validar o algoritmo novo.
  *   - Nunca existe GAVE_UP para público/renda.
  */
 export const PUBLIC_POLICY = Object.freeze({
@@ -154,7 +158,7 @@ function extractOpenAIText(response) {
   return parts.join('');
 }
 
-function extractOpenAISources(response) {
+export function extractOpenAISources(response) {
   const urls = new Set();
   for (const item of response?.output || []) {
     if (item?.type === 'web_search_call') {
@@ -376,10 +380,10 @@ function missingPublicFields(values) {
 export async function searchPublicWithOpenAI(env, task, phase = 'openai') {
   const apiKey = text(env?.OPENAI_API_KEY);
   const missing = missingPublicFields(task);
-  if (!missing.length) return { found: true, responded: false, complete: true, values: {}, model: '' };
+  if (!missing.length) return { found: true, responded: false, complete: true, values: {}, model: '', discoveredSources:[], searchCalls:0, apiCalls:0 };
   const request = publicSearchRequest(task, missing, env, phase);
   const model = request.model;
-  if (!apiKey) return { found: false, responded: false, reason: 'openai_key_missing', model };
+  if (!apiKey) return { found: false, responded: false, reason: 'openai_key_missing', model, discoveredSources:[], searchCalls:0, apiCalls:0 };
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 55_000);
   const startedAt = Date.now();
@@ -399,35 +403,40 @@ export async function searchPublicWithOpenAI(env, task, phase = 'openai') {
     });
     const response = routed.response;
     httpStatus = response.status;
+    const common={model,route:text(routed.route),apiCalls:Number(routed.apiCalls||1),httpStatus};
     if (!response.ok) {
       const detail = text(await response.text().catch(() => '')).slice(0, 200);
       await record({responded:false,ok:false,detail:`${routed.route||'openai'}:http_${response.status}:${detail}`,webSearchCalls:0});
-      return { found: false, responded: false, reason: `openai_http_${response.status}${detail ? `:${detail}` : ''}`, model };
+      return { found:false, responded:false, reason:`openai_http_${response.status}${detail ? `:${detail}` : ''}`, discoveredSources:[], searchCalls:0, ...common };
     }
     const raw = await response.json();
     const webSearchCalls = countWebSearchCalls(raw);
+    // IMPORTANTE v8: captura TODAS as URLs descobertas antes de validar o JSON.
+    // Mesmo que o modelo erre um número/URL de campo, o cache poderá abrir a
+    // matéria e resolver a ficha de forma determinística no próximo passo.
+    const discoveredSources=[...extractOpenAISources(raw)];
+    const acceptedSources = robustSources(discoveredSources, task);
     const output = extractOpenAIText(raw);
     if (!output) {
-      await record({raw,responded:true,ok:false,detail:'openai_empty_output',webSearchCalls});
-      return { found:false,responded:true,reason:'openai_empty_output',model };
+      await record({raw,responded:true,ok:false,detail:`openai_empty_output:sources=${discoveredSources.length}`,webSearchCalls});
+      return { found:false,responded:true,reason:'openai_empty_output',discoveredSources,rawSources:acceptedSources,searchCalls:webSearchCalls,...common };
     }
     const parsed = safeJson(output, null);
     if (!parsed) {
-      await record({raw,responded:true,ok:false,detail:'openai_invalid_json',webSearchCalls});
-      return { found:false,responded:true,reason:'openai_invalid_json',model };
+      await record({raw,responded:true,ok:false,detail:`openai_invalid_json:sources=${discoveredSources.length}`,webSearchCalls});
+      return { found:false,responded:true,reason:'openai_invalid_json',discoveredSources,rawSources:acceptedSources,searchCalls:webSearchCalls,...common };
     }
-    const sources = robustSources(extractOpenAISources(raw), task);
-    const verified = validatePublicPayload(parsed, sources, task);
+    const verified = validatePublicPayload(parsed, acceptedSources, task);
     if (!verified.accepted) {
-      await record({raw,responded:true,ok:true,detail:verified.reason,webSearchCalls});
-      return { found:false,responded:true,reason:verified.reason,model,sources };
+      await record({raw,responded:true,ok:webSearchCalls>0,detail:`${verified.reason}:sources=${discoveredSources.length}`,webSearchCalls});
+      return { found:false,responded:true,reason:verified.reason,parsed,discoveredSources,rawSources:acceptedSources,searchCalls:webSearchCalls,...common };
     }
-    await record({raw,responded:true,ok:true,detail:'accepted',webSearchCalls});
-    return { found: true, responded: true, model, rawSources:sources, ...verified };
+    await record({raw,responded:true,ok:true,detail:`accepted:sources=${discoveredSources.length}`,webSearchCalls});
+    return { found:true, responded:true, parsed, discoveredSources, rawSources:acceptedSources, searchCalls:webSearchCalls, ...common, ...verified };
   } catch (error) {
     const detail=text(error?.message||error).slice(0,240);
     await record({responded:false,ok:false,detail:`openai_error:${detail}`,webSearchCalls:0});
-    return { found: false, responded: false, reason: `openai_error:${detail}`, model };
+    return { found:false, responded:false, reason:`openai_error:${detail}`, model, discoveredSources:[], searchCalls:0, apiCalls:0, httpStatus };
   } finally { clearTimeout(timer); }
 }
 
@@ -766,6 +775,64 @@ async function writePublicAiState(env, eventId, state) {
     ).run();
 }
 
+
+async function readSearchDiag(env,eventId){
+  const row=await env.DB.prepare('SELECT * FROM postgame_public_search_diag WHERE event_id=?').bind(text(eventId)).first();
+  return {
+    gemini_api_calls:Number(row?.gemini_api_calls||0),
+    gemini_search_calls:Number(row?.gemini_search_calls||0),
+    gemini_sources_found:Number(row?.gemini_sources_found||0),
+    gemini_last_route:text(row?.gemini_last_route),
+    gemini_last_http_status:row?.gemini_last_http_status==null?null:Number(row.gemini_last_http_status),
+    gemini_last_result:text(row?.gemini_last_result),
+    gemini_last_error:text(row?.gemini_last_error),
+    openai_api_calls:Number(row?.openai_api_calls||0),
+    openai_search_calls:Number(row?.openai_search_calls||0),
+    openai_sources_found:Number(row?.openai_sources_found||0),
+    openai_last_route:text(row?.openai_last_route),
+    openai_last_http_status:row?.openai_last_http_status==null?null:Number(row.openai_last_http_status),
+    openai_last_result:text(row?.openai_last_result),
+    openai_last_error:text(row?.openai_last_error),
+    last_provider:text(row?.last_provider), last_at:text(row?.last_at),
+  };
+}
+
+async function recordSearchDiag(env,eventId,provider,result={},outcome='',now=Date.now()){
+  const apiCalls=Math.max(0,Number(result.apiCalls||0));
+  const searchCalls=Math.max(0,Number(result.searchCalls||0));
+  const sourcesFound=[...new Set((result.discoveredSources||result.sources||[]).map(normalizeUrl).filter(Boolean))].length;
+  const route=text(result.route);
+  const status=Number.isFinite(Number(result.httpStatus))?Number(result.httpStatus):null;
+  const accepted=String(outcome||'').startsWith('accepted_');
+  const error=(result.found||accepted)?'':text(result.reason);
+  const at=nowIso(now);
+  if(provider==='gemini'){
+    await env.DB.prepare(`INSERT INTO postgame_public_search_diag(
+      event_id,gemini_api_calls,gemini_search_calls,gemini_sources_found,gemini_last_route,gemini_last_http_status,gemini_last_result,gemini_last_error,last_provider,last_at,updated_at
+    ) VALUES(?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP)
+    ON CONFLICT(event_id) DO UPDATE SET
+      gemini_api_calls=postgame_public_search_diag.gemini_api_calls+excluded.gemini_api_calls,
+      gemini_search_calls=postgame_public_search_diag.gemini_search_calls+excluded.gemini_search_calls,
+      gemini_sources_found=postgame_public_search_diag.gemini_sources_found+excluded.gemini_sources_found,
+      gemini_last_route=excluded.gemini_last_route,gemini_last_http_status=excluded.gemini_last_http_status,
+      gemini_last_result=excluded.gemini_last_result,gemini_last_error=excluded.gemini_last_error,
+      last_provider=excluded.last_provider,last_at=excluded.last_at,updated_at=CURRENT_TIMESTAMP`)
+      .bind(text(eventId),apiCalls,searchCalls,sourcesFound,route,status,text(outcome),error.slice(0,500),'gemini',at).run();
+  }else if(provider==='openai'){
+    await env.DB.prepare(`INSERT INTO postgame_public_search_diag(
+      event_id,openai_api_calls,openai_search_calls,openai_sources_found,openai_last_route,openai_last_http_status,openai_last_result,openai_last_error,last_provider,last_at,updated_at
+    ) VALUES(?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP)
+    ON CONFLICT(event_id) DO UPDATE SET
+      openai_api_calls=postgame_public_search_diag.openai_api_calls+excluded.openai_api_calls,
+      openai_search_calls=postgame_public_search_diag.openai_search_calls+excluded.openai_search_calls,
+      openai_sources_found=postgame_public_search_diag.openai_sources_found+excluded.openai_sources_found,
+      openai_last_route=excluded.openai_last_route,openai_last_http_status=excluded.openai_last_http_status,
+      openai_last_result=excluded.openai_last_result,openai_last_error=excluded.openai_last_error,
+      last_provider=excluded.last_provider,last_at=excluded.last_at,updated_at=CURRENT_TIMESTAMP`)
+      .bind(text(eventId),apiCalls,searchCalls,sourcesFound,route,status,text(outcome),error.slice(0,500),'openai',at).run();
+  }
+}
+
 export function taskEndMs(task, now = Date.now()) {
   const finalAt = Date.parse(task?.final_at || '');
   if (Number.isFinite(finalAt)) return finalAt;
@@ -953,22 +1020,32 @@ async function maybeProbeMailer(env, now = Date.now()) {
 
 async function processPublicTask(env, task, now = Date.now()) {
   const eventId=text(task.event_id);
-  const ai=await readPublicAiState(env,eventId);
+  const [ai,diag]=await Promise.all([readPublicAiState(env,eventId),readSearchDiag(env,eventId)]);
   const values={publico:num(task.publico),publico_pagante:num(task.publico_pagante),renda:num(task.renda)};
   let sources=safeJson(task.public_sources_json,{})||{};
   let next={...ai,sol_completed:0};
-  let lastError='';
+  // v8: não apaga diagnóstico útil só porque uma passada determinística não
+  // produziu erro. O último erro só some quando público+renda forem resolvidos.
+  let lastError=text(task.public_last_error);
   let costSummary=null;
   let budget={allowGemini:true,allowOpenAI:true,hardStop:false,reason:''};
-  let plan=planPublicStep(task,ai,now,budget);
+  const ageMinutesAtStart=Math.max(0,(now-taskEndMs(task,now))/60_000);
+
+  // A primeira execução v8 de cada pendência DEVE comprovar uma busca Google
+  // real. A tabela 0014 nasce vazia, portanto isso independe dos contadores
+  // históricos da v7 e não exige editar manualmente a partida.
+  const forceGeminiV8=ageMinutesAtStart>=PUBLIC_POLICY.aiStartMinutes && Number(diag.gemini_search_calls||0)<1;
+  let plan=forceGeminiV8?{phase:'gemini',ageMinutes:ageMinutesAtStart,forcedV8:true}:planPublicStep(task,ai,now,budget);
 
   // Antes de uma busca paga/grounded, avalia o budget usando o ledger real.
   if(plan.phase==='gemini'||plan.phase==='openai'){
     costSummary=await postgamePublicCostSummary(env,now,eventId);
     budget=publicBudgetDecision(env,costSummary);
-    plan=planPublicStep(task,ai,now,budget);
+    if(plan.forcedV8){
+      if(budget.allowGemini===false) plan={phase:'budget_guard',ageMinutes:ageMinutesAtStart,forcedV8:true};
+    }else plan=planPublicStep(task,ai,now,budget);
   }
-  next.last_phase=plan.phase;
+  next.last_phase=plan.phase+(plan.forcedV8?':forced-v8':'');
 
   // ESPN continua sendo consultada enquanto faltar público. É gratuita e pode
   // resolver o campo sem gastar busca web.
@@ -979,47 +1056,79 @@ async function processPublicTask(env, task, now = Date.now()) {
     else if(espn.error) lastError=espn.error;
   }
 
-  // Reconsulta barata de fontes já descobertas. Gemini pode devolver URLs de
-  // redirecionamento do grounding; fetchSourceText resolve o destino real e só
-  // aceita o dado se o host final for uma fonte robusta.
+  // Reconsulta barata de fontes já descobertas.
   if(!isPublicComplete(values)){
     const cached=await refreshCachedPublicSources(env,task,values,sources);
-    if(cached.lastError&&!lastError)lastError=cached.lastError;
+    if(cached.lastError)lastError=cached.lastError;
   }
 
+  let forceRetrySoon=false;
   if(!isPublicComplete(values)&&plan.phase==='gemini'){
     const missing=missingPublicFields(values);
     const found=await searchPublicWithGemini(env,{...task,...values},missing);
     next.last_model=text(found.model);
     next.mini_attempts=Number(next.mini_attempts||0)+1;
     next.mini_last_error=found.found?'':text(found.reason);
-    await cacheDiscoveredSources(env,eventId,found.sources,'gemini');
+    const discovered=found.discoveredSources||found.sources||[];
+    await cacheDiscoveredSources(env,eventId,discovered,'gemini');
 
-    // Aceitação direta somente quando a URL citada pelo JSON é realmente uma
-    // das fontes robustas do grounding. Caso o Google devolva redirect, abrimos
-    // as fontes imediatamente e extraímos com Workers AI.
+    // Aceitação direta: valores do modelo só entram quando suas URLs são
+    // verificáveis entre as fontes realmente devolvidas pela busca.
     const valid=validateGroundedValues(found.parsed,found.sources||[],task);
+    let directAccepted=false;
     if(valid){
+      directAccepted=true;
       for(const key of ['publico','publico_pagante','renda']) if(valid.values[key]!=null&&!(Number(values[key])>0)){
         values[key]=valid.values[key]; sources[key]=valid.sources[key];
       }
     }
-    if(!isPublicComplete(values) && (found.sources||[]).length){
-      const refreshed=await refreshCachedPublicSources(env,task,values,sources);
-      if(refreshed.lastError&&!lastError)lastError=refreshed.lastError;
+
+    // Source recovery: qualquer URL descoberta vira insumo do parser local,
+    // mesmo quando o JSON do Gemini foi inválido ou rejeitado.
+    let refreshed={checked:0,foundAny:false,lastError:''};
+    if(!isPublicComplete(values) && discovered.length){
+      refreshed=await refreshCachedPublicSources(env,task,values,sources);
+      if(refreshed.lastError)lastError=refreshed.lastError;
     }
-    if(!found.found&&!lastError)lastError=text(found.reason)||lastError;
+    const outcome=isPublicComplete(values)?(directAccepted?'accepted_direct':'accepted_source_recovery')
+      : directAccepted?'accepted_partial'
+      : Number(found.searchCalls||0)<1?'no_real_search'
+      : discovered.length<1?'real_search_no_sources'
+      : refreshed.foundAny?'source_recovery_partial':'sources_cached_no_values';
+    await recordSearchDiag(env,eventId,'gemini',found,outcome,now);
+    if(!isPublicComplete(values)) lastError=text(found.reason)||text(refreshed.lastError)||outcome||lastError;
+    if(plan.forcedV8&&Number(found.searchCalls||0)<1)forceRetrySoon=true;
   }
 
   if(!isPublicComplete(values)&&plan.phase==='openai'){
     const found=await searchPublicWithOpenAI(env,{...task,...values},'openai');
     next.last_model=text(found.model);
     next.sol_attempts=Number(next.sol_attempts||0)+1;
+
+    // v8: URLs do web_search são persistidas SEM depender da aprovação do JSON.
+    // Assim uma matéria correta nunca se perde só porque o modelo formatou um
+    // número ou fonte de campo de maneira imperfeita.
+    const discovered=found.discoveredSources||found.rawSources||Object.values(found.sources||{});
+    await cacheDiscoveredSources(env,eventId,discovered,'openai');
+
+    let directAccepted=false;
     if(found.found&&found.values){
+      directAccepted=true;
       for(const key of ['publico','publico_pagante','renda']) if(found.values[key]!=null&&!(Number(values[key])>0)) values[key]=found.values[key];
       sources={...sources,...(found.sources||{})};
-      await cacheDiscoveredSources(env,eventId,found.rawSources||Object.values(found.sources||{}),'openai');
-    } else lastError=text(found.reason)||lastError;
+    }
+    let refreshed={checked:0,foundAny:false,lastError:''};
+    if(!isPublicComplete(values)&&discovered.length){
+      refreshed=await refreshCachedPublicSources(env,task,values,sources);
+      if(refreshed.lastError)lastError=refreshed.lastError;
+    }
+    const outcome=isPublicComplete(values)?(directAccepted?'accepted_direct':'accepted_source_recovery')
+      : directAccepted?'accepted_partial'
+      : Number(found.searchCalls||0)<1?'no_real_search'
+      : discovered.length<1?'real_search_no_sources'
+      : refreshed.foundAny?'source_recovery_partial':'sources_cached_no_values';
+    await recordSearchDiag(env,eventId,'openai',found,outcome,now);
+    if(!isPublicComplete(values)) lastError=text(found.reason)||text(refreshed.lastError)||outcome||lastError;
   }
 
   // Recalcula custo após qualquer tentativa cara para o próximo agendamento e
@@ -1038,12 +1147,10 @@ async function processPublicTask(env, task, now = Date.now()) {
   let nextAt=null;
   if(!complete){
     const nextPlan=planPublicStep(task,next,now,budget);
-    const nextMs=nextPublicAttemptMs(task,plan.phase,nextPlan,now,next);
+    const nextMs=forceRetrySoon?now+60_000:nextPublicAttemptMs(task,plan.phase,nextPlan,now,next);
     nextAt=nowIso(nextMs);
     if(budget.reason && !lastError) lastError=`budget:${budget.reason}`;
 
-    // Um único alerta real-time ao ultrapassar T+2h. Diferente da v5, o alerta
-    // deixa explícito que o Hunter continua procurando.
     if(ageMinutes>=PUBLIC_POLICY.overdueMinutes&&!next.alert_at){
       next.alert_status=await sendPublicNotFoundEmail(env,publicAlertMessage(task,values,sources,next,lastError,env,costSummary,nextAt));
       next.alert_at=nowIso(now);
@@ -1075,19 +1182,19 @@ async function ensurePolicyVersion(env, now = Date.now()) {
   if (current >= POSTGAME_POLICY_VERSION) return false;
   const isoNow = nowIso(now);
 
-  // v7 reaplica imediatamente o novo algoritmo a TODA pendência. Isso é
-  // deliberado: o primeiro cron após o deploy precisa testar aliases/fontes novas
-  // contra jogos que já estavam aguardando público/renda, sem edição manual.
+  // v8 reaplica imediatamente o novo algoritmo a TODA pendência. A nova tabela
+  // de diagnóstico nasce vazia e força uma busca Google real na primeira passada,
+  // independentemente dos contadores históricos da v7.
   await env.DB.prepare(`UPDATE postgame_fastlane SET
       public_status=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN 'resolved' ELSE 'overdue' END,
       public_next_at=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN NULL ELSE ? END,
-      public_last_error='requeued_attendance_hunter_v7',
+      public_last_error='requeued_attendance_hunter_v8_forced_web_search',
       updated_at=CURRENT_TIMESTAMP
     WHERE public_status<>'resolved'`).bind(isoNow).run();
 
   // Preserva contadores de custo/telemetria; sol_completed continua não terminal.
   await env.DB.prepare(`UPDATE postgame_public_ai SET sol_completed=0,
-      last_phase='migrated_v7_requeue',
+      last_phase='migrated_v8_forced_web_search',
       updated_at=CURRENT_TIMESTAMP`).run();
 
   await metaPut(env, 'static_seed_at', '1970-01-01T00:00:00.000Z');
@@ -1105,6 +1212,7 @@ async function cleanup(env, now = Date.now()) {
   await env.DB.prepare(`DELETE FROM postgame_public_ai WHERE event_id NOT IN (SELECT event_id FROM postgame_fastlane)`).run();
   await env.DB.prepare(`DELETE FROM postgame_source_cache WHERE event_id NOT IN (SELECT event_id FROM postgame_fastlane)`).run();
   await env.DB.prepare(`DELETE FROM postgame_match_context WHERE event_id NOT IN (SELECT event_id FROM postgame_fastlane)`).run();
+  await env.DB.prepare(`DELETE FROM postgame_public_search_diag WHERE event_id NOT IN (SELECT event_id FROM postgame_fastlane)`).run();
 }
 
 export async function runPostgameMaintenance(env, monitor, now = Date.now()) {
@@ -1138,6 +1246,21 @@ function publicRow(row) {
       espn_checks: Number(row.ai_deterministic_checks || 0), gemini_attempts: Number(row.ai_mini_attempts || 0),
       openai_attempts: Number(row.ai_sol_attempts || 0), alert_at: text(row.ai_alert_at), alert_status: text(row.ai_alert_status)
     },
+    public_search: {
+      last_provider: text(row.search_last_provider), last_at: text(row.search_last_at),
+      gemini: {
+        api_calls: Number(row.gemini_api_calls || 0), search_calls: Number(row.gemini_search_calls || 0),
+        sources_found: Number(row.gemini_sources_found || 0), route: text(row.gemini_last_route),
+        http_status: row.gemini_last_http_status == null ? null : Number(row.gemini_last_http_status),
+        result: text(row.gemini_last_result), error: text(row.gemini_last_error)
+      },
+      openai: {
+        api_calls: Number(row.openai_api_calls || 0), search_calls: Number(row.openai_search_calls || 0),
+        sources_found: Number(row.openai_sources_found || 0), route: text(row.openai_last_route),
+        http_status: row.openai_last_http_status == null ? null : Number(row.openai_last_http_status),
+        result: text(row.openai_last_result), error: text(row.openai_last_error)
+      }
+    },
     highlight: highlight && highlight.url ? highlight : null,
     highlight_status: text(row.highlight_status), highlight_attempts: Number(row.highlight_attempts || 0), highlight_next_at: text(row.highlight_next_at),
     updated_at: text(row.updated_at)
@@ -1150,9 +1273,13 @@ export async function readPostgameFastlane(env, eventIds = []) {
     a.last_phase AS ai_last_phase, a.last_model AS ai_last_model,
     a.deterministic_checks AS ai_deterministic_checks, a.mini_attempts AS ai_mini_attempts,
     a.sol_attempts AS ai_sol_attempts, a.alert_at AS ai_alert_at, a.alert_status AS ai_alert_status,
+    d.gemini_api_calls, d.gemini_search_calls, d.gemini_sources_found, d.gemini_last_route, d.gemini_last_http_status, d.gemini_last_result, d.gemini_last_error,
+    d.openai_api_calls, d.openai_search_calls, d.openai_sources_found, d.openai_last_route, d.openai_last_http_status, d.openai_last_result, d.openai_last_error,
+    d.last_provider AS search_last_provider, d.last_at AS search_last_at,
     (SELECT COUNT(*) FROM postgame_source_cache sc WHERE sc.event_id=p.event_id) AS source_cache_count
     FROM postgame_fastlane p
     LEFT JOIN postgame_public_ai a ON a.event_id=p.event_id
+    LEFT JOIN postgame_public_search_diag d ON d.event_id=p.event_id
     LEFT JOIN postgame_match_context c ON c.event_id=p.event_id`;
   let result;
   if (ids.length) {
@@ -1188,6 +1315,11 @@ export async function postgameStatus(env) {
     officialClubSourcesScopedToParticipants: true,
     regionalEditorialSources: true,
     deterministicFichaTecnicaExtraction: true,
+    geminiInteractionsApi: true,
+    geminiForcedGoogleSearch: true,
+    geminiDirectFallbackOnNoGrounding: true,
+    openAiSourceRecovery: true,
+    searchDiagnostics: true,
     preferredEditorialSourceCount: PREFERRED_EDITORIAL_SOURCE_SUFFIXES.length,
     publicPersistentUntilResolved: true,
     publicGaveUp: 0,
