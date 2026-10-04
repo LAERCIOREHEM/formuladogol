@@ -2,6 +2,7 @@ import { fetchEspnSummary } from './espn-source.js';
 import { sendMail, probeMail, mailConfig, maskAddress } from './mailer.js';
 import { countWebSearchCalls, recordAiUsage, recordProviderUsage, postgamePublicCostSummary } from './ai-usage.js';
 import { searchPublicWithGemini, fetchSourceText, extractPublicWithWorkersAI, fetchOpenAiResponses, openAiUsage } from './ai-router.js';
+import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, sourceTextMatchesTask, buildAttendanceSearchQueries, attendanceSourcePolicyText, PREFERRED_EDITORIAL_SOURCE_SUFFIXES } from './postgame-search-profile.js';
 
 const DEFAULT_SITE_BASE = 'https://formuladogol.com.br';
 // Fase definitiva (uma única chamada por partida). O Sol é reservado a ela e aos editoriais.
@@ -12,22 +13,22 @@ const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
-const POSTGAME_POLICY_VERSION = 6;
+const POSTGAME_POLICY_VERSION = 7;
 
 /*
- * Attendance/Revenue Hunter v6 — persistente, econômico e auditável:
- *   - ESPN + fontes já descobertas são sempre o caminho mais barato.
- *   - Gemini + Google Search: +5, +15, +30, +60, +120 min e depois a cada 1h.
- *   - OpenAI Web Search: +45, +90, +120 min e depois a cada 3h, somente se o
- *     budget permitir. O modelo padrão é Terra; Sol continua reservado a usos
- *     editoriais/complexos fora deste Hunter.
- *   - SLA: após 120 min vira OVERDUE, envia UM alerta analítico e CONTINUA.
- *   - Nunca existe GAVE_UP para público/renda. Budget guard corta busca cara,
- *     mas mantém ESPN/cache e torna o bloqueio visível no relatório diário.
+ * Attendance/Revenue Hunter v7 — recuperação ativa e genérica:
+ *   - Reutiliza aliases de TODOS os clubes no Gemini e no OpenAI.
+ *   - Aceita imprensa nacional/regional + sites oficiais SOMENTE dos dois clubes
+ *     participantes, exclusivamente para fatos documentais de ficha técnica.
+ *   - Parser determinístico extrai rótulos explícitos de público/pagantes/renda
+ *     antes de gastar Workers AI.
+ *   - Gemini reforçado entre T+20 e T+70; OpenAI segue como fallback controlado.
+ *   - Upgrade v7 reabre imediatamente toda pendência para validar o algoritmo novo.
+ *   - Nunca existe GAVE_UP para público/renda.
  */
 export const PUBLIC_POLICY = Object.freeze({
   aiStartMinutes: 5,
-  geminiScheduleMinutes: [5, 15, 30, 60, 120],
+  geminiScheduleMinutes: [5, 15, 25, 35, 45, 60, 90, 120],
   openaiScheduleMinutes: [45, 90, 120],
   deterministicEveryMinutes: 5,
   overdueMinutes: 120,
@@ -47,54 +48,20 @@ const CHANNELS = Object.freeze([
   { id: 'UC3KHYFWeB0WimMBfm3NEahQ', name: 'UOL Esporte', source: 'UOL Esporte / YouTube', embed: true, minAgeHours: 48 },
 ]);
 
-const TEAM_ALIASES = Object.freeze({
-  'Athletico-PR': ['athletico-pr','athletico pr','athletico','athletico paranaense','atletico-pr'],
-  'Atlético-MG': ['atlético-mg','atletico-mg','atlético mg','atletico mg','atlético mineiro','atletico mineiro','galo'],
-  'Bahia': ['bahia','ec bahia','esporte clube bahia'],
-  'Botafogo': ['botafogo','botafogo-rj'],
-  'Bragantino': ['bragantino','rb bragantino','red bull bragantino','red bull braga','braga'],
-  'Chapecoense': ['chapecoense','chape'],
-  'Corinthians': ['corinthians','sport club corinthians','timão','timao'],
-  'Coritiba': ['coritiba','coxa','coxa-branca','coxabranca'],
-  'Cruzeiro': ['cruzeiro','cruzeiro ec'],
-  'Flamengo': ['flamengo','fla','cr flamengo'],
-  'Fluminense': ['fluminense','flu'],
-  'Grêmio': ['grêmio','gremio','grêmio fbpa','gremio fbpa'],
-  'Internacional': ['internacional','inter','sc internacional'],
-  'Mirassol': ['mirassol','mirassol fc'],
-  'Palmeiras': ['palmeiras','se palmeiras','verdão','verdao'],
-  'Remo': ['remo','clube do remo'],
-  'Santos': ['santos','santos fc','peixe'],
-  'São Paulo': ['são paulo','sao paulo','são paulo fc','sao paulo fc','spfc'],
-  'Vasco da Gama': ['vasco','vasco da gama','cr vasco da gama'],
-  'Vitória': ['vitória','vitoria','ec vitória','ec vitoria'],
-});
+
 
 const POSITIVE_HIGHLIGHT_RE = /\b(melhores momentos|gols e melhores momentos|gols do jogo|todos os gols|highlights?)\b/i;
 const NEGATIVE_HIGHLIGHT_RE = /\b(aquecimento|esquenta|pre[- ]?jogo|pré[- ]?jogo|pos[- ]?jogo|pós[- ]?jogo|sem imagens|audio apenas|áudio apenas|narra[cç][aã]o|radio|rádio|tempo real|lance a lance|lances ao vivo|watchalong|watch party|react|podcast)\b/i;
 
 
-// Política editorial genérica: domínio robusto por categoria, nunca por clube.
-// Descobertas fora desta lista podem ser armazenadas para auditoria, mas não
-// entram automaticamente como fonte de público/renda.
-const ROBUST_SOURCE_SUFFIXES = Object.freeze([
-  'ge.globo.com', 'globoesporte.globo.com', 'espn.com.br', 'uol.com.br', 'gazetaesportiva.com', 'lance.com.br',
-  'terra.com.br', 'estadao.com.br', 'folha.uol.com.br', 'oglobo.globo.com',
-  'cnnbrasil.com.br', 'band.uol.com.br', 'r7.com', 'correiobraziliense.com.br',
-  'cbf.com.br',
-]);
-const REJECTED_SOURCE_HOST_RE = /(facebook|instagram|twitter|x\.com$|tiktok|youtube|reddit|forum|foro|blogspot|wordpress|bet|bets|aposta|torcida)/i;
+// Política editorial compartilhada com o gerador de consultas. Domínios oficiais
+// de clubes são aceitos apenas quando pertencem a um dos participantes.
+export const ROBUST_SOURCE_SUFFIXES = PREFERRED_EDITORIAL_SOURCE_SUFFIXES;
 
-function sourceHostname(value) {
-  try { return new URL(normalizeUrl(value)).hostname.toLowerCase().replace(/^www\./,''); } catch (_) { return ''; }
+export function sourceQuality(value, task = null) { return attendanceSourceQuality(normalizeUrl(value), task); }
+function robustSources(urls, task = null) {
+  return [...new Set((urls || []).map(normalizeUrl).filter((u) => u && isAcceptedAttendanceSource(u, task)))];
 }
-export function sourceQuality(value) {
-  const host = sourceHostname(value);
-  if (!host || REJECTED_SOURCE_HOST_RE.test(host)) return 'rejected';
-  if (ROBUST_SOURCE_SUFFIXES.some((suffix) => host === suffix || host.endsWith(`.${suffix}`))) return 'robust';
-  return 'unverified';
-}
-function robustSources(urls) { return [...new Set((urls || []).map(normalizeUrl).filter((u) => u && sourceQuality(u) === 'robust'))]; }
 
 const HIGHLIGHT_RETRY_MINUTES = [1, 2, 2, 5, 5, 5, 10, 15, 15, 30, 30, 60, 60, 120];
 // Legado: mantido apenas para retryMinutes('public') continuar compatível.
@@ -117,10 +84,7 @@ function safeJson(value, fallback = null) { try { return JSON.parse(value); } ca
 function clampInt(value, min, max) { const n = Math.round(Number(value)); return Number.isFinite(n) && n >= min && n <= max ? n : null; }
 function clampMoney(value, min = 1000, max = 50_000_000) { const n = Number(value); return Number.isFinite(n) && n >= min && n <= max ? Math.round(n * 100) / 100 : null; }
 
-function teamAliases(team) {
-  const direct = TEAM_ALIASES[text(team)] || [];
-  return [...new Set([text(team), ...direct].map(normalizeText).filter((v) => v.length >= 2))];
-}
+function teamAliases(team) { return teamSearchAliasesNormalized(team); }
 function titleHasTeam(title, team) {
   const normalized = ` ${normalizeText(title)} `;
   return teamAliases(team).some((alias) => alias && normalized.includes(` ${alias} `));
@@ -169,13 +133,13 @@ function sourceUrlKey(value) {
   } catch (_) { return ''; }
 }
 
-function verifiedSource(rawUrl, sourceUrls) {
+function verifiedSource(rawUrl, sourceUrls, task = null) {
   const candidate = normalizeUrl(rawUrl);
   const key = sourceUrlKey(candidate);
-  if (!candidate || !key || sourceQuality(candidate) !== 'robust') return '';
+  if (!candidate || !key || !isAcceptedAttendanceSource(candidate, task)) return '';
   for (const raw of sourceUrls || []) {
     const actual = normalizeUrl(raw);
-    if (actual && sourceQuality(actual) === 'robust' && sourceUrlKey(actual) === key) return actual;
+    if (actual && isAcceptedAttendanceSource(actual, task) && sourceUrlKey(actual) === key) return actual;
   }
   return '';
 }
@@ -209,7 +173,7 @@ function extractOpenAISources(response) {
   return urls;
 }
 
-export function validatePublicPayload(payload, sourceUrls) {
+export function validatePublicPayload(payload, sourceUrls, task = null) {
   const p = payload && typeof payload === 'object' ? payload : {};
   if (p.encontrado !== true) return { accepted: false, reason: 'not_found' };
   const confidence = Number(p.confianca || 0);
@@ -219,7 +183,7 @@ export function validatePublicPayload(payload, sourceUrls) {
   const revenueValue = clampMoney(p.renda);
   if (publicValue == null && paidValue == null && revenueValue == null) return { accepted: false, reason: 'no_values' };
   if (publicValue != null && paidValue != null && paidValue > publicValue) return { accepted: false, reason: 'paid_gt_present' };
-  const sources = new Set(robustSources([...sourceUrls]));
+  const sources = new Set(robustSources([...sourceUrls], task));
   const fields = [
     ['publico', publicValue, p.fonte_publico],
     ['publico_pagante', paidValue, p.fonte_publico_pagante],
@@ -229,13 +193,64 @@ export function validatePublicPayload(payload, sourceUrls) {
   const usedSources = {};
   for (const [key, value, rawUrl] of fields) {
     if (value == null) continue;
-    const url = verifiedSource(rawUrl, sources);
+    const url = verifiedSource(rawUrl, sources, task);
     if (!url) continue;
     accepted[key] = value;
     usedSources[key] = url;
   }
   if (!Object.keys(accepted).length) return { accepted: false, reason: 'source_not_verified' };
   return { accepted: true, values: accepted, sources: usedSources, confidence, note: text(p.observacao) };
+}
+
+function parseBrIntToken(value) {
+  const digits = text(value).replace(/\D/g, '');
+  return digits ? clampInt(Number(digits), 0, 150000) : null;
+}
+function parseBrMoneyToken(value) {
+  let raw = text(value).replace(/\s/g, '').replace(/^R\$/i, '');
+  if (!raw) return null;
+  if (raw.includes(',')) raw = raw.replace(/\./g, '').replace(',', '.');
+  else if (/^\d{1,3}(?:\.\d{3})+$/.test(raw)) raw = raw.replace(/\./g, '');
+  return clampMoney(Number(raw));
+}
+function firstMatch(textValue, patterns, parser) {
+  for (const re of patterns) {
+    const m = re.exec(textValue);
+    if (!m) continue;
+    const value = parser(m[1]);
+    if (value != null) return value;
+  }
+  return null;
+}
+
+// Parser barato para fichas técnicas claramente rotuladas. Não infere nada:
+// somente captura números imediatamente associados aos rótulos público/pagantes/renda.
+export function extractPublicFromTextDeterministic(sourceText, sourceUrl = '') {
+  const body = text(sourceText).replace(/\s+/g, ' ');
+  const publico = firstMatch(body, [
+    /\bp[úu]blico(?!\s+pagante)(?:\s+(?:presente|total|geral))?\s*(?:[:\-–—]|(?:foi\s+)?de)\s*([0-9][0-9.\s]{2,8})\b/i,
+    /\bp[úu]blico(?!\s+pagante)\s+([0-9]{1,3}(?:\.[0-9]{3})+|[0-9]{3,6})\s+(?:torcedores|pessoas|presentes)\b/i,
+  ], parseBrIntToken);
+  const publicoPagante = firstMatch(body, [
+    /\bp[úu]blico\s+pagante\s*(?:[:\-–—]|(?:foi\s+)?de)\s*([0-9][0-9.\s]{1,8})\b/i,
+    /\bpagantes?\s*(?:[:\-–—]|(?:foram\s+)?de?)\s*([0-9][0-9.\s]{1,8})\b/i,
+  ], parseBrIntToken);
+  const renda = firstMatch(body, [
+    /\brenda(?:\s+(?:bruta|total))?\s*(?:[:\-–—]|(?:foi\s+)?de)\s*(?:R\$\s*)?([0-9][0-9.\s]*(?:,[0-9]{2})?)\b/i,
+    /\bbilheteria\s*(?:[:\-–—]|(?:foi\s+)?de)\s*(?:R\$\s*)?([0-9][0-9.\s]*(?:,[0-9]{2})?)\b/i,
+  ], parseBrMoneyToken);
+  const found = publico != null || publicoPagante != null || renda != null;
+  return {
+    encontrado: found,
+    publico,
+    publico_pagante: publicoPagante,
+    renda,
+    fonte_publico: publico != null ? normalizeUrl(sourceUrl) || null : null,
+    fonte_publico_pagante: publicoPagante != null ? normalizeUrl(sourceUrl) || null : null,
+    fonte_renda: renda != null ? normalizeUrl(sourceUrl) || null : null,
+    confianca: found ? 1 : 0,
+    observacao: found ? 'extração determinística de ficha técnica rotulada' : 'sem rótulo explícito',
+  };
 }
 
 async function fetchJson(url, init = {}, timeoutMs = 12_000) {
@@ -331,16 +346,11 @@ export function publicSearchRequest(task, missing, env, phase = 'openai') {
   const round = text(task.round || task.rodada) || 'não informada';
   const stadium = text(task.stadium || task.estadio) || 'não informado';
   const missingText = missing.join(', ');
-  const queries = [
-    `"${matchup}" "público" "renda" "${date}"`,
-    `"${text(task.home)} ${score} ${text(task.away)}" público renda`,
-    `"${matchup}" "público pagante" "renda bruta"`,
-    `"${matchup}" "ficha técnica" público renda "${date}"`,
-    `"${matchup}" bilheteria público renda`,
-  ];
-  if (round !== 'não informada') queries.push(`"${matchup}" "rodada ${round}" público renda`);
-  if (stadium !== 'não informado') queries.push(`"${matchup}" "${stadium}" público renda`);
-  const instruction = `Pesquisa factual de pós-jogo. DOSSIÊ: partida=${matchup}; data real=${date}; placar=${score}; rodada=${round}; estádio=${stadium}; event_id=${text(task.event_id)}. Preciso exclusivamente de: ${missingText}. Use estas consultas como ponto de partida e reformule se necessário: ${queries.join(' ; ')}. NÃO use memória e NÃO estime. NÃO confunda com outro jogo, outra data ou a data original de uma rodada remarcada. Público significa público presente/total; pagantes é campo separado; renda em reais. Aceite apenas veículos esportivos/jornalísticos robustos ou fonte institucional da competição. Priorize ge, ESPN, UOL, Gazeta Esportiva, Lance, Terra, Estadão, Folha, O Globo, CNN Brasil, Band/R7/Correio Braziliense esportes e CBF. NÃO use site oficial de clube, blog de torcida, fórum, rede social, casa de aposta ou agregador sem origem editorial. Se um campo não estiver publicado em fonte robusta, retorne null. Cada número retornado precisa ter sua própria URL efetivamente lida pelo web_search.`;
+  const queries = buildAttendanceSearchQueries(task);
+  const aliasesHome = teamSearchAliasesNormalized(task.home).join(', ');
+  const aliasesAway = teamSearchAliasesNormalized(task.away).join(', ');
+  const sourcePolicy = attendanceSourcePolicyText(task);
+  const instruction = `Pesquisa factual de pós-jogo. DOSSIÊ: partida=${matchup}; data real=${date}; placar=${score}; rodada=${round}; estádio=${stadium}; event_id=${text(task.event_id)}. Aliases do mandante=${aliasesHome}; aliases do visitante=${aliasesAway}. Preciso exclusivamente de: ${missingText}. Use estas consultas como ponto de partida e REFORMULE quando necessário: ${queries.join(' ; ')}. NÃO dependa da expressão literal "${matchup}"; trate nomes equivalentes dos clubes como o mesmo confronto. NÃO use memória e NÃO estime. NÃO confunda com outro jogo, outra data ou a data original de uma rodada remarcada. Público significa público presente/total; pagantes é campo separado; renda em reais. ${sourcePolicy} Se um campo não estiver publicado em fonte aceita, retorne null. Cada número retornado precisa ter sua própria URL efetivamente lida pelo web_search.`;
   return {
     model,
     input: [{ role: 'user', content: [{ type: 'input_text', text: instruction }] }],
@@ -406,8 +416,8 @@ export async function searchPublicWithOpenAI(env, task, phase = 'openai') {
       await record({raw,responded:true,ok:false,detail:'openai_invalid_json',webSearchCalls});
       return { found:false,responded:true,reason:'openai_invalid_json',model };
     }
-    const sources = robustSources(extractOpenAISources(raw));
-    const verified = validatePublicPayload(parsed, sources);
+    const sources = robustSources(extractOpenAISources(raw), task);
+    const verified = validatePublicPayload(parsed, sources, task);
     if (!verified.accepted) {
       await record({raw,responded:true,ok:true,detail:verified.reason,webSearchCalls});
       return { found:false,responded:true,reason:verified.reason,model,sources };
@@ -629,10 +639,15 @@ function taskAgeHours(task, now = Date.now()) {
 async function claimDue(env, kind, now = Date.now()) {
   const prefix = kind === 'highlight' ? 'highlight' : 'public';
   const iso = nowIso(now);
+  // Público/renda recente tem prioridade para que um backlog antigo nunca segure
+  // o jogo que acabou de terminar. Depois dos recentes, preserva justiça por last_at.
+  const orderBy = kind === 'public'
+    ? `CASE WHEN julianday(p.final_at) >= julianday('now','-12 hours') THEN 0 ELSE 1 END ASC, p.final_at DESC, COALESCE(p.public_last_at,'1970-01-01T00:00:00.000Z') ASC`
+    : `COALESCE(p.highlight_last_at,'1970-01-01T00:00:00.000Z') ASC, p.final_at DESC`;
   const row = await env.DB.prepare(`SELECT p.*, c.round, c.stadium FROM postgame_fastlane p
     LEFT JOIN postgame_match_context c ON c.event_id=p.event_id
     WHERE p.${prefix}_status<>'resolved' AND COALESCE(p.${prefix}_next_at,'1970-01-01T00:00:00.000Z')<=?
-    ORDER BY COALESCE(p.${prefix}_last_at,'1970-01-01T00:00:00.000Z') ASC, p.final_at DESC LIMIT 1`).bind(iso).first();
+    ORDER BY ${orderBy} LIMIT 1`).bind(iso).first();
   if (!row) return null;
   const currentNext = text(row[`${prefix}_next_at`]);
   const lockUntil = nowIso(now + 10 * 60_000);
@@ -669,8 +684,8 @@ async function cachedSources(env,eventId){
   const r=await env.DB.prepare(`SELECT * FROM postgame_source_cache WHERE event_id=? ORDER BY COALESCE(last_checked_at,'') ASC,discovered_at DESC LIMIT 8`).bind(text(eventId)).all();
   return r?.results||[];
 }
-function validateGroundedValues(parsed, sourceUrls='') {
-  const urls = Array.isArray(sourceUrls) ? robustSources(sourceUrls) : robustSources([sourceUrls]);
+function validateGroundedValues(parsed, sourceUrls='', task = null) {
+  const urls = Array.isArray(sourceUrls) ? robustSources(sourceUrls, task) : robustSources([sourceUrls], task);
   if (!urls.length) return null;
   const p = parsed && typeof parsed === 'object' ? { ...parsed } : {};
   // Workers AI extrai uma página já aberta; nesse caso a própria URL robusta é
@@ -678,17 +693,38 @@ function validateGroundedValues(parsed, sourceUrls='') {
   if (!p.fonte_publico && p.publico != null && urls.length === 1) p.fonte_publico = urls[0];
   if (!p.fonte_publico_pagante && p.publico_pagante != null && urls.length === 1) p.fonte_publico_pagante = urls[0];
   if (!p.fonte_renda && p.renda != null && urls.length === 1) p.fonte_renda = urls[0];
-  const verified = validatePublicPayload(p, urls);
+  const verified = validatePublicPayload(p, urls, task);
   return verified.accepted ? verified : null;
 }
 
 async function refreshCachedPublicSources(env,task,values,sources){
   const rows=await cachedSources(env,task.event_id); let checked=0; let foundAny=false; let lastError='';
-  for(const row of rows.slice(0,4)){
+  for(const row of rows.slice(0,6)){
     const source=await fetchSourceText(row.url); checked++;
     if(!source.ok){lastError=source.reason;await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=failures+1 WHERE event_id=? AND url=?`).bind(source.reason,task.event_id,row.url).run();continue;}
-    const extracted=await extractPublicWithWorkersAI(env,task,source); const valid=validateGroundedValues(extracted.parsed,source.url);
-    await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=CASE WHEN ?='ok' THEN failures ELSE failures+1 END WHERE event_id=? AND url=?`).bind(valid?'ok':text(extracted.reason)||'no_data',valid?'ok':'fail',task.event_id,row.url).run();
+    if(!sourceTextMatchesTask(task,source.text)){
+      lastError='source_context_mismatch';
+      await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status='context_mismatch',failures=failures+1 WHERE event_id=? AND url=?`).bind(task.event_id,row.url).run();
+      continue;
+    }
+
+    // Primeiro caminho: parser determinístico. Uma ficha com rótulos explícitos
+    // como "PÚBLICO - 22.159" / "RENDA - R$ 1.002.775,79" é resolvida sem IA.
+    const deterministic=extractPublicFromTextDeterministic(source.text,source.url);
+    let valid=validateGroundedValues(deterministic,source.url,task);
+    let extractor='deterministic';
+
+    // Só gasta Workers AI quando a página realmente fala da partida e o parser
+    // de rótulos não conseguiu extrair nenhum campo confiável.
+    if(!valid){
+      const extracted=await extractPublicWithWorkersAI(env,task,source);
+      valid=validateGroundedValues(extracted.parsed,source.url,task);
+      extractor='workers-ai';
+      if(!valid&&extracted.reason)lastError=text(extracted.reason);
+    }
+
+    await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=CASE WHEN ?='ok' THEN failures ELSE failures+1 END WHERE event_id=? AND url=?`)
+      .bind(valid?`ok:${extractor}`:(lastError||'no_data'),valid?'ok':'fail',task.event_id,row.url).run();
     if(valid){foundAny=true;for(const key of ['publico','publico_pagante','renda']){if(valid.values[key]!=null&&!(Number(values[key])>0)){values[key]=valid.values[key];sources[key]=valid.sources[key];}}}
     if(isPublicComplete(values))break;
   }
@@ -962,7 +998,7 @@ async function processPublicTask(env, task, now = Date.now()) {
     // Aceitação direta somente quando a URL citada pelo JSON é realmente uma
     // das fontes robustas do grounding. Caso o Google devolva redirect, abrimos
     // as fontes imediatamente e extraímos com Workers AI.
-    const valid=validateGroundedValues(found.parsed,found.sources||[]);
+    const valid=validateGroundedValues(found.parsed,found.sources||[],task);
     if(valid){
       for(const key of ['publico','publico_pagante','renda']) if(valid.values[key]!=null&&!(Number(values[key])>0)){
         values[key]=valid.values[key]; sources[key]=valid.sources[key];
@@ -1039,20 +1075,19 @@ async function ensurePolicyVersion(env, now = Date.now()) {
   if (current >= POSTGAME_POLICY_VERSION) return false;
   const isoNow = nowIso(now);
 
-  // v6 elimina definitivamente o GAVE_UP para público/renda. Qualquer tarefa
-  // legada encerrada sem solução volta para a fila, mas preserva alert_at para
-  // não gerar uma nova rajada de e-mails de SLA no deploy.
+  // v7 reaplica imediatamente o novo algoritmo a TODA pendência. Isso é
+  // deliberado: o primeiro cron após o deploy precisa testar aliases/fontes novas
+  // contra jogos que já estavam aguardando público/renda, sem edição manual.
   await env.DB.prepare(`UPDATE postgame_fastlane SET
       public_status=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN 'resolved' ELSE 'overdue' END,
       public_next_at=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN NULL ELSE ? END,
-      public_last_error=CASE WHEN public_status='gave_up' THEN 'reaberta_attendance_hunter_v6' ELSE public_last_error END,
+      public_last_error='requeued_attendance_hunter_v7',
       updated_at=CURRENT_TIMESTAMP
     WHERE public_status<>'resolved'`).bind(isoNow).run();
 
-  // sol_completed era um terminal da política v5. Na v6 é sempre zero; o
-  // número de tentativas continua preservado para telemetria/custo.
+  // Preserva contadores de custo/telemetria; sol_completed continua não terminal.
   await env.DB.prepare(`UPDATE postgame_public_ai SET sol_completed=0,
-      last_phase=CASE WHEN last_phase='give_up' THEN 'migrated_v6' ELSE last_phase END,
+      last_phase='migrated_v7_requeue',
       updated_at=CURRENT_TIMESTAMP`).run();
 
   await metaPut(env, 'static_seed_at', '1970-01-01T00:00:00.000Z');
@@ -1141,11 +1176,19 @@ export async function postgameStatus(env) {
     SUM(CASE WHEN highlight_status<>'resolved' THEN 1 ELSE 0 END) AS highlight_pending
     FROM postgame_fastlane`).first();
   const cfg = mailConfig(env);
+  const storedPolicyVersion = Number(await metaGet(env, 'policy_version') || 0);
   return {
     ok: true,
     engine: 'cloudflare-postgame-fastlane',
     version: POSTGAME_POLICY_VERSION,
+    storedPolicyVersion,
     publicPolicy: PUBLIC_POLICY,
+    searchProfileVersion: POSTGAME_SEARCH_PROFILE_VERSION,
+    searchAliasesAllClubs: true,
+    officialClubSourcesScopedToParticipants: true,
+    regionalEditorialSources: true,
+    deterministicFichaTecnicaExtraction: true,
+    preferredEditorialSourceCount: PREFERRED_EDITORIAL_SOURCE_SUFFIXES.length,
     publicPersistentUntilResolved: true,
     publicGaveUp: 0,
     total: Number(counts?.total || 0),

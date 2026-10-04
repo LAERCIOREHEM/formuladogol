@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { aiGatewayId, gatewayBase, aiGatewayAuthHeaders, aiGatewayAuthConfigured, geminiConfigured, geminiGroundingSources, geminiSearchCount, isAiGatewayPreProviderFailure, fetchOpenAiResponses } from '../src/ai-router.js';
+import { aiGatewayId, gatewayBase, aiGatewayAuthHeaders, aiGatewayAuthConfigured, geminiConfigured, geminiGroundingSources, geminiSearchCount, isAiGatewayPreProviderFailure, fetchOpenAiResponses, publicSchemaInstruction } from '../src/ai-router.js';
+import { POSTGAME_SEARCH_PROFILE_VERSION, TEAM_SEARCH_PROFILES, buildAttendanceSearchQueries, officialClubDomainsForTask, attendanceSourceQuality } from '../src/postgame-search-profile.js';
 
 assert.equal(aiGatewayId({}), 'default');
 assert.equal(gatewayBase({AI_GATEWAY_ACCOUNT_ID:'abc',AI_GATEWAY_ID:'default'},'openai'),'https://gateway.ai.cloudflare.com/v1/abc/default/openai');
@@ -13,6 +14,31 @@ assert.equal(isAiGatewayPreProviderFailure(403,'error code: 1010'),true);
 const raw={candidates:[{groundingMetadata:{webSearchQueries:['q1','q2'],groundingChunks:[{web:{uri:'https://example.com/a'}},{web:{uri:'https://example.com/b'}}]}}]};
 assert.equal(geminiSearchCount(raw),2);
 assert.deepEqual(geminiGroundingSources(raw),['https://example.com/a','https://example.com/b']);
+
+// Hunter v7: o confronto real que motivou o hotfix precisa gerar consultas com
+// nomes alternativos, fontes direcionadas e domínios oficiais dos participantes.
+const hunterTask={event_id:'401841168',home:'Atlético-MG',away:'Bragantino',kickoff:'2026-10-03T21:30:00.000Z',home_score:1,away_score:0,round:21,stadium:'Arena MRV'};
+const hunterQueries=buildAttendanceSearchQueries(hunterTask);
+assert.equal(POSTGAME_SEARCH_PROFILE_VERSION,7);
+assert.equal(Object.keys(TEAM_SEARCH_PROFILES).length,20);
+for (const [club,profile] of Object.entries(TEAM_SEARCH_PROFILES)) {
+  assert.ok(profile.aliases.length >= 1, `${club}: aliases ausentes`);
+  assert.ok(profile.officialDomains.length >= 1, `${club}: domínio oficial ausente`);
+}
+assert.ok(hunterQueries.some((q)=>q.includes('Red Bull Bragantino')));
+assert.ok(hunterQueries.some((q)=>q.includes('Galo')));
+assert.ok(hunterQueries.some((q)=>q.includes('Atlético Mineiro')));
+assert.ok(hunterQueries.some((q)=>q.includes('site:uol.com.br')));
+assert.ok(hunterQueries.some((q)=>q.includes('site:atletico.com.br')));
+assert.ok(hunterQueries.some((q)=>q.includes('site:redbullbragantino.com.br')));
+assert.deepEqual(officialClubDomainsForTask(hunterTask),['atletico.com.br','redbullbragantino.com.br']);
+assert.equal(attendanceSourceQuality('https://atletico.com.br/noticias/x',hunterTask),'club_official');
+assert.equal(attendanceSourceQuality('https://atletico.com.br/noticias/x',{home:'Flamengo',away:'Santos'}),'unverified');
+const prompt=publicSchemaInstruction(hunterTask,['público presente','renda']);
+assert.match(prompt,/Red Bull Bragantino/);
+assert.match(prompt,/site:uol\.com\.br/);
+assert.match(prompt,/atletico\.com\.br/);
+assert.doesNotMatch(prompt,/NÃO use sites oficiais de clubes/);
 
 const originalFetch=globalThis.fetch;
 try {
