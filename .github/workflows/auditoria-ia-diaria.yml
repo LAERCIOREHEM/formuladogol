@@ -1,10 +1,11 @@
-name: Auditoria IA diária
+name: Auditoria IA manual
+run-name: Auditoria IA manual · #${{ github.run_number }} · ${{ github.actor }}
 
 on:
-  # Única janela programada da camada de IA: 08:45 em Brasília.
-  # Alinhado à documentação; a auditoria mantém trava persistente de uma chamada/dia.
-  schedule:
-    - cron: '45 11 * * *'
+  # R10R10: auditoria deixa de ser cron diário. Ela permanece disponível
+  # somente para diagnóstico/recovery manual quando o Health Monitor indicar
+  # inconsistência ou após mudanças estruturais relevantes.
+  # A trava persistente de no máximo uma chamada paga por dia é preservada.
   workflow_dispatch:
 
 permissions:
@@ -74,7 +75,7 @@ jobs:
           python scripts/auditoria_ia_diaria.py --dry-run >/tmp/auditoria-ia-dry-run.json
           python -m json.tool /tmp/auditoria-ia-dry-run.json >/dev/null
 
-      - name: Reservar de forma persistente a única chamada do dia
+      - name: Reservar de forma persistente a chamada manual do dia
         id: ai_gate
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -310,7 +311,7 @@ jobs:
             --arg from "$REMETENTE" \
             --arg to "$EMAIL_DESTINO" \
             --arg run "$RUN_URL" \
-            '{from:$from,to:[$to],subject:"Fórmula do Gol — falha operacional na auditoria IA",html:("<h2>Fórmula do Gol — falha operacional</h2><p>O workflow diário de auditoria IA falhou em uma etapa crítica de validação, reserva, publicação ou deploy.</p><p><a href=\""+$run+"\">Abrir execução no GitHub Actions</a></p><p>Os coletores esportivos normais permanecem independentes desta camada.</p>")}')"
+            '{from:$from,to:[$to],subject:"Fórmula do Gol — falha operacional na auditoria IA manual",html:("<h2>Fórmula do Gol — falha operacional</h2><p>O workflow manual de auditoria IA falhou em uma etapa crítica de validação, reserva, publicação ou deploy.</p><p><a href=\""+$run+"\">Abrir execução no GitHub Actions</a></p><p>Os coletores esportivos normais permanecem independentes desta camada.</p>")}')"
           HTTP_CODE="$(curl -sS -o /tmp/resend-failure.json -w '%{http_code}' \
             -X POST 'https://api.resend.com/emails' \
             -H "Authorization: Bearer ${RESEND_API_KEY}" \
