@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { countWebSearchCalls, estimateProviderCost } from '../src/ai-usage.js';
-import { dailyDigestDecision, githubActionsSeverity, isDailyDigestDue, summarizeCloudflareWorkersUsage, postgameDigestLines } from '../src/health-monitor.js';
+import { dailyDigestDecision, githubActionsSeverity, isDailyDigestDue, summarizeCloudflareWorkersUsage, postgameDigestLines, overallRecoveryDecision } from '../src/health-monitor.js';
 
 assert.equal(countWebSearchCalls({output:[{type:'web_search_call'},{type:'message'},{type:'web_search_call'}]}),2);
 assert.equal(countWebSearchCalls({}),0);
@@ -23,6 +23,14 @@ assert.equal(dailyDigestDecision({date:'2026-09-26',hour:11,minute:22},'',{now,l
 assert.equal(dailyDigestDecision({date:'2026-09-26',hour:11,minute:22},'',{now,lastAttemptAt:'2026-09-26T14:06:00Z'}).due,true);
 assert.equal(dailyDigestDecision({date:'2026-09-26',hour:12,minute:0},'',{now}).state,'missed');
 assert.equal(dailyDigestDecision({date:'2026-09-26',hour:11,minute:22},'2026-09-26',{now}).state,'sent');
+
+// Recuperação geral: YELLOW/RED -> GREEN gera e-mail imediato sem mexer no digest das 08:00.
+assert.equal(overallRecoveryDecision({state:'yellow'},{state:'green'}),true);
+assert.equal(overallRecoveryDecision({state:'red'},{state:'green'}),true);
+assert.equal(overallRecoveryDecision({state:'green'},{state:'green'}),false);
+assert.equal(overallRecoveryDecision({state:'yellow'},{state:'yellow'}),false);
+assert.equal(overallRecoveryDecision({state:'yellow'},{state:'green'},{dailySentThisRun:true}),false);
+assert.equal(overallRecoveryDecision({state:'green'},{state:'green'},{pending:true}),true,'falha de envio pendente deve ser reprocessada quando continua verde');
 
 // Uso agregado Workers Paid: billing diário + ciclo mensal + projeção.
 const usage=summarizeCloudflareWorkersUsage([

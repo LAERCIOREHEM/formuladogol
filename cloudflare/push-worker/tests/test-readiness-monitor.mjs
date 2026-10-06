@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { SportsMonitor } from '../src/sports-monitor.js';
+import { SportsMonitor, countReadinessPending, pruneReadinessPreflight } from '../src/sports-monitor.js';
 
 class FakeStorage {
   constructor(){ this.map=new Map(); this.alarm=null; }
@@ -47,6 +47,30 @@ class FakeDB {
       async first(){ return null; }, async all(){ return {results:[]}; }, async run(){ return {meta:{changes:1}}; }
     };
   }
+}
+
+
+// R10.2: readiness histórico não pode contaminar a saúde corrente.
+{
+  const oldKickoff='2026-10-03T21:30:00.000Z';
+  const currentNow=Date.parse('2026-10-06T11:00:00.000Z');
+  const stalePreflight={};
+  const staleWatchlist={};
+  for(let i=1;i<=5;i++){
+    const id=`old-${i}`;
+    staleWatchlist[id]={eventId:id,kickoff:oldKickoff,lastState:'pre'};
+    stalePreflight[id]={tplus3:{completedAt:Date.parse(oldKickoff)+3*60_000,readiness:'red',ready:false}};
+  }
+  assert.equal(countReadinessPending(stalePreflight,staleWatchlist,{},currentNow),0,'cinco readiness antigos não podem deixar o Health amarelo dias depois');
+  assert.deepEqual(pruneReadinessPreflight(stalePreflight,staleWatchlist,{},currentNow),{},'preflight antigo deve sair do estado operacional');
+
+  const upcomingKickoff=new Date(currentNow+10*60_000).toISOString();
+  const activePreflight={live:{t10:{completedAt:currentNow,readiness:'red',ready:false}}};
+  const activeWatchlist={live:{eventId:'live',kickoff:upcomingKickoff,lastState:'pre'}};
+  assert.equal(countReadinessPending(activePreflight,activeWatchlist,{},currentNow),1,'readiness vermelho dentro da janela operacional deve continuar amarelo');
+
+  const postMatches={live:{state:'post',kickoff:upcomingKickoff}};
+  assert.equal(countReadinessPending(activePreflight,activeWatchlist,postMatches,currentNow),0,'partida finalizada não pode manter readiness pendente');
 }
 
 const realNow=Date.now, realFetch=globalThis.fetch;
@@ -117,6 +141,27 @@ try {
   assert.equal(db.incidents.size,1,'readiness deve ter um único incidente por partida');
   assert.ok(db.incidents.has('push_readiness:dedup-1'));
   assert.equal(db.incidents.get('push_readiness:dedup-1').checkpoint,'tplus3');
+
+
+  // Regressão do incidente real: estado antigo com 5 reds + nenhum jogo
+  // operacional deve ser limpo mesmo quando pollOnce não busca ESPN.
+  {
+    const staleStorage=new FakeStorage();
+    const staleMonitor=new SportsMonitor({storage:staleStorage},{DB:new FakeDB(),PUSH_QUEUE:{send:async()=>{}}});
+    const staleNow=Date.parse('2026-10-06T11:00:00.000Z');
+    const staleKickoff='2026-10-03T21:30:00.000Z';
+    const watchlist={}, preflight={};
+    for(let i=1;i<=5;i++){
+      const id=`stale-${i}`;
+      watchlist[id]={eventId:id,league:'bra.1',kickoff:staleKickoff,lastState:'pre',home:{name:'A'},away:{name:'B'}};
+      preflight[id]={tplus3:{completedAt:Date.parse(staleKickoff)+3*60_000,readiness:'red',ready:false}};
+    }
+    await staleStorage.put({watchlist,matches:{},preflight,status:{lastPollAt:0,readinessRed:5}});
+    now=staleNow;
+    const cleaned=await staleMonitor.pollOnce();
+    assert.equal(cleaned.readinessRed,0,'poll sem jogo deve zerar readinessRed obsoleto');
+    assert.deepEqual(cleaned.preflight,{},'poll sem jogo deve podar preflight operacional obsoleto');
+  }
 
   console.log('readiness-monitor Boca-SaoPaulo regression: PASS');
 } finally { Date.now=realNow; globalThis.fetch=realFetch; }

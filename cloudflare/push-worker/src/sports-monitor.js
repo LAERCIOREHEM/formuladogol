@@ -47,6 +47,7 @@ const FAST_POLL_PRE_MS = 20 * 60_000;
 const AUX_SUMMARY_INTERVAL_MS = 30_000;
 const LIVE_POLL_LATE_START_MS = 45 * 60_000;
 const LIVE_POLICY_VERSION = '6-R10';
+const READINESS_LIFECYCLE_POLICY_VERSION = '6-R10.2';
 const ESSENTIAL_EVENT_TYPES = new Set(['prematch_15', 'goal', 'goal_overturned', 'red_card', 'lineup_confirmed', 'match_start', 'final_whistle']);
 
 function text(value) { return String(value == null ? '' : value).trim(); }
@@ -57,9 +58,35 @@ function latestReadinessState(state = {}) {
   return state?.tplus3 || state?.t10 || state?.t30 || null;
 }
 
-function countReadinessPending(preflight = {}) {
+function readinessOperationallyRelevant(game, match = null, nowMs = Date.now()) {
+  if (!game) return false;
+  const kickoff = Date.parse(game?.kickoff || match?.kickoff || '');
+  if (!Number.isFinite(kickoff)) return false;
+  const now = num(nowMs, Date.now());
+  if (match?.state === 'post') return false;
+  // Mesmo um estado "in" que tenha ficado preso não pode manter readiness
+  // vivo indefinidamente. Cinco horas após o kickoff ele já é histórico.
+  if (match?.state === 'in') return now >= kickoff - PRECHECK_FROM_MS && now <= kickoff + POST_WINDOW_MS;
+  // Readiness só é saúde ATUAL dentro da janela em que o guardião pode agir.
+  // O histórico completo continua no D1 (monitor_preflight), mas deixa de
+  // contaminar o estado corrente do Durable Object depois de T+45.
+  return now >= kickoff - PRECHECK_FROM_MS && now <= kickoff + LIVE_POLL_LATE_START_MS;
+}
+
+export function pruneReadinessPreflight(preflight = {}, watchlist = {}, matches = {}, nowMs = Date.now()) {
+  const next = {};
+  for (const [eventId, state] of Object.entries(preflight || {})) {
+    const game = watchlist?.[eventId];
+    if (!readinessOperationallyRelevant(game, matches?.[eventId], nowMs)) continue;
+    next[eventId] = state;
+  }
+  return next;
+}
+
+export function countReadinessPending(preflight = {}, watchlist = {}, matches = {}, nowMs = Date.now()) {
+  const relevant = pruneReadinessPreflight(preflight, watchlist, matches, nowMs);
   let count = 0;
-  for (const state of Object.values(preflight || {})) {
+  for (const state of Object.values(relevant)) {
     const latest = latestReadinessState(state || {});
     if (latest && latest.readiness === 'red') count += 1;
   }
@@ -565,6 +592,15 @@ export class SportsMonitor {
       if (!watchlist[eventId] && activeWatchEntry(previous, now)) watchlist[eventId] = previous;
     }
     await this.state.storage.put('watchlist', watchlist);
+
+    // R10.2: readiness é um sinal operacional, não um arquivo histórico.
+    // Registros antigos permanecem auditáveis no D1, mas são retirados do
+    // estado ativo assim que a partida sai da janela do guardião. Isso evita
+    // falso YELLOW em dias sem jogo.
+    const preflight = pruneReadinessPreflight(current.preflight, watchlist, current.matches, now);
+    await this.state.storage.put('preflight', preflight);
+    const readinessRed = countReadinessPending(preflight, watchlist, current.matches, now);
+
     const shouldPollEspn = Object.values(watchlist).some((entry) => shouldPollGame(entry, current.matches?.[entry.eventId], now));
     await this.writeStatus({
       lastBootstrapAt: now,
@@ -576,7 +612,10 @@ export class SportsMonitor {
       livePolicyVersion: LIVE_POLICY_VERSION,
       fastPollMs: FAST_POLL_MS,
       minPollGapMs: MIN_POLL_GAP_MS,
-      espnPollingSuppressed: !shouldPollEspn
+      espnPollingSuppressed: !shouldPollEspn,
+      readinessVersion: READINESS_VERSION,
+      readinessLifecyclePolicyVersion: READINESS_LIFECYCLE_POLICY_VERSION,
+      readinessRed
     });
 
     const lastPollAt = num(current.status.lastPollAt, 0);
@@ -818,6 +857,9 @@ export class SportsMonitor {
     const activeEntries = Object.values(snapshot.watchlist).filter((entry) => activeWatchEntry(entry, startedAt));
     const watchEntries = activeEntries.filter((entry) => shouldPollGame(entry, snapshot.matches?.[entry.eventId], startedAt));
     if (!watchEntries.length) {
+      const preflight = pruneReadinessPreflight(snapshot.preflight, snapshot.watchlist, snapshot.matches, startedAt);
+      const readinessRed = countReadinessPending(preflight, snapshot.watchlist, snapshot.matches, startedAt);
+      await this.state.storage.put('preflight', preflight);
       await this.writeStatus({
         lastPollAt: startedAt,
         lastPollCompletedAt: Date.now(),
@@ -827,7 +869,10 @@ export class SportsMonitor {
         livePolicyVersion: LIVE_POLICY_VERSION,
         fastPollMs: FAST_POLL_MS,
         minPollGapMs: MIN_POLL_GAP_MS,
-        espnPollingSuppressed: true
+        espnPollingSuppressed: true,
+        readinessVersion: READINESS_VERSION,
+        readinessLifecyclePolicyVersion: READINESS_LIFECYCLE_POLICY_VERSION,
+        readinessRed
       });
       return this.publicStatus();
     }
@@ -1137,9 +1182,11 @@ export class SportsMonitor {
       }
     }
 
-    // readinessRed representa partidas realmente pendentes, não apenas falhas
-    // observadas neste poll. Isso impede CRÍTICO→RECUPERADO falso no poll seguinte.
-    readinessRed = countReadinessPending(preflight);
+    // readinessRed representa somente pendências operacionalmente atuais.
+    // O histórico antigo continua no D1, mas é podado do estado ativo assim
+    // que sai da janela T-30..T+45 ou a partida termina.
+    const compactPreflight = pruneReadinessPreflight(preflight, watchlist, matches, startedAt);
+    readinessRed = countReadinessPending(compactPreflight, watchlist, matches, startedAt);
 
     let recentEvents = [...snapshot.recentEvents, ...newlyEmitted];
     if (recentEvents.length > MAX_RECENT_EVENTS) recentEvents = recentEvents.slice(-MAX_RECENT_EVENTS);
@@ -1149,7 +1196,7 @@ export class SportsMonitor {
       if (match?.state === 'post' && Number.isFinite(kickoff) && kickoff < finishedCutoff) delete matches[eventId];
     }
 
-    await this.state.storage.put({ watchlist, matches, recentEvents, preflight });
+    await this.state.storage.put({ watchlist, matches, recentEvents, preflight: compactPreflight });
     await this.writeStatus({
       lastPollAt: startedAt,
       lastPollCompletedAt: Date.now(),
@@ -1182,6 +1229,7 @@ export class SportsMonitor {
       minPollGapMs: MIN_POLL_GAP_MS,
       espnPollingSuppressed: false,
       readinessVersion: READINESS_VERSION,
+      readinessLifecyclePolicyVersion: READINESS_LIFECYCLE_POLICY_VERSION,
       readinessRed
     });
     await this.ensureNextAlarm();
@@ -1197,6 +1245,7 @@ export class SportsMonitor {
       essentialAlertPolicyVersion: SPORTS_ENGINE_CONSTANTS.ESSENTIAL_ALERT_POLICY_VERSION || '6-R10R4',
       goalRecoveryPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_RECOVERY_POLICY_VERSION || '6-R10R4',
       readinessVersion: READINESS_VERSION,
+      readinessLifecyclePolicyVersion: READINESS_LIFECYCLE_POLICY_VERSION,
       overturnPolicyVersion: SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION,
       goalDetectionPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION,
       goalReconciliationPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_RECONCILIATION_POLICY_VERSION,

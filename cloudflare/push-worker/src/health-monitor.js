@@ -12,7 +12,7 @@ const CF_WORKERS_CPU_INCLUDED_MS = 30_000_000;
 const CF_WORKERS_REQUESTS_INCLUDED = 10_000_000;
 const CF_CPU_OVERAGE_PER_MILLION_USD = 0.02;
 const CF_REQUEST_OVERAGE_PER_MILLION_USD = 0.30;
-const HEALTH_POLICY_VERSION = 7;
+const HEALTH_POLICY_VERSION = 8;
 
 function text(v) { return String(v ?? '').trim(); }
 function n(v) { const x = Number(v); return Number.isFinite(x) ? x : 0; }
@@ -392,6 +392,72 @@ function incidentMessage(indicator,snapshot,recovered=false){
   };
 }
 
+export function overallRecoveryDecision(previousSnapshot, currentSnapshot, { dailySentThisRun = false, pending = false } = {}) {
+  if (dailySentThisRun) return false;
+  if (text(currentSnapshot?.state) !== 'green') return false;
+  if (pending) return true;
+  const previousState = text(previousSnapshot?.state);
+  return Boolean(previousState && previousState !== 'green');
+}
+
+function overallRecoveryMessage(snapshot, now = Date.now()) {
+  const total = Array.isArray(snapshot?.indicators) ? snapshot.indicators.length : 0;
+  const green = Array.isArray(snapshot?.indicators) ? snapshot.indicators.filter((x) => x?.severity === 'green').length : 0;
+  const lines = [
+    'FÓRMULA DO GOL — RECUPERAÇÃO CONFIRMADA',
+    `${fmtDate(now)} · Health Monitor`,
+    '',
+    `ESTADO GERAL: 🟢 GREEN — ${green}/${total} verdes`,
+    '',
+    ...(snapshot?.indicators || []).map((x) => `🟢 ${x.label}: ${x.detail}`),
+    '',
+    'A inconsistência anterior foi normalizada.',
+    'Este aviso de recuperação não altera o ciclo do relatório diário.',
+    'Próximo relatório diário: 08:00 BRT.'
+  ];
+  return {
+    subject: '[Fórmula do GOL] ✅ RECUPERADO — tudo verde novamente',
+    body: lines.join('\n')
+  };
+}
+
+async function syncOverallRecovery(env, previousSnapshot, snapshot, { dailySentThisRun = false, now = Date.now() } = {}) {
+  const pendingRaw = await metaGet(env, 'overall_recovery_pending');
+  const pending = safeJson(pendingRaw, null);
+
+  if (text(snapshot?.state) !== 'green') {
+    if (pendingRaw) await metaPut(env, 'overall_recovery_pending', '');
+    return { sent: false, status: 'not_green' };
+  }
+
+  if (!overallRecoveryDecision(previousSnapshot, snapshot, { dailySentThisRun, pending: Boolean(pending) })) {
+    return { sent: false, status: dailySentThisRun ? 'covered_by_daily_digest' : 'no_transition' };
+  }
+
+  if (dailySentThisRun) {
+    if (pendingRaw) await metaPut(env, 'overall_recovery_pending', '');
+    return { sent: false, status: 'covered_by_daily_digest' };
+  }
+
+  const payload = pending || {
+    detectedAt: iso(now),
+    previousState: text(previousSnapshot?.state) || 'unknown',
+    currentState: 'green'
+  };
+  if (!pendingRaw) await metaPut(env, 'overall_recovery_pending', JSON.stringify(payload));
+
+  const status = await sendMail(env, overallRecoveryMessage(snapshot, now));
+  await metaPut(env, 'last_overall_recovery_status', text(status));
+  if (status === 'sent') {
+    await Promise.all([
+      metaPut(env, 'last_overall_recovery_at', iso(now)),
+      metaPut(env, 'overall_recovery_pending', '')
+    ]);
+    return { sent: true, status: 'sent' };
+  }
+  return { sent: false, status: text(status) || 'failed' };
+}
+
 async function syncIncidents(env,snapshot,now=Date.now()){
   const reds=snapshot.indicators.filter(x=>x.severity==='red'); const active=new Set(reds.map(x=>x.id));
   for(const ind of reds){
@@ -431,8 +497,9 @@ export async function runHealthMonitor(env, monitor=null, now=Date.now()){
     metaGet(env,'daily_digest_date'),metaGet(env,'last_daily_attempt_at'),metaGet(env,'daily_attempts_date'),metaGet(env,'daily_attempts_today'),metaGet(env,'last_daily_attempt_status')
   ]);
   const decision=dailyDigestDecision(br,lastDigest,{lastAttemptAt:attemptDate===br.date?lastAttemptAt:'',now});
-  let snapshot=null; let daily=decision.state;
+  let snapshot=null; let daily=decision.state; let dailySentThisRun=false;
   try {
+    const previousSnapshot=safeJson(await metaGet(env,'snapshot'),null);
     snapshot=await collectHealthSnapshot(env,monitor,now,false);
 
     // O relatório diário tem prioridade sobre a sincronização de incidentes. Assim,
@@ -443,6 +510,7 @@ export async function runHealthMonitor(env, monitor=null, now=Date.now()){
       const status=await sendMail(env,digestMessage(snapshot,now));
       if(status==='sent'){
         daily='sent';
+        dailySentThisRun=true;
         await Promise.all([
           metaPut(env,'daily_digest_date',br.date),
           metaPut(env,'last_daily_sent_at',iso(now)),
@@ -466,7 +534,8 @@ export async function runHealthMonitor(env, monitor=null, now=Date.now()){
     }
 
     await syncIncidents(env,snapshot,now);
-    const completed={at:iso(now),state:snapshot.state,daily};
+    const overallRecovery=await syncOverallRecovery(env,previousSnapshot,snapshot,{dailySentThisRun,now});
+    const completed={at:iso(now),state:snapshot.state,daily,overallRecovery:overallRecovery.status};
     await Promise.all([metaPut(env,'last_health_completed_at',iso(now)),metaPut(env,'last_health_run',JSON.stringify(completed)),metaPut(env,'last_health_error','')]);
     return {ok:true,state:snapshot.state,daily,snapshot};
   } catch(error){
@@ -477,8 +546,8 @@ export async function runHealthMonitor(env, monitor=null, now=Date.now()){
 
 export async function healthMonitorStatus(env,now=Date.now()){
   const br=brParts(now);
-  const [lastRun,snapshot,digestDate,targetDate,lastAttemptAt,lastAttemptStatus,lastAttemptError,attemptDate,attemptsRaw,lastSentAt,startedAt,completedAt,lastHealthError]=await Promise.all([
-    metaGet(env,'last_health_run'),metaGet(env,'snapshot'),metaGet(env,'daily_digest_date'),metaGet(env,'daily_target_date'),metaGet(env,'last_daily_attempt_at'),metaGet(env,'last_daily_attempt_status'),metaGet(env,'last_daily_attempt_error'),metaGet(env,'daily_attempts_date'),metaGet(env,'daily_attempts_today'),metaGet(env,'last_daily_sent_at'),metaGet(env,'last_health_started_at'),metaGet(env,'last_health_completed_at'),metaGet(env,'last_health_error')
+  const [lastRun,snapshot,digestDate,targetDate,lastAttemptAt,lastAttemptStatus,lastAttemptError,attemptDate,attemptsRaw,lastSentAt,startedAt,completedAt,lastHealthError,lastOverallRecoveryAt,lastOverallRecoveryStatus,overallRecoveryPending]=await Promise.all([
+    metaGet(env,'last_health_run'),metaGet(env,'snapshot'),metaGet(env,'daily_digest_date'),metaGet(env,'daily_target_date'),metaGet(env,'last_daily_attempt_at'),metaGet(env,'last_daily_attempt_status'),metaGet(env,'last_daily_attempt_error'),metaGet(env,'daily_attempts_date'),metaGet(env,'daily_attempts_today'),metaGet(env,'last_daily_sent_at'),metaGet(env,'last_health_started_at'),metaGet(env,'last_health_completed_at'),metaGet(env,'last_health_error'),metaGet(env,'last_overall_recovery_at'),metaGet(env,'last_overall_recovery_status'),metaGet(env,'overall_recovery_pending')
   ]);
   const decision=dailyDigestDecision(br,digestDate,{lastAttemptAt:attemptDate===br.date?lastAttemptAt:'',now});
   const completedMs=Date.parse(completedAt); const stale=!Number.isFinite(completedMs)||now-completedMs>15*60_000;
@@ -489,6 +558,7 @@ export async function healthMonitorStatus(env,now=Date.now()){
     snapshot:safeJson(snapshot,null),
     dailyDigestDate:digestDate,
     dailyDelivery:{targetDate:targetDate||br.date,state:deliveryState,attemptsToday:attemptDate===br.date?n(attemptsRaw):0,lastAttemptAt,lastAttemptStatus,lastAttemptError,lastSentAt,nextAttemptAt:decision.nextAttemptAt||null,recoveryWindowBrt:'08:00-11:59'},
+    overallRecovery:{lastSentAt:lastOverallRecoveryAt,lastStatus:lastOverallRecoveryStatus,pending:Boolean(safeJson(overallRecoveryPending,null)),preservesDailySchedule:true},
     scheduler:{healthCron:'*/5 * * * *',lastStartedAt:startedAt,lastCompletedAt:completedAt,stale,lastError:lastHealthError}
   };
 }
