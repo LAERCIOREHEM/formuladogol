@@ -1,17 +1,19 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-10-04",
-  "executado_em": "2026-10-04T12:58:48-03:00",
-  "status": "atencao",
-  "resumo": "Auditoria concluída com uma consulta externa. Não há pendências de público/renda nem de melhores momentos. As duas pendências de transmissão permanecem sem correção proposta: a evidência consultada confirma que a CBF divulgou a tabela detalhada da 29ª rodada com informações de transmissão, mas não permite associar inequivocamente os canais aos event_id pendentes fornecidos.",
+  "data_brt": "2026-10-06",
+  "executado_em": "2026-10-06T08:39:26-03:00",
+  "status": "critico",
+  "resumo": "Há indisponibilidade crítica do fluxo principal há 59,9 horas. Entre as pendências de transmissão, foi encontrada confirmação direta para o evento 401841248; os eventos 401841266 e 401841265 permanecem sem complementação, pois não houve fonte permitida que declarasse seus canais de forma inequívoca.",
   "triagem": {
-    "data_hora_brt": "2026-10-04T12:58:48-03:00",
+    "data_hora_brt": "2026-10-06T08:39:26-03:00",
     "saude": {
-      "status_deterministico": "atencao",
-      "criticos": [],
+      "status_deterministico": "critico",
+      "criticos": [
+        "último sucesso principal ocorreu há 59.9 h"
+      ],
       "avisos": [
-        "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura",
-        "2 transmissão(ões) ainda elegíveis para complementação"
+        "4 fonte(s) de transmissão falharam, sem perda crítica de cobertura",
+        "3 transmissão(ões) ainda elegíveis para complementação"
       ],
       "indicadores": {
         "estatisticas_erros_criticos": 0,
@@ -19,32 +21,41 @@
         "detalhes_inconsistencias": 0,
         "detalhes_falhas": 0,
         "jogos_sem_estatisticas": 0,
-        "transmissoes_criticas": 0,
+        "transmissoes_criticas": 1,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 16.2
+        "ultimo_sucesso_horas": 59.9
       }
     },
     "pendencias": {
       "publicos": [],
       "transmissoes": [
         {
-          "event_id": "401841252",
-          "rodada": 29,
-          "data_iso": "2026-10-07T19:30:00-03:00",
-          "mandante": "",
-          "visitante": "",
-          "nivel": "aviso",
-          "horas_ate_jogo": 78.5
-        },
-        {
           "event_id": "401841248",
           "rodada": 29,
           "data_iso": "2026-10-08T21:30:00-03:00",
           "mandante": "",
           "visitante": "",
+          "nivel": "critico",
+          "horas_ate_jogo": 60.8
+        },
+        {
+          "event_id": "401841266",
+          "rodada": 30,
+          "data_iso": "2026-10-11T19:30:00-03:00",
+          "mandante": "",
+          "visitante": "",
           "nivel": "aviso",
-          "horas_ate_jogo": 104.5
+          "horas_ate_jogo": 130.8
+        },
+        {
+          "event_id": "401841265",
+          "rodada": 30,
+          "data_iso": "2026-10-12T19:30:00-03:00",
+          "mandante": "",
+          "visitante": "",
+          "nivel": "aviso",
+          "horas_ate_jogo": 154.8
         }
       ],
       "melhores_momentos_apos_24h": []
@@ -78,19 +89,23 @@
       {
         "type": "search",
         "queries": [
-          "401841252 transmissão 7 outubro 2026 futebol",
-          "401841248 transmissão 8 outubro 2026 futebol"
+          "401841248 transmissão 8 outubro 2026 futebol",
+          "401841266 transmissão 11 outubro 2026 futebol",
+          "401841265 transmissão 12 outubro 2026 futebol"
         ]
       }
     ],
     "fontes_web": [
-      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-      "https://s3.static.brasilescola.uol.com.br/be/2026/02/portaria-pe-de-meia-datas-2026.pdf",
+      "https://edicao.correiobraziliense.com.br/correiobraziliense/2025/10/01/all.pdf",
+      "https://esportes.r7.com/futebol/campeonato-brasileiro-serie-a/agenda-do-futebol-na-record-confira-os-proximos-jogos-do-campeonato-brasileiro-05102026",
       "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/cruzeiro-x-sao-paulo/832176",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/red-bull-bragantino-x-cruzeiro/832185",
       "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
-      "https://www.espn.com.br/futebol/resultados/_/liga/bra.1/data/20261007",
+      "https://www.palmeiras.com.br/futebol",
+      "https://www.palmeiras.com.br/jogo",
+      "https://www.palmeiras.com.br/trasmissao/sportv",
+      "https://www.palmeiras.com.br/wp-content/uploads/2026/03/Relatorio-Palmeiras-2026-WEB.pdf",
+      "https://www.palmeiras.com.br/wp-content/uploads/2026/04/CL-2026-Manual-de-Clubes-POR-Fev26-1.pdf",
+      "https://www.palmeiras.com.br/wp-content/uploads/2026/05/balancete-e-demonstrativo-financeiro-janeiro-2026-v03.pdf",
       "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/08/31/cbf-rodadas-brasileirao.ghtm"
     ],
     "transport": {
@@ -99,49 +114,90 @@
     }
   },
   "resultado_ia": {
-    "status_geral": "atencao",
-    "resumo": "Auditoria concluída com uma consulta externa. Não há pendências de público/renda nem de melhores momentos. As duas pendências de transmissão permanecem sem correção proposta: a evidência consultada confirma que a CBF divulgou a tabela detalhada da 29ª rodada com informações de transmissão, mas não permite associar inequivocamente os canais aos event_id pendentes fornecidos.",
+    "status_geral": "critico",
+    "resumo": "Há indisponibilidade crítica do fluxo principal há 59,9 horas. Entre as pendências de transmissão, foi encontrada confirmação direta para o evento 401841248; os eventos 401841266 e 401841265 permanecem sem complementação, pois não houve fonte permitida que declarasse seus canais de forma inequívoca.",
     "problemas": [
       {
-        "categoria": "transmissao",
-        "severidade": "atencao",
-        "mensagem": "Transmissão ainda pendente para partida futura; não foi encontrada evidência diretamente associável, de forma inequívoca, ao event_id 401841252 dentro do limite de consulta.",
-        "event_id": "401841252",
-        "requer_intervencao": false
+        "categoria": "fonte",
+        "severidade": "critico",
+        "mensagem": "O último sucesso do coletor principal ocorreu há 59,9 horas; é necessária intervenção operacional para restabelecer o fluxo.",
+        "event_id": "",
+        "requer_intervencao": true
       },
       {
         "categoria": "transmissao",
-        "severidade": "atencao",
-        "mensagem": "Transmissão ainda pendente para partida futura; não foi encontrada evidência diretamente associável, de forma inequívoca, ao event_id 401841248 dentro do limite de consulta.",
+        "severidade": "info",
+        "mensagem": "Fonte oficial do mandante declara diretamente Globo, Premiere e getv para Palmeiras x Bahia em 08/10/2026 às 21h30.",
         "event_id": "401841248",
         "requer_intervencao": false
       },
       {
-        "categoria": "fonte",
-        "severidade": "info",
-        "mensagem": "As falhas isoladas de duas fontes de transmissão não configuram incidente crítico, pois o dossiê não aponta perda crítica de cobertura nem inconsistência em dados finais.",
-        "event_id": "",
+        "categoria": "transmissao",
+        "severidade": "atencao",
+        "mensagem": "Permanece pendência de transmissão elegível; não foi localizada, na consulta disponível, fonte permitida que declare diretamente os canais do jogo.",
+        "event_id": "401841266",
+        "requer_intervencao": false
+      },
+      {
+        "categoria": "transmissao",
+        "severidade": "atencao",
+        "mensagem": "Permanece pendência de transmissão elegível; não foi localizada, na consulta disponível, fonte permitida que declare diretamente os canais do jogo.",
+        "event_id": "401841265",
         "requer_intervencao": false
       }
     ],
     "correcoes_publico": [],
-    "correcoes_transmissao": [],
+    "correcoes_transmissao": [
+      {
+        "event_id": "401841248",
+        "canais": [
+          "Globo",
+          "Premiere",
+          "getv"
+        ],
+        "fonte_url": "https://www.palmeiras.com.br/futebol/",
+        "confianca": 0.99,
+        "justificativa": "A página oficial do Palmeiras lista Palmeiras x Bahia, em 08/10/2026 às 21h30, e declara diretamente a transmissão por Globo, Premiere e getv."
+      }
+    ],
     "melhores_momentos_pendentes": []
   },
   "correcoes": {
     "publicos_aceitos": [],
     "transmissoes_aceitas": [],
-    "rejeitadas": [],
+    "rejeitadas": [
+      {
+        "tipo": "transmissao",
+        "event_id": "401841248",
+        "motivos": [
+          "canal fora da lista permitida"
+        ],
+        "proposta": {
+          "event_id": "401841248",
+          "canais": [
+            "Globo",
+            "Premiere",
+            "getv"
+          ],
+          "fonte_url": "https://www.palmeiras.com.br/futebol/",
+          "confianca": 0.99,
+          "justificativa": "A página oficial do Palmeiras lista Palmeiras x Bahia, em 08/10/2026 às 21h30, e declara diretamente a transmissão por Globo, Premiere e getv."
+        }
+      }
+    ],
     "publicos_aplicados": [],
     "transmissoes_aplicadas": [],
     "editoriais_aplicados": []
   },
-  "criticos_nao_resolvidos": [],
+  "criticos_nao_resolvidos": [
+    "último sucesso principal ocorreu há 59.9 h",
+    "O último sucesso do coletor principal ocorreu há 59,9 horas; é necessária intervenção operacional para restabelecer o fluxo."
+  ],
   "alerta": {
     "ultimo_fingerprint": "",
     "ultimo_enviado_em": "",
     "envio_nesta_execucao": false,
-    "detalhe": "não necessário"
+    "detalhe": "RESEND_API_KEY/EMAIL_DESTINO não configurados"
   },
   "historico": [
     {
@@ -883,6 +939,22 @@
       "transmissoes_aplicadas": 0,
       "editoriais_aplicados": [],
       "criticos": [],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-10-06",
+      "executado_em": "2026-10-06T08:39:26-03:00",
+      "status": "critico",
+      "resumo": "Há indisponibilidade crítica do fluxo principal há 59,9 horas. Entre as pendências de transmissão, foi encontrada confirmação direta para o evento 401841248; os eventos 401841266 e 401841265 permanecem sem complementação, pois não houve fonte permitida que declarasse seus canais de forma inequívoca.",
+      "chamadas_openai": 1,
+      "web_searches": 1,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [
+        "último sucesso principal ocorreu há 59.9 h",
+        "O último sucesso do coletor principal ocorreu há 59,9 horas; é necessária intervenção operacional para restabelecer o fluxo."
+      ],
       "email_enviado": false
     }
   ]
