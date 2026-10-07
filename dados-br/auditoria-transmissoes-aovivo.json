@@ -15,14 +15,14 @@
   "resumo": {
     "jogos_na_janela": 64,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 13,
+    "descobertas_antecipadas": 12,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 60,
+    "candidatos_oficiais_encontrados": 61,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 0,
-    "search_api_jogos_pulados_grade_estavel": 1,
+    "search_api_jogos_elegiveis": 1,
+    "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 13,
-    "sem_transmissao": 1,
+    "sem_transmissao": 0,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -83,18 +83,6 @@
       "descoberta_antecipada": true
     },
     {
-      "event_id": "401841257",
-      "rodada": 29,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Botafogo x Vasco da Gama",
-      "data_iso": "2026-10-07T20:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
       "event_id": "401841249",
       "rodada": 29,
       "competicao_chave": "brasileirao",
@@ -106,7 +94,7 @@
         "GE TV"
       ],
       "manual": false,
-      "descoberta_antecipada": true
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841254",
@@ -467,6 +455,16 @@
       "titulo": "AO VIVO: DENVER BRONCOS X SEATTLE SEAHAWKS | NFL 2026/27 | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-10-15T20:15:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "Pk8WGhLxdpQ",
+      "url": "https://www.youtube.com/watch?v=Pk8WGhLxdpQ",
+      "fonte": "sbt",
+      "canal": "SBT",
+      "titulo": "SBT - Ao Vivo",
+      "status": "live",
+      "inicio_programado": "2026-10-06T10:43:19-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -940,24 +938,8 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [
-    {
-      "event_id": "401841257",
-      "jogo": "Botafogo x Vasco da Gama",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    }
-  ],
-  "sem_transmissao": [
-    {
-      "event_id": "401841257",
-      "rodada": 29,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Botafogo x Vasco da Gama",
-      "data_iso": "2026-10-07T20:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    }
-  ],
+  "search_api_pulados": [],
+  "sem_transmissao": [],
   "erros": [],
   "quota_estimada_youtube": {
     "unidades": 88,
@@ -968,5 +950,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-10-07T19:01:00-03:00"
+  "atualizado_em": "2026-10-07T20:01:03-03:00"
 }
