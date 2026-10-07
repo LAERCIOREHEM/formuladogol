@@ -5037,48 +5037,117 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado: Red Bull Bragantino x Mirassol, Brasileirão Série A 2026, fase única, rodada 29, ocorre em 07/10/2026 às 19h30 (horário de Brasília), no estádio Cícero de Souza Marques, em Bragança Paulista. A transmissão integral oficial no Brasil é exclusiva do Premiere. O ge oferecerá tempo real com vídeos, o que não configura transmissão integral."
+    },
+    {
+      "event_id": "401841255",
+      "jogo": "Internacional x Corinthians",
+      "data_iso": "2026-10-07T19:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-10-07T18:29:22-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "CazéTV"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cdn.conmebol.com/wp-content/uploads/2024/10/Analisis-Tactico-CONMEBOL-Libertadores-Femenina-2023-POR.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR-1.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR-Fev26.pdf",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/07/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-29a-rodada.ghtml",
+        "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+        "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/10/07/internacional-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://record.r7.com/fala-brasil/video/fala-esporte-brasileirao-retorna-e-internacional-enfrenta-corinthians-nesta-quarta-feira-7-06102026",
+        "https://record.r7.com/record-emissoras/sudeste/tv-leste/internacional-e-corinthians-se-enfrentam-em-jogo-decisivo-contra-o-z-4-na-tv-leste-07102026",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/corinthians-x-internacional/831983",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/masculino/2026/internacional-x-corinthians/834852",
+        "https://www.espn.com.br/futebol/partida/_/jogoId/401841255/corinthians-internacional",
+        "https://www.espn.com.br/futebol/time/calendario/_/id/874/2012",
+        "https://www.espn.com.br/futebol/time/calendario/_/id/874/bra.corinthians",
+        "https://www.uol.com.br/comidasebebidas/busca/montecarlo.htm",
+        "https://www.uol.com.br/esporte/ultimas-noticias/2026/10/07/onde-vai-passar-internacional-x-corinthians-pelo-brasileirao-como-assistir-ao-vivo.ghtm",
+        "https://www.youtube.com/watch?v=1CHIHCEwVyI",
+        "https://www.youtube.com/watch?v=xId4_LfucTI"
+      ],
+      "canais_depois": [
+        "CazéTV",
+        "Premiere",
+        "Record"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/10/07/internacional-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://record.r7.com/record-emissoras/sudeste/tv-leste/internacional-e-corinthians-se-enfrentam-em-jogo-decisivo-contra-o-z-4-na-tv-leste-07102026"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=7uq9nMdsVFU",
+          "scope": "match",
+          "valid_for_match": true,
+          "reason": "O dossiê identifica uma live oficial da CazéTV com o título “AO VIVO: INTERNACIONAL X CORINTHIANS | BRASILEIRÃO 2026 | 29ª RODADA”, iniciada antes da partida e classificada como escopo de partida. A cobertura independente do ge também confirma a Cazé entre os detentores da transmissão ao vivo."
+        }
+      ],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Internacional x Corinthians, Brasileirão 2026 (29ª rodada), quarta-feira, 07/10/2026, às 19h30 (horário de Brasília), no Beira-Rio. A transmissão integral será em CazéTV, Premiere e Record. Não é exclusiva."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841253",
-    "jogo": "Bragantino x Mirassol",
+    "event_id": "401841255",
+    "jogo": "Internacional x Corinthians",
     "data_iso": "2026-10-07T19:30:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-10-07T18:03:49-03:00",
+    "executado_em": "2026-10-07T18:29:22-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "Premiere"
+      "CazéTV"
     ],
-    "status": "confirmado",
+    "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://cbf-hml.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/20007",
+      "https://cdn.conmebol.com/wp-content/uploads/2024/10/Analisis-Tactico-CONMEBOL-Libertadores-Femenina-2023-POR.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR-1.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR-Fev26.pdf",
       "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/07/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-29a-rodada.ghtml",
       "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
-      "https://ge.globo.com/google/amp/sp/tem-esporte/futebol/times/mirassol/noticia/2026/09/28/cbf-divulga-datas-e-horarios-da-31a-a-34a-rodada-da-serie-a-veja-os-jogos-do-mirassol.ghtml",
-      "https://ge.globo.com/sp/tem-esporte/futebol/times/mirassol/noticia/2026/10/07/guanaes-quer-mirassol-como-visitante-indigesto-na-reta-final-do-brasileirao.ghtml",
-      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/10/07/bragantino-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/mirassol-x-red-bull-bragantino/831984",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/mirassol-x-remo/832094",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/red-bull-bragantino-x-coritiba-saf/832084",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/red-bull-bragantino-x-mirassol/832175",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-serie-a/apos-data-fifa-brasileirao-esta-de-volta-nesta-quarta-feira-confira-retrospecto-dos-confrontos-da-29-rodada"
+      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/10/07/internacional-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://record.r7.com/fala-brasil/video/fala-esporte-brasileirao-retorna-e-internacional-enfrenta-corinthians-nesta-quarta-feira-7-06102026",
+      "https://record.r7.com/record-emissoras/sudeste/tv-leste/internacional-e-corinthians-se-enfrentam-em-jogo-decisivo-contra-o-z-4-na-tv-leste-07102026",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/corinthians-x-internacional/831983",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/masculino/2026/internacional-x-corinthians/834852",
+      "https://www.espn.com.br/futebol/partida/_/jogoId/401841255/corinthians-internacional",
+      "https://www.espn.com.br/futebol/time/calendario/_/id/874/2012",
+      "https://www.espn.com.br/futebol/time/calendario/_/id/874/bra.corinthians",
+      "https://www.uol.com.br/comidasebebidas/busca/montecarlo.htm",
+      "https://www.uol.com.br/esporte/ultimas-noticias/2026/10/07/onde-vai-passar-internacional-x-corinthians-pelo-brasileirao-como-assistir-ao-vivo.ghtm",
+      "https://www.youtube.com/watch?v=1CHIHCEwVyI",
+      "https://www.youtube.com/watch?v=xId4_LfucTI"
     ],
     "canais_depois": [
-      "Premiere"
+      "CazéTV",
+      "Premiere",
+      "Record"
     ],
-    "exclusivo": true,
+    "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/red-bull-bragantino-x-mirassol/832175",
-      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/10/07/bragantino-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/07/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-29a-rodada.ghtml"
+      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/10/07/internacional-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://record.r7.com/record-emissoras/sudeste/tv-leste/internacional-e-corinthians-se-enfrentam-em-jogo-decisivo-contra-o-z-4-na-tv-leste-07102026"
     ],
-    "youtube": [],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=7uq9nMdsVFU",
+        "scope": "match",
+        "valid_for_match": true,
+        "reason": "O dossiê identifica uma live oficial da CazéTV com o título “AO VIVO: INTERNACIONAL X CORINTHIANS | BRASILEIRÃO 2026 | 29ª RODADA”, iniciada antes da partida e classificada como escopo de partida. A cobertura independente do ge também confirma a Cazé entre os detentores da transmissão ao vivo."
+      }
+    ],
     "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado: Red Bull Bragantino x Mirassol, Brasileirão Série A 2026, fase única, rodada 29, ocorre em 07/10/2026 às 19h30 (horário de Brasília), no estádio Cícero de Souza Marques, em Bragança Paulista. A transmissão integral oficial no Brasil é exclusiva do Premiere. O ge oferecerá tempo real com vídeos, o que não configura transmissão integral."
+    "resumo": "Confirmado para o Brasil: Internacional x Corinthians, Brasileirão 2026 (29ª rodada), quarta-feira, 07/10/2026, às 19h30 (horário de Brasília), no Beira-Rio. A transmissão integral será em CazéTV, Premiere e Record. Não é exclusiva."
   },
-  "atualizado_em": "2026-10-07T18:03:49-03:00"
+  "atualizado_em": "2026-10-07T18:29:22-03:00"
 }
