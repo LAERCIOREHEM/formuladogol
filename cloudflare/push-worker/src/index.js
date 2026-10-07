@@ -10,6 +10,7 @@ import { createLiveStatsStore } from './live-stats-store.js';
 import { postgameSearchProbe, postgameStatus, readPostgameFastlane, runPostgameMaintenance } from './postgame-fastlane.js';
 import { feedbackNotifierConfigured, runFeedbackNotifier } from './feedback-notifier.js';
 import { healthMonitorStatus, runHealthMonitor } from './health-monitor.js';
+import { RED_CARD_EVENT_POLICY_VERSION } from './readiness-guardian.js';
 
 export { PushState, SportsMonitor };
 
@@ -601,7 +602,7 @@ export default {
         ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok) && Boolean(operational?.ok),
         service: 'formula-do-gol-push',
         version: 10,
-        revision: '6-R10R13-READINESS-LIFECYCLE-HEALTH-RECOVERY-POSTGAME-V10-SCORER-R10R5',
+        revision: '6-R10R14-RED-CARD-EVENT-GUARD-READINESS-R10R13-POSTGAME-V10-SCORER-R10R5',
         liveGatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
         liveStateContractVersion: LIVE_API_CONSTANTS.LIVE_STATE_CONTRACT_VERSION,
         liveFactsContractVersion: LIVE_API_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
@@ -666,6 +667,9 @@ export default {
         sportsMonitorReady: Boolean(monitor?.ok),
         readinessAlertPolicyVersion: 'R10.1',
         readinessLifecyclePolicyVersion: '6-R10.2',
+        redCardEventPolicyVersion: RED_CARD_EVENT_POLICY_VERSION,
+        redCardAggregateStatsIgnored: true,
+        redCardEventContextRequired: true,
         readinessOperationalWindowOnly: true,
         readinessStalePreflightPruning: true,
         readinessIncidentDedup: true,

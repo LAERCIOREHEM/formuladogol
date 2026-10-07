@@ -138,6 +138,9 @@ try {
   status = await monitor.publicStatus();
   assert.equal(status.goalReconciliationPolicyVersion, '6-R9-R1');
   assert.equal(status.goalScorerEnrichmentPolicyVersion, '6-R10R5');
+  assert.equal(status.redCardEventPolicyVersion, '6-R10R6');
+  assert.equal(status.redCardAggregateStatsIgnored, true);
+  assert.equal(status.redCardEventContextRequired, true);
   assert.equal(status.scorerMissingAtDispatch, 0, 'R9 não deve despachar sem autor quando CORE já o publicou');
   assert.ok(numForTest(status.scorerSources.espn_core_plays) >= 1, 'telemetria deve atribuir a autoria ao CORE');
   assert.equal(status.goalReconciliation[eventId].scoreboardGoals, 1);

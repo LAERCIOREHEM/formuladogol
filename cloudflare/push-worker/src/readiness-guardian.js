@@ -1,5 +1,6 @@
 const MINUTE = 60_000;
 export const READINESS_VERSION = '6-R10.1';
+export const RED_CARD_EVENT_POLICY_VERSION = '6-R10R6';
 export const PRECHECK_FROM_MS = 35 * MINUTE;
 export const PRECHECK_POLL_MS = 60_000;
 export const RED_CONFIRM_MS = 60_000;
@@ -114,22 +115,70 @@ function teamFrom(item) {
   return teamDescriptor({ ...raw, id: raw?.id || item?.teamId || item?.competitorId });
 }
 
+function hasOwn(object, key) {
+  return Boolean(object && Object.prototype.hasOwnProperty.call(object, key));
+}
+
+function aggregateRedCardStatistic(item, descriptor) {
+  // ESPN summary/boxscore publica objetos como:
+  // {name:'redCards', displayName:'Red Cards', description:'Red Cards', value:0, displayValue:'0'}.
+  // Isso é uma MÉTRICA acumulada, nunca um lance. A política antiga interpretava
+  // apenas o texto "Red Cards" e criava um falso evento após duas observações.
+  const labels = [
+    item?.name, item?.displayName, item?.shortDisplayName, item?.label,
+    item?.description, item?.type
+  ].filter((value) => typeof value === 'string' || typeof value === 'number').map(norm).filter(Boolean);
+  const aggregateLabel = /^(?:redcards?|red cards?|cartao(?:s)? vermelho(?:s)?|secondyellowcards?|second yellow cards?|segundo(?:s)? amarelo(?:s)?|segunda(?:s)? amarela(?:s)?)$/;
+  const redLabel = labels.some((label) => aggregateLabel.test(label)) || aggregateLabel.test(descriptor);
+  const metricShape = hasOwn(item, 'value') || hasOwn(item, 'displayValue') || hasOwn(item, 'rank') || hasOwn(item, 'summary');
+  return Boolean(redLabel && metricShape && item?.redCard !== true && item?.isRedCard !== true);
+}
+
+function redCardEventContext({ item, athlete, team, minute, sourceId }) {
+  // Um alerta disciplinar precisa de evidência de LANCE: id/sequence, relógio,
+  // atleta, equipe ou narrativa própria do play. Um rótulo estatístico isolado
+  // não satisfaz este contrato, mesmo quando o valor agregado for 1 ou maior.
+  const narrative = text(item?.text || item?.shortText || item?.displayText);
+  return Boolean(
+    sourceId || minute || text(athlete?.id) || text(athlete?.name) ||
+    text(team?.id) || text(team?.name) || narrative
+  );
+}
+
+function persistedAggregateFalsePositive(card) {
+  const descriptor = norm(card?.descriptor);
+  const noContext = !text(card?.sourceId) && !text(card?.minute)
+    && !text(card?.athlete?.id) && !text(card?.athlete?.name)
+    && !text(card?.team?.id) && !text(card?.team?.name);
+  return noContext && /^(?:red cards?|cartao(?:s)? vermelho(?:s)?|second yellow cards?|segundo(?:s)? amarelo(?:s)?|segunda(?:s)? amarela(?:s)?)$/.test(descriptor);
+}
+
 export function extractRedCards(payload, observation = {}, sourceName = '') {
   const objects = [];
   walkObjects(payload, objects);
   const out = new Map();
   for (const item of objects) {
     const descriptor = eventDescriptor(item);
-    const red = item?.redCard === true || item?.isRedCard === true || /red card|cartao vermelho|expuls|second yellow|segundo amarelo|segunda amarela/.test(descriptor);
-    if (!red) continue;
+    const explicitFlag = item?.redCard === true || item?.isRedCard === true;
+    const narrativeRed = /red card|cartao vermelho|expuls|second yellow|segundo amarelo|segunda amarela/.test(descriptor);
+    if (!explicitFlag && !narrativeRed) continue;
+
+    // Primeira trava: objetos de boxscore/statistics jamais viram eventos.
+    if (aggregateRedCardStatistic(item, descriptor)) continue;
+
     const athlete = athleteFrom(item);
     const team = teamFrom(item);
-    const minute = text(item?.clock?.displayValue || item?.displayClock || item?.clock || '');
+    const minute = text(item?.clock?.displayValue || item?.displayClock || (typeof item?.clock === 'string' ? item.clock : ''));
     const sourceId = text(item?.id || item?.uid || item?.sequenceNumber || item?.sequence);
+
+    // Segunda trava: mesmo um texto que contenha "Red Card" precisa carregar
+    // contexto individual de play. Isso bloqueia rótulos/legendas genéricas.
+    if (!redCardEventContext({ item, athlete, team, minute, sourceId })) continue;
+
     const identity = sourceId || stableKey([text(observation?.eventId), team.id || team.name, athlete.id || athlete.name, minute, descriptor].join('|'));
     if (!identity) continue;
     const key = `${text(observation?.eventId)}:red:${identity}`;
-    out.set(key, { key, sourceId, athlete, team, minute, sourceName: text(sourceName), descriptor });
+    out.set(key, { key, sourceId, athlete, team, minute, sourceName: text(sourceName), descriptor, eventPolicyVersion: RED_CARD_EVENT_POLICY_VERSION });
   }
   return [...out.values()];
 }
@@ -188,6 +237,13 @@ export function applyRedCardObservations(matchInput, cards, observation, nowMs =
   const now = num(nowMs, Date.now());
   const match = structuredClone(matchInput || {});
   const current = match.redCards && typeof match.redCards === 'object' ? match.redCards : {};
+
+  // Remove candidatos fantasmas persistidos por versões anteriores. Eles eram
+  // derivados do rótulo agregado "Red Cards" e não possuíam id/minuto/jogador/time.
+  for (const [key, card] of Object.entries(current)) {
+    if (persistedAggregateFalsePositive(card)) delete current[key];
+  }
+
   const seen = new Set();
   const emitted = [];
   for (const card of Array.isArray(cards) ? cards : []) {

@@ -14,7 +14,7 @@ import {
 } from './sports-engine.js';
 import { countEligibleTargets, enqueueSportsEvent } from './push-dispatch.js';
 import {
-  PRECHECK_FROM_MS, PRECHECK_POLL_MS, READINESS_VERSION,
+  PRECHECK_FROM_MS, PRECHECK_POLL_MS, READINESS_VERSION, RED_CARD_EVENT_POLICY_VERSION,
   resolveScoreboardEvent, extractRedCards, mergeRedCards, applyRedCardObservations,
   extractLineupSnapshot, applyLineupObservation, dueReadinessCheckpoints, readinessSnapshot,
   aiResolverRequest, parseOpenAIJson
@@ -1246,6 +1246,9 @@ export class SportsMonitor {
       goalRecoveryPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_RECOVERY_POLICY_VERSION || '6-R10R4',
       readinessVersion: READINESS_VERSION,
       readinessLifecyclePolicyVersion: READINESS_LIFECYCLE_POLICY_VERSION,
+      redCardEventPolicyVersion: RED_CARD_EVENT_POLICY_VERSION,
+      redCardAggregateStatsIgnored: true,
+      redCardEventContextRequired: true,
       overturnPolicyVersion: SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION,
       goalDetectionPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION,
       goalReconciliationPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_RECONCILIATION_POLICY_VERSION,

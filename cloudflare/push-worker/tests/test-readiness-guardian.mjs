@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {
   CHECKPOINTS,
   READINESS_VERSION,
+  RED_CARD_EVENT_POLICY_VERSION,
   resolveScoreboardEvent,
   dueReadinessCheckpoints,
   readinessSnapshot,
@@ -34,6 +35,7 @@ function raw(id='401912542', state='pre') {
 }
 
 assert.equal(READINESS_VERSION, '6-R10.1');
+assert.equal(RED_CARD_EVENT_POLICY_VERSION, '6-R10R6');
 assert.deepEqual(CHECKPOINTS.map((x) => x.key), ['t30','t10','tplus3']);
 assert.deepEqual(deriveScheduleEvents({}, {}, Date.now(), true), [], 'alertas legados de agenda precisam permanecer desativados');
 
@@ -87,6 +89,45 @@ assert.equal(readiness.teamIdentityWarning, true);
 assert.ok(readiness.warnings.includes('team_identity_alias_warning'));
 assert.ok(!readiness.reasons.includes('team_identity_mismatch'));
 
+// R10R6: regressão real de 07/10/2026. O boxscore da ESPN publica a
+// estatística agregada "Red Cards" mesmo quando o valor é ZERO. O rótulo da
+// métrica nunca pode ser convertido em lance/expulsão, nem quando o valor for 1.
+const aggregateStatsPayload = {
+  boxscore: {
+    teams: [
+      { team: { id: '1', displayName: 'Remo' }, statistics: [
+        { name: 'redCards', displayName: 'Red Cards', description: 'Red Cards', value: 0, displayValue: '0' },
+        { name: 'secondYellowCards', displayName: 'Second Yellow Cards', description: 'Second Yellow Cards', value: 0, displayValue: '0' }
+      ] },
+      { team: { id: '2', displayName: 'Grêmio' }, statistics: [
+        { name: 'redCards', displayName: 'Red Cards', description: 'Red Cards', value: 1, displayValue: '1' }
+      ] }
+    ]
+  }
+};
+const aggregateObservation = {
+  eventId: '401-red-stat', league: 'bra.1',
+  home: { id:'1', name:'Remo', score:0 }, away: { id:'2', name:'Grêmio', score:0 }
+};
+assert.deepEqual(extractRedCards(aggregateStatsPayload, aggregateObservation, 'espn_summary'), [], 'Red Cards=0/1 do boxscore são métricas, não eventos');
+let aggregateMatch = { eventId:'401-red-stat', league:'bra.1', competitionKey:'brasileirao', kickoff, home:aggregateObservation.home, away:aggregateObservation.away };
+let aggregateStep = applyRedCardObservations(aggregateMatch, extractRedCards(aggregateStatsPayload, aggregateObservation, 'espn_summary'), aggregateObservation, 900_000);
+aggregateStep = applyRedCardObservations(aggregateStep.match, extractRedCards(aggregateStatsPayload, aggregateObservation, 'espn_summary'), aggregateObservation, 960_001);
+assert.equal(aggregateStep.emitted.length, 0, 'duas leituras estáveis da estatística agregada continuam sem push');
+
+// Estado legado criado pelo bug anterior também deve ser limpo no próximo poll.
+aggregateMatch = {
+  ...aggregateMatch,
+  redCards: {
+    legacy: {
+      key:'legacy', sourceId:'', athlete:{id:'',name:''}, team:{id:'',name:''}, minute:'',
+      descriptor:'red cards', status:'confirmed', firstSeenAt:1, lastSeenAt:2, stableCount:2
+    }
+  }
+};
+aggregateStep = applyRedCardObservations(aggregateMatch, [], aggregateObservation, 1_000_000);
+assert.deepEqual(aggregateStep.match.redCards, {}, 'candidato fantasma legado precisa ser removido');
+
 // Cartão vermelho: precisa de duas observações e 60 s de estabilidade.
 const redObservation = {
   eventId: game.eventId, league: game.league,
@@ -106,6 +147,15 @@ redStep = applyRedCardObservations(redStep.match, cards, redObservation, 1_060_0
 assert.equal(redStep.emitted.length, 1);
 assert.equal(redStep.emitted[0].type, 'red_card');
 assert.equal(redStep.emitted[0].athlete.name, 'José Silva');
+
+// Texto real de segundo amarelo sem flag booleana continua válido quando traz
+// contexto individual de play (id + clock + atleta/time).
+const secondYellow = extractRedCards({ plays:[{
+  id:'rc-2', type:{text:'Second Yellow Card'}, text:'Second yellow card to Pedro Lima',
+  athlete:{id:'88',displayName:'Pedro Lima'}, team:{id:'5',displayName:'Boca Juniors'}, clock:{displayValue:"71'"}
+}]}, redObservation, 'espn_core_plays');
+assert.equal(secondYellow.length,1);
+assert.equal(secondYellow[0].athlete.name,'Pedro Lima');
 
 // Escalação: só Brasileirão, exatamente 11 titulares por lado, duas leituras estáveis.
 const brObs = {
