@@ -269,6 +269,12 @@ jobs:
           NODE
           )"
 
+          EXPECTED_RED_CARD_POLICY="$(node --input-type=module <<'NODE'
+          import { RED_CARD_EVENT_POLICY_VERSION } from './src/readiness-guardian.js';
+          process.stdout.write(String(RED_CARD_EVENT_POLICY_VERSION));
+          NODE
+          )"
+
           # Versão da política pós-jogo lida do próprio código publicado.
           EXPECTED_POSTGAME="$(node <<'NODE'
           const fs = require('fs');
@@ -285,7 +291,7 @@ jobs:
           NODE
           )"
 
-          echo "Esperado pelo código local: revision=${EXPECTED_REVISION}; gateway=${EXPECTED_GATEWAY}; stateContract=${EXPECTED_STATE_CONTRACT}; factsContract=${EXPECTED_FACTS_CONTRACT}; monitorFacts=${EXPECTED_MONITOR_FACTS}; scorerPolicy=${EXPECTED_SCORER_POLICY}; statsFallback=${EXPECTED_STATS_FALLBACK}; postgame=${EXPECTED_POSTGAME}; searchProfile=${EXPECTED_SEARCH_PROFILE}"
+          echo "Esperado pelo código local: revision=${EXPECTED_REVISION}; gateway=${EXPECTED_GATEWAY}; stateContract=${EXPECTED_STATE_CONTRACT}; factsContract=${EXPECTED_FACTS_CONTRACT}; monitorFacts=${EXPECTED_MONITOR_FACTS}; scorerPolicy=${EXPECTED_SCORER_POLICY}; redCardPolicy=${EXPECTED_RED_CARD_POLICY}; statsFallback=${EXPECTED_STATS_FALLBACK}; postgame=${EXPECTED_POSTGAME}; searchProfile=${EXPECTED_SEARCH_PROFILE}"
 
           READY=0
           for i in 1 2 3 4 5 6 7 8 9 10; do
@@ -297,6 +303,7 @@ jobs:
                  EXPECTED_STATE_CONTRACT="$EXPECTED_STATE_CONTRACT" \
                  EXPECTED_FACTS_CONTRACT="$EXPECTED_FACTS_CONTRACT" \
                  EXPECTED_MONITOR_FACTS="$EXPECTED_MONITOR_FACTS" \
+                 EXPECTED_RED_CARD_POLICY="$EXPECTED_RED_CARD_POLICY" \
                  EXPECTED_POSTGAME="$EXPECTED_POSTGAME" \
                  AIG_AUTH_EXPECTED="${FDG_PUSH_AI_GATEWAY_TOKEN:+1}" \
                  API_FOOTBALL_EXPECTED="${FDG_PUSH_API_FOOTBALL_KEY:+1}" \
@@ -310,6 +317,7 @@ jobs:
           const expectedStateContract = Number(process.env.EXPECTED_STATE_CONTRACT);
           const expectedFactsContract = Number(process.env.EXPECTED_FACTS_CONTRACT);
           const expectedMonitorFacts = Number(process.env.EXPECTED_MONITOR_FACTS);
+          const expectedRedCardPolicy = process.env.EXPECTED_RED_CARD_POLICY;
           const expectedPostgame = Number(process.env.EXPECTED_POSTGAME);
           const problems = [];
           if (h.ok !== true) problems.push(`ok=${h.ok}`);
@@ -331,6 +339,9 @@ jobs:
           if (Number(h.sportsMonitorFactsVersion) !== expectedMonitorFacts) problems.push(`sportsMonitorFactsVersion=${h.sportsMonitorFactsVersion} esperado=${expectedMonitorFacts}`);
           if (h.sportsMonitorScorerRetention !== true) problems.push('sportsMonitorScorerRetention!=true');
           if (h.sportsMonitorSummaryScorerRecovery !== true) problems.push('sportsMonitorSummaryScorerRecovery!=true');
+          if (h.redCardEventPolicyVersion !== expectedRedCardPolicy) problems.push(`redCardEventPolicyVersion=${h.redCardEventPolicyVersion} esperado=${expectedRedCardPolicy}`);
+          if (h.redCardAggregateStatsIgnored !== true) problems.push('redCardAggregateStatsIgnored!=true');
+          if (h.redCardEventContextRequired !== true) problems.push('redCardEventContextRequired!=true');
           if (h.postgameFastlane !== true) problems.push('postgameFastlane!=true');
           if (Number(h.postgameFastlaneVersion) !== expectedPostgame) problems.push(`postgameFastlaneVersion=${h.postgameFastlaneVersion} esperado=${expectedPostgame}`);
           if (Number(h.postgameAttendanceHunterVersion) !== expectedPostgame) problems.push(`postgameAttendanceHunterVersion=${h.postgameAttendanceHunterVersion} esperado=${expectedPostgame}`);
@@ -554,7 +565,7 @@ jobs:
           NODE
 
           curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status >/tmp/fdg-monitor-status.json
-          EXPECTED_SCORER_POLICY="$EXPECTED_SCORER_POLICY" node <<'NODE'
+          EXPECTED_SCORER_POLICY="$EXPECTED_SCORER_POLICY" EXPECTED_RED_CARD_POLICY="$EXPECTED_RED_CARD_POLICY" node <<'NODE'
           const fs = require('fs');
           const m = JSON.parse(fs.readFileSync('/tmp/fdg-monitor-status.json', 'utf8'));
           const expected = {
@@ -567,6 +578,9 @@ jobs:
             essentialAlertPolicyVersion: '6-R10R4',
             readinessVersion: '6-R10.1',
             readinessLifecyclePolicyVersion: '6-R10.2',
+            redCardEventPolicyVersion: process.env.EXPECTED_RED_CARD_POLICY,
+            redCardAggregateStatsIgnored: true,
+            redCardEventContextRequired: true,
             fastPollMs: 10000,
           };
           const problems = [];
