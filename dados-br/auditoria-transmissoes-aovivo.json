@@ -19,8 +19,8 @@
     "busca_streams_executada": true,
     "candidatos_oficiais_encontrados": 60,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
     "transmissoes_publicadas": 13,
     "sem_transmissao": 1,
     "erros": 0
@@ -83,12 +83,12 @@
       "descoberta_antecipada": true
     },
     {
-      "event_id": "401841250",
+      "event_id": "401841257",
       "rodada": 29,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Vitória x Chapecoense",
-      "data_iso": "2026-10-07T20:00:00-03:00",
+      "jogo": "Botafogo x Vasco da Gama",
+      "data_iso": "2026-10-07T20:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -940,15 +940,21 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401841257",
+      "jogo": "Botafogo x Vasco da Gama",
+      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
+    }
+  ],
   "sem_transmissao": [
     {
-      "event_id": "401841250",
+      "event_id": "401841257",
       "rodada": 29,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Vitória x Chapecoense",
-      "data_iso": "2026-10-07T20:00:00-03:00",
+      "jogo": "Botafogo x Vasco da Gama",
+      "data_iso": "2026-10-07T20:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -962,5 +968,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-10-07T18:55:55-03:00"
+  "atualizado_em": "2026-10-07T19:01:00-03:00"
 }
