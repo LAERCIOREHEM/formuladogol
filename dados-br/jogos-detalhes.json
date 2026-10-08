@@ -1,15 +1,563 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-07T22:30:50.988693-03:00",
+  "gerado_em": "2026-10-07T22:36:23.015000-03:00",
   "fonte": "ESPN summary + scoreboard",
-  "total_jogos": 283,
-  "total_com_estatisticas": 283,
+  "total_jogos": 284,
+  "total_com_estatisticas": 284,
   "total_com_publico": 282,
-  "total_com_eventos": 283,
-  "total_com_jogadores": 283,
-  "total_eventos_validados": 283,
+  "total_com_eventos": 284,
+  "total_com_jogadores": 284,
+  "total_eventos_validados": 284,
   "total_eventos_pendentes_detalhes": 0,
   "jogos": {
+    "401841257": {
+      "event_id": "401841257",
+      "event_id_fonte_detalhes": "401841257",
+      "rodada": 29,
+      "data_iso": "2026-10-07T20:30",
+      "mandante": "Botafogo",
+      "visitante": "Vasco da Gama",
+      "placar_mandante": 1,
+      "placar_visitante": 2,
+      "estadio": "Joao Havelange Stadium",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "45.6%",
+          "away": "54.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "11",
+          "away": "17"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "8"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "12"
+        },
+        {
+          "nome": "Defesas",
+          "home": "5",
+          "away": "1"
+        },
+        {
+          "nome": "Passes",
+          "home": "365",
+          "away": "434"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "296",
+          "away": "368"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "12",
+          "away": "10"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "11",
+          "away": "15"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "6",
+          "away": "27"
+        },
+        {
+          "nome": "Cortes",
+          "home": "34",
+          "away": "23"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "7",
+          "away": "14"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "2"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "45.6%",
+          "away": "54.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "11",
+          "away": "17"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "8"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "12"
+        },
+        {
+          "nome": "Defesas",
+          "home": "5",
+          "away": "1"
+        },
+        {
+          "nome": "Passes",
+          "home": "365",
+          "away": "434"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "296",
+          "away": "368"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "12",
+          "away": "10"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "11",
+          "away": "15"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "6",
+          "away": "27"
+        },
+        {
+          "nome": "Cortes",
+          "home": "34",
+          "away": "23"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "7",
+          "away": "14"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "2"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "28'",
+          "jogador": "Alan Lescano",
+          "time": "Vasco da Gama",
+          "assistencias": [
+            "Bruno Duarte"
+          ],
+          "descricao": "Goal 70 Goal! Botafogo 0, Vasco da Gama 1. Alan Lescano (Vasco da Gama) left footed shot from the centre of the box to the top left corner. Assisted by Bruno Duarte following a fast break. Alan Lescano Goal"
+        },
+        {
+          "minuto": "51'",
+          "jogador": "David",
+          "time": "Vasco da Gama",
+          "assistencias": [
+            "Facundo Colidio"
+          ],
+          "descricao": "Goal 70 Goal! Botafogo 0, Vasco da Gama 2. David (Vasco da Gama) left footed shot from outside the box to the bottom right corner. Assisted by Facundo Colidio with a through ball following a fast break. David Goal"
+        },
+        {
+          "minuto": "60'",
+          "jogador": "Alex Telles",
+          "time": "Botafogo",
+          "assistencias": [],
+          "descricao": "Goal - Free-kick 138 Goal! Botafogo 1, Vasco da Gama 2. Alex Telles (Botafogo) from a free kick with a left footed shot to the top left corner. Alex Telles Goal - Free-kick"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "90'+7'",
+          "jogador": "Nahuel Ferraresi",
+          "time": "Botafogo",
+          "descricao": "Yellow Card 94 Nahuel Ferraresi (Botafogo) is shown the yellow card for a bad foul. Nahuel Ferraresi Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "199734",
+          "nome": "Alex Telles",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "224103",
+          "nome": "Arthur Cabral",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "319530",
+          "nome": "Arthur Chaves",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "297056",
+          "nome": "Cristian Medina",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "306764",
+          "nome": "Danilo Santos",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "228401",
+          "nome": "Gabriel Batista",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "176733",
+          "nome": "Hakim Ziyech",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "314841",
+          "nome": "Matheus Martins",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "245291",
+          "nome": "Nahuel Ferraresi",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "398719",
+          "nome": "Victor Hugo",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "268700",
+          "nome": "Vitinho",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "411290",
+          "nome": "José Kadir",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "269843",
+          "nome": "Júnior Santos",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "400067",
+          "nome": "Kauan Toledo",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "359977",
+          "nome": "Mateo Ponte",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "202374",
+          "nome": "Tiquinho Soares",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "336485",
+          "nome": "Alan Lescano",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "317383",
+          "nome": "Alan Saldivia",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "292259",
+          "nome": "Bruno Duarte",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "334756",
+          "nome": "Cuiabano",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "275941",
+          "nome": "Facundo Colidio",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "205464",
+          "nome": "Léo Jardim",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "285203",
+          "nome": "Marino Hinestroza",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "234842",
+          "nome": "Paulo Henrique",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "337099",
+          "nome": "Robert Renan",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "271473",
+          "nome": "Santiago Sosa",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "201717",
+          "nome": "Thiago Mendes",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "315293",
+          "nome": "Adson",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "219005",
+          "nome": "David",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "43711",
+          "nome": "José Luis Rodríguez",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "323815",
+          "nome": "Nuno Moreira",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "198302",
+          "nome": "Tchê Tchê",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Botafogo": 1,
+          "Vasco da Gama": 2
+        },
+        "gols_extraidos": {
+          "Botafogo": 1,
+          "Vasco da Gama": 2
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Botafogo": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Vasco da Gama": {
+            "amarelo": 0,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Botafogo": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Vasco da Gama": {
+            "amarelo": 0,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-10-07T22:36:13.918031-03:00"
+    },
     "401841250": {
       "event_id": "401841250",
       "event_id_fonte_detalhes": "401841250",
@@ -593,7 +1141,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-07T22:16:11.242805-03:00"
+      "atualizado_em": "2026-10-07T22:36:16.174348-03:00"
     },
     "401841255": {
       "event_id": "401841255",
@@ -1199,7 +1747,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-07T22:16:13.465646-03:00",
+      "atualizado_em": "2026-10-07T22:36:18.491441-03:00",
       "renda": 820972.5
     },
     "401841253": {
@@ -1733,7 +2281,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-07T22:16:15.815524-03:00",
+      "atualizado_em": "2026-10-07T22:36:20.740058-03:00",
       "publico_pagante": 2340,
       "renda": 54630
     },
@@ -2310,7 +2858,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-07T22:16:18.188798-03:00",
+      "atualizado_em": "2026-10-07T22:36:22.930608-03:00",
       "renda": 537018
     },
     "401841168": {
@@ -159829,7 +160377,5 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  },
-  "total_com_publico_pagante": 268,
-  "total_com_renda": 282
+  }
 }
