@@ -349,6 +349,13 @@ jobs:
           if (h.postgameOfficialClubSourcesScoped !== true) problems.push('postgameOfficialClubSourcesScoped!=true');
           if (h.postgameRegionalEditorialSources !== true) problems.push('postgameRegionalEditorialSources!=true');
           if (h.postgameDeterministicFichaTecnicaExtraction !== true) problems.push('postgameDeterministicFichaTecnicaExtraction!=true');
+          if (Number(h.postgameMatchIdentityGateVersion) !== 1) problems.push(`postgameMatchIdentityGateVersion=${h.postgameMatchIdentityGateVersion}`);
+          if (h.postgameMatchIdentityBothTeamsRequired !== true) problems.push('postgameMatchIdentityBothTeamsRequired!=true');
+          if (h.postgameMatchIdentitySourceDateConflictRejected !== true) problems.push('postgameMatchIdentitySourceDateConflictRejected!=true');
+          if (h.postgameSourceScopedExtraction !== true) problems.push('postgameSourceScopedExtraction!=true');
+          if (h.postgameModelValuesAuthoritative !== false) problems.push('postgameModelValuesAuthoritative!=false');
+          if (h.postgameVerifiedCorrectionsOverrideD1 !== true) problems.push('postgameVerifiedCorrectionsOverrideD1!=true');
+          if (h.postgameRecentResolvedIdentityRevalidation !== true) problems.push('postgameRecentResolvedIdentityRevalidation!=true');
           if (h.postgamePendingRequeueOnV10 !== true) problems.push('postgamePendingRequeueOnV10!=true');
           if (h.postgameGeminiInteractionsApi !== true) problems.push('postgameGeminiInteractionsApi!=true');
           if (h.postgameGeminiInteractionsDirect !== true) problems.push('postgameGeminiInteractionsDirect!=true');
@@ -420,7 +427,7 @@ jobs:
             exit 1
           fi
 
-          # Hunter v10 precisa não apenas estar publicado: o cron de 1 minuto deve
+          # Hunter v11 precisa não apenas estar publicado: o cron de 1 minuto deve
           # ter executado a política nova e reaberto imediatamente as pendências.
           POSTGAME_READY=0
           for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
@@ -441,6 +448,13 @@ jobs:
           if (s.officialClubSourcesScopedToParticipants !== true) problems.push('officialClubSourcesScopedToParticipants!=true');
           if (s.regionalEditorialSources !== true) problems.push('regionalEditorialSources!=true');
           if (s.deterministicFichaTecnicaExtraction !== true) problems.push('deterministicFichaTecnicaExtraction!=true');
+          if (Number(s.matchIdentityGateVersion) !== 1) problems.push(`matchIdentityGateVersion=${s.matchIdentityGateVersion}`);
+          if (s.matchIdentityBothTeamsRequired !== true) problems.push('matchIdentityBothTeamsRequired!=true');
+          if (s.matchIdentitySourceDateConflictRejected !== true) problems.push('matchIdentitySourceDateConflictRejected!=true');
+          if (s.sourceScopedExtraction !== true) problems.push('sourceScopedExtraction!=true');
+          if (s.modelValuesAuthoritative !== false) problems.push('modelValuesAuthoritative!=false');
+          if (s.verifiedCorrectionsOverrideD1 !== true) problems.push('verifiedCorrectionsOverrideD1!=true');
+          if (s.recentResolvedIdentityRevalidation !== true) problems.push('recentResolvedIdentityRevalidation!=true');
           if (s.geminiInteractionsApi !== true) problems.push('geminiInteractionsApi!=true');
           if (s.geminiInteractionsDirect !== true) problems.push('geminiInteractionsDirect!=true');
           if (s.geminiAiGatewayBypassForWebSearch !== true) problems.push('geminiAiGatewayBypassForWebSearch!=true');
@@ -457,7 +471,7 @@ jobs:
           if (s.publicPersistentUntilResolved !== true) problems.push('publicPersistentUntilResolved!=true');
           if (Number(s.publicGaveUp || 0) !== 0) problems.push(`publicGaveUp=${s.publicGaveUp}`);
           if (!(s.mailer && s.mailer.transport === 'cloudflare-email' && s.mailer.configured === true)) problems.push(`mailer=${JSON.stringify(s.mailer||null)}`);
-          if (problems.length) { console.error('Hunter v10 ainda não executou o contrato novo: ' + problems.join(' | ')); process.exit(1); }
+          if (problems.length) { console.error(`Hunter v${expectedPostgame} ainda não executou o contrato novo: ` + problems.join(' | ')); process.exit(1); }
           console.log(`Hunter v${s.version} EXECUTADO: storedPolicy=${s.storedPolicyVersion}; searchProfile=${s.searchProfileVersion}; total=${Number(s.total||0)} pending=${Number(s.publicPending||0)} overdue=${Number(s.publicOverdue||0)} budgetGuard=${Number(s.publicBudgetGuard||0)}.`);
           console.log(`E-mail do Worker: ${s.mailer.transport} (fallbacks: ${(s.mailer.fallbacks||[]).join(', ') || 'nenhum'})`);
           NODE
@@ -466,11 +480,11 @@ jobs:
                 break
               fi
             fi
-            echo "Aguardando primeiro cron do Attendance Hunter v10 (${i}/15)..."
+            echo "Aguardando primeiro cron do Attendance Hunter v${EXPECTED_POSTGAME} (${i}/15)..."
             sleep 6
           done
           if [ "$POSTGAME_READY" -ne 1 ]; then
-            echo 'ERRO: Attendance Hunter v10 foi publicado, mas o cron novo não concluiu uma execução dentro da janela de smoke test.'
+            echo "ERRO: Attendance Hunter v${EXPECTED_POSTGAME} foi publicado, mas o cron novo não concluiu uma execução dentro da janela de smoke test."
             cat /tmp/fdg-postgame-status.json 2>/dev/null || true
             exit 1
           fi
@@ -519,7 +533,7 @@ jobs:
           if (recentPending) {
             console.log(`Pendência recente ${recentPending.event_id}: Gemini API=${recentPending.public_search.gemini.api_calls}, buscas reais=${recentPending.public_search.gemini.search_calls}, fontes=${recentPending.public_search.gemini.sources_found}, cache=${recentPending.source_cache_count}.`);
           } else {
-            console.log('Sem pendência recente elegível para prova live; contrato de diagnóstico v9 validado.');
+            console.log('Sem pendência recente elegível para prova live; contrato de diagnóstico v11 validado.');
           }
           NODE
 
@@ -564,8 +578,13 @@ jobs:
           console.log(`LiveState canônico ESPN saudável: ${s.data.events.length} evento(s) no dia.`);
           NODE
 
-          curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status >/tmp/fdg-monitor-status.json
-          EXPECTED_SCORER_POLICY="$EXPECTED_SCORER_POLICY" EXPECTED_RED_CARD_POLICY="$EXPECTED_RED_CARD_POLICY" node <<'NODE'
+          # Durable Objects podem manter por alguns segundos uma instância da revisão
+          # anterior após o deploy. Aguarda convergência em vez de transformar propagação
+          # legítima em falso negativo do smoke test.
+          MONITOR_READY=0
+          for i in $(seq 1 15); do
+            if curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status >/tmp/fdg-monitor-status.json; then
+              if EXPECTED_SCORER_POLICY="$EXPECTED_SCORER_POLICY" EXPECTED_RED_CARD_POLICY="$EXPECTED_RED_CARD_POLICY" node <<'NODE'
           const fs = require('fs');
           const m = JSON.parse(fs.readFileSync('/tmp/fdg-monitor-status.json', 'utf8'));
           const expected = {
@@ -596,6 +615,19 @@ jobs:
           }
           console.log('Motor esportivo, recovery, readiness e push rápido saudáveis.');
           NODE
+              then
+                MONITOR_READY=1
+                break
+              fi
+            fi
+            echo "Aguardando convergência do SportsMonitor Durable Object (${i}/15)..."
+            sleep 6
+          done
+          if [ "$MONITOR_READY" -ne 1 ]; then
+            echo 'ERRO: SportsMonitor não convergiu para o contrato publicado.'
+            cat /tmp/fdg-monitor-status.json 2>/dev/null || true
+            exit 1
+          fi
 
           curl -fsS --max-time 20 https://push.formuladogol.com.br/v1/monitor/source-probe >/tmp/fdg-source-probe.json
           node <<'NODE'

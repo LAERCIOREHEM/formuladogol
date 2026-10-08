@@ -10,6 +10,7 @@ on:
     paths:
       - 'dados-br/correcoes/publicos-verificados.json'
       - 'scripts/atualizar_publicos_brasileirao.py'
+      - 'scripts/auditar_publicos_identidade.py'
       - '.github/workflows/atualizar-publicos-brasileirao.yml'
   workflow_dispatch:
     inputs:
@@ -77,15 +78,18 @@ jobs:
             scripts/atualizar_publicos_brasileirao.py \
             scripts/completar_publicos_ia.py \
             scripts/gerar_estatisticas_competicao_brasileirao.py \
-            scripts/importar_postgame_fastlane.py
+            scripts/importar_postgame_fastlane.py \
+            scripts/auditar_publicos_identidade.py
           python scripts/atualizar_publicos_brasileirao.py --self-test
           python scripts/completar_publicos_ia.py --self-test
           python scripts/importar_postgame_fastlane.py --self-test
+          python scripts/auditar_publicos_identidade.py --self-test
           python -m json.tool resultados.json >/dev/null
           python -m json.tool dados-br/jogos-detalhes.json >/dev/null
           python -m json.tool dados-br/publicos-complementares.json >/dev/null
           python -m json.tool dados-br/correcoes/publicos-verificados.json >/dev/null
           python -m json.tool dados-br/auditoria-publicos.json >/dev/null
+          if [[ -f dados-br/auditoria-publicos-identidade.json ]]; then python -m json.tool dados-br/auditoria-publicos-identidade.json >/dev/null; fi
 
       - name: Buscar lacunas de público e renda
         id: coleta
@@ -186,6 +190,9 @@ jobs:
           # auditoria-publicos.json fica defasada e as asserções de cobertura da
           # etapa seguinte acusam divergência.
           python scripts/atualizar_publicos_brasileirao.py --sem-rede
+          # R10R15: trava de identidade/integridade sobre TODOS os registros antes
+          # de qualquer commit. Crítico => workflow para e nada chega ao site.
+          python scripts/auditar_publicos_identidade.py --fail-on-critical
 
           NOVOS="$(python - <<'PY'
           import json
@@ -315,6 +322,7 @@ jobs:
             "dados-br/publicos-complementares.json"
             "dados-br/estado-publicos-ia.json"
             "dados-br/auditoria-publicos.json"
+            "dados-br/auditoria-publicos-identidade.json"
             "dados-br/jogos-detalhes.json"
             "dados-br/estatisticas-competicao.json"
           )
