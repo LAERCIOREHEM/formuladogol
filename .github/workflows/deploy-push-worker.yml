@@ -372,6 +372,9 @@ jobs:
           if (h.postgameSearchDiagnostics !== true) problems.push('postgameSearchDiagnostics!=true');
           if (h.postgamePublicPersistentUntilResolved !== true) problems.push('postgamePublicPersistentUntilResolved!=true');
           if (Number(h.postgamePublicSlaMinutes) !== 120) problems.push(`postgamePublicSlaMinutes=${h.postgamePublicSlaMinutes}`);
+          if (h.postgameMigrationSlaSuppression !== true) problems.push('postgameMigrationSlaSuppression!=true');
+          if (Number(h.postgameMigrationGraceMinutes) !== 15) problems.push(`postgameMigrationGraceMinutes=${h.postgameMigrationGraceMinutes}`);
+          if (h.postgameAdministrativeReopenSlaAnchor !== true) problems.push('postgameAdministrativeReopenSlaAnchor!=true');
           if (h.postgamePublicHourlyAfterSla !== true) problems.push('postgamePublicHourlyAfterSla!=true');
           if (h.postgamePublicBudgetGuard !== true) problems.push('postgamePublicBudgetGuard!=true');
           if (h.aiGateway !== 'default') problems.push(`aiGateway=${h.aiGateway}`);
