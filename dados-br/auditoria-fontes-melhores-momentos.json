@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-10-03T21:26:19-03:00",
+  "atualizado_em": "2026-10-07T21:55:53-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
     "regra": "GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video e CazéTV são prioritários. UOL Esporte é aceito como fallback após 48 horas ou por vínculo manual conferido.",
@@ -13,18 +13,35 @@
     "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais."
   },
   "resumo": {
-    "jogos_resultados": 279,
-    "jogos_com_video": 279,
+    "jogos_resultados": 282,
+    "jogos_com_video": 280,
     "ge_globo": 269,
     "amazon_prime_video": 3,
-    "cazetv": 4,
+    "cazetv": 5,
     "uol_esporte": 3,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 2,
     "percentual_fontes_preferidas": 100.0
   },
   "outros_sites_ainda_em_uso": [],
-  "sem_video": [],
+  "sem_video": [
+    {
+      "event_id": "401841253",
+      "rodada": 29,
+      "mandante": "Bragantino",
+      "visitante": "Mirassol",
+      "placar_mandante": 1,
+      "placar_visitante": 1
+    },
+    {
+      "event_id": "401841252",
+      "rodada": 29,
+      "mandante": "Remo",
+      "visitante": "Grêmio",
+      "placar_mandante": 1,
+      "placar_visitante": 1
+    }
+  ],
   "detalhamento": {
     "ge_globo": [
       {
@@ -4445,6 +4462,22 @@
         "channel_title": "CazéTV",
         "titulo": "MELHORES MOMENTOS: MIRASSOL 2 X 0 BOTAFOGO | BRASILEIRÃO 2026 | RODADA 28",
         "url": "https://www.youtube.com/watch?v=NjSnelxmrrs",
+        "confianca": 1.0
+      },
+      {
+        "event_id": "401841255",
+        "rodada": 29,
+        "mandante": "Internacional",
+        "visitante": "Corinthians",
+        "placar_mandante": 2,
+        "placar_visitante": 1,
+        "categoria_fonte": "cazetv",
+        "origem_vinculo": "automatico",
+        "fonte": "CazéTV / YouTube",
+        "fonte_busca": "cloudflare-fastlane-youtube-uploads",
+        "channel_title": "CazéTV",
+        "titulo": "MELHORES MOMENTOS: INTERNACIONAL 2 X 1 CORINTHIANS | BRASILEIRÃO 2026 | 29ª RODADA",
+        "url": "https://www.youtube.com/watch?v=12vh74zI-IU",
         "confianca": 1.0
       }
     ],
