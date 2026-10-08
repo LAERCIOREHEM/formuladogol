@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-07T22:36:23.015000-03:00",
+  "gerado_em": "2026-10-07T22:55:56.433213-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 284,
   "total_com_estatisticas": 284,
-  "total_com_publico": 282,
+  "total_com_publico": 283,
   "total_com_eventos": 284,
   "total_com_jogadores": 284,
   "total_eventos_validados": 284,
@@ -568,9 +568,9 @@
       "placar_mandante": 4,
       "placar_visitante": 0,
       "estadio": "Estadio Manoel Barradas",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 1945,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2025/06/02/chapecoense-goleia-o-amazonas-se-reabilita-e-encosta-no-g-4-da-serie-b.htm",
       "arbitro": "",
       "stats": [
         {
@@ -1141,7 +1141,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-07T22:36:16.174348-03:00"
+      "atualizado_em": "2026-10-07T22:36:16.174348-03:00",
+      "renda": 40605
     },
     "401841255": {
       "event_id": "401841255",
@@ -160377,5 +160378,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 268,
+  "total_com_renda": 283
 }
