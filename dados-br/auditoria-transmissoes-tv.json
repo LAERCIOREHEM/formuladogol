@@ -6,10 +6,10 @@
     "jogos_sem_transmissao_na_janela": 5,
     "jogos_sem_transmissao_14d": 2,
     "jogos_sem_transmissao_fora_14d": 3,
-    "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 4,
+    "jogos_criticos_sem_transmissao_72h": 1,
+    "registros_preservados": 6,
     "jogos_guardiao_ia": 1,
-    "jogos_estaveis_sem_reconsulta_editorial": 1,
+    "jogos_estaveis_sem_reconsulta_editorial": 15,
     "fontes_com_falha": 2
   },
   "fontes": {
@@ -26,18 +26,18 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 9386
+      "duracao_ms": 12006
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 47,
-      "duracao_ms": 20322
+      "jogos_com_canal": 33,
+      "duracao_ms": 9890
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 4,
-      "jogos_com_canal": 2,
-      "duracao_ms": 91420
+      "jogos_com_canal": 0,
+      "duracao_ms": 44804
     },
     "espn": {
       "ok": false,
@@ -54,15 +54,15 @@
       "rodada": 30,
       "jogo": "Bahia x Mirassol",
       "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 73.1,
-      "nivel": "aviso"
+      "faltam_horas": 71.9,
+      "nivel": "critico"
     },
     {
       "event_id": "401841265",
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 97.1,
+      "faltam_horas": 95.9,
       "nivel": "aviso"
     }
   ],
@@ -72,15 +72,15 @@
       "rodada": 30,
       "jogo": "Bahia x Mirassol",
       "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 73.1,
-      "nivel": "aviso"
+      "faltam_horas": 71.9,
+      "nivel": "critico"
     },
     {
       "event_id": "401841265",
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 97.1,
+      "faltam_horas": 95.9,
       "nivel": "aviso"
     },
     {
@@ -88,7 +88,7 @@
       "rodada": 32,
       "jogo": "Chapecoense x Fluminense",
       "data_iso": "2026-10-24T19:30:00-03:00",
-      "faltam_horas": 385.1,
+      "faltam_horas": 383.9,
       "nivel": "futuro"
     },
     {
@@ -96,7 +96,7 @@
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-29T19:30:00-03:00",
-      "faltam_horas": 505.1,
+      "faltam_horas": 503.9,
       "nivel": "futuro"
     },
     {
@@ -104,11 +104,27 @@
       "rodada": 34,
       "jogo": "Palmeiras x Remo",
       "data_iso": "2026-11-05T19:30:00-03:00",
-      "faltam_horas": 673.1,
+      "faltam_horas": 671.9,
       "nivel": "futuro"
     }
   ],
   "preservados": [
+    {
+      "event_id": "401841256",
+      "jogo": "Athletico-PR x Atlético-MG",
+      "canais": [
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841248",
+      "jogo": "Fluminense x Coritiba",
+      "canais": [
+        "Premiere",
+        "Globo"
+      ]
+    },
     {
       "event_id": "401841264",
       "jogo": "Coritiba x Botafogo",
@@ -152,5 +168,5 @@
     "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/08/fluminense-x-coritiba-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
     "https://ge.globo.com/gato-mestre/noticia/2026/10/07/fernando-diniz-e-o-19o-tecnico-demitido-no-brasileirao-2026-veja-a-lista.ghtml"
   ],
-  "atualizado_em": "2026-10-08T18:25:54-03:00"
+  "atualizado_em": "2026-10-08T19:36:17-03:00"
 }
