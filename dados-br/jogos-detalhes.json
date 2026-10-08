@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-07T21:36:21.984309-03:00",
+  "gerado_em": "2026-10-07T21:45:51.273344-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 282,
   "total_com_estatisticas": 282,
-  "total_com_publico": 279,
+  "total_com_publico": 280,
   "total_com_eventos": 282,
   "total_com_jogadores": 282,
   "total_eventos_validados": 282,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Estadio Beira-Rio",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 27566,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.itatiaia.com.br/esportes/futebol/futebol-nacional/brasileirao-serie-a/com-gol-mais-rapido-do-brasileiro-internacional-bate-corinthians-e-embola-luta-contra-o-z4",
       "arbitro": "",
       "stats": [
         {
@@ -607,7 +607,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-07T21:36:14.410644-03:00"
+      "atualizado_em": "2026-10-07T21:36:14.410644-03:00",
+      "renda": 820972.5
     },
     "401841253": {
       "event_id": "401841253",
@@ -159233,5 +159234,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 267,
+  "total_com_renda": 280
 }
