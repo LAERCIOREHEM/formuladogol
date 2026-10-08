@@ -1,8 +1,9 @@
 {
-  "atualizado_em": "2026-10-03T20:41:39.152778-03:00",
-  "atualizado_em_br": "03/10/2026 20:41 BRT",
+  "atualizado_em": "2026-10-07T21:36:11.253843-03:00",
+  "atualizado_em_br": "07/10/2026 21:36 BRT",
   "fonte": "ESPN",
   "fontes_complementares": [
+    "ESPN summary",
     "override manual"
   ],
   "fallbacks_resultado": [
@@ -23,9 +24,36 @@
       "fonte": "override manual",
       "origem": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial."
+    },
+    {
+      "event_id": "401841255",
+      "rodada": 29,
+      "jogo": "Internacional x Corinthians",
+      "placar": "2 x 1",
+      "fonte": "ESPN summary",
+      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841255",
+      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
+    },
+    {
+      "event_id": "401841253",
+      "rodada": 29,
+      "jogo": "Bragantino x Mirassol",
+      "placar": "1 x 1",
+      "fonte": "ESPN summary",
+      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841253",
+      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
+    },
+    {
+      "event_id": "401841252",
+      "rodada": 29,
+      "jogo": "Remo x Grêmio",
+      "placar": "1 x 1",
+      "fonte": "ESPN summary",
+      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841252",
+      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
     }
   ],
-  "ultima_rodada_disputada": 28,
+  "ultima_rodada_disputada": 29,
   "rodadas_consultadas": [
     1,
     2,
@@ -54,9 +82,10 @@
     25,
     26,
     27,
-    28
+    28,
+    29
   ],
-  "total_resultados": 279,
+  "total_resultados": 282,
   "times": [
     "Athletico-PR",
     "Atlético-MG",
@@ -80,6 +109,78 @@
     "Vitória"
   ],
   "resultados": [
+    {
+      "event_id": "401841255",
+      "rodada": 29,
+      "data_iso": "2026-10-07T19:30",
+      "mandante": {
+        "nome": "Internacional",
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/internacional.svg",
+        "sigla": "INT"
+      },
+      "visitante": {
+        "nome": "Corinthians",
+        "escudo": "https://s.sde.globo.com/media/organizations/2024/10/09/Corinthians_2024_Q4ahot4.svg",
+        "sigla": "COR"
+      },
+      "estadio": "Estadio Beira-Rio",
+      "transmissao": "",
+      "status": "FT",
+      "estado": "post",
+      "adiado": false,
+      "data_definir": false,
+      "finalizado_em": "2026-10-07T21:25:00-03:00",
+      "placar_mandante": 2,
+      "placar_visitante": 1
+    },
+    {
+      "event_id": "401841253",
+      "rodada": 29,
+      "data_iso": "2026-10-07T19:30",
+      "mandante": {
+        "nome": "Bragantino",
+        "escudo": "https://s.sde.globo.com/media/organizations/2021/06/28/bragantino.svg",
+        "sigla": "RBB"
+      },
+      "visitante": {
+        "nome": "Mirassol",
+        "escudo": "https://s.sde.globo.com/media/organizations/2024/08/20/mirassol-novo-svg-71690.svg",
+        "sigla": "MIR"
+      },
+      "estadio": "Estádio Municipal Cicero de Souza Marques",
+      "transmissao": "",
+      "status": "FT",
+      "estado": "post",
+      "adiado": false,
+      "data_definir": false,
+      "finalizado_em": "2026-10-07T21:25:00-03:00",
+      "placar_mandante": 1,
+      "placar_visitante": 1
+    },
+    {
+      "event_id": "401841252",
+      "rodada": 29,
+      "data_iso": "2026-10-07T19:30",
+      "mandante": {
+        "nome": "Remo",
+        "escudo": "https://s.sde.globo.com/media/organizations/2021/02/25/Remo-PA.svg",
+        "sigla": "REM"
+      },
+      "visitante": {
+        "nome": "Grêmio",
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/12/gremio.svg",
+        "sigla": "GRE"
+      },
+      "estadio": "Mangueirão",
+      "transmissao": "",
+      "status": "FT",
+      "estado": "post",
+      "adiado": false,
+      "data_definir": false,
+      "finalizado_em": "2026-10-07T21:25:00-03:00",
+      "placar_mandante": 1,
+      "placar_visitante": 1
+    },
     {
       "event_id": "401841168",
       "rodada": 21,
