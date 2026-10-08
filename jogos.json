@@ -1,9 +1,8 @@
 {
-  "atualizado_em": "2026-10-07T21:36:11.253843-03:00",
-  "atualizado_em_br": "07/10/2026 21:36 BRT",
+  "atualizado_em": "2026-10-07T22:16:08.725591-03:00",
+  "atualizado_em_br": "07/10/2026 22:16 BRT",
   "fonte": "ESPN",
   "fontes_complementares": [
-    "ESPN summary",
     "override manual"
   ],
   "fallbacks_resultado": [
@@ -24,33 +23,6 @@
       "fonte": "override manual",
       "origem": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial."
-    },
-    {
-      "event_id": "401841255",
-      "rodada": 29,
-      "jogo": "Internacional x Corinthians",
-      "placar": "2 x 1",
-      "fonte": "ESPN summary",
-      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841255",
-      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
-    },
-    {
-      "event_id": "401841253",
-      "rodada": 29,
-      "jogo": "Bragantino x Mirassol",
-      "placar": "1 x 1",
-      "fonte": "ESPN summary",
-      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841253",
-      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
-    },
-    {
-      "event_id": "401841252",
-      "rodada": 29,
-      "jogo": "Remo x Grêmio",
-      "placar": "1 x 1",
-      "fonte": "ESPN summary",
-      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841252",
-      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
     }
   ],
   "rodada_atual": 29,
@@ -62,31 +34,8 @@
     33,
     34
   ],
-  "total_jogos": 52,
+  "total_jogos": 51,
   "jogos": [
-    {
-      "event_id": "401841250",
-      "rodada": 29,
-      "data_iso": "2026-10-07T20:00",
-      "mandante": {
-        "nome": "Vitória",
-        "escudo": "https://s.sde.globo.com/media/organizations/2025/12/18/Vitoria_2025.svg",
-        "sigla": "VIT"
-      },
-      "visitante": {
-        "nome": "Chapecoense",
-        "escudo": "https://s.sde.globo.com/media/organizations/2021/06/21/CHAPECOENSE-2018.svg",
-        "sigla": "CHA"
-      },
-      "estadio": "Estadio Manoel Barradas",
-      "transmissao": "",
-      "status": "0'",
-      "estado": "pre",
-      "adiado": false,
-      "data_definir": false,
-      "placar_mandante": 0,
-      "placar_visitante": 0
-    },
     {
       "event_id": "401841257",
       "rodada": 29,
@@ -103,12 +52,12 @@
       },
       "estadio": "Joao Havelange Stadium",
       "transmissao": "",
-      "status": "0'",
-      "estado": "pre",
+      "status": "81'",
+      "estado": "in",
       "adiado": false,
       "data_definir": false,
-      "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_mandante": 1,
+      "placar_visitante": 2
     },
     {
       "event_id": "401841249",
@@ -126,8 +75,8 @@
       },
       "estadio": "Estadio Mineirão",
       "transmissao": "",
-      "status": "0'",
-      "estado": "pre",
+      "status": "44'",
+      "estado": "in",
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
@@ -255,7 +204,6 @@
       "data_definir": false,
       "fonte_calendario": "CBF oficial — agenda de credenciamento",
       "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
-      "data_espn_original": "2026-10-10T17:00",
       "placar_mandante": 0,
       "placar_visitante": 0
     },

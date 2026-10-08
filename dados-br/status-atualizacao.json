@@ -5,10 +5,10 @@
   "status": "aviso",
   "status_anterior": "aviso",
   "nivel": "aviso",
-  "ultima_tentativa": "2026-10-07T21:38:52-03:00",
-  "ultimo_sucesso": "2026-10-07T21:38:52-03:00",
-  "ultimo_snapshot_valido": "2026-10-07T21:38:52-03:00",
-  "snapshot_hash": "bc24e18a3743a818a2657cc2b2f29b15156d29b001bc6e3f3f8fba921d103b64",
+  "ultima_tentativa": "2026-10-07T22:17:53-03:00",
+  "ultimo_sucesso": "2026-10-07T22:17:53-03:00",
+  "ultimo_snapshot_valido": "2026-10-07T22:17:53-03:00",
+  "snapshot_hash": "e0ff36ac5df1872ed45684718968f4482ada7f0f640401a36e99d5cab74947d9",
   "fonte_principal": "ESPN",
   "fonte_estado": "available",
   "fonte_codigo": "ESPN_SCOREBOARD_OK",
@@ -17,7 +17,6 @@
   ],
   "snapshot_preservado": false,
   "fontes_complementares": [
-    "ESPN summary",
     "override manual"
   ],
   "fallbacks": [
@@ -38,45 +37,18 @@
       "fonte": "override manual",
       "origem": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial."
-    },
-    {
-      "event_id": "401841255",
-      "rodada": 29,
-      "jogo": "Internacional x Corinthians",
-      "placar": "2 x 1",
-      "fonte": "ESPN summary",
-      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841255",
-      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
-    },
-    {
-      "event_id": "401841253",
-      "rodada": 29,
-      "jogo": "Bragantino x Mirassol",
-      "placar": "1 x 1",
-      "fonte": "ESPN summary",
-      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841253",
-      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
-    },
-    {
-      "event_id": "401841252",
-      "rodada": 29,
-      "jogo": "Remo x Grêmio",
-      "placar": "1 x 1",
-      "fonte": "ESPN summary",
-      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841252",
-      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
     }
   ],
   "tentativas": 1,
   "sincronizado": true,
-  "mensagem_admin": "snapshot auditado e publicado; ESPN permaneceu principal e foram usadas fontes complementares: ESPN summary, override manual",
+  "mensagem_admin": "snapshot auditado e publicado; ESPN permaneceu principal e foram usadas fontes complementares: override manual",
   "mensagem_publica": "Dados atualizados e conferidos com fonte oficial complementar.",
   "mostrar_publico": false,
-  "run_url": "https://github.com/LAERCIOREHEM/formuladogol/actions/runs/37708554721",
-  "run_id": "37708554721",
+  "run_url": "https://github.com/LAERCIOREHEM/formuladogol/actions/runs/37712014476",
+  "run_id": "37712014476",
   "run_attempt": "1",
   "branch": "main",
-  "fingerprint": "e0c616a716893347bfe2eb6d1cd883daad7b5356ac1103db0ab17debbf1fbc15",
+  "fingerprint": "040933ce4b7398e4f5edec5ff35e15c0bb265871a6ad9e70a2bedffe4a2a7f59",
   "ultimo_alerta_em": "",
   "ultimo_alerta_fingerprint": "",
   "alerta_email": "não enviado",
