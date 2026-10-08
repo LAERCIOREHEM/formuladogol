@@ -1,6 +1,6 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-07T23:36:28.121400-03:00",
+  "gerado_em": "2026-10-08T12:02:40.825913-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 285,
   "total_com_estatisticas": 285,
@@ -573,9 +573,9 @@
       "placar_mandante": 1,
       "placar_visitante": 2,
       "estadio": "Joao Havelange Stadium",
-      "publico": 22116,
+      "publico": 23596,
       "publico_tipo": "presente",
-      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/03/veja-os-publicos-da-14a-rodada-do-campeonato-brasileiro.ghtml",
+      "publico_fonte": "https://www.correiobraziliense.com.br/esportes/2026/10/7516875-em-classico-eletrizante-vasco-bate-o-botafogo-no-nilton-santos.html",
       "arbitro": "",
       "stats": [
         {
@@ -1110,7 +1110,7 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-10-07T23:36:19.191378-03:00",
-      "publico_pagante": 18780,
+      "publico_pagante": 22071,
       "renda": 801180
     },
     "401841250": {
@@ -1123,9 +1123,9 @@
       "placar_mandante": 4,
       "placar_visitante": 0,
       "estadio": "Estadio Manoel Barradas",
-      "publico": 1945,
+      "publico": 13934,
       "publico_tipo": "presente",
-      "publico_fonte": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2025/06/02/chapecoense-goleia-o-amazonas-se-reabilita-e-encosta-no-g-4-da-serie-b.htm",
+      "publico_fonte": "https://www.bahianoticias.com.br/esportes/vitoria/31622-confira-publico-e-renda-de-vitoria-x-chapecoense-pelo-campeonato-brasileiro",
       "arbitro": "",
       "stats": [
         {
@@ -1697,7 +1697,8 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-10-07T23:36:21.465040-03:00",
-      "renda": 40605
+      "renda": 285132,
+      "publico_pagante": 13773
     },
     "401841255": {
       "event_id": "401841255",
@@ -160933,5 +160934,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 270,
+  "total_com_renda": 284
 }

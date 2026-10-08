@@ -716,12 +716,17 @@ def aplicar_correcoes_verificadas(
                 novo[key] = value
                 alteracoes += 1
 
+        # R10R15: uma nova correção não deve reescrever a data de verificação
+        # de TODAS as correções históricas. Cada jogo pode carregar seu próprio
+        # verificado_em; o valor de topo fica apenas como fallback legado.
+        verificado_jogo = str(raw.get("verificado_em") or verificado_em or "").strip()
         fontes = {
             "fonte": str(raw.get("fonte_publico") or raw.get("fonte") or "").strip(),
-            "fonte_pagantes": str(raw.get("fonte_pagantes") or "").strip(),
-            "fonte_renda": str(raw.get("fonte_renda") or "").strip(),
+            "fonte_publico": str(raw.get("fonte_publico") or raw.get("fonte") or "").strip(),
+            "fonte_pagantes": str(raw.get("fonte_pagantes") or raw.get("fonte_publico") or raw.get("fonte") or "").strip(),
+            "fonte_renda": str(raw.get("fonte_renda") or raw.get("fonte_publico") or raw.get("fonte") or "").strip(),
             "origem": str(raw.get("origem") or "correção documental verificada").strip(),
-            "verificado_em": verificado_em,
+            "verificado_em": verificado_jogo,
         }
         for key, value in fontes.items():
             if value and novo.get(key) != value:

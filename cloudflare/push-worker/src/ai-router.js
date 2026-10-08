@@ -28,7 +28,7 @@ export function publicSchemaInstruction(task,missing){
  const awayAliases=teamSearchAliasesNormalized(task.away).join(', ');
  const queryPack=queries.join(' ; ');
  const sourcePolicy=attendanceSourcePolicyText(task);
- return `Você é um pesquisador factual de pós-jogo. É OBRIGATÓRIO executar Google Search nesta chamada antes de responder. Pesquise na web APENAS dados documentais da partida ${matchup}. DOSSIÊ: data real=${date}; placar=${score}; rodada=${round}; estádio=${stadium}; event_id=${text(task.event_id)}. Aliases do mandante=${homeAliases}; aliases do visitante=${awayAliases}. Preciso exclusivamente de: ${missing.join(', ')}. Use as combinações de busca a seguir como ponto de partida e REFORMULE se necessário: ${queryPack}. NÃO dependa da expressão literal "${matchup}"; nomes equivalentes dos clubes representam a mesma partida. NÃO estime, NÃO use memória e NÃO confunda com outro confronto/data/rodada. Público = público presente/total; pagantes é campo separado; renda em reais. ${sourcePolicy} Cada número precisa ter sua própria URL realmente encontrada na busca. Se um campo não estiver publicado em fonte aceita, use null.`;
+ return `Você é um pesquisador factual de pós-jogo. É OBRIGATÓRIO executar Google Search nesta chamada antes de responder. Pesquise na web APENAS dados documentais da partida ${matchup}. DOSSIÊ: data real=${date}; placar=${score}; rodada=${round}; estádio=${stadium}; event_id=${text(task.event_id)}. Aliases do mandante=${homeAliases}; aliases do visitante=${awayAliases}. Preciso exclusivamente de: ${missing.join(', ')}. Use as combinações de busca a seguir como ponto de partida e REFORMULE se necessário: ${queryPack}. NÃO dependa da expressão literal "${matchup}"; nomes equivalentes dos clubes representam a mesma partida. NÃO estime, NÃO use memória e NÃO confunda com outro confronto/data/rodada. Público = público presente/total; pagantes é campo separado; renda em reais. ${sourcePolicy} Cada número precisa ter sua própria URL realmente encontrada na busca. IMPORTANTE: nesta etapa os números que você escrever NÃO são autoridade de gravação; o Worker abrirá a URL, provará a identidade da partida pelo Match Identity Gate e extrairá os valores somente do bloco textual daquele confronto. Se um campo não estiver publicado em fonte aceita, use null.`;
 }
 
 // ---------- Gemini generateContent legado (fallback de compatibilidade) ----------
@@ -86,7 +86,8 @@ export function geminiInteractionText(raw){
 }
 
 export function geminiInteractionRequest(task,missing,model='gemini-3.5-flash-lite'){
-  // R10R9: Gemini é DESCOBRIDOR DE FONTES, não extrator estruturado.
+  // R10R15: Gemini é DESCOBRIDOR DE FONTES, nunca autoridade numérica. A URL só
+  // pode alimentar o D1 após Match Identity Gate + extração textual escopada.
   // O payload segue a Interactions API atual: google_search + tool_choice no
   // generation_config. A remoção completa de response_format/responseSchema
   // elimina a incompatibilidade HTTP 400 observada em produção no v9 e consolidada no v10.

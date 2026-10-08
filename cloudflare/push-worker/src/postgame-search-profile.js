@@ -1,4 +1,4 @@
-export const POSTGAME_SEARCH_PROFILE_VERSION = 7;
+export const POSTGAME_SEARCH_PROFILE_VERSION = 8;
 
 function text(value) { return String(value ?? '').trim(); }
 function normalizeText(value) {
@@ -103,21 +103,153 @@ export function isAcceptedAttendanceSource(value, task = null) {
   return quality === 'robust' || quality === 'club_official';
 }
 
-export function sourceTextMatchesTask(task, sourceText) {
-  const normalized = ` ${normalizeText(sourceText)} `;
-  if (!normalized.trim()) return false;
-  const hasTeam = (team) => teamSearchAliasesNormalized(team).some((alias) => normalized.includes(` ${alias} `));
-  if (!hasTeam(task?.home) || !hasTeam(task?.away)) return false;
-  if (task?.home_score == null || task?.away_score == null) return true;
-  const home = Number(task.home_score), away = Number(task.away_score);
-  if (!Number.isFinite(home) || !Number.isFinite(away)) return true;
-  const scorePatterns = [
-    new RegExp(`\\b${home}\\s*[x×-]\\s*${away}\\b`),
-    new RegExp(`\\b${away}\\s*[x×-]\\s*${home}\\b`),
+export const AMBIGUOUS_IDENTITY_ALIASES = Object.freeze(new Set(['vitoria', 'internacional', 'santos', 'bahia', 'remo']));
+// Apelidos curtos continuam excelentes para DESCOBERTA, mas não são prova de
+// identidade por si só. A etapa de validação privilegia nomes canônicos/fortes.
+const SEARCH_ONLY_WEAK_IDENTITY_ALIASES = new Set(['galo','fla','flu','inter','timao','coxa','peixe','verdao','braga','chape']);
+const IDENTITY_PAIR_MAX_CHARS = 420;
+const IDENTITY_CONTEXT_RADIUS = 900;
+const IDENTITY_EXTRACTION_SUFFIX = 1800;
+
+function urlDate(value) {
+  const raw = text(value);
+  const m = raw.match(/\/(20\d{2})\/(\d{1,2})\/(\d{1,2})(?:\/|$)/);
+  if (!m) return '';
+  const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+  const dt = new Date(Date.UTC(y, mo - 1, d));
+  if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d) return '';
+  return `${String(y).padStart(4,'0')}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
+function daysBetweenIso(a, b) {
+  const x = Date.parse(`${a}T12:00:00Z`), y = Date.parse(`${b}T12:00:00Z`);
+  return Number.isFinite(x) && Number.isFinite(y) ? Math.abs(x - y) / 86400000 : null;
+}
+function identityAliases(team) {
+  const aliases = teamSearchAliasesNormalized(team).filter(Boolean);
+  const strong = aliases.filter((alias) => !SEARCH_ONLY_WEAK_IDENTITY_ALIASES.has(alias));
+  return (strong.length ? strong : aliases).sort((a,b) => b.length - a.length);
+}
+function aliasOccurrences(normalized, alias) {
+  const out = [];
+  const needle = ` ${alias} `;
+  let from = 0;
+  while (from < normalized.length) {
+    const idx = normalized.indexOf(needle, from);
+    if (idx < 0) break;
+    const start = idx + 1;
+    if (AMBIGUOUS_IDENTITY_ALIASES.has(alias)) {
+      const previous = normalized.slice(Math.max(0, start - 24), start).trim().split(/\s+/).at(-1) || '';
+      if (/^(?:uma|a|da|na|pela|para|sua|essa|esta|primeira|segunda|terceira)$/.test(previous)) {
+        from = idx + needle.length;
+        continue;
+      }
+    }
+    out.push({ alias, start, end: start + alias.length });
+    from = idx + needle.length;
+  }
+  return out;
+}
+function bestPair(normalized, homeAliases, awayAliases) {
+  const homes = homeAliases.flatMap((a) => aliasOccurrences(normalized, a));
+  const aways = awayAliases.flatMap((a) => aliasOccurrences(normalized, a));
+  let best = null;
+  for (const h of homes) for (const a of aways) {
+    const distance = Math.max(0, Math.max(h.start, a.start) - Math.min(h.end, a.end));
+    if (!best || distance < best.distance) best = { home: h, away: a, distance };
+  }
+  return best;
+}
+function taskScoreRegex(task) {
+  const h = Number(task?.home_score), a = Number(task?.away_score);
+  if (!Number.isFinite(h) || !Number.isFinite(a)) return null;
+  return new RegExp(`\\b${h}\\s*[x×-]\\s*${a}\\b`,'i');
+}
+function taskRoundRegex(task) {
+  const round = Number(task?.round ?? task?.rodada);
+  return Number.isFinite(round) && round > 0 ? new RegExp(`(?:\\b${round}\\s*[ªaºo]?\\s*rodada\\b|\\brodada\\s*${round}\\b)`,'i') : null;
+}
+function matchRelationEvidence(normWindow, homeAlias, awayAlias) {
+  const h = homeAlias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const a = awayAlias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const relation = '(?:enfrent(?:a|am|ou|aram|ando)|jog(?:a|am|ou|aram)|receb(?:e|eu)|gole(?:ia|ou)|bate(?:u)?|vence(?:u)?|venceu|perdeu\\s+para|empata(?:ram|ou)?|classico)';
+  const patterns = [
+    new RegExp(`\\b${h}\\s+\\d{1,2}\\s*[x×-]\\s*\\d{1,2}\\s+${a}\\b`,'i'),
+    new RegExp(`\\b${h}\\s*(?:x|vs|versus|contra)\\s*${a}\\b`,'i'),
+    new RegExp(`\\b${h}\\b.{0,90}\\b${relation}\\b.{0,90}\\b${a}\\b`,'i'),
+    new RegExp(`\\b${a}\\b.{0,90}\\b${relation}\\b.{0,90}\\b${h}\\b`,'i'),
+    new RegExp(`\\b${h}\\s+e\\s+${a}\\b.{0,90}\\b(?:enfrent|jog|duel|classico)`,'i'),
+    new RegExp(`\\bentre\\s+${h}\\s+e\\s+${a}\\b`,'i'),
   ];
-  // O placar é evidência adicional, não obrigatória: alguns textos de ficha
-  // técnica usam os gols em prosa e não repetem o placar no corpo extraído.
-  return scorePatterns.some((re) => re.test(normalized)) || (hasTeam(task?.home) && hasTeam(task?.away));
+  return patterns.some((re) => re.test(normWindow));
+}
+
+// R10R15: Match Identity Gate. Descobrir uma URL e provar que ela pertence ao
+// event_id são etapas distintas. O gate exige os DOIS clubes no mesmo bloco
+// contextual e rejeita conflitos objetivos, sobretudo data incompatível na URL.
+export function evaluateSourceMatchIdentity(task, sourceText, sourceUrl = '') {
+  const raw = text(sourceText).replace(/\s+/g, ' ');
+  const normalized = ` ${normalizeText(raw)} `;
+  const result = { accepted:false, score:0, reasons:[], conflicts:[], homeAlias:'', awayAlias:'', pairDistance:null, window:'' };
+  if (!normalized.trim()) { result.reasons.push('empty_source_text'); return result; }
+
+  const gameDate = text(task?.kickoff || task?.data_iso).slice(0,10);
+  const sourceDate = urlDate(sourceUrl);
+  let dateProof = false;
+  if (gameDate && sourceDate) {
+    const delta = daysBetweenIso(gameDate, sourceDate);
+    if (delta != null && delta > 3) result.conflicts.push(`url_date_mismatch:${sourceDate}:${gameDate}`);
+    else { result.score += 4; dateProof = true; }
+  }
+
+  const pair = bestPair(normalized, identityAliases(task?.home), identityAliases(task?.away));
+  if (!pair) { result.reasons.push('teams_not_both_found'); return result; }
+  result.homeAlias = pair.home.alias; result.awayAlias = pair.away.alias; result.pairDistance = pair.distance;
+  if (pair.distance > IDENTITY_PAIR_MAX_CHARS) { result.reasons.push(`teams_too_far:${pair.distance}`); return result; }
+
+  const pairStart = Math.min(pair.home.start,pair.away.start);
+  const pairEnd = Math.max(pair.home.end,pair.away.end);
+  const center = Math.floor((pairStart + pairEnd) / 2);
+  const contextStart = Math.max(0, center - IDENTITY_CONTEXT_RADIUS);
+  const contextEnd = Math.min(raw.length, center + IDENTITY_CONTEXT_RADIUS);
+  const contextWindow = raw.slice(contextStart, contextEnd).trim();
+  const normWindow = ` ${normalizeText(contextWindow)} `;
+  if (!matchRelationEvidence(normWindow, pair.home.alias, pair.away.alias)) {
+    result.reasons.push('teams_without_match_relation');
+    return result;
+  }
+  result.score += 5;
+
+  // Extração começa NO confronto identificado e segue adiante. Em páginas com
+  // vários jogos isto impede que o primeiro "Público/Renda" do bloco anterior
+  // seja capturado para a partida-alvo (incidente Botafogo x Vasco).
+  const extractionStart = Math.max(0, pairStart - 8);
+  const extractionEnd = Math.min(raw.length, pairEnd + IDENTITY_EXTRACTION_SUFFIX);
+  result.window = raw.slice(extractionStart, extractionEnd).trim();
+
+  const scoreRe = taskScoreRegex(task); if (scoreRe && scoreRe.test(normWindow)) result.score += 2;
+  const roundRe = taskRoundRegex(task); if (roundRe && roundRe.test(normWindow)) result.score += 2;
+  if (/\b(?:brasileirao|brasileiro|campeonato brasileiro)\b/i.test(normWindow)) result.score += 1;
+
+  const stadium = normalizeText(task?.stadium || task?.estadio);
+  if (stadium) {
+    const compact = stadium.replace(/^estadio\s+/,'');
+    if ((stadium.length >= 5 && normWindow.includes(` ${stadium} `)) || (compact.length >= 7 && normWindow.includes(` ${compact} `))) result.score += 2;
+  }
+
+  if (result.conflicts.length) return result;
+  const contextualExtras = result.score - 5 - (dateProof ? 4 : 0);
+  if (!dateProof && contextualExtras < 1) { result.reasons.push('insufficient_match_context'); return result; }
+  result.accepted = true; result.reasons.push('match_identity_confirmed');
+  return result;
+}
+
+export function sourceTextMatchesTask(task, sourceText, sourceUrl = '') {
+  return evaluateSourceMatchIdentity(task, sourceText, sourceUrl).accepted;
+}
+
+export function sourceTextWindowForTask(task, sourceText, sourceUrl = '') {
+  const gate = evaluateSourceMatchIdentity(task, sourceText, sourceUrl);
+  return gate.accepted ? gate.window : '';
 }
 
 function pairVariants(home, away) {

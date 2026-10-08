@@ -15,11 +15,12 @@ const raw={candidates:[{groundingMetadata:{webSearchQueries:['q1','q2'],groundin
 assert.equal(geminiSearchCount(raw),2);
 assert.deepEqual(geminiGroundingSources(raw),['https://example.com/a','https://example.com/b']);
 
-// Hunter v7: o confronto real que motivou o hotfix precisa gerar consultas com
+// Search profile v8: aliases/fontes continuam amplos na descoberta, enquanto o gate de identidade valida a fonte.
+// O confronto real que motivou os hotfixes de busca precisa gerar consultas com
 // nomes alternativos, fontes direcionadas e domínios oficiais dos participantes.
 const hunterTask={event_id:'401841168',home:'Atlético-MG',away:'Bragantino',kickoff:'2026-10-03T21:30:00.000Z',home_score:1,away_score:0,round:21,stadium:'Arena MRV'};
 const hunterQueries=buildAttendanceSearchQueries(hunterTask);
-assert.equal(POSTGAME_SEARCH_PROFILE_VERSION,7);
+assert.equal(POSTGAME_SEARCH_PROFILE_VERSION,8);
 assert.equal(Object.keys(TEAM_SEARCH_PROFILES).length,20);
 for (const [club,profile] of Object.entries(TEAM_SEARCH_PROFILES)) {
   assert.ok(profile.aliases.length >= 1, `${club}: aliases ausentes`);
@@ -39,10 +40,12 @@ assert.match(prompt,/Red Bull Bragantino/);
 assert.match(prompt,/site:uol\.com\.br/);
 assert.match(prompt,/atletico\.com\.br/);
 assert.doesNotMatch(prompt,/NÃO use sites oficiais de clubes/);
+assert.match(prompt,/NÃO são autoridade de gravação/);
+assert.match(prompt,/Match Identity Gate/);
 
 
 
-// Hunter v10: Interactions direto precisa expor busca real e URLs utilizáveis.
+// Hunter v11 preserva a busca observável: Interactions direto precisa expor URLs utilizáveis.
 const interactionRaw={
   status:'completed',
   steps:[

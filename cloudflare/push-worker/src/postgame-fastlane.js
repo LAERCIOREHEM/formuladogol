@@ -2,7 +2,7 @@ import { fetchEspnSummary } from './espn-source.js';
 import { sendMail, probeMail, mailConfig, maskAddress } from './mailer.js';
 import { countWebSearchCalls, recordAiUsage, recordProviderUsage, postgamePublicCostSummary } from './ai-usage.js';
 import { searchPublicWithGemini, fetchSourceText, extractPublicWithWorkersAI, fetchOpenAiResponses, openAiUsage } from './ai-router.js';
-import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, sourceTextMatchesTask, buildAttendanceSearchQueries, attendanceSourcePolicyText, officialClubDomainsForTask, PREFERRED_EDITORIAL_SOURCE_SUFFIXES } from './postgame-search-profile.js';
+import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, evaluateSourceMatchIdentity, buildAttendanceSearchQueries, attendanceSourcePolicyText, officialClubDomainsForTask, PREFERRED_EDITORIAL_SOURCE_SUFFIXES } from './postgame-search-profile.js';
 
 const DEFAULT_SITE_BASE = 'https://formuladogol.com.br';
 // Fase definitiva (uma única chamada por partida). O Sol é reservado a ela e aos editoriais.
@@ -13,10 +13,10 @@ const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
-const POSTGAME_POLICY_VERSION = 10;
+const POSTGAME_POLICY_VERSION = 11;
 
 /*
- * Attendance/Revenue Hunter v10 — Gemini Search Discovery + Circuit Breaker:
+ * Attendance/Revenue Hunter v11 — Match Identity Gate + Source-Scoped Extraction:
  *   - Mantém aliases de TODOS os clubes, imprensa nacional/regional e sites oficiais
  *     SOMENTE dos dois participantes para fatos documentais de ficha técnica.
  *   - Gemini Interactions vira DESCOBRIDOR DE FONTES: google_search real, sem JSON
@@ -30,6 +30,10 @@ const POSTGAME_POLICY_VERSION = 10;
  *   - OpenAI usa tool_choice=required e qualquer URL encontrada é cacheada antes da
  *     validação; Workers AI só extrai páginas que o parser local não resolver.
  *   - Upgrade v10 reabre imediatamente pendências e zera o circuito antigo.
+ *   - R10R15 separa discovery de autoridade: IA encontra URLs, mas números só entram
+ *     após baixar a página, provar identidade do jogo e extrair dentro do bloco correto.
+ *   - Fontes com data/confronto conflitantes são rejeitadas antes de qualquer valor.
+ *   - Correções documentais verificadas prevalecem também sobre valores antigos no D1.
  *   - Nunca existe GAVE_UP para público/renda.
  */
 export const PUBLIC_POLICY = Object.freeze({
@@ -630,6 +634,22 @@ async function upsertTask(env, row, staticData = {}) {
     highlightResolved ? JSON.stringify(highlight) : null, highlightResolved ? 'resolved' : 'pending', highlightResolved ? null : now,
     now, now
   ).run();
+
+  // R10R15: correções documentais verificadas são autoritativas por campo e
+  // precisam corrigir também o D1, não apenas o JSON estático do site.
+  if (staticData?.verified === true && (publico != null || pagantes != null || renda != null)) {
+    const src = staticData.public_sources ? JSON.stringify(staticData.public_sources) : null;
+    await env.DB.prepare(`UPDATE postgame_fastlane SET
+      publico=CASE WHEN ? IS NOT NULL THEN ? ELSE publico END,
+      publico_pagante=CASE WHEN ? IS NOT NULL THEN ? ELSE publico_pagante END,
+      renda=CASE WHEN ? IS NOT NULL THEN ? ELSE renda END,
+      public_sources_json=CASE WHEN ? IS NOT NULL AND ?<>'' THEN ? ELSE public_sources_json END,
+      public_status=CASE WHEN COALESCE(?,publico) IS NOT NULL AND COALESCE(?,renda) IS NOT NULL THEN 'resolved' ELSE public_status END,
+      public_next_at=CASE WHEN COALESCE(?,publico) IS NOT NULL AND COALESCE(?,renda) IS NOT NULL THEN NULL ELSE public_next_at END,
+      public_last_error='',updated_at=CURRENT_TIMESTAMP
+      WHERE event_id=?`)
+      .bind(publico,publico,pagantes,pagantes,renda,renda,src,src||'',src,publico,renda,publico,renda,eventId).run();
+  }
   const round = clampInt(row.round ?? row.rodada, 1, 60);
   const stadium = text(row.stadium || row.estadio);
   if (round != null || stadium) {
@@ -704,13 +724,18 @@ async function seedFromStatic(env, now = Date.now()) {
       if (Number.isFinite(kickoffMs) && kickoffMs < now - RECENT_RESULT_WINDOW_MS) continue;
       const basePub = publicMap[eventId] || {};
       const verifiedPub = verifiedMap[eventId] || {};
-      const pub = { ...basePub, ...verifiedPub };
+      const existing = await env.DB.prepare('SELECT event_id FROM postgame_fastlane WHERE event_id=?').bind(eventId).first();
+      // R10R15: snapshot estático não verificado pode inicializar uma linha NOVA,
+      // mas nunca deve recolocar em D1 um valor que o Identity Gate acabou de
+      // invalidar. Correção documental verificada continua autoritativa.
+      const pub = Object.keys(verifiedPub).length > 0 ? { ...basePub, ...verifiedPub } : (existing ? {} : basePub);
       const mm = mmMap[eventId] || null;
       await upsertTask(env, result, {
         publico: pub.publico,
         publico_pagante: pub.pagantes ?? pub.publico_pagante,
         renda: pub.renda,
         public_sources: (pub.fonte || pub.fonte_publico || pub.fonte_pagantes || pub.fonte_renda) ? { publico: pub.fonte_publico || pub.fonte, publico_pagante: pub.fonte_pagantes || pub.fonte_publico || pub.fonte, renda: pub.fonte_renda || pub.fonte_publico || pub.fonte } : null,
+        verified: Object.keys(verifiedPub).length > 0,
         highlight: mm,
       });
       count += 1;
@@ -793,22 +818,25 @@ async function refreshCachedPublicSources(env,task,values,sources){
   for(const row of rows.slice(0,6)){
     const source=await fetchSourceText(row.url); checked++;
     if(!source.ok){lastError=source.reason;await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=failures+1 WHERE event_id=? AND url=?`).bind(source.reason,task.event_id,row.url).run();continue;}
-    if(!sourceTextMatchesTask(task,source.text)){
-      lastError='source_context_mismatch';
-      await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status='context_mismatch',failures=failures+1 WHERE event_id=? AND url=?`).bind(task.event_id,row.url).run();
+    const identity=evaluateSourceMatchIdentity(task,source.text,source.url);
+    if(!identity.accepted){
+      lastError=`source_match_identity_rejected:${[...(identity.conflicts||[]),...(identity.reasons||[])].join('|')}`;
+      await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=failures+1 WHERE event_id=? AND url=?`).bind(lastError.slice(0,500),task.event_id,row.url).run();
       continue;
     }
 
-    // Primeiro caminho: parser determinístico. Uma ficha com rótulos explícitos
-    // como "PÚBLICO - 22.159" / "RENDA - R$ 1.002.775,79" é resolvida sem IA.
-    const deterministic=extractPublicFromTextDeterministic(source.text,source.url);
+    // R10R15: extrai SOMENTE a janela textual cuja identidade do confronto foi
+    // comprovada. Isso impede páginas de rodada de fornecerem os números do jogo
+    // imediatamente anterior/seguinte no documento.
+    const scopedSource={...source,text:identity.window};
+    const deterministic=extractPublicFromTextDeterministic(scopedSource.text,source.url);
     let valid=validateGroundedValues(deterministic,source.url,task);
     let extractor='deterministic';
 
     // Só gasta Workers AI quando a página realmente fala da partida e o parser
     // de rótulos não conseguiu extrair nenhum campo confiável.
     if(!valid){
-      const extracted=await extractPublicWithWorkersAI(env,task,source);
+      const extracted=await extractPublicWithWorkersAI(env,task,scopedSource);
       valid=validateGroundedValues(extracted.parsed,source.url,task);
       extractor='workers-ai';
       if(!valid&&extracted.reason)lastError=text(extracted.reason);
@@ -1173,16 +1201,9 @@ async function processPublicTask(env, task, now = Date.now()) {
     const discovered=found.discoveredSources||found.sources||[];
     await cacheDiscoveredSources(env,eventId,discovered,'gemini');
 
-    // Aceitação direta: valores do modelo só entram quando suas URLs são
-    // verificáveis entre as fontes realmente devolvidas pela busca.
-    const valid=validateGroundedValues(found.parsed,found.sources||[],task);
-    let directAccepted=false;
-    if(valid){
-      directAccepted=true;
-      for(const key of ['publico','publico_pagante','renda']) if(valid.values[key]!=null&&!(Number(values[key])>0)){
-        values[key]=valid.values[key]; sources[key]=valid.sources[key];
-      }
-    }
+    // R10R15: IA é SOMENTE descoberta. Mesmo que Gemini devolva números no texto,
+    // eles nunca entram no D1 sem abrir a URL + Match Identity Gate + extração scoped.
+    const directAccepted=false;
 
     // Source recovery: qualquer URL descoberta vira insumo do parser local,
     // mesmo quando o JSON do Gemini foi inválido ou rejeitado.
@@ -1220,12 +1241,9 @@ async function processPublicTask(env, task, now = Date.now()) {
     const discovered=found.discoveredSources||found.rawSources||Object.values(found.sources||{});
     await cacheDiscoveredSources(env,eventId,discovered,'openai');
 
-    let directAccepted=false;
-    if(found.found&&found.values){
-      directAccepted=true;
-      for(const key of ['publico','publico_pagante','renda']) if(found.values[key]!=null&&!(Number(values[key])>0)) values[key]=found.values[key];
-      sources={...sources,...(found.sources||{})};
-    }
+    // R10R15: OpenAI também é discovery-only. Valores estruturados do modelo
+    // servem para diagnóstico, nunca como autoridade factual sem abrir a fonte.
+    const directAccepted=false;
     let refreshed={checked:0,foundAny:false,lastError:''};
     if(!isPublicComplete(values)&&discovered.length){
       refreshed=await refreshCachedPublicSources(env,task,values,sources);
@@ -1293,25 +1311,46 @@ async function ensurePolicyVersion(env, now = Date.now()) {
   if (current >= POSTGAME_POLICY_VERSION) return false;
   const isoNow = nowIso(now);
 
-  // v10 reaplica imediatamente a nova cascata a TODA pendência. O marcador
-  // força uma prova Gemini discovery-only no primeiro ciclo elegível; se houver
-  // falha estrutural, o circuit breaker abre e OpenAI assume sem repetição cega.
+  // v11: reabre pendências normalmente e também remove, de forma genérica,
+  // campos recentes cuja URL documental contém uma data explicitamente
+  // incompatível com a data do jogo. O Match Identity Gate cuidará das novas URLs.
   await env.DB.prepare(`UPDATE postgame_fastlane SET
-      public_status=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN 'resolved' ELSE 'overdue' END,
-      public_next_at=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN NULL ELSE ? END,
-      public_last_error='requeued_attendance_hunter_v10_gemini_discovery_circuit',
+      public_status=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN public_status ELSE 'overdue' END,
+      public_next_at=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN public_next_at ELSE ? END,
+      public_last_error=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN public_last_error ELSE 'requeued_attendance_hunter_v11_match_identity_gate' END,
       updated_at=CURRENT_TIMESTAMP
     WHERE public_status<>'resolved'`).bind(isoNow).run();
 
-  // Preserva contadores de custo/telemetria; sol_completed continua não terminal.
-  await env.DB.prepare(`UPDATE postgame_public_ai SET sol_completed=0,
-      last_phase='migrated_v10_gemini_discovery_circuit',
-      updated_at=CURRENT_TIMESTAMP`).run();
+  const recent = await env.DB.prepare(`SELECT event_id,kickoff,final_at,publico,publico_pagante,renda,public_sources_json
+    FROM postgame_fastlane WHERE public_status='resolved' AND julianday(final_at)>=julianday('now','-7 days')`).all();
+  for (const row of recent?.results || []) {
+    const gameDate = text(row.kickoff).slice(0,10);
+    const src = safeJson(row.public_sources_json,{}) || {};
+    const bad = (url) => {
+      const m = text(url).match(/\/(20\d{2})\/(\d{1,2})\/(\d{1,2})(?:\/|$)/);
+      if (!m || !gameDate) return false;
+      const sourceDate = `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+      const a=Date.parse(`${gameDate}T12:00:00Z`), b=Date.parse(`${sourceDate}T12:00:00Z`);
+      return Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)>3*86400000;
+    };
+    const badPublic = bad(src.publico);
+    const badPaid = bad(src.publico_pagante);
+    const badRevenue = bad(src.renda);
+    if (!badPublic && !badPaid && !badRevenue) continue;
+    const publico = badPublic ? null : num(row.publico);
+    const pagantes = badPaid ? null : num(row.publico_pagante);
+    const renda = badRevenue ? null : num(row.renda);
+    const nextSources = {...src};
+    if (badPublic) delete nextSources.publico;
+    if (badPaid) delete nextSources.publico_pagante;
+    if (badRevenue) delete nextSources.renda;
+    const complete = publico != null && renda != null;
+    await env.DB.prepare(`UPDATE postgame_fastlane SET publico=?,publico_pagante=?,renda=?,public_sources_json=?,public_status=?,public_next_at=?,public_last_error=?,updated_at=CURRENT_TIMESTAMP WHERE event_id=?`)
+      .bind(publico,pagantes,renda,JSON.stringify(nextSources),complete?'resolved':'overdue',complete?null:isoNow,'revalidate_match_identity_v11_url_date_conflict',row.event_id).run();
+  }
 
-  // Nova versão deve comprovar o Gemini do zero: circuito/probe anteriores não
-  // podem mascarar o resultado do deploy.
-  await writeGeminiCircuit(env, {version:10,state:'closed',openUntil:'',consecutiveFailures:0,lastFailureAt:'',lastFailure:'',lastSuccessAt:''});
-  await metaPut(env, GEMINI_PROBE_META_KEY, '');
+  await env.DB.prepare(`UPDATE postgame_public_ai SET sol_completed=0,
+      last_phase='migrated_v11_match_identity_gate',updated_at=CURRENT_TIMESTAMP`).run();
   await metaPut(env, 'static_seed_at', '1970-01-01T00:00:00.000Z');
   await metaPut(env, 'policy_version', String(POSTGAME_POLICY_VERSION));
   return true;
@@ -1489,6 +1528,13 @@ export async function postgameStatus(env) {
     openAiRequiredWebSearch: true,
     openAiSourceRecovery: true,
     searchDiagnostics: true,
+    matchIdentityGateVersion: 1,
+    matchIdentityBothTeamsRequired: true,
+    matchIdentitySourceDateConflictRejected: true,
+    sourceScopedExtraction: true,
+    modelValuesAuthoritative: false,
+    verifiedCorrectionsOverrideD1: true,
+    recentResolvedIdentityRevalidation: true,
     preferredEditorialSourceCount: PREFERRED_EDITORIAL_SOURCE_SUFFIXES.length,
     publicPersistentUntilResolved: true,
     publicGaveUp: 0,

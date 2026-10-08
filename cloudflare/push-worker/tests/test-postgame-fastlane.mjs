@@ -224,4 +224,52 @@ assert.equal(shouldImmediateOpenAiFallback({ageMinutes:20,forcedUpgrade:true,bud
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:false},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),false);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:1,httpStatus:200,found:true},discoveredCount:2,refreshedFoundAny:true,complete:true}),false);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:1,httpStatus:200,found:true},discoveredCount:2,refreshedFoundAny:true,complete:false}),true);
-console.log('postgame-fastlane v10 policy + circuit tests: PASS');
+console.log('postgame-fastlane v11 policy + circuit tests: PASS');
+
+// ============================ R10R15 Match Identity Gate ============================
+{
+  const { evaluateSourceMatchIdentity, POSTGAME_SEARCH_PROFILE_VERSION } = await import('../src/postgame-search-profile.js');
+  assert.equal(POSTGAME_SEARCH_PROFILE_VERSION, 8);
+
+  const vitoriaChape = {
+    event_id:'401841250', home:'Vitória', away:'Chapecoense', kickoff:'2026-10-07T20:00:00-03:00',
+    home_score:4, away_score:0, round:29, stadium:'Estadio Manoel Barradas'
+  };
+  const fonteErrada = 'Chapecoense goleou o Amazonas por 4 x 0 na Arena Condá. Depois de dez jogos, a equipe voltou a ter uma vitória. PÚBLICO - 1.945. RENDA - R$ 40.605,00.';
+  const gateErrado = evaluateSourceMatchIdentity(vitoriaChape, fonteErrada, 'https://www.uol.com.br/esporte/ultimas-noticias/agencia/2025/06/02/chapecoense-goleia-o-amazonas.htm');
+  assert.equal(gateErrado.accepted, false, 'Vitória lexical + Chapecoense não pode provar EC Vitória x Chapecoense');
+  assert.ok(gateErrado.conflicts.some((x)=>String(x).startsWith('url_date_mismatch:')));
+
+  const fonteCorreta = 'Na noite desta quarta-feira, o Vitória goleou a Chapecoense por 4 a 0, no Barradão, pela 29ª rodada do Campeonato Brasileiro. Público: 13.934 pessoas. Público pagante: 13.773. Renda: R$ 285.132,00.';
+  const gateCorreto = evaluateSourceMatchIdentity(vitoriaChape, fonteCorreta, 'https://www.bahianoticias.com.br/esportes/vitoria/31622-confira-publico-e-renda-de-vitoria-x-chapecoense');
+  assert.equal(gateCorreto.accepted, true);
+  const parsedCorreto = extractPublicFromTextDeterministic(gateCorreto.window, 'https://www.bahianoticias.com.br/esportes/vitoria/31622-confira-publico-e-renda-de-vitoria-x-chapecoense');
+  assert.equal(parsedCorreto.publico, 13934);
+  assert.equal(parsedCorreto.publico_pagante, 13773);
+  assert.equal(parsedCorreto.renda, 285132);
+
+  const botVasco = {
+    event_id:'401841257', home:'Botafogo', away:'Vasco da Gama', kickoff:'2026-10-07T20:30:00-03:00',
+    home_score:1, away_score:2, round:29, stadium:'Nilton Santos'
+  };
+  const rodadaMultijogo = 'Veja os públicos da rodada. Botafogo 1 x 2 Remo (Nilton Santos). Público presente: 22.116. Público pagante: 18.780. Renda: R$ 696.020. Flamengo 2 x 2 Vasco (Maracanã). Público presente: 61.872.';
+  const gateMulti = evaluateSourceMatchIdentity(botVasco, rodadaMultijogo, 'https://ge.globo.com/gato-mestre/noticia/2026/05/03/veja-os-publicos-da-14a-rodada.ghtml');
+  assert.equal(gateMulti.accepted, false, 'nomes em seções diferentes de página multijogo não podem provar o confronto');
+
+  const rodadaComAlvo = 'Flamengo 2 x 1 Palmeiras. Público presente: 61.000. Público pagante: 58.000. Renda: R$ 4.200.000,00. Botafogo 1 x 2 Vasco. Público presente: 23.596. Público pagante: 22.071. Renda: R$ 801.180,00.';
+  const gateRodadaAlvo = evaluateSourceMatchIdentity(botVasco, rodadaComAlvo, 'https://ge.globo.com/gato-mestre/noticia/2026/10/07/publicos-da-29a-rodada.ghtml');
+  assert.equal(gateRodadaAlvo.accepted, true);
+  const parsedRodadaAlvo = extractPublicFromTextDeterministic(gateRodadaAlvo.window, 'https://ge.globo.com/gato-mestre/noticia/2026/10/07/publicos-da-29a-rodada.ghtml');
+  assert.equal(parsedRodadaAlvo.publico, 23596, 'bloco anterior da página multijogo não pode contaminar público');
+  assert.equal(parsedRodadaAlvo.publico_pagante, 22071);
+  assert.equal(parsedRodadaAlvo.renda, 801180);
+
+  const fonteBotVasco = 'Botafogo e Vasco se enfrentaram no Estádio Nilton Santos pela 29ª rodada. O clássico terminou Botafogo 1 x 2 Vasco. Público presente: 23.596. Público pagante: 22.071. Renda: R$ 801.180,00.';
+  const gateBotVasco = evaluateSourceMatchIdentity(botVasco, fonteBotVasco, 'https://www.correiobraziliense.com.br/esportes/2026/10/7516875-botafogo-vasco.html');
+  assert.equal(gateBotVasco.accepted, true);
+  const parsedBotVasco = extractPublicFromTextDeterministic(gateBotVasco.window, 'https://www.correiobraziliense.com.br/esportes/2026/10/7516875-botafogo-vasco.html');
+  assert.equal(parsedBotVasco.publico, 23596);
+  assert.equal(parsedBotVasco.publico_pagante, 22071);
+  assert.equal(parsedBotVasco.renda, 801180);
+}
+console.log('R10R15 match identity gate tests: PASS');
