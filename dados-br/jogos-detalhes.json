@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-07T23:10:57.626043-03:00",
+  "gerado_em": "2026-10-07T23:26:32.855283-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 284,
   "total_com_estatisticas": 284,
-  "total_com_publico": 283,
+  "total_com_publico": 284,
   "total_com_eventos": 284,
   "total_com_jogadores": 284,
   "total_eventos_validados": 284,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 2,
       "estadio": "Joao Havelange Stadium",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 22116,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/03/veja-os-publicos-da-14a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -557,7 +557,8 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-10-07T22:36:13.918031-03:00",
-      "renda": 801180
+      "renda": 801180,
+      "publico_pagante": 18780
     },
     "401841250": {
       "event_id": "401841250",
@@ -160380,6 +160381,6 @@
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
   },
-  "total_com_publico_pagante": 268,
+  "total_com_publico_pagante": 269,
   "total_com_renda": 284
 }
