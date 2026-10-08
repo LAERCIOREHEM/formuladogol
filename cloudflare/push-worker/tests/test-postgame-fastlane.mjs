@@ -129,7 +129,7 @@ console.log('postgame-fastlane tests: PASS');
 import {
   PUBLIC_POLICY, planPublicStep, nextPublicAttemptMs, publicSearchRequest, shouldImmediateOpenAiFallback,
   parseEspnAttendance, isPublicComplete, publicAlertMessage, taskEndMs,
-  publicBudgetDecision, sourceQuality
+  publicBudgetDecision, sourceQuality, publicSlaAgeMinutes, publicSlaAlertAllowed
 } from '../src/postgame-fastlane.js';
 
 const END = Date.parse('2026-10-02T23:53:00.000Z');
@@ -157,6 +157,15 @@ assert.equal(planPublicStep(task,{...zero,mini_attempts:5},at(45),{allowGemini:f
 assert.deepEqual(PUBLIC_POLICY.geminiScheduleMinutes,[5,15,25,35,45,60,90,120]);
 assert.deepEqual(PUBLIC_POLICY.openaiScheduleMinutes,[45,90,120]);
 assert.equal(PUBLIC_POLICY.overdueMinutes,120);
+assert.equal(PUBLIC_POLICY.migrationGraceMinutes,15);
+const oldFinished={final_at:'2026-10-07T22:00:00.000Z'};
+const reopenedAt='2026-10-08T15:00:00.000Z';
+const reopenedNow=Date.parse('2026-10-08T15:10:00.000Z');
+assert.equal(publicSlaAgeMinutes(oldFinished,reopenedNow,reopenedAt),10);
+assert.equal(publicSlaAlertAllowed(oldFinished,reopenedNow,reopenedAt),false);
+assert.equal(publicSlaAlertAllowed(oldFinished,Date.parse('2026-10-08T16:59:00.000Z'),reopenedAt),false);
+assert.equal(publicSlaAlertAllowed(oldFinished,Date.parse('2026-10-08T17:00:00.000Z'),reopenedAt),true);
+assert.equal(publicSlaAlertAllowed(oldFinished,Date.parse('2026-10-08T17:00:00.000Z'),''),true);
 assert.equal(PUBLIC_POLICY.overdueGeminiEveryMinutes,60);
 assert.equal(PUBLIC_POLICY.overdueOpenaiEveryMinutes,180);
 assert.equal(PUBLIC_POLICY.eventBudgetUsd,0.25);
@@ -224,7 +233,7 @@ assert.equal(shouldImmediateOpenAiFallback({ageMinutes:20,forcedUpgrade:true,bud
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:false},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),false);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:1,httpStatus:200,found:true},discoveredCount:2,refreshedFoundAny:true,complete:true}),false);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:1,httpStatus:200,found:true},discoveredCount:2,refreshedFoundAny:true,complete:false}),true);
-console.log('postgame-fastlane v11 policy + circuit tests: PASS');
+console.log('postgame-fastlane v12 policy + SLA suppression + circuit tests: PASS');
 
 // ============================ R10R15 Match Identity Gate ============================
 {

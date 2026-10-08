@@ -13,10 +13,10 @@ const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
-const POSTGAME_POLICY_VERSION = 11;
+const POSTGAME_POLICY_VERSION = 12;
 
 /*
- * Attendance/Revenue Hunter v11 — Match Identity Gate + Source-Scoped Extraction:
+ * Attendance/Revenue Hunter v12 — R10R15.1 SLA Migration Suppression:
  *   - Mantém aliases de TODOS os clubes, imprensa nacional/regional e sites oficiais
  *     SOMENTE dos dois participantes para fatos documentais de ficha técnica.
  *   - Gemini Interactions vira DESCOBRIDOR DE FONTES: google_search real, sem JSON
@@ -35,6 +35,10 @@ const POSTGAME_POLICY_VERSION = 11;
  *   - Fontes com data/confronto conflitantes são rejeitadas antes de qualquer valor.
  *   - Correções documentais verificadas prevalecem também sobre valores antigos no D1.
  *   - Nunca existe GAVE_UP para público/renda.
+ *   - R10R15.1 separa idade da partida de idade da pendência administrativa:
+ *     reaberturas por migração ganham relógio SLA próprio + grace period de 15 min.
+ *   - Revalidação administrativa continua buscando imediatamente, mas não pode enviar
+ *     falso e-mail de SLA usando a idade histórica da partida.
  */
 export const PUBLIC_POLICY = Object.freeze({
   aiStartMinutes: 5,
@@ -42,6 +46,7 @@ export const PUBLIC_POLICY = Object.freeze({
   openaiScheduleMinutes: [45, 90, 120],
   deterministicEveryMinutes: 5,
   overdueMinutes: 120,
+  migrationGraceMinutes: 15,
   overdueGeminiEveryMinutes: 60,
   overdueOpenaiEveryMinutes: 180,
   geminiCircuitStructuralMinutes: 30,
@@ -541,6 +546,34 @@ async function metaGet(env, key) {
 async function metaPut(env, key, value) {
   await env.DB.prepare(`INSERT INTO postgame_meta(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP)
     ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=CURRENT_TIMESTAMP`).bind(key, text(value)).run();
+}
+
+const PUBLIC_SLA_REOPEN_META_PREFIX = 'public_sla_reopened_v12:';
+function publicSlaMetaKey(eventId) { return `${PUBLIC_SLA_REOPEN_META_PREFIX}${text(eventId)}`; }
+
+export function publicSlaAgeMinutes(task, now = Date.now(), reopenedAt = '') {
+  const normalAge = Math.max(0, (now - taskEndMs(task, now)) / 60_000);
+  const reopenedMs = Date.parse(text(reopenedAt));
+  if (!Number.isFinite(reopenedMs) || reopenedMs > now) return normalAge;
+  return Math.max(0, (now - reopenedMs) / 60_000);
+}
+
+export function publicSlaAlertAllowed(task, now = Date.now(), reopenedAt = '', graceMinutes = PUBLIC_POLICY.migrationGraceMinutes) {
+  const reopenedMs = Date.parse(text(reopenedAt));
+  if (Number.isFinite(reopenedMs) && reopenedMs <= now && now - reopenedMs < Number(graceMinutes || 0) * 60_000) return false;
+  return publicSlaAgeMinutes(task, now, reopenedAt) >= PUBLIC_POLICY.overdueMinutes;
+}
+
+async function markPublicAdministrativeReopen(env, eventId, now = Date.now()) {
+  await metaPut(env, publicSlaMetaKey(eventId), nowIso(now));
+}
+
+async function readPublicAdministrativeReopen(env, eventId) {
+  return metaGet(env, publicSlaMetaKey(eventId));
+}
+
+async function clearPublicAdministrativeReopen(env, eventId) {
+  await metaPut(env, publicSlaMetaKey(eventId), '');
 }
 
 async function readGeminiCircuit(env, now = Date.now()) {
@@ -1149,6 +1182,7 @@ async function processPublicTask(env, task, now = Date.now()) {
   let costSummary=null;
   let budget={allowGemini:true,allowOpenAI:true,hardStop:false,reason:''};
   const ageMinutesAtStart=Math.max(0,(now-taskEndMs(task,now))/60_000);
+  const reopenedAt=await readPublicAdministrativeReopen(env,eventId);
 
   // O upgrade v10 marca cada pendência no próprio row. Assim a primeira passada
   // executa a cascata nova mesmo que existam contadores históricos de v7/v8.
@@ -1269,9 +1303,12 @@ async function processPublicTask(env, task, now = Date.now()) {
 
   const complete=isPublicComplete(values);
   const ageMinutes=Math.max(0,(now-taskEndMs(task,now))/60_000);
+  // R10R15.1: buscas continuam usando a idade real do jogo (agressividade preservada),
+  // mas status/alerta SLA usam a idade da pendência quando ela foi reaberta administrativamente.
+  const slaAgeMinutes=publicSlaAgeMinutes(task,now,reopenedAt);
   let status=complete?'resolved':'pending';
   if(!complete&&budget.reason) status='budget_guard';
-  else if(!complete&&ageMinutes>=PUBLIC_POLICY.overdueMinutes) status='overdue';
+  else if(!complete&&slaAgeMinutes>=PUBLIC_POLICY.overdueMinutes) status='overdue';
 
   let nextAt=null;
   if(!complete){
@@ -1280,10 +1317,15 @@ async function processPublicTask(env, task, now = Date.now()) {
     nextAt=nowIso(nextMs);
     if(budget.reason && !lastError) lastError=`budget:${budget.reason}`;
 
-    if(ageMinutes>=PUBLIC_POLICY.overdueMinutes&&!next.alert_at){
+    if(publicSlaAlertAllowed(task,now,reopenedAt)&&!next.alert_at){
       next.alert_status=await sendPublicNotFoundEmail(env,publicAlertMessage(task,values,sources,next,lastError,env,costSummary,nextAt));
       next.alert_at=nowIso(now);
     }
+  }
+
+  if(complete&&reopenedAt){
+    await clearPublicAdministrativeReopen(env,eventId);
+    if(!next.alert_at) next.alert_status='recovered_by_verified_or_grounded_correction';
   }
 
   await env.DB.prepare(`UPDATE postgame_fastlane SET publico=?,publico_pagante=?,renda=?,public_sources_json=?,public_status=?,public_attempts=?,public_last_at=?,public_next_at=?,public_last_error=?,updated_at=CURRENT_TIMESTAMP WHERE event_id=?`)
@@ -1311,47 +1353,58 @@ async function ensurePolicyVersion(env, now = Date.now()) {
   if (current >= POSTGAME_POLICY_VERSION) return false;
   const isoNow = nowIso(now);
 
-  // v11: reabre pendências normalmente e também remove, de forma genérica,
-  // campos recentes cuja URL documental contém uma data explicitamente
-  // incompatível com a data do jogo. O Match Identity Gate cuidará das novas URLs.
-  await env.DB.prepare(`UPDATE postgame_fastlane SET
-      public_status=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN public_status ELSE 'overdue' END,
-      public_next_at=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN public_next_at ELSE ? END,
-      public_last_error=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN public_last_error ELSE 'requeued_attendance_hunter_v11_match_identity_gate' END,
-      updated_at=CURRENT_TIMESTAMP
-    WHERE public_status<>'resolved'`).bind(isoNow).run();
+  // A migração destrutiva de identidade pertence exclusivamente ao salto para v11.
+  // Em v12 NÃO reabrimos novamente todas as pendências nem repetimos a varredura.
+  if (current < 11) {
+    await env.DB.prepare(`UPDATE postgame_fastlane SET
+        public_status=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN public_status ELSE 'overdue' END,
+        public_next_at=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN public_next_at ELSE ? END,
+        public_last_error=CASE WHEN publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0 THEN public_last_error ELSE 'requeued_attendance_hunter_v11_match_identity_gate' END,
+        updated_at=CURRENT_TIMESTAMP
+      WHERE public_status<>'resolved'`).bind(isoNow).run();
 
-  const recent = await env.DB.prepare(`SELECT event_id,kickoff,final_at,publico,publico_pagante,renda,public_sources_json
-    FROM postgame_fastlane WHERE public_status='resolved' AND julianday(final_at)>=julianday('now','-7 days')`).all();
-  for (const row of recent?.results || []) {
-    const gameDate = text(row.kickoff).slice(0,10);
-    const src = safeJson(row.public_sources_json,{}) || {};
-    const bad = (url) => {
-      const m = text(url).match(/\/(20\d{2})\/(\d{1,2})\/(\d{1,2})(?:\/|$)/);
-      if (!m || !gameDate) return false;
-      const sourceDate = `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
-      const a=Date.parse(`${gameDate}T12:00:00Z`), b=Date.parse(`${sourceDate}T12:00:00Z`);
-      return Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)>3*86400000;
-    };
-    const badPublic = bad(src.publico);
-    const badPaid = bad(src.publico_pagante);
-    const badRevenue = bad(src.renda);
-    if (!badPublic && !badPaid && !badRevenue) continue;
-    const publico = badPublic ? null : num(row.publico);
-    const pagantes = badPaid ? null : num(row.publico_pagante);
-    const renda = badRevenue ? null : num(row.renda);
-    const nextSources = {...src};
-    if (badPublic) delete nextSources.publico;
-    if (badPaid) delete nextSources.publico_pagante;
-    if (badRevenue) delete nextSources.renda;
-    const complete = publico != null && renda != null;
-    await env.DB.prepare(`UPDATE postgame_fastlane SET publico=?,publico_pagante=?,renda=?,public_sources_json=?,public_status=?,public_next_at=?,public_last_error=?,updated_at=CURRENT_TIMESTAMP WHERE event_id=?`)
-      .bind(publico,pagantes,renda,JSON.stringify(nextSources),complete?'resolved':'overdue',complete?null:isoNow,'revalidate_match_identity_v11_url_date_conflict',row.event_id).run();
+    const recent = await env.DB.prepare(`SELECT event_id,kickoff,final_at,publico,publico_pagante,renda,public_sources_json
+      FROM postgame_fastlane WHERE public_status='resolved' AND julianday(final_at)>=julianday('now','-7 days')`).all();
+    for (const row of recent?.results || []) {
+      const gameDate = text(row.kickoff).slice(0,10);
+      const src = safeJson(row.public_sources_json,{}) || {};
+      const bad = (url) => {
+        const m = text(url).match(/\/(20\d{2})\/(\d{1,2})\/(\d{1,2})(?:\/|$)/);
+        if (!m || !gameDate) return false;
+        const sourceDate = `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+        const a=Date.parse(`${gameDate}T12:00:00Z`), b=Date.parse(`${sourceDate}T12:00:00Z`);
+        return Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)>3*86400000;
+      };
+      const badPublic = bad(src.publico);
+      const badPaid = bad(src.publico_pagante);
+      const badRevenue = bad(src.renda);
+      if (!badPublic && !badPaid && !badRevenue) continue;
+      const publico = badPublic ? null : num(row.publico);
+      const pagantes = badPaid ? null : num(row.publico_pagante);
+      const renda = badRevenue ? null : num(row.renda);
+      const nextSources = {...src};
+      if (badPublic) delete nextSources.publico;
+      if (badPaid) delete nextSources.publico_pagante;
+      if (badRevenue) delete nextSources.renda;
+      const complete = publico != null && renda != null;
+      await env.DB.prepare(`UPDATE postgame_fastlane SET publico=?,publico_pagante=?,renda=?,public_sources_json=?,public_status=?,public_next_at=?,public_last_error=?,updated_at=CURRENT_TIMESTAMP WHERE event_id=?`)
+        .bind(publico,pagantes,renda,JSON.stringify(nextSources),complete?'resolved':'pending',complete?null:isoNow,'revalidate_match_identity_v11_url_date_conflict',row.event_id).run();
+      if (!complete) await markPublicAdministrativeReopen(env,row.event_id,now);
+    }
+
+    await env.DB.prepare(`UPDATE postgame_public_ai SET sol_completed=0,
+        last_phase='migrated_v11_match_identity_gate',updated_at=CURRENT_TIMESTAMP`).run();
+    await metaPut(env, 'static_seed_at', '1970-01-01T00:00:00.000Z');
   }
 
-  await env.DB.prepare(`UPDATE postgame_public_ai SET sol_completed=0,
-      last_phase='migrated_v11_match_identity_gate',updated_at=CURRENT_TIMESTAMP`).run();
-  await metaPut(env, 'static_seed_at', '1970-01-01T00:00:00.000Z');
+  // v12 é deliberadamente não destrutiva: instala a semântica de SLA separado
+  // sem reabrir partidas já resolvidas. Reaberturas futuras usam o anchor acima.
+  if (current < 12) {
+    await env.DB.prepare(`UPDATE postgame_public_ai SET
+      last_phase=CASE WHEN last_phase='migrated_v11_match_identity_gate' THEN 'migrated_v12_sla_migration_suppression' ELSE last_phase END,
+      updated_at=CURRENT_TIMESTAMP`).run();
+  }
+
   await metaPut(env, 'policy_version', String(POSTGAME_POLICY_VERSION));
   return true;
 }
