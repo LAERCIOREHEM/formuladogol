@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-07T22:16:18.272026-03:00",
+  "gerado_em": "2026-10-07T22:20:57.246996-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 283,
   "total_com_estatisticas": 283,
-  "total_com_publico": 280,
+  "total_com_publico": 281,
   "total_com_eventos": 283,
   "total_com_jogadores": 283,
   "total_eventos_validados": 283,
@@ -1212,9 +1212,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Estádio Municipal Cicero de Souza Marques",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 2340,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/com-um-a-menos-mirassol-reage-e-impede-vitoria-do-red-bull-bragantino-em-casa-cmuytd6rr0193015ulfgww4c4.html",
       "arbitro": "",
       "stats": [
         {
@@ -1733,7 +1733,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-07T22:16:15.815524-03:00"
+      "atualizado_em": "2026-10-07T22:16:15.815524-03:00",
+      "publico_pagante": 2340,
+      "renda": 54630
     },
     "401841252": {
       "event_id": "401841252",
@@ -159826,5 +159828,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 268,
+  "total_com_renda": 281
 }
