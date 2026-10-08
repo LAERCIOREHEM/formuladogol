@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-10-07T21:55:53-03:00",
+  "atualizado_em": "2026-10-07T22:46:02-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
     "regra": "GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video e CazéTV são prioritários. UOL Esporte é aceito como fallback após 48 horas ou por vínculo manual conferido.",
@@ -13,33 +13,25 @@
     "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais."
   },
   "resumo": {
-    "jogos_resultados": 282,
-    "jogos_com_video": 280,
-    "ge_globo": 269,
+    "jogos_resultados": 284,
+    "jogos_com_video": 283,
+    "ge_globo": 272,
     "amazon_prime_video": 3,
     "cazetv": 5,
     "uol_esporte": 3,
     "outros": 0,
-    "sem_video": 2,
+    "sem_video": 1,
     "percentual_fontes_preferidas": 100.0
   },
   "outros_sites_ainda_em_uso": [],
   "sem_video": [
     {
-      "event_id": "401841253",
+      "event_id": "401841257",
       "rodada": 29,
-      "mandante": "Bragantino",
-      "visitante": "Mirassol",
+      "mandante": "Botafogo",
+      "visitante": "Vasco da Gama",
       "placar_mandante": 1,
-      "placar_visitante": 1
-    },
-    {
-      "event_id": "401841252",
-      "rodada": 29,
-      "mandante": "Remo",
-      "visitante": "Grêmio",
-      "placar_mandante": 1,
-      "placar_visitante": 1
+      "placar_visitante": 2
     }
   ],
   "detalhamento": {
@@ -4346,6 +4338,54 @@
         "channel_title": "ge tv",
         "titulo": "VITÓRIA 1 X 3 CRUZEIRO | MELHORES MOMENTOS | 28ª RODADA | BRASILEIRÃO 2026 | ge.globo",
         "url": "https://www.youtube.com/watch?v=miFUwrs5Rzo",
+        "confianca": 1.0
+      },
+      {
+        "event_id": "401841253",
+        "rodada": 29,
+        "mandante": "Bragantino",
+        "visitante": "Mirassol",
+        "placar_mandante": 1,
+        "placar_visitante": 1,
+        "categoria_fonte": "ge_globo",
+        "origem_vinculo": "automatico",
+        "fonte": "GE TV / YouTube",
+        "fonte_busca": "cloudflare-fastlane-youtube-uploads",
+        "channel_title": "GE TV",
+        "titulo": "BRAGANTINO 1 X 1 MIRASSOL | MELHORES MOMENTOS | 29ª RODADA BRASILEIRÃO 2026 | ge.globo",
+        "url": "https://www.youtube.com/watch?v=31n6pwvReIU",
+        "confianca": 1.0
+      },
+      {
+        "event_id": "401841252",
+        "rodada": 29,
+        "mandante": "Remo",
+        "visitante": "Grêmio",
+        "placar_mandante": 1,
+        "placar_visitante": 1,
+        "categoria_fonte": "ge_globo",
+        "origem_vinculo": "automatico",
+        "fonte": "GE TV / YouTube",
+        "fonte_busca": "cloudflare-fastlane-youtube-uploads",
+        "channel_title": "GE TV",
+        "titulo": "REMO 1 X 1 GRÊMIO | MELHORES MOMENTOS | 29ª RODADA | BRASILEIRÃO 2026 | ge.globo",
+        "url": "https://www.youtube.com/watch?v=iW-oXE9nwgQ",
+        "confianca": 1.0
+      },
+      {
+        "event_id": "401841250",
+        "rodada": 29,
+        "mandante": "Vitória",
+        "visitante": "Chapecoense",
+        "placar_mandante": 4,
+        "placar_visitante": 0,
+        "categoria_fonte": "ge_globo",
+        "origem_vinculo": "automatico",
+        "fonte": "GE TV / YouTube",
+        "fonte_busca": "cloudflare-fastlane-youtube-uploads",
+        "channel_title": "GE TV",
+        "titulo": "VITÓRIA 4 X 0 CHAPECOENSE | MELHORES MOMENTOS | 29ª RODADA BRASILEIRÃO 2026 | ge.globo",
+        "url": "https://www.youtube.com/watch?v=sR0uQA5U22M",
         "confianca": 1.0
       }
     ],
