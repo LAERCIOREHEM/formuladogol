@@ -1,88 +1,31 @@
 {
-  "gerado_em": "2026-10-08T12:02:40.807823-03:00",
+  "gerado_em": "2026-10-08T12:21:01.003788-03:00",
   "fonte_automatica": "ge/Gato Mestre (presente/total, pagantes e renda; pagantes nunca substituem público presente)",
   "total_jogos_finalizados": 285,
-  "total_com_publico_ou_complemento": 284,
-  "total_sem_publico": 1,
-  "sem_publico": [
-    {
-      "event_id": "401841249",
-      "rodada": 29,
-      "data_iso": "2026-10-07T21:30",
-      "mandante": "Cruzeiro",
-      "visitante": "São Paulo",
-      "placar": "2 x 0"
-    }
-  ],
-  "total_com_publico_pagante": 269,
-  "total_sem_publico_pagante": 16,
-  "total_com_renda": 284,
-  "total_sem_renda": 1,
-  "sem_renda": [
-    {
-      "event_id": "401841249",
-      "rodada": 29,
-      "data_iso": "2026-10-07T21:30",
-      "mandante": "Cruzeiro",
-      "visitante": "São Paulo",
-      "placar": "2 x 0"
-    }
-  ],
+  "total_com_publico_ou_complemento": 285,
+  "total_sem_publico": 0,
+  "sem_publico": [],
+  "total_com_publico_pagante": 270,
+  "total_sem_publico_pagante": 15,
+  "total_com_renda": 285,
+  "total_sem_renda": 0,
+  "sem_renda": [],
   "total_partidas_fisicas": 285,
-  "total_partidas_fisicas_com_publico": 284,
-  "total_partidas_fisicas_sem_publico": 1,
-  "partidas_fisicas_sem_publico": [
-    {
-      "event_ids": [
-        "401841249"
-      ],
-      "rodada": 29,
-      "data_iso": "2026-10-07T21:30",
-      "mandante": "Cruzeiro",
-      "visitante": "São Paulo",
-      "placar": "2 x 0"
-    }
-  ],
+  "total_partidas_fisicas_com_publico": 285,
+  "total_partidas_fisicas_sem_publico": 0,
+  "partidas_fisicas_sem_publico": [],
   "rodadas_pendentes_no_inicio": [
     29,
     28,
     21,
     4
   ],
-  "novos_complementos": 23,
+  "novos_complementos": 0,
   "fontes_consultadas": [],
   "erros_fontes": [],
-  "conflitos": [
-    {
-      "event_id": "401841250",
-      "campo": "publico",
-      "existente": 1945,
-      "verificado": 13934,
-      "acao": "corrigido_por_fonte_documental_verificada"
-    },
-    {
-      "event_id": "401841250",
-      "campo": "renda",
-      "existente": 40605,
-      "verificado": 285132,
-      "acao": "corrigido_por_fonte_documental_verificada"
-    },
-    {
-      "event_id": "401841257",
-      "campo": "publico",
-      "existente": 22116,
-      "verificado": 23596,
-      "acao": "corrigido_por_fonte_documental_verificada"
-    },
-    {
-      "event_id": "401841257",
-      "campo": "pagantes",
-      "existente": 18780,
-      "verificado": 22071,
-      "acao": "corrigido_por_fonte_documental_verificada"
-    }
-  ],
+  "conflitos": [],
   "fontes_em_uso": {
+    "cloudflare-postgame-fastlane": 1,
     "https://gauchazh.clicrbs.com.br/esportes/gremio/noticia/2026/10/gremio-decepciona-cede-empate-ao-remo-e-se-complica-na-luta-para-sair-do-z-4-do-brasileirao-cmuysenq9018t015ug3d22cj4.html": 1,
     "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/com-um-a-menos-mirassol-reage-e-impede-vitoria-do-red-bull-bragantino-em-casa-cmuytd6rr0193015ulfgww4c4.html": 1,
     "https://ge.globo.com/gato-mestre/noticia/2026/01/29/veja-os-publicos-da-primeira-rodada-do-campeonato-brasileiro.ghtml": 9,
@@ -98,7 +41,7 @@
     "https://ge.globo.com/gato-mestre/noticia/2026/04/12/veja-os-publicos-da-11a-rodada-do-campeonato-brasileiro.ghtml": 8,
     "https://ge.globo.com/gato-mestre/noticia/2026/04/19/veja-os-publicos-da-12a-rodada-do-campeonato-brasileiro.ghtml": 8,
     "https://ge.globo.com/gato-mestre/noticia/2026/04/26/veja-os-publicos-da-13a-rodada-do-campeonato-brasileiro.ghtml": 9,
-    "https://ge.globo.com/gato-mestre/noticia/2026/05/03/veja-os-publicos-da-14a-rodada-do-campeonato-brasileiro.ghtml": 9,
+    "https://ge.globo.com/gato-mestre/noticia/2026/05/03/veja-os-publicos-da-14a-rodada-do-campeonato-brasileiro.ghtml": 8,
     "https://ge.globo.com/gato-mestre/noticia/2026/05/10/veja-os-publicos-da-15a-rodada-do-campeonato-brasileiro.ghtml": 10,
     "https://ge.globo.com/gato-mestre/noticia/2026/05/17/veja-os-publicos-da-16a-rodada-do-campeonato-brasileiro.ghtml": 9,
     "https://ge.globo.com/gato-mestre/noticia/2026/05/24/veja-os-publicos-da-17a-rodada-do-campeonato-brasileiro.ghtml": 9,
@@ -130,8 +73,10 @@
     "https://www.athletico.com.br/": 1,
     "https://www.athletico.com.br/resumo_do_jogo/athletico-desperdica-chances-e-e-superado-pelo-corinthians/": 1,
     "https://www.bahianoticias.com.br/esportes/bahia/33848-confira-publico-e-renda-de-bahia-x-chapecoense-pelo-brasileirao": 1,
+    "https://www.bahianoticias.com.br/esportes/vitoria/31622-confira-publico-e-renda-de-vitoria-x-chapecoense-pelo-campeonato-brasileiro": 1,
     "https://www.corinthians.com.br/noticias/corinthians-vence-red-bull-bragantino-por-2-a-0-na-neo-quimica-arena": 1,
     "https://www.correiobraziliense.com.br/esportes/2026/09/amp/7504602-hulk-faz-dois-fluminense-bate-o-corinthians-e-afunda-rival-em-crise.html": 1,
+    "https://www.correiobraziliense.com.br/esportes/2026/10/7516875-em-classico-eletrizante-vasco-bate-o-botafogo-no-nilton-santos.html": 1,
     "https://www.esporteclubebahia.com.br/fichas-tecnicas/": 1,
     "https://www.fogaonet.com/noticias-do-botafogo/publico-renda-botafogo-fluminense-brasileirao-2026/": 1,
     "https://www.gazetaesportiva.com/campeonatos/brasileiro-serie-a/sao-paulo-x-santos-brasileirao-2026/": 1,
@@ -143,28 +88,10 @@
     "https://www.santosfc.com.br/santos-fc-perde-para-o-internacional-na-vila-belmiro/": 1,
     "https://www.terra.com.br/esportes/botafogo/athletico-goleia-o-botafogo-e-assume-vice-lideranca-do-brasileirao,1d2b910b869313b749df6ba13d3a2edcbal3kf7i.html": 1,
     "https://www.terra.com.br/esportes/botafogo/com-tempos-distintos-botafogo-e-internacional-empatam-no-mane-garrincha%2Cb3f76c9a57bdd93f0b3cbb129c120906z22ly4u2.html": 1,
-    "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2025/06/02/chapecoense-goleia-o-amazonas-se-reabilita-e-encosta-no-g-4-da-serie-b.htm": 1,
     "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/07/23/botafogo-esbarra-no-goleiro-e-fica-no-0-a-0-contra-o-vitoria-em-jogo-atrasado-do-brasileirao.htm": 1,
     "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/09/20/flamengo-vence-o-red-bull-bragantino-e-abre-3-pontos-de-vantagem-para-o-palmeiras.amp.htm": 1,
     "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/03/atletico-mg-vence-o-red-bull-bragantino-em-jogo-com-lance-dramatico-na-arena-mrv.htm": 1
   },
-  "propagados_para_jogos_detalhes": 7,
-  "conflitos_jogos_detalhes": [
-    {
-      "event_id": "401841250",
-      "publico_detalhes_anterior": 1945,
-      "publico_documental": 13934,
-      "fonte_detalhes_anterior": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2025/06/02/chapecoense-goleia-o-amazonas-se-reabilita-e-encosta-no-g-4-da-serie-b.htm",
-      "fonte_documental": "https://www.bahianoticias.com.br/esportes/vitoria/31622-confira-publico-e-renda-de-vitoria-x-chapecoense-pelo-campeonato-brasileiro",
-      "acao": "corrigido_para_publico_presente_documentado"
-    },
-    {
-      "event_id": "401841257",
-      "publico_detalhes_anterior": 22116,
-      "publico_documental": 23596,
-      "fonte_detalhes_anterior": "https://ge.globo.com/gato-mestre/noticia/2026/05/03/veja-os-publicos-da-14a-rodada-do-campeonato-brasileiro.ghtml",
-      "fonte_documental": "https://www.correiobraziliense.com.br/esportes/2026/10/7516875-em-classico-eletrizante-vasco-bate-o-botafogo-no-nilton-santos.html",
-      "acao": "corrigido_para_publico_presente_documentado"
-    }
-  ]
+  "propagados_para_jogos_detalhes": 4,
+  "conflitos_jogos_detalhes": []
 }
