@@ -31,10 +31,16 @@ test('AF Fastlane mantém lock global, 2M simulações e reconciliação complet
   assert.match(yml, /gh workflow run atualizar-brasileirao\.yml --ref main/);
 });
 
-test('health e deploy expõem e validam AF Fastlane v1', async () => {
+test('health, Wrangler e package expõem a mesma versão 2.2.0', async () => {
   const index = await read('cloudflare/orchestrator-worker/src/index.js');
   const deploy = await read('.github/workflows/deploy-orchestrator-worker.yml');
+  const wrangler = await read('cloudflare/orchestrator-worker/wrangler.template.jsonc');
+  const pkg = JSON.parse(await read('cloudflare/orchestrator-worker/package.json'));
+
   assert.match(index, /version: String\(env\.ORCHESTRATOR_VERSION \|\| '2\.2\.0'\)/);
+  assert.match(wrangler, /"ORCHESTRATOR_VERSION":\s*"2\.2\.0"/);
+  assert.equal(pkg.version, '2.2.0');
+
   assert.match(index, /afPostFinalFastlane:\s*true/);
   assert.match(index, /afPostFinalFastlaneVersion:\s*1/);
   assert.match(deploy, /p\.afPostFinalFastlane === true/);
