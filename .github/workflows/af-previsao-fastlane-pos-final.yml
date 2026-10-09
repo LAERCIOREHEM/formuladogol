@@ -1,0 +1,297 @@
+name: AF-Previsão Fastlane pós-FINAL
+run-name: AF Fastlane · ${{ inputs.event_id || 'FINAL detectado' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      event_id:
+        description: 'ESPN event_id que motivou o FINAL; vazio é permitido em recuperação'
+        required: false
+        default: ''
+        type: string
+      origem:
+        description: 'Origem operacional do disparo'
+        required: false
+        default: 'manual'
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+# Mesmo lock dos demais writers. O Fastlane não concorre com outro commit no main.
+concurrency:
+  group: repo-write-main
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  fastlane:
+    name: ESPN canônica → AF → publicação rápida
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: requirements-af-previsao.txt
+
+      - name: Dependências do AF
+        run: python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
+
+      - name: Validar somente o caminho crítico
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile \
+            atualizar_espn.py \
+            fontes_brasileirao.py \
+            scripts/gerar_agenda_clubes_brasileirao.py \
+            scripts/af_previsao_continental.py \
+            scripts/gerar_probabilidades_jogos.py \
+            scripts/gerar_probabilidades_brasileirao.py \
+            scripts/reconciliar_af_continental.py
+          python atualizar_espn.py --selftest
+          python scripts/gerar_agenda_clubes_brasileirao.py --self-test
+          python scripts/af_previsao_continental.py --self-test
+          python scripts/gerar_probabilidades_brasileirao.py --self-test
+          python scripts/gerar_probabilidades_jogos.py --self-test
+
+      - name: Snapshot anterior
+        id: before
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+
+          def load(path):
+              return json.loads(Path(path).read_text(encoding='utf-8'))
+
+          r = load('resultados.json')
+          p = load('dados-br/probabilidades-brasileirao.json')
+          print(f"resultados={int(r.get('total_resultados') or len(r.get('resultados') or []))}")
+          print(f"hash_af={p.get('hash_entrada','')}")
+          print(f"referencia_af={p.get('referencia_esportiva_em','')}")
+          PY
+
+      - name: Atualizar somente a base canônica ESPN
+        id: espn
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          API_FOOTBALL_LEAGUE_ID: ${{ secrets.API_FOOTBALL_LEAGUE_ID }}
+        run: python atualizar_espn.py
+
+      - name: Fail closed se a base não sincronizou
+        if: steps.espn.outputs.sincronizado != 'true'
+        shell: bash
+        run: |
+          echo "::error title=AF Fastlane preservado::A ESPN não entregou uma transação canônica sincronizada. Nenhum AF rápido será publicado."
+          echo "motivo=${{ steps.espn.outputs.motivo }}"
+          exit 1
+
+      - name: Atualizar agenda mínima para fechar o gatilho do FINAL
+        run: python scripts/gerar_agenda_clubes_brasileirao.py
+
+      - name: Detectar FINAL material novo
+        id: delta
+        shell: bash
+        env:
+          BEFORE_RESULTS: ${{ steps.before.outputs.resultados }}
+        run: |
+          set -euo pipefail
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          from pathlib import Path
+          r=json.loads(Path('resultados.json').read_text(encoding='utf-8'))
+          after=int(r.get('total_resultados') or len(r.get('resultados') or []))
+          before=int(os.environ.get('BEFORE_RESULTS') or 0)
+          print(f"before={before}")
+          print(f"after={after}")
+          print(f"new_final={'true' if after > before else 'false'}")
+          PY
+
+      - name: Recalcular AF imediatamente
+        id: af
+        if: steps.delta.outputs.new_final == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          # O reconciliador valida os três snapshots continentais e a auditoria
+          # antes de permitir o novo AF. Se houver contradição, falha fechado.
+          python scripts/reconciliar_af_continental.py --force --max-attempts 2
+
+      - name: Validar atomicidade esportiva
+        if: steps.delta.outputs.new_final == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from datetime import datetime
+          from pathlib import Path
+
+          def load(path):
+              return json.loads(Path(path).read_text(encoding='utf-8'))
+
+          resultados = load('resultados.json')
+          probs = load('dados-br/probabilidades-brasileirao.json')
+          audit = load('dados-br/auditoria-probabilidades.json')
+
+          total = int(resultados.get('total_resultados') or len(resultados.get('resultados') or []))
+          base = int((probs.get('base_corrente') or {}).get('partidas_concluidas') or -1)
+          if base != total:
+              raise SystemExit(f'AF inconsistente: base_corrente={base}, resultados={total}')
+
+          if probs.get('status') != 'ok':
+              raise SystemExit('AF novo sem status=ok')
+          if int((probs.get('simulacao') or {}).get('quantidade') or 0) != 2_000_000:
+              raise SystemExit('AF Fastlane não usou 2.000.000 simulações')
+          if audit.get('status') != 'ok':
+              raise SystemExit('auditoria-probabilidades não confirmou status=ok')
+
+          finals = [
+              str(x.get('finalizado_em') or '') for x in resultados.get('resultados') or []
+              if str(x.get('estado') or '').lower() == 'post' and x.get('finalizado_em')
+          ]
+          latest_final = max(finals) if finals else ''
+          ref = str(probs.get('referencia_esportiva_em') or '')
+          if latest_final and ref and datetime.fromisoformat(ref) < datetime.fromisoformat(latest_final):
+              raise SystemExit(f'AF atrasado: referencia={ref} < final={latest_final}')
+
+          print(f'Atomicidade OK: {total} concluídos; referência={ref}; simulações=2.000.000.')
+          PY
+
+      - name: Preparar artefatos atômicos
+        id: material
+        if: steps.delta.outputs.new_final == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILES=(
+            tabela.json
+            espn_eventos.json
+            jogos.json
+            resultados.json
+            dados-br/agenda-clubes-br.json
+            dados-br/probabilidades-brasileirao.json
+            dados-br/probabilidades-por-pontuacao.json
+            dados-br/probabilidades-jogos.json
+            dados-br/auditoria-probabilidades-jogos.json
+            dados-br/probabilidades-bolao.json
+            dados-br/auditoria-probabilidades.json
+            dados-br/historico-probabilidades.json
+            dados-br/avaliacao-af-previsao.json
+          )
+          EXISTING=()
+          for f in "${FILES[@]}"; do [[ -e "$f" ]] && EXISTING+=("$f"); done
+          if [[ -z "$(git status --porcelain -- "${EXISTING[@]}")" ]]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publicar transação rápida no main
+        id: publish
+        if: steps.delta.outputs.new_final == 'true' && steps.material.outputs.changed == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "published=false" >> "$GITHUB_OUTPUT"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          FILES=(
+            tabela.json
+            espn_eventos.json
+            jogos.json
+            resultados.json
+            dados-br/agenda-clubes-br.json
+            dados-br/probabilidades-brasileirao.json
+            dados-br/probabilidades-por-pontuacao.json
+            dados-br/probabilidades-jogos.json
+            dados-br/auditoria-probabilidades-jogos.json
+            dados-br/probabilidades-bolao.json
+            dados-br/auditoria-probabilidades.json
+            dados-br/historico-probabilidades.json
+            dados-br/avaliacao-af-previsao.json
+          )
+          EXISTING=()
+          for f in "${FILES[@]}"; do [[ -e "$f" ]] && EXISTING+=("$f"); done
+
+          TMP_DIR="$(mktemp -d)"
+          for f in "${EXISTING[@]}"; do
+            mkdir -p "$TMP_DIR/$(dirname "$f")"
+            cp -a "$f" "$TMP_DIR/$f"
+          done
+
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            for f in "${EXISTING[@]}"; do
+              rm -rf "$f"
+              mkdir -p "$(dirname "$f")"
+              cp -a "$TMP_DIR/$f" "$f"
+            done
+
+            if [[ -z "$(git status --porcelain -- "${EXISTING[@]}")" ]]; then
+              echo "Outro writer já publicou exatamente o mesmo estado."
+              exit 0
+            fi
+
+            git add -- "${EXISTING[@]}"
+            git commit -m "AF Fastlane pós-FINAL - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+            if git push origin HEAD:main; then
+              echo "published=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "ERRO: push do AF Fastlane falhou após 5 tentativas."
+          exit 1
+
+      - name: Disparar deploy imediato
+        if: steps.publish.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main
+
+      - name: Enfileirar reconciliação completa fora do caminho crítico
+        if: steps.publish.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run atualizar-brasileirao.yml --ref main
+          echo "Workflow completo enfileirado; estatísticas, líderes, auditorias e demais derivados continuam fora do caminho crítico do AF."
+
+      - name: Resumo
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## AF-Previsão Fastlane pós-FINAL"
+            echo ""
+            echo "- Evento gatilho: \`${{ inputs.event_id || 'não informado' }}\`"
+            echo "- Origem: \`${{ inputs.origem || 'manual' }}\`"
+            echo "- Concluídos antes: \`${{ steps.before.outputs.resultados || '?' }}\`"
+            echo "- Concluídos depois: \`${{ steps.delta.outputs.after || '?' }}\`"
+            echo "- FINAL material novo: \`${{ steps.delta.outputs.new_final || 'false' }}\`"
+            echo "- Publicado: \`${{ steps.publish.outputs.published || 'false' }}\`"
+            echo ""
+            echo "Contrato: o Fastlane publica somente base ESPN canônica + AF auditado. O workflow completo é enfileirado depois e não bloqueia a primeira publicação das probabilidades."
+          } >> "$GITHUB_STEP_SUMMARY"

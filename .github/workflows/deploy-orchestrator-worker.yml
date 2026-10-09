@@ -8,6 +8,8 @@ on:
       - 'cloudflare/orchestrator-worker/**'
       - 'scripts/orquestrar_workflows.py'
       - '.github/workflows/orquestrador-inteligente.yml'
+      - '.github/workflows/af-previsao-fastlane-pos-final.yml'
+      - '.github/workflows/atualizar-brasileirao.yml'
       - '.github/workflows/atualizar-publicos-brasileirao.yml'
       - '.github/workflows/auditar-transmissoes-ia.yml'
       - '.github/workflows/buscar-transmissoes-aovivo-brasileirao.yml'
@@ -21,9 +23,7 @@ on:
         required: true
         default: "shadow"
         type: choice
-        options:
-          - shadow
-          - active
+        options: [shadow, active]
 
 permissions:
   contents: read
@@ -92,21 +92,15 @@ jobs:
           FP="$(python3 - <<'PY'
           import sys
           from pathlib import Path
-
           root = Path.cwd().resolve().parents[1]
           sys.path.insert(0, str(root / 'scripts'))
           from orquestrar_workflows import editorial_continental_guard_fingerprint
-
           print(editorial_continental_guard_fingerprint())
           PY
           )"
           [[ "$FP" =~ ^[0-9a-f]{64}$ ]] || { echo 'ERRO: fingerprint continental inválido.'; exit 1; }
           echo "FDG_CONTINENTAL_GUARD_FINGERPRINT=$FP" >> "$GITHUB_ENV"
-          echo "Governança continental: ${FP:0:12}…"
 
-      # Primeiro publica SHADOW em qualquer situação. Assim uma primeira
-      # instalação jamais consegue disparar Actions antes de o secret GitHub
-      # estar gravado no Worker.
       - name: Renderizar configuração segura SHADOW
         env:
           FDG_ORCHESTRATOR_MODE: shadow
@@ -147,6 +141,7 @@ jobs:
           const ok =
             p.ok === true &&
             p.service === 'formula-do-gol-orchestrator' &&
+            p.version === '2.2.0' &&
             p.mode === expectedMode &&
             p.cron === '*/5 * * * *' &&
             p.liveBrowserUntouched === true &&
@@ -175,18 +170,22 @@ jobs:
             p.continentalEditorialSingleAuthority === true &&
             p.continentalHighlightsIndependent === true &&
             p.brasileiraoSourceCircuitBreaker === true &&
-            p.espnScoreboardGateway === true;
+            p.espnScoreboardGateway === true &&
+            p.afPostFinalFastlane === true &&
+            p.afPostFinalFastlaneVersion === 1 &&
+            p.afPostFinalFastlaneWorkflow === 'af-previsao-fastlane-pos-final.yml' &&
+            p.afPostFinalFullReconciliationQueued === true;
           process.exit(ok ? 0 : 1);
           NODE
             then
-              echo "Health OK em modo $EXPECTED."
+              echo "Health OK em modo $EXPECTED; AF Fastlane v1 confirmado."
               printf '%s\n' "$BODY"
               exit 0
             fi
             echo "Tentativa $i/20: health ainda não refletiu o contrato esperado."
             sleep 6
           done
-          echo "ERRO: health não confirmou modo $EXPECTED e contrato Fastlane em $URL"
+          echo "ERRO: health não confirmou modo $EXPECTED e contrato AF Fastlane v1 em $URL"
           curl -fsS --max-time 10 "$URL" || true
           echo
           exit 1
@@ -211,14 +210,9 @@ jobs:
             echo ''
             echo "- **Modo:** \`${REQUESTED_MODE}\`"
             echo '- **Worker:** `formula-do-gol-orchestrator`'
-            echo '- **Cron:** `*/5 * * * *` (5 minutos; apenas decisão, sem Action quando não há trabalho)'
-            echo '- **Estado:** Durable Object SQLite `OrchestratorState`'
+            echo '- **Versão:** `2.2.0`'
+            echo '- **AF pós-FINAL:** `Fastlane v1`'
+            echo '- **Cron:** `*/5 * * * *`'
             echo '- **Health:** https://orchestrator.formuladogol.com.br/health'
             echo '- **Status:** https://orchestrator.formuladogol.com.br/status'
-            echo ''
-            if [[ "${REQUESTED_MODE}" == 'shadow' ]]; then
-              echo '**Não desative o cron-job.org ainda.** Valide decisões em SHADOW primeiro.'
-            else
-              echo '**ACTIVE confirmado.** Após validar uma decisão real correta, desative o cron-job.org.'
-            fi
           } >> "$GITHUB_STEP_SUMMARY"
