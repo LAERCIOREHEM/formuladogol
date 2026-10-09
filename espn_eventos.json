@@ -1,8 +1,7 @@
 {
-  "atualizado_em": "2026-10-08T23:31:13.740307-03:00",
+  "atualizado_em": "2026-10-08T23:48:38.574733-03:00",
   "fonte": "ESPN",
   "fontes_complementares": [
-    "ESPN summary",
     "override manual"
   ],
   "fallbacks_resultado": [
@@ -23,42 +22,6 @@
       "fonte": "override manual",
       "origem": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial."
-    },
-    {
-      "event_id": "401841251",
-      "rodada": 29,
-      "jogo": "Santos x Flamengo",
-      "placar": "2 x 2",
-      "fonte": "ESPN summary",
-      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841251",
-      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
-    },
-    {
-      "event_id": "401841256",
-      "rodada": 29,
-      "jogo": "Athletico-PR x Atlético-MG",
-      "placar": "2 x 2",
-      "fonte": "ESPN summary",
-      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841256",
-      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
-    },
-    {
-      "event_id": "401841248",
-      "rodada": 29,
-      "jogo": "Fluminense x Coritiba",
-      "placar": "4 x 0",
-      "fonte": "ESPN summary",
-      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841248",
-      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
-    },
-    {
-      "event_id": "401841254",
-      "rodada": 29,
-      "jogo": "Palmeiras x Bahia",
-      "placar": "1 x 0",
-      "fonte": "ESPN summary",
-      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841254",
-      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
     }
   ],
   "total": 370,
@@ -8365,7 +8328,7 @@
       "visitante": "Flamengo",
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "transmissao": "",
-      "status": "FT",
+      "status": "90'+15'",
       "estado": "post",
       "concluido": true,
       "placar_mandante": 2,
@@ -8381,9 +8344,9 @@
       "motivo_ajuste": "",
       "resultado_manual": false,
       "resultado_fallback": false,
-      "fonte_resultado": "ESPN summary",
-      "origem_resultado": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841251",
-      "motivo_fallback": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN.",
+      "fonte_resultado": "ESPN",
+      "origem_resultado": "",
+      "motivo_fallback": "",
       "motivo_resultado_manual": ""
     },
     {
@@ -8394,7 +8357,7 @@
       "visitante": "Atlético-MG",
       "estadio": "Arena da Baixada",
       "transmissao": "",
-      "status": "FT",
+      "status": "90'+10'",
       "estado": "post",
       "concluido": true,
       "placar_mandante": 2,
@@ -8410,9 +8373,9 @@
       "motivo_ajuste": "",
       "resultado_manual": false,
       "resultado_fallback": false,
-      "fonte_resultado": "ESPN summary",
-      "origem_resultado": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841256",
-      "motivo_fallback": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN.",
+      "fonte_resultado": "ESPN",
+      "origem_resultado": "",
+      "motivo_fallback": "",
       "motivo_resultado_manual": ""
     },
     {
@@ -8423,7 +8386,7 @@
       "visitante": "Coritiba",
       "estadio": "Estadio do Maracana",
       "transmissao": "",
-      "status": "FT",
+      "status": "90'+5'",
       "estado": "post",
       "concluido": true,
       "placar_mandante": 4,
@@ -8439,9 +8402,9 @@
       "motivo_ajuste": "",
       "resultado_manual": false,
       "resultado_fallback": false,
-      "fonte_resultado": "ESPN summary",
-      "origem_resultado": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841248",
-      "motivo_fallback": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN.",
+      "fonte_resultado": "ESPN",
+      "origem_resultado": "",
+      "motivo_fallback": "",
       "motivo_resultado_manual": ""
     },
     {
@@ -8452,7 +8415,7 @@
       "visitante": "Bahia",
       "estadio": "Allianz Parque",
       "transmissao": "",
-      "status": "FT",
+      "status": "90'+5'",
       "estado": "post",
       "concluido": true,
       "placar_mandante": 1,
@@ -8468,9 +8431,9 @@
       "motivo_ajuste": "",
       "resultado_manual": false,
       "resultado_fallback": false,
-      "fonte_resultado": "ESPN summary",
-      "origem_resultado": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841254",
-      "motivo_fallback": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN.",
+      "fonte_resultado": "ESPN",
+      "origem_resultado": "",
+      "motivo_fallback": "",
       "motivo_resultado_manual": ""
     },
     {

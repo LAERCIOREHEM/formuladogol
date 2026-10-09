@@ -1,15 +1,1104 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-08T22:55:54.085908-03:00",
+  "gerado_em": "2026-10-08T23:49:01.942229-03:00",
   "fonte": "ESPN summary + scoreboard",
-  "total_jogos": 287,
-  "total_com_estatisticas": 287,
+  "total_jogos": 289,
+  "total_com_estatisticas": 289,
   "total_com_publico": 287,
-  "total_com_eventos": 287,
-  "total_com_jogadores": 287,
-  "total_eventos_validados": 287,
+  "total_com_eventos": 289,
+  "total_com_jogadores": 289,
+  "total_eventos_validados": 289,
   "total_eventos_pendentes_detalhes": 0,
   "jogos": {
+    "401841248": {
+      "event_id": "401841248",
+      "event_id_fonte_detalhes": "401841248",
+      "rodada": 29,
+      "data_iso": "2026-10-08T21:30",
+      "mandante": "Fluminense",
+      "visitante": "Coritiba",
+      "placar_mandante": 4,
+      "placar_visitante": 0,
+      "estadio": "Estadio do Maracana",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "68.3%",
+          "away": "31.7%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "22",
+          "away": "8"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "10",
+          "away": "0"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "0%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "8"
+        },
+        {
+          "nome": "Defesas",
+          "home": "0",
+          "away": "6"
+        },
+        {
+          "nome": "Passes",
+          "home": "867",
+          "away": "395"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "809",
+          "away": "340"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "6",
+          "away": "6"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "7",
+          "away": "4"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "5",
+          "away": "9"
+        },
+        {
+          "nome": "Cortes",
+          "home": "12",
+          "away": "25"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "1"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "68.3%",
+          "away": "31.7%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "22",
+          "away": "8"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "10",
+          "away": "0"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "0%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "8"
+        },
+        {
+          "nome": "Defesas",
+          "home": "0",
+          "away": "6"
+        },
+        {
+          "nome": "Passes",
+          "home": "867",
+          "away": "395"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "809",
+          "away": "340"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "6",
+          "away": "6"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "7",
+          "away": "4"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "5",
+          "away": "9"
+        },
+        {
+          "nome": "Cortes",
+          "home": "12",
+          "away": "25"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "1"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "30'",
+          "jogador": "Jefferson Savarino",
+          "time": "Fluminense",
+          "assistencias": [
+            "Hulk"
+          ],
+          "descricao": "Goal 70 Goal! Fluminense 1, Coritiba 0. Jefferson Savarino (Fluminense) right footed shot from the right side of the box to the top right corner. Assisted by Hulk with a cross following a corner. Jefferson Savarino Goal"
+        },
+        {
+          "minuto": "49'",
+          "jogador": "Jefferson Savarino",
+          "time": "Fluminense",
+          "assistencias": [
+            "Thiago Silva"
+          ],
+          "descricao": "Goal 70 Goal! Fluminense 2, Coritiba 0. Jefferson Savarino (Fluminense) right footed shot from outside the box to the top right corner. Assisted by Thiago Silva following a corner. Jefferson Savarino Goal"
+        },
+        {
+          "minuto": "65'",
+          "jogador": "Jefferson Savarino",
+          "time": "Fluminense",
+          "assistencias": [
+            "Kevin Serna"
+          ],
+          "descricao": "Goal 70 Goal! Fluminense 3, Coritiba 0. Jefferson Savarino (Fluminense) left footed shot from the centre of the box to the bottom left corner. Assisted by Kevin Serna. Jefferson Savarino Goal"
+        },
+        {
+          "minuto": "90'+3'",
+          "jogador": "Luciano Acosta",
+          "time": "Fluminense",
+          "assistencias": [
+            "Wesley Natã"
+          ],
+          "descricao": "Goal 70 Goal! Fluminense 4, Coritiba 0. Lucho Acosta (Fluminense) left footed shot from the centre of the box to the centre of the goal. Assisted by Wesley Natã following a fast break. Luciano Acosta Goal"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "86'",
+          "jogador": "Bruno Melo",
+          "time": "Coritiba",
+          "descricao": "Yellow Card 94 Bruno Melo (Coritiba) is shown the yellow card for a bad foul. Bruno Melo Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "236324",
+          "nome": "Breno",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "243831",
+          "nome": "Bruno Melo",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "242711",
+          "nome": "Fabricio Bustos",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "272437",
+          "nome": "Felipe Jonatan",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "256018",
+          "nome": "Jacy Maranhão",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "150215",
+          "nome": "Josué Pesqueira",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "276240",
+          "nome": "Nicolás Fonseca",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "311037",
+          "nome": "Pedro Rangel",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "216846",
+          "nome": "Pedro Rocha",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "128368",
+          "nome": "Sebastián Gómez",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "188143",
+          "nome": "Thiago Santos",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "295072",
+          "nome": "Fabinho",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "417356",
+          "nome": "Paulo Roberto",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "155268",
+          "nome": "Rodrigo Moledo",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "200826",
+          "nome": "Tinga",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "316781",
+          "nome": "Vini Paulista",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "158382",
+          "nome": "Fábio",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "175902",
+          "nome": "Ganso",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "271557",
+          "nome": "Guga",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "207269",
+          "nome": "Guilherme Arana",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "336622",
+          "nome": "Hércules",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "124068",
+          "nome": "Hulk",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "177219",
+          "nome": "Jefferson Savarino",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "235941",
+          "nome": "Julian Millan",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "287633",
+          "nome": "Kevin Serna",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "307946",
+          "nome": "Martinelli",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "96254",
+          "nome": "Thiago Silva",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "199958",
+          "nome": "Luciano Acosta",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "201547",
+          "nome": "Otávio",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "116395",
+          "nome": "Rodrigo Castillo",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "146162",
+          "nome": "Samuel Xavier",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "403159",
+          "nome": "Wesley Natã",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Fluminense": 4,
+          "Coritiba": 0
+        },
+        "gols_extraidos": {
+          "Fluminense": 4,
+          "Coritiba": 0
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Fluminense": {
+            "amarelo": 0,
+            "vermelho": 0
+          },
+          "Coritiba": {
+            "amarelo": 1,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Fluminense": {
+            "amarelo": 0,
+            "vermelho": 0
+          },
+          "Coritiba": {
+            "amarelo": 1,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-10-08T23:48:41.320594-03:00"
+    },
+    "401841254": {
+      "event_id": "401841254",
+      "event_id_fonte_detalhes": "401841254",
+      "rodada": 29,
+      "data_iso": "2026-10-08T21:30",
+      "mandante": "Palmeiras",
+      "visitante": "Bahia",
+      "placar_mandante": 1,
+      "placar_visitante": 0,
+      "estadio": "Allianz Parque",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "40.8%",
+          "away": "59.2%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "26",
+          "away": "10"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "11",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "5"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "10%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "12"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "10"
+        },
+        {
+          "nome": "Passes",
+          "home": "363",
+          "away": "543"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "301",
+          "away": "489"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "14",
+          "away": "10"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "7",
+          "away": "5"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "9",
+          "away": "15"
+        },
+        {
+          "nome": "Cortes",
+          "home": "16",
+          "away": "24"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "7",
+          "away": "3"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "1"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "40.8%",
+          "away": "59.2%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "26",
+          "away": "10"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "11",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "5"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "10%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "12"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "10"
+        },
+        {
+          "nome": "Passes",
+          "home": "363",
+          "away": "543"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "301",
+          "away": "489"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "14",
+          "away": "10"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "7",
+          "away": "5"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "9",
+          "away": "15"
+        },
+        {
+          "nome": "Cortes",
+          "home": "16",
+          "away": "24"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "7",
+          "away": "3"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "1"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "7'",
+          "jogador": "José Manuel López",
+          "time": "Palmeiras",
+          "assistencias": [
+            "Alexander Barboza"
+          ],
+          "descricao": "Goal - Header 137 Goal! Palmeiras 1, Bahia 0. José Manuel López (Palmeiras) header from very close range to the high centre of the goal. Assisted by Alexander Barboza with a headed pass following a corner. José Manuel López Goal - Header"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "61'",
+          "jogador": "Nicolás Acevedo",
+          "time": "Bahia",
+          "descricao": "Yellow Card 94 Nicolás Acevedo (Bahia) is shown the yellow card for a bad foul. Nicolás Acevedo Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "64'",
+          "jogador": "Khellven",
+          "time": "Palmeiras",
+          "descricao": "Yellow Card 94 Khellven (Palmeiras) is shown the yellow card for a bad foul. Khellven Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "87'",
+          "jogador": "Jean Lucas",
+          "time": "Bahia",
+          "descricao": "Yellow Card 94 Jean Lucas (Bahia) is shown the yellow card for a bad foul. Jean Lucas Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "318291",
+          "nome": "Alejo Veliz",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "124439",
+          "nome": "Cristian Olivera",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "219090",
+          "nome": "David Duarte",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "333907",
+          "nome": "Erick Pulga",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "269910",
+          "nome": "Jean Lucas",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "252973",
+          "nome": "Kanu",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "304757",
+          "nome": "Luciano Juba",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "285757",
+          "nome": "Nicolás Acevedo",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "266664",
+          "nome": "Rodrigo Nestor",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "381149",
+          "nome": "Román Gómez",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "224106",
+          "nome": "Ronaldo",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "269675",
+          "nome": "Ademir",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "299932",
+          "nome": "Caio Alexandre",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "253796",
+          "nome": "Erick",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "335673",
+          "nome": "Mateo Sanabria",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "198360",
+          "nome": "Willian José",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "222631",
+          "nome": "Alexander Barboza",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "210143",
+          "nome": "Andreas Pereira",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "382965",
+          "nome": "Arthur Gabriel",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "276741",
+          "nome": "Carlos Miguel",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "118395",
+          "nome": "Gustavo Gómez",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "311743",
+          "nome": "José Manuel López",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "288669",
+          "nome": "Khellven",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "186776",
+          "nome": "Lucas Evangelista",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "234016",
+          "nome": "Marlon Freitas",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "252609",
+          "nome": "Murilo",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "329383",
+          "nome": "Vitor Roque",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "152812",
+          "nome": "Felipe Anderson",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "239566",
+          "nome": "Jhon Arias",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "301653",
+          "nome": "Ramón Sosa",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Palmeiras": 1,
+          "Bahia": 0
+        },
+        "gols_extraidos": {
+          "Palmeiras": 1,
+          "Bahia": 0
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Palmeiras": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Bahia": {
+            "amarelo": 2,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Palmeiras": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Bahia": {
+            "amarelo": 2,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-10-08T23:48:43.554207-03:00"
+    },
     "401841256": {
       "event_id": "401841256",
       "event_id_fonte_detalhes": "401841256",
@@ -577,7 +1666,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:36:19.224742-03:00",
+      "atualizado_em": "2026-10-08T23:48:45.916472-03:00",
       "renda": 962380
     },
     "401841251": {
@@ -1187,7 +2276,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:36:21.680209-03:00",
+      "atualizado_em": "2026-10-08T23:48:48.147016-03:00",
       "renda": 569905
     },
     "401841249": {
@@ -1741,7 +2830,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:36:23.893391-03:00",
+      "atualizado_em": "2026-10-08T23:48:50.421583-03:00",
       "renda": 773013
     },
     "401841257": {
@@ -2290,7 +3379,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:36:26.424893-03:00",
+      "atualizado_em": "2026-10-08T23:48:52.776142-03:00",
       "publico_pagante": 22071,
       "renda": 801180
     },
@@ -2877,7 +3966,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:36:29.028070-03:00",
+      "atualizado_em": "2026-10-08T23:48:55.020988-03:00",
       "publico_pagante": 13773,
       "renda": 285132
     },
@@ -3485,7 +4574,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:36:31.306589-03:00",
+      "atualizado_em": "2026-10-08T23:48:57.193324-03:00",
       "renda": 820972.5
     },
     "401841253": {
@@ -4019,7 +5108,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:36:33.651975-03:00",
+      "atualizado_em": "2026-10-08T23:48:59.648701-03:00",
       "publico_pagante": 2340,
       "renda": 54630
     },
@@ -4596,7 +5685,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:36:35.921172-03:00",
+      "atualizado_em": "2026-10-08T23:49:01.857596-03:00",
       "renda": 537018
     },
     "401841168": {
@@ -162115,7 +163204,5 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  },
-  "total_com_publico_pagante": 270,
-  "total_com_renda": 287
+  }
 }
