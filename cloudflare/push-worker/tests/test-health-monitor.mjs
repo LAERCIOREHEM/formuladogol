@@ -81,22 +81,27 @@ assert.match(hunterText,/não existe GAVE_UP/);
 assert.match(hunterText,/US\$ 1\.8400 \/ US\$ 10\.00/);
 
 
-// R10R16.1 — quatro indicadores reais; RAG READY não significa runtime ativo.
+// R10R17 — cinco indicadores: RAG runtime e MCP são comprovados, não inferidos.
 const ri=reliabilityIntelligenceIndicators({
   orchestratorHealth:{sportingSnapshotIntegrityGuard:true,sportingSnapshotIntegrityGuardVersion:1,reliabilityControlPlane:true,reliabilityDiagnosticArtifact:true,reliabilityIncidentRegressionSuite:true,reliabilityCorrelationId:true},
   orchestratorStatus:{reliabilityState:'CORE_GREEN'},
   factualAudit:{schema_version:2,total_criticos:0,total_avisos:0},
-  ragManifest:{schema_version:1,production_rag_enabled:false,collections:['a','b']}
+  ragManifest:{schema_version:2,production_rag_enabled:true,collections:['a','b']},
+  opsIntelligence:{rag:{ready:true,sourceCount:15,chunkCount:32},mcp:{enabled:true,readOnly:true,protocolVersion:'2026-07-28',tools:5,resources:2}}
 });
-assert.equal(ri.length,4);
-assert.deepEqual(ri.map(x=>x.severity),['green','green','green','green']);
-assert.match(ri[2].detail,/runtime OFF por política/);
+assert.equal(ri.length,5);
+assert.deepEqual(ri.map(x=>x.severity),['green','green','green','green','green']);
+assert.match(ri[2].detail,/zero IA por retrieval/);
+assert.match(ri[4].detail,/somente leitura/);
 const riBad=reliabilityIntelligenceIndicators({
   orchestratorHealth:{sportingSnapshotIntegrityGuard:true,sportingSnapshotIntegrityGuardVersion:1,reliabilityControlPlane:true,reliabilityDiagnosticArtifact:true,reliabilityIncidentRegressionSuite:true,reliabilityCorrelationId:true},
   orchestratorStatus:{reliabilityState:'CORE_GREEN'},
   factualAudit:{schema_version:2,total_criticos:1,total_avisos:0},
-  ragManifest:{schema_version:1,production_rag_enabled:false,collections:['a']}
+  ragManifest:{schema_version:2,production_rag_enabled:true,collections:['a']},
+  opsIntelligence:{rag:{ready:false,problems:['index_http_404']},mcp:{enabled:false,readOnly:true,protocolVersion:'2026-07-28'}}
 });
 assert.equal(riBad[1].severity,'red');
+assert.equal(riBad[2].severity,'yellow');
+assert.equal(riBad[4].severity,'yellow');
 
 console.log('health-monitor/ai-usage tests: PASS');

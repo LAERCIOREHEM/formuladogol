@@ -20,3 +20,13 @@ Princípio de arquitetura: **dados estruturados → regras determinísticas → 
 - `ENRICHMENT_PENDING`: core íntegro, mas público/renda, vídeo ou outro enriquecimento segue pendente.
 - `DEGRADED`: core preservado, porém fonte principal está degradada/preservada.
 - `CRITICAL`: integridade esportiva não foi provada; publicação deve falhar fechada.
+
+## Camada R10R17 — Ops Intelligence
+
+- `dados-br/ops-rag-index.json`: índice operacional determinístico derivado deste corpus.
+- `cloudflare/push-worker/src/ops-intelligence.js`: retrieval BM25 lexical, cache e contexto operacional.
+- `cloudflare/push-worker/src/ops-mcp.js`: gateway MCP `2026-07-28`, somente leitura, com compatibilidade stateless para clientes 2025.
+- Endpoint MCP: `https://push.formuladogol.com.br/mcp`.
+- O retrieval não chama Gemini/OpenAI nem busca web; o modelo do cliente MCP interpreta o contexto recuperado.
+- RAG/MCP são `fail-open` para o site: indisponibilidade dessa camada nunca bloqueia resultado, tabela, AF, pós-jogo ou editorial.
+- Fine Tuning permanece `not_used_by_design`.

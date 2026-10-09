@@ -151,7 +151,22 @@
     "knowledge_base": {
       "ativo": true,
       "diretorio": "docs/operations",
-      "rag_em_producao": false
+      "rag_em_producao": true,
+      "runtime": "fdg-ops-rag",
+      "runtime_version": 1,
+      "retrieval": "deterministic_bm25_lexical",
+      "critical_path": false
+    },
+    "ops_intelligence": {
+      "ativo": true,
+      "versao": 1,
+      "rag_runtime": true,
+      "mcp_ops": true,
+      "mcp_endpoint": "https://push.formuladogol.com.br/mcp",
+      "mcp_protocol_version": "2026-07-28",
+      "mcp_read_only": true,
+      "external_ai_per_retrieval": false,
+      "fine_tuning": "not_used_by_design"
     }
   }
 }

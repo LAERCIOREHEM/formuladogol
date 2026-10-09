@@ -1,5 +1,6 @@
 import { sendMail, mailConfig, maskAddress } from './mailer.js';
 import { aiUsageSummary, providerUsageSummary, postgamePublicCostSummary } from './ai-usage.js';
+import { OPS_INTELLIGENCE_CONSTANTS, opsIntelligenceStatus } from './ops-intelligence.js';
 
 const SITE = 'https://formuladogol.com.br';
 const ORCH = 'https://orchestrator.formuladogol.com.br';
@@ -12,7 +13,7 @@ const CF_WORKERS_CPU_INCLUDED_MS = 30_000_000;
 const CF_WORKERS_REQUESTS_INCLUDED = 10_000_000;
 const CF_CPU_OVERAGE_PER_MILLION_USD = 0.02;
 const CF_REQUEST_OVERAGE_PER_MILLION_USD = 0.30;
-const HEALTH_POLICY_VERSION = 9;
+const HEALTH_POLICY_VERSION = 10;
 
 function text(v) { return String(v ?? '').trim(); }
 function n(v) { const x = Number(v); return Number.isFinite(x) ? x : 0; }
@@ -158,7 +159,7 @@ async function cloudflareBillingSummary(env, now=Date.now()) {
 function indicator(id,label,severity,detail=''){ return {id,label,severity,detail}; }
 function worst(indicators){ return indicators.some(x=>x.severity==='red')?'red':indicators.some(x=>x.severity==='yellow')?'yellow':'green'; }
 
-export function reliabilityIntelligenceIndicators({orchestratorHealth={},orchestratorStatus={},reliabilitySnapshot={},factualAudit={},ragManifest={}}={}) {
+export function reliabilityIntelligenceIndicators({orchestratorHealth={},orchestratorStatus={},reliabilitySnapshot={},factualAudit={},ragManifest={},opsIntelligence={}}={}) {
   const reliabilityState=text(orchestratorStatus?.reliabilityState)||text(reliabilitySnapshot?.state);
   const sportingReady=orchestratorHealth?.sportingSnapshotIntegrityGuard===true && Number(orchestratorHealth?.sportingSnapshotIntegrityGuardVersion||0)>=1;
   let sportingSeverity='yellow';
@@ -176,10 +177,12 @@ export function reliabilityIntelligenceIndicators({orchestratorHealth={},orchest
     !factualKnown?'auditoria R10R16.1 indisponível':`${critical} crítico(s) · ${warnings} aviso(s) · field quarantine ativo`);
 
   const collections=Array.isArray(ragManifest?.collections)?ragManifest.collections.length:0;
-  const ragReady=Number(ragManifest?.schema_version||0)>=1 && collections>0;
+  const ragReady=Number(ragManifest?.schema_version||0)>=2 && collections>0;
   const ragRuntime=ragManifest?.production_rag_enabled===true;
-  const rag=indicator('rag-readiness','Knowledge Base / RAG Readiness',ragReady?'green':'yellow',
-    ragReady?`KB READY · ${collections} coleção(ões) · runtime ${ragRuntime?'ON':'OFF por política'}`:'manifesto/corpus RAG indisponível');
+  const runtimeReady=opsIntelligence?.rag?.ready===true && Number(opsIntelligence?.rag?.chunkCount||0)>0;
+  const ragSeverity=!ragReady||!ragRuntime?'red':runtimeReady?'green':'yellow';
+  const rag=indicator('rag-runtime','Knowledge Base / RAG Runtime',ragSeverity,
+    !ragReady?'manifesto/corpus RAG indisponível':!ragRuntime?'manifesto desativou runtime':runtimeReady?`ATIVO · ${n(opsIntelligence?.rag?.sourceCount)} fonte(s) · ${n(opsIntelligence?.rag?.chunkCount)} chunk(s) · zero IA por retrieval`:`runtime aquecendo/índice indisponível · ${(opsIntelligence?.rag?.problems||[]).join(', ')||'sem detalhe'}`);
 
   const controlFlags=[
     orchestratorHealth?.reliabilityControlPlane===true,
@@ -190,7 +193,10 @@ export function reliabilityIntelligenceIndicators({orchestratorHealth={},orchest
   const controlReady=controlFlags.every(Boolean);
   const control=indicator('ops-control-plane','Operational Diagnostics / Control Plane',controlReady?'green':'red',
     controlReady?'diagnóstico JSON + incident codes + correlation ID + regression suite ativos':'control plane incompleto');
-  return [sporting,factual,rag,control];
+  const mcpReady=opsIntelligence?.mcp?.enabled===true && opsIntelligence?.mcp?.readOnly===true && text(opsIntelligence?.mcp?.protocolVersion)===OPS_INTELLIGENCE_CONSTANTS.mcpProtocolVersion;
+  const mcp=indicator('mcp-ops','MCP Ops / Read-only Gateway',mcpReady?'green':'yellow',
+    mcpReady?`ATIVO · MCP ${text(opsIntelligence?.mcp?.protocolVersion)} · ${n(opsIntelligence?.mcp?.tools)} tools / ${n(opsIntelligence?.mcp?.resources)} resources · somente leitura`:'gateway MCP indisponível ou contrato read-only não comprovado');
+  return [sporting,factual,rag,control,mcp];
 }
 function icon(s){ return s==='red'?'🔴':s==='yellow'?'🟡':'🟢'; }
 function cloudflareSeverity(cf){
@@ -241,7 +247,7 @@ export function dailyDigestDecision(br,lastDate,{lastAttemptAt='',now=Date.now()
 export async function collectHealthSnapshot(env, monitor = null, now = Date.now(), force = false) {
   const previous = safeJson(await metaGet(env,'snapshot'),null);
   if (!force && previous && Number(previous.policyVersion) === HEALTH_POLICY_VERSION && now-(Date.parse(previous.at)||0)<SNAPSHOT_TTL_MS) return previous;
-  const [site, publicAudit, factualAuditResponse, ragManifestResponse, reliabilitySnapshotResponse, orchHealth, orchStatus, ai, providers, post, postRowsRaw, postCost, cfBilling] = await Promise.all([
+  const [site, publicAudit, factualAuditResponse, ragManifestResponse, reliabilitySnapshotResponse, orchHealth, orchStatus, ai, providers, post, postRowsRaw, postCost, cfBilling, opsIntelligence] = await Promise.all([
     fetchJson(`${text(env.SITE_BASE)||SITE}/`),
     fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/auditoria-publicos.json`),
     fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/auditoria-publicos-identidade.json`),
@@ -265,7 +271,8 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
       LEFT JOIN postgame_match_context c ON c.event_id=p.event_id
       WHERE p.public_status<>'resolved' ORDER BY p.final_at ASC LIMIT 20`).all(),
     postgamePublicCostSummary(env,now),
-    cloudflareBillingSummary(env,now)
+    cloudflareBillingSummary(env,now),
+    opsIntelligenceStatus(env)
   ]);
   const cfg=mailConfig(env);
   let probe=null;
@@ -307,7 +314,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   const factualAudit=factualAuditResponse?.ok&&factualAuditResponse?.body&&typeof factualAuditResponse.body==='object'?factualAuditResponse.body:{};
   const ragManifest=ragManifestResponse?.ok&&ragManifestResponse?.body&&typeof ragManifestResponse.body==='object'?ragManifestResponse.body:{};
   const reliabilitySnapshot=reliabilitySnapshotResponse?.ok&&reliabilitySnapshotResponse?.body&&typeof reliabilitySnapshotResponse.body==='object'?reliabilitySnapshotResponse.body:{};
-  const reliabilityIndicators=reliabilityIntelligenceIndicators({orchestratorHealth:orchHealth?.body||{},orchestratorStatus:os,reliabilitySnapshot,factualAudit,ragManifest});
+  const reliabilityIndicators=reliabilityIntelligenceIndicators({orchestratorHealth:orchHealth?.body||{},orchestratorStatus:os,reliabilitySnapshot,factualAudit,ragManifest,opsIntelligence});
   const seasonCoverage={
     finalizados:n(auditBody.total_jogos_finalizados),
     comPublico:n(auditBody.total_com_publico_ou_complemento),
@@ -352,7 +359,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     indicator('openai','IA / Custos',hunterBudgetPct>=100?'red':hunterBudgetPct>=warningPct?'yellow':!geminiReady||!workersAiReady||!gatewayAuthReady?'yellow':perEventAnomaly?'yellow':providerFailures>3?'yellow':'green',`${providers.calls} chamada(s) multi-provider · ${providers.searches} busca(s) web · Hunter ${fmtUsd(hunterMonthUsd)}/${fmtUsd(monthlyBudgetUsd)} (${fmtPct(hunterBudgetPct)}) · ${providerFailures} falha(s) /24h`),
     indicator('cloudflare','Cloudflare / CPU & Requests',cloudflareSeverity(cfBilling),cloudflareDetail(cfBilling)),
   ];
-  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY)),fineTuning:'not_used_by_design'},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches},reliabilityIntelligence:{sportingState:text(os.reliabilityState)||text(reliabilitySnapshot.state),factualAuditSchema:n(factualAudit.schema_version),factualCritical:n(factualAudit.total_criticos),factualWarnings:n(factualAudit.total_avisos),ragKnowledgeBaseReady:Number(ragManifest.schema_version||0)>=1&&Array.isArray(ragManifest.collections)&&ragManifest.collections.length>0,ragRuntimeEnabled:ragManifest.production_rag_enabled===true,mcpOpsEnabled:false,fineTuning:'not_used_by_design'},postgame:{pending:postPending,searching:postSearching,overdue:postOverdue,budgetGuard:postBudget,resolved:postResolved,seasonCoverage,highlightPending:highlight,persistentUntilResolved:true,pendingRows,cost:{...postCost,budget:{monthlyBudgetUsd,eventBudgetUsd,warningPct,monthPct:hunterBudgetPct}}},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
+  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY)),fineTuning:'not_used_by_design'},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches},reliabilityIntelligence:{sportingState:text(os.reliabilityState)||text(reliabilitySnapshot.state),factualAuditSchema:n(factualAudit.schema_version),factualCritical:n(factualAudit.total_criticos),factualWarnings:n(factualAudit.total_avisos),ragKnowledgeBaseReady:Number(ragManifest.schema_version||0)>=2&&Array.isArray(ragManifest.collections)&&ragManifest.collections.length>0,ragRuntimeEnabled:opsIntelligence?.rag?.ready===true,ragRuntimeVersion:n(opsIntelligence?.rag?.version),ragSourceCount:n(opsIntelligence?.rag?.sourceCount),ragChunkCount:n(opsIntelligence?.rag?.chunkCount),ragSourceSha256:text(opsIntelligence?.rag?.sourceSha256),mcpOpsEnabled:opsIntelligence?.mcp?.enabled===true,mcpOpsReadOnly:opsIntelligence?.mcp?.readOnly===true,mcpProtocolVersion:text(opsIntelligence?.mcp?.protocolVersion),mcpTools:n(opsIntelligence?.mcp?.tools),mcpResources:n(opsIntelligence?.mcp?.resources),fineTuning:'not_used_by_design'},postgame:{pending:postPending,searching:postSearching,overdue:postOverdue,budgetGuard:postBudget,resolved:postResolved,seasonCoverage,highlightPending:highlight,persistentUntilResolved:true,pendingRows,cost:{...postCost,budget:{monthlyBudgetUsd,eventBudgetUsd,warningPct,monthPct:hunterBudgetPct}}},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
   await metaPut(env,'snapshot',JSON.stringify(snapshot));
   return snapshot;
 }
@@ -421,8 +428,8 @@ function digestMessage(snapshot, now=Date.now()) {
     ...snapshot.indicators.map(x=>`${icon(x.severity)} ${x.label}: ${x.detail}`), '',
     'CONFIABILIDADE / INTELIGÊNCIA OPERACIONAL',
     `RAG Knowledge Base: ${snapshot.reliabilityIntelligence?.ragKnowledgeBaseReady?'READY':'INDISPONÍVEL'}`,
-    `RAG Runtime: ${snapshot.reliabilityIntelligence?.ragRuntimeEnabled?'ATIVO':'OFF por política — fora do caminho crítico'}`,
-    'MCP Ops: não implantado nesta execução (reservado para R10R17)',
+    `RAG Runtime: ${snapshot.reliabilityIntelligence?.ragRuntimeEnabled?`ATIVO · v${snapshot.reliabilityIntelligence?.ragRuntimeVersion||1} · ${snapshot.reliabilityIntelligence?.ragSourceCount||0} fontes / ${snapshot.reliabilityIntelligence?.ragChunkCount||0} chunks · zero IA por retrieval`:'INDISPONÍVEL'}`,
+    `MCP Ops: ${snapshot.reliabilityIntelligence?.mcpOpsEnabled?'ATIVO':'INDISPONÍVEL'} · ${snapshot.reliabilityIntelligence?.mcpOpsReadOnly?'somente leitura':'contrato não comprovado'} · protocolo ${snapshot.reliabilityIntelligence?.mcpProtocolVersion||'—'} · ${snapshot.reliabilityIntelligence?.mcpTools||0} tools`,
     'Fine Tuning: não utilizado por desenho', '',
     'ORQUESTRADOR', `Modo: ${snapshot.orchestrator.workloadMode||'—'}`, `Próximo jogo relevante: ${fmtDate(snapshot.orchestrator.nextRelevantMatchAt)}`,
     `Dispatches GitHub 24h: ${snapshot.orchestrator.githubDispatchesLast24h}`, '',

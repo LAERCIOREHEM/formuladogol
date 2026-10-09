@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "runtime": "fdg-ops-rag",
+  "runtime_version": 1,
+  "retrieval": "deterministic_bm25_lexical",
+  "authority": "diagnosis_and_context_only",
+  "source_sha256": "92cdf33f1030681f1098c44a8e63ef01ba79f118c8ebe249fcf8df0d72882b68",
+  "source_count": 15,
+  "chunk_count": 33,
+  "token_count": 1479,
+  "sources": [
+    "docs/operations/CONTRACTS.md",
+    "docs/operations/R10R16-ROLLBACK.md",
+    "docs/operations/README.md",
+    "docs/operations/incidents/FDG-INC-20261007-FALSE-RED-CARD.md",
+    "docs/operations/incidents/FDG-INC-20261007-WRONG-MATCH-ATTENDANCE.md",
+    "docs/operations/incidents/FDG-INC-20261008-AF-COVERAGE.md",
+    "docs/operations/incidents/FDG-INC-20261008-FINAL-REGRESSION.md",
+    "docs/operations/incidents/FDG-INC-20261008-MIGRATION-SLA.md",
+    "docs/operations/incidents/FDG-INC-20261008-VERSION-DRIFT.md",
+    "docs/operations/incidents/FDG-INC-20261009-EDITORIAL-CLOSURE.md",
+    "docs/operations/incidents/FDG-INC-20261009-PUBLIC-REVENUE-FIELD-COLLISION.md",
+    "docs/operations/incidents/FDG-INC-INDEX.md",
+    "docs/operations/runbooks/OPS-INTELLIGENCE-RAG-MCP.md",
+    "docs/operations/runbooks/POSTGAME-FACTUAL-INTEGRITY.md",
+    "docs/operations/runbooks/SPORTING-INTEGRITY.md"
+  ],
+  "chunks": [
+    {
+      "id": "100c923c3632a5c7",
+      "path": "docs/operations/CONTRACTS.md",
+      "heading": "Fonte única de verdade",
+      "scope": "operations",
+      "text": "O arquivo `cloudflare/orchestrator-worker/src/contract.js` é a autoridade de versão, cron, feature flags de health e SLOs do Orchestrator. O Wrangler usa `__ORCHESTRATOR_VERSION__` e recebe a versão do contrato no render. `package.json` permanece apenas como metadado e é validado contra o contrato antes do deploy.",
+      "token_count": 36
+    },
+    {
+      "id": "6b7dcce2e6cb51fa",
+      "path": "docs/operations/CONTRACTS.md",
+      "heading": "Sporting Snapshot Integrity Guard",
+      "scope": "operations",
+      "text": "A publicação exige simultaneamente:\n\n1. FINAL nunca pode regredir para `in/pre` no mesmo `event_id`. 2. Partida concluída não pode existir nas probabilidades pré-jogo. 3. concluídos + restantes = 380. 4. base corrente do AF = resultados concluídos. 5. calendário restante = probabilidades por jogo por identidade esportiva. 6. event_ids e confrontos sem duplicidade. 7. referência do AF não anterior ao último FINAL. 8. exatamente 2.000.000 simulações no AF publicado e auditado. 9. hashes de auditoria compatíveis com os artefatos publicados.\n\nQualquer violação falha fechada e gera `fdg-diagnostico*.json`.",
+      "token_count": 81
+    },
+    {
+      "id": "9005b3d3fc194aa4",
+      "path": "docs/operations/R10R16-ROLLBACK.md",
+      "heading": "R10R16 — rollback",
+      "scope": "operations",
+      "text": "Rollback deve ser feito por commit/revert dos arquivos da execução; não altere dados esportivos para mascarar falha.",
+      "token_count": 18
+    },
+    {
+      "id": "5163ccb7cf7c362e",
+      "path": "docs/operations/R10R16-ROLLBACK.md",
+      "heading": "Ordem segura",
+      "scope": "operations",
+      "text": "1. Reverter os arquivos R10R16 em um único commit. 2. Rodar **Deploy Orchestrator Worker** em `active` se o revert tocar `cloudflare/orchestrator-worker/**` ou `dados-br/config-orquestrador.json`. 3. Confirmar `/health` e `/status`. 4. Não executar `AF-Previsão Fastlane pós-FINAL` manualmente com dados antigos só para testar. 5. Se o problema estiver apenas no novo CI, reverta `.github/workflows/reliability-control-plane.yml` sem mexer nos dados esportivos.",
+      "token_count": 58
+    },
+    {
+      "id": "bdc6128b46730bb3",
+      "path": "docs/operations/R10R16-ROLLBACK.md",
+      "heading": "Não reverter",
+      "scope": "operations",
+      "text": "- Match Identity Gate de público/renda. - supressão de SLA de migração. - proteção de cartão vermelho falso. - FINAL monotônico. - AF de 2.000.000 simulações. - Editorial Closure Guarantee.",
+      "token_count": 25
+    },
+    {
+      "id": "c301a9d58cb3d726",
+      "path": "docs/operations/README.md",
+      "heading": "FDG Operations Knowledge Base",
+      "scope": "operations",
+      "text": "Base operacional criada na Execução R10R16. O objetivo é preservar contratos, incidentes e runbooks de forma indexável, sem colocar RAG no caminho crítico esportivo.\n\nPrincípio de arquitetura: **dados estruturados → regras determinísticas → validação → publicação**. IA pode descobrir, explicar e redigir; nunca é autoridade para placar, classificação, probabilidades, público/renda ou eventos esportivos.",
+      "token_count": 46
+    },
+    {
+      "id": "28e638d3f814e264",
+      "path": "docs/operations/README.md",
+      "heading": "Núcleo R10R16",
+      "scope": "operations",
+      "text": "- `cloudflare/orchestrator-worker/src/contract.js`: contrato canônico do Orchestrator. - `scripts/validar_snapshot_esportivo.py`: Sporting Snapshot Integrity Guard compartilhado por Fastlane e updater completo. - `scripts/validar_publicacao_brasileirao.py`: validação completa extraída do YAML. - `scripts/fdg_reliability.py`: códigos de incidente, diagnóstico e correlation ID. - `dados-br/estado-confiabilidade.json`: estado CORE/ENRICHMENT. - `dados-br/slo-confiabilidade.json`: observações mensuráveis de SLO quando houver novo FINAL. - `tests/incidents/`: regressões de incidentes reais.",
+      "token_count": 55
+    },
+    {
+      "id": "b0df8116e87284e0",
+      "path": "docs/operations/README.md",
+      "heading": "Estados",
+      "scope": "operations",
+      "text": "- `CORE_GREEN`: resultado/tabela/AF consistentes; sem degradação relevante. - `ENRICHMENT_PENDING`: core íntegro, mas público/renda, vídeo ou outro enriquecimento segue pendente. - `DEGRADED`: core preservado, porém fonte principal está degradada/preservada. - `CRITICAL`: integridade esportiva não foi provada; publicação deve falhar fechada.",
+      "token_count": 39
+    },
+    {
+      "id": "cba8f267bdd3d762",
+      "path": "docs/operations/README.md",
+      "heading": "Camada R10R17 — Ops Intelligence",
+      "scope": "operations",
+      "text": "- `dados-br/ops-rag-index.json`: índice operacional determinístico derivado deste corpus. - `cloudflare/push-worker/src/ops-intelligence.js`: retrieval BM25 lexical, cache e contexto operacional. - `cloudflare/push-worker/src/ops-mcp.js`: gateway MCP `2026-07-28`, somente leitura, com compatibilidade stateless para clientes 2025. - Endpoint MCP: `https://push.formuladogol.com.br/mcp`. - O retrieval não chama Gemini/OpenAI nem busca web; o modelo do cliente MCP interpreta o contexto recuperado. - RAG/MCP são `fail-open` para o site: indisponibilidade dessa camada nunca bloqueia resultado, tabela, AF, pós-jogo ou editorial. - Fine Tuning permanece `not_used_by_design`.",
+      "token_count": 74
+    },
+    {
+      "id": "de68e5937dfb774b",
+      "path": "docs/operations/incidents/FDG-INC-20261007-FALSE-RED-CARD.md",
+      "heading": "FDG-INC-20261007 — FALSE_RED_CARD",
+      "scope": "incidents",
+      "text": "**Sintoma:** push de cartão vermelho em partidas sem expulsão. **Regra:** evento disciplinar precisa satisfazer o guard específico e não pode ser inferido por texto ambíguo. A regressão permanece coberta pelos testes do Push Worker.",
+      "token_count": 31
+    },
+    {
+      "id": "1ffe1b3c7177d680",
+      "path": "docs/operations/incidents/FDG-INC-20261007-WRONG-MATCH-ATTENDANCE.md",
+      "heading": "FDG-INC-20261007 — SOURCE_IDENTITY_MISMATCH",
+      "scope": "incidents",
+      "text": "**Sintoma:** público/renda de outra partida foi associado ao evento correto. **Causa:** URL descoberta era aceita sem prova suficiente de identidade. **Regra:** IA descobre URLs; gravação exige abrir a fonte, Match Identity Gate e extração limitada ao contexto daquele confronto.",
+      "token_count": 38
+    },
+    {
+      "id": "6ccbe6b3137d295e",
+      "path": "docs/operations/incidents/FDG-INC-20261008-AF-COVERAGE.md",
+      "heading": "FDG-INC-20261008 — AF_COVERAGE_MISMATCH",
+      "scope": "incidents",
+      "text": "**Sintoma:** validação esperava jogos já FINAL entre partidas restantes. **Causa raiz:** regressão de estado esportivo; não erro matemático do AF. **Regra:** calendário restante e probabilidades pré-jogo devem ter exatamente o mesmo conjunto por identidade esportiva.",
+      "token_count": 33
+    },
+    {
+      "id": "0b58581815c6603a",
+      "path": "docs/operations/incidents/FDG-INC-20261008-FINAL-REGRESSION.md",
+      "heading": "FDG-INC-20261008 — FINAL_STATE_REGRESSION",
+      "scope": "incidents",
+      "text": "**Sintoma:** jogos já encerrados reapareceram como pendentes na cobertura pré-jogo. **Causa:** superfície atrasada do scoreboard substituía estado FINAL já confirmado. **Regra:** `post` é monotônico para o mesmo `event_id`; feed `pre/in` posterior é ignorado. **Teste:** `tests/incidents/test_reliability_incidents.py::test_final_state_regression_is_monotonic`.",
+      "token_count": 35
+    },
+    {
+      "id": "ab848557ebe4ca3d",
+      "path": "docs/operations/incidents/FDG-INC-20261008-MIGRATION-SLA.md",
+      "heading": "FDG-INC-20261008 — MIGRATION_SLA_FALSE_CRITICAL",
+      "scope": "incidents",
+      "text": "**Sintoma:** reabertura administrativa por migração apareceu como pendência esportiva antiga e disparou crítico imediato. **Regra:** reabertura administrativa recebe âncora própria de SLA; migration grace e `postgameAdministrativeReopenSlaAnchor` permanecem obrigatórios.",
+      "token_count": 26
+    },
+    {
+      "id": "924f74dc4dfa202b",
+      "path": "docs/operations/incidents/FDG-INC-20261008-VERSION-DRIFT.md",
+      "heading": "FDG-INC-20261008 — CONTRACT_VERSION_DRIFT",
+      "scope": "incidents",
+      "text": "**Sintoma:** Worker novo publicado, health ainda anunciava versão antiga. **Causa:** `ORCHESTRATOR_VERSION` no Wrangler sobrescrevia o fallback do código. **Regra:** `contract.js` é autoridade; Wrangler usa placeholder renderizado e o deploy bloqueia drift antes da publicação.",
+      "token_count": 30
+    },
+    {
+      "id": "4c5ebbbc71738e42",
+      "path": "docs/operations/incidents/FDG-INC-20261009-EDITORIAL-CLOSURE.md",
+      "heading": "FDG-INC-20261009 — EDITORIAL_CLOSURE_STARVATION",
+      "scope": "incidents",
+      "text": "**Sintoma:** rodada 29 fechada e com marco AF, porém editorial não foi publicado automaticamente. **Regra:** Editorial Closure Guarantee reavalia rodada elegível a cada cron, prioriza fechamento antes de enriquecimentos e respeita o writer global sem interrompê-lo.",
+      "token_count": 32
+    },
+    {
+      "id": "2aa58235f36ea4e9",
+      "path": "docs/operations/incidents/FDG-INC-20261009-PUBLIC-REVENUE-FIELD-COLLISION.md",
+      "heading": "Incidente",
+      "scope": "incidents",
+      "text": "Evento `401841248` — Fluminense 4 x 0 Coritiba, rodada 29.\n\nO snapshot de público/renda continha:\n\n- público presente: 15.056; - renda: R$ 15.056,00.\n\nA renda havia recebido numericamente o mesmo valor do público. A identidade da partida e das URLs estava correta, portanto o Match Identity Gate não detectava a colisão semântica entre campos.",
+      "token_count": 42
+    },
+    {
+      "id": "9a9156234cf43c04",
+      "path": "docs/operations/incidents/FDG-INC-20261009-PUBLIC-REVENUE-FIELD-COLLISION.md",
+      "heading": "Valor curado",
+      "scope": "incidents",
+      "text": "- público presente: 15.056; - renda adotada: R$ 708.004,50; - fonte de renda: SBT Sports; - decisão: correção documental verificada em `dados-br/correcoes/publicos-verificados.json`.\n\nHá divergência de R$ 1.000,00 em fonte secundária (Itatiaia). A execução R10R16.1 preserva a decisão curada de R$ 708.004,50.",
+      "token_count": 37
+    },
+    {
+      "id": "ce77b196d5cb6eac",
+      "path": "docs/operations/incidents/FDG-INC-20261009-PUBLIC-REVENUE-FIELD-COLLISION.md",
+      "heading": "Causa raiz",
+      "scope": "incidents",
+      "text": "O pipeline provava que a página pertencia à partida correta, mas não possuía uma trava determinística capaz de detectar que o número do campo `renda` colidia semanticamente com o número de `publico`.",
+      "token_count": 27
+    },
+    {
+      "id": "78e7d2a1e4d5d944",
+      "path": "docs/operations/incidents/FDG-INC-20261009-PUBLIC-REVENUE-FIELD-COLLISION.md",
+      "heading": "Regra introduzida",
+      "scope": "incidents",
+      "text": "`PUBLIC_REVENUE_FIELD_COLLISION`:\n\n1. `publico > 0` e `renda > 0`; 2. `abs(renda - publico) < 0,005`; 3. preservar `publico`; 4. colocar somente `renda` em quarentena; 5. remover a fonte de renda do snapshot automático; 6. reabrir somente a renda para reconciliação direcionada; 7. correção documental verificada por event_id/campo tem precedência absoluta.\n\nUma relação renda/público inferior a R$ 5,00 é apenas aviso `REVENUE_PER_ATTENDEE_LOW`; não remove nem inventa valores.",
+      "token_count": 57
+    },
+    {
+      "id": "b29048d62ef3b4b7",
+      "path": "docs/operations/incidents/FDG-INC-20261009-PUBLIC-REVENUE-FIELD-COLLISION.md",
+      "heading": "Prevenção",
+      "scope": "incidents",
+      "text": "- Push Worker: Factual Integrity Guard antes de `resolved`; - migração v13: reabre somente colisões já resolvidas no D1, sem varredura de IA; - importador Fastlane: bloqueia colisão e aplica correção curada antes do commit; - coletor offline: sweep determinístico global, sem rede; - auditoria: crítico quando a colisão chega ao snapshot publicável; - Incident Regression Suite: fixture permanente `15056 / 15056 = FAIL`, `15056 / 708004.50 = PASS`.",
+      "token_count": 57
+    },
+    {
+      "id": "b94a5dd97ae9b103",
+      "path": "docs/operations/incidents/FDG-INC-INDEX.md",
+      "heading": "Índice de incidentes",
+      "scope": "incidents",
+      "text": "- FINAL_STATE_REGRESSION - CONTRACT_VERSION_DRIFT - AF_COVERAGE_MISMATCH - SOURCE_IDENTITY_MISMATCH - FALSE_RED_CARD - MIGRATION_SLA_FALSE_CRITICAL - EDITORIAL_CLOSURE_STARVATION - PUBLIC_REVENUE_FIELD_COLLISION\n\nCada novo incidente crítico deve resultar em: código estável, diagnóstico estruturado, regra de prevenção, teste de regressão e atualização deste corpus.",
+      "token_count": 28
+    },
+    {
+      "id": "a01c3a0459851616",
+      "path": "docs/operations/runbooks/OPS-INTELLIGENCE-RAG-MCP.md",
+      "heading": "Objetivo",
+      "scope": "runbooks",
+      "text": "Transformar o corpus operacional da R10R16/R10R16.1 em uma camada consultável por agentes sem colocar IA no caminho crítico esportivo.\n\nFluxo:\n\n`Health / Reliability / Postgame -> RAG operacional -> MCP read-only -> modelo do cliente -> diagnóstico`\n\nO RAG recupera contexto. O modelo do cliente interpreta. Os motores determinísticos continuam sendo a autoridade para placar, tabela, AF, público e renda.",
+      "token_count": 50
+    },
+    {
+      "id": "215affa49e5c832d",
+      "path": "docs/operations/runbooks/OPS-INTELLIGENCE-RAG-MCP.md",
+      "heading": "RAG operacional",
+      "scope": "runbooks",
+      "text": "- Runtime: `fdg-ops-rag` v1. - Índice: `/dados-br/ops-rag-index.json`. - Recuperação: BM25 lexical determinístico com boost de heading/path/frase. - Corpus: contratos, runbooks, rollback e incidentes reais em `docs/operations`. - Custo por retrieval: zero chamada externa de IA e zero busca web. - Cache do Worker: 5 minutos. - Falha do índice: fail-open para todos os pipelines esportivos.\n\nO índice não contém placares como fonte de autoridade e não pode sobrescrever dados do site.",
+      "token_count": 63
+    },
+    {
+      "id": "2c70e04d23ade848",
+      "path": "docs/operations/runbooks/OPS-INTELLIGENCE-RAG-MCP.md",
+      "heading": "MCP Ops",
+      "scope": "runbooks",
+      "text": "Endpoint: `https://push.formuladogol.com.br/mcp`\n\nContrato:\n\n- MCP moderno `2026-07-28` via Streamable HTTP. - Compatibilidade stateless com clientes MCP da era 2025 provida pelo SDK oficial. - Somente leitura. - Nenhuma ferramenta de commit, deploy, escrita D1, alteração de JSON esportivo, edição de secrets ou acionamento de workflow. - Rate limit compartilhado do Push Worker. - Se `OPS_MCP_TOKEN` existir no ambiente, Bearer token passa a ser obrigatório; o workflow aceita o secret GitHub opcional `OPS_MCP_TOKEN`, replica-o no Worker e usa-o no smoke test. Sem esse secret, o gateway expõe apenas o conjunto público/read-only e limitado abaixo.",
+      "token_count": 83
+    },
+    {
+      "id": "6d24c7d7aeaac4ed",
+      "path": "docs/operations/runbooks/OPS-INTELLIGENCE-RAG-MCP.md",
+      "heading": "Tools",
+      "scope": "runbooks",
+      "text": "1. `fdg_ops_status` — estado RAG/MCP. 2. `fdg_rag_search` — recuperação no corpus operacional. 3. `fdg_incident_lookup` — busca focada em incidentes/regressões. 4. `fdg_reliability_context` — CORE/ENRICHMENT, auditoria factual e Orchestrator. 5. `fdg_postgame_status` — resumo seguro do Postgame Fastlane sem executar pesquisa/IA.\n\n- `fdg://ops/rag-manifest` - `fdg://ops/reliability`",
+      "token_count": 42
+    },
+    {
+      "id": "41156c027c0e39b1",
+      "path": "docs/operations/runbooks/OPS-INTELLIGENCE-RAG-MCP.md",
+      "heading": "Autoridade e segurança",
+      "scope": "runbooks",
+      "text": "RAG/MCP podem explicar e localizar precedentes; não podem decidir nem gravar fatos esportivos.\n\n- placar: fonte estruturada + contratos determinísticos; - classificação: cálculo determinístico; - probabilidades: AF determinístico de 2 milhões de simulações; - público/renda: Match Identity + Factual Integrity + correção verificada; - RAG: diagnóstico/contexto; - MCP: leitura/orquestração de contexto para o modelo cliente.",
+      "token_count": 47
+    },
+    {
+      "id": "a7630ad4f4c2c5c2",
+      "path": "docs/operations/runbooks/OPS-INTELLIGENCE-RAG-MCP.md",
+      "heading": "Health",
+      "scope": "runbooks",
+      "text": "O Health Policy v10 separa cinco indicadores de confiabilidade/inteligência:\n\n1. Sporting Integrity / R10R16; 2. Integridade Factual / Público & Renda; 3. Knowledge Base / RAG Runtime; 4. Operational Diagnostics / Control Plane; 5. MCP Ops / Read-only Gateway.\n\nFine Tuning continua `not_used_by_design`.",
+      "token_count": 37
+    },
+    {
+      "id": "962af75f4e95f687",
+      "path": "docs/operations/runbooks/POSTGAME-FACTUAL-INTEGRITY.md",
+      "heading": "Objetivo",
+      "scope": "runbooks",
+      "text": "Impedir publicação de público/renda semanticamente incoerentes sem transformar a auditoria em uma revisão cara de todas as partidas.",
+      "token_count": 18
+    },
+    {
+      "id": "812219d73656ef90",
+      "path": "docs/operations/runbooks/POSTGAME-FACTUAL-INTEGRITY.md",
+      "heading": "Fluxo",
+      "scope": "runbooks",
+      "text": "`fonte descoberta -> Match Identity Gate -> extração por campo -> Factual Integrity Guard -> publicação`\n\nSe o guard detectar `PUBLIC_REVENUE_FIELD_COLLISION`:\n\n1. público permanece válido; 2. renda e sua URL entram em quarentena; 3. a partida volta a `pending` somente para o campo renda; 4. cache/fontes já conhecidas são rechecados primeiro; 5. Gemini/OpenAI só entram conforme o Hunter normal e somente para a partida afetada; 6. nenhuma varredura histórica global por IA é executada.",
+      "token_count": 63
+    },
+    {
+      "id": "35887261b17647ae",
+      "path": "docs/operations/runbooks/POSTGAME-FACTUAL-INTEGRITY.md",
+      "heading": "Autoridade",
+      "scope": "runbooks",
+      "text": "Ordem de precedência:\n\n1. correção documental verificada em `dados-br/correcoes/publicos-verificados.json`; 2. extração determinística de fonte cuja identidade foi provada; 3. Workers AI apenas sobre janela textual já validada; 4. Gemini/OpenAI somente para descoberta de fontes, nunca para gravar números diretamente.",
+      "token_count": 42
+    },
+    {
+      "id": "06d3f1cf4833f8e6",
+      "path": "docs/operations/runbooks/POSTGAME-FACTUAL-INTEGRITY.md",
+      "heading": "Health",
+      "scope": "runbooks",
+      "text": "O relatório diário expõe quatro sinais adicionais:\n\n- Sporting Integrity / R10R16; - Integridade Factual / Público & Renda; - Knowledge Base / RAG Readiness; - Operational Diagnostics / Control Plane.\n\n`RAG READY` significa corpus/manifesto íntegros. Não significa runtime RAG em produção. MCP Ops fica reservado para R10R17. Fine Tuning permanece não utilizado por desenho.",
+      "token_count": 46
+    },
+    {
+      "id": "66e595fd6277258c",
+      "path": "docs/operations/runbooks/SPORTING-INTEGRITY.md",
+      "heading": "Runbook — Sporting Integrity",
+      "scope": "runbooks",
+      "text": "1. Abra o job que falhou e baixe o artifact `fdg-*-diagnostic-*`. 2. Leia `code`, `trace_id`, `message` e `context`. 3. Para `STATE_REGRESSION_AFTER_FINAL`, confirme o mesmo `event_id` em `resultados.json` e `espn_eventos.json`; o estado canônico deve permanecer `post`. 4. Para `AF_COVERAGE_MISMATCH`, compare calendário restante e `probabilidades-jogos.json` pela identidade mandante+visitante. 5. Para `AF_BASE_MISMATCH`, compare `base_corrente.partidas_concluidas` com os resultados concluídos deduplicados. 6. Para `AF_SIMULATION_CONTRACT`, nunca reduza o alvo de 2.000.000 para “fazer passar”. Corrija a geração. 7. Para `CONTRACT_VERSION_DRIFT`, corrija a fonte derivada; não enfraqueça o smoke test. 8. Só publique depois que `scripts/validar_snapshot_esportivo.py --profile ci` passar.",
+      "token_count": 83
+    }
+  ]
+}

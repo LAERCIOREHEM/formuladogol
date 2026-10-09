@@ -10,6 +10,8 @@ import { createLiveStatsStore } from './live-stats-store.js';
 import { postgameSearchProbe, postgameStatus, readPostgameFastlane, runPostgameMaintenance } from './postgame-fastlane.js';
 import { feedbackNotifierConfigured, runFeedbackNotifier } from './feedback-notifier.js';
 import { healthMonitorStatus, runHealthMonitor } from './health-monitor.js';
+import { handleOpsMcp, OPS_MCP_CONSTANTS } from './ops-mcp.js';
+import { OPS_INTELLIGENCE_CONSTANTS, opsIntelligenceStatus, searchOpsRag } from './ops-intelligence.js';
 import { RED_CARD_EVENT_POLICY_VERSION } from './readiness-guardian.js';
 
 export { PushState, SportsMonitor };
@@ -583,6 +585,13 @@ export default {
 
   async fetch(request, env) {
     const url = new URL(request.url);
+
+    // R10R17 — MCP oficial, somente leitura e fora do caminho crítico esportivo.
+    if (url.pathname === OPS_MCP_CONSTANTS.endpoint) {
+      if (!(await allowStatusRead(request, env, 'ops-mcp'))) return json(request, { ok:false, error:'rate_limited' }, 429);
+      return handleOpsMcp(request, env);
+    }
+
     if (request.method === 'OPTIONS') {
       const origin = request.headers.get('Origin') || '';
       if (!ALLOWED_ORIGINS.has(origin)) return new Response(null, { status: 403 });
@@ -602,7 +611,7 @@ export default {
         ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok) && Boolean(operational?.ok),
         service: 'formula-do-gol-push',
         version: 10,
-        revision: '6-R10R16.1-POSTGAME-FACTUAL-INTEGRITY-HEALTH-INTELLIGENCE-R10R16-RELIABILITY',
+        revision: '6-R10R17-FDG-OPS-INTELLIGENCE-RAG-MCP-R10R16.1-FACTUAL-INTEGRITY',
         liveGatewayVersion: LIVE_API_CONSTANTS.LIVE_GATEWAY_VERSION,
         liveStateContractVersion: LIVE_API_CONSTANTS.LIVE_STATE_CONTRACT_VERSION,
         liveFactsContractVersion: LIVE_API_CONSTANTS.LIVE_FACTS_CONTRACT_VERSION,
@@ -671,7 +680,7 @@ export default {
         feedbackNotifier: true,
         feedbackNotifierConfigured: feedbackNotifierConfigured(env),
         healthEmailMonitor: true,
-        healthMonitorPolicyVersion: 9,
+        healthMonitorPolicyVersion: 10,
         healthEmailDailyBrt: '08:00',
         healthEmailRecoveryUntilBrt: '11:59',
         healthMonitorCron: '*/5 * * * *',
@@ -680,13 +689,20 @@ export default {
         healthEmailNoOpenAI: true,
         healthEmailOverallRecovery: true,
         healthEmailOverallRecoveryPreservesDaily0800: true,
-        healthReliabilityIntelligenceIndicators: 4,
+        healthReliabilityIntelligenceIndicators: 5,
         healthSportingIntegrityIndicator: true,
         healthFactualIntegrityIndicator: true,
         healthRagReadinessIndicator: true,
+        healthRagRuntimeIndicator: true,
         healthOperationalControlPlaneIndicator: true,
-        healthRagRuntimeEnabled: false,
-        healthMcpOpsEnabled: false,
+        healthMcpOpsIndicator: true,
+        healthRagRuntimeEnabled: true,
+        healthMcpOpsEnabled: true,
+        healthMcpOpsReadOnly: true,
+        healthMcpProtocolVersion: OPS_MCP_CONSTANTS.protocolVersion,
+        opsIntelligenceVersion: OPS_INTELLIGENCE_CONSTANTS.version,
+        opsRagRuntimeVersion: OPS_INTELLIGENCE_CONSTANTS.ragRuntimeVersion,
+        opsMcpGatewayVersion: OPS_INTELLIGENCE_CONSTANTS.mcpGatewayVersion,
         healthFineTuning: 'not_used_by_design',
         sportsMonitorReady: Boolean(monitor?.ok),
         readinessAlertPolicyVersion: 'R10.1',
@@ -730,6 +746,19 @@ export default {
         if (!(await allowStatusRead(request, env, 'health-monitor-status'))) return json(request, { ok:false, error:'rate_limited' }, 429);
         return json(request, await healthMonitorStatus(env), 200, { 'Cache-Control':'no-store' });
       }
+      if (url.pathname === '/v1/ops-intelligence/status' && request.method === 'GET') {
+        if (!(await allowStatusRead(request, env, 'ops-intelligence-status'))) return json(request, { ok:false, error:'rate_limited' }, 429);
+        return json(request, await opsIntelligenceStatus(env, { force:url.searchParams.get('force')==='1' }));
+      }
+      if (url.pathname === '/v1/ops-intelligence/search' && request.method === 'GET') {
+        if (!(await allowStatusRead(request, env, 'ops-intelligence-search'))) return json(request, { ok:false, error:'rate_limited' }, 429);
+        const q=String(url.searchParams.get('q')||'').trim();
+        const topK=Number(url.searchParams.get('top_k')||5);
+        const scope=String(url.searchParams.get('scope')||'all');
+        const payload=await searchOpsRag(env,q,{topK,scope});
+        return json(request,payload,payload.ok?200:payload.error==='query_required'?400:503);
+      }
+
       if (url.pathname === '/v1/postgame/status' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'postgame-status'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
         return json(request, await postgameStatus(env), 200, { 'Cache-Control': 'no-store' });

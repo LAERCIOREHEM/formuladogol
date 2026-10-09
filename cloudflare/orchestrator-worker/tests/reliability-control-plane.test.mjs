@@ -72,11 +72,18 @@ test('estado CORE/ENRICHMENT é publicado e enriquecimento não bloqueia core', 
   assert.ok(['CORE_GREEN','ENRICHMENT_PENDING','DEGRADED','CRITICAL'].includes(state.state));
 });
 
-test('corpus operacional e rollback existem sem ativar RAG no caminho crítico', async () => {
+test('R10R17 ativa RAG/MCP operacional sem colocá-los no caminho crítico', async () => {
   const cfg = JSON.parse(await read('dados-br/config-orquestrador.json'));
   const manifest = JSON.parse(await read('docs/operations/RAG-MANIFEST.json'));
   const rollback = await read('docs/operations/R10R16-ROLLBACK.md');
-  assert.equal(cfg.reliability_control_plane.knowledge_base.rag_em_producao, false);
-  assert.equal(manifest.production_rag_enabled, false);
+  assert.equal(cfg.reliability_control_plane.knowledge_base.rag_em_producao, true);
+  assert.equal(cfg.reliability_control_plane.knowledge_base.critical_path, false);
+  assert.equal(cfg.reliability_control_plane.ops_intelligence.mcp_read_only, true);
+  assert.equal(cfg.reliability_control_plane.ops_intelligence.external_ai_per_retrieval, false);
+  assert.equal(manifest.production_rag_enabled, true);
+  assert.equal(manifest.runtime.critical_path, false);
+  assert.equal(manifest.runtime.external_ai_calls_per_retrieval, 0);
+  assert.equal(manifest.mcp.read_only, true);
+  assert.equal(manifest.mcp.protocol_version, '2026-07-28');
   assert.match(rollback, /rollback/i);
 });
