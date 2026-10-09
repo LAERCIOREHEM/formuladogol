@@ -1,15 +1,570 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-08T21:44:00.232198-03:00",
+  "gerado_em": "2026-10-08T22:19:17.399722-03:00",
   "fonte": "ESPN summary + scoreboard",
-  "total_jogos": 286,
-  "total_com_estatisticas": 286,
+  "total_jogos": 287,
+  "total_com_estatisticas": 287,
   "total_com_publico": 285,
-  "total_com_eventos": 286,
-  "total_com_jogadores": 286,
-  "total_eventos_validados": 286,
+  "total_com_eventos": 287,
+  "total_com_jogadores": 287,
+  "total_eventos_validados": 287,
   "total_eventos_pendentes_detalhes": 0,
   "jogos": {
+    "401841256": {
+      "event_id": "401841256",
+      "event_id_fonte_detalhes": "401841256",
+      "rodada": 29,
+      "data_iso": "2026-10-08T20:00",
+      "mandante": "Athletico-PR",
+      "visitante": "Atlético-MG",
+      "placar_mandante": 1,
+      "placar_visitante": 1,
+      "estadio": "Arena da Baixada",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "51.4%",
+          "away": "48.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "31",
+          "away": "15"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "10",
+          "away": "9"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "8",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "60%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "11"
+        },
+        {
+          "nome": "Defesas",
+          "home": "7",
+          "away": "8"
+        },
+        {
+          "nome": "Passes",
+          "home": "500",
+          "away": "488"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "440",
+          "away": "426"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "8",
+          "away": "9"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "8",
+          "away": "11"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "9",
+          "away": "9"
+        },
+        {
+          "nome": "Cortes",
+          "home": "13",
+          "away": "27"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "10",
+          "away": "4"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "1"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "51.4%",
+          "away": "48.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "31",
+          "away": "15"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "10",
+          "away": "9"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "8",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "60%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "11"
+        },
+        {
+          "nome": "Defesas",
+          "home": "7",
+          "away": "8"
+        },
+        {
+          "nome": "Passes",
+          "home": "500",
+          "away": "488"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "440",
+          "away": "426"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "8",
+          "away": "9"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "8",
+          "away": "11"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "9",
+          "away": "9"
+        },
+        {
+          "nome": "Cortes",
+          "home": "13",
+          "away": "27"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "10",
+          "away": "4"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "1"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "8'",
+          "jogador": "Kerwin Vargas",
+          "time": "Athletico-PR",
+          "assistencias": [
+            "Gilberto"
+          ],
+          "descricao": "Goal 70 Goal! Athletico Paranaense 1, Atlético Mineiro 0. Kerwin Vargas (Athletico Paranaense) right footed shot from outside the box to the bottom right corner. Assisted by Gilberto. Kerwin Vargas Goal"
+        },
+        {
+          "minuto": "90'+7'",
+          "jogador": "Lyanco",
+          "time": "Atlético-MG",
+          "assistencias": [
+            "Thiago Borbas"
+          ],
+          "descricao": "Goal 70 Goal! Athletico Paranaense 2, Atlético Mineiro 2. Lyanco (Atlético Mineiro) right footed shot from the right side of the box to the top right corner. Assisted by Thiago Borbas. Lyanco Goal"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "67'",
+          "jogador": "Tomás Cuello",
+          "time": "Atlético-MG",
+          "descricao": "Yellow Card 94 Tomás Cuello (Atlético Mineiro) is shown the yellow card for a bad foul. Tomás Cuello Yellow Card"
+        },
+        {
+          "tipo": "vermelho",
+          "minuto": "73'",
+          "jogador": "Tomás Pérez",
+          "time": "Atlético-MG",
+          "descricao": "Red Card 93 Tomás Pérez (Atlético Mineiro) is shown the red card. Tomás Pérez Red Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "74'",
+          "jogador": "Kevin Castaño",
+          "time": "Atlético-MG",
+          "descricao": "Yellow Card 94 Kevin Castaño (Atlético Mineiro) is shown the yellow card for a bad foul. Kevin Castaño Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "381170",
+          "nome": "Arthur Dias",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "192080",
+          "nome": "Carlos Terán",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "198761",
+          "nome": "Gilberto",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "173351",
+          "nome": "Jádson",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "361359",
+          "nome": "João Cruz",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "340596",
+          "nome": "Kerwin Vargas",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "268476",
+          "nome": "Kevin Viveros",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "309499",
+          "nome": "Lucas Esquivel",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "113352",
+          "nome": "Luiz Gustavo",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "322655",
+          "nome": "Mycael",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "197049",
+          "nome": "Stiven Mendoza",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "296574",
+          "nome": "Bruno Zapelli",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "417345",
+          "nome": "Claudinho",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "361454",
+          "nome": "Gilberto Junior",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "378910",
+          "nome": "Jorge Rivaldo",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "380327",
+          "nome": "Leozinho",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "158272",
+          "nome": "Bernard",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "161559",
+          "nome": "Fred",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "318191",
+          "nome": "Gabriel Delfim",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "220747",
+          "nome": "Lyanco",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "417570",
+          "nome": "Mamady Cissé",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "233416",
+          "nome": "Maycon",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "304699",
+          "nome": "Natanael",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "286703",
+          "nome": "Reiner",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "245858",
+          "nome": "Renan Lodi",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "252197",
+          "nome": "Tomás Cuello",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "398934",
+          "nome": "Vitão",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "268472",
+          "nome": "Igor Gomes",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "307756",
+          "nome": "Kevin Castaño",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "302628",
+          "nome": "Thiago Borbas",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "361299",
+          "nome": "Tomás Pérez",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "334382",
+          "nome": "Victor Hugo",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Athletico-PR": 1,
+          "Atlético-MG": 1
+        },
+        "gols_extraidos": {
+          "Athletico-PR": 1,
+          "Atlético-MG": 1
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Athletico-PR": {
+            "amarelo": 0,
+            "vermelho": 0
+          },
+          "Atlético-MG": {
+            "amarelo": 2,
+            "vermelho": 1
+          }
+        },
+        "cartoes_extraidos": {
+          "Athletico-PR": {
+            "amarelo": 0,
+            "vermelho": 0
+          },
+          "Atlético-MG": {
+            "amarelo": 2,
+            "vermelho": 1
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-10-08T22:19:00.165073-03:00"
+    },
     "401841251": {
       "event_id": "401841251",
       "event_id_fonte_detalhes": "401841251",
@@ -17,8 +572,8 @@
       "data_iso": "2026-10-08T19:30",
       "mandante": "Santos",
       "visitante": "Flamengo",
-      "placar_mandante": 0,
-      "placar_visitante": 0,
+      "placar_mandante": 1,
+      "placar_visitante": 2,
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "publico": null,
       "publico_tipo": "",
@@ -210,7 +765,33 @@
           "away": "0"
         }
       ],
-      "gols": [],
+      "gols": [
+        {
+          "minuto": "43'",
+          "jogador": "Danilo",
+          "time": "Flamengo",
+          "assistencias": [
+            "Pedro"
+          ],
+          "descricao": "Goal 70 Goal! Santos 0, Flamengo 1. Danilo (Flamengo) right footed shot from the centre of the box to the bottom left corner. Assisted by Pedro. Danilo Goal"
+        },
+        {
+          "minuto": "45'+4'",
+          "jogador": "Lucas Paquetá",
+          "time": "Flamengo",
+          "assistencias": [
+            "Jorge Carrascal"
+          ],
+          "descricao": "Goal - Header 137 Goal! Santos 0, Flamengo 2. Lucas Paquetá (Flamengo) header from the centre of the box to the bottom left corner. Assisted by Jorge Carrascal with a cross following a corner. Lucas Paquetá Goal - Header"
+        },
+        {
+          "minuto": "82'",
+          "jogador": "Neymar",
+          "time": "Santos",
+          "assistencias": [],
+          "descricao": "Penalty - Scored 98 Goal! Santos 1, Flamengo 2. Neymar (Santos) converts the penalty with a right footed shot to the bottom left corner. Neymar Penalty - Scored"
+        }
+      ],
       "cartoes": [
         {
           "tipo": "amarelo",
@@ -535,12 +1116,12 @@
       "jogadores_preservados_de_execucao_anterior": false,
       "validacao_eventos": {
         "gols_esperados": {
-          "Santos": 0,
-          "Flamengo": 0
+          "Santos": 1,
+          "Flamengo": 2
         },
         "gols_extraidos": {
-          "Santos": 0,
-          "Flamengo": 0
+          "Santos": 1,
+          "Flamengo": 2
         },
         "gols_completos": true,
         "gols_sem_excesso": true,
@@ -584,7 +1165,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T21:43:46.192464-03:00"
+      "atualizado_em": "2026-10-08T22:19:02.698410-03:00"
     },
     "401841249": {
       "event_id": "401841249",
@@ -1137,7 +1718,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T21:43:48.753354-03:00",
+      "atualizado_em": "2026-10-08T22:19:05.130356-03:00",
       "renda": 773013
     },
     "401841257": {
@@ -1686,7 +2267,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T21:43:50.927605-03:00",
+      "atualizado_em": "2026-10-08T22:19:07.670114-03:00",
       "publico_pagante": 22071,
       "renda": 801180
     },
@@ -2273,7 +2854,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T21:43:53.260491-03:00",
+      "atualizado_em": "2026-10-08T22:19:09.989847-03:00",
       "publico_pagante": 13773,
       "renda": 285132
     },
@@ -2881,7 +3462,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T21:43:55.517241-03:00",
+      "atualizado_em": "2026-10-08T22:19:12.623389-03:00",
       "renda": 820972.5
     },
     "401841253": {
@@ -3415,7 +3996,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T21:43:57.829014-03:00",
+      "atualizado_em": "2026-10-08T22:19:14.953934-03:00",
       "publico_pagante": 2340,
       "renda": 54630
     },
@@ -3992,7 +4573,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T21:44:00.147703-03:00",
+      "atualizado_em": "2026-10-08T22:19:17.313557-03:00",
       "renda": 537018
     },
     "401841168": {

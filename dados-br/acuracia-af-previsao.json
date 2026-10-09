@@ -2,7 +2,7 @@
   "schema_version": 1,
   "projeto": "AF-Previsão",
   "temporada": 2026,
-  "gerado_em": "2026-10-08T21:44:46-03:00",
+  "gerado_em": "2026-10-08T22:20:07-03:00",
   "status": "ok",
   "escopo_publico": {
     "inicio_historico_classificacao": "2026-07-17T22:05:00-03:00",
@@ -20,11 +20,11 @@
     "ultima_previsao_temporada": "2026-10-07T23:23:00-03:00"
   },
   "jogos": {
-    "jogos_avaliados": 106,
+    "jogos_avaliados": 108,
     "maior_probabilidade": {
-      "amostra": 106,
-      "confirmadas": 50,
-      "taxa_confirmacao_pct": 47.17
+      "amostra": 108,
+      "confirmadas": 52,
+      "taxa_confirmacao_pct": 48.15
     },
     "alta_confianca_80": {
       "amostra": 0,
@@ -58,10 +58,10 @@
           20,
           30
         ],
-        "amostra": 150,
-        "probabilidade_media_pct": 25.7415,
-        "frequencia_observada_pct": 28.0,
-        "erro_absoluto_pp": 2.2585
+        "amostra": 154,
+        "probabilidade_media_pct": 25.7263,
+        "frequencia_observada_pct": 27.2727,
+        "erro_absoluto_pp": 1.5464
       },
       {
         "faixa_pct": [
@@ -78,20 +78,20 @@
           40,
           50
         ],
-        "amostra": 50,
-        "probabilidade_media_pct": 44.8751,
-        "frequencia_observada_pct": 38.0,
-        "erro_absoluto_pp": 6.8751
+        "amostra": 51,
+        "probabilidade_media_pct": 44.9588,
+        "frequencia_observada_pct": 39.2157,
+        "erro_absoluto_pp": 5.7431
       },
       {
         "faixa_pct": [
           50,
           60
         ],
-        "amostra": 25,
-        "probabilidade_media_pct": 54.7567,
-        "frequencia_observada_pct": 44.0,
-        "erro_absoluto_pp": 10.7567
+        "amostra": 26,
+        "probabilidade_media_pct": 54.5828,
+        "frequencia_observada_pct": 46.1538,
+        "erro_absoluto_pp": 8.429
       },
       {
         "faixa_pct": [
@@ -115,8 +115,8 @@
       }
     ],
     "metricas_tecnicas": {
-      "brier_multiclasse_medio": 0.20513122,
-      "log_loss_medio": 1.02395043
+      "brier_multiclasse_medio": 0.2031034,
+      "log_loss_medio": 1.01519099
     },
     "por_rodada": [
       {
@@ -211,12 +211,12 @@
       },
       {
         "rodada": 29,
-        "jogos_avaliados": 14,
-        "maior_probabilidade_avaliada": 14,
-        "maior_probabilidade_confirmada": 6,
+        "jogos_avaliados": 16,
+        "maior_probabilidade_avaliada": 16,
+        "maior_probabilidade_confirmada": 8,
         "previsoes_fortes_60_total": 1,
         "previsoes_fortes_60_confirmadas": 0,
-        "taxa_confirmacao_pct": 42.86,
+        "taxa_confirmacao_pct": 50.0,
         "taxa_fortes_60_pct": 0.0
       }
     ]
