@@ -1,0 +1,57 @@
+FDG — AF-PREVISÃO FASTLANE PÓS-FINAL — R1
+Baseline consultado no GitHub: main em 08/10/2026, após os commits operacionais de 22:39–23:01 BRT.
+
+OBJETIVO
+Reduzir a latência entre FINAL confirmado pela ESPN e publicação das novas probabilidades.
+O caminho crítico deixa de esperar estatísticas, líderes, público/renda, melhores momentos,
+editoriais e demais derivados.
+
+NOVO FLUXO
+Cloudflare detecta FINAL
+→ af-previsao-fastlane-pos-final.yml
+→ atualizar_espn.py (base canônica)
+→ gerar agenda mínima
+→ reconciliar_af_continental.py
+→ AF com 2.000.000 simulações
+→ validação de atomicidade
+→ commit dos artefatos esportivos + AF
+→ deploy.yml
+→ atualizar-brasileirao.yml enfileirado para reconciliação completa.
+
+FAIL-CLOSED
+- ESPN não sincronizou: não publica AF rápido.
+- Auditoria/snapshots continentais contraditórios: reconciliador falha e não publica.
+- base_corrente do AF != total_resultados: não publica.
+- AF sem 2.000.000 simulações: não publica.
+- referência esportiva anterior ao último FINAL: não publica.
+- Todos os writers continuam no lock repo-write-main.
+
+ARQUIVOS
+NOVO:
+.github/workflows/af-previsao-fastlane-pos-final.yml
+cloudflare/orchestrator-worker/tests/af-fastlane.test.mjs
+
+ALTERADOS:
+cloudflare/orchestrator-worker/src/github.js
+cloudflare/orchestrator-worker/src/index.js
+.github/workflows/deploy-orchestrator-worker.yml
+dados-br/config-orquestrador.json
+
+DEPLOY
+1. GitHub → Add file → Upload files.
+2. Arraste o CONTEÚDO deste ZIP preservando as pastas.
+3. Commit direto em main.
+4. O push deve disparar automaticamente “Deploy Orchestrator Worker”.
+5. NÃO rode manualmente o AF Fastlane após o upload só para testar com dados antigos.
+6. Confirme que o deploy do Orchestrator termina verde e o smoke test mostra:
+   version=2.2.0
+   afPostFinalFastlane=true
+   afPostFinalFastlaneVersion=1
+7. No próximo FINAL real, o Orchestrator deve disparar “AF-Previsão Fastlane pós-FINAL”.
+8. Após o commit rápido, devem ser enfileirados:
+   - Deploy site (GitHub Pages)
+   - Atualizar Brasileirao (ESPN), para reconciliação completa.
+
+OBSERVAÇÃO
+Este pacote não reduz as 2.000.000 simulações e não relaxa as travas continentais.
+A otimização é arquitetural: retira tarefas não essenciais do caminho crítico.

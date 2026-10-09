@@ -1,12 +1,19 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "descricao": "Política determinística de contingência/manual. O orquestrador operacional primário roda no Cloudflare Worker; a IA não decide gatilhos.",
   "timezone": "America/Sao_Paulo",
   "atualizar_brasileirao": {
     "sondagem_antes_minutos": 45,
     "sondagem_depois_minutos": 240,
     "retentativa_final_pendente_minutos": 15,
-    "fallback_final_estimado_minutos": 130
+    "fallback_final_estimado_minutos": 130,
+    "af_fastlane_pos_final": {
+      "ativo": true,
+      "versao": 1,
+      "workflow": "af-previsao-fastlane-pos-final.yml",
+      "simulacoes": 2000000,
+      "politica": "FINAL confirmado aciona caminho crítico mínimo ESPN canônica -> agenda mínima -> AF auditado -> commit -> deploy; reconciliação completa é enfileirada depois e não bloqueia a publicação inicial das probabilidades."
+    }
   },
   "melhores_momentos": {
     "primeira_tentativa_apos_final_minutos": 5,
@@ -75,6 +82,7 @@
     "cron_job_org": false,
     "github_orquestrador": "fallback manual apenas",
     "postgame_fastlane": "formula-do-gol-push (cron 1 min + D1; descoberta sem GitHub, consolidação concreta limitada)",
+    "af_fastlane": "af-previsao-fastlane-pos-final.yml (FINAL -> AF primeiro; reconciliação completa depois)",
     "modo_dormente": true,
     "gate_github": "somente mudança esportiva real ou descoberta concreta pós-jogo"
   }

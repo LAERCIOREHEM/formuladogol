@@ -1,4 +1,5 @@
 const WRITER_NAMES = new Set([
+  'AF-Previsão Fastlane pós-FINAL',
   'Atualizar Brasileirao (ESPN)',
   'Atualizar Elencos Brasileirao (ESPN)',
   'Auditar modelos AF-Previsão',
@@ -59,7 +60,13 @@ export async function dispatchWorkflow(env, workflow, inputs = {}) {
 export function dispatchSpec(decision) {
   switch (decision?.action) {
     case 'atualizar_brasileirao':
-      return { workflow: 'atualizar-brasileirao.yml', inputs: {} };
+      // FINAL detectado entra primeiro no caminho crítico mínimo:
+      // ESPN canônica -> AF -> commit -> deploy. O workflow completo é
+      // enfileirado pelo próprio Fastlane depois da publicação rápida.
+      return {
+        workflow: 'af-previsao-fastlane-pos-final.yml',
+        inputs: { event_id: decision.eventId || '', origem: 'orchestrator-final' },
+      };
     case 'publicos':
       return { workflow: 'atualizar-publicos-brasileirao.yml', inputs: { modo: 'partida', event_id: decision.eventId || '', origem_fastlane: decision.fastlane ? 'true' : 'false' } };
     case 'melhores_momentos': {
