@@ -1,6 +1,6 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-08T22:19:17.399722-03:00",
+  "gerado_em": "2026-10-08T22:36:36.005427-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 287,
   "total_com_estatisticas": 287,
@@ -17,8 +17,8 @@
       "data_iso": "2026-10-08T20:00",
       "mandante": "Athletico-PR",
       "visitante": "Atlético-MG",
-      "placar_mandante": 1,
-      "placar_visitante": 1,
+      "placar_mandante": 2,
+      "placar_visitante": 2,
       "estadio": "Arena da Baixada",
       "publico": null,
       "publico_tipo": "",
@@ -219,6 +219,20 @@
             "Gilberto"
           ],
           "descricao": "Goal 70 Goal! Athletico Paranaense 1, Atlético Mineiro 0. Kerwin Vargas (Athletico Paranaense) right footed shot from outside the box to the bottom right corner. Assisted by Gilberto. Kerwin Vargas Goal"
+        },
+        {
+          "minuto": "27'",
+          "jogador": "Bernard",
+          "time": "Atlético-MG",
+          "assistencias": [],
+          "descricao": "Goal - Free-kick 138 Goal! Athletico Paranaense 1, Atlético Mineiro 1. Bernard (Atlético Mineiro) from a free kick with a right footed shot to the bottom right corner. Bernard Goal - Free-kick"
+        },
+        {
+          "minuto": "90'+3'",
+          "jogador": "Kevin Viveros",
+          "time": "Athletico-PR",
+          "assistencias": [],
+          "descricao": "Goal 70 Goal! Athletico Paranaense 2, Atlético Mineiro 1. Kevin Viveros (Athletico Paranaense) right footed shot from the centre of the box to the bottom right corner. Kevin Viveros Goal"
         },
         {
           "minuto": "90'+7'",
@@ -514,12 +528,12 @@
       "jogadores_preservados_de_execucao_anterior": false,
       "validacao_eventos": {
         "gols_esperados": {
-          "Athletico-PR": 1,
-          "Atlético-MG": 1
+          "Athletico-PR": 2,
+          "Atlético-MG": 2
         },
         "gols_extraidos": {
-          "Athletico-PR": 1,
-          "Atlético-MG": 1
+          "Athletico-PR": 2,
+          "Atlético-MG": 2
         },
         "gols_completos": true,
         "gols_sem_excesso": true,
@@ -563,7 +577,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:19:00.165073-03:00"
+      "atualizado_em": "2026-10-08T22:36:19.224742-03:00"
     },
     "401841251": {
       "event_id": "401841251",
@@ -572,7 +586,7 @@
       "data_iso": "2026-10-08T19:30",
       "mandante": "Santos",
       "visitante": "Flamengo",
-      "placar_mandante": 1,
+      "placar_mandante": 2,
       "placar_visitante": 2,
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "publico": null,
@@ -790,6 +804,13 @@
           "time": "Santos",
           "assistencias": [],
           "descricao": "Penalty - Scored 98 Goal! Santos 1, Flamengo 2. Neymar (Santos) converts the penalty with a right footed shot to the bottom left corner. Neymar Penalty - Scored"
+        },
+        {
+          "minuto": "88'",
+          "jogador": "Neymar",
+          "time": "Santos",
+          "assistencias": [],
+          "descricao": "Penalty - Scored 98 Goal! Santos 2, Flamengo 2. Neymar (Santos) converts the penalty with a right footed shot to the bottom left corner. Neymar Penalty - Scored"
         }
       ],
       "cartoes": [
@@ -1116,11 +1137,11 @@
       "jogadores_preservados_de_execucao_anterior": false,
       "validacao_eventos": {
         "gols_esperados": {
-          "Santos": 1,
+          "Santos": 2,
           "Flamengo": 2
         },
         "gols_extraidos": {
-          "Santos": 1,
+          "Santos": 2,
           "Flamengo": 2
         },
         "gols_completos": true,
@@ -1165,7 +1186,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:19:02.698410-03:00"
+      "atualizado_em": "2026-10-08T22:36:21.680209-03:00"
     },
     "401841249": {
       "event_id": "401841249",
@@ -1718,7 +1739,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:19:05.130356-03:00",
+      "atualizado_em": "2026-10-08T22:36:23.893391-03:00",
       "renda": 773013
     },
     "401841257": {
@@ -2267,7 +2288,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:19:07.670114-03:00",
+      "atualizado_em": "2026-10-08T22:36:26.424893-03:00",
       "publico_pagante": 22071,
       "renda": 801180
     },
@@ -2854,7 +2875,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:19:09.989847-03:00",
+      "atualizado_em": "2026-10-08T22:36:29.028070-03:00",
       "publico_pagante": 13773,
       "renda": 285132
     },
@@ -3462,7 +3483,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:19:12.623389-03:00",
+      "atualizado_em": "2026-10-08T22:36:31.306589-03:00",
       "renda": 820972.5
     },
     "401841253": {
@@ -3996,7 +4017,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:19:14.953934-03:00",
+      "atualizado_em": "2026-10-08T22:36:33.651975-03:00",
       "publico_pagante": 2340,
       "renda": 54630
     },
@@ -4573,7 +4594,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:19:17.313557-03:00",
+      "atualizado_em": "2026-10-08T22:36:35.921172-03:00",
       "renda": 537018
     },
     "401841168": {
