@@ -495,7 +495,7 @@ jobs:
           cat >/tmp/fdg-mcp-status-call.json <<'JSON'
           {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"fdg_ops_status","arguments":{},"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientInfo":{"name":"fdg-deploy-smoke","version":"1.0.0"},"io.modelcontextprotocol/clientCapabilities":{}}}}
           JSON
-          MCP_CALL_HTTP="$(curl -sS --max-time 20 -o /tmp/fdg-mcp-status-call.out -w '%{http_code}' -X POST 'https://push.formuladogol.com.br/mcp' -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' -H 'MCP-Protocol-Version: 2026-07-28' -H 'Mcp-Method: tools/call' "${MCP_AUTH_ARGS[@]}" --data-binary @/tmp/fdg-mcp-status-call.json || true)"
+          MCP_CALL_HTTP="$(curl -sS --max-time 20 -o /tmp/fdg-mcp-status-call.out -w '%{http_code}' -X POST 'https://push.formuladogol.com.br/mcp' -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' -H 'MCP-Protocol-Version: 2026-07-28' -H 'Mcp-Method: tools/call' -H 'Mcp-Name: fdg_ops_status' "${MCP_AUTH_ARGS[@]}" --data-binary @/tmp/fdg-mcp-status-call.json || true)"
 
           MCP_DISCOVER_HTTP="$MCP_DISCOVER_HTTP" MCP_TOOLS_HTTP="$MCP_TOOLS_HTTP" MCP_CALL_HTTP="$MCP_CALL_HTTP" node <<'NODE'
           const fs=require('fs');
