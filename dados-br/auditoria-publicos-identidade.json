@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
-  "policy": "R10R15-postgame-match-identity-gate",
-  "gerado_em": "2026-10-09T04:01:15.802667Z",
+  "schema_version": 2,
+  "policy": "R10R16.1-postgame-factual-integrity-guard",
+  "gerado_em": "2026-10-09T13:04:29.333653Z",
   "total_registros_publicos": 291,
   "total_ok": 291,
   "total_avisos": 0,
@@ -360,5 +360,5 @@
     "401879459",
     "401913077"
   ],
-  "nota": "Auditoria offline completa. Identidade semântica de novas páginas é validada online pelo Match Identity Gate antes da extração."
+  "nota": "Auditoria offline completa e sem rede. Match Identity Gate prova a partida; Factual Integrity Guard prova coerência semântica mínima por campo antes da publicação."
 }

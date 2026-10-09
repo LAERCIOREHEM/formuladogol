@@ -59,6 +59,21 @@ class ReliabilityIncidentRegressionSuite(unittest.TestCase):
         self.assertIn('Match Identity Gate',profile)
         self.assertIn('IA é SOMENTE descoberta',fastlane)
 
+    def test_public_revenue_field_collision_is_quarantined(self):
+        from scripts.postgame_factual_integrity import (
+            INCIDENT_PUBLIC_REVENUE_COLLISION, inspect_factual_integrity, quarantine_row
+        )
+        bad = inspect_factual_integrity(15056, None, 15056)
+        self.assertEqual(bad['critical'], [INCIDENT_PUBLIC_REVENUE_COLLISION])
+        clean, verdict = quarantine_row({'publico':15056,'renda':15056,'fonte_renda':'https://example.com/x'})
+        self.assertEqual(clean.get('publico'), 15056)
+        self.assertNotIn('renda', clean)
+        self.assertEqual(verdict['quarantine_fields'], ['renda'])
+        good = inspect_factual_integrity(15056, None, 708004.50)
+        self.assertEqual(good['critical'], [])
+        corrections=json.loads((ROOT/'dados-br/correcoes/publicos-verificados.json').read_text(encoding='utf-8'))
+        self.assertEqual(float(corrections['jogos']['401841248']['renda']), 708004.50)
+
     def test_false_red_card_guard_remains_present(self):
         corpus='\n'.join(p.read_text(encoding='utf-8',errors='ignore') for p in [
             ROOT/'cloudflare/push-worker/src/index.js', ROOT/'cloudflare/push-worker/tests/test-postgame-fastlane.mjs'

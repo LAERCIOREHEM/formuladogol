@@ -12,7 +12,7 @@ const CF_WORKERS_CPU_INCLUDED_MS = 30_000_000;
 const CF_WORKERS_REQUESTS_INCLUDED = 10_000_000;
 const CF_CPU_OVERAGE_PER_MILLION_USD = 0.02;
 const CF_REQUEST_OVERAGE_PER_MILLION_USD = 0.30;
-const HEALTH_POLICY_VERSION = 8;
+const HEALTH_POLICY_VERSION = 9;
 
 function text(v) { return String(v ?? '').trim(); }
 function n(v) { const x = Number(v); return Number.isFinite(x) ? x : 0; }
@@ -157,6 +157,41 @@ async function cloudflareBillingSummary(env, now=Date.now()) {
 
 function indicator(id,label,severity,detail=''){ return {id,label,severity,detail}; }
 function worst(indicators){ return indicators.some(x=>x.severity==='red')?'red':indicators.some(x=>x.severity==='yellow')?'yellow':'green'; }
+
+export function reliabilityIntelligenceIndicators({orchestratorHealth={},orchestratorStatus={},reliabilitySnapshot={},factualAudit={},ragManifest={}}={}) {
+  const reliabilityState=text(orchestratorStatus?.reliabilityState)||text(reliabilitySnapshot?.state);
+  const sportingReady=orchestratorHealth?.sportingSnapshotIntegrityGuard===true && Number(orchestratorHealth?.sportingSnapshotIntegrityGuardVersion||0)>=1;
+  let sportingSeverity='yellow';
+  if(!sportingReady) sportingSeverity='red';
+  else if(reliabilityState==='CRITICAL') sportingSeverity='red';
+  else if(reliabilityState==='DEGRADED') sportingSeverity='yellow';
+  else if(reliabilityState==='CORE_GREEN'||reliabilityState==='ENRICHMENT_PENDING') sportingSeverity='green';
+  const sporting=indicator('sporting-integrity','Sporting Integrity / R10R16',sportingSeverity,
+    `${sportingReady?'guard ativo':'guard indisponível'} · estado ${reliabilityState||'não reportado'} · FINAL monotônico + AF/snapshot`);
+
+  const critical=n(factualAudit?.total_criticos), warnings=n(factualAudit?.total_avisos);
+  const factualKnown=Number(factualAudit?.schema_version||0)>=2;
+  const factual=indicator('factual-integrity','Integridade Factual / Público & Renda',
+    !factualKnown?'yellow':critical>0?'red':warnings>0?'yellow':'green',
+    !factualKnown?'auditoria R10R16.1 indisponível':`${critical} crítico(s) · ${warnings} aviso(s) · field quarantine ativo`);
+
+  const collections=Array.isArray(ragManifest?.collections)?ragManifest.collections.length:0;
+  const ragReady=Number(ragManifest?.schema_version||0)>=1 && collections>0;
+  const ragRuntime=ragManifest?.production_rag_enabled===true;
+  const rag=indicator('rag-readiness','Knowledge Base / RAG Readiness',ragReady?'green':'yellow',
+    ragReady?`KB READY · ${collections} coleção(ões) · runtime ${ragRuntime?'ON':'OFF por política'}`:'manifesto/corpus RAG indisponível');
+
+  const controlFlags=[
+    orchestratorHealth?.reliabilityControlPlane===true,
+    orchestratorHealth?.reliabilityDiagnosticArtifact===true,
+    orchestratorHealth?.reliabilityIncidentRegressionSuite===true,
+    orchestratorHealth?.reliabilityCorrelationId===true,
+  ];
+  const controlReady=controlFlags.every(Boolean);
+  const control=indicator('ops-control-plane','Operational Diagnostics / Control Plane',controlReady?'green':'red',
+    controlReady?'diagnóstico JSON + incident codes + correlation ID + regression suite ativos':'control plane incompleto');
+  return [sporting,factual,rag,control];
+}
 function icon(s){ return s==='red'?'🔴':s==='yellow'?'🟡':'🟢'; }
 function cloudflareSeverity(cf){
   if(!cf?.configured||!cf?.ok||!cf?.workers) return 'yellow';
@@ -206,8 +241,13 @@ export function dailyDigestDecision(br,lastDate,{lastAttemptAt='',now=Date.now()
 export async function collectHealthSnapshot(env, monitor = null, now = Date.now(), force = false) {
   const previous = safeJson(await metaGet(env,'snapshot'),null);
   if (!force && previous && Number(previous.policyVersion) === HEALTH_POLICY_VERSION && now-(Date.parse(previous.at)||0)<SNAPSHOT_TTL_MS) return previous;
-  const [site, publicAudit, orchHealth, orchStatus, ai, providers, post, postRowsRaw, postCost, cfBilling] = await Promise.all([
-    fetchJson(`${text(env.SITE_BASE)||SITE}/`), fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/auditoria-publicos.json`), fetchJson(`${ORCH}/health`), fetchJson(`${ORCH}/status`), aiUsageSummary(env,24), providerUsageSummary(env,24),
+  const [site, publicAudit, factualAuditResponse, ragManifestResponse, reliabilitySnapshotResponse, orchHealth, orchStatus, ai, providers, post, postRowsRaw, postCost, cfBilling] = await Promise.all([
+    fetchJson(`${text(env.SITE_BASE)||SITE}/`),
+    fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/auditoria-publicos.json`),
+    fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/auditoria-publicos-identidade.json`),
+    fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/rag-manifest.json`),
+    fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/estado-confiabilidade.json`),
+    fetchJson(`${ORCH}/health`), fetchJson(`${ORCH}/status`), aiUsageSummary(env,24), providerUsageSummary(env,24),
     env.DB.prepare(`SELECT COUNT(*) total,
       COALESCE(SUM(CASE WHEN public_status='resolved' THEN 1 ELSE 0 END),0) public_resolved,
       COALESCE(SUM(CASE WHEN public_status='pending' THEN 1 ELSE 0 END),0) public_searching,
@@ -264,6 +304,10 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   const hunterBudgetPct=monthlyBudgetUsd>0?hunterMonthUsd/monthlyBudgetUsd*100:0;
   const eventCosts=new Map((postCost?.events||[]).map((r)=>[text(r.eventId),r]));
   const auditBody=publicAudit?.ok&&publicAudit?.body&&typeof publicAudit.body==='object'?publicAudit.body:{};
+  const factualAudit=factualAuditResponse?.ok&&factualAuditResponse?.body&&typeof factualAuditResponse.body==='object'?factualAuditResponse.body:{};
+  const ragManifest=ragManifestResponse?.ok&&ragManifestResponse?.body&&typeof ragManifestResponse.body==='object'?ragManifestResponse.body:{};
+  const reliabilitySnapshot=reliabilitySnapshotResponse?.ok&&reliabilitySnapshotResponse?.body&&typeof reliabilitySnapshotResponse.body==='object'?reliabilitySnapshotResponse.body:{};
+  const reliabilityIndicators=reliabilityIntelligenceIndicators({orchestratorHealth:orchHealth?.body||{},orchestratorStatus:os,reliabilitySnapshot,factualAudit,ragManifest});
   const seasonCoverage={
     finalizados:n(auditBody.total_jogos_finalizados),
     comPublico:n(auditBody.total_com_publico_ou_complemento),
@@ -301,13 +345,14 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     // OVERDUE é amarelo: o Hunter já envia um alerta específico em T+2h e
     // continua pesquisando. Vermelho fica reservado ao budget guard.
     indicator('postgame','Pós-jogo',postBudget>0?'red':postPending>0?'yellow':'green',`${postPending} pendência(s) · ${postOverdue} >2h · ${postBudget} budget guard · busca persistente`),
+    ...reliabilityIndicators,
     indicator('highlights','Melhores Momentos',highlight>0?'yellow':'green',`${highlight} pendência(s)`),
     indicator('editorial','Editorial / Transmissões',Array.isArray(os.errors)&&os.errors.length?'yellow':'green',Array.isArray(os.errors)&&os.errors.length?`${os.errors.length} erro(s) no último ciclo`:'sem erro reportado pelo Orchestrator'),
     indicator('infra','Infraestrutura / E-mail',!cfg.configured||probe?.ok===false?'red':'green',`${cfg.transport} · ${maskAddress(cfg.to)}${probe?` · ${probe.status||`probe ${probe.ok?'OK':'FALHOU'}`}`:''}${cfg.fallbacks?.length?` · fallback ${cfg.fallbacks.join(' + ')}`:''}`),
     indicator('openai','IA / Custos',hunterBudgetPct>=100?'red':hunterBudgetPct>=warningPct?'yellow':!geminiReady||!workersAiReady||!gatewayAuthReady?'yellow':perEventAnomaly?'yellow':providerFailures>3?'yellow':'green',`${providers.calls} chamada(s) multi-provider · ${providers.searches} busca(s) web · Hunter ${fmtUsd(hunterMonthUsd)}/${fmtUsd(monthlyBudgetUsd)} (${fmtPct(hunterBudgetPct)}) · ${providerFailures} falha(s) /24h`),
     indicator('cloudflare','Cloudflare / CPU & Requests',cloudflareSeverity(cfBilling),cloudflareDetail(cfBilling)),
   ];
-  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY))},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches},postgame:{pending:postPending,searching:postSearching,overdue:postOverdue,budgetGuard:postBudget,resolved:postResolved,seasonCoverage,highlightPending:highlight,persistentUntilResolved:true,pendingRows,cost:{...postCost,budget:{monthlyBudgetUsd,eventBudgetUsd,warningPct,monthPct:hunterBudgetPct}}},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
+  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY)),fineTuning:'not_used_by_design'},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches},reliabilityIntelligence:{sportingState:text(os.reliabilityState)||text(reliabilitySnapshot.state),factualAuditSchema:n(factualAudit.schema_version),factualCritical:n(factualAudit.total_criticos),factualWarnings:n(factualAudit.total_avisos),ragKnowledgeBaseReady:Number(ragManifest.schema_version||0)>=1&&Array.isArray(ragManifest.collections)&&ragManifest.collections.length>0,ragRuntimeEnabled:ragManifest.production_rag_enabled===true,mcpOpsEnabled:false,fineTuning:'not_used_by_design'},postgame:{pending:postPending,searching:postSearching,overdue:postOverdue,budgetGuard:postBudget,resolved:postResolved,seasonCoverage,highlightPending:highlight,persistentUntilResolved:true,pendingRows,cost:{...postCost,budget:{monthlyBudgetUsd,eventBudgetUsd,warningPct,monthPct:hunterBudgetPct}}},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
   await metaPut(env,'snapshot',JSON.stringify(snapshot));
   return snapshot;
 }
@@ -374,6 +419,11 @@ function digestMessage(snapshot, now=Date.now()) {
     'FÓRMULA DO GOL — HEALTH REPORT', `${brParts(now).date} · relatório diário 08:00 BRT`, '',
     `ESTADO GERAL: ${icon(snapshot.state)} ${snapshot.state.toUpperCase()} — ${green}/${total} verdes`, '',
     ...snapshot.indicators.map(x=>`${icon(x.severity)} ${x.label}: ${x.detail}`), '',
+    'CONFIABILIDADE / INTELIGÊNCIA OPERACIONAL',
+    `RAG Knowledge Base: ${snapshot.reliabilityIntelligence?.ragKnowledgeBaseReady?'READY':'INDISPONÍVEL'}`,
+    `RAG Runtime: ${snapshot.reliabilityIntelligence?.ragRuntimeEnabled?'ATIVO':'OFF por política — fora do caminho crítico'}`,
+    'MCP Ops: não implantado nesta execução (reservado para R10R17)',
+    'Fine Tuning: não utilizado por desenho', '',
     'ORQUESTRADOR', `Modo: ${snapshot.orchestrator.workloadMode||'—'}`, `Próximo jogo relevante: ${fmtDate(snapshot.orchestrator.nextRelevantMatchAt)}`,
     `Dispatches GitHub 24h: ${snapshot.orchestrator.githubDispatchesLast24h}`, '',
     ...postgameDigestLines(snapshot.postgame,now), '',

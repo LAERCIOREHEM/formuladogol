@@ -6,13 +6,14 @@
     "docs/operations/CONTRACTS.md",
     "docs/operations/runbooks/SPORTING-INTEGRITY.md",
     "docs/operations/incidents/*.md",
-    "docs/operations/R10R16-ROLLBACK.md"
+    "docs/operations/R10R16-ROLLBACK.md",
+    "docs/operations/runbooks/POSTGAME-FACTUAL-INTEGRITY.md"
   ],
   "authority_rules": {
     "placar": "structured_source_only",
     "classificacao": "deterministic_only",
     "probabilidades": "deterministic_only",
-    "publico_renda": "verified_source_identity_only",
+    "publico_renda": "match_identity_plus_factual_integrity_plus_verified_corrections",
     "rag": "diagnosis_and_context_only"
   }
 }

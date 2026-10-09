@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-09T01:01:15.602232-03:00",
+  "gerado_em": "2026-10-09T09:58:01.698850-03:00",
   "fonte_automatica": "ge/Gato Mestre (presente/total, pagantes e renda; pagantes nunca substituem público presente)",
   "total_jogos_finalizados": 289,
   "total_com_publico_ou_complemento": 289,
@@ -20,12 +20,22 @@
     21,
     4
   ],
-  "novos_complementos": 0,
+  "novos_complementos": 5,
   "fontes_consultadas": [],
   "erros_fontes": [],
-  "conflitos": [],
+  "conflitos": [
+    {
+      "event_id": "401841248",
+      "campo": "renda",
+      "existente": 15056,
+      "verificado": 708004.5,
+      "acao": "corrigido_por_fonte_documental_verificada"
+    }
+  ],
+  "factual_integrity_policy_version": 1,
+  "factual_integrity_quarantined": [],
+  "total_factual_integrity_quarantined": 0,
   "fontes_em_uso": {
-    "cloudflare-postgame-fastlane": 1,
     "https://gauchazh.clicrbs.com.br/esportes/gremio/noticia/2026/10/gremio-decepciona-cede-empate-ao-remo-e-se-complica-na-luta-para-sair-do-z-4-do-brasileirao-cmuysenq9018t015ug3d22cj4.html": 1,
     "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/com-um-a-menos-mirassol-reage-e-impede-vitoria-do-red-bull-bragantino-em-casa-cmuytd6rr0193015ulfgww4c4.html": 1,
     "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/neymar-anota-duas-vezes-de-penalti-e-santos-busca-empate-com-o-lider-flamengo-na-vila-cmv08zgmn01uf0164vlsjieqx.html": 1,
@@ -82,6 +92,7 @@
     "https://www.esporteclubebahia.com.br/fichas-tecnicas/": 1,
     "https://www.fogaonet.com/noticias-do-botafogo/publico-renda-botafogo-fluminense-brasileirao-2026/": 1,
     "https://www.gazetaesportiva.com/campeonatos/brasileiro-serie-a/sao-paulo-x-santos-brasileirao-2026/": 1,
+    "https://www.gazetaesportiva.com/times/palmeiras/palmeiras-x-bahia-29-rodada-brasileirao-08-10-2026": 1,
     "https://www.internacional.com.br/noticias/masculino/inter-e-superado-no-beira-rio": 1,
     "https://www.internacional.com.br/noticias/masculino/reves-na-estreia-do-brasileirao": 1,
     "https://www.itatiaia.com.br/esportes/futebol/futebol-nacional/brasileirao-serie-a/com-gol-mais-rapido-do-brasileiro-internacional-bate-corinthians-e-embola-luta-contra-o-z4": 1,
@@ -96,6 +107,6 @@
     "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/09/20/flamengo-vence-o-red-bull-bragantino-e-abre-3-pontos-de-vantagem-para-o-palmeiras.amp.htm": 1,
     "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/03/atletico-mg-vence-o-red-bull-bragantino-em-jogo-com-lance-dramatico-na-arena-mrv.htm": 1
   },
-  "propagados_para_jogos_detalhes": 3,
+  "propagados_para_jogos_detalhes": 1,
   "conflitos_jogos_detalhes": []
 }

@@ -3,6 +3,7 @@ import { sendMail, probeMail, mailConfig, maskAddress } from './mailer.js';
 import { countWebSearchCalls, recordAiUsage, recordProviderUsage, postgamePublicCostSummary } from './ai-usage.js';
 import { searchPublicWithGemini, fetchSourceText, extractPublicWithWorkersAI, fetchOpenAiResponses, openAiUsage } from './ai-router.js';
 import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, evaluateSourceMatchIdentity, buildAttendanceSearchQueries, attendanceSourcePolicyText, officialClubDomainsForTask, PREFERRED_EDITORIAL_SOURCE_SUFFIXES } from './postgame-search-profile.js';
+import { FACTUAL_INTEGRITY_POLICY_VERSION, FACTUAL_INCIDENTS, inspectPostgameFactualIntegrity, quarantinePostgameFactualIntegrity } from './postgame-factual-integrity.js';
 
 const DEFAULT_SITE_BASE = 'https://formuladogol.com.br';
 // Fase definitiva (uma única chamada por partida). O Sol é reservado a ela e aos editoriais.
@@ -13,10 +14,10 @@ const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
-const POSTGAME_POLICY_VERSION = 12;
+const POSTGAME_POLICY_VERSION = 13;
 
 /*
- * Attendance/Revenue Hunter v12 — R10R15.1 SLA Migration Suppression:
+ * Attendance/Revenue Hunter v13 — R10R16.1 Factual Integrity + R10R15.1 SLA Migration Suppression:
  *   - Mantém aliases de TODOS os clubes, imprensa nacional/regional e sites oficiais
  *     SOMENTE dos dois participantes para fatos documentais de ficha técnica.
  *   - Gemini Interactions vira DESCOBRIDOR DE FONTES: google_search real, sem JSON
@@ -35,7 +36,8 @@ const POSTGAME_POLICY_VERSION = 12;
  *   - Fontes com data/confronto conflitantes são rejeitadas antes de qualquer valor.
  *   - Correções documentais verificadas prevalecem também sobre valores antigos no D1.
  *   - Nunca existe GAVE_UP para público/renda.
- *   - R10R15.1 separa idade da partida de idade da pendência administrativa:
+ *   - R10R16.1 adiciona guard determinístico por campo e reabre apenas colisões factual-integrity.
+   - R10R15.1 separa idade da partida de idade da pendência administrativa:
  *     reaberturas por migração ganham relógio SLA próprio + grace period de 15 min.
  *   - Revalidação administrativa continua buscando imediatamente, mas não pode enviar
  *     falso e-mail de SLA usando a idade histórica da partida.
@@ -227,11 +229,20 @@ export function validatePublicPayload(payload, sourceUrls, task = null) {
   if (p.encontrado !== true) return { accepted: false, reason: 'not_found' };
   const confidence = Number(p.confianca || 0);
   if (!(confidence >= 0.90 && confidence <= 1)) return { accepted: false, reason: 'low_confidence' };
-  const publicValue = clampInt(p.publico, 500, 150000);
-  const paidValue = clampInt(p.publico_pagante, 0, 150000);
-  const revenueValue = clampMoney(p.renda);
+  let publicValue = clampInt(p.publico, 500, 150000);
+  let paidValue = clampInt(p.publico_pagante, 0, 150000);
+  let revenueValue = clampMoney(p.renda);
   if (publicValue == null && paidValue == null && revenueValue == null) return { accepted: false, reason: 'no_values' };
   if (publicValue != null && paidValue != null && paidValue > publicValue) return { accepted: false, reason: 'paid_gt_present' };
+
+  // R10R16.1: a identidade da página não basta; cada campo também precisa ser
+  // semanticamente coerente. Se renda == público, preserva o público e põe
+  // SOMENTE a renda em quarentena. O contexto do task cobre respostas parciais.
+  const contextPublic = publicValue ?? clampInt(task?.publico, 500, 150000);
+  const factual = inspectPostgameFactualIntegrity({ publico: contextPublic, publico_pagante: paidValue ?? task?.publico_pagante, renda: revenueValue });
+  if (factual.quarantineFields.includes('renda')) revenueValue = null;
+  if (factual.quarantineFields.includes('publico_pagante')) paidValue = null;
+
   const sources = new Set(robustSources([...sourceUrls], task));
   const fields = [
     ['publico', publicValue, p.fonte_publico],
@@ -247,9 +258,15 @@ export function validatePublicPayload(payload, sourceUrls, task = null) {
     accepted[key] = value;
     usedSources[key] = url;
   }
-  if (!Object.keys(accepted).length) return { accepted: false, reason: 'source_not_verified' };
-  return { accepted: true, values: accepted, sources: usedSources, confidence, note: text(p.observacao) };
+  if (!Object.keys(accepted).length) {
+    return { accepted: false, reason: factual.critical[0] ? `factual_integrity:${factual.critical[0]}` : 'source_not_verified', factualIntegrity: factual };
+  }
+  return {
+    accepted: true, values: accepted, sources: usedSources, confidence, note: text(p.observacao),
+    factualIntegrity: factual, quarantinedFields: factual.quarantineFields,
+  };
 }
+
 
 function parseBrIntToken(value) {
   const digits = text(value).replace(/\D/g, '');
@@ -877,7 +894,17 @@ async function refreshCachedPublicSources(env,task,values,sources){
 
     await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=CASE WHEN ?='ok' THEN failures ELSE failures+1 END WHERE event_id=? AND url=?`)
       .bind(valid?`ok:${extractor}`:(lastError||'no_data'),valid?'ok':'fail',task.event_id,row.url).run();
-    if(valid){foundAny=true;for(const key of ['publico','publico_pagante','renda']){if(valid.values[key]!=null&&!(Number(values[key])>0)){values[key]=valid.values[key];sources[key]=valid.sources[key];}}}
+    if(valid){
+      foundAny=true;
+      for(const key of ['publico','publico_pagante','renda']){
+        if(valid.values[key]!=null&&!(Number(values[key])>0)){values[key]=valid.values[key];sources[key]=valid.sources[key];}
+      }
+      const guarded=quarantinePostgameFactualIntegrity(values,sources);
+      Object.assign(values,guarded.values);
+      for(const key of Object.keys(sources)) delete sources[key];
+      Object.assign(sources,guarded.sources);
+      if(guarded.verdict.critical.length) lastError=`factual_integrity:${guarded.verdict.critical.join('|')}`;
+    }
     if(isPublicComplete(values))break;
   }
   return {checked,foundAny,lastError};
@@ -1179,6 +1206,12 @@ async function processPublicTask(env, task, now = Date.now()) {
   // v10: não apaga diagnóstico útil só porque uma passada determinística não
   // produziu erro. O último erro só some quando público+renda forem resolvidos.
   let lastError=text(task.public_last_error);
+  const initialGuard=quarantinePostgameFactualIntegrity(values,sources);
+  Object.assign(values,initialGuard.values);
+  sources={...initialGuard.sources};
+  if(initialGuard.verdict.critical.length){
+    lastError=`factual_integrity:${initialGuard.verdict.critical.join('|')}`;
+  }
   let costSummary=null;
   let budget={allowGemini:true,allowOpenAI:true,hardStop:false,reason:''};
   const ageMinutesAtStart=Math.max(0,(now-taskEndMs(task,now))/60_000);
@@ -1403,6 +1436,26 @@ async function ensurePolicyVersion(env, now = Date.now()) {
     await env.DB.prepare(`UPDATE postgame_public_ai SET
       last_phase=CASE WHEN last_phase='migrated_v11_match_identity_gate' THEN 'migrated_v12_sla_migration_suppression' ELSE last_phase END,
       updated_at=CURRENT_TIMESTAMP`).run();
+  }
+
+  // R10R16.1/v13: varredura TARGETED e sem IA. Reabre somente linhas cuja
+  // renda é numericamente idêntica ao público; não revisa o histórico inteiro.
+  if (current < 13) {
+    const suspicious=await env.DB.prepare(`SELECT event_id,publico,publico_pagante,renda,public_sources_json
+      FROM postgame_fastlane
+      WHERE publico IS NOT NULL AND publico>0 AND renda IS NOT NULL AND renda>0
+        AND ABS(renda-publico)<0.005`).all();
+    for (const row of suspicious?.results || []) {
+      const src=safeJson(row.public_sources_json,{})||{};
+      delete src.renda;
+      await env.DB.prepare(`UPDATE postgame_fastlane SET
+        renda=NULL,public_sources_json=?,public_status='pending',public_next_at=?,
+        public_last_error=?,updated_at=CURRENT_TIMESTAMP WHERE event_id=?`)
+        .bind(JSON.stringify(src),isoNow,`factual_integrity:${FACTUAL_INCIDENTS.PUBLIC_REVENUE_FIELD_COLLISION}`,row.event_id).run();
+      await markPublicAdministrativeReopen(env,row.event_id,now);
+      await env.DB.prepare(`UPDATE postgame_public_ai SET sol_completed=0,last_phase='migrated_v13_factual_integrity_targeted_reopen',updated_at=CURRENT_TIMESTAMP WHERE event_id=?`)
+        .bind(row.event_id).run();
+    }
   }
 
   await metaPut(env, 'policy_version', String(POSTGAME_POLICY_VERSION));

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R10R15 — auditoria offline de integridade/identidade de público e renda.
+"""R10R16.1 — auditoria offline de integridade factual/identidade de público e renda.
 
 Não pesquisa a web. Varre TODOS os registros publicados e procura contaminações
 estruturais que podem ser provadas pelo próprio repositório: event_id inexistente,
@@ -7,7 +7,8 @@ pagantes > presentes, fontes sem URL, URL documental com data muito distante do
 jogo e divergência em relação a correções documentais verificadas.
 
 A validação semântica online de cada nova fonte é responsabilidade do Match
-Identity Gate do Push Worker. Este arquivo é a segunda trava, antes do commit.
+Identity Gate + Factual Integrity Guard do Push Worker. Este arquivo é a segunda
+trava determinística antes do commit e NÃO pesquisa a web.
 """
 from __future__ import annotations
 import argparse, json, re
@@ -15,6 +16,11 @@ from copy import deepcopy
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from postgame_factual_integrity import (
+    INCIDENT_PUBLIC_REVENUE_COLLISION,
+    inspect_factual_integrity,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTADOS = ROOT / 'resultados.json'
@@ -66,6 +72,13 @@ def audit_payload(resultados: dict[str,Any], publicos: dict[str,Any], correcoes:
         if p is not None and not (100 <= p <= 250000): issues.append(f'publico_fora_faixa:{p:g}')
         if paid is not None and p is not None and paid > p: issues.append(f'pagantes_maior_que_publico:{paid:g}>{p:g}')
         if rev is not None and not (0 < rev < 100_000_000): issues.append(f'renda_fora_faixa:{rev:g}')
+
+        factual=inspect_factual_integrity(p, paid, rev)
+        for code in factual.get('critical') or []:
+            issues.append(f'factual_integrity:{code}')
+        for code in factual.get('warnings') or []:
+            warns.append(f'factual_integrity:{code}')
+
         fields=source_fields(row)
         for field,value in (('publico',p),('pagantes',paid),('renda',rev)):
             if value is not None and not fields[field]: warns.append(f'{field}_sem_fonte')
@@ -92,11 +105,11 @@ def audit_payload(resultados: dict[str,Any], publicos: dict[str,Any], correcoes:
         elif warns: warnings.append({**item,'avisos':warns})
         else: ok.append(str(eid))
     return {
-      'schema_version':1,'policy':'R10R15-postgame-match-identity-gate',
+      'schema_version':2,'policy':'R10R16.1-postgame-factual-integrity-guard',
       'gerado_em':datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
       'total_registros_publicos':len(rows),'total_ok':len(ok),'total_avisos':len(warnings),'total_criticos':len(critical),'total_observacoes':len(observations),
       'criticos':critical,'avisos':warnings,'observacoes':observations,'event_ids_ok':ok,
-      'nota':'Auditoria offline completa. Identidade semântica de novas páginas é validada online pelo Match Identity Gate antes da extração.'
+      'nota':'Auditoria offline completa e sem rede. Match Identity Gate prova a partida; Factual Integrity Guard prova coerência semântica mínima por campo antes da publicação.'
     }
 
 def self_test() -> None:
@@ -108,7 +121,14 @@ def self_test() -> None:
     ver={'jogos':{'x':{'publico':13934,'pagantes':13773,'renda':285132}}}
     out2=audit_payload(resultados,fixed,ver)
     assert out2['total_criticos']==0
-    print('SELF-TEST OK: auditoria de identidade de público/renda R10R15')
+    collision={'jogos':{'x':{'publico':15056,'renda':15056,'fonte':'https://site.com/2026/10/07/certa.htm','fonte_renda':'https://site.com/2026/10/07/certa.htm'}}}
+    out3=audit_payload(resultados,collision,{'jogos':{}})
+    assert out3['total_criticos']==1
+    assert INCIDENT_PUBLIC_REVENUE_COLLISION in ' '.join(out3['criticos'][0]['problemas'])
+    good={'jogos':{'x':{'publico':15056,'renda':708004.50,'fonte':'https://site.com/2026/10/07/certa.htm','fonte_renda':'https://site.com/2026/10/07/certa.htm'}}}
+    out4=audit_payload(resultados,good,{'jogos':{'x':{'publico':15056,'renda':708004.50}}})
+    assert out4['total_criticos']==0
+    print('SELF-TEST OK: auditoria de identidade + integridade factual R10R16.1')
 
 def main() -> None:
     ap=argparse.ArgumentParser()
@@ -120,7 +140,7 @@ def main() -> None:
     payload=audit_payload(load(RESULTADOS,{}),load(PUBLICOS,{}),load(CORRECOES,{}))
     OUT.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     if args.stdout: print(json.dumps(payload,ensure_ascii=False,indent=2))
-    else: print(f"R10R15 sweep: {payload['total_registros_publicos']} registros; OK={payload['total_ok']}; avisos={payload['total_avisos']}; observações={payload['total_observacoes']}; críticos={payload['total_criticos']}")
+    else: print(f"R10R16.1 sweep: {payload['total_registros_publicos']} registros; OK={payload['total_ok']}; avisos={payload['total_avisos']}; observações={payload['total_observacoes']}; críticos={payload['total_criticos']}")
     if args.fail_on_critical and payload['total_criticos']:
         raise SystemExit(3)
 if __name__=='__main__': main()

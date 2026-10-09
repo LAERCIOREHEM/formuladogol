@@ -40,6 +40,8 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+from postgame_factual_integrity import quarantine_row
+
 ROOT = Path(__file__).resolve().parents[1]
 RESULTADOS = ROOT / "resultados.json"
 DETALHES = ROOT / "dados-br" / "jogos-detalhes.json"
@@ -791,6 +793,25 @@ def executar_coleta(
     mapa: dict[str, dict[str, Any]] = {str(k): dict(v) for k, v in jogos_mapa.items() if isinstance(v, dict)}
     correcoes = carregar_json(CORRECOES_VERIFICADAS, {"jogos": {}})
     correcoes_aplicadas, conflitos_correcoes = aplicar_correcoes_verificadas(mapa, correcoes)
+
+    # R10R16.1: sweep determinístico barato em 100% do snapshot. Não pesquisa
+    # a web; somente coloca o CAMPO criticamente incoerente em quarentena.
+    # Correções documentais verificadas têm precedência absoluta.
+    verified_games = correcoes.get("jogos") if isinstance(correcoes, dict) and isinstance(correcoes.get("jogos"), dict) else {}
+    integridade_quarentena = []
+    for _eid, _row in list(mapa.items()):
+        _verified = verified_games.get(str(_eid)) if isinstance(verified_games.get(str(_eid)), dict) else {}
+        _clean, _verdict = quarantine_row(_row, verified=_verified)
+        if _clean != _row:
+            _clean["integridade_factual"] = {
+                "policy_version": _verdict.get("policy_version"),
+                "estado": "quarentena",
+                "incidentes": _verdict.get("critical"),
+                "campos": _verdict.get("quarantine_fields"),
+                "detectado_em": iso_agora_brt(),
+            }
+            mapa[str(_eid)] = _clean
+            integridade_quarentena.append({"event_id": str(_eid), "incidentes": _verdict.get("critical"), "campos": _verdict.get("quarantine_fields")})
     fontes_rodadas = payload.get("fontes_rodadas") if isinstance(payload.get("fontes_rodadas"), dict) else {}
     fontes_rodadas = {str(k): v for k, v in fontes_rodadas.items()}
 
@@ -1029,6 +1050,9 @@ def executar_coleta(
         "fontes_consultadas": fontes_consultadas,
         "erros_fontes": erros_fontes,
         "conflitos": conflitos,
+        "factual_integrity_policy_version": 1,
+        "factual_integrity_quarantined": integridade_quarentena,
+        "total_factual_integrity_quarantined": len(integridade_quarentena),
         "fontes_em_uso": dict(sorted(fontes.items())),
     }
     return saida, audit
@@ -1223,7 +1247,10 @@ def self_test() -> None:
     assert propagado_nd["jogos"]["x"]["renda"] == 103620
     assert "publico_pagante" not in propagado_nd["jogos"]["x"]
     assert numero_renda("R$ 473.220,00") == 473220 and numero_renda("R$ 785.419,30") == 785419.30
-    print("SELF-TEST OK: parser GE, sitemap dinâmico, normal+AMP, público presente/total, renda/pagantes documentados, bloqueio de pagantes, aliases, duplicados e conflitos.")
+    from postgame_factual_integrity import inspect_factual_integrity
+    assert inspect_factual_integrity(15056, None, 15056)["quarantine_fields"] == ["renda"]
+    assert not inspect_factual_integrity(15056, None, 708004.50)["critical"]
+    print("SELF-TEST OK: parser GE + R10R16.1 factual integrity guard.")
 
 
 def main() -> None:

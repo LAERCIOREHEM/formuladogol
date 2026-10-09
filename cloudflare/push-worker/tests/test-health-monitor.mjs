@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { countWebSearchCalls, estimateProviderCost } from '../src/ai-usage.js';
-import { dailyDigestDecision, githubActionsSeverity, isDailyDigestDue, summarizeCloudflareWorkersUsage, postgameDigestLines, overallRecoveryDecision } from '../src/health-monitor.js';
+import { dailyDigestDecision, githubActionsSeverity, isDailyDigestDue, summarizeCloudflareWorkersUsage, postgameDigestLines, overallRecoveryDecision, reliabilityIntelligenceIndicators } from '../src/health-monitor.js';
 
 assert.equal(countWebSearchCalls({output:[{type:'web_search_call'},{type:'message'},{type:'web_search_call'}]}),2);
 assert.equal(countWebSearchCalls({}),0);
@@ -79,5 +79,24 @@ assert.match(hunterText,/PÓS-JOGO — PÚBLICO & RENDA/);
 assert.match(hunterText,/São Paulo 1 x 2 Santos/);
 assert.match(hunterText,/não existe GAVE_UP/);
 assert.match(hunterText,/US\$ 1\.8400 \/ US\$ 10\.00/);
+
+
+// R10R16.1 — quatro indicadores reais; RAG READY não significa runtime ativo.
+const ri=reliabilityIntelligenceIndicators({
+  orchestratorHealth:{sportingSnapshotIntegrityGuard:true,sportingSnapshotIntegrityGuardVersion:1,reliabilityControlPlane:true,reliabilityDiagnosticArtifact:true,reliabilityIncidentRegressionSuite:true,reliabilityCorrelationId:true},
+  orchestratorStatus:{reliabilityState:'CORE_GREEN'},
+  factualAudit:{schema_version:2,total_criticos:0,total_avisos:0},
+  ragManifest:{schema_version:1,production_rag_enabled:false,collections:['a','b']}
+});
+assert.equal(ri.length,4);
+assert.deepEqual(ri.map(x=>x.severity),['green','green','green','green']);
+assert.match(ri[2].detail,/runtime OFF por política/);
+const riBad=reliabilityIntelligenceIndicators({
+  orchestratorHealth:{sportingSnapshotIntegrityGuard:true,sportingSnapshotIntegrityGuardVersion:1,reliabilityControlPlane:true,reliabilityDiagnosticArtifact:true,reliabilityIncidentRegressionSuite:true,reliabilityCorrelationId:true},
+  orchestratorStatus:{reliabilityState:'CORE_GREEN'},
+  factualAudit:{schema_version:2,total_criticos:1,total_avisos:0},
+  ragManifest:{schema_version:1,production_rag_enabled:false,collections:['a']}
+});
+assert.equal(riBad[1].severity,'red');
 
 console.log('health-monitor/ai-usage tests: PASS');

@@ -233,7 +233,7 @@ assert.equal(shouldImmediateOpenAiFallback({ageMinutes:20,forcedUpgrade:true,bud
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:false},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),false);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:1,httpStatus:200,found:true},discoveredCount:2,refreshedFoundAny:true,complete:true}),false);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:1,httpStatus:200,found:true},discoveredCount:2,refreshedFoundAny:true,complete:false}),true);
-console.log('postgame-fastlane v12 policy + SLA suppression + circuit tests: PASS');
+console.log('postgame-fastlane v13 policy + factual integrity + SLA suppression + circuit tests: PASS');
 
 // ============================ R10R15 Match Identity Gate ============================
 {
@@ -282,3 +282,38 @@ console.log('postgame-fastlane v12 policy + SLA suppression + circuit tests: PAS
   assert.equal(parsedBotVasco.renda, 801180);
 }
 console.log('R10R15 match identity gate tests: PASS');
+// ============================ R10R16.1 Factual Integrity Guard ============================
+{
+  const { inspectPostgameFactualIntegrity, quarantinePostgameFactualIntegrity, FACTUAL_INCIDENTS } = await import('../src/postgame-factual-integrity.js');
+  const collision=inspectPostgameFactualIntegrity({publico:15056,renda:15056});
+  assert.deepEqual(collision.critical,[FACTUAL_INCIDENTS.PUBLIC_REVENUE_FIELD_COLLISION]);
+  assert.deepEqual(collision.quarantineFields,['renda']);
+  const q=quarantinePostgameFactualIntegrity({publico:15056,publico_pagante:null,renda:15056},{publico:'https://a',renda:'https://b'});
+  assert.equal(q.values.publico,15056);
+  assert.equal(q.values.renda,null);
+  assert.equal(q.sources.publico,'https://a');
+  assert.equal(q.sources.renda,undefined);
+  const good=inspectPostgameFactualIntegrity({publico:15056,renda:708004.50});
+  assert.equal(good.critical.length,0);
+
+  const src=new Set(['https://www.uol.com.br/esporte/ficha.htm']);
+  const partial=validatePublicPayload({
+    encontrado:true,publico:15056,publico_pagante:null,renda:15056,
+    fonte_publico:'https://www.uol.com.br/esporte/ficha.htm',fonte_publico_pagante:null,fonte_renda:'https://www.uol.com.br/esporte/ficha.htm',
+    confianca:1,observacao:'colisão'
+  },src,{publico:null});
+  assert.equal(partial.accepted,true,'público confiável deve sobreviver à quarentena da renda');
+  assert.equal(partial.values.publico,15056);
+  assert.equal(partial.values.renda,undefined);
+  assert.deepEqual(partial.quarantinedFields,['renda']);
+
+  const revenueOnly=validatePublicPayload({
+    encontrado:true,publico:null,publico_pagante:null,renda:15056,
+    fonte_publico:null,fonte_publico_pagante:null,fonte_renda:'https://www.uol.com.br/esporte/ficha.htm',
+    confianca:1,observacao:'colisão contextual'
+  },src,{publico:15056});
+  assert.equal(revenueOnly.accepted,false);
+  assert.match(revenueOnly.reason,/PUBLIC_REVENUE_FIELD_COLLISION/);
+}
+console.log('R10R16.1 factual integrity guard tests: PASS');
+
