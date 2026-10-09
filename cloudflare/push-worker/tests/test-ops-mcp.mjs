@@ -28,7 +28,8 @@ async function rpc(method,params={},name=''){
     'MCP-Protocol-Version':'2026-07-28',
     'Mcp-Method':method,
   };
-  if(name) headers['Mcp-Name']=name;
+  const toolName=method==='tools/call'?String(params?.name||name||''):name;
+  if(toolName) headers['Mcp-Name']=toolName;
   const request=new Request('https://push.formuladogol.com.br/mcp',{method:'POST',headers,body:JSON.stringify({jsonrpc:'2.0',id,method,params:{...params,_meta:modernMeta}})});
   const response=await handleOpsMcp(request,{});
   assert.equal(response.status,200,`${method} HTTP ${response.status}: ${await response.clone().text()}`);
