@@ -29,6 +29,7 @@ import {
   tvCheckpointDue,
 } from './logic.js';
 import { activeWriter, dispatchSpec, dispatchWorkflow } from './github.js';
+import { editorialClosureDecision, eligibleRoundFromAgenda } from './editorial-closure.js';
 import { fetchPostgameFastlane, fetchSiteBundle, probeEspn, probeEspnAvailability, repositoryFallbacks } from './sources.js';
 
 // O Worker acorda a cada 5 minutos. O caminho rápido continua compacto:
@@ -37,6 +38,11 @@ import { fetchPostgameFastlane, fetchSiteBundle, probeEspn, probeEspnAvailabilit
 const FAST_PATHS = [
   'dados-br/agenda-clubes-br.json',
   'dados-br/status-atualizacao.json',
+];
+
+const EDITORIAL_CLOSURE_PATHS = [
+  'dados-br/config-analises.json',
+  'dados-br/analises.json',
 ];
 
 const SLOW_PATHS = [
@@ -231,7 +237,7 @@ export class OrchestratorState {
     return {
       ok: true,
       engine: 'fdg-cloudflare-orchestrator',
-      version: String(this.env.ORCHESTRATOR_VERSION || '2.0.0'),
+      version: String(this.env.ORCHESTRATOR_VERSION || '2.3.0'),
       mode: String(this.env.ORCHESTRATOR_MODE || 'shadow'),
       ...status,
       recentDecisions: history.slice(-10).reverse(),
@@ -412,6 +418,76 @@ export class OrchestratorState {
     return { ...runtime, blocked, recoveryEligible };
   }
 
+  async editorialClosureGuard(games, now) {
+    // Cheap pre-gate: só consulta manifesto/config quando a agenda canônica já
+    // demonstra que alguma rodada pode estar editorialmente fechada.
+    const preliminary = eligibleRoundFromAgenda(games, now);
+    if (!preliminary) return { candidate: null, hint: { state: 'idle', slaMinutes: 15 } };
+
+    const cachedResolved = (await this.state.storage.get('editorial:closure:lastResolved')) || {};
+    if (Number(cachedResolved.round || 0) === preliminary.round && Number(cachedResolved.completed || 0) >= preliminary.completed) {
+      return {
+        candidate: null,
+        hint: { ...preliminary, state: 'resolved_cached', eligible: true, slaMinutes: 15, priority: 'closure-guarantee' },
+      };
+    }
+
+    const bundle = await fetchSiteBundle(this.env, EDITORIAL_CLOSURE_PATHS);
+    const errors = bundleErrors(bundle);
+    if (!bundleReady(bundle, EDITORIAL_CLOSURE_PATHS)) {
+      return {
+        candidate: null,
+        errors,
+        hint: {
+          state: 'degraded', round: preliminary.round, completed: preliminary.completed,
+          pending: preliminary.pending, slaMinutes: 15,
+          reason: 'manifesto/config editorial indisponível; fail closed',
+        },
+      };
+    }
+
+    const analyses = data(bundle, 'dados-br/analises.json', { artigos: [] });
+    const config = data(bundle, 'dados-br/config-analises.json', {});
+    const decision = editorialClosureDecision(games, analyses, now, config);
+    if (!decision.eligible) return { candidate: null, errors, hint: { ...decision, slaMinutes: 15 } };
+
+    const firstKey = `editorial:closure:${decision.round}:firstEligibleAt`;
+    let firstEligibleAt = await this.storageDate(firstKey);
+    if (!firstEligibleAt) {
+      firstEligibleAt = now;
+      await this.state.storage.put(firstKey, now.toISOString());
+    }
+    const ageMinutes = minutesBetween(firstEligibleAt, now);
+    const overdue = ageMinutes >= 15 && decision.state !== 'resolved';
+
+    const hint = {
+      ...decision,
+      firstEligibleAt: firstEligibleAt.toISOString(),
+      ageMinutes: Math.round(ageMinutes * 10) / 10,
+      slaMinutes: 15,
+      overdue,
+      priority: 'closure-guarantee',
+    };
+
+    if (decision.state === 'resolved') {
+      await this.state.storage.put('editorial:closure:lastResolved', { round: decision.round, completed: decision.completed, articleId: decision.articleId || '', resolvedAt: now.toISOString() });
+      return { candidate: null, errors, hint };
+    }
+
+    return {
+      errors,
+      hint,
+      candidate: {
+        action: 'editorial_rodada',
+        round: decision.round,
+        reason: `EDITORIAL CLOSURE GUARANTEE: rodada ${decision.round} elegível (${decision.reason}), editorial ausente; prioridade até publicação.`,
+        retryMinutes: 5,
+        editorialClosureGuarantee: true,
+        stateUpdates: { [`editorial:closure:${decision.round}:lastDispatchAt`]: now.toISOString() },
+      },
+    };
+  }
+
   async tick() {
     if (this.busy) return { ok: true, skipped: 'busy' };
     this.busy = true;
@@ -471,6 +547,17 @@ export class OrchestratorState {
         }
       }
 
+      // EDITORIAL CLOSURE GUARANTEE: depois de absorver FINAL esportivo,
+      // mas antes de público/renda, vídeos, continentais e grade, uma rodada
+      // elegível sem matéria ganha prioridade. Writer ativo não é atropelado;
+      // o cron volta a tentar em até 5 min até o manifesto confirmar publicação.
+      if (!candidate) {
+        const closure = await this.editorialClosureGuard(games, now);
+        errors.push(...(closure.errors || []));
+        hints.editorialClosure = closure.hint;
+        candidate = closure.candidate || null;
+      }
+
       if (!candidate) {
         const lastSlow = await this.storageDate('meta:lastSlowEval');
         const nextSlowAt = await this.storageDate('meta:nextSlowEvalAt');
@@ -484,7 +571,7 @@ export class OrchestratorState {
           const slowBundle = await fetchSiteBundle(this.env, SLOW_PATHS);
           errors.push(...bundleErrors(slowBundle));
           const slow = await this.slowDecision({ now, games, bundle: slowBundle, fastBundle, brSource });
-          hints = slow?.hints || (await this.state.storage.get('meta:lastHints')) || {};
+          hints = { ...(slow?.hints || (await this.state.storage.get('meta:lastHints')) || {}), editorialClosure: hints.editorialClosure };
           candidate = slow?.action && slow.action !== 'none' ? slow : null;
           if (candidate?.hints) delete candidate.hints;
           const nextAt = boundedNextSlowAt(now, games, hints, Boolean(candidate));
@@ -494,8 +581,8 @@ export class OrchestratorState {
           await this.state.storage.put('meta:lastHints', { ...hints, nextSlowEvalAt: nextAt.toISOString() });
           hints = { ...hints, nextSlowEvalAt: nextAt.toISOString() };
         } else {
-          hints = (await this.state.storage.get('meta:lastHints')) || {};
-          hints = { ...hints, nextSlowEvalAt: nextSlowAt?.toISOString?.() || '' };
+          const storedHints = (await this.state.storage.get('meta:lastHints')) || {};
+          hints = { ...storedHints, editorialClosure: hints.editorialClosure, nextSlowEvalAt: nextSlowAt?.toISOString?.() || '' };
         }
       }
 

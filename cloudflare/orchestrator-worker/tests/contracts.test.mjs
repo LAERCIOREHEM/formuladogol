@@ -129,7 +129,7 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(state, /transmissoes_guardian/);
   const index = await read('cloudflare/orchestrator-worker/src/index.js');
   assert.match(index, /transmissionGuardian:\s*true/);
-  assert.match(index, /2\.2\.0/);
+  assert.match(index, /2\.3\.0/);
   assert.match(index, /transmissionGuardianNeedGate:\s*true/);
   assert.match(index, /transmissionNeedDrivenV2:\s*true/);
   assert.match(index, /adaptiveSlowPath:\s*true/);
@@ -231,7 +231,7 @@ test('Brasileirão source breaker blocks heavy retries and uses structured colle
 
 test('canonical operational config is aligned with Cloudflare transmission/public policy', async () => {
   const cfg = JSON.parse(await read('dados-br/config-orquestrador.json'));
-  assert.equal(cfg.schema_version, 6);
+  assert.equal(cfg.schema_version, 7);
   assert.equal(cfg.atualizar_brasileirao.af_fastlane_pos_final.ativo, true);
   assert.equal(cfg.atualizar_brasileirao.af_fastlane_pos_final.simulacoes, 2_000_000);
   assert.equal(cfg.publicos.primeira_tentativa_apos_final_minutos, 15);

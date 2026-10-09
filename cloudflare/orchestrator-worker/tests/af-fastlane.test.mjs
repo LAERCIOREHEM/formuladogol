@@ -31,15 +31,15 @@ test('AF Fastlane mantém lock global, 2M simulações e reconciliação complet
   assert.match(yml, /gh workflow run atualizar-brasileirao\.yml --ref main/);
 });
 
-test('health, Wrangler e package expõem a mesma versão 2.2.0', async () => {
+test('health, Wrangler e package expõem a mesma versão 2.3.0', async () => {
   const index = await read('cloudflare/orchestrator-worker/src/index.js');
   const deploy = await read('.github/workflows/deploy-orchestrator-worker.yml');
   const wrangler = await read('cloudflare/orchestrator-worker/wrangler.template.jsonc');
   const pkg = JSON.parse(await read('cloudflare/orchestrator-worker/package.json'));
 
-  assert.match(index, /version: String\(env\.ORCHESTRATOR_VERSION \|\| '2\.2\.0'\)/);
-  assert.match(wrangler, /"ORCHESTRATOR_VERSION":\s*"2\.2\.0"/);
-  assert.equal(pkg.version, '2.2.0');
+  assert.match(index, /version: String\(env\.ORCHESTRATOR_VERSION \|\| '2\.3\.0'\)/);
+  assert.match(wrangler, /"ORCHESTRATOR_VERSION":\s*"2\.3\.0"/);
+  assert.equal(pkg.version, '2.3.0');
 
   assert.match(index, /afPostFinalFastlane:\s*true/);
   assert.match(index, /afPostFinalFastlaneVersion:\s*1/);
@@ -50,7 +50,7 @@ test('health, Wrangler e package expõem a mesma versão 2.2.0', async () => {
 
 test('config canônico documenta o caminho crítico pós-FINAL', async () => {
   const cfg = JSON.parse(await read('dados-br/config-orquestrador.json'));
-  assert.equal(cfg.schema_version, 6);
+  assert.equal(cfg.schema_version, 7);
   assert.equal(cfg.atualizar_brasileirao.af_fastlane_pos_final.ativo, true);
   assert.equal(cfg.atualizar_brasileirao.af_fastlane_pos_final.simulacoes, 2_000_000);
   assert.equal(cfg.execucao_primaria.af_fastlane.includes('af-previsao-fastlane-pos-final.yml'), true);

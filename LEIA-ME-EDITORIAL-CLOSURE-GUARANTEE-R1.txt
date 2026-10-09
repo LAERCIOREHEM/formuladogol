@@ -1,0 +1,66 @@
+FÓRMULA DO GOL — EDITORIAL CLOSURE GUARANTEE R1
+================================================
+
+Objetivo
+--------
+Impedir que um editorial de rodada já elegível fique esperando tarefas de enriquecimento
+(público/renda, melhores momentos, editoriais secundários ou grade futura).
+
+Contrato operacional
+--------------------
+1. O cron do orquestrador continua em 5 minutos.
+2. FINAL esportivo ainda tem precedência: primeiro o resultado precisa ser absorvido.
+3. Em seguida, o Closure Guarantee verifica a maior rodada editorialmente elegível.
+4. Se o artigo correspondente ainda não existir no manifesto canônico, editorial_rodada vira
+   candidato prioritário ANTES do slow path/enriquecimentos.
+5. Writer global ativo nunca é interrompido. O próximo cron volta a tentar automaticamente.
+6. SLA alvo: 15 minutos a partir da primeira elegibilidade observada.
+7. O /status expõe firstEligibleAt, ageMinutes, overdue e estado do guard.
+8. Após confirmação do artigo, o estado resolvido é cacheado por rodada + cobertura para manter
+   o modo dormente barato. Se uma rodada publicada com 8/10 depois chegar a 10/10, a cobertura
+   maior invalida o cache e permite a atualização editorial.
+9. Fail closed: agenda incompleta ou manifesto/config indisponível não autoriza publicação.
+
+Rodada 29
+---------
+Como a R29 já foi publicada manualmente antes deste módulo, o primeiro tick após o deploy apenas
+reconhecerá o artigo existente e gravará o fechamento como resolvido. NÃO deve republicar a R29.
+
+Arquivos do pacote
+------------------
+.github/workflows/deploy-orchestrator-worker.yml
+cloudflare/orchestrator-worker/package.json
+cloudflare/orchestrator-worker/wrangler.template.jsonc
+cloudflare/orchestrator-worker/src/editorial-closure.js (NOVO)
+cloudflare/orchestrator-worker/src/index.js
+cloudflare/orchestrator-worker/src/orchestrator-state.js
+cloudflare/orchestrator-worker/tests/af-fastlane.test.mjs
+cloudflare/orchestrator-worker/tests/contracts.test.mjs
+cloudflare/orchestrator-worker/tests/editorial-closure.test.mjs (NOVO)
+dados-br/config-orquestrador.json
+
+Deploy
+------
+1. Enviar todos os arquivos preservando os caminhos e sobrescrever os existentes.
+2. Commit no main.
+3. O push dispara automaticamente "Deploy Orchestrator Worker" em modo active.
+4. Não é necessário rodar Publicar análise editorial da rodada novamente.
+
+Validação esperada
+------------------
+/health:
+- version = 2.3.0
+- editorialClosureGuarantee = true
+- editorialClosureGuaranteeVersion = 1
+- editorialClosureSlaMinutes = 15
+- editorialClosureCronMinutes = 5
+- editorialClosureWriterSafe = true
+
+/status após os primeiros ticks:
+- editorialClosure.state deve ficar resolved/resolved_cached para a R29 já publicada.
+
+Validação local realizada no pacote
+-----------------------------------
+- npm run check: PASS
+- npm test: 72/72 PASS no baseline reconstruído com os hotfixes vigentes
+- testes específicos AF Fastlane + Closure Guarantee: 9/9 PASS

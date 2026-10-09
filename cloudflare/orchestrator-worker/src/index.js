@@ -48,7 +48,7 @@ export default {
       return json({
         ok: true,
         service: 'formula-do-gol-orchestrator',
-        version: String(env.ORCHESTRATOR_VERSION || '2.2.0'),
+        version: String(env.ORCHESTRATOR_VERSION || '2.3.0'),
         mode: String(env.ORCHESTRATOR_MODE || 'shadow'),
         cron: '*/5 * * * *',
         liveBrowserUntouched: true,
@@ -97,6 +97,12 @@ export default {
         afPostFinalFastlaneVersion: 1,
         afPostFinalFastlaneWorkflow: 'af-previsao-fastlane-pos-final.yml',
         afPostFinalFullReconciliationQueued: true,
+        editorialClosureGuarantee: true,
+        editorialClosureGuaranteeVersion: 1,
+        editorialClosureSlaMinutes: 15,
+        editorialClosureCronMinutes: 5,
+        editorialClosurePriority: 'after-final-before-enrichment',
+        editorialClosureWriterSafe: true,
       });
     }
     if (url.pathname === '/status' || url.pathname === '/v1/status') {

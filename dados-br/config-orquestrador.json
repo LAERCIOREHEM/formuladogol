@@ -1,5 +1,5 @@
 {
-  "schema_version": 6,
+  "schema_version": 7,
   "descricao": "Política determinística de contingência/manual. O orquestrador operacional primário roda no Cloudflare Worker; a IA não decide gatilhos.",
   "timezone": "America/Sao_Paulo",
   "atualizar_brasileirao": {
@@ -84,6 +84,18 @@
     "postgame_fastlane": "formula-do-gol-push (cron 1 min + D1; descoberta sem GitHub, consolidação concreta limitada)",
     "af_fastlane": "af-previsao-fastlane-pos-final.yml (FINAL -> AF primeiro; reconciliação completa depois)",
     "modo_dormente": true,
-    "gate_github": "somente mudança esportiva real ou descoberta concreta pós-jogo"
+    "gate_github": "somente mudança esportiva real ou descoberta concreta pós-jogo",
+    "editorial_closure_guarantee": "v1 · SLA alvo 15 min · cron 5 min · prioridade anti-starvation após FINAL"
+  },
+  "editorial_closure_guarantee": {
+    "ativo": true,
+    "versao": 1,
+    "sla_minutos": 15,
+    "cron_minutos": 5,
+    "prioridade": "apos absorver FINAL esportivo e antes de enriquecimentos pós-jogo/editoriais secundários",
+    "workflow": "publicar-analise-rodada.yml",
+    "respeita_writer_global": true,
+    "fail_closed": true,
+    "politica": "Rodada editorialmente elegível sem artigo é reavaliada a cada cron e recebe prioridade até o manifesto canônico confirmar a publicação; writer ativo nunca é interrompido e o próximo cron retenta automaticamente."
   }
 }
