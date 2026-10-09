@@ -1,0 +1,25 @@
+FDG — AF FASTLANE R1 — HOTFIX3 FINAL MONOTONIC
+
+Falha corrigida:
+O workflow completo foi enfileirado depois do Fastlane. O main já possuía os dois
+FINAIS e o AF pré-jogo com 289 concluídos / 91 restantes, mas uma superfície
+atrasada do scoreboard ESPN podia devolver o mesmo event_id novamente como
+pre/in-play. O merge incremental substituía cegamente o FINAL anterior, reabria
+a partida no working tree e a validação passava a esperar Santos x Flamengo e
+Athletico-PR x Atlético-MG entre os jogos restantes, enquanto
+probabilidades-jogos.json corretamente já os havia removido.
+
+Correção:
+- FINAL confirmado passa a ser monotônico no merge incremental.
+- Um estado pre/in-play posterior não pode reabrir o mesmo event_id.
+- Outro estado FINAL continua podendo substituir/confirmar o evento.
+- Self-test novo reproduz exatamente a regressão FINAL -> in e exige preservação.
+
+Arquivo funcional alterado:
+- atualizar_espn.py
+
+Depois do upload:
+1. Commit em main.
+2. Rode "Atualizar Brasileirao (ESPN)" novamente uma única vez, ou aguarde o
+   orquestrador dispará-lo.
+3. Não marque forcar_af e não marque reconstruir_fontes.

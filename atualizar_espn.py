@@ -600,11 +600,43 @@ def _scoreboard_anual_util(
 def _mesclar_eventos_normalizados(
     anteriores: list[dict[str, Any]], novos: list[dict[str, Any]]
 ) -> list[dict[str, Any]]:
-    merged = {str(item.get("event_id")): copy.deepcopy(item) for item in anteriores if item.get("event_id")}
+    """Mescla a janela ESPN sem permitir regressão de um FINAL confirmado.
+
+    O scoreboard pode ficar temporariamente atrás do summary individual. Nesse
+    intervalo, o mesmo event_id pode reaparecer como pre/in-play mesmo depois
+    de o FINAL já ter sido confirmado e publicado. FINAL é monotônico: somente
+    outro estado concluído pode substituir um estado concluído anterior.
+    """
+    merged = {
+        str(item.get("event_id")): copy.deepcopy(item)
+        for item in anteriores
+        if item.get("event_id")
+    }
     for item in novos:
         event_id = str(item.get("event_id") or "")
-        if event_id:
-            merged[event_id] = item
+        if not event_id:
+            continue
+        previous = merged.get(event_id)
+        previous_final = bool(
+            previous
+            and (
+                previous.get("concluido") is True
+                or str(previous.get("estado") or "").lower() == "post"
+            )
+        )
+        incoming_final = bool(
+            item.get("concluido") is True
+            or str(item.get("estado") or "").lower() == "post"
+        )
+        if previous_final and not incoming_final:
+            print(
+                "::warning title=Regressão ESPN ignorada::"
+                f"evento {event_id} já estava FINAL; feed novo retornou "
+                f"estado={item.get('estado')!r}/concluido={item.get('concluido')!r}. "
+                "Mantendo o FINAL canônico anterior."
+            )
+            continue
+        merged[event_id] = item
     events = sorted(merged.values(), key=lambda item: item.get("_sort") or 0)
     inferir_rodadas_faltantes(events)
     aplicar_ajustes_calendario(events)
@@ -2800,6 +2832,23 @@ def selftest_execucao_6() -> None:
     merged_map = {item["event_id"]: item for item in merged_test}
     assert merged_map["A"]["placar_mandante"] == 1
     assert merged_map["B"]["concluido"] is True and merged_map["B"]["placar_mandante"] == 2
+
+    # FINAL é monotônico: uma superfície atrasada da ESPN não pode reabrir
+    # uma partida que o summary já confirmou como encerrada.
+    regressao = dict(
+        encerrado,
+        status="82'",
+        estado="in",
+        concluido=False,
+        placar_mandante=1,
+        placar_visitante=0,
+    )
+    monotonic_test = _mesclar_eventos_normalizados([encerrado], [regressao])
+    monotonic_map = {item["event_id"]: item for item in monotonic_test}
+    assert monotonic_map["B"]["concluido"] is True
+    assert monotonic_map["B"]["estado"] == "post"
+    assert monotonic_map["B"]["placar_mandante"] == 2
+    assert monotonic_map["B"]["placar_visitante"] == 0
     usable, _ = _scoreboard_anual_util([antigo, encerrado] * 10, [antigo])
     assert usable is True
     # Circuit breaker local: 400/403 em todas as superfícies é persistente;
