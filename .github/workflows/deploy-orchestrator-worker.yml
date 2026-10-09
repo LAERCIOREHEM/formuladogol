@@ -9,6 +9,7 @@ on:
       - 'scripts/orquestrar_workflows.py'
       - '.github/workflows/orquestrador-inteligente.yml'
       - '.github/workflows/af-previsao-fastlane-pos-final.yml'
+      - '.github/workflows/publicar-analise-rodada.yml'
       - '.github/workflows/atualizar-brasileirao.yml'
       - '.github/workflows/atualizar-publicos-brasileirao.yml'
       - '.github/workflows/auditar-transmissoes-ia.yml'
@@ -114,15 +115,15 @@ jobs:
           const fs = require('fs');
           const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
           const rendered = fs.readFileSync('wrangler.generated.jsonc', 'utf8');
-          if (pkg.version !== '2.2.0') {
-            console.error(`ERRO: package.json version=${pkg.version}; esperado=2.2.0`);
+          if (pkg.version !== '2.3.0') {
+            console.error(`ERRO: package.json version=${pkg.version}; esperado=2.3.0`);
             process.exit(1);
           }
-          if (!/"ORCHESTRATOR_VERSION"\s*:\s*"2\.2\.0"/.test(rendered)) {
-            console.error('ERRO: wrangler.generated.jsonc não contém ORCHESTRATOR_VERSION=2.2.0');
+          if (!/"ORCHESTRATOR_VERSION"\s*:\s*"2\.3\.0"/.test(rendered)) {
+            console.error('ERRO: wrangler.generated.jsonc não contém ORCHESTRATOR_VERSION=2.3.0');
             process.exit(1);
           }
-          console.log('Versão sincronizada: package=2.2.0; Wrangler=2.2.0.');
+          console.log('Versão sincronizada: package=2.3.0; Wrangler=2.3.0.');
           NODE
 
       - name: Deploy base SHADOW + Durable Object + Cron Trigger
@@ -160,7 +161,7 @@ jobs:
           const ok =
             p.ok === true &&
             p.service === 'formula-do-gol-orchestrator' &&
-            p.version === '2.2.0' &&
+            p.version === '2.3.0' &&
             p.mode === expectedMode &&
             p.cron === '*/5 * * * *' &&
             p.liveBrowserUntouched === true &&
@@ -193,18 +194,24 @@ jobs:
             p.afPostFinalFastlane === true &&
             p.afPostFinalFastlaneVersion === 1 &&
             p.afPostFinalFastlaneWorkflow === 'af-previsao-fastlane-pos-final.yml' &&
-            p.afPostFinalFullReconciliationQueued === true;
+            p.afPostFinalFullReconciliationQueued === true &&
+            p.editorialClosureGuarantee === true &&
+            p.editorialClosureGuaranteeVersion === 1 &&
+            p.editorialClosureSlaMinutes === 15 &&
+            p.editorialClosureCronMinutes === 5 &&
+            p.editorialClosurePriority === 'after-final-before-enrichment' &&
+            p.editorialClosureWriterSafe === true;
           process.exit(ok ? 0 : 1);
           NODE
             then
-              echo "Health OK em modo $EXPECTED; AF Fastlane v1 confirmado."
+              echo "Health OK em modo $EXPECTED; AF Fastlane v1 + Editorial Closure Guarantee v1 confirmados."
               printf '%s\n' "$BODY"
               exit 0
             fi
             echo "Tentativa $i/20: health ainda não refletiu o contrato esperado."
             sleep 6
           done
-          echo "ERRO: health não confirmou modo $EXPECTED e contrato AF Fastlane v1 em $URL"
+          echo "ERRO: health não confirmou modo $EXPECTED e contratos AF Fastlane v1 + Editorial Closure Guarantee v1 em $URL"
           curl -fsS --max-time 10 "$URL" || true
           echo
           exit 1
@@ -229,8 +236,9 @@ jobs:
             echo ''
             echo "- **Modo:** \`${REQUESTED_MODE}\`"
             echo '- **Worker:** `formula-do-gol-orchestrator`'
-            echo '- **Versão:** `2.2.0`'
+            echo '- **Versão:** `2.3.0`'
             echo '- **AF pós-FINAL:** `Fastlane v1`'
+            echo '- **Editorial:** `Closure Guarantee v1 · SLA alvo 15 min`'
             echo '- **Cron:** `*/5 * * * *`'
             echo '- **Health:** https://orchestrator.formuladogol.com.br/health'
             echo '- **Status:** https://orchestrator.formuladogol.com.br/status'
