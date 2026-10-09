@@ -14,6 +14,11 @@ on:
         required: false
         default: 'manual'
         type: string
+      trace_id:
+        description: 'Correlation ID interno do ciclo pós-FINAL'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: write
@@ -49,6 +54,15 @@ jobs:
       - name: Dependências do AF
         run: python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
 
+      - name: Preparar correlation ID ponta a ponta
+        shell: bash
+        run: |
+          set -euo pipefail
+          TRACE='${{ inputs.trace_id }}'
+          if [[ -z "$TRACE" ]]; then TRACE="fdg-${{ inputs.event_id || 'recovery' }}"; fi
+          echo "FDG_TRACE_ID=$TRACE" >> "$GITHUB_ENV"
+          echo "Correlation ID: $TRACE"
+
       - name: Validar somente o caminho crítico
         shell: bash
         run: |
@@ -60,7 +74,11 @@ jobs:
             scripts/af_previsao_continental.py \
             scripts/gerar_probabilidades_jogos.py \
             scripts/gerar_probabilidades_brasileirao.py \
-            scripts/reconciliar_af_continental.py
+            scripts/reconciliar_af_continental.py \
+            scripts/fdg_reliability.py \
+            scripts/validar_snapshot_esportivo.py \
+            scripts/registrar_slo_confiabilidade.py \
+            scripts/gerar_estado_confiabilidade.py
           python atualizar_espn.py --selftest
           python scripts/gerar_agenda_clubes_brasileirao.py --self-test
           python scripts/af_previsao_continental.py --self-test
@@ -132,46 +150,25 @@ jobs:
           # antes de permitir o novo AF. Se houver contradição, falha fechado.
           python scripts/reconciliar_af_continental.py --force --max-attempts 2
 
-      - name: Validar atomicidade esportiva
+      - name: Sporting Snapshot Integrity Guard
         if: steps.delta.outputs.new_final == 'true'
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          import json
-          from datetime import datetime
-          from pathlib import Path
+          python scripts/validar_snapshot_esportivo.py \
+            --profile fastlane \
+            --event-id "${{ inputs.event_id }}" \
+            --trace-id "$FDG_TRACE_ID" \
+            --diagnostic artifacts/reliability/fdg-diagnostico-fastlane.json \
+            --report artifacts/reliability/sporting-integrity-fastlane.json
 
-          def load(path):
-              return json.loads(Path(path).read_text(encoding='utf-8'))
+      - name: Registrar SLO FINAL → AF
+        if: steps.delta.outputs.new_final == 'true' && inputs.event_id != ''
+        run: python scripts/registrar_slo_confiabilidade.py --event-id "${{ inputs.event_id }}" --trace-id "$FDG_TRACE_ID"
 
-          resultados = load('resultados.json')
-          probs = load('dados-br/probabilidades-brasileirao.json')
-          audit = load('dados-br/auditoria-probabilidades.json')
-
-          total = int(resultados.get('total_resultados') or len(resultados.get('resultados') or []))
-          base = int((probs.get('base_corrente') or {}).get('partidas_concluidas') or -1)
-          if base != total:
-              raise SystemExit(f'AF inconsistente: base_corrente={base}, resultados={total}')
-
-          if probs.get('status') != 'ok':
-              raise SystemExit('AF novo sem status=ok')
-          if int((probs.get('simulacao') or {}).get('quantidade') or 0) != 2_000_000:
-              raise SystemExit('AF Fastlane não usou 2.000.000 simulações')
-          if audit.get('status') != 'ok':
-              raise SystemExit('auditoria-probabilidades não confirmou status=ok')
-
-          finals = [
-              str(x.get('finalizado_em') or '') for x in resultados.get('resultados') or []
-              if str(x.get('estado') or '').lower() == 'post' and x.get('finalizado_em')
-          ]
-          latest_final = max(finals) if finals else ''
-          ref = str(probs.get('referencia_esportiva_em') or '')
-          if latest_final and ref and datetime.fromisoformat(ref) < datetime.fromisoformat(latest_final):
-              raise SystemExit(f'AF atrasado: referencia={ref} < final={latest_final}')
-
-          print(f'Atomicidade OK: {total} concluídos; referência={ref}; simulações=2.000.000.')
-          PY
+      - name: Atualizar estado CORE / ENRICHMENT
+        if: steps.delta.outputs.new_final == 'true'
+        run: python scripts/gerar_estado_confiabilidade.py --profile fastlane
 
       - name: Preparar artefatos atômicos
         id: material
@@ -193,6 +190,8 @@ jobs:
             dados-br/auditoria-probabilidades.json
             dados-br/historico-probabilidades.json
             dados-br/avaliacao-af-previsao.json
+            dados-br/slo-confiabilidade.json
+            dados-br/estado-confiabilidade.json
           )
           EXISTING=()
           for f in "${FILES[@]}"; do [[ -e "$f" ]] && EXISTING+=("$f"); done
@@ -226,6 +225,8 @@ jobs:
             dados-br/auditoria-probabilidades.json
             dados-br/historico-probabilidades.json
             dados-br/avaliacao-af-previsao.json
+            dados-br/slo-confiabilidade.json
+            dados-br/estado-confiabilidade.json
           )
           EXISTING=()
           for f in "${FILES[@]}"; do [[ -e "$f" ]] && EXISTING+=("$f"); done
@@ -276,8 +277,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh workflow run atualizar-brasileirao.yml --ref main
+          gh workflow run atualizar-brasileirao.yml --ref main -f trace_id="$FDG_TRACE_ID"
           echo "Workflow completo enfileirado; estatísticas, líderes, auditorias e demais derivados continuam fora do caminho crítico do AF."
+
+      - name: Anexar diagnóstico estruturado em caso de falha
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg-fastlane-diagnostic-${{ github.run_id }}
+          path: artifacts/reliability/
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Resumo
         if: always()
@@ -288,6 +298,7 @@ jobs:
             echo ""
             echo "- Evento gatilho: \`${{ inputs.event_id || 'não informado' }}\`"
             echo "- Origem: \`${{ inputs.origem || 'manual' }}\`"
+            echo "- Trace: \`$FDG_TRACE_ID\`"
             echo "- Concluídos antes: \`${{ steps.before.outputs.resultados || '?' }}\`"
             echo "- Concluídos depois: \`${{ steps.delta.outputs.after || '?' }}\`"
             echo "- FINAL material novo: \`${{ steps.delta.outputs.new_final || 'false' }}\`"

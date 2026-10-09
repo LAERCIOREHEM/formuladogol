@@ -1,0 +1,64 @@
+name: Reliability Control Plane CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/fdg_reliability.py'
+      - 'scripts/validar_snapshot_esportivo.py'
+      - 'scripts/validar_publicacao_brasileirao.py'
+      - 'scripts/registrar_slo_confiabilidade.py'
+      - 'scripts/gerar_estado_confiabilidade.py'
+      - 'atualizar_espn.py'
+      - 'cloudflare/orchestrator-worker/**'
+      - 'tests/incidents/**'
+      - '.github/workflows/af-previsao-fastlane-pos-final.yml'
+      - '.github/workflows/atualizar-brasileirao.yml'
+      - '.github/workflows/deploy-orchestrator-worker.yml'
+      - '.github/workflows/reliability-control-plane.yml'
+      - 'dados-br/config-orquestrador.json'
+      - 'docs/operations/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fdg-reliability-control-plane-ci
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: requirements-af-previsao.txt
+      - name: Dependências Python
+        run: python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
+      - name: Sporting Snapshot Integrity + incident regressions
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/fdg_reliability.py scripts/validar_snapshot_esportivo.py scripts/validar_publicacao_brasileirao.py scripts/registrar_slo_confiabilidade.py scripts/gerar_estado_confiabilidade.py
+          python scripts/validar_snapshot_esportivo.py --profile ci --report artifacts/reliability/sporting-integrity-ci.json --diagnostic artifacts/reliability/fdg-diagnostico-ci.json
+          python -m unittest discover -s tests/incidents -p 'test_*.py' -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Orchestrator contracts
+        working-directory: cloudflare/orchestrator-worker
+        run: |
+          npm install --no-audit --no-fund
+          npm run validate
+      - name: Upload diagnostic artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg-reliability-ci-${{ github.run_id }}
+          path: artifacts/reliability/
+          if-no-files-found: ignore
+          retention-days: 14

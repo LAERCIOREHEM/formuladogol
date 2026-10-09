@@ -257,6 +257,8 @@ jobs:
             dados-br/ranking-desempenho.json
             dados-br/resultados-manuais.json
             dados-br/status-atualizacao.json
+            dados-br/estado-confiabilidade.json
+            dados-br/slo-confiabilidade.json
             dados-br/transmissoes-aovivo-manual.json
             dados-br/transmissoes-aovivo.json
             dados-br/transmissoes-tv.json
@@ -1731,6 +1733,59 @@ jobs:
           if [[ "$publicado" != "true" ]]; then
             echo "::warning title=Registro da notificação pendente::O e-mail foi enviado, mas o registro de deduplicação não pôde ser publicado."
           fi
+
+      - name: Reliability SLO — medir FINAL → AF → deploy
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/reliability
+          python - <<'PY'
+          import json, subprocess
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          def parse(value):
+              if not value: return None
+              d=datetime.fromisoformat(str(value).replace('Z','+00:00'))
+              return d if d.tzinfo else d.replace(tzinfo=timezone.utc)
+          def minutes(a,b):
+              a,b=parse(a),parse(b)
+              return round((b-a).total_seconds()/60,3) if a and b else None
+
+          resultados=json.loads(Path('resultados.json').read_text(encoding='utf-8'))
+          af=json.loads(Path('dados-br/probabilidades-brasileirao.json').read_text(encoding='utf-8'))
+          finals=[str(x.get('finalizado_em') or '') for x in resultados.get('resultados') or [] if x.get('finalizado_em')]
+          latest=max(finals) if finals else ''
+          af_at=str(af.get('calculado_em') or af.get('gerado_em') or '')
+          commit_at=subprocess.check_output(['git','show','-s','--format=%cI','HEAD'],text=True).strip()
+          deployed_at=datetime.now(timezone.utc).isoformat()
+          payload={
+            'schema_version':1,
+            'trace_scope':'latest-sporting-snapshot',
+            'latest_final':latest,
+            'af_calculated_at':af_at,
+            'commit_at':commit_at,
+            'deploy_confirmed_at':deployed_at,
+            'metrics_minutes':{
+              'final_to_af':minutes(latest,af_at),
+              'af_to_deploy':minutes(af_at,deployed_at),
+              'commit_to_deploy':minutes(commit_at,deployed_at),
+            },
+            'targets_minutes':{'final_to_af':10,'commit_to_site':5},
+          }
+          Path('artifacts/reliability/deploy-slo.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(payload,ensure_ascii=False))
+          PY
+
+      - name: Anexar métrica de SLO do deploy
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg-deploy-slo-${{ github.run_id }}
+          path: artifacts/reliability/deploy-slo.json
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Notificar buscadores via IndexNow
         if: success()

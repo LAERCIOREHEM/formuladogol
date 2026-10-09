@@ -16,6 +16,11 @@ on:
         required: false
         default: false
         type: boolean
+      trace_id:
+        description: 'Correlation ID interno do ciclo pós-FINAL; normalmente preenchido pelo AF Fastlane'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: write
@@ -33,6 +38,8 @@ jobs:
     name: Buscar dados ESPN e publicar JSONs
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      FDG_TRACE_ID: ${{ inputs.trace_id }}
 
     steps:
       - name: Baixar repositorio
@@ -62,6 +69,11 @@ jobs:
         run: |
           python -m py_compile \
             atualizar_espn.py \
+            scripts/fdg_reliability.py \
+            scripts/validar_snapshot_esportivo.py \
+            scripts/validar_publicacao_brasileirao.py \
+            scripts/registrar_slo_confiabilidade.py \
+            scripts/gerar_estado_confiabilidade.py \
             fontes_brasileirao.py \
             scripts/atualizar_transmissoes_tv_brasileirao.py \
             scripts/gerar_agenda_clubes_brasileirao.py \
@@ -578,410 +590,11 @@ jobs:
           done
           # A fonte principal permanece ESPN; fallbacks pontuais são registrados
           # por evento sem alterar a origem principal do snapshot.
-          python - <<'PY'
-          import json
-          import math
-          import os
-          from scripts.gerar_probabilidades_brasileirao import (
-              continental_snapshots_state_hash,
-              load_current_matches,
-              load_current_state,
-              load_fixtures,
-              sporting_fixture_key,
-          )
-          for arq in ['tabela.json', 'jogos.json', 'resultados.json']:
-              d = json.load(open(arq, encoding='utf-8'))
-              assert d.get('fonte') == 'ESPN', f'{arq}: fonte nao e ESPN'
-          t = json.load(open('tabela.json', encoding='utf-8'))
-          assert len(t.get('tabela') or []) == 20, 'tabela sem 20 times'
-          j = json.load(open('jogos.json', encoding='utf-8'))
-          assert isinstance(j.get('jogos'), list), 'jogos.json sem lista jogos'
-          r = json.load(open('resultados.json', encoding='utf-8'))
-          e = json.load(open('espn_eventos.json', encoding='utf-8'))
-          assert isinstance(r.get('resultados'), list), 'resultados.json sem lista resultados'
-          status_ops = json.load(open('dados-br/status-atualizacao.json', encoding='utf-8'))
-          assert status_ops.get('status') in {'ok', 'aviso'}, 'status operacional incompatível com publicação sincronizada'
-          assert status_ops.get('sincronizado') is True, 'status operacional não reconhece snapshot sincronizado'
-          tv = json.load(open('dados-br/transmissoes-tv.json', encoding='utf-8'))
-          assert isinstance(tv.get('jogos'), dict), 'transmissoes-tv.json sem mapa de jogos'
-          aud_tv = json.load(open('dados-br/auditoria-transmissoes-tv.json', encoding='utf-8'))
-          assert isinstance(aud_tv.get('fontes'), dict), 'auditoria de transmissões sem mapa de fontes'
-          assert isinstance(aud_tv.get('sem_transmissao'), list), 'auditoria de transmissões sem pendências'
-                  # Este workflow NAO executa atualizar_transmissoes_tv_brasileirao.py: ele apenas
-          # consome os dois arquivos. Uma divergencia entre eles e defeito do coletor
-          # (workflow buscar-transmissoes-aovivo-brasileirao); derrubar aqui bloqueia
-          # tabela, resultados e AF-Previsao por um artefato que este job nao repara.
-          # Continua fatal no workflow que produz os arquivos; aqui vira aviso.
-          tv_publicados = len(tv['jogos'])
-          tv_auditados = int((aud_tv.get('resumo') or {}).get('jogos_com_transmissao') or 0)
-          if tv_auditados != tv_publicados:
-              print('::warning title=Transmissoes dessincronizadas::auditoria conta '
-                    f'{tv_auditados} jogo(s) e a saida publica {tv_publicados}; rode o workflow '
-                    'Buscar transmissoes dos clubes do Brasileirao para reconciliar.')
-          print('  OK   JSONs principais: ESPN como fonte principal; tabela com 20 times')
-          stats = json.load(open('dados-br/estatisticas.json', encoding='utf-8'))
-          rank = json.load(open('dados-br/ranking-desempenho.json', encoding='utf-8'))
-          hist_rank = json.load(open('dados-br/historico-ranking-desempenho.json', encoding='utf-8'))
-          assert len(stats.get('clubes') or []) == 20, 'estatisticas.json sem 20 clubes'
-          assert len(rank.get('ranking') or []) == 20, 'ranking-desempenho.json sem 20 clubes'
-          for item in rank.get('ranking') or []:
-              for campo in ['indice_final', 'ataque', 'defesa', 'dominio', 'eficiencia', 'disciplina']:
-                  assert campo in item, f'ranking sem campo {campo}'
-          snapshots_rank = hist_rank.get('snapshots') or []
-          assert hist_rank.get('schema_version') == 1, 'histórico do ranking com schema inválido'
-          assert snapshots_rank and snapshots_rank[-1].get('id') == 'atual', 'histórico do ranking sem estado atual'
-          assert len({item.get('id') for item in snapshots_rank}) == len(snapshots_rank), 'snapshots repetidos no histórico do ranking'
-          for snapshot in snapshots_rank:
-              linhas = snapshot.get('ranking') or []
-              assert len(linhas) == 20, f"{snapshot.get('id')}: histórico sem 20 clubes"
-              assert sorted(int(item.get('pos') or 0) for item in linhas) == list(range(1, 21)), f"{snapshot.get('id')}: posições inválidas"
-              jogos_iguais = snapshot.get('jogos_por_clube')
-              if jogos_iguais is not None:
-                  assert all(int(item.get('jogos') or 0) == int(jogos_iguais) for item in linhas), f"{snapshot.get('id')}: amostras desiguais"
-          campos_hist = ['time', 'pos', 'indice_final', 'ataque', 'defesa', 'dominio', 'eficiencia', 'disciplina', 'jogos']
-          atual_hist = [{campo: item.get(campo) for campo in campos_hist} for item in snapshots_rank[-1]['ranking']]
-          atual_rank = [{campo: item.get(campo) for campo in campos_hist} for item in rank['ranking']]
-          assert atual_hist == atual_rank, 'snapshot atual diverge do ranking publicado'
-          aud_rank = json.load(open('dados-br/auditoria-ranking-desempenho.json', encoding='utf-8'))
-          assert aud_rank.get('clubes_no_ranking') == 20, 'auditoria-ranking sem 20 clubes'
-          jogadores = json.load(open('dados-br/jogadores.json', encoding='utf-8'))
-          assert isinstance(jogadores.get('artilharia'), list), 'jogadores.json sem artilharia'
-          assert isinstance(jogadores.get('assistencias'), list), 'jogadores.json sem assistencias'
-          assert isinstance(jogadores.get('participacoes_gol'), list), 'jogadores.json sem participacoes_gol'
-          lideres = json.load(open('dados-br/lideres-jogadores.json', encoding='utf-8'))
-          assert lideres.get('status') == 'valido', 'lideres-jogadores.json inválido'
-          assert len(lideres.get('artilharia') or []) >= 40, 'artilharia completa truncada'
-          assert len(lideres.get('assistencias') or []) >= 20, 'assistências completas truncadas'
-          assert int(lideres['artilharia'][0].get('gols') or 0) > 0, 'líder de gols inválido'
-          assert int(lideres['assistencias'][0].get('assistencias') or 0) > 0, 'líder de assistências inválido'
-          assert len(jogadores.get('artilharia') or []) >= 40, 'jogadores.json sem artilharia completa'
-          assert len(jogadores.get('assistencias') or []) >= 20, 'jogadores.json sem assistências completas'
-          detalhes = json.load(open('dados-br/jogos-detalhes.json', encoding='utf-8'))
-          assert isinstance(detalhes.get('jogos'), dict), 'jogos-detalhes.json sem objeto jogos'
-          auditoria = json.load(open('dados-br/auditoria-jogos-detalhes.json', encoding='utf-8'))
-          assert isinstance(auditoria.get('falhas'), list), 'auditoria-jogos-detalhes.json sem lista falhas'
-          assert 'total_com_publico' in auditoria, 'auditoria-jogos-detalhes sem contagem de público'
-          auditoria_publicos = json.load(open('dados-br/auditoria-publicos.json', encoding='utf-8'))
-          assert isinstance(auditoria_publicos.get('sem_publico'), list), 'auditoria-publicos.json sem lista de pendências'
-          assert int(auditoria_publicos.get('total_partidas_fisicas') or 0) > 0, 'auditoria-publicos sem partidas físicas'
-          assert int(auditoria_publicos.get('total_partidas_fisicas_com_publico') or 0) + int(auditoria_publicos.get('total_partidas_fisicas_sem_publico') or 0) == int(auditoria_publicos.get('total_partidas_fisicas') or 0), 'auditoria-publicos com cobertura inconsistente'
-          assert auditoria.get('total_inconsistencias_eventos') == 0, 'há gols/cartões inconsistentes'
-          validados = int(detalhes.get('total_eventos_validados') or 0)
-          pendentes = int(detalhes.get('total_eventos_pendentes_detalhes') or 0)
-          assert validados + pendentes == detalhes.get('total_jogos'), 'há jogo sem eventos validados ou pendência manual declarada'
-          for event_id, item in (detalhes.get('jogos') or {}).items():
-              validacao = item.get('validacao_eventos') or {}
-              if validacao.get('pendente_detalhes') is not True:
-                  continue
-              if item.get('resultado_manual') is True:
-                  assert validacao.get('resultado_confirmado') is True, f'{event_id}: resultado manual pendente sem confirmação'
-                  assert validacao.get('tipo_pendencia') == 'resultado_manual_sem_ficha', f'{event_id}: tipo de pendência manual inválido'
-              else:
-                  assert validacao.get('tipo_pendencia') == 'ficha_espn_incompleta', f'{event_id}: pendência ESPN sem classificação explícita'
-                  assert validacao.get('gols_compativeis') is True, f'{event_id}: gols pendentes contradizem o placar'
-                  assert validacao.get('cartoes_compativeis') is True, f'{event_id}: cartões pendentes contradizem o boxscore'
-          competicao = json.load(open('dados-br/estatisticas-competicao.json', encoding='utf-8'))
-          assert len(competicao.get('gols_por_clube') or []) == 20, 'estatísticas da competição sem 20 clubes'
-          assert all(len(item.get('marcadores') or []) >= 5 for item in competicao.get('gols_por_clube') or []), 'há clube com menos de cinco marcadores'
-          assert isinstance(competicao.get('sequencias'), dict), 'estatísticas da competição sem sequências'
-          assert isinstance(competicao.get('performance_por_partida'), dict), 'estatísticas da competição sem performance'
-          auditoria_stats = json.load(open('dados-br/auditoria-estatisticas.json', encoding='utf-8'))
-          assert auditoria_stats.get('status') == 'ok', 'auditoria de estatísticas falhou'
-          cobertura = json.load(open('dados-br/auditoria-cobertura-resultados.json', encoding='utf-8'))
-          assert isinstance(cobertura.get('resumo'), dict), 'auditoria-cobertura-resultados.json sem resumo'
-          calendario = json.load(open('dados-br/auditoria-calendario.json', encoding='utf-8'))
-          assert isinstance(calendario.get('resumo'), dict), 'auditoria-calendario.json sem resumo'
-          resumo_cal = calendario['resumo']
-          assert resumo_cal.get('partidas_mapeadas_calendario_completo') == 380, 'calendário não tem 380 partidas'
-          assert resumo_cal.get('rodadas_com_10_jogos') == 38, 'calendário não tem 38 rodadas íntegras'
-          assert resumo_cal.get('clubes_com_38_jogos') == 20, 'há clube sem 38 jogos'
-          assert resumo_cal.get('confrontos_com_ida_e_volta') == 190, 'ida e volta incompletas'
-          completo = json.load(open('dados-br/calendario-completo.json', encoding='utf-8'))
-          assert completo.get('total_partidas') == 380, 'calendario-completo.json sem 380 partidas'
-          competicoes = {}
-          for chave, arquivo in {
-              'copa_do_brasil': 'dados-br/competicoes-af-previsao/copa-do-brasil.json',
-              'libertadores': 'dados-br/competicoes-af-previsao/libertadores.json',
-              'sul_americana': 'dados-br/competicoes-af-previsao/sul-americana.json',
-          }.items():
-              snapshot = json.load(open(arquivo, encoding='utf-8'))
-              assert int(snapshot.get('schema_version') or 0) >= 2, f'{arquivo}: normalização continental antiga'
-              assert (snapshot.get('competicao') or {}).get('chave') == chave, f'{arquivo}: competição divergente'
-              competicoes[chave] = snapshot
-          aud_copas = json.load(open('dados-br/auditoria-competicoes-af-previsao.json', encoding='utf-8'))
-          assert isinstance(aud_copas.get('competicoes'), list), 'auditoria continental sem competições'
+          python scripts/validar_publicacao_brasileirao.py
 
-          previsao = json.load(open('dados-br/probabilidades-brasileirao.json', encoding='utf-8'))
-          assert previsao.get('status') == 'ok', 'AF-Previsão com status inválido'
-          assert previsao.get('base_corrente', {}).get('partidas_totais') == 380, 'AF-Previsão sem 380 partidas'
-          assert previsao.get('base_corrente', {}).get('partidas_concluidas') + previsao.get('base_corrente', {}).get('partidas_restantes') == 380, 'AF-Previsão com partição inválida'
-          pontos_obj = json.load(open('dados-br/probabilidades-por-pontuacao.json', encoding='utf-8'))
-          assert pontos_obj.get('status') == 'ok', 'probabilidades por pontuação inválidas'
-          assert pontos_obj.get('simulacoes') == previsao.get('simulacao', {}).get('quantidade'), 'simulações divergentes na tabela por pontuação'
-          niveis_pontos = pontos_obj.get('niveis') or []
-          assert len(niveis_pontos) >= 7, 'níveis de pontuação insuficientes'
-          assert pontos_obj.get('auditoria', {}).get('curvas_monotonicas') is True, 'curvas por pontuação não monotônicas'
-          for campo in ['titulo', 'libertadores', 'sul_americana_ou_melhor', 'permanencia']:
-              valores = [n.get(campo) for n in niveis_pontos if n.get(campo) is not None]
-              assert valores == sorted(valores), f'cortes não monotônicos: {campo}'
-              assert all(0 <= int(v) <= 114 for v in valores), f'corte fora da faixa: {campo}'
-          clubes_prev = previsao.get('clubes') or []
-          assert len(clubes_prev) == 20, 'AF-Previsão sem 20 clubes'
-          assert previsao.get('total_previsoes_partidas') == previsao.get('base_corrente', {}).get('partidas_restantes'), 'AF-Previsão sem previsão para todos os jogos restantes'
-          assert len(previsao.get('partidas_restantes') or []) == previsao.get('base_corrente', {}).get('partidas_restantes'), 'lista de partidas previstas incompleta'
-          # Validação compatível com o schema publicado. O schema legado mantinha
-          # uma métrica G6 separada (600%); o modelo continental usa as cinco
-          # vagas-base reais definidas no config (G5 = 500%). Em caso de coleta inconsistente, o
-          # gerador preserva o snapshot anterior e a trava deve validar a versão
-          # preservada — não aplicar a regra de outro schema.
-          schema_prev = int(previsao.get('schema_version') or 1)
-          config_prev = json.load(open('dados-br/config-af-previsao.json', encoding='utf-8'))
-          execucao_cfg = config_prev.get('execucao_2') or {}
-          simulacoes_configuradas = int(execucao_cfg.get('simulacoes_monte_carlo') or 2000000)
-          zonas_cfg = (execucao_cfg.get('zonas_base') or {})
-
-          def tamanho_faixa(chave, legado):
-              faixa = zonas_cfg.get(chave)
-              if schema_prev < 2 or not isinstance(faixa, list) or len(faixa) != 2:
-                  return legado
-              inicio, fim = (int(faixa[0]), int(faixa[1]))
-              assert 1 <= inicio <= fim <= 20, f'config AF inválida em {chave}: {faixa}'
-              return fim - inicio + 1
-
-          esperados = {
-              'campeao': 100,
-              'g4': 400,
-              'g6': 600,
-              'libertadores_base': 100 * tamanho_faixa('libertadores_base', 6),
-              'sul_americana_base': 100 * tamanho_faixa('sul_americana_base', 6),
-              'rebaixamento': 400,
-          }
-          for campo, esperado in esperados.items():
-              total = sum(float(item['probabilidades_pct'][campo]) for item in clubes_prev)
-              assert abs(total - esperado) <= 0.02, (
-                  f'AF-Previsão schema {schema_prev}: soma inválida em {campo}: '
-                  f'{total}; esperado {esperado}'
-              )
-          print(f'  OK   Somas AF-Previsão validadas conforme schema {schema_prev}: {esperados}')
-          assert all(abs(sum(item.get('distribuicao_posicoes_pct') or []) - 100) <= 0.02 for item in clubes_prev), 'AF-Previsão: distribuição de posições inválida'
-
-          integrado = previsao.get('schema_version', 0) >= 2 and (previsao.get('integracao_continental') or {}).get('status') == 'ok'
-          snapshots_prontos = all(snapshot.get('status') == 'ok' and snapshot.get('eventos') for snapshot in competicoes.values())
-          if integrado:
-              assert snapshots_prontos, 'previsão integrada publicada com snapshots continentais inválidos'
-              total_sula = sum(float(item['probabilidades_pct']['sul_americana']) for item in clubes_prev)
-              assert abs(total_sula - 600) <= 0.02, f'Sul-Americana integrada não soma 600%: {total_sula}'
-              for item in clubes_prev:
-                  for campo in ('libertadores', 'sul_americana', 'sem_competicao_continental'):
-                      detalhe = (item.get('probabilidades_detalhes') or {}).get(campo) or {}
-                      simulacoes_detalhe = int(detalhe.get('simulacoes') or 0)
-                      assert simulacoes_detalhe >= 200000, f'{item["clube"]}: detalhe sem amostra probabilística válida em {campo}'
-                      if simulacoes_detalhe < simulacoes_configuradas:
-                          print(f'::warning::{item["clube"]}: previsão preservada com {simulacoes_detalhe} simulações; a próxima publicação íntegra usará {simulacoes_configuradas}.')
-                      assert isinstance(detalhe.get('exibicao'), str), f'{item["clube"]}: exibição ausente em {campo}'
-                      ocorrencias = int(detalhe.get('ocorrencias') or 0)
-                      percentual = float(item['probabilidades_pct'][campo])
-                      assert abs(percentual - 100.0 * ocorrencias / simulacoes_detalhe) <= 0.000001, f'{item["clube"]}: percentual diverge das ocorrências em {campo}'
-                      if 0.0 < percentual < 100.0:
-                          assert not detalhe['exibicao'].startswith('100'), f'{item["clube"]}: arredondamento criou certeza falsa em {campo}'
-                  lib_pct = float(item['probabilidades_pct']['libertadores'])
-                  sula_pct = float(item['probabilidades_pct']['sul_americana'])
-                  sem_continental_pct = float(item['probabilidades_pct']['sem_competicao_continental'])
-                  assert abs(lib_pct + sula_pct + sem_continental_pct - 100.0) <= 0.000001, f'{item["clube"]}: destinos continentais não fecham 100%'
-                  if sula_pct > 0.0:
-                      assert lib_pct < 100.0, f'{item["clube"]}: Libertadores em 100% com Sul-Americana positiva'
-                  decomposicao = item.get('decomposicao_chances') or {}
-                  lib = decomposicao.get('libertadores') or {}
-                  sula = decomposicao.get('sul_americana') or {}
-                  sem_continental = decomposicao.get('sem_competicao_continental') or {}
-                  assert abs(float(lib.get('soma_vias_pct', -1)) - float(item['probabilidades_pct']['libertadores'])) <= 0.002, f'{item["clube"]}: vias da Libertadores não fecham'
-                  assert abs(float(sula.get('soma_vias_pct', -1)) - float(item['probabilidades_pct']['sul_americana'])) <= 0.002, f'{item["clube"]}: vias da Sul-Americana não fecham'
-                  assert abs(float((sem_continental.get('total') or {}).get('percentual_estimado', -1)) - sem_continental_pct) <= 0.000001, f'{item["clube"]}: complemento continental não fecha'
-              print('  OK   AF-Previsão continental integrado e decomposto por via')
-          else:
-              # Estado transitório legítimo: os snapshots continentais podem estar
-              # prontos enquanto a previsão publicada é a anterior (schema 1),
-              # preservada pelo gerador quando os feeds da ESPN estão fora de
-              # sincronia (ex.: resultado entrou em resultados.json mas a tabela
-              # oficial ainda não computou os pontos). O estado preservado já é
-              # validado acima: status ok, somas fechando e hash íntegro com a
-              # auditoria. A integração acontece naturalmente na execução
-              # seguinte, quando a ESPN sincroniza.
-              if snapshots_prontos and aud_copas.get('status') == 'ok':
-                  print('::warning::Snapshots continentais prontos; previsão anterior (schema 1) preservada aguardando sincronização da ESPN. Integração ocorrerá na próxima execução.')
-              else:
-                  print('::warning::AF-Previsão anterior preservado porque a coleta continental ainda não ficou íntegra')
-          aud_prev = json.load(open('dados-br/auditoria-probabilidades.json', encoding='utf-8'))
-          assert aud_prev.get('status') == 'ok', 'auditoria do AF-Previsão falhou'
-          simulacoes_publicadas = int(aud_prev.get('simulacao', {}).get('quantidade') or 0)
-          assert simulacoes_publicadas >= 200000, 'AF-Previsão sem amostra probabilística válida'
-          if simulacoes_publicadas < simulacoes_configuradas:
-              print(f'::warning::Último AF-Previsão válido preservado com {simulacoes_publicadas} simulações; alvo configurado atual: {simulacoes_configuradas}.')
-          else:
-              assert simulacoes_publicadas >= simulacoes_configuradas, 'AF-Previsão abaixo da quantidade configurada'
-          assert aud_prev.get('simulacao', {}).get('convergencia', {}).get('maior_diferenca_entre_metades_pontos_percentuais', 99) <= 1.0, 'AF-Previsão sem convergência suficiente'
-          assert aud_prev.get('hash_entrada') == previsao.get('hash_entrada'), 'hash divergente entre previsão e auditoria'
-          if integrado:
-              assert aud_prev.get('schema_version', 0) >= 2, 'auditoria integrada em schema antigo'
-              assert isinstance(aud_prev.get('integracao_continental'), dict), 'auditoria sem integração continental'
-              hash_continental_atual = continental_snapshots_state_hash(competicoes)
-              hash_continental_af = str((previsao.get('integracao_continental') or {}).get('hash_snapshots') or '')
-              continental_changed = os.environ.get('CONTINENTAL_CHANGED') == 'true'
-              af_updated = os.environ.get('AF_UPDATED') == 'true'
-              af_cobre_snapshots_atuais = hash_continental_af == hash_continental_atual
-              if not af_cobre_snapshots_atuais:
-                  if continental_changed and not af_updated:
-                      # Estado transacional deliberado: o working tree contém a coleta
-                      # nova, porém o bloco de commit exclui esses snapshots enquanto
-                      # não existir AF correspondente. Validar o AF antigo contra a
-                      # coleta ainda não publicável criava uma falha artificial.
-                      print(
-                          '::warning::Snapshots continentais novos ainda não serão publicados: '
-                          f'AF preservado={hash_continental_af} coleta atual={hash_continental_atual}. '
-                          'O commit manterá o último conjunto AF+copas consistente.'
-                      )
-                  else:
-                      raise AssertionError(
-                          'AF não foi recalculado com o snapshot continental atual: '
-                          f'af={hash_continental_af} atual={hash_continental_atual}'
-                      )
-              if af_cobre_snapshots_atuais:
-                  copa_snapshot = competicoes['copa_do_brasil']
-                  copa_resumo = copa_snapshot.get('resumo') or {}
-                  copa_fase = copa_snapshot.get('fase_atual') or {}
-                  auditoria_integracao = (aud_prev.get('integracao_continental') or {}).get('competicoes') or {}
-                  copa_af = auditoria_integracao.get('copa_do_brasil') or {}
-                  assert int(copa_af.get('partidas_concluidas_no_ajuste') or -1) == int(copa_resumo.get('finalizados') or 0), (
-                      'AF não incorporou todas as partidas concluídas da Copa do Brasil'
-                  )
-                  # Em qualquer fase eliminatória encerrada, o AF deve partir dos
-                  # vencedores factuais e simular somente o caminho ainda restante.
-                  fase_ordem = int(copa_fase.get('ordem') or 0)
-                  esperados_por_fase = {600: 8, 700: 4, 800: 2, 900: 1}
-                  if fase_ordem in esperados_por_fase and int(copa_fase.get('eventos_pendentes') or 0) == 0:
-                      esperados = esperados_por_fase[fase_ordem]
-                      ativos = list(copa_af.get('clubes_ativos') or [])
-                      assert int(copa_af.get('equipes_ativas') or 0) == esperados, f'Copa encerrada na fase {fase_ordem} sem {esperados} vencedor(es) ativo(s) no AF'
-                      assert len(ativos) == len(set(ativos)) == esperados, 'lista de vencedores da Copa inválida no AF'
-                      tamanhos_esperados = []
-                      tamanho = esperados
-                      while tamanho >= 1:
-                          tamanhos_esperados.append(tamanho)
-                          if tamanho == 1:
-                              break
-                          tamanho //= 2
-                      assert list(copa_af.get('rodadas_simuladas_tamanhos') or []) == tamanhos_esperados, f'estrutura simulada da Copa incompatível com a fase {fase_ordem}'
-                      print(f'  OK   Copa do Brasil: {esperados} vencedor(es) factual(is) incorporado(s) e probabilidades recalculadas')
-          probabilidades_jogos = json.load(open('dados-br/probabilidades-jogos.json', encoding='utf-8'))
-          auditoria_jogos = json.load(open('dados-br/auditoria-probabilidades-jogos.json', encoding='utf-8'))
-          assert probabilidades_jogos.get('schema_version') == 1, 'probabilidades por jogo em schema inesperado'
-          assert probabilidades_jogos.get('status') == 'ok', 'probabilidades por jogo com status inválido'
-          assert probabilidades_jogos.get('tipo') == 'probabilidades_pre_jogo', 'tipo inválido nas probabilidades por jogo'
-          assert isinstance(probabilidades_jogos.get('hash_entrada'), str) and probabilidades_jogos.get('hash_entrada'), 'hash de entrada ausente nas probabilidades por jogo'
-          jogos_previstos = probabilidades_jogos.get('jogos') or []
-          base_jogos = probabilidades_jogos.get('base_corrente') or {}
-          assert int(probabilidades_jogos.get('total_jogos') or -1) == len(jogos_previstos), 'total divergente nas probabilidades por jogo'
-          assert int(base_jogos.get('partidas_concluidas') or -1) + len(jogos_previstos) == 380, 'partição inválida nas probabilidades por jogo'
-          assert int(base_jogos.get('partidas_restantes') or -1) == len(jogos_previstos), 'base corrente divergente nas probabilidades por jogo'
-          # Valida a cobertura pela identidade esportiva estável, não pelo ID
-          # transitório da ESPN. O calendário continua sendo a fonte canônica.
-          estado_atual = load_current_state(t)
-          clubes_permitidos = set(estado_atual.teams)
-          concluidos = load_current_matches(e, clubes_permitidos, r)
-          ids_concluidos = {str(item.source_id) for item in concluidos}
-          chaves_concluidas = {
-              sporting_fixture_key(item.round_no, item.home, item.away) for item in concluidos
-          }
-          restantes, _ = load_fixtures(
-              completo, ids_concluidos, clubes_permitidos, concluded_keys=chaves_concluidas
-          )
-          mapa_restantes = {
-              sporting_fixture_key(item.round_no, item.home, item.away): item
-              for item in restantes
-          }
-          assert len(mapa_restantes) == len(restantes), 'calendário restante contém confronto duplicado'
-
-          mapa_jogos = {}
-          ids_jogos = []
-          for item in jogos_previstos:
-              event_id = str(item.get('event_id') or '').strip()
-              assert event_id, 'probabilidade pré-jogo sem event_id canônico'
-              ids_jogos.append(event_id)
-              chave = sporting_fixture_key(
-                  int(item.get('rodada') or 0),
-                  str(item.get('mandante') or ''),
-                  str(item.get('visitante') or ''),
-              )
-              assert chave not in mapa_jogos, f'confronto duplicado nas probabilidades por jogo: {chave}'
-              mapa_jogos[chave] = item
-          assert len(ids_jogos) == len(set(ids_jogos)), 'event_id duplicado nas probabilidades por jogo'
-          assert set(mapa_jogos) == set(mapa_restantes), (
-              'cobertura das probabilidades por jogo diverge do calendário restante; '
-              f'faltam={sorted(set(mapa_restantes) - set(mapa_jogos))[:3]} '
-              f'sobram={sorted(set(mapa_jogos) - set(mapa_restantes))[:3]}'
-          )
-          for chave, item in mapa_jogos.items():
-              event_id = str(item.get('event_id') or '')
-              assert item.get('status') == 'pre_jogo', f'{event_id}: status não é pré-jogo'
-              assert item.get('valido_ate') == 'inicio_da_partida', f'{event_id}: validade ausente'
-              for bloco_nome in ('probabilidades_pct', 'probabilidades_exibicao_pct'):
-                  bloco = item.get(bloco_nome) or {}
-                  valores = [float(bloco.get(campo)) for campo in ('mandante', 'empate', 'visitante')]
-                  assert all(math.isfinite(valor) and 0 <= valor <= 100 for valor in valores), f'{event_id}: probabilidade inválida em {bloco_nome}'
-                  assert abs(sum(valores) - 100.0) <= 1e-9, f'{event_id}: {bloco_nome} não soma 100%'
-              taxas = item.get('gols_esperados') or {}
-              assert all(math.isfinite(float(taxas.get(campo))) and float(taxas.get(campo)) > 0 for campo in ('mandante', 'visitante')), f'{event_id}: taxa de gols inválida'
-          assert auditoria_jogos.get('status') == 'ok', 'auditoria das probabilidades por jogo falhou'
-          assert auditoria_jogos.get('hash_entrada') == probabilidades_jogos.get('hash_entrada'), 'hash de entrada divergente na auditoria por jogo'
-          import hashlib
-          payload_hash = hashlib.sha256(json.dumps(probabilidades_jogos, ensure_ascii=False, sort_keys=True, separators=(',', ':'), allow_nan=False).encode('utf-8')).hexdigest()
-          assert auditoria_jogos.get('hash_saida') == payload_hash, 'hash de saída divergente na auditoria por jogo'
-          assert int((auditoria_jogos.get('validacoes') or {}).get('jogos') or -1) == len(jogos_previstos), 'auditoria por jogo com cobertura divergente'
-          print(f'  OK   Probabilidades pré-jogo: {len(jogos_previstos)} partidas; V/E/D fecham 100%')
-
-          bolao = json.load(open('dados-br/probabilidades-bolao.json', encoding='utf-8'))
-          participantes_bolao = json.load(open('dados-br/participantes-bolao-classificacao.json', encoding='utf-8'))
-          assert bolao.get('status') == 'ok', 'projeção do bolão com status inválido'
-          assert int(bolao.get('simulacoes') or 0) >= 200000, 'projeção do bolão sem amostra probabilística válida'
-          nomes_config = {item.get('nome') for item in (participantes_bolao.get('participantes') or [])}
-          linhas_bolao = bolao.get('participantes') or []
-          assert len(linhas_bolao) == len(nomes_config) >= 2, 'projeção do bolão com participantes incompletos'
-          assert {item.get('nome') for item in linhas_bolao} == nomes_config, 'nomes divergentes na projeção do bolão'
-          soma_titulo_bolao = sum(float(item.get('chance_titulo_pct') or 0) for item in linhas_bolao)
-          assert abs(soma_titulo_bolao - 100.0) <= 0.02, f'chances do bolão não somam 100%: {soma_titulo_bolao}'
-          assert all(0 <= float(item.get('chance_top3_pct') or 0) <= 100 for item in linhas_bolao), 'chance top 3 inválida'
-          assert all(0 <= float(item.get('chance_nao_pagar_pct') or 0) <= 100 for item in linhas_bolao), 'chance de não pagar inválida'
-          print(f'  OK   AF-Previsão do bolão: {len(linhas_bolao)} participantes; título soma {soma_titulo_bolao:.6f}%')
-          hist_prev = json.load(open('dados-br/historico-probabilidades.json', encoding='utf-8'))
-          assert hist_prev.get('total_snapshots', 0) >= 1, 'histórico do AF-Previsão vazio'
-          assert hist_prev.get('schema_version', 0) >= 4, 'histórico sem deduplicação por resultado e referência por clube'
-          estado_publicado = hist_prev.get('estado_publicado') or {}
-          assert estado_publicado.get('hash_entrada') == previsao.get('hash_entrada'), (
-              'histórico não referencia a publicação corrente: '
-              f"historico={estado_publicado.get('hash_entrada')} previsao={previsao.get('hash_entrada')}"
-          )
-          assert estado_publicado.get('hash_estado_esportivo'), 'histórico sem hash do estado de resultados concluídos'
-          estados_historicos = [item.get('hash_estado_esportivo') for item in (hist_prev.get('snapshots') or [])]
-          assert all(estados_historicos) and len(estados_historicos) == len(set(estados_historicos)), 'histórico contém estados esportivos repetidos'
-          integridade_hist = hist_prev.get('integridade') or {}
-          assert integridade_hist.get('encadeamento_valido') is True, 'histórico sem integridade declarada'
-          assert integridade_hist.get('hash_final') == (hist_prev.get('snapshots') or [])[-1].get('hash_snapshot'), 'hash final do histórico divergente'
-          avaliacao = json.load(open('dados-br/avaliacao-af-previsao.json', encoding='utf-8'))
-          assert avaliacao.get('status') in {'coletando_historico', 'aguardando_resultados_continentais', 'avaliacao_concluida', 'avaliacao_concluida_amostra_reduzida'}, 'status inválido da avaliação AF'
-          assert (avaliacao.get('integridade_historico') or {}).get('valido') is True, 'avaliação detectou histórico inválido'
-          assert (avaliacao.get('integridade_historico') or {}).get('encadeado') is True, 'avaliação não reconheceu a cadeia do histórico'
-          historico_jogos = json.load(open('dados-br/historico-probabilidades-jogos.json', encoding='utf-8'))
-          acuracia = json.load(open('dados-br/acuracia-af-previsao.json', encoding='utf-8'))
-          assert historico_jogos.get('schema_version') == 1, 'histórico pré-jogo em schema inválido'
-          assert isinstance(historico_jogos.get('previsoes'), list), 'histórico pré-jogo sem previsões'
-          assert (historico_jogos.get('criterio') or {}).get('nao_reconstroi_passado') is True, 'histórico pré-jogo sem trava retrospectiva'
-          assert acuracia.get('status') == 'ok', 'painel de acurácia inválido'
-          assert (acuracia.get('escopo_publico') or {}).get('avaliacao_alvo') == 'resultado_v_e_d', 'painel de acurácia fora do alvo V/E/D'
-          assert (acuracia.get('escopo_publico') or {}).get('avaliacao_jogo_individual_publica') is False, 'painel não deve expor acurácia jogo a jogo'
-          assert isinstance(acuracia.get('timeline_clubes'), dict) and len(acuracia.get('timeline_clubes') or {}) == 20, 'timeline de acurácia sem 20 clubes'
-          print('  OK   Acurácia AF-Previsão: histórico pré-jogo, calibração agregada e timeline por clube')
-          print('  OK   Estatísticas, calendário e AF-Previsão gerados')
-          PY
+      - name: Publicar estado CORE / ENRICHMENT do Reliability Control Plane
+        if: steps.espn.outputs.sincronizado == 'true'
+        run: python scripts/gerar_estado_confiabilidade.py --profile full
 
       - name: Validar atualização independente das copas e do AF
         if: steps.espn.outputs.sincronizado != 'true'
@@ -1086,6 +699,7 @@ jobs:
             dados-br/probabilidades-bolao.json \
             dados-br/acuracia-af-previsao.json \
             dados-br/marcos-af-previsao.json \
+            dados-br/estado-confiabilidade.json dados-br/slo-confiabilidade.json \
             dados-br/analises.json analises sitemap.xml news-sitemap.xml feed.xml
 
       - name: Detectar mudança material principal
@@ -1106,6 +720,7 @@ jobs:
             dados-br/probabilidades-brasileirao.json dados-br/probabilidades-por-pontuacao.json \
             dados-br/probabilidades-jogos.json dados-br/probabilidades-bolao.json \
             dados-br/acuracia-af-previsao.json dados-br/marcos-af-previsao.json \
+            dados-br/estado-confiabilidade.json dados-br/slo-confiabilidade.json \
             dados-br/melhores-momentos-copa-do-brasil.json dados-br/analises.json \
             analises sitemap.xml news-sitemap.xml feed.xml
 
@@ -1126,6 +741,8 @@ jobs:
 
           FILES=(
             "dados-br/status-atualizacao.json"
+            "dados-br/estado-confiabilidade.json"
+            "dados-br/slo-confiabilidade.json"
             "dados-br/historico-probabilidades-jogos.json"
             "dados-br/acuracia-af-previsao.json"
             "dados-br/marcos-af-previsao.json"
@@ -1229,6 +846,8 @@ jobs:
             "dados-br/transmissoes-tv.json"
             "dados-br/auditoria-transmissoes-tv.json"
             "dados-br/status-atualizacao.json"
+            "dados-br/estado-confiabilidade.json"
+            "dados-br/slo-confiabilidade.json"
             "dados-br/historico-probabilidades-jogos.json"
             "dados-br/acuracia-af-previsao.json"
             "dados-br/estatisticas.json"
@@ -1335,6 +954,15 @@ jobs:
 
           echo "ERRO: Push falhou apos 5 tentativas."
           exit 1
+
+      - name: Anexar diagnóstico estruturado em caso de falha
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg-reliability-diagnostic-${{ github.run_id }}
+          path: artifacts/reliability/
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Disparar deploy após publicação válida
         if: >-
