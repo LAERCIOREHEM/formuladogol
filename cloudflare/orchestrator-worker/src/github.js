@@ -65,7 +65,7 @@ export function dispatchSpec(decision) {
       // enfileirado pelo próprio Fastlane depois da publicação rápida.
       return {
         workflow: 'af-previsao-fastlane-pos-final.yml',
-        inputs: { event_id: decision.eventId || '', origem: 'orchestrator-final' },
+        inputs: { event_id: decision.eventId || '', origem: 'orchestrator-final', trace_id: decision.traceId || '' },
       };
     case 'publicos':
       return { workflow: 'atualizar-publicos-brasileirao.yml', inputs: { modo: 'partida', event_id: decision.eventId || '', origem_fastlane: decision.fastlane ? 'true' : 'false' } };

@@ -1,0 +1,89 @@
+FÓRMULA DO GOL — EXECUÇÃO R10R16
+RELIABILITY CONTROL PLANE & SPORTING INTEGRITY
+
+BASELINE DO ZIP RECEBIDO
+SHA-256: 927bafde733a838bb02cec19edfd2e1a79f420c524126644b24d4d337775b0bf
+
+OBJETIVO
+Transformar incidentes recorrentes do site em contratos verificáveis, diagnóstico estruturado e testes permanentes. Esta execução NÃO coloca RAG/IA no caminho crítico esportivo. Resultado, tabela, probabilidades e integridade permanecem determinísticos.
+
+ENTREGAS PRINCIPAIS
+1. contract.js como fonte canônica de versão, cron, flags de health e SLOs do Orchestrator.
+2. Wrangler sem versão/cron autoritativos hardcoded: placeholders são renderizados a partir de contract.js.
+3. Sporting Snapshot Integrity Guard compartilhado por AF Fastlane e Atualizar Brasileirão.
+4. FINAL monotônico preservado e coberto por Incident Regression Suite.
+5. Validação completa do Brasileirão extraída do YAML para scripts/validar_publicacao_brasileirao.py.
+6. Diagnóstico JSON automático em falhas, com códigos estáveis de incidente.
+7. Correlation ID fdg-{event_id}: Orchestrator -> AF Fastlane -> Atualizar Brasileirão.
+8. SLO: metas FINAL→detecção 5 min, FINAL→resultados 7 min, FINAL→AF 10 min e commit→site 5 min.
+9. AF Fastlane registra observação FINAL→AF; Deploy Pages gera artifact FINAL→AF→deploy após smoke público.
+10. Estados CORE_GREEN / ENRICHMENT_PENDING / DEGRADED / CRITICAL.
+11. Enriquecimentos (público/renda/MM) não transformam core íntegro em crítico.
+12. Incident Regression Suite com incidentes reais: FINAL regression, version drift, AF coverage, Match Identity, red card guard, migration SLA.
+13. Corpus docs/operations pronto para RAG futuro, mas RAG permanece desligado em produção.
+14. Workflow Reliability Control Plane CI somente para alterações de código/contrato, sem rodar a cada atualização esportiva.
+15. Rollback documentado.
+
+CONTRATO ATUAL
+Orchestrator: 2.4.0
+config-orquestrador.json: schema 8
+AF: 2.000.000 simulações obrigatórias
+Reliability Control Plane: v1
+Sporting Snapshot Integrity Guard: v1
+Editorial Closure Guarantee: v1 preservado
+AF Fastlane: v1 preservado
+
+ESTADO DA BASE USADA NA GERAÇÃO
+Sporting Integrity: PASS
+289 jogos concluídos + 91 restantes = 380
+AF: 2.000.000 simulações
+Estado de confiabilidade inicial: ENRICHMENT_PENDING
+Motivo: core íntegro e 1 enriquecimento de público ainda pendente no snapshot recebido. Isso NÃO bloqueia resultado/tabela/AF.
+
+VALIDAÇÕES EXECUTADAS ANTES DO EMPACOTAMENTO
+- python scripts/validar_snapshot_esportivo.py --profile ci: PASS
+- python scripts/validar_publicacao_brasileirao.py: PASS
+- python -m unittest discover -s tests/incidents: 7/7 PASS
+- cloudflare/orchestrator-worker npm run validate: 78/78 testes PASS + node --check PASS
+- render-config com versão/cron derivados de contract.js: PASS
+- YAML parse dos workflows R10R16: PASS
+- preflight de contract drift (package + Wrangler + schema): PASS
+
+COMO SUBIR
+1. GitHub -> Add file -> Upload files.
+2. Envie TODO o conteúdo deste ZIP preservando as pastas.
+3. Commit diretamente em main, como no fluxo que você já utiliza.
+
+O QUE DEVE RODAR AUTOMATICAMENTE APÓS O COMMIT
+A) Reliability Control Plane CI
+   - Deve ficar GREEN.
+   - É validação, não deploy.
+
+B) Deploy Orchestrator Worker
+   - Push em main deve usar modo ACTIVE automaticamente.
+   - Deve ficar GREEN.
+   - Health esperado: version=2.4.0, reliabilityControlPlane=true, sportingSnapshotIntegrityGuard=true.
+
+C) Deploy site (GitHub Pages)
+   - Também será disparado porque a execução altera deploy.yml e dados-br públicos de confiabilidade.
+   - Deve ficar GREEN.
+   - Após o smoke público, gera artifact fdg-deploy-slo-<run_id>.
+
+NÃO RODE MANUALMENTE
+- AF-Previsão Fastlane pós-FINAL apenas para testar dados antigos.
+- Atualizar Brasileirao apenas para testar a execução.
+- Publicar editorial da rodada 29 novamente.
+
+TESTE REAL
+No próximo FINAL real:
+1. Orchestrator cria trace fdg-{event_id}.
+2. AF Fastlane absorve ESPN canônica e recalcula 2.000.000 simulações.
+3. Sporting Integrity Guard precisa passar antes do commit.
+4. SLO FINAL→AF é registrado em dados-br/slo-confiabilidade.json.
+5. Deploy Pages publica e mede FINAL→AF→deploy em artifact.
+6. Atualizar Brasileirão completo recebe o mesmo trace_id e executa o mesmo guard.
+7. /status do Orchestrator passa a carregar hints.reliability com CORE/ENRICHMENT.
+
+ROLLBACK
+Ver docs/operations/R10R16-ROLLBACK.md.
+Não reverta Match Identity Gate, migration SLA suppression, false red-card guard, FINAL monotônico, AF 2M nem Editorial Closure Guarantee para contornar erro de deploy.

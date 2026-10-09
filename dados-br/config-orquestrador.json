@@ -1,5 +1,5 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "descricao": "Política determinística de contingência/manual. O orquestrador operacional primário roda no Cloudflare Worker; a IA não decide gatilhos.",
   "timezone": "America/Sao_Paulo",
   "atualizar_brasileirao": {
@@ -85,7 +85,8 @@
     "af_fastlane": "af-previsao-fastlane-pos-final.yml (FINAL -> AF primeiro; reconciliação completa depois)",
     "modo_dormente": true,
     "gate_github": "somente mudança esportiva real ou descoberta concreta pós-jogo",
-    "editorial_closure_guarantee": "v1 · SLA alvo 15 min · cron 5 min · prioridade anti-starvation após FINAL"
+    "editorial_closure_guarantee": "v1 · SLA alvo 15 min · cron 5 min · prioridade anti-starvation após FINAL",
+    "reliability_control_plane": "R10R16: contract.js + Sporting Integrity Guard + diagnostics + trace + SLO + CORE/ENRICHMENT"
   },
   "editorial_closure_guarantee": {
     "ativo": true,
@@ -97,5 +98,60 @@
     "respeita_writer_global": true,
     "fail_closed": true,
     "politica": "Rodada editorialmente elegível sem artigo é reavaliada a cada cron e recebe prioridade até o manifesto canônico confirmar a publicação; writer ativo nunca é interrompido e o próximo cron retenta automaticamente."
+  },
+  "reliability_control_plane": {
+    "ativo": true,
+    "versao": 1,
+    "contrato_canonico": "cloudflare/orchestrator-worker/src/contract.js",
+    "sporting_snapshot_integrity_guard": {
+      "ativo": true,
+      "versao": 1,
+      "script": "scripts/validar_snapshot_esportivo.py",
+      "compartilhado_por": [
+        "af-previsao-fastlane-pos-final.yml",
+        "atualizar-brasileirao.yml"
+      ],
+      "simulacoes_af_obrigatorias": 2000000,
+      "partidas_temporada": 380,
+      "final_monotonico": true
+    },
+    "diagnostico": {
+      "ativo": true,
+      "arquivo": "artifacts/reliability/fdg-diagnostico.json",
+      "upload_em_falha": true,
+      "retencao_dias": 14
+    },
+    "correlation_id": {
+      "ativo": true,
+      "formato": "fdg-{event_id}",
+      "propagacao": [
+        "orchestrator",
+        "af-fastlane",
+        "atualizar-brasileirao"
+      ]
+    },
+    "slo_minutos": {
+      "final_para_deteccao": 5,
+      "final_para_resultados": 7,
+      "final_para_af": 10,
+      "commit_para_site": 5,
+      "editorial_fechamento": 15
+    },
+    "estados": [
+      "CORE_GREEN",
+      "ENRICHMENT_PENDING",
+      "DEGRADED",
+      "CRITICAL"
+    ],
+    "enrichment_nao_bloqueia_core": true,
+    "incident_regression_suite": {
+      "ativo": true,
+      "diretorio": "tests/incidents"
+    },
+    "knowledge_base": {
+      "ativo": true,
+      "diretorio": "docs/operations",
+      "rag_em_producao": false
+    }
   }
 }

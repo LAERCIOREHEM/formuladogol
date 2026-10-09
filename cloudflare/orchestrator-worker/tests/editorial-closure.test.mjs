@@ -47,7 +47,7 @@ test('agenda incompleta falha fechada', () => {
 
 test('arquitetura prioriza Closure Guarantee antes do slow path e expõe contrato', async () => {
   const state = await readFile(new URL('../src/orchestrator-state.js', import.meta.url), 'utf8');
-  const index = await readFile(new URL('../src/index.js', import.meta.url), 'utf8');
+  const contract = await readFile(new URL('../src/contract.js', import.meta.url), 'utf8');
   const github = await readFile(new URL('../src/github.js', import.meta.url), 'utf8');
   const deploy = await readFile(new URL('../../../.github/workflows/deploy-orchestrator-worker.yml', import.meta.url), 'utf8');
   const config = JSON.parse(await readFile(new URL('../../../dados-br/config-orquestrador.json', import.meta.url), 'utf8'));
@@ -60,10 +60,10 @@ test('arquitetura prioriza Closure Guarantee antes do slow path e expõe contrat
   assert.match(state, /resolved_cached/);
   assert.match(state, /overdue = ageMinutes >= 15/);
   assert.match(github, /publicar-analise-rodada\.yml/);
-  assert.match(index, /editorialClosureGuarantee: true/);
-  assert.match(index, /editorialClosureSlaMinutes: 15/);
-  assert.match(deploy, /editorialClosureGuaranteeVersion === 1/);
-  assert.equal(config.schema_version, 7);
+  assert.match(contract, /editorialClosureGuarantee: true/);
+  assert.match(contract, /editorialClosureSlaMinutes: 15/);
+  assert.match(deploy, /ORCHESTRATOR_CONTRACT\.health/);
+  assert.equal(config.schema_version, 8);
   assert.equal(config.editorial_closure_guarantee.ativo, true);
   assert.equal(config.editorial_closure_guarantee.sla_minutos, 15);
 });

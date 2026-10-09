@@ -1,3 +1,4 @@
+import { ORCHESTRATOR_CONTRACT } from '../src/contract.js';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -17,9 +18,11 @@ if (!/^[0-9a-f]{64}$/.test(continentalFingerprint)) {
 const template = fs.readFileSync(templatePath, 'utf8');
 const rendered = template
   .replaceAll('__ORCHESTRATOR_MODE__', mode)
+  .replaceAll('__ORCHESTRATOR_VERSION__', ORCHESTRATOR_CONTRACT.version)
+  .replaceAll('__ORCHESTRATOR_CRON__', ORCHESTRATOR_CONTRACT.cron)
   .replaceAll('__CONTINENTAL_GUARD_FINGERPRINT__', continentalFingerprint);
-if (rendered.includes('__ORCHESTRATOR_MODE__') || rendered.includes('__CONTINENTAL_GUARD_FINGERPRINT__')) {
+if (rendered.includes('__ORCHESTRATOR_MODE__') || rendered.includes('__ORCHESTRATOR_VERSION__') || rendered.includes('__ORCHESTRATOR_CRON__') || rendered.includes('__CONTINENTAL_GUARD_FINGERPRINT__')) {
   throw new Error('Placeholder de configuração não foi substituído.');
 }
 fs.writeFileSync(outputPath, rendered);
-console.log(`Config gerado: ${outputPath} (mode=${mode}; continental=${continentalFingerprint.slice(0, 12)})`);
+console.log(`Config gerado: ${outputPath} (mode=${mode}; version=${ORCHESTRATOR_CONTRACT.version}; continental=${continentalFingerprint.slice(0, 12)})`);

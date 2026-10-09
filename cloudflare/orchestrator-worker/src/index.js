@@ -1,4 +1,5 @@
 import { OrchestratorState } from './orchestrator-state.js';
+import { orchestratorHealth } from './contract.js';
 
 export { OrchestratorState };
 
@@ -45,65 +46,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === '/' || url.pathname === '/health') {
-      return json({
-        ok: true,
-        service: 'formula-do-gol-orchestrator',
-        version: String(env.ORCHESTRATOR_VERSION || '2.3.0'),
-        mode: String(env.ORCHESTRATOR_MODE || 'shadow'),
-        cron: '*/5 * * * *',
-        liveBrowserUntouched: true,
-        liveBrowserRefreshSeconds: 30,
-        githubHeartbeatRemoved: true,
-        transmissionGuardian: true,
-        transmissionGuardianCheckpointsMinutes: [-90, -15, 10],
-        transmissionGuardianNeedGate: true,
-        transmissionGuardianBatching: true,
-        transmissionNeedDrivenV2: true,
-        adaptiveSlowPath: true,
-        adaptiveSlowPathMaxSleepMinutes: 60,
-        transmissionTvOperationalWindowHours: 72,
-        transmissionTvCheckpointsMinutes: [-4320, -1440, -360],
-        transmissionPlayerCheckpointsMinutes: [-90, -15, 10],
-        transmissionYoutubeOnlyWhenRequired: true,
-        publicFirstAttemptAfterFinalMinutes: 15,
-        postgameFastlanePrimary: true,
-        postgameAiRoutingVersion: 6,
-        postgameAiGateway: true,
-        postgameGeminiPrimarySearch: true,
-        postgameWorkersAiExtraction: true,
-        postgameOpenAiFallbackOnly: true,
-        postgameFastlaneCronMinutes: 1,
-        dormantMode: true,
-        postgameConcreteGate: true,
-        postgameAutomaticWindowHours: null,
-        postgamePublicPersistentUntilResolved: true,
-        postgamePublicSlaMinutes: 120,
-        postgameGithubMaxDispatchesPerEvent: 2,
-        postgameHighlightsBatching: true,
-        targetedPublicResearch: true,
-        continentalPhaseFingerprints: true,
-        continentalAgendaAware: true,
-        continentalStateIdempotency: true,
-        continentalEditorialSingleAuthority: true,
-        continentalHighlightsIndependent: true,
-        continentalDailyFallbackMinutes: 1440,
-        continentalJointBrazilianClosure: true,
-        continentalPairPhaseReconciliation: true,
-        continentalAiAuditWorkflow: true,
-        brasileiraoSourceCircuitBreaker: true,
-        brasileiraoSourceProbeMinutes: 5,
-        espnScoreboardGateway: true,
-        afPostFinalFastlane: true,
-        afPostFinalFastlaneVersion: 1,
-        afPostFinalFastlaneWorkflow: 'af-previsao-fastlane-pos-final.yml',
-        afPostFinalFullReconciliationQueued: true,
-        editorialClosureGuarantee: true,
-        editorialClosureGuaranteeVersion: 1,
-        editorialClosureSlaMinutes: 15,
-        editorialClosureCronMinutes: 5,
-        editorialClosurePriority: 'after-final-before-enrichment',
-        editorialClosureWriterSafe: true,
-      });
+      return json(orchestratorHealth(env.ORCHESTRATOR_MODE || 'shadow'));
     }
     if (url.pathname === '/status' || url.pathname === '/v1/status') {
       return forwardState(env, '/status');

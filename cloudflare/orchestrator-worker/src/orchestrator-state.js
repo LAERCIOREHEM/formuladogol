@@ -29,6 +29,7 @@ import {
   tvCheckpointDue,
 } from './logic.js';
 import { activeWriter, dispatchSpec, dispatchWorkflow } from './github.js';
+import { ORCHESTRATOR_CONTRACT, correlationIdForEvent } from './contract.js';
 import { editorialClosureDecision, eligibleRoundFromAgenda } from './editorial-closure.js';
 import { fetchPostgameFastlane, fetchSiteBundle, probeEspn, probeEspnAvailability, repositoryFallbacks } from './sources.js';
 
@@ -68,6 +69,7 @@ const SLOW_PATHS = [
   'dados-br/analises.json',
   'dados-br/historico-probabilidades-continentais.json',
   'dados-br/estado-editorial-continentais.json',
+  'dados-br/estado-confiabilidade.json',
 ];
 
 function data(bundle, path, fallback = {}) {
@@ -237,7 +239,7 @@ export class OrchestratorState {
     return {
       ok: true,
       engine: 'fdg-cloudflare-orchestrator',
-      version: String(this.env.ORCHESTRATOR_VERSION || '2.3.0'),
+      version: String(this.env.ORCHESTRATOR_VERSION || ORCHESTRATOR_CONTRACT.version),
       mode: String(this.env.ORCHESTRATOR_MODE || 'shadow'),
       ...status,
       recentDecisions: history.slice(-10).reverse(),
@@ -519,11 +521,13 @@ export class OrchestratorState {
         if (!bundleReady(fastBundle, ['dados-br/agenda-clubes-br.json'])) continue;
         if (game.league === 'bra.1' && brSource.blocked) continue;
         if (espn.states.get(game.eventId)?.state !== 'post' || game.concluded) continue;
+        const traceId = correlationIdForEvent(game.eventId);
         candidate = {
-          action: 'atualizar_brasileirao', eventId: game.eventId,
+          action: 'atualizar_brasileirao', eventId: game.eventId, traceId,
           reason: `ESPN marcou FINAL ainda não incorporado: ${gameLabel(game)}.`,
           retryMinutes: POLICY.sports.finalRetryMinutes,
           brSourceSensitive: game.league === 'bra.1',
+          stateUpdates: { 'reliability:lastTrace': { traceId, eventId: game.eventId, detectedAt: now.toISOString(), stage: 'final_detected' } },
         };
         break;
       }
@@ -537,11 +541,13 @@ export class OrchestratorState {
           const cupLike = /copa|libert|sul/i.test(game.competition);
           const fallback = cupLike ? 160 : 130;
           if (elapsed < fallback) continue;
+          const traceId = correlationIdForEvent(game.eventId);
           candidate = {
-            action: 'atualizar_brasileirao', eventId: game.eventId,
+            action: 'atualizar_brasileirao', eventId: game.eventId, traceId,
             reason: `Contingência pós-jogo: ESPN indisponível e ${gameLabel(game)} ultrapassou ${fallback} min sem FINAL publicado.`,
             retryMinutes: POLICY.sports.finalRetryMinutes,
             brSourceSensitive: game.league === 'bra.1',
+            stateUpdates: { 'reliability:lastTrace': { traceId, eventId: game.eventId, detectedAt: now.toISOString(), stage: 'fallback_final_detected' } },
           };
           break;
         }
@@ -658,6 +664,7 @@ export class OrchestratorState {
           action: candidate.action,
           eventId: candidate.eventId || '',
           eventIds: candidate.eventIds || [],
+          traceId: candidate.traceId || '',
           round: candidate.round || '',
           checkpoint: candidate.checkpoint ?? null,
           reason: candidate.reason,
@@ -665,11 +672,13 @@ export class OrchestratorState {
         result: dispatchResult.result,
         resultReason: dispatchResult.reason,
         brasileiraoSource: hints.brasileiraoSourceBreaker,
+        reliabilityState: String(hints?.reliability?.state || ''),
+        reliability: hints?.reliability || null,
         errors: errors.slice(0, 12),
         hints,
       };
       const historyItem = candidate ? {
-        at: now.toISOString(), action: candidate.action, eventId: candidate.eventId || '', round: candidate.round || '',
+        at: now.toISOString(), action: candidate.action, eventId: candidate.eventId || '', traceId: candidate.traceId || '', round: candidate.round || '',
         checkpoint: candidate.checkpoint ?? null, reason: candidate.reason, result: dispatchResult.result,
       } : (errors.length ? { at: now.toISOString(), action: 'none', reason: errors[0], result: 'degraded' } : null);
       await this.record(status, historyItem);
@@ -712,7 +721,16 @@ export class OrchestratorState {
     const analyses = data(bundle, 'dados-br/analises.json', { artigos: [] });
     const contHistory = data(bundle, 'dados-br/historico-probabilidades-continentais.json', { marcos: [] });
     const contLock = data(bundle, 'dados-br/estado-editorial-continentais.json', { bloqueado: false });
+    const reliability = data(bundle, 'dados-br/estado-confiabilidade.json', {});
     const hints = {};
+    if (reliability?.state) {
+      hints.reliability = {
+        state: String(reliability.state),
+        core: reliability.core || {},
+        enrichment: reliability.enrichment || {},
+        slo: reliability.slo || {},
+      };
+    }
     const ready = (...paths) => bundleReady(bundle, paths);
     const fastReady = (...paths) => bundleReady(fastBundle, paths);
 

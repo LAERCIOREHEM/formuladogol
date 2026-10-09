@@ -33,8 +33,8 @@ test('Cloudflare deploy auto-activates on main push and protects first install',
   assert.match(yml, /wrangler secret put GITHUB_TOKEN/);
   assert.match(yml, /github\.event_name == 'push' \|\| inputs\.mode == 'active'/);
   assert.match(yml, /orchestrator\.formuladogol\.com\.br\/health/);
-  assert.match(yml, /transmissionGuardianNeedGate/);
-  assert.match(yml, /targetedPublicResearch/);
+  assert.match(yml, /ORCHESTRATOR_CONTRACT\.health/);
+  assert.match(yml, /health contract drift/);
 });
 
 test('targeted highlights input reaches both BR scripts and skips Cup broad scan', async () => {
@@ -95,7 +95,7 @@ test('Wrangler contract uses independent SQLite Durable Object and five-minute c
   const wrangler = await read('cloudflare/orchestrator-worker/wrangler.template.jsonc');
   assert.match(wrangler, /formula-do-gol-orchestrator/);
   assert.match(wrangler, /orchestrator\.formuladogol\.com\.br/);
-  assert.match(wrangler, /"\*\/5 \* \* \* \*"/);
+  assert.match(wrangler, /__ORCHESTRATOR_CRON__/);
   assert.match(wrangler, /"new_sqlite_classes"/);
   assert.match(wrangler, /"OrchestratorState"/);
   assert.doesNotMatch(wrangler, /formula-do-gol-push/);
@@ -127,31 +127,31 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(guardian, /Guardião IA de transmissões/);
   assert.match(state, /guardiancp:/);
   assert.match(state, /transmissoes_guardian/);
-  const index = await read('cloudflare/orchestrator-worker/src/index.js');
-  assert.match(index, /transmissionGuardian:\s*true/);
-  assert.match(index, /2\.3\.0/);
-  assert.match(index, /transmissionGuardianNeedGate:\s*true/);
-  assert.match(index, /transmissionNeedDrivenV2:\s*true/);
-  assert.match(index, /adaptiveSlowPath:\s*true/);
-  assert.match(index, /adaptiveSlowPathMaxSleepMinutes:\s*60/);
-  assert.match(index, /transmissionTvOperationalWindowHours:\s*72/);
-  assert.match(index, /transmissionYoutubeOnlyWhenRequired:\s*true/);
-  assert.match(index, /publicFirstAttemptAfterFinalMinutes:\s*15/);
-  assert.match(index, /dormantMode:\s*true/);
-  assert.match(index, /postgameConcreteGate:\s*true/);
-  assert.match(index, /postgameAutomaticWindowHours:\s*null/);
-  assert.match(index, /postgamePublicPersistentUntilResolved:\s*true/);
-  assert.match(index, /postgamePublicSlaMinutes:\s*120/);
-  assert.match(index, /postgameAiRoutingVersion:\s*6/);
-  assert.match(index, /postgameGithubMaxDispatchesPerEvent:\s*2/);
-  assert.match(index, /postgameHighlightsBatching:\s*true/);
-  assert.match(index, /transmissionGuardianBatching:\s*true/);
-  assert.match(index, /targetedPublicResearch:\s*true/);
-  assert.match(index, /continentalPhaseFingerprints:\s*true/);
-  assert.match(index, /continentalAgendaAware:\s*true/);
-  assert.match(index, /continentalStateIdempotency:\s*true/);
-  assert.match(index, /brasileiraoSourceCircuitBreaker:\s*true/);
-  assert.match(index, /espnScoreboardGateway:\s*true/);
+  const contract = await read('cloudflare/orchestrator-worker/src/contract.js');
+  assert.match(contract, /transmissionGuardian:\s*true/);
+  assert.match(contract, /version:\s*'2\.4\.0'/);
+  assert.match(contract, /transmissionGuardianNeedGate:\s*true/);
+  assert.match(contract, /transmissionNeedDrivenV2:\s*true/);
+  assert.match(contract, /adaptiveSlowPath:\s*true/);
+  assert.match(contract, /adaptiveSlowPathMaxSleepMinutes:\s*60/);
+  assert.match(contract, /transmissionTvOperationalWindowHours:\s*72/);
+  assert.match(contract, /transmissionYoutubeOnlyWhenRequired:\s*true/);
+  assert.match(contract, /publicFirstAttemptAfterFinalMinutes:\s*15/);
+  assert.match(contract, /dormantMode:\s*true/);
+  assert.match(contract, /postgameConcreteGate:\s*true/);
+  assert.match(contract, /postgameAutomaticWindowHours:\s*null/);
+  assert.match(contract, /postgamePublicPersistentUntilResolved:\s*true/);
+  assert.match(contract, /postgamePublicSlaMinutes:\s*120/);
+  assert.match(contract, /postgameAiRoutingVersion:\s*6/);
+  assert.match(contract, /postgameGithubMaxDispatchesPerEvent:\s*2/);
+  assert.match(contract, /postgameHighlightsBatching:\s*true/);
+  assert.match(contract, /transmissionGuardianBatching:\s*true/);
+  assert.match(contract, /targetedPublicResearch:\s*true/);
+  assert.match(contract, /continentalPhaseFingerprints:\s*true/);
+  assert.match(contract, /continentalAgendaAware:\s*true/);
+  assert.match(contract, /continentalStateIdempotency:\s*true/);
+  assert.match(contract, /brasileiraoSourceCircuitBreaker:\s*true/);
+  assert.match(contract, /espnScoreboardGateway:\s*true/);
 });
 
 test('public workflow is targetable and Guardian workflow supports batch event ids', async () => {
@@ -231,7 +231,7 @@ test('Brasileirão source breaker blocks heavy retries and uses structured colle
 
 test('canonical operational config is aligned with Cloudflare transmission/public policy', async () => {
   const cfg = JSON.parse(await read('dados-br/config-orquestrador.json'));
-  assert.equal(cfg.schema_version, 7);
+  assert.equal(cfg.schema_version, 8);
   assert.equal(cfg.atualizar_brasileirao.af_fastlane_pos_final.ativo, true);
   assert.equal(cfg.atualizar_brasileirao.af_fastlane_pos_final.simulacoes, 2_000_000);
   assert.equal(cfg.publicos.primeira_tentativa_apos_final_minutos, 15);
@@ -284,10 +284,9 @@ test('continental editorial has a single dispatcher and no embedded video search
 });
 
 test('orchestrator health advertises continental single-authority governance', async () => {
-  const index = await read('cloudflare/orchestrator-worker/src/index.js');
+  const contract = await read('cloudflare/orchestrator-worker/src/contract.js');
   const deploy = await read('.github/workflows/deploy-orchestrator-worker.yml');
-  assert.match(index, /continentalEditorialSingleAuthority:\s*true/);
-  assert.match(index, /continentalHighlightsIndependent:\s*true/);
-  assert.match(deploy, /continentalEditorialSingleAuthority/);
-  assert.match(deploy, /continentalHighlightsIndependent/);
+  assert.match(contract, /continentalEditorialSingleAuthority:\s*true/);
+  assert.match(contract, /continentalHighlightsIndependent:\s*true/);
+  assert.match(deploy, /ORCHESTRATOR_CONTRACT\.health/);
 });
