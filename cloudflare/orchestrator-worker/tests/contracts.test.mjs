@@ -69,10 +69,11 @@ test('all normal writers touched by this package share repo-write-main', async (
   assert.match(deploy, /cancel-in-progress: false/);
 });
 
-test('AI audit documentation and schedule agree on 08:45 BRT', async () => {
+test('AI audit is manual-only and preserves daily paid-call guard', async () => {
   const yml = await read('.github/workflows/auditoria-ia-diaria.yml');
-  assert.match(yml, /08:45 em Brasília/);
-  assert.match(yml, /cron: '45 11 \* \* \*'/);
+  assert.match(yml, /workflow_dispatch:/);
+  assert.doesNotMatch(yml, /^\s*schedule:/m);
+  assert.doesNotMatch(yml, /^\s*- cron:/m);
 });
 
 
@@ -128,7 +129,7 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(state, /transmissoes_guardian/);
   const index = await read('cloudflare/orchestrator-worker/src/index.js');
   assert.match(index, /transmissionGuardian:\s*true/);
-  assert.match(index, /2\.1\.0/);
+  assert.match(index, /2\.2\.0/);
   assert.match(index, /transmissionGuardianNeedGate:\s*true/);
   assert.match(index, /transmissionNeedDrivenV2:\s*true/);
   assert.match(index, /adaptiveSlowPath:\s*true/);
@@ -230,7 +231,9 @@ test('Brasileirão source breaker blocks heavy retries and uses structured colle
 
 test('canonical operational config is aligned with Cloudflare transmission/public policy', async () => {
   const cfg = JSON.parse(await read('dados-br/config-orquestrador.json'));
-  assert.equal(cfg.schema_version, 5);
+  assert.equal(cfg.schema_version, 6);
+  assert.equal(cfg.atualizar_brasileirao.af_fastlane_pos_final.ativo, true);
+  assert.equal(cfg.atualizar_brasileirao.af_fastlane_pos_final.simulacoes, 2_000_000);
   assert.equal(cfg.publicos.primeira_tentativa_apos_final_minutos, 15);
   assert.equal(cfg.publicos.janela_automatica_horas, 24);
   assert.equal(cfg.publicos.max_dispatches_github_por_jogo, 2);
@@ -241,6 +244,7 @@ test('canonical operational config is aligned with Cloudflare transmission/publi
   assert.equal(cfg.melhores_momentos.github_fallback_automatico, false);
   assert.equal(cfg.execucao_primaria.modo_dormente, true);
   assert.match(cfg.execucao_primaria.postgame_fastlane, /push/i);
+  assert.match(cfg.execucao_primaria.af_fastlane, /af-previsao-fastlane-pos-final\.yml/);
   assert.equal(cfg.transmissoes.janela_operacional_tv_horas, 72);
   assert.deepEqual(cfg.transmissoes.tv_checkpoints_minutos, [-4320, -1440, -360]);
   assert.deepEqual(cfg.transmissoes.aovivo_checkpoints_minutos, [-90, -15, 10]);
