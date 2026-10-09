@@ -6,10 +6,10 @@
     "jogos_sem_transmissao_na_janela": 4,
     "jogos_sem_transmissao_14d": 1,
     "jogos_sem_transmissao_fora_14d": 3,
-    "jogos_criticos_sem_transmissao_72h": 0,
+    "jogos_criticos_sem_transmissao_72h": 1,
     "registros_preservados": 5,
     "jogos_guardiao_ia": 0,
-    "jogos_estaveis_sem_reconsulta_editorial": 11,
+    "jogos_estaveis_sem_reconsulta_editorial": 0,
     "fontes_com_falha": 2
   },
   "fontes": {
@@ -26,18 +26,18 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 11255
+      "duracao_ms": 12145
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 33,
-      "duracao_ms": 28335
+      "jogos_com_canal": 44,
+      "duracao_ms": 27494
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 3,
       "jogos_com_canal": 0,
-      "duracao_ms": 64515
+      "duracao_ms": 66328
     },
     "espn": {
       "ok": false,
@@ -54,8 +54,8 @@
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 75.4,
-      "nivel": "aviso"
+      "faltam_horas": 71.9,
+      "nivel": "critico"
     }
   ],
   "sem_transmissao_futura": [
@@ -64,15 +64,15 @@
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 75.4,
-      "nivel": "aviso"
+      "faltam_horas": 71.9,
+      "nivel": "critico"
     },
     {
       "event_id": "401841278",
       "rodada": 32,
       "jogo": "Chapecoense x Fluminense",
       "data_iso": "2026-10-24T19:30:00-03:00",
-      "faltam_horas": 363.4,
+      "faltam_horas": 359.9,
       "nivel": "futuro"
     },
     {
@@ -80,7 +80,7 @@
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-29T19:30:00-03:00",
-      "faltam_horas": 483.4,
+      "faltam_horas": 479.9,
       "nivel": "futuro"
     },
     {
@@ -88,7 +88,7 @@
       "rodada": 34,
       "jogo": "Palmeiras x Remo",
       "data_iso": "2026-11-05T19:30:00-03:00",
-      "faltam_horas": 651.4,
+      "faltam_horas": 647.9,
       "nivel": "futuro"
     }
   ],
@@ -147,5 +147,5 @@
     "https://ge.globo.com/cartola/craque-da-rodada/noticia/2026/10/09/cartola-2026-matheuzinho-estoura-scouts-contra-a-chape-e-faz-maior-pontuacao-do-ano-na-rodada-29.ghtml",
     "https://ge.globo.com/gato-mestre/noticia/2026/10/08/athletico-pr-2-x-2-atletico-mg-tem-o-maior-publico-da-29a-rodada-do-brasileiro-veja-a-lista.ghtml"
   ],
-  "atualizado_em": "2026-10-09T16:05:43-03:00"
+  "atualizado_em": "2026-10-09T19:35:44-03:00"
 }
