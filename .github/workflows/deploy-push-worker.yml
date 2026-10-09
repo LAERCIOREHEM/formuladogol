@@ -356,6 +356,12 @@ jobs:
           if (h.postgameModelValuesAuthoritative !== false) problems.push('postgameModelValuesAuthoritative!=false');
           if (h.postgameVerifiedCorrectionsOverrideD1 !== true) problems.push('postgameVerifiedCorrectionsOverrideD1!=true');
           if (h.postgameRecentResolvedIdentityRevalidation !== true) problems.push('postgameRecentResolvedIdentityRevalidation!=true');
+          if (h.postgameFactualIntegrityGuard !== true) problems.push('postgameFactualIntegrityGuard!=true');
+          if (Number(h.postgameFactualIntegrityGuardVersion) !== 1) problems.push(`postgameFactualIntegrityGuardVersion=${h.postgameFactualIntegrityGuardVersion}`);
+          if (h.postgameFactualFieldQuarantine !== true) problems.push('postgameFactualFieldQuarantine!=true');
+          if (h.postgameFactualTargetedReconciliation !== true) problems.push('postgameFactualTargetedReconciliation!=true');
+          if (h.postgameFactualFullAiRescan !== false) problems.push('postgameFactualFullAiRescan!=false');
+          if (h.postgamePublicRevenueCollisionIncident !== 'PUBLIC_REVENUE_FIELD_COLLISION') problems.push(`postgamePublicRevenueCollisionIncident=${h.postgamePublicRevenueCollisionIncident}`);
           if (h.postgamePendingRequeueOnV10 !== true) problems.push('postgamePendingRequeueOnV10!=true');
           if (h.postgameGeminiInteractionsApi !== true) problems.push('postgameGeminiInteractionsApi!=true');
           if (h.postgameGeminiInteractionsDirect !== true) problems.push('postgameGeminiInteractionsDirect!=true');
@@ -382,7 +388,7 @@ jobs:
           if (h.geminiSearch !== true) problems.push('geminiSearch!=true');
           if (h.workersAiExtraction !== true) problems.push('workersAiExtraction!=true');
           if (h.healthEmailMonitor !== true) problems.push('healthEmailMonitor!=true');
-          if (Number(h.healthMonitorPolicyVersion) !== 8) problems.push(`healthMonitorPolicyVersion=${h.healthMonitorPolicyVersion}`);
+          if (Number(h.healthMonitorPolicyVersion) !== 9) problems.push(`healthMonitorPolicyVersion=${h.healthMonitorPolicyVersion}`);
           if (h.healthEmailDailyBrt !== '08:00') problems.push(`healthEmailDailyBrt=${h.healthEmailDailyBrt}`);
           if (h.healthEmailRecoveryUntilBrt !== '11:59') problems.push(`healthEmailRecoveryUntilBrt=${h.healthEmailRecoveryUntilBrt}`);
           if (h.healthMonitorCron !== '*/5 * * * *') problems.push(`healthMonitorCron=${h.healthMonitorCron}`);
@@ -391,6 +397,14 @@ jobs:
           if (h.healthEmailNoOpenAI !== true) problems.push('healthEmailNoOpenAI!=true');
           if (h.healthEmailOverallRecovery !== true) problems.push('healthEmailOverallRecovery!=true');
           if (h.healthEmailOverallRecoveryPreservesDaily0800 !== true) problems.push('healthEmailOverallRecoveryPreservesDaily0800!=true');
+          if (Number(h.healthReliabilityIntelligenceIndicators) !== 4) problems.push(`healthReliabilityIntelligenceIndicators=${h.healthReliabilityIntelligenceIndicators}`);
+          if (h.healthSportingIntegrityIndicator !== true) problems.push('healthSportingIntegrityIndicator!=true');
+          if (h.healthFactualIntegrityIndicator !== true) problems.push('healthFactualIntegrityIndicator!=true');
+          if (h.healthRagReadinessIndicator !== true) problems.push('healthRagReadinessIndicator!=true');
+          if (h.healthOperationalControlPlaneIndicator !== true) problems.push('healthOperationalControlPlaneIndicator!=true');
+          if (h.healthRagRuntimeEnabled !== false) problems.push('healthRagRuntimeEnabled!=false');
+          if (h.healthMcpOpsEnabled !== false) problems.push('healthMcpOpsEnabled!=false');
+          if (h.healthFineTuning !== 'not_used_by_design') problems.push(`healthFineTuning=${h.healthFineTuning}`);
           if (h.readinessAlertPolicyVersion !== 'R10.1') problems.push(`readinessAlertPolicyVersion=${h.readinessAlertPolicyVersion}`);
           if (h.readinessLifecyclePolicyVersion !== '6-R10.2') problems.push(`readinessLifecyclePolicyVersion=${h.readinessLifecyclePolicyVersion}`);
           if (h.readinessOperationalWindowOnly !== true) problems.push('readinessOperationalWindowOnly!=true');

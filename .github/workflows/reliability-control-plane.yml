@@ -10,6 +10,9 @@ on:
       - 'scripts/validar_publicacao_brasileirao.py'
       - 'scripts/registrar_slo_confiabilidade.py'
       - 'scripts/gerar_estado_confiabilidade.py'
+      - 'scripts/postgame_factual_integrity.py'
+      - 'scripts/auditar_publicos_identidade.py'
+      - 'scripts/importar_postgame_fastlane.py'
       - 'atualizar_espn.py'
       - 'cloudflare/orchestrator-worker/**'
       - 'tests/incidents/**'
@@ -43,7 +46,7 @@ jobs:
       - name: Sporting Snapshot Integrity + incident regressions
         run: |
           set -euo pipefail
-          python -m py_compile scripts/fdg_reliability.py scripts/validar_snapshot_esportivo.py scripts/validar_publicacao_brasileirao.py scripts/registrar_slo_confiabilidade.py scripts/gerar_estado_confiabilidade.py
+          python -m py_compile scripts/fdg_reliability.py scripts/validar_snapshot_esportivo.py scripts/validar_publicacao_brasileirao.py scripts/registrar_slo_confiabilidade.py scripts/gerar_estado_confiabilidade.py scripts/postgame_factual_integrity.py scripts/auditar_publicos_identidade.py scripts/importar_postgame_fastlane.py
           python scripts/validar_snapshot_esportivo.py --profile ci --report artifacts/reliability/sporting-integrity-ci.json --diagnostic artifacts/reliability/fdg-diagnostico-ci.json
           python -m unittest discover -s tests/incidents -p 'test_*.py' -v
       - uses: actions/setup-node@v4

@@ -69,6 +69,7 @@ on:
       - 'js/br-push.js'
       - 'js/br-alertas.js'
       - 'dados-br/**'
+      - 'docs/operations/RAG-MANIFEST.json'
       - 'analises/**'
       - 'scripts/gerar_fundacao_organica.py'
       - 'scripts/gerar_paginas_clubes.py'
@@ -232,6 +233,8 @@ jobs:
           PUBLIC_DATA=(
             dados-br/agenda-clubes-br.json
             dados-br/auditoria-estatisticas.json
+            dados-br/auditoria-publicos.json
+            dados-br/auditoria-publicos-identidade.json
             dados-br/auditoria-modelos-af-previsao.json
             dados-br/auditoria-probabilidades.json
             dados-br/avaliacao-af-previsao.json
@@ -333,6 +336,11 @@ jobs:
             fi
             cp -a "$item" "_site/$item"
           done
+
+          # R10R16.1: o Health Monitor precisa conhecer o estado real do corpus
+          # sem publicar todo docs/operations. Copia somente o manifesto canônico.
+          test -f docs/operations/RAG-MANIFEST.json || { echo 'ERRO: RAG-MANIFEST ausente.'; exit 1; }
+          cp -a docs/operations/RAG-MANIFEST.json _site/dados-br/rag-manifest.json
 
           if [[ ! -d img ]]; then
             echo "ERRO: diretório público img ausente."

@@ -11,6 +11,7 @@ on:
       - 'dados-br/correcoes/publicos-verificados.json'
       - 'scripts/atualizar_publicos_brasileirao.py'
       - 'scripts/auditar_publicos_identidade.py'
+      - 'scripts/postgame_factual_integrity.py'
       - '.github/workflows/atualizar-publicos-brasileirao.yml'
   workflow_dispatch:
     inputs:
@@ -79,11 +80,13 @@ jobs:
             scripts/completar_publicos_ia.py \
             scripts/gerar_estatisticas_competicao_brasileirao.py \
             scripts/importar_postgame_fastlane.py \
-            scripts/auditar_publicos_identidade.py
+            scripts/auditar_publicos_identidade.py \
+            scripts/postgame_factual_integrity.py
           python scripts/atualizar_publicos_brasileirao.py --self-test
           python scripts/completar_publicos_ia.py --self-test
           python scripts/importar_postgame_fastlane.py --self-test
           python scripts/auditar_publicos_identidade.py --self-test
+          python scripts/postgame_factual_integrity.py
           python -m json.tool resultados.json >/dev/null
           python -m json.tool dados-br/jogos-detalhes.json >/dev/null
           python -m json.tool dados-br/publicos-complementares.json >/dev/null
@@ -190,8 +193,9 @@ jobs:
           # auditoria-publicos.json fica defasada e as asserções de cobertura da
           # etapa seguinte acusam divergência.
           python scripts/atualizar_publicos_brasileirao.py --sem-rede
-          # R10R15: trava de identidade/integridade sobre TODOS os registros antes
-          # de qualquer commit. Crítico => workflow para e nada chega ao site.
+          # R10R16.1: sweep determinístico de identidade + integridade factual em
+          # TODOS os registros. Sem pesquisa global de IA: somente anomalias ficam
+          # pendentes para reconciliação direcionada. Crítico => nada chega ao site.
           python scripts/auditar_publicos_identidade.py --fail-on-critical
 
           NOVOS="$(python - <<'PY'
