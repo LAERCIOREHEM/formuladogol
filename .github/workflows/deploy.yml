@@ -69,7 +69,7 @@ on:
       - 'js/br-push.js'
       - 'js/br-alertas.js'
       - 'dados-br/**'
-      - 'docs/operations/RAG-MANIFEST.json'
+      - 'docs/operations/**'
       - 'analises/**'
       - 'scripts/gerar_fundacao_organica.py'
       - 'scripts/gerar_paginas_clubes.py'
@@ -78,6 +78,7 @@ on:
       - 'scripts/gerar_fechamento_organico.py'
       - 'scripts/validar_org_final.py'
       - 'scripts/validar_pwa_instalacao.mjs'
+      - 'scripts/build_ops_rag_index.py'
       - 'css/br-clube.css'
       - 'css/br-jogo.css'
       - 'css/br-competicoes.css'
@@ -337,10 +338,13 @@ jobs:
             cp -a "$item" "_site/$item"
           done
 
-          # R10R16.1: o Health Monitor precisa conhecer o estado real do corpus
-          # sem publicar todo docs/operations. Copia somente o manifesto canônico.
+          # R10R17: publica somente o manifesto e o índice operacional derivado.
+          # O corpus-fonte permanece em docs/operations; o índice não entra no
+          # caminho crítico esportivo e custa zero IA/web por retrieval.
           test -f docs/operations/RAG-MANIFEST.json || { echo 'ERRO: RAG-MANIFEST ausente.'; exit 1; }
           cp -a docs/operations/RAG-MANIFEST.json _site/dados-br/rag-manifest.json
+          python scripts/build_ops_rag_index.py --output _site/dados-br/ops-rag-index.json
+          python -m json.tool _site/dados-br/ops-rag-index.json >/dev/null
 
           if [[ ! -d img ]]; then
             echo "ERRO: diretório público img ausente."

@@ -38,6 +38,7 @@ jobs:
       FDG_PUSH_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       FDG_PUSH_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       FDG_PUSH_CF_BILLING_READ_TOKEN: ${{ secrets.FDG_CF_BILLING_READ_TOKEN }}
+      FDG_PUSH_OPS_MCP_TOKEN: ${{ secrets.OPS_MCP_TOKEN }}
     defaults:
       run:
         working-directory: cloudflare/push-worker
@@ -174,6 +175,12 @@ jobs:
             echo 'Secret opcional CLOUDFLARE_BILLING_READ_TOKEN atualizado (somente leitura de custos Cloudflare).'
           else
             echo 'INFO: FDG_CF_BILLING_READ_TOKEN ausente; relatório diário continuará sem custo Cloudflare exato.'
+          fi
+          if [ -n "${FDG_PUSH_OPS_MCP_TOKEN:-}" ]; then
+            printf '%s' "$FDG_PUSH_OPS_MCP_TOKEN" | npx wrangler secret put OPS_MCP_TOKEN --config wrangler.generated.jsonc
+            echo 'Secret opcional OPS_MCP_TOKEN atualizado para o gateway MCP read-only.'
+          else
+            echo 'INFO: OPS_MCP_TOKEN ausente; MCP permanece público/read-only e limitado.'
           fi
           printf '%s' "$FDG_PUSH_YOUTUBE_API_KEY" | npx wrangler secret put YOUTUBE_API_KEY --config wrangler.generated.jsonc
           echo 'Secret YOUTUBE_API_KEY atualizado para o pós-jogo Fastlane.'
@@ -388,7 +395,7 @@ jobs:
           if (h.geminiSearch !== true) problems.push('geminiSearch!=true');
           if (h.workersAiExtraction !== true) problems.push('workersAiExtraction!=true');
           if (h.healthEmailMonitor !== true) problems.push('healthEmailMonitor!=true');
-          if (Number(h.healthMonitorPolicyVersion) !== 9) problems.push(`healthMonitorPolicyVersion=${h.healthMonitorPolicyVersion}`);
+          if (Number(h.healthMonitorPolicyVersion) !== 10) problems.push(`healthMonitorPolicyVersion=${h.healthMonitorPolicyVersion}`);
           if (h.healthEmailDailyBrt !== '08:00') problems.push(`healthEmailDailyBrt=${h.healthEmailDailyBrt}`);
           if (h.healthEmailRecoveryUntilBrt !== '11:59') problems.push(`healthEmailRecoveryUntilBrt=${h.healthEmailRecoveryUntilBrt}`);
           if (h.healthMonitorCron !== '*/5 * * * *') problems.push(`healthMonitorCron=${h.healthMonitorCron}`);
@@ -397,13 +404,20 @@ jobs:
           if (h.healthEmailNoOpenAI !== true) problems.push('healthEmailNoOpenAI!=true');
           if (h.healthEmailOverallRecovery !== true) problems.push('healthEmailOverallRecovery!=true');
           if (h.healthEmailOverallRecoveryPreservesDaily0800 !== true) problems.push('healthEmailOverallRecoveryPreservesDaily0800!=true');
-          if (Number(h.healthReliabilityIntelligenceIndicators) !== 4) problems.push(`healthReliabilityIntelligenceIndicators=${h.healthReliabilityIntelligenceIndicators}`);
+          if (Number(h.healthReliabilityIntelligenceIndicators) !== 5) problems.push(`healthReliabilityIntelligenceIndicators=${h.healthReliabilityIntelligenceIndicators}`);
           if (h.healthSportingIntegrityIndicator !== true) problems.push('healthSportingIntegrityIndicator!=true');
           if (h.healthFactualIntegrityIndicator !== true) problems.push('healthFactualIntegrityIndicator!=true');
           if (h.healthRagReadinessIndicator !== true) problems.push('healthRagReadinessIndicator!=true');
+          if (h.healthRagRuntimeIndicator !== true) problems.push('healthRagRuntimeIndicator!=true');
           if (h.healthOperationalControlPlaneIndicator !== true) problems.push('healthOperationalControlPlaneIndicator!=true');
-          if (h.healthRagRuntimeEnabled !== false) problems.push('healthRagRuntimeEnabled!=false');
-          if (h.healthMcpOpsEnabled !== false) problems.push('healthMcpOpsEnabled!=false');
+          if (h.healthMcpOpsIndicator !== true) problems.push('healthMcpOpsIndicator!=true');
+          if (h.healthRagRuntimeEnabled !== true) problems.push('healthRagRuntimeEnabled!=true');
+          if (h.healthMcpOpsEnabled !== true) problems.push('healthMcpOpsEnabled!=true');
+          if (h.healthMcpOpsReadOnly !== true) problems.push('healthMcpOpsReadOnly!=true');
+          if (h.healthMcpProtocolVersion !== '2026-07-28') problems.push(`healthMcpProtocolVersion=${h.healthMcpProtocolVersion}`);
+          if (Number(h.opsIntelligenceVersion) !== 1) problems.push(`opsIntelligenceVersion=${h.opsIntelligenceVersion}`);
+          if (Number(h.opsRagRuntimeVersion) !== 1) problems.push(`opsRagRuntimeVersion=${h.opsRagRuntimeVersion}`);
+          if (Number(h.opsMcpGatewayVersion) !== 1) problems.push(`opsMcpGatewayVersion=${h.opsMcpGatewayVersion}`);
           if (h.healthFineTuning !== 'not_used_by_design') problems.push(`healthFineTuning=${h.healthFineTuning}`);
           if (h.readinessAlertPolicyVersion !== 'R10.1') problems.push(`readinessAlertPolicyVersion=${h.readinessAlertPolicyVersion}`);
           if (h.readinessLifecyclePolicyVersion !== '6-R10.2') problems.push(`readinessLifecyclePolicyVersion=${h.readinessLifecyclePolicyVersion}`);
@@ -443,6 +457,70 @@ jobs:
             cat /tmp/fdg-push-health.json 2>/dev/null || true
             exit 1
           fi
+
+          # R10R17 — prova o runtime operacional sem depender do índice do Pages
+          # já ter propagado. O status deve expor o MCP read-only; em seguida
+          # executamos RPCs MCP 2026-07-28 reais contra o Worker publicado.
+          OPS_HTTP="$(curl -sS --max-time 15 -o /tmp/fdg-ops-intelligence.json -w '%{http_code}' 'https://push.formuladogol.com.br/v1/ops-intelligence/status' || true)"
+          OPS_HTTP="$OPS_HTTP" node <<'NODE'
+          const fs=require('fs'); let x=null;
+          try{x=JSON.parse(fs.readFileSync('/tmp/fdg-ops-intelligence.json','utf8'));}catch(_){ }
+          const p=[];
+          if(process.env.OPS_HTTP!=='200') p.push(`http=${process.env.OPS_HTTP}`);
+          if(x?.service!=='fdg-ops-intelligence') p.push(`service=${x?.service}`);
+          if(Number(x?.version)!==1) p.push(`version=${x?.version}`);
+          if(x?.mcp?.enabled!==true) p.push('mcp.enabled!=true');
+          if(x?.mcp?.readOnly!==true) p.push('mcp.readOnly!=true');
+          if(x?.mcp?.protocolVersion!=='2026-07-28') p.push(`mcp.protocolVersion=${x?.mcp?.protocolVersion}`);
+          if(Number(x?.mcp?.tools)!==5) p.push(`mcp.tools=${x?.mcp?.tools}`);
+          if(p.length){console.error('Ops Intelligence inválido: '+p.join(' | '));process.exit(1);}
+          console.log(`Ops Intelligence publicado: RAG ready=${x?.rag?.ready} · MCP ${x?.mcp?.protocolVersion} read-only.`);
+          NODE
+
+          MCP_AUTH_ARGS=()
+          if [ -n "${FDG_PUSH_OPS_MCP_TOKEN:-}" ]; then
+            MCP_AUTH_ARGS=(-H "Authorization: Bearer ${FDG_PUSH_OPS_MCP_TOKEN}")
+          fi
+
+          cat >/tmp/fdg-mcp-discover.json <<'JSON'
+          {"jsonrpc":"2.0","id":1,"method":"server/discover","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientInfo":{"name":"fdg-deploy-smoke","version":"1.0.0"},"io.modelcontextprotocol/clientCapabilities":{}}}}
+          JSON
+          MCP_DISCOVER_HTTP="$(curl -sS --max-time 20 -o /tmp/fdg-mcp-discover.out -w '%{http_code}' -X POST 'https://push.formuladogol.com.br/mcp' -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' -H 'MCP-Protocol-Version: 2026-07-28' -H 'Mcp-Method: server/discover' "${MCP_AUTH_ARGS[@]}" --data-binary @/tmp/fdg-mcp-discover.json || true)"
+
+          cat >/tmp/fdg-mcp-tools.json <<'JSON'
+          {"jsonrpc":"2.0","id":2,"method":"tools/list","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientInfo":{"name":"fdg-deploy-smoke","version":"1.0.0"},"io.modelcontextprotocol/clientCapabilities":{}}}}
+          JSON
+          MCP_TOOLS_HTTP="$(curl -sS --max-time 20 -o /tmp/fdg-mcp-tools.out -w '%{http_code}' -X POST 'https://push.formuladogol.com.br/mcp' -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' -H 'MCP-Protocol-Version: 2026-07-28' -H 'Mcp-Method: tools/list' "${MCP_AUTH_ARGS[@]}" --data-binary @/tmp/fdg-mcp-tools.json || true)"
+
+          cat >/tmp/fdg-mcp-status-call.json <<'JSON'
+          {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"fdg_ops_status","arguments":{},"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientInfo":{"name":"fdg-deploy-smoke","version":"1.0.0"},"io.modelcontextprotocol/clientCapabilities":{}}}}
+          JSON
+          MCP_CALL_HTTP="$(curl -sS --max-time 20 -o /tmp/fdg-mcp-status-call.out -w '%{http_code}' -X POST 'https://push.formuladogol.com.br/mcp' -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' -H 'MCP-Protocol-Version: 2026-07-28' -H 'Mcp-Method: tools/call' "${MCP_AUTH_ARGS[@]}" --data-binary @/tmp/fdg-mcp-status-call.json || true)"
+
+          MCP_DISCOVER_HTTP="$MCP_DISCOVER_HTTP" MCP_TOOLS_HTTP="$MCP_TOOLS_HTTP" MCP_CALL_HTTP="$MCP_CALL_HTTP" node <<'NODE'
+          const fs=require('fs');
+          function parse(file){
+            const raw=fs.readFileSync(file,'utf8').trim();
+            try{return JSON.parse(raw);}catch(_){
+              const lines=raw.split(/\r?\n/).filter(x=>x.startsWith('data:')).map(x=>x.slice(5).trim());
+              for(const line of lines){try{return JSON.parse(line);}catch(_){} }
+              return null;
+            }
+          }
+          const d=parse('/tmp/fdg-mcp-discover.out'), t=parse('/tmp/fdg-mcp-tools.out'), c=parse('/tmp/fdg-mcp-status-call.out'); const p=[];
+          if(process.env.MCP_DISCOVER_HTTP!=='200') p.push(`discover_http=${process.env.MCP_DISCOVER_HTTP}`);
+          if(process.env.MCP_TOOLS_HTTP!=='200') p.push(`tools_http=${process.env.MCP_TOOLS_HTTP}`);
+          if(process.env.MCP_CALL_HTTP!=='200') p.push(`call_http=${process.env.MCP_CALL_HTTP}`);
+          if(!Array.isArray(d?.result?.supportedVersions)||!d.result.supportedVersions.includes('2026-07-28')) p.push('discover_sem_2026-07-28');
+          const expected=['fdg_ops_status','fdg_rag_search','fdg_incident_lookup','fdg_reliability_context','fdg_postgame_status'].sort();
+          const got=(t?.result?.tools||[]).map(x=>x.name).sort();
+          if(JSON.stringify(got)!==JSON.stringify(expected)) p.push(`tools=${JSON.stringify(got)}`);
+          if((t?.result?.tools||[]).some(x=>x?.annotations?.readOnlyHint!==true)) p.push('tool_sem_readOnlyHint');
+          const callText=(c?.result?.content||[]).find(x=>x?.type==='text')?.text||'';
+          if(c?.result?.isError===true||!callText.includes('fdg-ops-intelligence')) p.push('fdg_ops_status_call_invalido');
+          if(p.length){console.error('MCP smoke falhou: '+p.join(' | '));process.exit(1);}
+          console.log('MCP Ops 2026-07-28: server/discover + tools/list + fdg_ops_status PASS (5/5 read-only).');
+          NODE
 
           # Hunter v11 precisa não apenas estar publicado: o cron de 1 minuto deve
           # ter executado a política nova e reaberto imediatamente as pendências.
