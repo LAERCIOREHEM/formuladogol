@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-08T23:49:01.942229-03:00",
+  "gerado_em": "2026-10-09T00:11:00.891940-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 289,
   "total_com_estatisticas": 289,
-  "total_com_publico": 287,
+  "total_com_publico": 288,
   "total_com_eventos": 289,
   "total_com_jogadores": 289,
   "total_eventos_validados": 289,
@@ -20,9 +20,9 @@
       "placar_mandante": 4,
       "placar_visitante": 0,
       "estadio": "Estadio do Maracana",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 15056,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/savarino-encerra-jejum-com-hat-trick-em-goleada-sobre-o-coritiba-e-leva-fluminense-ao-3o-lugar-cmv0d3cpn01t8015urcycivvp.html",
       "arbitro": "",
       "stats": [
         {
@@ -567,7 +567,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T23:48:41.320594-03:00"
+      "atualizado_em": "2026-10-08T23:48:41.320594-03:00",
+      "renda": 15056
     },
     "401841254": {
       "event_id": "401841254",
@@ -163204,5 +163205,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 270,
+  "total_com_renda": 288
 }
