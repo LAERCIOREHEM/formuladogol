@@ -1,21 +1,21 @@
 {
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
-    "jogos_na_janela": 58,
-    "jogos_com_transmissao": 53,
-    "jogos_sem_transmissao_na_janela": 5,
-    "jogos_sem_transmissao_14d": 2,
+    "jogos_na_janela": 54,
+    "jogos_com_transmissao": 50,
+    "jogos_sem_transmissao_na_janela": 4,
+    "jogos_sem_transmissao_14d": 1,
     "jogos_sem_transmissao_fora_14d": 3,
-    "jogos_criticos_sem_transmissao_72h": 1,
-    "registros_preservados": 4,
-    "jogos_guardiao_ia": 2,
-    "jogos_estaveis_sem_reconsulta_editorial": 2,
+    "jogos_criticos_sem_transmissao_72h": 0,
+    "registros_preservados": 5,
+    "jogos_guardiao_ia": 0,
+    "jogos_estaveis_sem_reconsulta_editorial": 11,
     "fontes_com_falha": 2
   },
   "fontes": {
     "guardiao_ia": {
       "ok": true,
-      "jogos_com_canal": 2
+      "jogos_com_canal": 0
     },
     "cbf": {
       "ok": false,
@@ -26,61 +26,45 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 8417
+      "duracao_ms": 11255
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 46,
-      "duracao_ms": 20435
+      "jogos_com_canal": 33,
+      "duracao_ms": 28335
     },
     "ge_artigos": {
       "ok": true,
-      "artigos_consultados": 4,
-      "jogos_com_canal": 1,
-      "duracao_ms": 94018
+      "artigos_consultados": 3,
+      "jogos_com_canal": 0,
+      "duracao_ms": 64515
     },
     "espn": {
       "ok": false,
-      "erro": "RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261006-20261209&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
+      "erro": "RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261007-20261210&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
     },
     "youtube_oficial": {
       "ok": true,
-      "jogos_com_canal": 13
+      "jogos_com_canal": 12
     }
   },
   "sem_transmissao": [
-    {
-      "event_id": "401841266",
-      "rodada": 30,
-      "jogo": "Bahia x Mirassol",
-      "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 71.6,
-      "nivel": "critico"
-    },
     {
       "event_id": "401841265",
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 95.6,
+      "faltam_horas": 75.4,
       "nivel": "aviso"
     }
   ],
   "sem_transmissao_futura": [
     {
-      "event_id": "401841266",
-      "rodada": 30,
-      "jogo": "Bahia x Mirassol",
-      "data_iso": "2026-10-11T19:30:00-03:00",
-      "faltam_horas": 71.6,
-      "nivel": "critico"
-    },
-    {
       "event_id": "401841265",
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 95.6,
+      "faltam_horas": 75.4,
       "nivel": "aviso"
     },
     {
@@ -88,7 +72,7 @@
       "rodada": 32,
       "jogo": "Chapecoense x Fluminense",
       "data_iso": "2026-10-24T19:30:00-03:00",
-      "faltam_horas": 383.6,
+      "faltam_horas": 363.4,
       "nivel": "futuro"
     },
     {
@@ -96,7 +80,7 @@
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-29T19:30:00-03:00",
-      "faltam_horas": 503.6,
+      "faltam_horas": 483.4,
       "nivel": "futuro"
     },
     {
@@ -104,7 +88,7 @@
       "rodada": 34,
       "jogo": "Palmeiras x Remo",
       "data_iso": "2026-11-05T19:30:00-03:00",
-      "faltam_horas": 671.6,
+      "faltam_horas": 651.4,
       "nivel": "futuro"
     }
   ],
@@ -126,6 +110,18 @@
       ]
     },
     {
+      "event_id": "401841301",
+      "jogo": "Internacional x Coritiba",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
       "event_id": "401841302",
       "jogo": "Vitória x Fluminense",
       "canais": [
@@ -144,13 +140,12 @@
     "CBF: Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
     "CBF: Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
     "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
-    "ESPN: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261006-20261209&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
+    "ESPN: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261007-20261210&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
   ],
   "artigos_ge_descobertos": [
-    "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/08/athletico-pr-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-    "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/10/08/palmeiras-x-bahia-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-    "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/08/fluminense-x-coritiba-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-    "https://ge.globo.com/gato-mestre/noticia/2026/10/07/fernando-diniz-e-o-19o-tecnico-demitido-no-brasileirao-2026-veja-a-lista.ghtml"
+    "https://ge.globo.com/gato-mestre/noticia/2026/10/09/palpite-ge-2026-loffredo-vence-a-rodada-veja-acertos-e-erros.ghtml",
+    "https://ge.globo.com/cartola/craque-da-rodada/noticia/2026/10/09/cartola-2026-matheuzinho-estoura-scouts-contra-a-chape-e-faz-maior-pontuacao-do-ano-na-rodada-29.ghtml",
+    "https://ge.globo.com/gato-mestre/noticia/2026/10/08/athletico-pr-2-x-2-atletico-mg-tem-o-maior-publico-da-29a-rodada-do-brasileiro-veja-a-lista.ghtml"
   ],
-  "atualizado_em": "2026-10-08T19:51:08-03:00"
+  "atualizado_em": "2026-10-09T16:05:43-03:00"
 }
