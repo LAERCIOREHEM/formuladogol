@@ -1,8 +1,9 @@
 {
-  "atualizado_em": "2026-10-08T22:36:16.637037-03:00",
-  "atualizado_em_br": "08/10/2026 22:36 BRT",
+  "atualizado_em": "2026-10-08T23:31:13.740307-03:00",
+  "atualizado_em_br": "08/10/2026 23:31 BRT",
   "fonte": "ESPN",
   "fontes_complementares": [
+    "ESPN summary",
     "override manual"
   ],
   "fallbacks_resultado": [
@@ -23,6 +24,42 @@
       "fonte": "override manual",
       "origem": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial."
+    },
+    {
+      "event_id": "401841251",
+      "rodada": 29,
+      "jogo": "Santos x Flamengo",
+      "placar": "2 x 2",
+      "fonte": "ESPN summary",
+      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841251",
+      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
+    },
+    {
+      "event_id": "401841256",
+      "rodada": 29,
+      "jogo": "Athletico-PR x Atlético-MG",
+      "placar": "2 x 2",
+      "fonte": "ESPN summary",
+      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841256",
+      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
+    },
+    {
+      "event_id": "401841248",
+      "rodada": 29,
+      "jogo": "Fluminense x Coritiba",
+      "placar": "4 x 0",
+      "fonte": "ESPN summary",
+      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841248",
+      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
+    },
+    {
+      "event_id": "401841254",
+      "rodada": 29,
+      "jogo": "Palmeiras x Bahia",
+      "placar": "1 x 0",
+      "fonte": "ESPN summary",
+      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841254",
+      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
     }
   ],
   "ultima_rodada_disputada": 29,
@@ -57,7 +94,7 @@
     28,
     29
   ],
-  "total_resultados": 287,
+  "total_resultados": 289,
   "times": [
     "Athletico-PR",
     "Atlético-MG",
@@ -82,6 +119,54 @@
   ],
   "resultados": [
     {
+      "event_id": "401841248",
+      "rodada": 29,
+      "data_iso": "2026-10-08T21:30",
+      "mandante": {
+        "nome": "Fluminense",
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
+        "sigla": "FLU"
+      },
+      "visitante": {
+        "nome": "Coritiba",
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/coritiba.svg",
+        "sigla": "CFC"
+      },
+      "estadio": "Estadio do Maracana",
+      "transmissao": "",
+      "status": "FT",
+      "estado": "post",
+      "adiado": false,
+      "data_definir": false,
+      "finalizado_em": "2026-10-08T23:25:00-03:00",
+      "placar_mandante": 4,
+      "placar_visitante": 0
+    },
+    {
+      "event_id": "401841254",
+      "rodada": 29,
+      "data_iso": "2026-10-08T21:30",
+      "mandante": {
+        "nome": "Palmeiras",
+        "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
+        "sigla": "PAL"
+      },
+      "visitante": {
+        "nome": "Bahia",
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/bahia.svg",
+        "sigla": "BAH"
+      },
+      "estadio": "Allianz Parque",
+      "transmissao": "",
+      "status": "FT",
+      "estado": "post",
+      "adiado": false,
+      "data_definir": false,
+      "finalizado_em": "2026-10-08T23:25:00-03:00",
+      "placar_mandante": 1,
+      "placar_visitante": 0
+    },
+    {
       "event_id": "401841256",
       "rodada": 29,
       "data_iso": "2026-10-08T20:00",
@@ -97,7 +182,7 @@
       },
       "estadio": "Arena da Baixada",
       "transmissao": "",
-      "status": "90'+10'",
+      "status": "FT",
       "estado": "post",
       "adiado": false,
       "data_definir": false,
@@ -121,7 +206,7 @@
       },
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "transmissao": "",
-      "status": "90'+15'",
+      "status": "FT",
       "estado": "post",
       "adiado": false,
       "data_definir": false,
