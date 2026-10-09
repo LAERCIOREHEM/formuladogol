@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-08T22:36:36.005427-03:00",
+  "gerado_em": "2026-10-08T22:45:56.718569-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 287,
   "total_com_estatisticas": 287,
-  "total_com_publico": 285,
+  "total_com_publico": 286,
   "total_com_eventos": 287,
   "total_com_jogadores": 287,
   "total_eventos_validados": 287,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 2,
       "estadio": "Arena da Baixada",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 24891,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.oliberal.com/esportes/com-dois-gols-nos-acrescimos-athletico-pr-e-atletico-mg-protagonizam-empate-eletrizante-1.1179109",
       "arbitro": "",
       "stats": [
         {
@@ -577,7 +577,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-08T22:36:19.224742-03:00"
+      "atualizado_em": "2026-10-08T22:36:19.224742-03:00",
+      "renda": 962380
     },
     "401841251": {
       "event_id": "401841251",
@@ -162113,5 +162114,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 270,
+  "total_com_renda": 286
 }
