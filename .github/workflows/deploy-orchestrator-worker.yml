@@ -106,6 +106,25 @@ jobs:
           FDG_ORCHESTRATOR_MODE: shadow
         run: npm run render-config
 
+      - name: Validar versão renderizada antes do deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const rendered = fs.readFileSync('wrangler.generated.jsonc', 'utf8');
+          if (pkg.version !== '2.2.0') {
+            console.error(`ERRO: package.json version=${pkg.version}; esperado=2.2.0`);
+            process.exit(1);
+          }
+          if (!/"ORCHESTRATOR_VERSION"\s*:\s*"2\.2\.0"/.test(rendered)) {
+            console.error('ERRO: wrangler.generated.jsonc não contém ORCHESTRATOR_VERSION=2.2.0');
+            process.exit(1);
+          }
+          console.log('Versão sincronizada: package=2.2.0; Wrangler=2.2.0.');
+          NODE
+
       - name: Deploy base SHADOW + Durable Object + Cron Trigger
         run: npx wrangler deploy --config wrangler.generated.jsonc
 
