@@ -13,15 +13,15 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 54,
+    "jogos_na_janela": 53,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 11,
+    "descobertas_antecipadas": 10,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 67,
+    "candidatos_oficiais_encontrados": 66,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
-    "transmissoes_publicadas": 12,
+    "transmissoes_publicadas": 11,
     "sem_transmissao": 0,
     "erros": 0
   },
@@ -68,20 +68,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401841262",
-      "rodada": 30,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Vasco da Gama x Remo",
-      "data_iso": "2026-10-10T18:00:00-03:00",
-      "principal": "CazéTV",
-      "fontes_encontradas": [
-        "CazéTV"
-      ],
-      "manual": false,
-      "descoberta_antecipada": true
-    },
     {
       "event_id": "401841259",
       "rodada": 30,
@@ -256,23 +242,6 @@
       ]
     },
     {
-      "event_id": "401841262",
-      "jogo": "Vasco da Gama x Remo",
-      "fonte": "cazetv",
-      "video_id": "90fW7TbZ9sg",
-      "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg",
-      "titulo": "AO VIVO: VASCO X REMO | BRASILEIRÃO 2026 | 30ª RODADA",
-      "status": "live",
-      "confianca": 0.925,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (90 min de diferença)"
-      ]
-    },
-    {
       "event_id": "401841263",
       "jogo": "Flamengo x Fluminense",
       "fonte": "getv",
@@ -385,22 +354,6 @@
       ]
     },
     {
-      "event_id": "401841262",
-      "jogo": "Vasco da Gama x Remo",
-      "fonte": "cazetv",
-      "video_id": "ahc29ktiDU0",
-      "url": "https://www.youtube.com/watch?v=ahc29ktiDU0",
-      "titulo": "AO VIVO: LOGO APÓS VASCO X REMO NO BRASILEIRÃO | RODA DE BOBO",
-      "status": "upcoming",
-      "confianca": 0.85,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "horário compatível (120 min de diferença)"
-      ]
-    },
-    {
       "event_id": "401841306",
       "jogo": "Athletico-PR x Vasco da Gama",
       "fonte": "cazetv",
@@ -452,6 +405,16 @@
       "titulo": "SBT Ao Vivo",
       "status": "live",
       "inicio_programado": "2026-10-08T12:15:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "90fW7TbZ9sg",
+      "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: VASCO E REMO FICAM NO 0 X 0 EM JOGO MORNO EM SÃO JANUÁRIO  | RODA DE BOBO",
+      "status": "live",
+      "inicio_programado": "2026-10-10T16:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -997,5 +960,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-10-10T19:56:01-03:00"
+  "atualizado_em": "2026-10-10T20:50:59-03:00"
 }

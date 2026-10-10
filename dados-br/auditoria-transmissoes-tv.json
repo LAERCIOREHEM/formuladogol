@@ -2,15 +2,15 @@
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
     "jogos_na_janela": 54,
-    "jogos_com_transmissao": 50,
-    "jogos_sem_transmissao_na_janela": 4,
-    "jogos_sem_transmissao_14d": 2,
+    "jogos_com_transmissao": 49,
+    "jogos_sem_transmissao_na_janela": 5,
+    "jogos_sem_transmissao_14d": 3,
     "jogos_sem_transmissao_fora_14d": 2,
-    "jogos_criticos_sem_transmissao_72h": 1,
-    "registros_preservados": 37,
+    "jogos_criticos_sem_transmissao_72h": 2,
+    "registros_preservados": 38,
     "jogos_guardiao_ia": 0,
     "jogos_estaveis_sem_reconsulta_editorial": 0,
-    "fontes_com_falha": 2
+    "fontes_com_falha": 0
   },
   "fontes": {
     "guardiao_ia": {
@@ -18,43 +18,45 @@
       "jogos_com_canal": 0
     },
     "cbf": {
-      "ok": false,
-      "competicoes_ok": [],
+      "ok": true,
+      "competicoes_ok": [
+        "brasileirao"
+      ],
       "registros": 0,
       "erros": [
-        "Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 10831
-    },
-    "ge_agenda": {
-      "ok": true,
-      "jogos_com_canal": 0,
-      "duracao_ms": 9830
-    },
-    "ge_artigos": {
-      "ok": true,
-      "artigos_consultados": 6,
-      "jogos_com_canal": 3,
-      "duracao_ms": 134240
+      "duracao_ms": 5435
     },
     "espn": {
-      "ok": false,
-      "erro": "RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261008-20261211&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
+      "ok": true,
+      "competicoes_consultadas": 2,
+      "eventos_na_janela": 0,
+      "scoreboard_com_canal": 0,
+      "summary_com_canal": 0,
+      "duracao_ms": 0
     },
     "youtube_oficial": {
       "ok": true,
-      "jogos_com_canal": 12
+      "jogos_com_canal": 11
     }
   },
   "sem_transmissao": [
+    {
+      "event_id": "401841262",
+      "rodada": 30,
+      "jogo": "Vasco da Gama x Remo",
+      "data_iso": "2026-10-10T18:00:00-03:00",
+      "faltam_horas": -2.9,
+      "nivel": "critico"
+    },
     {
       "event_id": "401841265",
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 46.8,
+      "faltam_horas": 46.6,
       "nivel": "critico"
     },
     {
@@ -62,17 +64,25 @@
       "rodada": 32,
       "jogo": "Chapecoense x Fluminense",
       "data_iso": "2026-10-24T19:30:00-03:00",
-      "faltam_horas": 334.8,
+      "faltam_horas": 334.6,
       "nivel": "aviso"
     }
   ],
   "sem_transmissao_futura": [
     {
+      "event_id": "401841262",
+      "rodada": 30,
+      "jogo": "Vasco da Gama x Remo",
+      "data_iso": "2026-10-10T18:00:00-03:00",
+      "faltam_horas": -2.9,
+      "nivel": "critico"
+    },
+    {
       "event_id": "401841265",
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 46.8,
+      "faltam_horas": 46.6,
       "nivel": "critico"
     },
     {
@@ -80,7 +90,7 @@
       "rodada": 32,
       "jogo": "Chapecoense x Fluminense",
       "data_iso": "2026-10-24T19:30:00-03:00",
-      "faltam_horas": 334.8,
+      "faltam_horas": 334.6,
       "nivel": "aviso"
     },
     {
@@ -88,7 +98,7 @@
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-29T19:30:00-03:00",
-      "faltam_horas": 454.8,
+      "faltam_horas": 454.6,
       "nivel": "futuro"
     },
     {
@@ -96,7 +106,7 @@
       "rodada": 34,
       "jogo": "Palmeiras x Remo",
       "data_iso": "2026-11-05T19:30:00-03:00",
-      "faltam_horas": 622.8,
+      "faltam_horas": 622.6,
       "nivel": "futuro"
     }
   ],
@@ -106,6 +116,13 @@
       "jogo": "Atlético-MG x Santos",
       "canais": [
         "Premiere"
+      ]
+    },
+    {
+      "event_id": "401841267",
+      "jogo": "Grêmio x Internacional",
+      "canais": [
+        "Globo"
       ]
     },
     {
@@ -406,18 +423,9 @@
     }
   ],
   "erros": [
-    "CBF: Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
     "CBF: Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
-    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
-    "ESPN: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261008-20261211&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
+    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
-  "artigos_ge_descobertos": [
-    "https://ge.globo.com/gato-mestre/dicas/noticia/2026/10/10/veja-a-expectativa-de-gols-xg-e-as-dicas-de-sg-para-a-rodada-30-do-cartola-2026.ghtml",
-    "https://ge.globo.com/cartola/dicas/noticia/2026/10/10/cartola-palmeiras-puxa-fila-dos-jogadores-que-estao-bem-veja-o-mapa-da-mitada-da-rodada-30.ghtml",
-    "https://ge.globo.com/gato-mestre/noticia/2026/10/10/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-30a-rodada-do-brasileirao.ghtml",
-    "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/10/10/sao-paulo-x-vitoria-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-    "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/10/10/vasco-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-    "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/10/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-30a-rodada.ghtml"
-  ],
-  "atualizado_em": "2026-10-10T20:41:04-03:00"
+  "artigos_ge_descobertos": [],
+  "atualizado_em": "2026-10-10T20:51:22-03:00"
 }
