@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-10T20:15:10.102810-03:00",
+  "gerado_em": "2026-10-10T20:30:52.910961-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 290,
   "total_com_estatisticas": 290,
-  "total_com_publico": 289,
+  "total_com_publico": 290,
   "total_com_eventos": 290,
   "total_com_jogadores": 290,
   "total_eventos_validados": 290,
@@ -20,9 +20,9 @@
       "placar_mandante": 0,
       "placar_visitante": 0,
       "estadio": "Estádio São Januário",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 19866,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.oliberal.com/esportes/remo-segura-embalo-do-vasco-e-garante-ponto-em-sao-januario-1.1180744",
       "arbitro": "",
       "stats": [
         {
@@ -551,7 +551,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-10T20:15:05.385358-03:00"
+      "atualizado_em": "2026-10-10T20:15:05.385358-03:00",
+      "renda": 1092645
     },
     "401841248": {
       "event_id": "401841248",
@@ -163749,5 +163750,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 270,
+  "total_com_renda": 290
 }
