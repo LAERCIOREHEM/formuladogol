@@ -17,7 +17,7 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 11,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 68,
+    "candidatos_oficiais_encontrados": 67,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
@@ -239,6 +239,23 @@
   ],
   "aceitos": [
     {
+      "event_id": "401841259",
+      "jogo": "São Paulo x Vitória",
+      "fonte": "getv",
+      "video_id": "uS7cuCJTHqA",
+      "url": "https://www.youtube.com/watch?v=uS7cuCJTHqA",
+      "titulo": "SÃO PAULO X VITÓRIA | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+      "status": "live",
+      "confianca": 0.95,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "transmissão já está ao vivo",
+        "horário compatível (60 min de diferença)"
+      ]
+    },
+    {
       "event_id": "401841262",
       "jogo": "Vasco da Gama x Remo",
       "fonte": "cazetv",
@@ -317,22 +334,6 @@
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
         "horário compatível (90 min de diferença)"
-      ]
-    },
-    {
-      "event_id": "401841259",
-      "jogo": "São Paulo x Vitória",
-      "fonte": "getv",
-      "video_id": "uS7cuCJTHqA",
-      "url": "https://www.youtube.com/watch?v=uS7cuCJTHqA",
-      "titulo": "SÃO PAULO X VITÓRIA | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
-      "status": "upcoming",
-      "confianca": 0.9,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "horário compatível (60 min de diferença)"
       ]
     },
     {
@@ -451,16 +452,6 @@
       "titulo": "SBT Ao Vivo",
       "status": "live",
       "inicio_programado": "2026-10-08T12:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "2DHweqKp_60",
-      "url": "https://www.youtube.com/watch?v=2DHweqKp_60",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "11+ DA HISTÓRIA DA SELEÇÃO BRASILEIRA FEMININA! MARTA, CRISTIANE, FORMIGA... | Tropa ge tv",
-      "status": "live",
-      "inicio_programado": "2026-10-10T19:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1006,5 +997,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-10-10T19:30:59-03:00"
+  "atualizado_em": "2026-10-10T19:56:01-03:00"
 }
