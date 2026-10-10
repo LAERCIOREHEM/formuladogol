@@ -4,13 +4,13 @@
     "jogos_na_janela": 54,
     "jogos_com_transmissao": 50,
     "jogos_sem_transmissao_na_janela": 4,
-    "jogos_sem_transmissao_14d": 1,
-    "jogos_sem_transmissao_fora_14d": 3,
+    "jogos_sem_transmissao_14d": 2,
+    "jogos_sem_transmissao_fora_14d": 2,
     "jogos_criticos_sem_transmissao_72h": 1,
-    "registros_preservados": 5,
+    "registros_preservados": 38,
     "jogos_guardiao_ia": 0,
-    "jogos_estaveis_sem_reconsulta_editorial": 0,
-    "fontes_com_falha": 2
+    "jogos_estaveis_sem_reconsulta_editorial": 11,
+    "fontes_com_falha": 0
   },
   "fontes": {
     "guardiao_ia": {
@@ -18,30 +18,24 @@
       "jogos_com_canal": 0
     },
     "cbf": {
-      "ok": false,
-      "competicoes_ok": [],
+      "ok": true,
+      "competicoes_ok": [
+        "brasileirao"
+      ],
       "registros": 0,
       "erros": [
-        "Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 12145
-    },
-    "ge_agenda": {
-      "ok": true,
-      "jogos_com_canal": 44,
-      "duracao_ms": 27494
-    },
-    "ge_artigos": {
-      "ok": true,
-      "artigos_consultados": 3,
-      "jogos_com_canal": 0,
-      "duracao_ms": 66328
+      "duracao_ms": 4859
     },
     "espn": {
-      "ok": false,
-      "erro": "RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261007-20261210&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
+      "ok": true,
+      "competicoes_consultadas": 2,
+      "eventos_na_janela": 0,
+      "scoreboard_com_canal": 0,
+      "summary_com_canal": 0,
+      "duracao_ms": 0
     },
     "youtube_oficial": {
       "ok": true,
@@ -54,8 +48,16 @@
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 71.9,
+      "faltam_horas": 48.0,
       "nivel": "critico"
+    },
+    {
+      "event_id": "401841278",
+      "rodada": 32,
+      "jogo": "Chapecoense x Fluminense",
+      "data_iso": "2026-10-24T19:30:00-03:00",
+      "faltam_horas": 336.0,
+      "nivel": "aviso"
     }
   ],
   "sem_transmissao_futura": [
@@ -64,7 +66,7 @@
       "rodada": 30,
       "jogo": "Chapecoense x Athletico-PR",
       "data_iso": "2026-10-12T19:30:00-03:00",
-      "faltam_horas": 71.9,
+      "faltam_horas": 48.0,
       "nivel": "critico"
     },
     {
@@ -72,15 +74,15 @@
       "rodada": 32,
       "jogo": "Chapecoense x Fluminense",
       "data_iso": "2026-10-24T19:30:00-03:00",
-      "faltam_horas": 359.9,
-      "nivel": "futuro"
+      "faltam_horas": 336.0,
+      "nivel": "aviso"
     },
     {
       "event_id": "401841294",
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-29T19:30:00-03:00",
-      "faltam_horas": 479.9,
+      "faltam_horas": 456.0,
       "nivel": "futuro"
     },
     {
@@ -88,11 +90,33 @@
       "rodada": 34,
       "jogo": "Palmeiras x Remo",
       "data_iso": "2026-11-05T19:30:00-03:00",
-      "faltam_horas": 647.9,
+      "faltam_horas": 624.0,
       "nivel": "futuro"
     }
   ],
   "preservados": [
+    {
+      "event_id": "401841258",
+      "jogo": "Atlético-MG x Santos",
+      "canais": [
+        "Premiere"
+      ]
+    },
+    {
+      "event_id": "401841267",
+      "jogo": "Grêmio x Internacional",
+      "canais": [
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841266",
+      "jogo": "Bahia x Mirassol",
+      "canais": [
+        "Premiere"
+      ]
+    },
     {
       "event_id": "401841264",
       "jogo": "Coritiba x Botafogo",
@@ -103,10 +127,227 @@
       ]
     },
     {
+      "event_id": "401841275",
+      "jogo": "Mirassol x Internacional",
+      "canais": [
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841270",
+      "jogo": "Atlético-MG x Coritiba",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841271",
+      "jogo": "Athletico-PR x Palmeiras",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841273",
+      "jogo": "São Paulo x Vasco da Gama",
+      "canais": [
+        "Premiere",
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841277",
+      "jogo": "Fluminense x Santos",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841269",
+      "jogo": "Bahia x Flamengo",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841274",
+      "jogo": "Remo x Bragantino",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841272",
+      "jogo": "Corinthians x Vitória",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841287",
+      "jogo": "Cruzeiro x Remo",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841285",
+      "jogo": "Internacional x Botafogo",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841284",
+      "jogo": "Mirassol x São Paulo",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841283",
+      "jogo": "Palmeiras x Bragantino",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841282",
+      "jogo": "Santos x Bahia",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841279",
+      "jogo": "Coritiba x Grêmio",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841286",
+      "jogo": "Flamengo x Atlético-MG",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841291",
+      "jogo": "Bragantino x Chapecoense",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841293",
+      "jogo": "Santos x Palmeiras",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841296",
+      "jogo": "Bahia x São Paulo",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841297",
+      "jogo": "Remo x Botafogo",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841288",
+      "jogo": "Atlético-MG x Cruzeiro",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841292",
+      "jogo": "Vasco da Gama x Flamengo",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841290",
+      "jogo": "Grêmio x Athletico-PR",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841295",
+      "jogo": "Corinthians x Mirassol",
+      "canais": [
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401913109",
+      "jogo": "Grêmio x Atlético-MG",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
       "event_id": "401913105",
       "jogo": "Palmeiras x Vasco da Gama",
       "canais": [
         "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841299",
+      "jogo": "Bragantino x Santos",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841304",
+      "jogo": "Chapecoense x Mirassol",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Prime Video"
       ]
     },
     {
@@ -119,6 +360,36 @@
         "Globo",
         "Prime Video",
         "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841307",
+      "jogo": "Flamengo x Grêmio",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841305",
+      "jogo": "Botafogo x Atlético-MG",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841298",
+      "jogo": "São Paulo x Corinthians",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841303",
+      "jogo": "Cruzeiro x Bahia",
+      "canais": [
+        "SporTV"
       ]
     },
     {
@@ -137,15 +408,9 @@
     }
   ],
   "erros": [
-    "CBF: Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
     "CBF: Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
-    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
-    "ESPN: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261007-20261210&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
+    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
-  "artigos_ge_descobertos": [
-    "https://ge.globo.com/gato-mestre/noticia/2026/10/09/palpite-ge-2026-loffredo-vence-a-rodada-veja-acertos-e-erros.ghtml",
-    "https://ge.globo.com/cartola/craque-da-rodada/noticia/2026/10/09/cartola-2026-matheuzinho-estoura-scouts-contra-a-chape-e-faz-maior-pontuacao-do-ano-na-rodada-29.ghtml",
-    "https://ge.globo.com/gato-mestre/noticia/2026/10/08/athletico-pr-2-x-2-atletico-mg-tem-o-maior-publico-da-29a-rodada-do-brasileiro-veja-a-lista.ghtml"
-  ],
-  "atualizado_em": "2026-10-09T19:35:44-03:00"
+  "artigos_ge_descobertos": [],
+  "atualizado_em": "2026-10-10T19:31:23-03:00"
 }

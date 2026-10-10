@@ -13,42 +13,6 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "jogos": {
-    "401841254": {
-      "event_id": "401841254",
-      "rodada": 29,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "espn_league": "bra.1",
-      "mandante": "Palmeiras",
-      "visitante": "Bahia",
-      "data_iso": "2026-10-08T21:30:00-03:00",
-      "estadio": "Allianz Parque",
-      "origem": "automático",
-      "principal": {
-        "fonte": "getv",
-        "nome": "GE TV",
-        "video_id": "YrzbyMtsouA",
-        "url": "https://www.youtube.com/watch?v=YrzbyMtsouA",
-        "status": "upcoming",
-        "inicio_programado": "2026-10-08T20:00:00-03:00",
-        "inicio_real": "",
-        "titulo": "PALMEIRAS X BAHIA | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
-        "canal": "ge tv",
-        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
-        "thumbnail": "https://i.ytimg.com/vi/YrzbyMtsouA/maxresdefault_live.jpg",
-        "confianca": 0.875,
-        "motivos": [
-          "os dois clubes aparecem no título",
-          "identifica Brasileirão/competição",
-          "identifica transmissão ao vivo",
-          "horário compatível (90 min de diferença)"
-        ],
-        "origem_busca": "validação-direta",
-        "escopo": "partida",
-        "embeddable": true
-      },
-      "alternativas": []
-    },
     "401841262": {
       "event_id": "401841262",
       "rodada": 30,
@@ -65,21 +29,22 @@
         "nome": "CazéTV",
         "video_id": "90fW7TbZ9sg",
         "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg",
-        "status": "upcoming",
+        "status": "live",
         "inicio_programado": "2026-10-10T16:30:00-03:00",
-        "inicio_real": "",
+        "inicio_real": "2026-10-10T16:30:26-03:00",
         "titulo": "AO VIVO: VASCO X REMO | BRASILEIRÃO 2026 | 30ª RODADA",
         "canal": "CazéTV",
         "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
         "thumbnail": "https://i.ytimg.com/vi/90fW7TbZ9sg/maxresdefault_live.jpg",
-        "confianca": 0.875,
+        "confianca": 0.925,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
           "identifica transmissão ao vivo",
+          "transmissão já está ao vivo",
           "horário compatível (90 min de diferença)"
         ],
-        "origem_busca": "validação-direta",
+        "origem_busca": "streams-page",
         "escopo": "partida",
         "embeddable": false
       },
@@ -138,18 +103,18 @@
         "video_id": "6-ebvfwXwVQ",
         "url": "https://www.youtube.com/watch?v=6-ebvfwXwVQ",
         "status": "upcoming",
-        "inicio_programado": "2026-10-11T16:00:00-03:00",
+        "inicio_programado": "2026-10-11T15:50:00-03:00",
         "inicio_real": "",
         "titulo": "AO VIVO: FLAMENGO X FLUMINENSE | BRASILEIRÃO 2026 | ge tv",
         "canal": "ge tv",
         "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
         "thumbnail": "https://i.ytimg.com/vi/6-ebvfwXwVQ/maxresdefault_live.jpg",
-        "confianca": 0.875,
+        "confianca": 0.8667,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
           "identifica transmissão ao vivo",
-          "horário compatível (90 min de diferença)"
+          "horário compatível (100 min de diferença)"
         ],
         "origem_busca": "uploads",
         "escopo": "partida",
@@ -174,18 +139,18 @@
         "video_id": "zZuGjqmMunI",
         "url": "https://www.youtube.com/watch?v=zZuGjqmMunI",
         "status": "upcoming",
-        "inicio_programado": "2026-10-11T16:00:00-03:00",
+        "inicio_programado": "2026-10-11T15:50:00-03:00",
         "inicio_real": "",
         "titulo": "AO VIVO: PALMEIRAS X CORINTHIANS | BRASILEIRÃO 2026 | ge tv",
         "canal": "ge tv",
         "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
         "thumbnail": "https://i.ytimg.com/vi/zZuGjqmMunI/maxresdefault_live.jpg",
-        "confianca": 0.875,
+        "confianca": 0.8667,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
           "identifica transmissão ao vivo",
-          "horário compatível (90 min de diferença)"
+          "horário compatível (100 min de diferença)"
         ],
         "origem_busca": "uploads",
         "escopo": "partida",
@@ -478,5 +443,5 @@
       "alternativas": []
     }
   },
-  "atualizado_em": "2026-10-08T18:00:57-03:00"
+  "atualizado_em": "2026-10-10T19:30:59-03:00"
 }
