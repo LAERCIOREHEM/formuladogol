@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "atualizado_em": "2026-10-09T10:04:30-03:00",
+  "atualizado_em": "2026-10-10T20:12:47-03:00",
   "state": "CORE_GREEN",
   "core": {
     "status": "ok",
     "sporting_integrity": "ok",
-    "concluded": 289,
-    "remaining": 91,
+    "concluded": 290,
+    "remaining": 90,
     "simulations": 2000000,
-    "af_reference": "2026-10-08T23:25:00-03:00"
+    "af_reference": "2026-10-10T19:55:00-03:00"
   },
   "enrichment": {
     "pending_public": 0,
@@ -28,6 +28,16 @@
       "final_to_af": 10,
       "commit_to_site": 5
     },
-    "ultima_observacao": null
+    "ultima_observacao": {
+      "trace_id": "fdg-401841262",
+      "event_id": "401841262",
+      "finalizado_em": "2026-10-10T19:55:00-03:00",
+      "af_calculado_em": "2026-10-10T20:12:44-03:00",
+      "final_para_af_minutos": 17.733,
+      "alvo_minutos": 10,
+      "dentro_slo": false,
+      "registrado_em": "2026-10-10T20:12:47-03:00",
+      "run_id": "38094089795"
+    }
   }
 }
