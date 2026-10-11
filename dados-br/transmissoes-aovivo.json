@@ -13,6 +13,43 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "jogos": {
+    "401841263": {
+      "event_id": "401841263",
+      "rodada": 30,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Flamengo",
+      "visitante": "Fluminense",
+      "data_iso": "2026-10-11T17:30:00-03:00",
+      "estadio": "Estadio do Maracana",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "6-ebvfwXwVQ",
+        "url": "https://www.youtube.com/watch?v=6-ebvfwXwVQ",
+        "status": "live",
+        "inicio_programado": "2026-10-11T15:50:00-03:00",
+        "inicio_real": "2026-10-11T15:50:09-03:00",
+        "titulo": "AO VIVO: FLAMENGO X FLUMINENSE | BRASILEIRÃO 2026 | ge tv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/6-ebvfwXwVQ/maxresdefault_live.jpg",
+        "confianca": 0.9167,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "transmissão já está ao vivo",
+          "horário compatível (100 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": true
+      },
+      "alternativas": []
+    },
     "401841261": {
       "event_id": "401841261",
       "rodada": 30,
@@ -335,5 +372,5 @@
       "alternativas": []
     }
   },
-  "atualizado_em": "2026-10-11T16:00:53-03:00"
+  "atualizado_em": "2026-10-11T16:35:49-03:00"
 }
