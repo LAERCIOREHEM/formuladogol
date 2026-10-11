@@ -65,11 +65,13 @@
       "data_iso": "2026-10-11T17:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "GE TV"
+        "GE TV",
+        "Premiere",
+        "Globo"
       ],
-      "origem": "YouTube oficial validado",
+      "origem": "GE guia editorial + YouTube oficial validado",
       "confianca": "confirmado",
-      "estavel": false,
+      "estavel": true,
       "exclusivo": false,
       "fontes": [
         {
@@ -78,9 +80,31 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=6-ebvfwXwVQ",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/11/bahia-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo",
+            "GE TV",
+            "Premiere"
+          ],
+          "referencia": "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/10/10/vasco-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -88,6 +112,21 @@
           "nome": "Assistir na GE TV",
           "url": "https://www.youtube.com/watch?v=6-ebvfwXwVQ",
           "tipo": "player_oficial"
+        },
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -101,20 +140,30 @@
       "canais": [
         "Globo"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "GE guia editorial",
+      "confianca": "confirmado",
       "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "GE guia editorial",
           "canais": [
             "Globo"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/11/bahia-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/10/10/vasco-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -133,11 +182,13 @@
       "data_iso": "2026-10-11T17:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "GE TV"
+        "GE TV",
+        "Premiere",
+        "Globo"
       ],
-      "origem": "YouTube oficial validado",
+      "origem": "GE guia editorial + YouTube oficial validado",
       "confianca": "confirmado",
-      "estavel": false,
+      "estavel": true,
       "exclusivo": false,
       "fontes": [
         {
@@ -146,9 +197,43 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=zZuGjqmMunI",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/11/bahia-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo",
+            "Premiere",
+            "GE TV"
+          ],
+          "referencia": "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/10/10/sao-paulo-x-vitoria-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo",
+            "Premiere",
+            "GE TV"
+          ],
+          "referencia": "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/10/10/vasco-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -156,6 +241,21 @@
           "nome": "Assistir na GE TV",
           "url": "https://www.youtube.com/watch?v=zZuGjqmMunI",
           "tipo": "player_oficial"
+        },
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -169,20 +269,20 @@
       "canais": [
         "Globo"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "GE guia editorial",
+      "confianca": "confirmado",
       "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "GE guia editorial",
           "canais": [
             "Globo"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/10/10/vasco-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -218,7 +318,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -272,7 +372,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=7zFuTKhYbD4",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -308,7 +408,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -352,7 +452,7 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=-x1MQjpr02Y",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -390,7 +490,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -443,7 +543,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -494,7 +594,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -547,7 +647,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -596,7 +696,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=TOeRJyuK8-s",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -634,7 +734,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -687,7 +787,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -745,7 +845,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -803,7 +903,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -861,7 +961,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -919,7 +1019,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -973,7 +1073,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=ITbRBWMF4W8",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -1007,7 +1107,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1046,7 +1146,7 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=FDo01YVDsNE",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -1084,7 +1184,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1141,7 +1241,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1205,7 +1305,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1248,7 +1348,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1289,9 +1389,10 @@
       "data_iso": "2026-10-28T19:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "CazéTV"
+        "CazéTV",
+        "Globo"
       ],
-      "origem": "YouTube oficial validado",
+      "origem": "GE guia editorial + YouTube oficial validado",
       "confianca": "confirmado",
       "estavel": false,
       "exclusivo": false,
@@ -1302,9 +1403,19 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=t4pf4qZ0c14",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/11/bahia-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -1312,6 +1423,11 @@
           "nome": "Assistir na CazéTV",
           "url": "https://www.youtube.com/watch?v=t4pf4qZ0c14",
           "tipo": "player_oficial"
+        },
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -1336,7 +1452,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1375,7 +1491,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1418,7 +1534,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1472,7 +1588,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1511,7 +1627,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1550,7 +1666,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1591,7 +1707,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1635,7 +1751,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1674,7 +1790,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1717,7 +1833,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1775,7 +1891,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1839,7 +1955,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1908,7 +2024,7 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=cOjixSohLkY",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -1931,20 +2047,20 @@
       "canais": [
         "Globo"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "GE guia editorial",
+      "confianca": "confirmado",
       "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "GE guia editorial",
           "canais": [
             "Globo"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/11/bahia-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -1976,7 +2092,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -2019,7 +2135,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -2073,7 +2189,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -2112,7 +2228,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -2151,7 +2267,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=89tPGaf7W4s",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -2185,7 +2301,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-11T14:35:32-03:00",
+          "capturado_em": "2026-10-11T14:51:01-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -2204,5 +2320,5 @@
       ]
     }
   },
-  "atualizado_em": "2026-10-11T14:35:32-03:00"
+  "atualizado_em": "2026-10-11T14:51:01-03:00"
 }
