@@ -5438,51 +5438,133 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado: Grêmio x Internacional, Brasileirão 2026 — 30ª rodada, domingo, 11/10/2026, às 17h30 (horário de Brasília), na Arena do Grêmio. Transmissão integral pela Globo exclusivamente no Rio Grande do Sul (RBS TV) e pelo Premiere para todo o Brasil. O Tempo Real do ge não é transmissão de vídeo integral."
+    },
+    {
+      "event_id": "401841261",
+      "jogo": "Palmeiras x Corinthians",
+      "data_iso": "2026-10-11T17:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-10-11T16:15:14-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "GE TV",
+        "Globo"
+      ],
+      "status": "nao_resolvido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [],
+      "rejeicoes": [
+        "nenhuma fonte declarada consta entre as páginas efetivamente retornadas pelo web_search"
+      ],
+      "resumo": "Confirmado para Brasil: Palmeiras x Corinthians, Brasileirão Série A 2026, 30ª rodada, neste domingo (11/10/2026), às 17h30 (horário de Brasília), no Nubank Parque, em São Paulo. A transmissão integral será de TV Globo (apenas SP, PR e MS), ge tv e Premiere. Não é exclusiva."
+    },
+    {
+      "event_id": "401841263",
+      "jogo": "Flamengo x Fluminense",
+      "data_iso": "2026-10-11T17:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-10-11T16:15:24-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "GE TV",
+        "Premiere",
+        "Globo"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/10/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-30a-rodada.ghtml",
+        "https://ge.globo.com/futebol/times/flamengo/noticia/2026/10/11/flamengo-perde-margem-para-erros-e-projeta-jogos-extremamente-tensos-em-disputa-com-o-palmeiras.ghtml",
+        "https://ge.globo.com/google/amp/futebol/times/fluminense/noticia/2026/09/30/fluminense-aposta-em-mes-sem-viagens-para-chegar-bem-fisicamente-a-semifinal-da-libertadores.ghtml",
+        "https://ge.globo.com/google/amp/futebol/times/fluminense/noticia/2026/10/11/nonato-valoriza-classico-do-fluminense-com-o-flamengo-tem-que-ter-nocao-da-dimensao-dessa-partida.ghtml",
+        "https://ge.globo.com/rj/futebol/brasileirao-serie-a/jogo/11-10-2026/flamengo-fluminense.ghtml",
+        "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/10/11/flamengo-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://globoplay.globo.com/v/1202467",
+        "https://globoplay.globo.com/v/12688242",
+        "https://globoplay.globo.com/v/14450621",
+        "https://globoplay.globo.com/v/3640799",
+        "https://globoplay.globo.com/v/4221470",
+        "https://globoplay.globo.com/v/4831313"
+      ],
+      "canais_depois": [
+        "GE TV",
+        "Globo",
+        "Premiere"
+      ],
+      "exclusivo": false,
+      "confianca": 0.98,
+      "fontes_aceitas": [
+        "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/10/11/flamengo-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=6-ebvfwXwVQ",
+          "scope": "unknown",
+          "valid_for_match": false,
+          "reason": "O guia do ge confirma que a GE TV transmite Flamengo x Fluminense ao vivo, mas a página específica deste URL do YouTube não pôde ser carregada para verificar diretamente se o vídeo entrega a partida integral — e não apenas pré-jogo, narração ou pós-jogo."
+        }
+      ],
+      "youtube_removidos": [
+        "https://www.youtube.com/watch?v=6-ebvfwXwVQ"
+      ],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para Flamengo x Fluminense, domingo, 11/10/2026, às 17h30 (horário de Brasília), no Maracanã, pela 30ª rodada (fase única) do Brasileirão: Globo, GE TV e Premiere transmitem ao vivo. A relação é completa com base no guia específico e atualizado do ge."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841267",
-    "jogo": "Grêmio x Internacional",
+    "event_id": "401841263",
+    "jogo": "Flamengo x Fluminense",
     "data_iso": "2026-10-11T17:30:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-10-11T16:03:44-03:00",
+    "executado_em": "2026-10-11T16:15:24-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
+      "GE TV",
+      "Premiere",
       "Globo"
     ],
-    "status": "corrigido",
+    "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
       "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/10/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-30a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/rs/futebol/brasileirao-serie-a/noticia/2026/09/30/cbf-define-arbitragem-para-o-gre-nal-455-pelo-brasileirao.ghtml",
-      "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/10/07/remo-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/jogo/11-10-2026/gremio-internacional.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/03/29/cbf-confirma-data-e-horario-do-gre-nal-do-1o-turno-do-brasileirao-confira.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/04/11/internacional-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/10/11/gremio-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/internacional-x-gremio-onde-assistir-ao-gre-nal-pela-32a-rodada-do-brasileirao.ghtml",
-      "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/10/02/gremio-abre-venda-de-ingressos-com-promocao-para-socios-no-gre-nal-do-brasileirao.ghtml",
-      "https://ge.globo.com/rs/futebol/times/internacional",
-      "https://ge.globo.com/rs/futebol/times/internacional/noticia/2026/10/07/inter-retoma-parceria-e-tera-patrocinio-master-pontual-contra-corinthians-e-gremio.ghtml",
-      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/09/12/chapecoense-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://www.youtube.com/watch?v=_VmKn91yU6c",
-      "https://www.youtube.com/watch?v=yKH6AhCMJ9M"
+      "https://ge.globo.com/futebol/times/flamengo/noticia/2026/10/11/flamengo-perde-margem-para-erros-e-projeta-jogos-extremamente-tensos-em-disputa-com-o-palmeiras.ghtml",
+      "https://ge.globo.com/google/amp/futebol/times/fluminense/noticia/2026/09/30/fluminense-aposta-em-mes-sem-viagens-para-chegar-bem-fisicamente-a-semifinal-da-libertadores.ghtml",
+      "https://ge.globo.com/google/amp/futebol/times/fluminense/noticia/2026/10/11/nonato-valoriza-classico-do-fluminense-com-o-flamengo-tem-que-ter-nocao-da-dimensao-dessa-partida.ghtml",
+      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/jogo/11-10-2026/flamengo-fluminense.ghtml",
+      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/10/11/flamengo-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://globoplay.globo.com/v/1202467",
+      "https://globoplay.globo.com/v/12688242",
+      "https://globoplay.globo.com/v/14450621",
+      "https://globoplay.globo.com/v/3640799",
+      "https://globoplay.globo.com/v/4221470",
+      "https://globoplay.globo.com/v/4831313"
     ],
     "canais_depois": [
+      "GE TV",
       "Globo",
       "Premiere"
     ],
     "exclusivo": false,
-    "confianca": 0.99,
+    "confianca": 0.98,
     "fontes_aceitas": [
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/10/11/gremio-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/10/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-30a-rodada.ghtml"
+      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/10/11/flamengo-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
     ],
-    "youtube": [],
-    "youtube_removidos": [],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=6-ebvfwXwVQ",
+        "scope": "unknown",
+        "valid_for_match": false,
+        "reason": "O guia do ge confirma que a GE TV transmite Flamengo x Fluminense ao vivo, mas a página específica deste URL do YouTube não pôde ser carregada para verificar diretamente se o vídeo entrega a partida integral — e não apenas pré-jogo, narração ou pós-jogo."
+      }
+    ],
+    "youtube_removidos": [
+      "https://www.youtube.com/watch?v=6-ebvfwXwVQ"
+    ],
     "overlay_alterado": true,
-    "resumo": "Confirmado: Grêmio x Internacional, Brasileirão 2026 — 30ª rodada, domingo, 11/10/2026, às 17h30 (horário de Brasília), na Arena do Grêmio. Transmissão integral pela Globo exclusivamente no Rio Grande do Sul (RBS TV) e pelo Premiere para todo o Brasil. O Tempo Real do ge não é transmissão de vídeo integral."
+    "resumo": "Confirmado para Flamengo x Fluminense, domingo, 11/10/2026, às 17h30 (horário de Brasília), no Maracanã, pela 30ª rodada (fase única) do Brasileirão: Globo, GE TV e Premiere transmitem ao vivo. A relação é completa com base no guia específico e atualizado do ge."
   },
-  "atualizado_em": "2026-10-11T16:03:44-03:00"
+  "atualizado_em": "2026-10-11T16:15:24-03:00"
 }
