@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-10T23:10:17.727188-03:00",
+  "gerado_em": "2026-10-10T23:20:55.869875-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 291,
   "total_com_estatisticas": 291,
-  "total_com_publico": 290,
+  "total_com_publico": 291,
   "total_com_eventos": 291,
   "total_com_jogadores": 291,
   "total_eventos_validados": 291,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Estádio Cícero Pompeu de Toledo",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 22618,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.estadao.com.br/esportes/futebol/sao-paulo-x-vitoria-campeonato-brasileiro-30-rodada-analise",
       "arbitro": "",
       "stats": [
         {
@@ -591,7 +591,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-10T23:10:15.305979-03:00"
+      "atualizado_em": "2026-10-10T23:10:15.305979-03:00",
+      "renda": 861880
     },
     "401841262": {
       "event_id": "401841262",
@@ -164333,5 +164334,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 270,
+  "total_com_renda": 291
 }
