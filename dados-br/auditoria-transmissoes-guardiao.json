@@ -5564,60 +5564,95 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado: Palmeiras x Corinthians, Campeonato Brasileiro 2026 (30ª rodada/fase única), domingo, 11/10/2026, às 17h30 (horário de Brasília), no Nubank Parque, em São Paulo. A transmissão integral no Brasil é de Globo (para SP, PR e MS), Premiere e GE TV. O vídeo do YouTube informado é do canal oficial ge tv e está identificado como transmissão ao vivo da partida; portanto, é válido para o jogo. A referência editorial anterior para São Paulo x Vitória não sustenta este evento e foi desconsiderada."
+    },
+    {
+      "event_id": "401841266",
+      "jogo": "Bahia x Mirassol",
+      "data_iso": "2026-10-11T19:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-10-11T18:09:34-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Globo"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cdn.conmebol.com/wp-content/uploads/2026/04/Hospitales-de-referencia-competencias-CONMEBOL-2026-1-1.pdf",
+        "https://ge.globo.com/ajuda",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/11/bahia-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/ba/futebol/times/bahia/noticia/2026/10/10/escalacao-do-bahia-contra-o-mirassol-veja-time-provavel-duvidas-e-desfalques.ghtml",
+        "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://ge.globo.com/sp/tem-esporte/futebol/times/mirassol/noticia/2026/10/10/escalacao-do-mirassol-suspensao-forca-mudanca-na-zaga-em-sequencia-fora-de-casa.ghtml",
+        "https://globoplay.globo.com/v/11631432",
+        "https://globoplay.globo.com/v/13808052",
+        "https://globoplay.globo.com/v/14143454",
+        "https://jcconcursos.uol.com.br/media/uploads/anexos/concurso-camara-mirassol-edital-1-2025.pdf",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/bahia-x-mirassol/832189",
+        "https://www.cnnbrasil.com.br/esportes/brasileirao/bahia-x-mirassol-horario-e-onde-assistir-ao-jogo-do-brasileirao-2",
+        "https://www.uol.com.br/esporte/futebol/times/mirassol"
+      ],
+      "canais_depois": [
+        "Premiere"
+      ],
+      "exclusivo": true,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/11/bahia-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/bahia-x-mirassol/832189",
+        "https://www.cnnbrasil.com.br/esportes/brasileirao/bahia-x-mirassol-horario-e-onde-assistir-ao-jogo-do-brasileirao-2"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Bahia x Mirassol, Brasileirão Série A 2026, fase única, 30ª rodada, hoje (domingo, 11/10/2026), às 19h30 de Brasília, na Arena Fonte Nova, em Salvador. A transmissão integral oficial é exclusiva do Premiere. Globo/GE fará cobertura em tempo real, não transmissão da partida; portanto, o snapshot anterior com Globo foi substituído."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841261",
-    "jogo": "Palmeiras x Corinthians",
-    "data_iso": "2026-10-11T17:30:00-03:00",
-    "checkpoint": -15,
-    "executado_em": "2026-10-11T17:24:40-03:00",
+    "event_id": "401841266",
+    "jogo": "Bahia x Mirassol",
+    "data_iso": "2026-10-11T19:30:00-03:00",
+    "checkpoint": -90,
+    "executado_em": "2026-10-11T18:09:34-03:00",
     "chamada_openai": true,
-    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+    "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "GE TV",
       "Globo"
     ],
     "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/07/29/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-21a-rodada.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/07/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-29a-rodada.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/10/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-30a-rodada.ghtml",
+      "https://cdn.conmebol.com/wp-content/uploads/2026/04/Hospitales-de-referencia-competencias-CONMEBOL-2026-1-1.pdf",
+      "https://ge.globo.com/ajuda",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/11/bahia-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/ba/futebol/times/bahia/noticia/2026/10/10/escalacao-do-bahia-contra-o-mirassol-veja-time-provavel-duvidas-e-desfalques.ghtml",
       "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
-      "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/10/05/agenda-palmeiras-tera-dez-jogos-em-um-mes-com-classicos-e-decisoes-nas-copas.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/sp/campinas-e-regiao/futebol/futebol-feminino/brasileiro-feminino/noticia/2026/03/13/palmeiras-x-corinthians-pelo-brasileirao-feminino-onde-assistir-ao-vivo-e-horario.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/jogo/11-10-2026/palmeiras-corinthians.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/04/12/corinthians-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/10/11/palmeiras-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/ribeirao-preto-e-regiao/futebol/futebol-feminino/copa-do-brasil-feminina/noticia/2026/05/29/palmeiras-x-corinthians-na-copa-do-brasil-feminina-onde-assistir-ao-vivo-e-horario.ghtml",
-      "https://www.youtube.com/watch?v=_LeCSCocnhg",
-      "https://www.youtube.com/watch?v=aTKsS7uWisY"
+      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+      "https://ge.globo.com/sp/tem-esporte/futebol/times/mirassol/noticia/2026/10/10/escalacao-do-mirassol-suspensao-forca-mudanca-na-zaga-em-sequencia-fora-de-casa.ghtml",
+      "https://globoplay.globo.com/v/11631432",
+      "https://globoplay.globo.com/v/13808052",
+      "https://globoplay.globo.com/v/14143454",
+      "https://jcconcursos.uol.com.br/media/uploads/anexos/concurso-camara-mirassol-edital-1-2025.pdf",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/bahia-x-mirassol/832189",
+      "https://www.cnnbrasil.com.br/esportes/brasileirao/bahia-x-mirassol-horario-e-onde-assistir-ao-jogo-do-brasileirao-2",
+      "https://www.uol.com.br/esporte/futebol/times/mirassol"
     ],
     "canais_depois": [
-      "GE TV",
-      "Globo",
       "Premiere"
     ],
-    "exclusivo": false,
+    "exclusivo": true,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/10/11/palmeiras-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/10/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-30a-rodada.ghtml"
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/11/bahia-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/bahia-x-mirassol/832189",
+      "https://www.cnnbrasil.com.br/esportes/brasileirao/bahia-x-mirassol-horario-e-onde-assistir-ao-jogo-do-brasileirao-2"
     ],
-    "youtube": [
-      {
-        "url": "https://www.youtube.com/watch?v=zZuGjqmMunI",
-        "scope": "match",
-        "valid_for_match": true,
-        "reason": "O dossiê identifica uma live oficial do canal ge tv, iniciada às 15h50 de 11/10/2026, com título específico de Palmeiras x Corinthians pelo Brasileirão 2026. A página oficial do ge para esta partida também informa explicitamente que a ge tv transmite ao vivo, além de Globo e Premiere."
-      }
-    ],
+    "youtube": [],
     "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado: Palmeiras x Corinthians, Campeonato Brasileiro 2026 (30ª rodada/fase única), domingo, 11/10/2026, às 17h30 (horário de Brasília), no Nubank Parque, em São Paulo. A transmissão integral no Brasil é de Globo (para SP, PR e MS), Premiere e GE TV. O vídeo do YouTube informado é do canal oficial ge tv e está identificado como transmissão ao vivo da partida; portanto, é válido para o jogo. A referência editorial anterior para São Paulo x Vitória não sustenta este evento e foi desconsiderada."
+    "resumo": "Confirmado para o Brasil: Bahia x Mirassol, Brasileirão Série A 2026, fase única, 30ª rodada, hoje (domingo, 11/10/2026), às 19h30 de Brasília, na Arena Fonte Nova, em Salvador. A transmissão integral oficial é exclusiva do Premiere. Globo/GE fará cobertura em tempo real, não transmissão da partida; portanto, o snapshot anterior com Globo foi substituído."
   },
-  "atualizado_em": "2026-10-11T17:24:40-03:00"
+  "atualizado_em": "2026-10-11T18:09:34-03:00"
 }
