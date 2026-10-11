@@ -17,7 +17,7 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 10,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 49,
+    "candidatos_oficiais_encontrados": 48,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
@@ -69,18 +69,6 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841258",
-      "rodada": 30,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Santos",
-      "data_iso": "2026-10-11T16:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
       "event_id": "401841263",
       "rodada": 30,
       "competicao_chave": "brasileirao",
@@ -93,6 +81,18 @@
       ],
       "manual": false,
       "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401841267",
+      "rodada": 30,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Grêmio x Internacional",
+      "data_iso": "2026-10-11T17:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841261",
@@ -229,12 +229,13 @@
       "video_id": "6-ebvfwXwVQ",
       "url": "https://www.youtube.com/watch?v=6-ebvfwXwVQ",
       "titulo": "AO VIVO: FLAMENGO X FLUMINENSE | BRASILEIRÃO 2026 | ge tv",
-      "status": "upcoming",
-      "confianca": 0.8667,
+      "status": "live",
+      "confianca": 0.9167,
       "motivos": [
         "os dois clubes aparecem no título",
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
+        "transmissão já está ao vivo",
         "horário compatível (100 min de diferença)"
       ]
     },
@@ -293,12 +294,13 @@
       "video_id": "zZuGjqmMunI",
       "url": "https://www.youtube.com/watch?v=zZuGjqmMunI",
       "titulo": "AO VIVO: PALMEIRAS X CORINTHIANS | BRASILEIRÃO 2026 | ge tv",
-      "status": "upcoming",
-      "confianca": 0.8667,
+      "status": "live",
+      "confianca": 0.9167,
       "motivos": [
         "os dois clubes aparecem no título",
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
+        "transmissão já está ao vivo",
         "horário compatível (100 min de diferença)"
       ]
     },
@@ -386,16 +388,6 @@
       "titulo": "SBT Ao Vivo",
       "status": "live",
       "inicio_programado": "2026-10-08T12:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "i26YSLGXtBs",
-      "url": "https://www.youtube.com/watch?v=i26YSLGXtBs",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: REAL BETIS X OSASUNA | LALIGA 26/27 | 8ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-10-11T10:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -534,7 +526,7 @@
       "fonte": "getv",
       "canal": "ge tv",
       "titulo": "AO VIVO: SEATTLE SEAHWAKS X SAN FRANCISCO 49ERS | NFL 2026/27 | ge tv",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-10-11T16:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -599,16 +591,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "B6pdLNMOiLg",
-      "url": "https://www.youtube.com/watch?v=B6pdLNMOiLg",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: CAGLIARI X JUVENTUS | SÉRIE A ITALIANA 26/27 | 6ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T15:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "CcP_GHaXnqc",
       "url": "https://www.youtube.com/watch?v=CcP_GHaXnqc",
       "fonte": "cazetv",
@@ -644,7 +626,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: RACING CLUB X VALENCIA | LaLiga 26/27 | 8ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-10-11T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -739,6 +721,16 @@
       "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
     },
     {
+      "video_id": "i26YSLGXtBs",
+      "url": "https://www.youtube.com/watch?v=i26YSLGXtBs",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: CAGLIARI X JUVENTUS | SÉRIE A ITALIANA 26/27 | 6ª RODADA",
+      "status": "live",
+      "inicio_programado": "2026-10-11T10:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "p19LrCSs7hk",
       "url": "https://www.youtube.com/watch?v=p19LrCSs7hk",
       "fonte": "cazetv",
@@ -764,7 +756,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): TROYES X MARSEILLE | LIGUE 1 26/27 | 6ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-10-11T15:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     }
@@ -772,24 +764,24 @@
   "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401841258",
+      "event_id": "401841267",
       "rodada": 30,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Santos",
-      "data_iso": "2026-10-11T16:00:00-03:00",
+      "jogo": "Grêmio x Internacional",
+      "data_iso": "2026-10-11T17:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 88,
+    "unidades": 87,
     "requisicoes": {
       "channels": 4,
-      "videos": 44,
+      "videos": 43,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-10-11T14:31:09-03:00"
+  "atualizado_em": "2026-10-11T16:00:53-03:00"
 }
