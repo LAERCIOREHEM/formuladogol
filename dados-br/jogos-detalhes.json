@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-11T19:40:22.916606-03:00",
+  "gerado_em": "2026-10-11T20:10:57.708517-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 295,
   "total_com_estatisticas": 295,
-  "total_com_publico": 291,
+  "total_com_publico": 292,
   "total_com_eventos": 295,
   "total_com_jogadores": 295,
   "total_eventos_validados": 295,
@@ -626,9 +626,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Estadio do Maracana",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 63300,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/carrascal-decide-fla-flu-e-flamengo-mantem-lideranca-sob-pressao-do-palmeiras-cmv4f74q902qp015ugq3rlexn.html",
       "arbitro": "",
       "stats": [
         {
@@ -166680,5 +166680,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 270,
+  "total_com_renda": 291
 }
