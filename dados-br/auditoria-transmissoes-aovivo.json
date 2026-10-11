@@ -13,16 +13,16 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 53,
+    "jogos_na_janela": 52,
     "jogos_foco": 1,
     "descobertas_antecipadas": 10,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 66,
+    "candidatos_oficiais_encontrados": 49,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
-    "transmissoes_publicadas": 11,
-    "sem_transmissao": 0,
+    "transmissoes_publicadas": 10,
+    "sem_transmissao": 1,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -69,16 +69,14 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841259",
+      "event_id": "401841258",
       "rodada": 30,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "São Paulo x Vitória",
-      "data_iso": "2026-10-10T21:00:00-03:00",
-      "principal": "GE TV",
-      "fontes_encontradas": [
-        "GE TV"
-      ],
+      "jogo": "Atlético-MG x Santos",
+      "data_iso": "2026-10-11T16:00:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
       "manual": false,
       "descoberta_antecipada": false
     },
@@ -224,23 +222,6 @@
     }
   ],
   "aceitos": [
-    {
-      "event_id": "401841259",
-      "jogo": "São Paulo x Vitória",
-      "fonte": "getv",
-      "video_id": "uS7cuCJTHqA",
-      "url": "https://www.youtube.com/watch?v=uS7cuCJTHqA",
-      "titulo": "SÃO PAULO X VITÓRIA | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
-      "status": "live",
-      "confianca": 0.95,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (60 min de diferença)"
-      ]
-    },
     {
       "event_id": "401841263",
       "jogo": "Flamengo x Fluminense",
@@ -408,13 +389,13 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "90fW7TbZ9sg",
-      "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg",
+      "video_id": "i26YSLGXtBs",
+      "url": "https://www.youtube.com/watch?v=i26YSLGXtBs",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: VASCO E REMO FICAM NO 0 X 0 EM JOGO MORNO EM SÃO JANUÁRIO  | RODA DE BOBO",
+      "titulo": "AO VIVO: REAL BETIS X OSASUNA | LALIGA 26/27 | 8ª RODADA",
       "status": "live",
-      "inicio_programado": "2026-10-10T16:30:00-03:00",
+      "inicio_programado": "2026-10-11T10:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -446,16 +427,6 @@
       "status": "upcoming",
       "inicio_programado": "2026-10-15T20:30:00-03:00",
       "motivo": "conteúdo rejeitado: narracao"
-    },
-    {
-      "video_id": "4OV-3Nv88F8",
-      "url": "https://www.youtube.com/watch?v=4OV-3Nv88F8",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: JACKSONVILLE JAGUARS X PHILADELPHIA EAGLES | NFL LONDON GAME 2026 | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T10:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "5kqmi4JY3TE",
@@ -508,26 +479,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "T0ay3NtWYEc",
-      "url": "https://www.youtube.com/watch?v=T0ay3NtWYEc",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: FLUMINENSE X PALMEIRAS | SEMIFINAL | LIBERTADORES 2026 | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-14T19:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "TaOzLjkBTZs",
-      "url": "https://www.youtube.com/watch?v=TaOzLjkBTZs",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "EXCLUSIVO: CAMPEÃS PELO SÃO PAULO CONTAM DETALHES DO TÍTULO DO BRASILEIRÃO | Panela Sportv",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-10T20:55:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "VJqQalNosgA",
       "url": "https://www.youtube.com/watch?v=VJqQalNosgA",
       "fonte": "getv",
@@ -546,16 +497,6 @@
       "status": "upcoming",
       "inicio_programado": "2026-10-21T19:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "X59nCs816zo",
-      "url": "https://www.youtube.com/watch?v=X59nCs816zo",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "FLUMINENSE X FLAMENGO | MELHORES MOMENTOS | TAÇA RIO 2008 | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T13:50:00-03:00",
-      "motivo": "conteúdo rejeitado: melhores momentos"
     },
     {
       "video_id": "_2dy6SD80wo",
@@ -598,16 +539,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "j4BSlTKq44M",
-      "url": "https://www.youtube.com/watch?v=j4BSlTKq44M",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "CORINTHIANS X PALMEIRAS | MELHORES MOMENTOS | BRASILEIRÃO 2017 | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T13:30:00-03:00",
-      "motivo": "conteúdo rejeitado: melhores momentos"
-    },
-    {
       "video_id": "rkoldK015GI",
       "url": "https://www.youtube.com/watch?v=rkoldK015GI",
       "fonte": "getv",
@@ -648,26 +579,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "q3LwUJVfsxk",
-      "url": "https://www.youtube.com/watch?v=q3LwUJVfsxk",
-      "fonte": "sbt",
-      "canal": "SBT",
-      "titulo": "Time Nova Geração X Time Geração Nostalgia | Viva A Noite (10/10/26)",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T02:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "2m4bwQuMZ1w",
-      "url": "https://www.youtube.com/watch?v=2m4bwQuMZ1w",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: TÊNIS DE MESA | FINAIS DO CHINA SMASH 2026",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T06:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "64_OTsuvnPs",
       "url": "https://www.youtube.com/watch?v=64_OTsuvnPs",
       "fonte": "cazetv",
@@ -685,16 +596,6 @@
       "titulo": "AO VIVO: CSKA SOFIA X MÔNACO | CONFERENCE LEAGUE 26/27 | 1ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-10-15T13:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "8Fqqs66c6ao",
-      "url": "https://www.youtube.com/watch?v=8Fqqs66c6ao",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): RENNES X AUXERRE | LIGUE 1 26/27 | 6ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T12:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -728,16 +629,6 @@
       "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
     },
     {
-      "video_id": "FfmxsKUUuGU",
-      "url": "https://www.youtube.com/watch?v=FfmxsKUUuGU",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: JUDÔ | TIME BRASIL NO MUNDIAL DE BAKU 2026 | FINAIS | 8º DIA",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T10:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "HPs_ahJ6ns4",
       "url": "https://www.youtube.com/watch?v=HPs_ahJ6ns4",
       "fonte": "cazetv",
@@ -765,26 +656,6 @@
       "titulo": "AO VIVO: FC SALZBURG X MILAN | EUROPA LEAGUE 26/27 | 2ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-10-15T13:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "Ke1LZaLheVg",
-      "url": "https://www.youtube.com/watch?v=Ke1LZaLheVg",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: JUDÔ | TIME BRASIL NO DUELO POR EQUIPES DO MUNDIAL DE BAKU 2026 | 8º DIA",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T03:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "QNYhQNhHDPU",
-      "url": "https://www.youtube.com/watch?v=QNYhQNhHDPU",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: TÊNIS DE MESA | HUGO CALDERANO NO CHINA SMASH | SEMIFINAL",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T00:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -828,36 +699,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "aConm-Qye50",
-      "url": "https://www.youtube.com/watch?v=aConm-Qye50",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: REAL BETIS X OSASUNA | LALIGA 26/27 | 8ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T12:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "b0qyeJrQWpQ",
-      "url": "https://www.youtube.com/watch?v=b0qyeJrQWpQ",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): NICE X STRASBOURG | LIGUE 1 26/27 | 6ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T09:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "cu707Ey2nss",
-      "url": "https://www.youtube.com/watch?v=cu707Ey2nss",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ELCHE X CELTA DE VIGO | LALIGA 26/27 | 8ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T08:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "e21oU_yA7Vg",
       "url": "https://www.youtube.com/watch?v=e21oU_yA7Vg",
       "fonte": "cazetv",
@@ -898,16 +739,6 @@
       "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
     },
     {
-      "video_id": "i26YSLGXtBs",
-      "url": "https://www.youtube.com/watch?v=i26YSLGXtBs",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: FC KÖLN X BORUSSIA MÖNCHENGLADBACH | BUNDESLIGA 26/27 | 5ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T10:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "p19LrCSs7hk",
       "url": "https://www.youtube.com/watch?v=p19LrCSs7hk",
       "fonte": "cazetv",
@@ -915,16 +746,6 @@
       "titulo": "AO VIVO: CRUZEIRO X LDU | LIBERTADORES FEMININA 2026 | 1ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-10-16T20:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "pOTUkYLo3RA",
-      "url": "https://www.youtube.com/watch?v=pOTUkYLo3RA",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: TAEKWONDO | HENRIQUE MARQUES E O TIME BRASIL NO GRAND PRIX DE TAEKWONDO | 3º DIA",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T10:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -949,7 +770,17 @@
     }
   ],
   "search_api_pulados": [],
-  "sem_transmissao": [],
+  "sem_transmissao": [
+    {
+      "event_id": "401841258",
+      "rodada": 30,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Atlético-MG x Santos",
+      "data_iso": "2026-10-11T16:00:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
+    }
+  ],
   "erros": [],
   "quota_estimada_youtube": {
     "unidades": 88,
@@ -960,5 +791,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-10-10T20:50:59-03:00"
+  "atualizado_em": "2026-10-11T14:31:09-03:00"
 }
