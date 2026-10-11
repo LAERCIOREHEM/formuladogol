@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "atualizado_em": "2026-10-11T18:22:17-03:00",
+  "atualizado_em": "2026-10-11T19:27:10-03:00",
   "targets_minutos": {
     "final_to_detection": 5,
     "final_to_results": 7,
@@ -8,19 +8,19 @@
     "commit_to_site": 5
   },
   "ultima_observacao": {
-    "trace_id": "fdg-401841258",
-    "event_id": "401841258",
-    "finalizado_em": "2026-10-11T18:01:00-03:00",
-    "af_calculado_em": "2026-10-11T18:22:15-03:00",
-    "final_para_af_minutos": 21.25,
+    "trace_id": "fdg-401841261",
+    "event_id": "401841261",
+    "finalizado_em": "2026-10-11T19:19:00-03:00",
+    "af_calculado_em": "2026-10-11T19:27:08-03:00",
+    "final_para_af_minutos": 8.133,
     "alvo_minutos": 10,
-    "dentro_slo": false,
-    "registrado_em": "2026-10-11T18:22:17-03:00",
-    "run_id": "38175951482"
+    "dentro_slo": true,
+    "registrado_em": "2026-10-11T19:27:10-03:00",
+    "run_id": "38180359878"
   },
   "resumo": {
-    "amostra_final_para_af": 3,
-    "media_final_para_af_minutos": 17.261,
+    "amostra_final_para_af": 4,
+    "media_final_para_af_minutos": 14.979,
     "violacoes_final_para_af": 3
   },
   "observacoes": [
@@ -56,6 +56,17 @@
       "dentro_slo": false,
       "registrado_em": "2026-10-11T18:22:17-03:00",
       "run_id": "38175951482"
+    },
+    {
+      "trace_id": "fdg-401841261",
+      "event_id": "401841261",
+      "finalizado_em": "2026-10-11T19:19:00-03:00",
+      "af_calculado_em": "2026-10-11T19:27:08-03:00",
+      "final_para_af_minutos": 8.133,
+      "alvo_minutos": 10,
+      "dentro_slo": true,
+      "registrado_em": "2026-10-11T19:27:10-03:00",
+      "run_id": "38180359878"
     }
   ]
 }
