@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-12T18:19:34.380477-03:00",
+  "gerado_em": "2026-10-12T18:50:57.093092-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 297,
   "total_com_estatisticas": 297,
-  "total_com_publico": 296,
+  "total_com_publico": 297,
   "total_com_eventos": 297,
   "total_com_jogadores": 297,
   "total_eventos_validados": 297,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Couto Pereira",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 26439,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/botafogo-empata-com-o-coritiba-e-soma-primeiro-ponto-na-era-tite-cmv5rmbpp0097014limb2c1qm.html",
       "arbitro": "",
       "stats": [
         {
@@ -589,7 +589,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-12T18:19:17.942088-03:00"
+      "atualizado_em": "2026-10-12T18:19:17.942088-03:00",
+      "renda": 968062
     },
     "401841266": {
       "event_id": "401841266",
@@ -167826,5 +167827,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 272,
+  "total_com_renda": 297
 }
