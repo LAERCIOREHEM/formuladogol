@@ -748,21 +748,36 @@ async function seedFromMonitor(env, monitor) {
 }
 
 async function seedFromStatic(env, now = Date.now()) {
+  // Reconciliacao inicial imediata ao instalar o contrato Pages↔D1.
+  // Em falha de Pages, reconsulta gratuita a cada 2 minutos ate normalizar.
+  const contractVersion='pages_d1_public_snapshot_v1';
+  if (await metaGet(env, 'static_seed_contract_version') !== contractVersion) {
+    await metaPut(env, 'static_seed_contract_version', contractVersion);
+    await metaPut(env, 'static_seed_at', '1970-01-01T00:00:00.000Z');
+  }
+  const seedError=await metaGet(env, 'static_seed_error');
+  const intervalMs=seedError ? 2 * 60_000 : STATIC_SEED_INTERVAL_MS;
   const last = Date.parse(await metaGet(env, 'static_seed_at')) || 0;
-  if (now - last < STATIC_SEED_INTERVAL_MS) return 0;
+  if (now - last < intervalMs) return 0;
   await metaPut(env, 'static_seed_at', nowIso(now));
   const base = text(env?.SITE_BASE || DEFAULT_SITE_BASE).replace(/\/$/, '');
   try {
     const stamp = now;
     const [results, publicData, verifiedData, mmAuto, mmManual] = await Promise.all([
       fetchJson(`${base}/resultados.json?t=${stamp}`, { cache: 'no-store' }, 10_000),
-      fetchJson(`${base}/dados-br/publicos-complementares.json?t=${stamp}`, { cache: 'no-store' }, 10_000).catch(() => ({ jogos: {} })),
-      fetchJson(`${base}/dados-br/correcoes/publicos-verificados.json?t=${stamp}`, { cache: 'no-store' }, 10_000).catch(() => ({ jogos: {} })),
+      fetchJson(`${base}/dados-br/publicos-complementares.json?t=${stamp}`, { cache: 'no-store' }, 10_000),
+      fetchJson(`${base}/dados-br/correcoes/publicos-verificados.json?t=${stamp}`, { cache: 'no-store' }, 10_000),
       fetchJson(`${base}/dados-br/melhores-momentos.json?t=${stamp}`, { cache: 'no-store' }, 10_000).catch(() => ({ jogos: {} })),
       fetchJson(`${base}/dados-br/melhores-momentos-manual.json?t=${stamp}`, { cache: 'no-store' }, 10_000).catch(() => ({ jogos: {} })),
     ]);
-    const publicMap = publicData?.jogos && typeof publicData.jogos === 'object' ? publicData.jogos : {};
-    const verifiedMap = verifiedData?.jogos && typeof verifiedData.jogos === 'object' ? verifiedData.jogos : {};
+    // Contrato obrigatorio: uma resposta 200 sem o mapa `jogos` tambem e falha.
+    // Nunca transformar um 404/JSON invalido em `jogos:{}` e gerar falso SLA.
+    if (!publicData?.jogos || typeof publicData.jogos !== 'object' || Array.isArray(publicData.jogos))
+      throw new Error('static_publicos_complementares_contract_invalid');
+    if (!verifiedData?.jogos || typeof verifiedData.jogos !== 'object' || Array.isArray(verifiedData.jogos))
+      throw new Error('static_publicos_verificados_contract_invalid');
+    const publicMap = publicData.jogos;
+    const verifiedMap = verifiedData.jogos;
     const mmMap = { ...(mmAuto?.jogos || {}), ...(mmManual?.jogos || {}) };
     let count = 0;
     for (const result of results?.resultados || []) {
@@ -790,6 +805,8 @@ async function seedFromStatic(env, now = Date.now()) {
       });
       count += 1;
     }
+    // Limpa falhas antigas assim que o snapshot autoritativo volta a ser legivel.
+    await metaPut(env, 'static_seed_error', '');
     return count;
   } catch (error) {
     await metaPut(env, 'static_seed_error', text(error?.message || error).slice(0, 500));
@@ -1351,8 +1368,16 @@ async function processPublicTask(env, task, now = Date.now()) {
     if(budget.reason && !lastError) lastError=`budget:${budget.reason}`;
 
     if(publicSlaAlertAllowed(task,now,reopenedAt)&&!next.alert_at){
-      next.alert_status=await sendPublicNotFoundEmail(env,publicAlertMessage(task,values,sources,next,lastError,env,costSummary,nextAt));
-      next.alert_at=nowIso(now);
+      // O D1 pode estar pendente enquanto o Pages ja publicou uma correcao.
+      // Sem conseguir ler o snapshot autoritativo, nao afirmar por e-mail que
+      // publico/renda nao foram localizados. A busca/retry segue normalmente.
+      const staticSeedError=await metaGet(env,'static_seed_error');
+      if(staticSeedError){
+        next.alert_status='suppressed_static_seed_unavailable';
+      }else{
+        next.alert_status=await sendPublicNotFoundEmail(env,publicAlertMessage(task,values,sources,next,lastError,env,costSummary,nextAt));
+        next.alert_at=nowIso(now);
+      }
     }
   }
 
