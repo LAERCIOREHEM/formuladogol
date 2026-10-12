@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-11T21:45:35.009456-03:00",
+  "gerado_em": "2026-10-11T22:25:55.973557-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 296,
   "total_com_estatisticas": 296,
-  "total_com_publico": 295,
+  "total_com_publico": 296,
   "total_com_eventos": 296,
   "total_com_jogadores": 296,
   "total_eventos_validados": 296,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Arena Fonte Nova",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 28704,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/10/11/flamengo-1-x-0-fluminense-tem-o-maior-publico-da-30a-rodada-do-brasileiro-veja-a-lista.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -566,7 +566,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-11T21:45:21.291297-03:00"
+      "atualizado_em": "2026-10-11T21:45:21.291297-03:00",
+      "publico_pagante": 18982,
+      "renda": 1609117
     },
     "401841261": {
       "event_id": "401841261",
@@ -167243,5 +167245,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 272,
+  "total_com_renda": 296
 }
