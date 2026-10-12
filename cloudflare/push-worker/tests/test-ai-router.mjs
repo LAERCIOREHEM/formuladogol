@@ -15,12 +15,12 @@ const raw={candidates:[{groundingMetadata:{webSearchQueries:['q1','q2'],groundin
 assert.equal(geminiSearchCount(raw),2);
 assert.deepEqual(geminiGroundingSources(raw),['https://example.com/a','https://example.com/b']);
 
-// Search profile v8: aliases/fontes continuam amplos na descoberta, enquanto o gate de identidade valida a fonte.
+// Search profile v9: aliases/fontes continuam amplos na descoberta, enquanto o gate de identidade valida a fonte.
 // O confronto real que motivou os hotfixes de busca precisa gerar consultas com
 // nomes alternativos, fontes direcionadas e domínios oficiais dos participantes.
 const hunterTask={event_id:'401841168',home:'Atlético-MG',away:'Bragantino',kickoff:'2026-10-03T21:30:00.000Z',home_score:1,away_score:0,round:21,stadium:'Arena MRV'};
 const hunterQueries=buildAttendanceSearchQueries(hunterTask);
-assert.equal(POSTGAME_SEARCH_PROFILE_VERSION,8);
+assert.equal(POSTGAME_SEARCH_PROFILE_VERSION,9);
 assert.equal(Object.keys(TEAM_SEARCH_PROFILES).length,20);
 for (const [club,profile] of Object.entries(TEAM_SEARCH_PROFILES)) {
   assert.ok(profile.aliases.length >= 1, `${club}: aliases ausentes`);
