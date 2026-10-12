@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R10R16.1 — auditoria offline de integridade factual/identidade de público e renda.
+"""R10R17-HF2 — auditoria offline de integridade factual/identidade de público e renda.
 
 Não pesquisa a web. Varre TODOS os registros publicados e procura contaminações
 estruturais que podem ser provadas pelo próprio repositório: event_id inexistente,
@@ -12,6 +12,7 @@ trava determinística antes do commit e NÃO pesquisa a web.
 """
 from __future__ import annotations
 import argparse, json, re
+from urllib.parse import urlsplit, unquote
 from copy import deepcopy
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -44,6 +45,15 @@ def url_date(url: str) -> date | None:
     if not m: return None
     try: return date(int(m.group(1)),int(m.group(2)),int(m.group(3)))
     except ValueError: return None
+
+def source_competition_conflict(url: str) -> str:
+    """Bloqueia fonte de OUTRA competição por segmento de diretório, não slug."""
+    try:
+        path=unquote(urlsplit(str(url or '')).path).lower().replace('_','-')
+    except ValueError:
+        return ''
+    m=re.search(r'(?:^|/)(copa-do-brasil|campeonato-carioca|campeonato-paulista|libertadores|sul-americana)(?:/|$)',path)
+    return m.group(1) if m else ''
 
 def game_date(row: dict[str,Any]) -> date | None:
     raw=str(row.get('data_iso') or '')[:10]
@@ -86,6 +96,9 @@ def audit_payload(resultados: dict[str,Any], publicos: dict[str,Any], correcoes:
         if gd:
             for field,url in fields.items():
                 if not url: continue
+                if {'publico':p,'pagantes':paid,'renda':rev}[field] is not None:
+                    mismatch=source_competition_conflict(url)
+                    if mismatch: issues.append(f'{field}_url_competicao_incompativel:{mismatch}')
                 sd=url_date(url)
                 if sd:
                     delta=abs((sd-gd).days)
@@ -105,7 +118,7 @@ def audit_payload(resultados: dict[str,Any], publicos: dict[str,Any], correcoes:
         elif warns: warnings.append({**item,'avisos':warns})
         else: ok.append(str(eid))
     return {
-      'schema_version':2,'policy':'R10R16.1-postgame-factual-integrity-guard',
+      'schema_version':2,'policy':'R10R17-HF2-source-competition-guard',
       'gerado_em':datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
       'total_registros_publicos':len(rows),'total_ok':len(ok),'total_avisos':len(warnings),'total_criticos':len(critical),'total_observacoes':len(observations),
       'criticos':critical,'avisos':warnings,'observacoes':observations,'event_ids_ok':ok,
@@ -128,7 +141,15 @@ def self_test() -> None:
     good={'jogos':{'x':{'publico':15056,'renda':708004.50,'fonte':'https://site.com/2026/10/07/certa.htm','fonte_renda':'https://site.com/2026/10/07/certa.htm'}}}
     out4=audit_payload(resultados,good,{'jogos':{'x':{'publico':15056,'renda':708004.50}}})
     assert out4['total_criticos']==0
-    print('SELF-TEST OK: auditoria de identidade + integridade factual R10R16.1')
+    other_competition={'jogos':{'x':{'publico':53528,'renda':4106188.74,'fonte':'https://itatiaia.com.br/esportes/futebol/copa-do-brasil/grenal-sem-data'}}}
+    out5=audit_payload(resultados,other_competition,{'jogos':{}})
+    assert out5['total_criticos']==1 and 'url_competicao_incompativel:copa-do-brasil' in ' '.join(out5['criticos'][0]['problemas'])
+    old_carioca={'jogos':{'x':{'renda':1245363,'fonte_renda':'https://ge.globo.com/Esportes/Noticias/Futebol/Campeonato_Carioca/0%2C%2CMUL1082422-9835%2C00.html'}}}
+    out6=audit_payload(resultados,old_carioca,{'jogos':{}})
+    assert out6['total_criticos']==1 and 'url_competicao_incompativel:campeonato-carioca' in ' '.join(out6['criticos'][0]['problemas'])
+    legitimate_slug={'jogos':{'x':{'publico':53528,'renda':4106188.74,'fonte':'https://uol.com.br/esporte/2026/10/07/time-vinga-eliminacao-na-copa-do-brasil.htm'}}}
+    assert audit_payload(resultados,legitimate_slug,{'jogos':{}})['total_criticos']==0
+    print('SELF-TEST OK: auditoria de identidade + integridade factual + competição R10R17-HF2')
 
 def main() -> None:
     ap=argparse.ArgumentParser()

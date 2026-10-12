@@ -1,4 +1,4 @@
-export const POSTGAME_SEARCH_PROFILE_VERSION = 8;
+export const POSTGAME_SEARCH_PROFILE_VERSION = 9;
 
 function text(value) { return String(value ?? '').trim(); }
 function normalizeText(value) {
@@ -183,6 +183,21 @@ function matchRelationEvidence(normWindow, homeAlias, awayAlias) {
   return patterns.some((re) => re.test(normWindow));
 }
 
+// R10R17-HF2: a mesma dupla pode disputar clássicos em competições diferentes.
+// Uma URL na seção editorial de Copa do Brasil/Carioca/etc. NÃO é prova do
+// Brasileirão, mesmo que contenha os dois clubes e o estádio correto.
+// Só segmentos de diretório são avaliados: "eliminado-na-copa-do-brasil.htm"
+// no título de uma matéria do Brasileirão não constitui conflito.
+export function sourceCompetitionConflict(task, sourceUrl = '') {
+  const league = text(task?.league || task?.espn_league || 'bra.1').toLowerCase();
+  if (league !== 'bra.1') return '';
+  let path = '';
+  try { path = decodeURIComponent(new URL(text(sourceUrl)).pathname).toLowerCase().replace(/_/g, '-'); }
+  catch (_) { return ''; }
+  const match = path.match(/(?:^|\/)(copa-do-brasil|campeonato-carioca|campeonato-paulista|libertadores|sul-americana)(?:\/|$)/);
+  return match ? `url_competition_mismatch:${match[1]}` : '';
+}
+
 // R10R15: Match Identity Gate. Descobrir uma URL e provar que ela pertence ao
 // event_id são etapas distintas. O gate exige os DOIS clubes no mesmo bloco
 // contextual e rejeita conflitos objetivos, sobretudo data incompatível na URL.
@@ -191,6 +206,8 @@ export function evaluateSourceMatchIdentity(task, sourceText, sourceUrl = '') {
   const normalized = ` ${normalizeText(raw)} `;
   const result = { accepted:false, score:0, reasons:[], conflicts:[], homeAlias:'', awayAlias:'', pairDistance:null, window:'' };
   if (!normalized.trim()) { result.reasons.push('empty_source_text'); return result; }
+  const competitionConflict = sourceCompetitionConflict(task, sourceUrl);
+  if (competitionConflict) { result.conflicts.push(competitionConflict); return result; }
 
   const gameDate = text(task?.kickoff || task?.data_iso).slice(0,10);
   const sourceDate = urlDate(sourceUrl);

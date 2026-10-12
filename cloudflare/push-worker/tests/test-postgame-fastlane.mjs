@@ -238,7 +238,28 @@ console.log('postgame-fastlane v13 policy + factual integrity + SLA suppression 
 // ============================ R10R15 Match Identity Gate ============================
 {
   const { evaluateSourceMatchIdentity, POSTGAME_SEARCH_PROFILE_VERSION } = await import('../src/postgame-search-profile.js');
-  assert.equal(POSTGAME_SEARCH_PROFILE_VERSION, 8);
+  assert.equal(POSTGAME_SEARCH_PROFILE_VERSION, 9);
+
+  const grenal = {
+    event_id:'401841267', league:'bra.1', home:'Grêmio', away:'Internacional',
+    kickoff:'2026-10-11T17:30:00-03:00', home_score:1, away_score:1,
+    round:30, stadium:'Arena do Grêmio'
+  };
+  const wrongCompetitionText='Grêmio e Internacional se enfrentaram na Arena do Grêmio, público 55.337, em clássico da Copa do Brasil.';
+  const wrongCompetitionUrl='https://www.itatiaia.com.br/esportes/futebol/futebol-nacional/copa-do-brasil/arena-do-gremio-teve-quebra-de-recorde-de-publico-no-grenal-pela-copa-do-brasil';
+  const wrongCompetition=evaluateSourceMatchIdentity(grenal,wrongCompetitionText,wrongCompetitionUrl);
+  assert.equal(wrongCompetition.accepted,false,'Copa do Brasil não pode validar Gre-Nal do Brasileirão');
+  assert.ok(wrongCompetition.conflicts.some(x=>x==='url_competition_mismatch:copa-do-brasil'));
+  const validGrenal=evaluateSourceMatchIdentity(grenal,
+    'Grêmio 1 x 1 Internacional, na Arena do Grêmio, 30ª rodada do Campeonato Brasileiro. Público 53.528 torcedores. Renda R$ 4.106.188,74.',
+    'https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/11/gremio-e-internacional-empatam-no-gre-nal-455.htm');
+  assert.equal(validGrenal.accepted,true,'fonte válida do Gre-Nal 455 não pode ser bloqueada');
+  const flaFlu={event_id:'401841263',league:'bra.1',home:'Flamengo',away:'Fluminense',kickoff:'2026-10-11T17:30:00-03:00',home_score:1,away_score:0,round:30,stadium:'Maracanã'};
+  const wrongCarioca=evaluateSourceMatchIdentity(flaFlu,
+    'Flamengo 1 x 0 Fluminense no Maracanã. Público 63.300. Renda R$ 1.245.363,00.',
+    'https://ge.globo.com/Esportes/Noticias/Futebol/Campeonato_Carioca/0%2C%2CMUL1082422-9835%2C00.html');
+  assert.equal(wrongCarioca.accepted,false,'Campeonato Carioca não pode validar renda do Brasileirão');
+  assert.ok(wrongCarioca.conflicts.some(x=>x==='url_competition_mismatch:campeonato-carioca'));
 
   const vitoriaChape = {
     event_id:'401841250', home:'Vitória', away:'Chapecoense', kickoff:'2026-10-07T20:00:00-03:00',
