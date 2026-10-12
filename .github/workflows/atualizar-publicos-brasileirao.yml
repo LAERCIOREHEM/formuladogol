@@ -130,8 +130,45 @@ jobs:
           if [[ "${MODO:-automatico}" == "curated_push" ]]; then
             echo "Correção curada já consolidada; pulando rede/IA."
           elif [[ "${ORIGEM_FASTLANE:-false}" == "true" ]]; then
-            echo "Fastlane: importando somente dado concreto já descoberto no Cloudflare."
+            echo "Fastlane: importando fatos concretos já descobertos no Cloudflare."
             python scripts/importar_postgame_fastlane.py --tipo publicos --event-id "$EVENT_ID"
+            # R10R17-HF2: Action verde não significa campo resolvido. Quando D1
+            # não trouxe público E renda, faz fallback documental para este ID.
+            # Nunca varre 380 jogos; a IA só entra se ainda houver lacuna após GE.
+            publico_ou_renda_pendente() {
+              EVENT_ID="$EVENT_ID" python - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          eid=os.environ['EVENT_ID']
+          if not eid: sys.exit(1)
+          # O Orchestrator pode detectar FINAL antes do snapshot estático da ESPN.
+          # Nesse intervalo importa o D1, mas não força coleta que exige FINAL local.
+          results=json.loads(Path('resultados.json').read_text(encoding='utf-8')).get('resultados',[])
+          match=next((r for r in results if str(r.get('event_id'))==eid),None)
+          if not match or str(match.get('estado','')).lower()!='post': sys.exit(1)
+          p=json.loads(Path('dados-br/publicos-complementares.json').read_text(encoding='utf-8')).get('jogos',{}).get(eid,{})
+          d=json.loads(Path('dados-br/jogos-detalhes.json').read_text(encoding='utf-8')).get('jogos',{}).get(eid,{})
+          def valid(x):
+              try: return x is not None and float(x)>0
+              except (ValueError,TypeError): return False
+          missing=not (valid(p.get('publico')) or valid(d.get('publico'))) or not (valid(p.get('renda')) or valid(d.get('renda')))
+          sys.exit(0 if missing else 1)
+          PY
+            }
+            if [[ -n "${EVENT_ID:-}" ]] && publico_ou_renda_pendente; then
+              echo "::warning::Fastlane sem cobertura completa do event_id ${EVENT_ID}; pesquisa determinística direcionada."
+              python scripts/atualizar_publicos_brasileirao.py --event-id "$EVENT_ID" --max-rodadas 1
+              if publico_ou_renda_pendente; then
+                echo "::notice::Ainda falta público/renda; fallback IA por evento com grace de 30min e backoff persistente."
+                set +e
+                python scripts/completar_publicos_ia.py --grace-horas 0.5 --modo partida --event-id "$EVENT_ID" --max-jogos 1 2>&1 | tee /tmp/camada-ia.log
+                IA_RC=${PIPESTATUS[0]}
+                set -e
+                if [[ "$IA_RC" != "0" ]]; then
+                  echo "::warning::Fallback IA falhou ($IA_RC); mantendo dado verificado e retentativas futuras."
+                fi
+              fi
+            fi
           else
           # Fluxo correto: coletor determinístico PRIMEIRO; IA somente como fallback
           # para o que continuar faltando. A IA usa web_search amplo e obrigatório,
