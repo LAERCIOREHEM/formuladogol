@@ -5608,51 +5608,89 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: Bahia x Mirassol, Brasileirão Série A 2026, fase única, 30ª rodada, hoje (domingo, 11/10/2026), às 19h30 de Brasília, na Arena Fonte Nova, em Salvador. A transmissão integral oficial é exclusiva do Premiere. Globo/GE fará cobertura em tempo real, não transmissão da partida; portanto, o snapshot anterior com Globo foi substituído."
+    },
+    {
+      "event_id": "401841265",
+      "jogo": "Chapecoense x Athletico-PR",
+      "data_iso": "2026-10-12T19:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-10-12T18:03:50-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Premiere"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/ajuda",
+        "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/times/athletico-pr/noticia/2026/09/28/agenda-do-athletico-veja-datas-e-horarios-dos-jogos-ate-a-34a-rodada-do-brasileirao.ghtml",
+        "https://ge.globo.com/pr/futebol/times/athletico-pr/noticia/2026/01/13/agenda-do-athletico-na-serie-a-2026-veja-datas-e-horarios-dos-jogos-ate-a-8a-rodada.ghtml",
+        "https://ge.globo.com/programas/segue-o-jogo",
+        "https://ge.globo.com/sc/futebol/brasileirao-serie-a/jogo/12-10-2026/chapecoense-atletico-pr.ghtml",
+        "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/10/12/chapecoense-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sc/futebol/times/chapecoense",
+        "https://ge.globo.com/sc/futebol/times/chapecoense/noticia/2026/10/01/elenco-da-chapecoense-retorna-aos-treinos-com-foco-na-serie-a.ghtml",
+        "https://ge.globo.com/sc/futebol/times/chapecoense/noticia/2026/10/11/escalacao-da-chapecoense-fernando-suspenso-e-reencontro-com-a-torcida-na-arena-conda.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/20086"
+      ],
+      "canais_depois": [
+        "Premiere"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/10/12/chapecoense-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sc/futebol/brasileirao-serie-a/jogo/12-10-2026/chapecoense-atletico-pr.ghtml"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado: Chapecoense x Athletico-PR, pela 30ª rodada da Série A do Brasileirão, será em 12/10/2026 às 19h30 (horário de Brasília), na Arena Condá. A transmissão integral oficial no Brasil é do Premiere. O ge fará acompanhamento em tempo real, que não constitui transmissão da partida. Não há evidência consultada de outro canal/plataforma da lista com exibição integral; exclusividade não foi declarada explicitamente pela fonte."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841266",
-    "jogo": "Bahia x Mirassol",
-    "data_iso": "2026-10-11T19:30:00-03:00",
+    "event_id": "401841265",
+    "jogo": "Chapecoense x Athletico-PR",
+    "data_iso": "2026-10-12T19:30:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-10-11T18:09:34-03:00",
+    "executado_em": "2026-10-12T18:03:50-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "Globo"
+      "Premiere"
     ],
-    "status": "corrigido",
+    "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://cdn.conmebol.com/wp-content/uploads/2026/04/Hospitales-de-referencia-competencias-CONMEBOL-2026-1-1.pdf",
       "https://ge.globo.com/ajuda",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/11/bahia-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/ba/futebol/times/bahia/noticia/2026/10/10/escalacao-do-bahia-contra-o-mirassol-veja-time-provavel-duvidas-e-desfalques.ghtml",
       "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
       "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/sp/tem-esporte/futebol/times/mirassol/noticia/2026/10/10/escalacao-do-mirassol-suspensao-forca-mudanca-na-zaga-em-sequencia-fora-de-casa.ghtml",
-      "https://globoplay.globo.com/v/11631432",
-      "https://globoplay.globo.com/v/13808052",
-      "https://globoplay.globo.com/v/14143454",
-      "https://jcconcursos.uol.com.br/media/uploads/anexos/concurso-camara-mirassol-edital-1-2025.pdf",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/bahia-x-mirassol/832189",
-      "https://www.cnnbrasil.com.br/esportes/brasileirao/bahia-x-mirassol-horario-e-onde-assistir-ao-jogo-do-brasileirao-2",
-      "https://www.uol.com.br/esporte/futebol/times/mirassol"
+      "https://ge.globo.com/google/amp/pr/futebol/times/athletico-pr/noticia/2026/09/28/agenda-do-athletico-veja-datas-e-horarios-dos-jogos-ate-a-34a-rodada-do-brasileirao.ghtml",
+      "https://ge.globo.com/pr/futebol/times/athletico-pr/noticia/2026/01/13/agenda-do-athletico-na-serie-a-2026-veja-datas-e-horarios-dos-jogos-ate-a-8a-rodada.ghtml",
+      "https://ge.globo.com/programas/segue-o-jogo",
+      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/jogo/12-10-2026/chapecoense-atletico-pr.ghtml",
+      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/10/12/chapecoense-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sc/futebol/times/chapecoense",
+      "https://ge.globo.com/sc/futebol/times/chapecoense/noticia/2026/10/01/elenco-da-chapecoense-retorna-aos-treinos-com-foco-na-serie-a.ghtml",
+      "https://ge.globo.com/sc/futebol/times/chapecoense/noticia/2026/10/11/escalacao-da-chapecoense-fernando-suspenso-e-reencontro-com-a-torcida-na-arena-conda.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/20086"
     ],
     "canais_depois": [
       "Premiere"
     ],
-    "exclusivo": true,
+    "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/11/bahia-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/bahia-x-mirassol/832189",
-      "https://www.cnnbrasil.com.br/esportes/brasileirao/bahia-x-mirassol-horario-e-onde-assistir-ao-jogo-do-brasileirao-2"
+      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/10/12/chapecoense-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/jogo/12-10-2026/chapecoense-atletico-pr.ghtml"
     ],
     "youtube": [],
     "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: Bahia x Mirassol, Brasileirão Série A 2026, fase única, 30ª rodada, hoje (domingo, 11/10/2026), às 19h30 de Brasília, na Arena Fonte Nova, em Salvador. A transmissão integral oficial é exclusiva do Premiere. Globo/GE fará cobertura em tempo real, não transmissão da partida; portanto, o snapshot anterior com Globo foi substituído."
+    "resumo": "Confirmado: Chapecoense x Athletico-PR, pela 30ª rodada da Série A do Brasileirão, será em 12/10/2026 às 19h30 (horário de Brasília), na Arena Condá. A transmissão integral oficial no Brasil é do Premiere. O ge fará acompanhamento em tempo real, que não constitui transmissão da partida. Não há evidência consultada de outro canal/plataforma da lista com exibição integral; exclusividade não foi declarada explicitamente pela fonte."
   },
-  "atualizado_em": "2026-10-11T18:09:34-03:00"
+  "atualizado_em": "2026-10-12T18:03:50-03:00"
 }

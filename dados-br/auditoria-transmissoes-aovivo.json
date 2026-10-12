@@ -13,11 +13,11 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 52,
+    "jogos_na_janela": 47,
     "jogos_foco": 1,
     "descobertas_antecipadas": 10,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 47,
+    "candidatos_oficiais_encontrados": 54,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
@@ -69,40 +69,12 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841263",
+      "event_id": "401841265",
       "rodada": 30,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Flamengo x Fluminense",
-      "data_iso": "2026-10-11T17:30:00-03:00",
-      "principal": "GE TV",
-      "fontes_encontradas": [
-        "GE TV"
-      ],
-      "manual": false,
-      "descoberta_antecipada": true
-    },
-    {
-      "event_id": "401841261",
-      "rodada": 30,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Palmeiras x Corinthians",
-      "data_iso": "2026-10-11T17:30:00-03:00",
-      "principal": "GE TV",
-      "fontes_encontradas": [
-        "GE TV"
-      ],
-      "manual": false,
-      "descoberta_antecipada": true
-    },
-    {
-      "event_id": "401841266",
-      "rodada": 30,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Bahia x Mirassol",
-      "data_iso": "2026-10-11T19:30:00-03:00",
+      "jogo": "Chapecoense x Athletico-PR",
+      "data_iso": "2026-10-12T19:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -132,6 +104,20 @@
       "principal": "CazéTV",
       "fontes_encontradas": [
         "CazéTV"
+      ],
+      "manual": false,
+      "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401841273",
+      "rodada": 31,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "São Paulo x Vasco da Gama",
+      "data_iso": "2026-10-17T21:00:00-03:00",
+      "principal": "GE TV",
+      "fontes_encontradas": [
+        "GE TV"
       ],
       "manual": false,
       "descoberta_antecipada": true
@@ -193,6 +179,20 @@
       "descoberta_antecipada": true
     },
     {
+      "event_id": "401841296",
+      "rodada": 33,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Bahia x São Paulo",
+      "data_iso": "2026-10-28T21:30:00-03:00",
+      "principal": "GE TV",
+      "fontes_encontradas": [
+        "GE TV"
+      ],
+      "manual": false,
+      "descoberta_antecipada": true
+    },
+    {
       "event_id": "401841306",
       "rodada": 34,
       "competicao_chave": "brasileirao",
@@ -222,23 +222,6 @@
     }
   ],
   "aceitos": [
-    {
-      "event_id": "401841263",
-      "jogo": "Flamengo x Fluminense",
-      "fonte": "getv",
-      "video_id": "6-ebvfwXwVQ",
-      "url": "https://www.youtube.com/watch?v=6-ebvfwXwVQ",
-      "titulo": "AO VIVO: FLAMENGO X FLUMINENSE | BRASILEIRÃO 2026 | ge tv",
-      "status": "live",
-      "confianca": 0.9167,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (100 min de diferença)"
-      ]
-    },
     {
       "event_id": "401841260",
       "jogo": "Bragantino x Cruzeiro",
@@ -272,6 +255,22 @@
       ]
     },
     {
+      "event_id": "401841273",
+      "jogo": "São Paulo x Vasco da Gama",
+      "fonte": "getv",
+      "video_id": "MSak0lTho8c",
+      "url": "https://www.youtube.com/watch?v=MSak0lTho8c",
+      "titulo": "SÃO PAULO X VASCO | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+      "status": "upcoming",
+      "confianca": 0.9,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "horário compatível (60 min de diferença)"
+      ]
+    },
+    {
       "event_id": "401841276",
       "jogo": "Grêmio x Cruzeiro",
       "fonte": "getv",
@@ -288,20 +287,19 @@
       ]
     },
     {
-      "event_id": "401841261",
-      "jogo": "Palmeiras x Corinthians",
+      "event_id": "401841296",
+      "jogo": "Bahia x São Paulo",
       "fonte": "getv",
-      "video_id": "zZuGjqmMunI",
-      "url": "https://www.youtube.com/watch?v=zZuGjqmMunI",
-      "titulo": "AO VIVO: PALMEIRAS X CORINTHIANS | BRASILEIRÃO 2026 | ge tv",
-      "status": "live",
-      "confianca": 0.9167,
+      "video_id": "yL7MzrhVAJk",
+      "url": "https://www.youtube.com/watch?v=yL7MzrhVAJk",
+      "titulo": "AO VIVO: BAHIA X SÃO PAULO | BRASILEIRÃO 2026 | ge tv",
+      "status": "upcoming",
+      "confianca": 0.875,
       "motivos": [
         "os dois clubes aparecem no título",
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (100 min de diferença)"
+        "horário compatível (90 min de diferença)"
       ]
     },
     {
@@ -371,6 +369,16 @@
   ],
   "rejeitados": [
     {
+      "video_id": "5kqmi4JY3TE",
+      "url": "https://www.youtube.com/watch?v=5kqmi4JY3TE",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! FLAMENGO E PALMEIRAS VENCEM E CORINTHIANS AGUARDA N0OVO TREINADOR SEEDORF! | Panela Sportv",
+      "status": "live",
+      "inicio_programado": "2026-10-12T18:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "e8d0-d94Qlo",
       "url": "https://www.youtube.com/watch?v=e8d0-d94Qlo",
       "fonte": "getv",
@@ -388,16 +396,6 @@
       "titulo": "SBT Ao Vivo",
       "status": "live",
       "inicio_programado": "2026-10-08T12:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "JULAbK5otvA",
-      "url": "https://www.youtube.com/watch?v=JULAbK5otvA",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "REPRISE: CHELSEA X BOURNEMOUTH | PREMIER LEAGUE 26/27 | 6ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-10-11T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -431,14 +429,24 @@
       "motivo": "conteúdo rejeitado: narracao"
     },
     {
-      "video_id": "5kqmi4JY3TE",
-      "url": "https://www.youtube.com/watch?v=5kqmi4JY3TE",
+      "video_id": "Ai2S9Eq4C10",
+      "url": "https://www.youtube.com/watch?v=Ai2S9Eq4C10",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO! FLAMENGO X FLUMINENSE, PALMEIRAS X CORINTHIANS, GRÊMIO X INTER E MAIS! | Panela Sportv",
+      "titulo": "AO VIVO! PRIMEIRA DESCIDA ANALISA JOGOS DA SEMANA 5 DA NFL #podcast | ge.globo",
       "status": "upcoming",
-      "inicio_programado": "2026-10-12T18:00:00-03:00",
-      "motivo": "conteúdo reúne mais de uma partida"
+      "inicio_programado": "2026-10-13T11:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "C00XM8ryHko",
+      "url": "https://www.youtube.com/watch?v=C00XM8ryHko",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: NÁUTICO X AVAÍ | BRASILEIRÃO SÉRIE B 2026 | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-31T19:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "Gh2C5kzwa7M",
@@ -448,16 +456,6 @@
       "titulo": "AO VIVO: BRASIL X ARGENTINA | AMISTOSO DA SELEÇÃO FEMININA | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-10-13T19:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "JjPyKOzKTTk",
-      "url": "https://www.youtube.com/watch?v=JjPyKOzKTTk",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "BALTIMORE RAVENS X ATLANTA FALCONS | AQUECIMENTO AO VIVO | NFL | #live | sportv",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-11T20:25:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -481,6 +479,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "Rw7HTYoN8qE",
+      "url": "https://www.youtube.com/watch?v=Rw7HTYoN8qE",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! NA PONTA DOS DEDOS ANALISA VITÓRIA DE MAX VERSTAPPEN EM SINGAPURA #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-13T14:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "VJqQalNosgA",
       "url": "https://www.youtube.com/watch?v=VJqQalNosgA",
       "fonte": "getv",
@@ -501,13 +509,23 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "Y9N8A9vNDRc",
-      "url": "https://www.youtube.com/watch?v=Y9N8A9vNDRc",
+      "video_id": "WC8eaqcIHsM",
+      "url": "https://www.youtube.com/watch?v=WC8eaqcIHsM",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "MOSAICO AO VIVO: CLÁSSICOS DO BRASILEIRÃO + NFL | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-10-11T16:00:00-03:00",
+      "titulo": "AO VIVO: MONTES CLAROS X CRUZEIRO | SUPERLIGA MASCULINA DE VÔLEI 2026/27 | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-26T18:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "XF3zPeoFPhc",
+      "url": "https://www.youtube.com/watch?v=XF3zPeoFPhc",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "DALLAS COWBOYS X GREEN BAY PACKERS | AQUECIMENTO AO VIVO | NFL | #live | sportv",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-18T20:25:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -541,13 +559,43 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "fthTyif7wFo",
-      "url": "https://www.youtube.com/watch?v=fthTyif7wFo",
+      "video_id": "hNog7bqOalc",
+      "url": "https://www.youtube.com/watch?v=hNog7bqOalc",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: SAN FRANCISCO 49ERS X SEATTLE SEAHAWKS | NFL 2026/27 | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-10-11T16:00:00-03:00",
+      "titulo": "AO VIVO: MINAS X BRASÍLIA | SUPERLIGA FEMININA DE VÔLEI 2026/27 | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-31T18:50:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "iuGzXZLUTvM",
+      "url": "https://www.youtube.com/watch?v=iuGzXZLUTvM",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: SUZANO X GOIÁS | SUPERLIGA MASCULINA DE VÔLEI 2026/27 | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-27T18:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "jOI-1I9MVEQ",
+      "url": "https://www.youtube.com/watch?v=jOI-1I9MVEQ",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: ESPORTE CLUBE PINHEIROS X BRUSQUE VÔLEI | SUPERLIGA FEMININA DE VÔLEI 2026/27 | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-30T18:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "nMKMdd-uthE",
+      "url": "https://www.youtube.com/watch?v=nMKMdd-uthE",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "CORINTHIANS X COLO COLO | AQUECIMENTO AO VIVO | LIBERTADORES FEMININA 2026 | #live | sportv",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-15T16:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -591,13 +639,23 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "64_OTsuvnPs",
-      "url": "https://www.youtube.com/watch?v=64_OTsuvnPs",
+      "video_id": "RvcDNjlDRSQ",
+      "url": "https://www.youtube.com/watch?v=RvcDNjlDRSQ",
+      "fonte": "sbt",
+      "canal": "SBT",
+      "titulo": "Programa do João com Camila Pudim, Cariúcha, Yas Amorim e Enzo Rabelo | (10/10/26)",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-12T19:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "1_E7ie4K8kY",
+      "url": "https://www.youtube.com/watch?v=1_E7ie4K8kY",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: DOMINGO DE CLÁSSICOS NO BRASILEIRÃO | GERAL CAZÉTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): LECH POZNAŃ X BAYER LEVERKUSEN | EUROPA LEAGUE 26/27 | 2ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-10-11T19:20:00-03:00",
+      "inicio_programado": "2026-10-15T13:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -608,6 +666,16 @@
       "titulo": "AO VIVO: CSKA SOFIA X MÔNACO | CONFERENCE LEAGUE 26/27 | 1ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-10-15T13:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "8S92IHd7QhU",
+      "url": "https://www.youtube.com/watch?v=8S92IHd7QhU",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: LOGO APÓS BOCA X VASCO PELA SUL-AMERICANA | GERAL CAZÉTV",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-13T23:20:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -629,6 +697,16 @@
       "status": "upcoming",
       "inicio_programado": "2026-10-15T20:15:00-03:00",
       "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
+    },
+    {
+      "video_id": "FGlce-sw980",
+      "url": "https://www.youtube.com/watch?v=FGlce-sw980",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: TÊNIS | PROGRAMAÇÃO COMPLETA DO ATP CHALLENGER DE SANTA CRUZ DE LA SIERRA 2",
+      "status": "live",
+      "inicio_programado": "2026-10-12T15:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "HPs_ahJ6ns4",
@@ -681,16 +759,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "XT0Zmv1ag48",
-      "url": "https://www.youtube.com/watch?v=XT0Zmv1ag48",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: RODADA DO BRASILEIRÃO CHEIA DE CLÁSSICOS PELO BRASIL! | SEIS EM UM",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-12T17:50:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "e21oU_yA7Vg",
       "url": "https://www.youtube.com/watch?v=e21oU_yA7Vg",
       "fonte": "cazetv",
@@ -706,7 +774,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: LEVANTE X SEVILLA | LALIGA 26/27 | 8ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-10-12T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -754,24 +822,24 @@
   "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401841266",
+      "event_id": "401841265",
       "rodada": 30,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Bahia x Mirassol",
-      "data_iso": "2026-10-11T19:30:00-03:00",
+      "jogo": "Chapecoense x Athletico-PR",
+      "data_iso": "2026-10-12T19:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 88,
+    "unidades": 87,
     "requisicoes": {
       "channels": 4,
-      "videos": 44,
+      "videos": 43,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-10-11T18:05:59-03:00"
+  "atualizado_em": "2026-10-12T18:01:15-03:00"
 }
