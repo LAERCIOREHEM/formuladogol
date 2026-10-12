@@ -13,16 +13,16 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 47,
+    "jogos_na_janela": 46,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 10,
+    "descobertas_antecipadas": 9,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 54,
+    "candidatos_oficiais_encontrados": 55,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 10,
-    "sem_transmissao": 1,
+    "sem_transmissao": 0,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -69,18 +69,6 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841265",
-      "rodada": 30,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Chapecoense x Athletico-PR",
-      "data_iso": "2026-10-12T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
       "event_id": "401841260",
       "rodada": 30,
       "competicao_chave": "brasileirao",
@@ -92,7 +80,7 @@
         "GE TV"
       ],
       "manual": false,
-      "descoberta_antecipada": true
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841268",
@@ -589,6 +577,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "mMjWR80wghA",
+      "url": "https://www.youtube.com/watch?v=mMjWR80wghA",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "PULGAR MERECIA SER EXPULSO? FALTOU MARCAR PÊNALTI PRO FLUMINENSE? PANELA ANALISA | PANELA SPORTV",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-12T19:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "nMKMdd-uthE",
       "url": "https://www.youtube.com/watch?v=nMKMdd-uthE",
       "fonte": "getv",
@@ -644,7 +642,7 @@
       "fonte": "sbt",
       "canal": "SBT",
       "titulo": "Programa do João com Camila Pudim, Cariúcha, Yas Amorim e Enzo Rabelo | (10/10/26)",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-10-12T19:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -773,7 +771,7 @@
       "url": "https://www.youtube.com/watch?v=exOtkjMOi3k",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: LEVANTE X SEVILLA | LALIGA 26/27 | 8ª RODADA",
+      "titulo": "AO VIVO: RODADA CHEIA NA EUROPA E BRIGA CONTRA O REBAIXAMENTO SEGUE QUENTE NO BRASIL | SEIS EM UM",
       "status": "live",
       "inicio_programado": "2026-10-12T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -820,17 +818,7 @@
     }
   ],
   "search_api_pulados": [],
-  "sem_transmissao": [
-    {
-      "event_id": "401841265",
-      "rodada": 30,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Chapecoense x Athletico-PR",
-      "data_iso": "2026-10-12T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    }
-  ],
+  "sem_transmissao": [],
   "erros": [],
   "quota_estimada_youtube": {
     "unidades": 87,
@@ -841,5 +829,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-10-12T18:01:15-03:00"
+  "atualizado_em": "2026-10-12T19:31:04-03:00"
 }

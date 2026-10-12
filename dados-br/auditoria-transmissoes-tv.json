@@ -1,15 +1,15 @@
 {
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
-    "jogos_na_janela": 47,
-    "jogos_com_transmissao": 44,
+    "jogos_na_janela": 46,
+    "jogos_com_transmissao": 43,
     "jogos_sem_transmissao_na_janela": 3,
     "jogos_sem_transmissao_14d": 1,
     "jogos_sem_transmissao_fora_14d": 2,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 33,
+    "registros_preservados": 32,
     "jogos_guardiao_ia": 1,
-    "jogos_estaveis_sem_reconsulta_editorial": 2,
+    "jogos_estaveis_sem_reconsulta_editorial": 1,
     "fontes_com_falha": 0
   },
   "fontes": {
@@ -27,7 +27,7 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 6855
+      "duracao_ms": 5342
     },
     "espn": {
       "ok": true,
@@ -48,7 +48,7 @@
       "rodada": 32,
       "jogo": "Chapecoense x Fluminense",
       "data_iso": "2026-10-24T19:30:00-03:00",
-      "faltam_horas": 289.4,
+      "faltam_horas": 288.0,
       "nivel": "aviso"
     }
   ],
@@ -58,7 +58,7 @@
       "rodada": 32,
       "jogo": "Chapecoense x Fluminense",
       "data_iso": "2026-10-24T19:30:00-03:00",
-      "faltam_horas": 289.4,
+      "faltam_horas": 288.0,
       "nivel": "aviso"
     },
     {
@@ -66,7 +66,7 @@
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-29T19:30:00-03:00",
-      "faltam_horas": 409.4,
+      "faltam_horas": 408.0,
       "nivel": "futuro"
     },
     {
@@ -74,18 +74,11 @@
       "rodada": 34,
       "jogo": "Palmeiras x Remo",
       "data_iso": "2026-11-05T19:30:00-03:00",
-      "faltam_horas": 577.4,
+      "faltam_horas": 576.0,
       "nivel": "futuro"
     }
   ],
   "preservados": [
-    {
-      "event_id": "401841264",
-      "jogo": "Coritiba x Botafogo",
-      "canais": [
-        "Prime Video"
-      ]
-    },
     {
       "event_id": "401841275",
       "jogo": "Mirassol x Internacional",
@@ -367,5 +360,5 @@
     "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
   "artigos_ge_descobertos": [],
-  "atualizado_em": "2026-10-12T18:04:00-03:00"
+  "atualizado_em": "2026-10-12T19:31:27-03:00"
 }
