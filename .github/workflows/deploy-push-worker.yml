@@ -89,6 +89,9 @@ jobs:
       - name: Instalar dependências
         run: npm install --no-audit --no-fund
 
+      - name: Contrato Pages ↔ D1 (publicos e correcoes)
+        run: python ../../scripts/validar_contrato_publicos_fastlane.py
+
       - name: Validar código
         run: npm run check
 

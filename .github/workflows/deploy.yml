@@ -79,6 +79,7 @@ on:
       - 'scripts/validar_org_final.py'
       - 'scripts/validar_pwa_instalacao.mjs'
       - 'scripts/build_ops_rag_index.py'
+      - 'scripts/validar_contrato_publicos_fastlane.py'
       - 'css/br-clube.css'
       - 'css/br-jogo.css'
       - 'css/br-competicoes.css'
@@ -250,6 +251,9 @@ jobs:
             dados-br/historico-probabilidades-continentais.json
             dados-br/historico-ranking-desempenho.json
             dados-br/jogos-detalhes.json
+            # Fonte autoritativa de reconciliacao do Fastlane/D1.
+            dados-br/publicos-complementares.json
+            dados-br/correcoes/publicos-verificados.json
             dados-br/lideres-jogadores.json
             dados-br/mascotes.json
             dados-br/melhores-momentos-manual.json
@@ -330,6 +334,8 @@ jobs:
             copa2026/img/palcos
           )
 
+          # PUBLIC_DATA inclui arquivo em subpasta; criar destino antes do cp.
+          mkdir -p _site/dados-br/correcoes
           for item in "${PUBLIC_ROOT[@]}" "${PUBLIC_CSS[@]}" "${PUBLIC_JS[@]}" "${PUBLIC_DATA[@]}"; do
             if [[ ! -f "$item" ]]; then
               echo "ERRO: arquivo público obrigatório ausente: $item"
@@ -734,6 +740,12 @@ jobs:
             || python3 -m pip install --quiet --disable-pip-version-check --break-system-packages pillow
           python3 scripts/otimizar_imagens.py --raiz _site --pastas img copa2026/img
 
+      - name: Validar reconciliacao Pages ↔ D1 (snapshot de publicos)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/validar_contrato_publicos_fastlane.py --site-root _site
+
       - name: Validar pacote público antes do upload
         shell: bash
         run: |
@@ -807,7 +819,9 @@ jobs:
           REQUIRED_OPERATIONAL=(
             _site/dados-br/status-atualizacao.json
             _site/dados-br/status-deploy.json
-            _site/dados-br/transmissoes-tv.json
+             _site/dados-br/transmissoes-tv.json
+             _site/dados-br/publicos-complementares.json
+             _site/dados-br/correcoes/publicos-verificados.json
           )
           for item in "${REQUIRED_OPERATIONAL[@]}"; do
             if [[ ! -f "$item" ]]; then
