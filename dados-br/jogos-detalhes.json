@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-11T20:45:56.758195-03:00",
+  "gerado_em": "2026-10-11T21:10:38.167956-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 295,
   "total_com_estatisticas": 295,
-  "total_com_publico": 293,
+  "total_com_publico": 295,
   "total_com_eventos": 295,
   "total_com_jogadores": 295,
   "total_eventos_validados": 295,
@@ -20,9 +20,9 @@
       "placar_mandante": 4,
       "placar_visitante": 1,
       "estadio": "Allianz Parque",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 30112,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/11/palmeiras-faz-4-atropela-o-corinthians-e-ganha-moral-para-decisao-na-libertadores.htm",
       "arbitro": "",
       "stats": [
         {
@@ -614,7 +614,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-11T19:40:11.211132-03:00"
+      "atualizado_em": "2026-10-11T19:40:11.211132-03:00",
+      "renda": 2893994.24
     },
     "401841263": {
       "event_id": "401841263",
@@ -628,7 +629,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 63300,
       "publico_tipo": "presente",
-      "publico_fonte": "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/carrascal-decide-fla-flu-e-flamengo-mantem-lideranca-sob-pressao-do-palmeiras-cmv4f74q902qp015ugq3rlexn.html",
+      "publico_fonte": "https://sports.sbt.com.br/noticia/brasileirao/flamengo-vence-fluminense-e-segue-na-lideranca-do-brasileirao",
       "arbitro": "",
       "stats": [
         {
@@ -1189,7 +1190,8 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-10-11T19:40:13.505898-03:00",
-      "renda": 1245363
+      "renda": 7006350,
+      "publico_pagante": 58246
     },
     "401841267": {
       "event_id": "401841267",
@@ -1201,9 +1203,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Arena do Grêmio",
-      "publico": 55337,
+      "publico": 53528,
       "publico_tipo": "presente",
-      "publico_fonte": "https://www.itatiaia.com.br/esportes/futebol/futebol-nacional/copa-do-brasil/arena-do-gremio-teve-quebra-de-recorde-de-publico-no-grenal-pela-copa-do-brasil",
+      "publico_fonte": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/11/gremio-e-internacional-empatam-no-gre-nal-455-e-permanecem-no-z4.htm",
       "arbitro": "",
       "stats": [
         {
@@ -1763,7 +1765,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-11T19:40:15.804301-03:00"
+      "atualizado_em": "2026-10-11T19:40:15.804301-03:00",
+      "renda": 4106188.74
     },
     "401841258": {
       "event_id": "401841258",
@@ -1775,9 +1778,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Arena MRV",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 29777,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://noataque.com.br/futebol/brasileirao-serie-a/time/atletico-mg/noticia/2026/10/11/o-publico-e-a-renda-de-atletico-x-santos-pelo-brasileiro-na-arena-mrv/",
       "arbitro": "",
       "stats": [
         {
@@ -2355,7 +2358,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-11T19:40:18.092467-03:00"
+      "atualizado_em": "2026-10-11T19:40:18.092467-03:00",
+      "renda": 1609117.32
     },
     "401841259": {
       "event_id": "401841259",
@@ -166682,6 +166686,6 @@
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
   },
-  "total_com_publico_pagante": 270,
-  "total_com_renda": 292
+  "total_com_publico_pagante": 271,
+  "total_com_renda": 295
 }
