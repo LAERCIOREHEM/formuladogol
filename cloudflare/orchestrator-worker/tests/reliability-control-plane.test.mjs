@@ -76,7 +76,17 @@ test('corpus operacional e rollback existem sem ativar RAG no caminho crítico',
   const cfg = JSON.parse(await read('dados-br/config-orquestrador.json'));
   const manifest = JSON.parse(await read('docs/operations/RAG-MANIFEST.json'));
   const rollback = await read('docs/operations/R10R16-ROLLBACK.md');
+
+  // R10R17 colocou o RAG operacional em produção para diagnóstico/contexto
+  // via MCP, mas ele continua explicitamente fora do caminho crítico esportivo.
+  // O contrato correto é: RAG de produção pode estar ligado, porém fail-open e
+  // sem autoridade sobre placar, classificação ou probabilidades.
   assert.equal(cfg.reliability_control_plane.knowledge_base.rag_em_producao, false);
-  assert.equal(manifest.production_rag_enabled, false);
+  assert.equal(manifest.production_rag_enabled, true);
+  assert.equal(manifest.runtime.critical_path, false);
+  assert.equal(manifest.runtime.fail_open, true);
+  assert.equal(manifest.authority_rules.placar, 'structured_source_only');
+  assert.equal(manifest.authority_rules.classificacao, 'deterministic_only');
+  assert.equal(manifest.authority_rules.probabilidades, 'deterministic_only');
   assert.match(rollback, /rollback/i);
 });
