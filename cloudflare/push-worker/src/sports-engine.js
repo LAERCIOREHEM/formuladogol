@@ -385,27 +385,60 @@ function mergeGoalDetails(existing, incoming) {
 
   const existingName = text(out.athleteName);
   const incomingName = text(incoming?.athleteName);
-  const sameName = existingName && incomingName && normalized(existingName) === normalized(incomingName);
+  const existingId = text(out.athleteId);
+  const incomingId = text(incoming?.athleteId);
+  const sameId = Boolean(existingId && incomingId && existingId === incomingId);
+  const sameName = Boolean(existingName && incomingName && normalized(existingName) === normalized(incomingName));
+  const existingStructured = out.athleteStructured === true;
+  const incomingStructured = incoming?.athleteStructured === true;
   let takeIncomingScorer = false;
+  let newConflict = false;
   if (!existingName && incomingName) takeIncomingScorer = true;
-  else if (sameName && incoming?.athleteStructured === true && out.athleteStructured !== true) takeIncomingScorer = true;
-  else if (existingName && incomingName && !sameName) {
-    if (incoming?.athleteStructured === true && out.athleteStructured !== true) takeIncomingScorer = true;
-    else if (incoming?.athleteStructured === out.athleteStructured && text(incoming?.athleteId) && !text(out.athleteId)) takeIncomingScorer = true;
-    else {
-      out.scorerConflict = true;
+  else if (existingStructured && incomingStructured && existingId && incomingId && existingId !== incomingId) {
+    // Mesmo nome exibido não equivale a mesma pessoa se os IDs ESPN divergem.
+    newConflict = true;
+    out.scorerConflictStrong = true;
+    out.scorerCandidates = [...new Set([...(Array.isArray(out.scorerCandidates) ? out.scorerCandidates : []), existingName, incomingName].filter(Boolean))];
+  } else if (sameId || sameName) {
+    // Nomes abreviados podem divergir entre feeds ESPN; o MESMO athleteId
+    // prova que se trata da mesma pessoa, sem criar conflito permanente.
+    if (incomingStructured && !existingStructured) takeIncomingScorer = true;
+    else if (sameId && incomingStructured && incomingName.length > existingName.length) takeIncomingScorer = true;
+  } else if (existingName && incomingName) {
+    if (incomingStructured && !existingStructured && (!existingId || sameId)) {
+      // Evidência estruturada supera um nome apenas inferido da narração.
+      takeIncomingScorer = true;
+    } else if (existingStructured && !incomingStructured && !incomingId) {
+      // Nunca desautorizar atleta com ID ESPN por inferência textual divergente.
+    } else {
+      newConflict = true;
       out.scorerCandidates = [...new Set([...(Array.isArray(out.scorerCandidates) ? out.scorerCandidates : []), existingName, incomingName].filter(Boolean))];
+      if (existingStructured && incomingStructured && existingId && incomingId && existingId !== incomingId) {
+        out.scorerConflictStrong = true;
+      }
     }
   }
+  if (incoming?.scorerConflictStrong === true) out.scorerConflictStrong = true;
+  if (newConflict || incoming?.scorerConflict === true) out.scorerConflict = true;
   if (takeIncomingScorer) {
     out.athleteName = incomingName;
-    out.athleteId = text(incoming?.athleteId);
-    out.athleteStructured = incoming?.athleteStructured === true;
+    out.athleteId = incomingId;
+    out.athleteStructured = incomingStructured;
     out.athleteSource = text(incoming?.athleteSource || incoming?.sourceName);
   } else {
-    if (!text(out.athleteId) && text(incoming?.athleteId) && (!incomingName || sameName)) out.athleteId = text(incoming.athleteId);
+    if (!existingId && incomingId && (!incomingName || sameName)) out.athleteId = incomingId;
     if (!text(out.athleteSource) && existingName) out.athleteSource = text(existing?.athleteSource || existing?.sourceName);
-    out.athleteStructured = Boolean(out.athleteStructured || (sameName && incoming?.athleteStructured === true));
+    out.athleteStructured = Boolean(out.athleteStructured || ((sameName || sameId) && incomingStructured));
+  }
+  // O conflito transitório não pode ficar gravado para sempre. Apenas um ID
+  // estruturado inequívoco pode limpá-lo; dois IDs estruturados diferentes
+  // continuam bloqueados, mesmo após uma resposta isolada posterior.
+  const structuredRecovery = incomingStructured && incoming?.scorerConflict !== true &&
+    !out.scorerConflictStrong && !newConflict &&
+    (sameId || (!existingStructured && (!existingId || existingId === incomingId)));
+  if (structuredRecovery) {
+    out.scorerConflict = false;
+    out.scorerCandidates = [];
   }
 
   // Conserva a identidade canônica, mas deixa o sourceName apontar para a versão
@@ -433,35 +466,42 @@ export function mergeScoringPlayVariants(variants) {
   return merged.sort((a, b) => num(a?.order, 0) - num(b?.order, 0) || text(a?.key).localeCompare(text(b?.key)));
 }
 
+function hasReliableScorer(play) {
+  return play?.scorerConflict !== true && Boolean(text(play?.athleteName));
+}
+
 export function unresolvedScorersForTransition(match, observation, plays) {
-  const previousTotal = goalCountFromScore(match || {});
   const targetTotal = goalCountFromScore(observation || {});
-  const credible = (Array.isArray(plays) ? plays : []).filter(credibleRegulationPlay);
-  let missing = 0;
-  if (targetTotal > previousTotal) {
-    const newGoals = credible.filter((play) => {
-      const total = num(play?.homeScoreAfter, 0) + num(play?.awayScoreAfter, 0);
-      return total > previousTotal && total <= targetTotal;
-    });
-    missing += Math.max(0, targetTotal - previousTotal - newGoals.length);
-    missing += newGoals.filter((play) => !text(play?.athleteName)).length;
-  }
-  for (const play of Object.values(match?.plays || {})) {
-    if (play?.status === 'pending' && credibleRegulationPlay(play) && !text(play?.athleteName) && scoreStillContainsPlay(play, observation)) missing += 1;
-  }
-  return missing;
+  if (!targetTotal) return 0;
+  // Contabiliza TODAS as transições do placar, inclusive gols já confirmados
+  // há dezenas de minutos. Antes, só os gols novos ou ainda pending entravam
+  // na busca; o nome podia permanecer ausente até o apito final.
+  const states = new Map();
+  const add = (play) => {
+    if (!credibleRegulationPlay(play) || play?.shootout || ['rejected','overturned'].includes(text(play?.status))) return;
+    if (!scoreStillContainsPlay(play, observation)) return;
+    const home = num(play.homeScoreAfter, -1), away = num(play.awayScoreAfter, -1);
+    if (home < 0 || away < 0 || home + away < 1 || home + away > targetTotal) return;
+    const key = `${home}-${away}`;
+    const old = states.get(key);
+    if (!old || (!hasReliableScorer(old) && hasReliableScorer(play))) states.set(key, play);
+  };
+  for (const play of Object.values(match?.plays || {})) add(play);
+  for (const play of (Array.isArray(plays) ? plays : [])) add(play);
+  return Math.max(0, targetTotal - states.size) + [...states.values()].filter((play) => !hasReliableScorer(play)).length;
 }
 
 export function scorerCoverage(plays, observation) {
   const targetTotal = goalCountFromScore(observation || {});
   const credible = (Array.isArray(plays) ? plays : []).filter(credibleRegulationPlay);
   const relevant = credible.filter((play) => num(play?.homeScoreAfter, 0) + num(play?.awayScoreAfter, 0) <= targetTotal);
+  const named = relevant.filter(hasReliableScorer);
   return {
     expectedGoals: targetTotal,
     playCount: relevant.length,
-    namedScorers: relevant.filter((play) => text(play?.athleteName)).length,
-    structuredScorers: relevant.filter((play) => text(play?.athleteName) && play?.athleteStructured === true).length,
-    missingScorers: Math.max(0, targetTotal - relevant.filter((play) => text(play?.athleteName)).length)
+    namedScorers: named.length,
+    structuredScorers: named.filter((play) => play?.athleteStructured === true).length,
+    missingScorers: Math.max(0, targetTotal - named.length)
   };
 }
 
@@ -1193,10 +1233,10 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
     if (!text(existing.side) && text(mergedDetails.side)) existing.side = text(mergedDetails.side);
     if (!text(existing.minute) && text(mergedDetails.minute)) existing.minute = text(mergedDetails.minute);
     if (!text(existing.sourceId) && text(mergedDetails.sourceId)) existing.sourceId = text(mergedDetails.sourceId);
-    if (mergedDetails.scorerConflict === true) existing.scorerConflict = true;
-    if (Array.isArray(mergedDetails.scorerCandidates) && mergedDetails.scorerCandidates.length) {
-      existing.scorerCandidates = [...mergedDetails.scorerCandidates];
-    }
+    existing.scorerConflict = mergedDetails.scorerConflict === true;
+    existing.scorerConflictStrong = mergedDetails.scorerConflictStrong === true;
+    existing.scorerCandidates = existing.scorerConflict && Array.isArray(mergedDetails.scorerCandidates)
+      ? [...mergedDetails.scorerCandidates] : [];
     if (existingScorer && !incomingScorer && text(existing.athleteName)) {
       existing.scorerIdentityPreservedAt = now;
     }
@@ -1374,7 +1414,7 @@ export const SPORTS_ENGINE_CONSTANTS = Object.freeze({
   OVERTURN_POLICY_VERSION: '6-R10R4',
   GOAL_DETECTION_POLICY_VERSION: '6-R8',
   GOAL_RECONCILIATION_POLICY_VERSION: '6-R9-R1',
-  GOAL_SCORER_ENRICHMENT_POLICY_VERSION: '6-R10R5',
+  GOAL_SCORER_ENRICHMENT_POLICY_VERSION: '6-R10R6',
   GOAL_RECOVERY_POLICY_VERSION: '6-R10R4',
   ESSENTIAL_ALERT_POLICY_VERSION: '6-R10R4'
 });

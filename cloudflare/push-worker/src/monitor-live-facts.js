@@ -97,6 +97,7 @@ function buildMonitorScorePath(match) {
           ownGoal: evidence?.ownGoal === true,
           penalty: evidence?.penalty === true,
           scorerConflict,
+          scorerConflictStrong: evidence?.scorerConflictStrong === true,
           identityPending: !(evidence?.ownGoal === true || scorer),
           status: text(evidence?.status || 'pending'),
           scoreFallback: evidence ? evidence?.scoreFallback === true : true,
@@ -151,18 +152,21 @@ function enrichMonitorGoals(goals, supplementalFacts) {
       // O monitor stateful continua soberano quando já conhece o autor. O summary
       // apenas complementa minuto/assistências se concordar com a mesma pessoa.
       match = candidates.find((item) => text(item?.scorer) && normPlayer(item.scorer) === normPlayer(currentScorer)) || null;
-    } else if (goal?.scorerConflict !== true) {
-      // R10R5: se o monitor conhece matematicamente a transição/equipe mas perdeu
-      // a autoria, o summary canônico pode reidratar o nome. Exigimos identidade
-      // inequívoca: todos os candidatos nomeados compatíveis devem apontar para
-      // o mesmo jogador. Conflito ou ambiguidade mantém o placeholder.
+    } else {
+      // Mesmo um conflito histórico do Durable Object pode ser resolvido,
+      // desde que o summary do MESMO placar/time traga UM scorer estruturado
+      // inequívoco. Uma inferência textual isolada nunca apaga o conflito.
       const named = candidates.filter((item) => item?.scorerConflict !== true && text(item?.scorer));
-      const byName = new Map();
+      const byIdentity = new Map();
       for (const item of named) {
-        const key = normPlayer(item.scorer);
-        if (key && !byName.has(key)) byName.set(key, item);
+        const id = text(item.scorerId);
+        const key = id ? `id:${id}` : `name:${normPlayer(item.scorer)}`;
+        if (key && !byIdentity.has(key)) byIdentity.set(key, item);
       }
-      if (byName.size === 1) match = [...byName.values()][0];
+      if (byIdentity.size === 1) {
+        const sole = [...byIdentity.values()][0];
+        if (goal?.scorerConflict !== true || (goal?.scorerConflictStrong !== true && text(sole.scorerId))) match = sole;
+      }
     }
     if (!match) return goal;
 

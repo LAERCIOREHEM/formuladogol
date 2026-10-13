@@ -137,7 +137,7 @@ try {
   assert.equal(row[14], 'João Pedro');
   status = await monitor.publicStatus();
   assert.equal(status.goalReconciliationPolicyVersion, '6-R9-R1');
-  assert.equal(status.goalScorerEnrichmentPolicyVersion, '6-R10R5');
+  assert.equal(status.goalScorerEnrichmentPolicyVersion, '6-R10R6');
   assert.equal(status.redCardEventPolicyVersion, '6-R10R6');
   assert.equal(status.redCardAggregateStatsIgnored, true);
   assert.equal(status.redCardEventContextRequired, true);

@@ -45,6 +45,17 @@ const SCHEDULE_CHANGE_MIN_MS = 2 * 60_000;
 const LIVE_POLL_PRE_MS = PRECHECK_FROM_MS;
 const FAST_POLL_PRE_MS = 20 * 60_000;
 const AUX_SUMMARY_INTERVAL_MS = 30_000;
+const SCORER_RECOVERY_INTERVAL_MS = 30_000;
+
+// Recuperação permanente de autoria: novo gol busca imediatamente; gols antigos
+// com identidade ausente/conflitante voltam à ESPN a cada 30s, sem gastar IA.
+export function shouldRetryMissingScorers(previous, observation, missing, now = Date.now()) {
+  if (!(Number(missing) > 0) || text(observation?.state) !== 'in') return false;
+  const oldTotal = num(previous?.home?.score, 0) + num(previous?.away?.score, 0);
+  const newTotal = num(observation?.home?.score, 0) + num(observation?.away?.score, 0);
+  if (newTotal > oldTotal) return true;
+  return now - num(previous?.lastScorerRecoveryAt, 0) >= SCORER_RECOVERY_INTERVAL_MS;
+}
 const LIVE_POLL_LATE_START_MS = 45 * 60_000;
 const LIVE_POLICY_VERSION = '6-R10';
 const READINESS_LIFECYCLE_POLICY_VERSION = '6-R10.2';
@@ -1022,8 +1033,13 @@ export class SportsMonitor {
       let unresolvedBefore = unresolvedScorersForTransition(previous, observation, plays || []);
       const countBefore = regulationPlays(plays).length;
       const needsCoverage = needsSummary(previous, observation) && countBefore < expectedGoals;
-      if (unresolvedBefore > 0 || needsCoverage) {
-        if (unresolvedBefore > 0) scorerEnrichmentAttemptsThisPoll += 1;
+      const scorerRecoveryDue = shouldRetryMissingScorers(previous, observation, unresolvedBefore, startedAt);
+      let scorerRecoveryAttemptedAt = 0;
+      if (scorerRecoveryDue || needsCoverage) {
+        if (scorerRecoveryDue) {
+          scorerEnrichmentAttemptsThisPoll += 1;
+          scorerRecoveryAttemptedAt = startedAt;
+        }
         try {
           const enrichment = await fetchEspnScorerEnrichment(game.league, sourceEventId, globalThis.fetch, expectedGoals);
           const variants = Array.isArray(enrichment.variants) && enrichment.variants.length
@@ -1106,6 +1122,7 @@ export class SportsMonitor {
       const result = applyObservation(previous, observation, plays, startedAt);
       let nextMatch = result.match;
       if (fullSummaryData) nextMatch.lastAuxSummaryAt = startedAt;
+      if (scorerRecoveryAttemptedAt) nextMatch.lastScorerRecoveryAt = scorerRecoveryAttemptedAt;
 
       const redStep = applyRedCardObservations(nextMatch, mergeRedCards(...redCardVariants), observation, startedAt);
       nextMatch = redStep.match;
