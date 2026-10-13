@@ -98,6 +98,11 @@ jobs:
       - name: Testar motor esportivo
         run: npm run test:sports
 
+      - name: R10R6 - regressao de autoria tardia e conflitos ESPN
+        run: |
+          node --check tests/test-scorer-recovery.mjs
+          node tests/test-scorer-recovery.mjs
+
       - name: Testar distribuição de push
         run: npm run test:push
 
