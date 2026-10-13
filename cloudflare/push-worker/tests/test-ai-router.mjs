@@ -20,7 +20,7 @@ assert.deepEqual(geminiGroundingSources(raw),['https://example.com/a','https://e
 // nomes alternativos, fontes direcionadas e domínios oficiais dos participantes.
 const hunterTask={event_id:'401841168',home:'Atlético-MG',away:'Bragantino',kickoff:'2026-10-03T21:30:00.000Z',home_score:1,away_score:0,round:21,stadium:'Arena MRV'};
 const hunterQueries=buildAttendanceSearchQueries(hunterTask);
-assert.equal(POSTGAME_SEARCH_PROFILE_VERSION,9);
+assert.equal(POSTGAME_SEARCH_PROFILE_VERSION,10);
 assert.equal(Object.keys(TEAM_SEARCH_PROFILES).length,20);
 for (const [club,profile] of Object.entries(TEAM_SEARCH_PROFILES)) {
   assert.ok(profile.aliases.length >= 1, `${club}: aliases ausentes`);

@@ -2,7 +2,7 @@ import { fetchEspnSummary } from './espn-source.js';
 import { sendMail, probeMail, mailConfig, maskAddress } from './mailer.js';
 import { countWebSearchCalls, recordAiUsage, recordProviderUsage, postgamePublicCostSummary } from './ai-usage.js';
 import { searchPublicWithGemini, fetchSourceText, extractPublicWithWorkersAI, fetchOpenAiResponses, openAiUsage } from './ai-router.js';
-import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, evaluateSourceMatchIdentity, buildAttendanceSearchQueries, attendanceSourcePolicyText, officialClubDomainsForTask, PREFERRED_EDITORIAL_SOURCE_SUFFIXES } from './postgame-search-profile.js';
+import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, evaluateSourceMatchIdentity, buildAttendanceSearchQueries, attendanceSourcePolicyText, officialClubDomainsForTask, PREFERRED_EDITORIAL_SOURCE_SUFFIXES, isMultiMatchRoundupSource, verifiedStadiumCapacity } from './postgame-search-profile.js';
 import { FACTUAL_INTEGRITY_POLICY_VERSION, FACTUAL_INCIDENTS, inspectPostgameFactualIntegrity, quarantinePostgameFactualIntegrity } from './postgame-factual-integrity.js';
 
 const DEFAULT_SITE_BASE = 'https://formuladogol.com.br';
@@ -232,6 +232,15 @@ export function validatePublicPayload(payload, sourceUrls, task = null) {
   let publicValue = clampInt(p.publico, 500, 150000);
   let paidValue = clampInt(p.publico_pagante, 0, 150000);
   let revenueValue = clampMoney(p.renda);
+  // A URL é uma lista de jogos, não uma ficha técnica de UM event_id.
+  // Nem mesmo uma resposta de IA com confiança 1 pode contornar este bloqueio.
+  if ([p.fonte_publico, p.fonte_publico_pagante, p.fonte_renda].some((url) => url && isMultiMatchRoundupSource(url))) {
+    return { accepted: false, reason: 'multi_match_roundup_requires_structured_parser' };
+  }
+  const capacity = verifiedStadiumCapacity(task);
+  if (capacity && (publicValue > capacity || paidValue > capacity)) {
+    return { accepted: false, reason: `stadium_capacity_exceeded:${capacity}` };
+  }
   if (publicValue == null && paidValue == null && revenueValue == null) return { accepted: false, reason: 'no_values' };
   if (publicValue != null && paidValue != null && paidValue > publicValue) return { accepted: false, reason: 'paid_gt_present' };
 
@@ -687,7 +696,7 @@ async function upsertTask(env, row, staticData = {}) {
 
   // R10R15: correções documentais verificadas são autoritativas por campo e
   // precisam corrigir também o D1, não apenas o JSON estático do site.
-  if (staticData?.verified === true && (publico != null || pagantes != null || renda != null)) {
+  if (staticData?.verified === true && (publico != null || pagantes != null || renda != null || staticData.clear_unverified_paid === true)) {
     const src = staticData.public_sources ? JSON.stringify(staticData.public_sources) : null;
     await env.DB.prepare(`UPDATE postgame_fastlane SET
       publico=CASE WHEN ? IS NOT NULL THEN ? ELSE publico END,
@@ -699,6 +708,16 @@ async function upsertTask(env, row, staticData = {}) {
       public_last_error='',updated_at=CURRENT_TIMESTAMP
       WHERE event_id=?`)
       .bind(publico,publico,pagantes,pagantes,renda,renda,src,src||'',src,publico,renda,publico,renda,eventId).run();
+    // Declaração explícita de pagantes não comprovados é um DELETE por campo.
+    // COALESCE sozinho preservava 58.246 pagantes de Flamengo x Fluminense
+    // no D1 da Chapecoense, mesmo após o JSON do Pages ser corrigido.
+    if (staticData.clear_unverified_paid === true) {
+      const sources = { ...(staticData.public_sources || {}) };
+      delete sources.publico_pagante;
+      await env.DB.prepare(`UPDATE postgame_fastlane SET publico_pagante=NULL,
+        public_sources_json=?,updated_at=CURRENT_TIMESTAMP WHERE event_id=?`)
+        .bind(JSON.stringify(sources),eventId).run();
+    }
   }
   const round = clampInt(row.round ?? row.rodada, 1, 60);
   const stadium = text(row.stadium || row.estadio);
@@ -786,7 +805,9 @@ async function seedFromStatic(env, now = Date.now()) {
       const concluded = result?.concluido === true || text(result?.estado).toLowerCase() === 'post' || /encerr|final/i.test(text(result?.status));
       if (!concluded) continue;
       const kickoffMs = Date.parse(result?.data_iso || '');
-      if (Number.isFinite(kickoffMs) && kickoffMs < now - RECENT_RESULT_WINDOW_MS) continue;
+      // Correções curadas são aplicadas mesmo se o jogo já saiu da janela
+      // de 48h; os demais eventos continuam com a janela curta original.
+      if (Number.isFinite(kickoffMs) && kickoffMs < now - RECENT_RESULT_WINDOW_MS && !Object.hasOwn(verifiedMap, eventId)) continue;
       const basePub = publicMap[eventId] || {};
       const verifiedPub = verifiedMap[eventId] || {};
       const existing = await env.DB.prepare('SELECT event_id FROM postgame_fastlane WHERE event_id=?').bind(eventId).first();
@@ -797,9 +818,14 @@ async function seedFromStatic(env, now = Date.now()) {
       const mm = mmMap[eventId] || null;
       await upsertTask(env, result, {
         publico: pub.publico,
-        publico_pagante: pub.pagantes ?? pub.publico_pagante,
+        publico_pagante: verifiedPub.pagantes_status === 'nao_divulgado' ? null : (pub.pagantes ?? pub.publico_pagante),
         renda: pub.renda,
-        public_sources: (pub.fonte || pub.fonte_publico || pub.fonte_pagantes || pub.fonte_renda) ? { publico: pub.fonte_publico || pub.fonte, publico_pagante: pub.fonte_pagantes || pub.fonte_publico || pub.fonte, renda: pub.fonte_renda || pub.fonte_publico || pub.fonte } : null,
+        public_sources: (pub.fonte || pub.fonte_publico || pub.fonte_pagantes || pub.fonte_renda) ? {
+          publico: pub.fonte_publico || pub.fonte,
+          ...(verifiedPub.pagantes_status === 'nao_divulgado' ? {} : { publico_pagante: pub.fonte_pagantes || pub.fonte_publico || pub.fonte }),
+          renda: pub.fonte_renda || pub.fonte_publico || pub.fonte
+        } : null,
+        clear_unverified_paid: verifiedPub.pagantes_status === 'nao_divulgado',
         verified: Object.keys(verifiedPub).length > 0,
         highlight: mm,
       });

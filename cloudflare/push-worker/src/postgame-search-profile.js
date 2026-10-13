@@ -1,4 +1,4 @@
-export const POSTGAME_SEARCH_PROFILE_VERSION = 9;
+export const POSTGAME_SEARCH_PROFILE_VERSION = 10;
 
 function text(value) { return String(value ?? '').trim(); }
 function normalizeText(value) {
@@ -111,6 +111,27 @@ const IDENTITY_PAIR_MAX_CHARS = 420;
 const IDENTITY_CONTEXT_RADIUS = 900;
 const IDENTITY_EXTRACTION_SUFFIX = 1800;
 
+// R10R17-HF6: estes endereços publicam uma LISTA de partidas.
+// O parser Python de rodada separa cada bloco por confronto; o Worker NÃO
+// pode extrair um número dessa lista usando uma janela textual arbitrária.
+export function isMultiMatchRoundupSource(sourceUrl = '') {
+  let pathname = '';
+  try { pathname = decodeURIComponent(new URL(text(sourceUrl)).pathname).toLowerCase(); } catch (_) { return false; }
+  return /\/gato-mestre\//.test(pathname) || /(?:publicos?-d[aeo]s?-\d+[ao]?-rodada|veja-os-publicos-da-rodada)/.test(pathname);
+}
+
+// A capacidade se refere ao ESTÁDIO efetivo, nunca apenas ao mandante:
+// não bloqueia jogos transferidos para outro estádio. Lista deliberadamente
+// restrita a estádios cuja capacidade foi confirmada.
+export const VERIFIED_STADIUM_CAPACITY = Object.freeze({
+  'arena conda': 20089,
+});
+export function verifiedStadiumCapacity(task) {
+  const name = normalizeText(task?.stadium || task?.estadio).replace(/^estadio\s+/, '');
+  return VERIFIED_STADIUM_CAPACITY[name] || null;
+}
+
+
 function urlDate(value) {
   const raw = text(value);
   const m = raw.match(/\/(20\d{2})\/(\d{1,2})\/(\d{1,2})(?:\/|$)/);
@@ -208,6 +229,10 @@ export function evaluateSourceMatchIdentity(task, sourceText, sourceUrl = '') {
   if (!normalized.trim()) { result.reasons.push('empty_source_text'); return result; }
   const competitionConflict = sourceCompetitionConflict(task, sourceUrl);
   if (competitionConflict) { result.conflicts.push(competitionConflict); return result; }
+  if (isMultiMatchRoundupSource(sourceUrl)) {
+    result.conflicts.push('multi_match_roundup_requires_structured_parser');
+    return result;
+  }
 
   const gameDate = text(task?.kickoff || task?.data_iso).slice(0,10);
   const sourceDate = urlDate(sourceUrl);

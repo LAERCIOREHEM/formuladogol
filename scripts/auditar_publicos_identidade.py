@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R10R17-HF2 — auditoria offline de integridade factual/identidade de público e renda.
+"""R10R17-HF6 — auditoria offline de integridade factual/identidade de público e renda.
 
 Não pesquisa a web. Varre TODOS os registros publicados e procura contaminações
 estruturais que podem ser provadas pelo próprio repositório: event_id inexistente,
@@ -11,7 +11,7 @@ Identity Gate + Factual Integrity Guard do Push Worker. Este arquivo é a segund
 trava determinística antes do commit e NÃO pesquisa a web.
 """
 from __future__ import annotations
-import argparse, json, re
+import argparse, json, re, unicodedata
 from urllib.parse import urlsplit, unquote
 from copy import deepcopy
 from datetime import date, datetime, timezone
@@ -55,6 +55,14 @@ def source_competition_conflict(url: str) -> str:
     m=re.search(r'(?:^|/)(copa-do-brasil|campeonato-carioca|campeonato-paulista|libertadores|sul-americana)(?:/|$)',path)
     return m.group(1) if m else ''
 
+# Capacidade de estádio, não do mandante: jogos em campo neutro continuam válidos.
+VERIFIED_STADIUM_CAPACITY = {'arena conda': 20089}
+def stadium_capacity(game: dict[str,Any]) -> int | None:
+    raw=str(game.get('estadio') or game.get('stadium') or '').lower()
+    name=' '.join(''.join(c for c in unicodedata.normalize('NFD',raw) if not unicodedata.combining(c)).split())
+    name=re.sub(r'^estadio\s+', '', name)
+    return VERIFIED_STADIUM_CAPACITY.get(name)
+
 def game_date(row: dict[str,Any]) -> date | None:
     raw=str(row.get('data_iso') or '')[:10]
     try: return date.fromisoformat(raw)
@@ -82,6 +90,9 @@ def audit_payload(resultados: dict[str,Any], publicos: dict[str,Any], correcoes:
         if p is not None and not (100 <= p <= 250000): issues.append(f'publico_fora_faixa:{p:g}')
         if paid is not None and p is not None and paid > p: issues.append(f'pagantes_maior_que_publico:{paid:g}>{p:g}')
         if rev is not None and not (0 < rev < 100_000_000): issues.append(f'renda_fora_faixa:{rev:g}')
+        cap=stadium_capacity(game or {})
+        if cap is not None and ((p is not None and p > cap) or (paid is not None and paid > cap)):
+            issues.append(f'capacidade_estadio_excedida:{cap}:publico={p}:pagantes={paid}')
 
         factual=inspect_factual_integrity(p, paid, rev)
         for code in factual.get('critical') or []:
@@ -106,6 +117,8 @@ def audit_payload(resultados: dict[str,Any], publicos: dict[str,Any], correcoes:
                     elif delta > 3: observations.append({'event_id':str(eid),'tipo':f'{field}_url_data_distante:{delta}d'})
         vr=verified.get(str(eid)) if isinstance(verified,dict) else None
         if isinstance(vr,dict):
+            if vr.get('pagantes_status') == 'nao_divulgado' and paid is not None:
+                issues.append('pagantes_nao_comprovados_deveriam_estar_ausentes')
             comparisons=(('publico','publico'),('pagantes','pagantes'),('renda','renda'))
             for rk,pk in comparisons:
                 expected=num(vr.get(rk)); actual=num(row.get(pk))
@@ -114,11 +127,24 @@ def audit_payload(resultados: dict[str,Any], publicos: dict[str,Any], correcoes:
               'mandante':((game.get('mandante') or {}).get('nome') if isinstance(game.get('mandante'),dict) else '') if game else '',
               'visitante':((game.get('visitante') or {}).get('nome') if isinstance(game.get('visitante'),dict) else '') if game else '',
               'publico':row.get('publico'),'pagantes':row.get('pagantes'),'renda':row.get('renda'),'fontes':fields}
+        # Duas partidas distintas da MESMA rodada com público e renda idênticos
+        # exigem revisão: a janela de uma reportagem multijogo pode ter vazado.
+        if game and p is not None and rev is not None:
+            for other_eid,other_row in rows.items():
+                if str(other_eid)==str(eid) or not isinstance(other_row,dict): continue
+                other=games.get(str(other_eid))
+                if not other or other.get('rodada')!=game.get('rodada'): continue
+                if num(other_row.get('publico'))==p and num(other_row.get('renda'))==rev:
+                    # Não é o mesmo evento replicado sob IDs diferentes.
+                    participants=lambda g: (str((g.get('mandante') or {}).get('nome')),str((g.get('visitante') or {}).get('nome')))
+                    if participants(game)!=participants(other):
+                        issues.append(f'publico_renda_duplicados_outro_jogo:{other_eid}')
+                        break
         if issues: critical.append({**item,'problemas':issues})
         elif warns: warnings.append({**item,'avisos':warns})
         else: ok.append(str(eid))
     return {
-      'schema_version':2,'policy':'R10R17-HF2-source-competition-guard',
+      'schema_version':2,'policy':'R10R17-HF6-match-field-capacity-guard',
       'gerado_em':datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
       'total_registros_publicos':len(rows),'total_ok':len(ok),'total_avisos':len(warnings),'total_criticos':len(critical),'total_observacoes':len(observations),
       'criticos':critical,'avisos':warnings,'observacoes':observations,'event_ids_ok':ok,
@@ -149,7 +175,19 @@ def self_test() -> None:
     assert out6['total_criticos']==1 and 'url_competicao_incompativel:campeonato-carioca' in ' '.join(out6['criticos'][0]['problemas'])
     legitimate_slug={'jogos':{'x':{'publico':53528,'renda':4106188.74,'fonte':'https://uol.com.br/esporte/2026/10/07/time-vinga-eliminacao-na-copa-do-brasil.htm'}}}
     assert audit_payload(resultados,legitimate_slug,{'jogos':{}})['total_criticos']==0
-    print('SELF-TEST OK: auditoria de identidade + integridade factual + competição R10R17-HF2')
+    chape={'event_id':'y','data_iso':'2026-10-12T19:30','rodada':30,'estadio':'Arena Condá','mandante':{'nome':'Chapecoense'},'visitante':{'nome':'Athletico-PR'}}
+    fla={'event_id':'z','data_iso':'2026-10-11T17:30','rodada':30,'estadio':'Maracanã','mandante':{'nome':'Flamengo'},'visitante':{'nome':'Fluminense'}}
+    both={'resultados':[chape,fla]}
+    same={'jogos':{'y':{'publico':63300,'pagantes':58246,'renda':7006350,'fonte':'https://ge.globo.com/gato-mestre/2026/10/11/lista.ghtml'},'z':{'publico':63300,'pagantes':58246,'renda':7006350,'fonte':'https://ge.globo.com/gato-mestre/2026/10/11/lista.ghtml'}}}
+    out7=audit_payload(both,same,{'jogos':{'y':{'publico':3924,'renda':169490,'pagantes_status':'nao_divulgado'}}})
+    assert out7['total_criticos']>=1
+    assert any('capacidade_estadio_excedida' in str(r['problemas']) for r in out7['criticos'])
+    assert any('publico_renda_duplicados_outro_jogo' in str(r['problemas']) for r in out7['criticos'])
+    assert any('pagantes_nao_comprovados' in str(r['problemas']) for r in out7['criticos'])
+    fixed={'jogos':{'y':{'publico':3924,'renda':169490,'fonte':'https://uol.com.br/2026/10/12/ficha'},'z':{'publico':63300,'pagantes':58246,'renda':7006350,'fonte':'https://uol.com.br/2026/10/11/ficha'}}}
+    out8=audit_payload(both,fixed,{'jogos':{'y':{'publico':3924,'renda':169490,'pagantes_status':'nao_divulgado'}}})
+    assert out8['total_criticos']==0
+    print('SELF-TEST OK: auditoria de identidade + competição + capacidade + duplicação + pagantes sem prova HF6')
 
 def main() -> None:
     ap=argparse.ArgumentParser()

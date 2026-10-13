@@ -44,10 +44,10 @@ assert.equal(rejected.accepted, false);
 assert.equal(rejected.reason, 'source_not_verified');
 
 // Normalização de fontes: web_search pode devolver URL AMP e o JSON canônico.
-const geAmpSources = new Set(['https://ge.globo.com/google/amp/gato-mestre/noticia/2026/09/20/exemplo.ghtml']);
+const geAmpSources = new Set(['https://ge.globo.com/google/amp/futebol/noticia/2026/09/20/exemplo.ghtml']);
 const geCanonical = validatePublicPayload({
   encontrado: true, publico: 66053, publico_pagante: null, renda: null,
-  fonte_publico: 'https://ge.globo.com/gato-mestre/noticia/2026/09/20/exemplo.ghtml',
+  fonte_publico: 'https://ge.globo.com/futebol/noticia/2026/09/20/exemplo.ghtml',
   fonte_publico_pagante: null, fonte_renda: null, confianca: 0.99, observacao: ''
 }, geAmpSources);
 assert.equal(geCanonical.accepted, true);
@@ -238,7 +238,7 @@ console.log('postgame-fastlane v13 policy + factual integrity + SLA suppression 
 // ============================ R10R15 Match Identity Gate ============================
 {
   const { evaluateSourceMatchIdentity, POSTGAME_SEARCH_PROFILE_VERSION } = await import('../src/postgame-search-profile.js');
-  assert.equal(POSTGAME_SEARCH_PROFILE_VERSION, 9);
+  assert.equal(POSTGAME_SEARCH_PROFILE_VERSION, 10);
 
   const grenal = {
     event_id:'401841267', league:'bra.1', home:'Grêmio', away:'Internacional',
@@ -288,11 +288,30 @@ console.log('postgame-fastlane v13 policy + factual integrity + SLA suppression 
 
   const rodadaComAlvo = 'Flamengo 2 x 1 Palmeiras. Público presente: 61.000. Público pagante: 58.000. Renda: R$ 4.200.000,00. Botafogo 1 x 2 Vasco. Público presente: 23.596. Público pagante: 22.071. Renda: R$ 801.180,00.';
   const gateRodadaAlvo = evaluateSourceMatchIdentity(botVasco, rodadaComAlvo, 'https://ge.globo.com/gato-mestre/noticia/2026/10/07/publicos-da-29a-rodada.ghtml');
-  assert.equal(gateRodadaAlvo.accepted, true);
-  const parsedRodadaAlvo = extractPublicFromTextDeterministic(gateRodadaAlvo.window, 'https://ge.globo.com/gato-mestre/noticia/2026/10/07/publicos-da-29a-rodada.ghtml');
-  assert.equal(parsedRodadaAlvo.publico, 23596, 'bloco anterior da página multijogo não pode contaminar público');
-  assert.equal(parsedRodadaAlvo.publico_pagante, 22071);
-  assert.equal(parsedRodadaAlvo.renda, 801180);
+  assert.equal(gateRodadaAlvo.accepted, false, 'matéria multijogo exige parser estruturado por confronto');
+  assert.ok(gateRodadaAlvo.conflicts.includes('multi_match_roundup_requires_structured_parser'));
+  // O parser Python continua responsável pelas matérias agregadas de rodada.
+
+  const chape = {event_id:'401841265',league:'bra.1',home:'Chapecoense',away:'Athletico-PR',kickoff:'2026-10-12T19:30:00-03:00',home_score:1,away_score:4,round:30,stadium:'Arena Condá'};
+  const geRodada = 'Flamengo 1 x 0 Fluminense. Público presente: 63.300. Pagantes: 58.246. Renda: R$ 7.006.350,00. Chapecoense 1 x 4 Athletico-PR. A partida será na Arena Condá.';
+  const geUrl = 'https://ge.globo.com/gato-mestre/noticia/2026/10/11/flamengo-1-x-0-fluminense-tem-o-maior-publico-da-30a-rodada-do-brasileiro-veja-a-lista.ghtml';
+  const gateChape = evaluateSourceMatchIdentity(chape, geRodada, geUrl);
+  assert.equal(gateChape.accepted, false, 'Chapecoense não pode herdar 63.300 presentes do Flamengo');
+  assert.ok(gateChape.conflicts.includes('multi_match_roundup_requires_structured_parser'));
+  const invalidRoundup = validatePublicPayload({encontrado:true,publico:63300,publico_pagante:58246,renda:7006350,fonte_publico:geUrl,fonte_publico_pagante:geUrl,fonte_renda:geUrl,confianca:1}, [geUrl], chape);
+  assert.equal(invalidRoundup.accepted, false, 'IA não pode contornar bloqueio de matéria agregada');
+  const chapeSource = 'Chapecoense 1 x 4 Athletico-PR, Arena Condá. Público: 3.924 torcedores. Renda: R$ 169.490,00.';
+  const chapeUrl = 'https://www.bol.uol.com.br/esporte/2026/10/12/athletico-pr-goleia-chapecoense-com-dois-gols-do-artilheiro-viveros.htm';
+  const validChape = evaluateSourceMatchIdentity(chape, chapeSource, chapeUrl);
+  assert.equal(validChape.accepted, true);
+  const parsedChape = extractPublicFromTextDeterministic(validChape.window, chapeUrl);
+  const acceptedChape = validatePublicPayload(parsedChape, [chapeUrl], chape);
+  assert.equal(acceptedChape.accepted, true);
+  assert.equal(acceptedChape.values.publico, 3924);
+  assert.equal(acceptedChape.values.renda, 169490);
+  const impossible = validatePublicPayload({...parsedChape, publico:63300}, [chapeUrl], chape);
+  assert.equal(impossible.accepted, false);
+  assert.equal(impossible.reason, 'stadium_capacity_exceeded:20089');
 
   const fonteBotVasco = 'Botafogo e Vasco se enfrentaram no Estádio Nilton Santos pela 29ª rodada. O clássico terminou Botafogo 1 x 2 Vasco. Público presente: 23.596. Público pagante: 22.071. Renda: R$ 801.180,00.';
   const gateBotVasco = evaluateSourceMatchIdentity(botVasco, fonteBotVasco, 'https://www.correiobraziliense.com.br/esportes/2026/10/7516875-botafogo-vasco.html');
