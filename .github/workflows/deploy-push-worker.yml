@@ -19,7 +19,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -102,6 +102,9 @@ jobs:
         run: |
           node --check tests/test-scorer-recovery.mjs
           node tests/test-scorer-recovery.mjs
+
+      - name: HF6 - regressão do smoke SportsMonitor DO
+        run: node tests/verify-monitor-deploy.mjs --self-test
 
       - name: Testar distribuição de push
         run: npm run test:push
@@ -307,8 +310,8 @@ jobs:
           )"
 
           # R10R17-HF2: recusar deploy sem a regressão de competição do Match Identity Gate.
-          if [[ "${EXPECTED_SEARCH_PROFILE}" != "9" ]]; then
-            echo "::error::Match Identity Search Profile v9 obrigatório para bloquear fontes de outra competição."
+          if [[ "${EXPECTED_SEARCH_PROFILE}" != "10" ]]; then
+            echo "::error::Match Identity Search Profile v10 obrigatório para bloquear fontes de outra competição."
             exit 1
           fi
           echo "Esperado pelo código local: revision=${EXPECTED_REVISION}; gateway=${EXPECTED_GATEWAY}; stateContract=${EXPECTED_STATE_CONTRACT}; factsContract=${EXPECTED_FACTS_CONTRACT}; monitorFacts=${EXPECTED_MONITOR_FACTS}; scorerPolicy=${EXPECTED_SCORER_POLICY}; redCardPolicy=${EXPECTED_RED_CARD_POLICY}; statsFallback=${EXPECTED_STATS_FALLBACK}; postgame=${EXPECTED_POSTGAME}; searchProfile=${EXPECTED_SEARCH_PROFILE}"
@@ -686,55 +689,39 @@ jobs:
           console.log(`LiveState canônico ESPN saudável: ${s.data.events.length} evento(s) no dia.`);
           NODE
 
-          # Durable Objects podem manter por alguns segundos uma instância da revisão
-          # anterior após o deploy. Aguarda convergência em vez de transformar propagação
-          # legítima em falso negativo do smoke test.
+          # Cloudflare confirma: Worker novo e DO antigo podem coexistir por
+          # segundos/minutos durante propagação global. Em partida AO VIVO,
+          # R10R5 antigo com polling saudável é WARNING transitório; qualquer
+          # outro contrato divergente permanece FAIL. Não reiniciar o DO no jogo.
           MONITOR_READY=0
-          for i in $(seq 1 15); do
+          MONITOR_COMPAT=0
+          for i in $(seq 1 24); do
             if curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status >/tmp/fdg-monitor-status.json; then
-              if EXPECTED_SCORER_POLICY="$EXPECTED_SCORER_POLICY" EXPECTED_RED_CARD_POLICY="$EXPECTED_RED_CARD_POLICY" node <<'NODE'
-          const fs = require('fs');
-          const m = JSON.parse(fs.readFileSync('/tmp/fdg-monitor-status.json', 'utf8'));
-          const expected = {
-            engineVersion: 5,
-            overturnPolicyVersion: '6-R10R4',
-            livePolicyVersion: '6-R10',
-            goalReconciliationPolicyVersion: '6-R9-R1',
-            goalScorerEnrichmentPolicyVersion: process.env.EXPECTED_SCORER_POLICY,
-            goalRecoveryPolicyVersion: '6-R10R4',
-            essentialAlertPolicyVersion: '6-R10R4',
-            readinessVersion: '6-R10.1',
-            readinessLifecyclePolicyVersion: '6-R10.2',
-            redCardEventPolicyVersion: process.env.EXPECTED_RED_CARD_POLICY,
-            redCardAggregateStatsIgnored: true,
-            redCardEventContextRequired: true,
-            fastPollMs: 10000,
-          };
-          const problems = [];
-          for (const [k, v] of Object.entries(expected)) {
-            if (m[k] !== v) problems.push(`${k}=${m[k]} esperado=${v}`);
-          }
-          if (Number(m.watchCount || 0) === 0 && Number(m.activeGames || 0) === 0 && Number(m.readinessRed || 0) !== 0) {
-            problems.push(`readinessRed=${m.readinessRed} com watchCount=0/activeGames=0`);
-          }
-          if (problems.length) {
-            console.error('Monitor esportivo inconsistente: ' + problems.join(' | '));
-            process.exit(1);
-          }
-          console.log('Motor esportivo, recovery, readiness e push rápido saudáveis.');
-          NODE
-              then
+              set +e
+              EXPECTED_SCORER_POLICY="$EXPECTED_SCORER_POLICY" EXPECTED_RED_CARD_POLICY="$EXPECTED_RED_CARD_POLICY" \
+                node tests/verify-monitor-deploy.mjs /tmp/fdg-monitor-status.json
+              MONITOR_RC=$?
+              set -e
+              if [[ "$MONITOR_RC" -eq 0 ]]; then
                 MONITOR_READY=1
                 break
               fi
+              if [[ "$MONITOR_RC" -eq 2 ]]; then MONITOR_COMPAT=1; else MONITOR_COMPAT=0; fi
+            else
+              MONITOR_COMPAT=0
             fi
-            echo "Aguardando convergência do SportsMonitor Durable Object (${i}/15)..."
-            sleep 6
+            echo "Aguardando convergência global do SportsMonitor DO (${i}/24)..."
+            sleep 10
           done
-          if [ "$MONITOR_READY" -ne 1 ]; then
-            echo 'ERRO: SportsMonitor não convergiu para o contrato publicado.'
-            cat /tmp/fdg-monitor-status.json 2>/dev/null || true
-            exit 1
+          if [[ "$MONITOR_READY" -ne 1 ]]; then
+            if [[ "$MONITOR_COMPAT" -eq 1 ]]; then
+              echo '::warning::Cloudflare Worker novo validado; SportsMonitor DO ativo ainda executa R10R5. Polling íntegro, sem gols faltantes. Propagação pendente, sem interromper jogo ao vivo.'
+              echo '⚠️ SportsMonitor DO: R10R5 ainda ativo durante partida; Worker R10R6 publicado, demais contratos/polling OK. Revalidar após partida.' >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo '::error::SportsMonitor DO não convergiu e NÃO atende aos critérios de compatibilidade segura.'
+              cat /tmp/fdg-monitor-status.json 2>/dev/null || true
+              exit 1
+            fi
           fi
 
           curl -fsS --max-time 20 https://push.formuladogol.com.br/v1/monitor/source-probe >/tmp/fdg-source-probe.json

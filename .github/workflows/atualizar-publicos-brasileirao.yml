@@ -11,6 +11,7 @@ on:
       - 'dados-br/correcoes/publicos-verificados.json'
       - 'scripts/atualizar_publicos_brasileirao.py'
       - 'scripts/auditar_publicos_identidade.py'
+      - 'scripts/curar_publicos_hotfix6.py'
       - 'scripts/postgame_factual_integrity.py'
       - '.github/workflows/atualizar-publicos-brasileirao.yml'
   workflow_dispatch:
@@ -81,10 +82,12 @@ jobs:
             scripts/gerar_estatisticas_competicao_brasileirao.py \
             scripts/importar_postgame_fastlane.py \
             scripts/auditar_publicos_identidade.py \
+            scripts/curar_publicos_hotfix6.py \
             scripts/postgame_factual_integrity.py
           python scripts/atualizar_publicos_brasileirao.py --self-test
           python scripts/completar_publicos_ia.py --self-test
           python scripts/importar_postgame_fastlane.py --self-test
+          python scripts/curar_publicos_hotfix6.py --self-test
           python scripts/auditar_publicos_identidade.py --self-test
           python scripts/postgame_factual_integrity.py
           python -m json.tool resultados.json >/dev/null
@@ -229,6 +232,11 @@ jobs:
           # não reescreve a auditoria. Sem esta reconsolidação (offline, sem rede)
           # auditoria-publicos.json fica defasada e as asserções de cobertura da
           # etapa seguinte acusam divergência.
+          python scripts/atualizar_publicos_brasileirao.py --sem-rede
+          # HF6: remove explicitamente pagantes falsos que a mesclagem legado
+          # (COALESCE) preservava. A segunda consolidação atualiza os derivados
+          # e a auditoria com o estado efetivamente publicado.
+          python scripts/curar_publicos_hotfix6.py --apply
           python scripts/atualizar_publicos_brasileirao.py --sem-rede
           # R10R16.1: sweep determinístico de identidade + integridade factual em
           # TODOS os registros. Sem pesquisa global de IA: somente anomalias ficam
