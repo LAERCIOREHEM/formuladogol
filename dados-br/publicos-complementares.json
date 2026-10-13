@@ -1,6 +1,6 @@
 {
   "_comentario": "Complemento documental de público presente, pagantes e renda. Correções verificadas por event_id são mescladas por campo antes da coleta; a busca automática prioriza ge/Gato Mestre. Público pagante nunca substitui público presente e fontes avulsas podem cobrir jogos remarcados.",
-  "atualizado_em": "2026-10-13T01:20:49.226680Z",
+  "atualizado_em": "2026-10-12T23:15:21.581042-03:00",
   "jogos": {
     "401840808": {
       "tipo": "presente",
@@ -3673,16 +3673,15 @@
       "tipo": "presente",
       "publico": 28704,
       "publico_status": "divulgado",
-      "fonte": "https://ge.globo.com/gato-mestre/noticia/2026/10/11/flamengo-1-x-0-fluminense-tem-o-maior-publico-da-30a-rodada-do-brasileiro-veja-a-lista.ghtml",
-      "fonte_publico": "https://ge.globo.com/gato-mestre/noticia/2026/10/11/flamengo-1-x-0-fluminense-tem-o-maior-publico-da-30a-rodada-do-brasileiro-veja-a-lista.ghtml",
-      "pagantes": 18982,
-      "pagantes_status": "divulgado",
-      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/10/11/flamengo-1-x-0-fluminense-tem-o-maior-publico-da-30a-rodada-do-brasileiro-veja-a-lista.ghtml",
-      "renda": 1609117,
+      "fonte": "https://www.bahianoticias.com.br/esportes/bahia/34166-confira-publico-e-renda-de-bahia-x-mirassol-pela-30a-rodada-do-brasileirao",
+      "fonte_publico": "https://www.bahianoticias.com.br/esportes/bahia/34166-confira-publico-e-renda-de-bahia-x-mirassol-pela-30a-rodada-do-brasileirao",
+      "pagantes_status": "nao_divulgado",
+      "renda": 935545,
       "renda_status": "divulgado",
-      "fonte_renda": "https://ge.globo.com/gato-mestre/noticia/2026/10/11/flamengo-1-x-0-fluminense-tem-o-maior-publico-da-30a-rodada-do-brasileiro-veja-a-lista.ghtml",
-      "origem": "cloudflare-postgame-fastlane",
-      "verificado_em": "2026-10-12T01:25:55.759953Z"
+      "fonte_renda": "https://www.bahianoticias.com.br/esportes/bahia/34166-confira-publico-e-renda-de-bahia-x-mirassol-pela-30a-rodada-do-brasileirao",
+      "origem": "correção documental verificada",
+      "verificado_em": "2026-10-12T23:05:00-03:00",
+      "fonte_pagantes": "https://www.bahianoticias.com.br/esportes/bahia/34166-confira-publico-e-renda-de-bahia-x-mirassol-pela-30a-rodada-do-brasileirao"
     },
     "401841264": {
       "tipo": "presente",
@@ -3698,18 +3697,28 @@
     },
     "401841265": {
       "tipo": "presente",
-      "publico": 63300,
+      "publico": 3924,
       "publico_status": "divulgado",
-      "fonte": "https://ge.globo.com/gato-mestre/noticia/2026/10/11/flamengo-1-x-0-fluminense-tem-o-maior-publico-da-30a-rodada-do-brasileiro-veja-a-lista.ghtml",
-      "fonte_publico": "https://ge.globo.com/gato-mestre/noticia/2026/10/11/flamengo-1-x-0-fluminense-tem-o-maior-publico-da-30a-rodada-do-brasileiro-veja-a-lista.ghtml",
-      "pagantes": 58246,
-      "pagantes_status": "divulgado",
-      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/10/11/flamengo-1-x-0-fluminense-tem-o-maior-publico-da-30a-rodada-do-brasileiro-veja-a-lista.ghtml",
-      "renda": 7006350,
+      "fonte": "https://www.bol.uol.com.br/esporte/2026/10/12/athletico-pr-goleia-chapecoense-com-dois-gols-do-artilheiro-viveros.htm",
+      "fonte_publico": "https://www.bol.uol.com.br/esporte/2026/10/12/athletico-pr-goleia-chapecoense-com-dois-gols-do-artilheiro-viveros.htm",
+      "pagantes_status": "nao_divulgado",
+      "renda": 169490,
       "renda_status": "divulgado",
-      "fonte_renda": "https://ge.globo.com/gato-mestre/noticia/2026/10/11/flamengo-1-x-0-fluminense-tem-o-maior-publico-da-30a-rodada-do-brasileiro-veja-a-lista.ghtml",
-      "origem": "cloudflare-postgame-fastlane",
-      "verificado_em": "2026-10-13T01:20:49.226680Z"
+      "fonte_renda": "https://www.bol.uol.com.br/esporte/2026/10/12/athletico-pr-goleia-chapecoense-com-dois-gols-do-artilheiro-viveros.htm",
+      "origem": "correção documental verificada",
+      "verificado_em": "2026-10-12T23:05:00-03:00",
+      "integridade_factual": {
+        "policy_version": 1,
+        "estado": "quarentena",
+        "incidentes": [
+          "PAID_ATTENDANCE_GT_PRESENT"
+        ],
+        "campos": [
+          "pagantes"
+        ],
+        "detectado_em": "2026-10-12T23:15:21.111293-03:00"
+      },
+      "fonte_pagantes": "https://www.bol.uol.com.br/esporte/2026/10/12/athletico-pr-goleia-chapecoense-com-dois-gols-do-artilheiro-viveros.htm"
     }
   },
   "fontes_rodadas": {
