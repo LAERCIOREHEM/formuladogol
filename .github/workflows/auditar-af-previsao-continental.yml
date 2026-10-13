@@ -79,6 +79,7 @@ jobs:
           python scripts/validar_python_embutido_workflow.py --self-test
           python scripts/validar_python_embutido_workflow.py .github/workflows/atualizar-brasileirao.yml
           python scripts/atualizar_competicoes_af_previsao.py --self-test
+          python -m json.tool dados-br/correcoes/agenda-continentais-oficial.json > /dev/null
           python scripts/gerar_agenda_clubes_brasileirao.py --self-test
           python scripts/af_previsao_continental.py --self-test
           python scripts/gerar_probabilidades_brasileirao.py --self-test

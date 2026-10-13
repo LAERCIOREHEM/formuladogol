@@ -16,6 +16,11 @@ on:
         required: false
         default: false
         type: boolean
+      forcar_fontes_continentais:
+        description: 'Ignorar cache e atualizar somente a janela continental recente/futura, sem reconstrução anual'
+        required: false
+        default: false
+        type: boolean
       trace_id:
         description: 'Correlation ID interno do ciclo pós-FINAL; normalmente preenchido pelo AF Fastlane'
         required: false
@@ -114,6 +119,7 @@ jobs:
           python scripts/buscar_detalhes_jogos_brasileirao.py --self-test
           python scripts/gerar_auditoria_estatisticas_brasileirao.py --self-test
           python scripts/atualizar_competicoes_af_previsao.py --self-test
+          python -m json.tool dados-br/correcoes/agenda-continentais-oficial.json > /dev/null
           python scripts/af_previsao_continental.py --self-test
           python scripts/gerar_probabilidades_brasileirao.py --self-test
           python scripts/gerar_marcos_af_previsao.py --self-test
@@ -248,6 +254,7 @@ jobs:
         env:
           FORCAR_AF: ${{ inputs.forcar_af }}
           RECONSTRUIR_FONTES: ${{ inputs.reconstruir_fontes }}
+          FORCAR_FONTES_CONTINENTAIS: ${{ inputs.forcar_fontes_continentais }}
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
           API_FOOTBALL_CONTINENTAL_RESERVE: '12'
         shell: bash
@@ -263,6 +270,13 @@ jobs:
           )
           if [[ "${FORCAR_AF:-false}" == "true" ]]; then
             ARGS+=(--force --max-age-minutes 0)
+          fi
+          # HOTFIX 8: o Phase Transition Guardian precisa furar o cache para
+          # descobrir a fase seguinte, mas não deve refazer a temporada inteira.
+          # full-refresh-hours=0 com snapshot existente desliga a reconstrução
+          # semanal nesta execução e mantém somente a janela adaptativa 21d/120d.
+          if [[ "${FORCAR_FONTES_CONTINENTAIS:-false}" == "true" ]]; then
+            ARGS+=(--force --max-age-minutes 0 --full-refresh-hours 0)
           fi
           if [[ "${RECONSTRUIR_FONTES:-false}" == "true" ]]; then
             ARGS+=(--full --force --max-age-minutes 0)
@@ -295,6 +309,13 @@ jobs:
         run: |
           python scripts/gerar_agenda_clubes_brasileirao.py
           python -m json.tool dados-br/agenda-clubes-br.json > /dev/null
+          python - <<'PY'
+          import json
+          data=json.load(open('dados-br/agenda-clubes-br.json',encoding='utf-8'))
+          integ=data.get('integridade_continental') or {}
+          assert integ.get('status') == 'ok', f"agenda continental incompleta: {integ}"
+          print(f"Agenda continental íntegra: esperados={integ.get('esperados_no_periodo',0)} fallback_oficial={integ.get('fallbacks_documentais_ativos',0)}")
+          PY
 
       - name: Verificar se o estado esportivo exige novo AF-Previsão
         if: ${{ always() && steps.continental.outcome == 'success' }}
