@@ -17,6 +17,189 @@
     "acessos": "canais de direitos e plataformas de acesso são campos distintos; Claro tv+/Globoplay são opções para canais contratados, não novos detentores de direitos"
   },
   "jogos": {
+    "fdg-conmebol-sul-americana-202610132130-boca-juniors-vasco-da-gama": {
+      "event_id": "fdg-conmebol-sul-americana-202610132130-boca-juniors-vasco-da-gama",
+      "rodada": 0,
+      "mandante": "Boca Juniors",
+      "visitante": "Vasco da Gama",
+      "data_iso": "2026-10-13T21:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "SBT",
+        "Paramount+"
+      ],
+      "origem": "override editorial — transmissoes.json + YouTube oficial validado",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "SBT",
+            "Paramount+"
+          ],
+          "referencia": "https://sports.sbt.com.br/noticia/sul-americana/sbt-transmite-vasco-e-boca-juniors-na-semi-da-sula",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        },
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "SBT"
+          ],
+          "referencia": "https://youtu.be/_WK_3KBsK04",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
+          "autoridade": 120,
+          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Assistir no SBT",
+          "url": "https://youtu.be/_WK_3KBsK04",
+          "tipo": "player_oficial"
+        },
+        {
+          "nome": "Paramount+",
+          "url": "https://www.paramountplus.com/br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "fdg-conmebol-sul-americana-202610141900-atletico-mg-montevideo-city-torque": {
+      "event_id": "fdg-conmebol-sul-americana-202610141900-atletico-mg-montevideo-city-torque",
+      "rodada": 0,
+      "mandante": "Atlético-MG",
+      "visitante": "Montevideo City Torque",
+      "data_iso": "2026-10-14T19:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Disney+ / ESPN"
+      ],
+      "origem": "GE Agenda",
+      "confianca": "confirmado",
+      "estavel": false,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "GE Agenda",
+          "canais": [
+            "Disney+ / ESPN"
+          ],
+          "referencia": "https://ge.globo.com/agenda/",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
+          "autoridade": 80,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "fdg-conmebol-libertadores-202610142130-fluminense-palmeiras": {
+      "event_id": "fdg-conmebol-libertadores-202610142130-fluminense-palmeiras",
+      "rodada": 0,
+      "mandante": "Fluminense",
+      "visitante": "Palmeiras",
+      "data_iso": "2026-10-14T21:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "GE TV",
+        "CazéTV",
+        "Globo",
+        "Paramount+"
+      ],
+      "origem": "GE Agenda + YouTube oficial validado",
+      "confianca": "confirmado",
+      "estavel": true,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "CazéTV"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=c5J2-ywJ66k",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
+          "autoridade": 120,
+          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+        },
+        {
+          "fonte": "GE Agenda",
+          "canais": [
+            "Globo",
+            "Paramount+",
+            "GE TV"
+          ],
+          "referencia": "https://ge.globo.com/agenda/",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
+          "autoridade": 80,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Assistir na CazéTV",
+          "url": "https://www.youtube.com/watch?v=c5J2-ywJ66k",
+          "tipo": "player_oficial"
+        },
+        {
+          "nome": "GE TV no YouTube",
+          "url": "https://www.youtube.com/@getv/streams",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Paramount+",
+          "url": "https://www.paramountplus.com/br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "fdg-conmebol-libertadores-202610152130-estudiantes-de-la-plata-flamengo": {
+      "event_id": "fdg-conmebol-libertadores-202610152130-estudiantes-de-la-plata-flamengo",
+      "rodada": 0,
+      "mandante": "Estudiantes de La Plata",
+      "visitante": "Flamengo",
+      "data_iso": "2026-10-15T21:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Disney+ / ESPN"
+      ],
+      "origem": "GE Agenda",
+      "confianca": "confirmado",
+      "estavel": false,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "GE Agenda",
+          "canais": [
+            "Disney+ / ESPN"
+          ],
+          "referencia": "https://ge.globo.com/agenda/",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
+          "autoridade": 80,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
     "401841275": {
       "event_id": "401841275",
       "rodada": 31,
@@ -40,7 +223,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -71,14 +254,11 @@
       "data_iso": "2026-10-17T18:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "CazéTV",
-        "Premiere",
-        "SporTV",
-        "Prime Video"
+        "CazéTV"
       ],
-      "origem": "GE Agenda + YouTube oficial validado",
+      "origem": "YouTube oficial validado",
       "confianca": "confirmado",
-      "estavel": true,
+      "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
@@ -87,21 +267,9 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=-x1MQjpr02Y",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
-        },
-        {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Prime Video",
-            "Premiere",
-            "SporTV"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -109,31 +277,6 @@
           "nome": "Assistir na CazéTV",
           "url": "https://www.youtube.com/watch?v=-x1MQjpr02Y",
           "tipo": "player_oficial"
-        },
-        {
-          "nome": "Premiere no Globoplay",
-          "url": "https://globoplay.globo.com/canais/premiere/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "SporTV no Globoplay",
-          "url": "https://globoplay.globo.com/canais/sportv-us/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "SporTV na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Prime Video",
-          "url": "https://www.primevideo.com/",
-          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -162,7 +305,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -215,7 +358,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -264,7 +407,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=MSak0lTho8c",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -300,7 +443,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -331,15 +474,11 @@
       "data_iso": "2026-10-18T16:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "GE TV",
-        "Premiere",
-        "SporTV",
-        "Prime Video",
-        "Disney+ / ESPN"
+        "GE TV"
       ],
-      "origem": "GE Agenda + YouTube oficial validado",
+      "origem": "YouTube oficial validado",
       "confianca": "confirmado",
-      "estavel": true,
+      "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
@@ -348,22 +487,9 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=TOeRJyuK8-s",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
-        },
-        {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Prime Video",
-            "Premiere",
-            "SporTV",
-            "Disney+ / ESPN"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -371,36 +497,6 @@
           "nome": "Assistir na GE TV",
           "url": "https://www.youtube.com/watch?v=TOeRJyuK8-s",
           "tipo": "player_oficial"
-        },
-        {
-          "nome": "Premiere no Globoplay",
-          "url": "https://globoplay.globo.com/canais/premiere/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "SporTV no Globoplay",
-          "url": "https://globoplay.globo.com/canais/sportv-us/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "SporTV na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Prime Video",
-          "url": "https://www.primevideo.com/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Disney+ (ESPN)",
-          "url": "https://www.disneyplus.com/pt-br/",
-          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -427,7 +523,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -475,7 +571,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -533,7 +629,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -566,6 +662,178 @@
         }
       ]
     },
+    "fdg-conmebol-sul-americana-202610202130-vasco-da-gama-boca-juniors": {
+      "event_id": "fdg-conmebol-sul-americana-202610202130-vasco-da-gama-boca-juniors",
+      "rodada": 0,
+      "mandante": "Vasco da Gama",
+      "visitante": "Boca Juniors",
+      "data_iso": "2026-10-20T21:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "SBT",
+        "Paramount+"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "SBT",
+            "Paramount+"
+          ],
+          "referencia": "https://sports.sbt.com.br/noticia/sul-americana/sbt-transmite-vasco-e-boca-juniors-na-semi-da-sula",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "SBT no YouTube",
+          "url": "https://www.youtube.com/@sbt/streams",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "SBT ao vivo",
+          "url": "https://www.sbt.com.br/ao-vivo",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Paramount+",
+          "url": "https://www.paramountplus.com/br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "fdg-conmebol-sul-americana-202610211900-montevideo-city-torque-atletico-mg": {
+      "event_id": "fdg-conmebol-sul-americana-202610211900-montevideo-city-torque-atletico-mg",
+      "rodada": 0,
+      "mandante": "Montevideo City Torque",
+      "visitante": "Atlético-MG",
+      "data_iso": "2026-10-21T19:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Disney+ / ESPN"
+      ],
+      "origem": "GE Agenda",
+      "confianca": "confirmado",
+      "estavel": false,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "GE Agenda",
+          "canais": [
+            "Disney+ / ESPN"
+          ],
+          "referencia": "https://ge.globo.com/agenda/",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
+          "autoridade": 80,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "fdg-conmebol-libertadores-202610212130-palmeiras-fluminense": {
+      "event_id": "fdg-conmebol-libertadores-202610212130-palmeiras-fluminense",
+      "rodada": 0,
+      "mandante": "Palmeiras",
+      "visitante": "Fluminense",
+      "data_iso": "2026-10-21T21:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "GE TV",
+        "Globo",
+        "Paramount+"
+      ],
+      "origem": "GE Agenda + YouTube oficial validado",
+      "confianca": "confirmado",
+      "estavel": true,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "GE TV"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=VOACrxTR5-I",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
+          "autoridade": 120,
+          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+        },
+        {
+          "fonte": "GE Agenda",
+          "canais": [
+            "Globo",
+            "Paramount+",
+            "GE TV"
+          ],
+          "referencia": "https://ge.globo.com/agenda/",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
+          "autoridade": 80,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Assistir na GE TV",
+          "url": "https://www.youtube.com/watch?v=VOACrxTR5-I",
+          "tipo": "player_oficial"
+        },
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Paramount+",
+          "url": "https://www.paramountplus.com/br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "fdg-conmebol-libertadores-202610222130-flamengo-estudiantes-de-la-plata": {
+      "event_id": "fdg-conmebol-libertadores-202610222130-flamengo-estudiantes-de-la-plata",
+      "rodada": 0,
+      "mandante": "Flamengo",
+      "visitante": "Estudiantes de La Plata",
+      "data_iso": "2026-10-22T21:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Disney+ / ESPN"
+      ],
+      "origem": "GE Agenda",
+      "confianca": "confirmado",
+      "estavel": false,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "GE Agenda",
+          "canais": [
+            "Disney+ / ESPN"
+          ],
+          "referencia": "https://ge.globo.com/agenda/",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
+          "autoridade": 80,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
     "401841287": {
       "event_id": "401841287",
       "rodada": 32,
@@ -591,7 +859,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -657,7 +925,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -735,7 +1003,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -789,7 +1057,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=ITbRBWMF4W8",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -823,7 +1091,7 @@
             "SporTV"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -862,7 +1130,7 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=FDo01YVDsNE",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -898,7 +1166,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -948,7 +1216,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -1007,7 +1275,7 @@
             "SporTV"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -1050,7 +1318,7 @@
             "SporTV"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -1091,13 +1359,11 @@
       "data_iso": "2026-10-28T19:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "CazéTV",
-        "Premiere",
-        "Globo"
+        "CazéTV"
       ],
-      "origem": "GE Agenda + YouTube oficial validado",
+      "origem": "YouTube oficial validado",
       "confianca": "confirmado",
-      "estavel": true,
+      "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
@@ -1106,20 +1372,9 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=t4pf4qZ0c14",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
-        },
-        {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Premiere",
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -1127,21 +1382,6 @@
           "nome": "Assistir na CazéTV",
           "url": "https://www.youtube.com/watch?v=t4pf4qZ0c14",
           "tipo": "player_oficial"
-        },
-        {
-          "nome": "Premiere no Globoplay",
-          "url": "https://globoplay.globo.com/canais/premiere/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "TV Globo no Globoplay",
-          "url": "https://globoplay.globo.com/",
-          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -1168,7 +1408,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -1212,7 +1452,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=yL7MzrhVAJk",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -1258,7 +1498,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1332,7 +1572,7 @@
             "SporTV"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -1371,7 +1611,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1416,7 +1656,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -1477,7 +1717,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -1523,7 +1763,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -1567,7 +1807,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1610,7 +1850,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1668,7 +1908,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1732,7 +1972,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1801,7 +2041,7 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=cOjixSohLkY",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -1837,7 +2077,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -1881,7 +2121,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1924,7 +2164,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1978,7 +2218,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -2017,7 +2257,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -2043,13 +2283,11 @@
       "data_iso": "2026-11-08T17:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "GE TV",
-        "Premiere",
-        "Globo"
+        "GE TV"
       ],
-      "origem": "GE Agenda + YouTube oficial validado",
+      "origem": "YouTube oficial validado",
       "confianca": "confirmado",
-      "estavel": true,
+      "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
@@ -2058,20 +2296,9 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=89tPGaf7W4s",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
-        },
-        {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Premiere",
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -2079,21 +2306,6 @@
           "nome": "Assistir na GE TV",
           "url": "https://www.youtube.com/watch?v=89tPGaf7W4s",
           "tipo": "player_oficial"
-        },
-        {
-          "nome": "Premiere no Globoplay",
-          "url": "https://globoplay.globo.com/canais/premiere/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "TV Globo no Globoplay",
-          "url": "https://globoplay.globo.com/",
-          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -2118,7 +2330,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-13T20:16:44-03:00",
+          "capturado_em": "2026-10-13T20:36:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -2137,5 +2349,5 @@
       ]
     }
   },
-  "atualizado_em": "2026-10-13T20:16:44-03:00"
+  "atualizado_em": "2026-10-13T20:36:45-03:00"
 }

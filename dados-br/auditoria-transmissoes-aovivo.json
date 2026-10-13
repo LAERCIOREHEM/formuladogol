@@ -13,16 +13,16 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 45,
+    "jogos_na_janela": 52,
     "jogos_foco": 52,
     "descobertas_antecipadas": 0,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 71,
-    "search_api_fallback_chamadas": 4,
+    "candidatos_oficiais_encontrados": 70,
+    "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 52,
     "search_api_jogos_pulados_grade_estavel": 0,
-    "transmissoes_publicadas": 9,
-    "sem_transmissao": 36,
+    "transmissoes_publicadas": 12,
+    "sem_transmissao": 40,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -69,12 +69,52 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "",
+      "event_id": "fdg-conmebol-sul-americana-202610132130-boca-juniors-vasco-da-gama",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "competicao_nome": "Sul-Americana",
+      "jogo": "Boca Juniors x Vasco da Gama",
+      "data_iso": "2026-10-13T21:30:00-03:00",
+      "principal": "SBT",
+      "fontes_encontradas": [
+        "SBT"
+      ],
+      "manual": false,
+      "descoberta_antecipada": false
+    },
+    {
+      "event_id": "fdg-conmebol-sul-americana-202610141900-atletico-mg-montevideo-city-torque",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "competicao_nome": "Sul-Americana",
+      "jogo": "Atlético-MG x Montevideo City Torque",
+      "data_iso": "2026-10-14T19:00:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
+    },
+    {
+      "event_id": "fdg-conmebol-libertadores-202610142130-fluminense-palmeiras",
       "rodada": 0,
       "competicao_chave": "libertadores",
       "competicao_nome": "Libertadores",
-      "jogo": "Flamengo x Estudiantes de La Plata",
-      "data_iso": "2026-10-22T21:30:00-03:00",
+      "jogo": "Fluminense x Palmeiras",
+      "data_iso": "2026-10-14T21:30:00-03:00",
+      "principal": "CazéTV",
+      "fontes_encontradas": [
+        "CazéTV"
+      ],
+      "manual": false,
+      "descoberta_antecipada": false
+    },
+    {
+      "event_id": "fdg-conmebol-libertadores-202610152130-estudiantes-de-la-plata-flamengo",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Estudiantes de La Plata x Flamengo",
+      "data_iso": "2026-10-15T21:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -201,6 +241,56 @@
       "competicao_nome": "Brasileirão",
       "jogo": "Corinthians x Vitória",
       "data_iso": "2026-10-19T20:00:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
+    },
+    {
+      "event_id": "fdg-conmebol-sul-americana-202610202130-vasco-da-gama-boca-juniors",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "competicao_nome": "Sul-Americana",
+      "jogo": "Vasco da Gama x Boca Juniors",
+      "data_iso": "2026-10-20T21:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
+    },
+    {
+      "event_id": "fdg-conmebol-sul-americana-202610211900-montevideo-city-torque-atletico-mg",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "competicao_nome": "Sul-Americana",
+      "jogo": "Montevideo City Torque x Atlético-MG",
+      "data_iso": "2026-10-21T19:00:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
+    },
+    {
+      "event_id": "fdg-conmebol-libertadores-202610212130-palmeiras-fluminense",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Palmeiras x Fluminense",
+      "data_iso": "2026-10-21T21:30:00-03:00",
+      "principal": "GE TV",
+      "fontes_encontradas": [
+        "GE TV"
+      ],
+      "manual": false,
+      "descoberta_antecipada": false
+    },
+    {
+      "event_id": "fdg-conmebol-libertadores-202610222130-flamengo-estudiantes-de-la-plata",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Flamengo x Estudiantes de La Plata",
+      "data_iso": "2026-10-22T21:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -629,6 +719,23 @@
   ],
   "aceitos": [
     {
+      "event_id": "fdg-conmebol-sul-americana-202610132130-boca-juniors-vasco-da-gama",
+      "jogo": "Boca Juniors x Vasco da Gama",
+      "fonte": "sbt_sports",
+      "video_id": "_WK_3KBsK04",
+      "url": "https://www.youtube.com/watch?v=_WK_3KBsK04",
+      "titulo": "AO VIVO | BOCA JUNIORS X VASCO COM IMAGENS - SULAMERICANA 2026",
+      "status": "live",
+      "confianca": 0.84,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "transmissão já está ao vivo",
+        "horário compatível (210 min de diferença)"
+      ]
+    },
+    {
       "event_id": "401841280",
       "jogo": "Vitória x Athletico-PR",
       "fonte": "getv",
@@ -674,6 +781,22 @@
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
         "horário compatível (90 min de diferença)"
+      ]
+    },
+    {
+      "event_id": "fdg-conmebol-libertadores-202610212130-palmeiras-fluminense",
+      "jogo": "Palmeiras x Fluminense",
+      "fonte": "getv",
+      "video_id": "VOACrxTR5-I",
+      "url": "https://www.youtube.com/watch?v=VOACrxTR5-I",
+      "titulo": "AO VIVO: PALMEIRAS X FLUMINENSE | SEMIFINAL | LIBERTADORES 2026 | ge tv",
+      "status": "upcoming",
+      "confianca": 0.825,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "horário compatível (150 min de diferença)"
       ]
     },
     {
@@ -725,6 +848,22 @@
       ]
     },
     {
+      "event_id": "fdg-conmebol-libertadores-202610142130-fluminense-palmeiras",
+      "jogo": "Fluminense x Palmeiras",
+      "fonte": "cazetv",
+      "video_id": "c5J2-ywJ66k",
+      "url": "https://www.youtube.com/watch?v=c5J2-ywJ66k",
+      "titulo": "AO VIVO: LOGO APÓS FLUMINENSE X PALMEIRAS NA LIBERTADORES | GERAL CAZÉTV",
+      "status": "upcoming",
+      "confianca": 0.8583,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "horário compatível (110 min de diferença)"
+      ]
+    },
+    {
       "event_id": "401841306",
       "jogo": "Athletico-PR x Vasco da Gama",
       "fonte": "cazetv",
@@ -759,6 +898,16 @@
   ],
   "rejeitados": [
     {
+      "video_id": "Gh2C5kzwa7M",
+      "url": "https://www.youtube.com/watch?v=Gh2C5kzwa7M",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: BRASIL X ARGENTINA | AMISTOSO DA SELEÇÃO FEMININA | ge tv",
+      "status": "live",
+      "inicio_programado": "2026-10-13T19:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "e8d0-d94Qlo",
       "url": "https://www.youtube.com/watch?v=e8d0-d94Qlo",
       "fonte": "getv",
@@ -766,16 +915,6 @@
       "titulo": "AO VIVO: SEATTLE SEAHAWKS X DENVER BRONCOS | NFL 2026/27 | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-10-15T21:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "_WK_3KBsK04",
-      "url": "https://www.youtube.com/watch?v=_WK_3KBsK04",
-      "fonte": "sbt_sports",
-      "canal": "SBT Sports",
-      "titulo": "SUPERLIVE: GALATASARAY 1 X 4 BARCELONA - JOGO COMPLETO",
-      "status": "live",
-      "inicio_programado": "2026-10-13T18:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -793,10 +932,10 @@
       "url": "https://www.youtube.com/watch?v=gQ_hIEjOcKs",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "COMPACTO: CAGLIARI X JUVENTUS | SÉRIE A ITALIANA 26/27 | 6ª RODADA",
+      "titulo": "AO VIVO: VASCO X BOCA JUNIORS | SUL-AMERICANA | NARRAÇÃO | NOCHE DE COPA",
       "status": "live",
       "inicio_programado": "2026-10-13T20:30:00-03:00",
-      "motivo": "conteúdo rejeitado: compacto"
+      "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
     },
     {
       "video_id": "34Xcy8YegDY",
@@ -839,16 +978,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "Gh2C5kzwa7M",
-      "url": "https://www.youtube.com/watch?v=Gh2C5kzwa7M",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: BRASIL X ARGENTINA | AMISTOSO DA SELEÇÃO FEMININA | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-10-13T19:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "LR-pfb9vCdo",
       "url": "https://www.youtube.com/watch?v=LR-pfb9vCdo",
       "fonte": "getv",
@@ -876,16 +1005,6 @@
       "titulo": "AO VIVO: CHICAGO BEARS X NEW ENGLAND PATRIOTS | NFL 2026/27 | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-10-22T21:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "VOACrxTR5-I",
-      "url": "https://www.youtube.com/watch?v=VOACrxTR5-I",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: PALMEIRAS X FLUMINENSE | SEMIFINAL | LIBERTADORES 2026 | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-21T19:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -996,16 +1115,6 @@
       "titulo": "AO VIVO: BRASÍLIA X OSASCO | SUPERLIGA FEMININA DE VÔLEI 2026/27 | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-10-19T18:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "vBuQsJv2yh8",
-      "url": "https://www.youtube.com/watch?v=vBuQsJv2yh8",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO! FLUMINENSE X PALMEIRAS, FLAMENGO, LIBERTADORES, SEEDORF E MAIS! | Denilson show | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-10-13T19:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1259,16 +1368,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "c5J2-ywJ66k",
-      "url": "https://www.youtube.com/watch?v=c5J2-ywJ66k",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: LOGO APÓS FLUMINENSE X PALMEIRAS NA LIBERTADORES | GERAL CAZÉTV",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-14T23:20:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "d2d8HT4eOB8",
       "url": "https://www.youtube.com/watch?v=d2d8HT4eOB8",
       "fonte": "cazetv",
@@ -1392,12 +1491,21 @@
   "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "",
+      "event_id": "fdg-conmebol-sul-americana-202610141900-atletico-mg-montevideo-city-torque",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "competicao_nome": "Sul-Americana",
+      "jogo": "Atlético-MG x Montevideo City Torque",
+      "data_iso": "2026-10-14T19:00:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
+    },
+    {
+      "event_id": "fdg-conmebol-libertadores-202610152130-estudiantes-de-la-plata-flamengo",
       "rodada": 0,
       "competicao_chave": "libertadores",
       "competicao_nome": "Libertadores",
-      "jogo": "Flamengo x Estudiantes de La Plata",
-      "data_iso": "2026-10-22T21:30:00-03:00",
+      "jogo": "Estudiantes de La Plata x Flamengo",
+      "data_iso": "2026-10-15T21:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     },
     {
@@ -1461,6 +1569,33 @@
       "competicao_nome": "Brasileirão",
       "jogo": "Corinthians x Vitória",
       "data_iso": "2026-10-19T20:00:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
+    },
+    {
+      "event_id": "fdg-conmebol-sul-americana-202610202130-vasco-da-gama-boca-juniors",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "competicao_nome": "Sul-Americana",
+      "jogo": "Vasco da Gama x Boca Juniors",
+      "data_iso": "2026-10-20T21:30:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
+    },
+    {
+      "event_id": "fdg-conmebol-sul-americana-202610211900-montevideo-city-torque-atletico-mg",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "competicao_nome": "Sul-Americana",
+      "jogo": "Montevideo City Torque x Atlético-MG",
+      "data_iso": "2026-10-21T19:00:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
+    },
+    {
+      "event_id": "fdg-conmebol-libertadores-202610222130-flamengo-estudiantes-de-la-plata",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Flamengo x Estudiantes de La Plata",
+      "data_iso": "2026-10-22T21:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     },
     {
@@ -1718,14 +1853,13 @@
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 490,
+    "unidades": 89,
     "requisicoes": {
       "channels": 4,
-      "videos": 46,
-      "playlistItems": 40,
-      "search": 4
+      "videos": 45,
+      "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-10-13T20:16:20-03:00"
+  "atualizado_em": "2026-10-13T20:36:22-03:00"
 }

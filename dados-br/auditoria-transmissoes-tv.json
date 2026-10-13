@@ -2,14 +2,14 @@
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
     "jogos_na_janela": 52,
-    "jogos_com_transmissao": 41,
-    "jogos_sem_transmissao_na_janela": 11,
-    "jogos_sem_transmissao_14d": 9,
+    "jogos_com_transmissao": 49,
+    "jogos_sem_transmissao_na_janela": 3,
+    "jogos_sem_transmissao_14d": 1,
     "jogos_sem_transmissao_fora_14d": 2,
-    "jogos_criticos_sem_transmissao_72h": 4,
+    "jogos_criticos_sem_transmissao_72h": 0,
     "registros_preservados": 18,
     "jogos_guardiao_ia": 0,
-    "jogos_estaveis_sem_reconsulta_editorial": 0,
+    "jogos_estaveis_sem_reconsulta_editorial": 6,
     "fontes_com_falha": 2
   },
   "fontes": {
@@ -26,18 +26,18 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 12919
+      "duracao_ms": 11220
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 18,
-      "duracao_ms": 15136
+      "jogos_com_canal": 20,
+      "duracao_ms": 22543
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 2,
       "jogos_com_canal": 0,
-      "duracao_ms": 28029
+      "duracao_ms": 39308
     },
     "espn": {
       "ok": false,
@@ -45,154 +45,26 @@
     },
     "youtube_oficial": {
       "ok": true,
-      "jogos_com_canal": 9
+      "jogos_com_canal": 12
     }
   },
   "sem_transmissao": [
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Boca Juniors x Vasco da Gama",
-      "data_iso": "2026-10-13T21:30:00-03:00",
-      "faltam_horas": 1.2,
-      "nivel": "critico"
-    },
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Atlético-MG x Montevideo City Torque",
-      "data_iso": "2026-10-14T19:00:00-03:00",
-      "faltam_horas": 22.7,
-      "nivel": "critico"
-    },
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Fluminense x Palmeiras",
-      "data_iso": "2026-10-14T21:30:00-03:00",
-      "faltam_horas": 25.2,
-      "nivel": "critico"
-    },
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Estudiantes de La Plata x Flamengo",
-      "data_iso": "2026-10-15T21:30:00-03:00",
-      "faltam_horas": 49.2,
-      "nivel": "critico"
-    },
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Vasco da Gama x Boca Juniors",
-      "data_iso": "2026-10-20T21:30:00-03:00",
-      "faltam_horas": 169.2,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Montevideo City Torque x Atlético-MG",
-      "data_iso": "2026-10-21T19:00:00-03:00",
-      "faltam_horas": 190.7,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Palmeiras x Fluminense",
-      "data_iso": "2026-10-21T21:30:00-03:00",
-      "faltam_horas": 193.2,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Flamengo x Estudiantes de La Plata",
-      "data_iso": "2026-10-22T21:30:00-03:00",
-      "faltam_horas": 217.2,
-      "nivel": "aviso"
-    },
     {
       "event_id": "401841278",
       "rodada": 32,
       "jogo": "Chapecoense x Fluminense",
       "data_iso": "2026-10-24T19:30:00-03:00",
-      "faltam_horas": 263.2,
+      "faltam_horas": 262.9,
       "nivel": "aviso"
     }
   ],
   "sem_transmissao_futura": [
     {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Boca Juniors x Vasco da Gama",
-      "data_iso": "2026-10-13T21:30:00-03:00",
-      "faltam_horas": 1.2,
-      "nivel": "critico"
-    },
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Atlético-MG x Montevideo City Torque",
-      "data_iso": "2026-10-14T19:00:00-03:00",
-      "faltam_horas": 22.7,
-      "nivel": "critico"
-    },
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Fluminense x Palmeiras",
-      "data_iso": "2026-10-14T21:30:00-03:00",
-      "faltam_horas": 25.2,
-      "nivel": "critico"
-    },
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Estudiantes de La Plata x Flamengo",
-      "data_iso": "2026-10-15T21:30:00-03:00",
-      "faltam_horas": 49.2,
-      "nivel": "critico"
-    },
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Vasco da Gama x Boca Juniors",
-      "data_iso": "2026-10-20T21:30:00-03:00",
-      "faltam_horas": 169.2,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Montevideo City Torque x Atlético-MG",
-      "data_iso": "2026-10-21T19:00:00-03:00",
-      "faltam_horas": 190.7,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Palmeiras x Fluminense",
-      "data_iso": "2026-10-21T21:30:00-03:00",
-      "faltam_horas": 193.2,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "",
-      "rodada": 0,
-      "jogo": "Flamengo x Estudiantes de La Plata",
-      "data_iso": "2026-10-22T21:30:00-03:00",
-      "faltam_horas": 217.2,
-      "nivel": "aviso"
-    },
-    {
       "event_id": "401841278",
       "rodada": 32,
       "jogo": "Chapecoense x Fluminense",
       "data_iso": "2026-10-24T19:30:00-03:00",
-      "faltam_horas": 263.2,
+      "faltam_horas": 262.9,
       "nivel": "aviso"
     },
     {
@@ -200,7 +72,7 @@
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-29T19:30:00-03:00",
-      "faltam_horas": 383.2,
+      "faltam_horas": 382.9,
       "nivel": "futuro"
     },
     {
@@ -208,7 +80,7 @@
       "rodada": 34,
       "jogo": "Palmeiras x Remo",
       "data_iso": "2026-11-05T19:30:00-03:00",
-      "faltam_horas": 551.2,
+      "faltam_horas": 550.9,
       "nivel": "futuro"
     }
   ],
@@ -385,5 +257,5 @@
     "https://ge.globo.com/gato-mestre/noticia/2026/10/13/palpite-ge-2026-gato-mestre-leva-a-melhor-na-rodada-veja-acertos-e-erros.ghtml",
     "https://ge.globo.com/cartola/craque-da-rodada/noticia/2026/10/13/cartola-2026-giay-do-palmeiras-atropela-contra-o-corinthians-e-e-o-craque-da-rodada-30.ghtml"
   ],
-  "atualizado_em": "2026-10-13T20:16:44-03:00"
+  "atualizado_em": "2026-10-13T20:36:45-03:00"
 }

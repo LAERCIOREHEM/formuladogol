@@ -13,6 +13,79 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "jogos": {
+    "fdg-conmebol-sul-americana-202610132130-boca-juniors-vasco-da-gama": {
+      "event_id": "fdg-conmebol-sul-americana-202610132130-boca-juniors-vasco-da-gama",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "competicao_nome": "Sul-Americana",
+      "espn_league": "conmebol.sudamericana",
+      "mandante": "Boca Juniors",
+      "visitante": "Vasco da Gama",
+      "data_iso": "2026-10-13T21:30:00-03:00",
+      "estadio": "La Bombonera",
+      "origem": "automático",
+      "principal": {
+        "fonte": "sbt_sports",
+        "nome": "SBT",
+        "video_id": "_WK_3KBsK04",
+        "url": "https://youtu.be/_WK_3KBsK04",
+        "status": "live",
+        "inicio_programado": "2026-10-13T18:00:00-03:00",
+        "inicio_real": "2026-10-13T18:09:05-03:00",
+        "titulo": "AO VIVO | BOCA JUNIORS X VASCO COM IMAGENS - SULAMERICANA 2026",
+        "canal": "SBT Sports",
+        "channel_id": "UCxc3marqP9BJSkQ0_K4mqDg",
+        "thumbnail": "https://i.ytimg.com/vi/_WK_3KBsK04/maxresdefault_live.jpg",
+        "confianca": 0.84,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "transmissão já está ao vivo",
+          "horário compatível (210 min de diferença)"
+        ],
+        "origem_busca": "streams-page",
+        "escopo": "partida",
+        "embeddable": true
+      },
+      "alternativas": []
+    },
+    "fdg-conmebol-libertadores-202610142130-fluminense-palmeiras": {
+      "event_id": "fdg-conmebol-libertadores-202610142130-fluminense-palmeiras",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "espn_league": "conmebol.libertadores",
+      "mandante": "Fluminense",
+      "visitante": "Palmeiras",
+      "data_iso": "2026-10-14T21:30:00-03:00",
+      "estadio": "Estádio do Maracanã",
+      "origem": "automático",
+      "principal": {
+        "fonte": "cazetv",
+        "nome": "CazéTV",
+        "video_id": "c5J2-ywJ66k",
+        "url": "https://www.youtube.com/watch?v=c5J2-ywJ66k",
+        "status": "upcoming",
+        "inicio_programado": "2026-10-14T23:20:00-03:00",
+        "inicio_real": "",
+        "titulo": "AO VIVO: LOGO APÓS FLUMINENSE X PALMEIRAS NA LIBERTADORES | GERAL CAZÉTV",
+        "canal": "CazéTV",
+        "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
+        "thumbnail": "https://i.ytimg.com/vi/c5J2-ywJ66k/maxresdefault_live.jpg",
+        "confianca": 0.8583,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (110 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": false
+      },
+      "alternativas": []
+    },
     "401841268": {
       "event_id": "401841268",
       "rodada": 31,
@@ -114,6 +187,42 @@
           "identifica Brasileirão/competição",
           "identifica transmissão ao vivo",
           "horário compatível (90 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": true
+      },
+      "alternativas": []
+    },
+    "fdg-conmebol-libertadores-202610212130-palmeiras-fluminense": {
+      "event_id": "fdg-conmebol-libertadores-202610212130-palmeiras-fluminense",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "espn_league": "conmebol.libertadores",
+      "mandante": "Palmeiras",
+      "visitante": "Fluminense",
+      "data_iso": "2026-10-21T21:30:00-03:00",
+      "estadio": "NuBank Parque",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "VOACrxTR5-I",
+        "url": "https://www.youtube.com/watch?v=VOACrxTR5-I",
+        "status": "upcoming",
+        "inicio_programado": "2026-10-21T19:00:00-03:00",
+        "inicio_real": "",
+        "titulo": "AO VIVO: PALMEIRAS X FLUMINENSE | SEMIFINAL | LIBERTADORES 2026 | ge tv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/VOACrxTR5-I/maxresdefault_live.jpg",
+        "confianca": 0.825,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (150 min de diferença)"
         ],
         "origem_busca": "uploads",
         "escopo": "partida",
@@ -334,5 +443,5 @@
       "alternativas": []
     }
   },
-  "atualizado_em": "2026-10-13T20:16:20-03:00"
+  "atualizado_em": "2026-10-13T20:36:22-03:00"
 }
