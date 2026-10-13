@@ -61,6 +61,20 @@ jobs:
           python -m py_compile scripts/gerar_agenda_clubes_brasileirao.py
           python scripts/gerar_agenda_clubes_brasileirao.py --self-test
           python scripts/gerar_agenda_clubes_brasileirao.py
+          python - <<'PY'
+          import json
+          agenda = json.load(open('dados-br/agenda-clubes-br.json', encoding='utf-8'))
+          games = agenda.get('jogos') or []
+          documentals = [g for g in games if g.get('fallback_agenda_oficial')]
+          for g in documentals:
+              event_id = str(g.get('event_id') or '')
+              assert event_id.startswith('fdg-conmebol-'), f'Fallback continental sem identidade interna: {g}'
+              assert g.get('event_id_origem') == 'documental_interno'
+              assert not g.get('espn_event_id'), 'Fallback não pode simular ESPN event_id'
+          ids = [str(g.get('event_id') or '') for g in games]
+          assert len(ids) == len(set(ids)), 'Identidade duplicada na agenda'
+          print(f'Identidade continental OK: {len(documentals)} documentais; IDs únicos')
+          PY
           python -m py_compile scripts/buscar_transmissoes_aovivo_brasileirao.py
           python scripts/buscar_transmissoes_aovivo_brasileirao.py --selftest
           python -m py_compile scripts/atualizar_transmissoes_tv_brasileirao.py
