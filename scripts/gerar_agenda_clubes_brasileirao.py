@@ -17,6 +17,7 @@ import argparse
 import calendar
 import copy
 import json
+import re
 import os
 import sys
 import unicodedata
@@ -378,6 +379,26 @@ def _continental_aggregate(data: Mapping[str, Any], raw: Mapping[str, Any]) -> d
     }
 
 
+def documentary_event_id(raw: Mapping[str, Any]) -> str:
+    """ID interno determinístico; NUNCA um ID da ESPN.
+
+    Inclui competição, data e participantes para impedir colisões entre ida e
+    volta e preservar a identidade entre execuções do coletor.
+    """
+    date = parse_dt(raw.get("data_iso"))
+    home = raw.get("mandante") or {}
+    away = raw.get("visitante") or {}
+    if not date or not isinstance(home, Mapping) or not isinstance(away, Mapping):
+        return ""
+    def token(team: Mapping[str, Any]) -> str:
+        name = norm(team.get("nome") or "")
+        return re.sub(r"[^a-z0-9]+", "-", name).strip("-")
+    competition = re.sub(r"[^a-z0-9]+", "-", str(raw.get("competicao_chave") or "").lower()).strip("-")
+    if not competition or not token(home) or not token(away):
+        return ""
+    return f"fdg-conmebol-{competition}-{date:%Y%m%d%H%M}-{token(home)}-{token(away)}"
+
+
 def official_continental_games(root: Path) -> Iterable[dict[str, Any]]:
     """Agenda oficial documental usada apenas quando o snapshot estruturado atrasar.
 
@@ -395,7 +416,9 @@ def official_continental_games(root: Path) -> Iterable[dict[str, Any]]:
         if not (home["serie_a_2026"] or away["serie_a_2026"]):
             continue
         yield {
-            "event_id": "",
+            "event_id": documentary_event_id(raw),
+            "event_id_origem": "documental_interno",
+            "espn_event_id": "",
             "competicao_chave": str(raw.get("competicao_chave") or ""),
             "competicao_nome": "CONMEBOL Libertadores" if raw.get("competicao_chave") == "libertadores" else "CONMEBOL Sudamericana",
             "competicao_nome_curto": "Libertadores" if raw.get("competicao_chave") == "libertadores" else "Sul-Americana",
@@ -434,7 +457,7 @@ def fixture_signature(item: Mapping[str, Any]) -> tuple[str, str, str, str]:
 
 
 def merge_schedule_candidates(candidates: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Deduplica snapshot ESPN x fallback oficial, preferindo event_id estruturado."""
+    """Deduplica snapshot ESPN x fallback oficial, preferindo event_id ESPN real."""
     merged: dict[tuple[str, str, str, str], dict[str, Any]] = {}
     passthrough: list[dict[str, Any]] = []
     for item in candidates:
@@ -448,7 +471,9 @@ def merge_schedule_candidates(candidates: Iterable[dict[str, Any]]) -> list[dict
             continue
         prev_id = str(previous.get("event_id") or "")
         new_id = str(item.get("event_id") or "")
-        if new_id and not prev_id:
+        prev_espn = bool(prev_id and not prev_id.startswith("fdg-conmebol-"))
+        new_espn = bool(new_id and not new_id.startswith("fdg-conmebol-"))
+        if new_espn and not prev_espn:
             preferred, secondary = dict(item), previous
         else:
             preferred, secondary = previous, item
@@ -458,7 +483,10 @@ def merge_schedule_candidates(candidates: Iterable[dict[str, Any]]) -> list[dict
             preferred["fonte_calendario"] = secondary.get("fonte_calendario")
         if secondary.get("fonte_url") and not preferred.get("fonte_url"):
             preferred["fonte_url"] = secondary.get("fonte_url")
-        preferred["fallback_agenda_oficial"] = bool(preferred.get("fallback_agenda_oficial") and not new_id and not prev_id)
+        preferred["fallback_agenda_oficial"] = bool(preferred.get("fallback_agenda_oficial") and not (new_espn or prev_espn))
+        if new_espn or prev_espn:
+            preferred.pop("event_id_origem", None)
+            preferred.pop("espn_event_id", None)
         merged[sig] = preferred
     return list(merged.values()) + passthrough
 
@@ -657,6 +685,12 @@ def selftest() -> None:
     espn_row = {**official_row, "event_id": "401999999", "fonte": "snapshot", "fallback_agenda_oficial": False}
     merged = merge_schedule_candidates([official_row, espn_row])
     assert len(merged) == 1 and merged[0]["event_id"] == "401999999"
+    doc_id = documentary_event_id({**official_row, "mandante": {"nome": "Boca Juniors"}, "visitante": {"nome": "Vasco da Gama"}})
+    assert doc_id.startswith("fdg-conmebol-sul-americana-202610132130-")
+    assert doc_id == documentary_event_id(official_row)
+    doc = {**official_row, "event_id": doc_id, "event_id_origem": "documental_interno"}
+    assert merge_schedule_candidates([doc, espn_row])[0]["event_id"] == "401999999"
+    assert merge_schedule_candidates([espn_row, doc])[0]["event_id"] == "401999999"
     assert merged[0]["fonte_calendario"] == "CONMEBOL oficial"
     print("self-test OK")
 

@@ -832,7 +832,8 @@ def espn_summary_entries(
 ) -> dict[str, list[Evidence]]:
     out: dict[str, list[Evidence]] = {}
     game_by_id = {str(game.get("event_id") or game.get("id") or ""): game for game in games}
-    ids = sorted(set(str(x) for x in event_ids if x))
+    # IDs documentais são chaves internas de correlação, não eventos ESPN.
+    ids = sorted(set(str(x) for x in event_ids if x and str(x).isdigit()))
 
     def fetch_one(event_id: str) -> tuple[str, str, list[str], str]:
         game = game_by_id.get(event_id) or {}
