@@ -82,7 +82,9 @@ test('five-minute fast path fetches compact agenda plus authoritative source sta
   const fastBlock = state.match(/const FAST_PATHS = \[([\s\S]*?)\];/)?.[1] || '';
   assert.match(fastBlock, /agenda-clubes-br\.json/);
   assert.match(fastBlock, /status-atualizacao\.json/);
-  assert.doesNotMatch(fastBlock, /resultados\.json|competicoes-af-previsao|jogos-detalhes/);
+  assert.doesNotMatch(fastBlock, /resultados\.json|competicoes-af-previsao\/(?:libertadores|sul-americana)|jogos-detalhes/);
+  assert.match(fastBlock, /auditoria-competicoes-af-previsao\.json/);
+  assert.match(fastBlock, /agenda-continentais-oficial\.json/);
   assert.doesNotMatch(state, /dados-br\/jogos-detalhes\.json/);
   assert.match(state, /pendingPublicsFromAudit/);
 });
@@ -129,7 +131,7 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(state, /transmissoes_guardian/);
   const contract = await read('cloudflare/orchestrator-worker/src/contract.js');
   assert.match(contract, /transmissionGuardian:\s*true/);
-  assert.match(contract, /version:\s*'2\.4\.0'/);
+  assert.match(contract, /version:\s*'2\.5\.0'/);
   assert.match(contract, /transmissionGuardianNeedGate:\s*true/);
   assert.match(contract, /transmissionNeedDrivenV2:\s*true/);
   assert.match(contract, /adaptiveSlowPath:\s*true/);
@@ -149,6 +151,9 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(contract, /targetedPublicResearch:\s*true/);
   assert.match(contract, /continentalPhaseFingerprints:\s*true/);
   assert.match(contract, /continentalAgendaAware:\s*true/);
+  assert.match(contract, /continentalPhaseTransitionGuardian:\s*true/);
+  assert.match(contract, /continentalAdaptiveScoreboardWindows:\s*true/);
+  assert.match(contract, /continentalOfficialScheduleFallback:\s*true/);
   assert.match(contract, /continentalStateIdempotency:\s*true/);
   assert.match(contract, /brasileiraoSourceCircuitBreaker:\s*true/);
   assert.match(contract, /espnScoreboardGateway:\s*true/);

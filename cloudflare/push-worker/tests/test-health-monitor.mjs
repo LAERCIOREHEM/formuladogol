@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { countWebSearchCalls, estimateProviderCost } from '../src/ai-usage.js';
-import { dailyDigestDecision, githubActionsSeverity, isDailyDigestDue, summarizeCloudflareWorkersUsage, postgameDigestLines, overallRecoveryDecision, reliabilityIntelligenceIndicators } from '../src/health-monitor.js';
+import { dailyDigestDecision, githubActionsSeverity, isDailyDigestDue, summarizeCloudflareWorkersUsage, postgameDigestLines, overallRecoveryDecision, reliabilityIntelligenceIndicators, continentalAgendaHealth } from '../src/health-monitor.js';
 
 assert.equal(countWebSearchCalls({output:[{type:'web_search_call'},{type:'message'},{type:'web_search_call'}]}),2);
 assert.equal(countWebSearchCalls({}),0);
@@ -103,5 +103,12 @@ const riBad=reliabilityIntelligenceIndicators({
 assert.equal(riBad[1].severity,'red');
 assert.equal(riBad[2].severity,'yellow');
 assert.equal(riBad[4].severity,'yellow');
+
+
+const continentalMissing=continentalAgendaHealth({integridade_continental:{status:'degraded',faltantes:[{x:1}]},jogos:[]},Date.parse('2026-10-13T21:40:00Z'));
+assert.equal(continentalMissing.severity,'red');
+const continentalFallback=continentalAgendaHealth({integridade_continental:{status:'ok',faltantes:[],fallbacks_documentais_ativos:4},jogos:[{competicao_chave:'sul_americana',data_iso:'2026-10-13T21:30:00-03:00',mandante:{nome:'Boca Juniors'},visitante:{nome:'Vasco da Gama'}}]},Date.parse('2026-10-13T21:40:00Z'));
+assert.equal(continentalFallback.severity,'yellow');
+assert.match(continentalFallback.detail,/Boca Juniors x Vasco da Gama/);
 
 console.log('health-monitor/ai-usage tests: PASS');

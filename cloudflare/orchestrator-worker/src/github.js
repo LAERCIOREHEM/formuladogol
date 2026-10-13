@@ -59,6 +59,11 @@ export async function dispatchWorkflow(env, workflow, inputs = {}) {
 
 export function dispatchSpec(decision) {
   switch (decision?.action) {
+    case 'refresh_continentais':
+      return {
+        workflow: 'atualizar-brasileirao.yml',
+        inputs: { forcar_fontes_continentais: 'true', reconstruir_fontes: 'false', forcar_af: 'false', trace_id: decision.traceId || 'continental-phase-transition' },
+      };
     case 'atualizar_brasileirao':
       // FINAL detectado entra primeiro no caminho crítico mínimo:
       // ESPN canônica -> AF -> commit -> deploy. O workflow completo é

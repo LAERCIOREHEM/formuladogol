@@ -63,6 +63,11 @@ DATA_DIR = ROOT / "dados-br" / "competicoes-af-previsao"
 AUDIT_PATH = ROOT / "dados-br" / "auditoria-competicoes-af-previsao.json"
 OVERRIDES_PATH = ROOT / "dados-br" / "ajustes-competicoes.json"
 SNAPSHOT_SCHEMA_VERSION = 2
+# HOTFIX 8: a API pública da ESPN passou a rejeitar janelas amplas (HTTP 400).
+# A coleta continental usa lotes curtos e, se um lote ainda falhar, divide-o
+# progressivamente até um único dia antes de desistir. Isso impede que uma
+# consulta de 42 dias apague semanas inteiras de agenda futura.
+SCOREBOARD_WINDOW_DAYS = max(1, min(14, int(os.environ.get("AF_CONTINENTAL_ESPN_WINDOW_DAYS", "7"))))
 BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{league}/scoreboard"
 SUMMARY_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{league}/summary"
 API_FOOTBALL_ROOT = "https://v3.football.api-sports.io"
@@ -574,8 +579,45 @@ def date_windows(year: int, days: int = 42) -> Iterable[tuple[datetime, datetime
     yield from date_windows_between(start, end, days)
 
 
+def _scoreboard_payload_resilient(
+    spec: CompetitionSpec,
+    lower: datetime,
+    upper: datetime,
+    *,
+    fetcher=None,
+) -> tuple[list[dict[str, Any]], int]:
+    """Busca um intervalo ESPN e subdivide apenas quando a própria janela falha.
+
+    O endpoint ``scoreboard`` aceita intervalos de tamanhos variáveis e pode
+    responder HTTP 400 para uma faixa que antes funcionava. O fallback é
+    determinístico: 7 dias -> metades -> ... -> 1 dia. Um erro diário continua
+    sendo erro real e sobe para o chamador; nunca é mascarado por JSON vazio.
+    """
+    fetcher = fetcher or fetch_json
+    date_range = f"{lower:%Y%m%d}-{upper:%Y%m%d}"
+    url = BASE_URL.format(league=spec.league)
+    try:
+        payload = fetcher(f"{url}?dates={date_range}&limit=250&lang=pt&region=br")
+        return [event for event in (payload.get("events") or []) if isinstance(event, dict)], 1
+    except Exception as exc:  # noqa: BLE001
+        total_days = (upper.date() - lower.date()).days + 1
+        if total_days <= 1:
+            raise RuntimeError(
+                f"{spec.key}: scoreboard ESPN falhou também em janela diária {date_range}: {exc}"
+            ) from exc
+        left_days = max(1, total_days // 2)
+        left_end_date = lower.date() + timedelta(days=left_days - 1)
+        right_start_date = left_end_date + timedelta(days=1)
+        left_end = datetime.combine(left_end_date, datetime.max.time(), tzinfo=BRT)
+        right_start = datetime.combine(right_start_date, datetime.min.time(), tzinfo=BRT)
+        left, left_requests = _scoreboard_payload_resilient(spec, lower, min(left_end, upper), fetcher=fetcher)
+        right, right_requests = _scoreboard_payload_resilient(spec, max(right_start, lower), upper, fetcher=fetcher)
+        # Conta também a tentativa ampla que falhou: observabilidade real do custo.
+        return left + right, 1 + left_requests + right_requests
+
+
 def fetch_events_between(
-    spec: CompetitionSpec, start: datetime, end: datetime
+    spec: CompetitionSpec, start: datetime, end: datetime, *, fetcher=None
 ) -> tuple[list[dict[str, Any]], int]:
     events: dict[str, dict[str, Any]] = {}
     requests = 0
@@ -585,13 +627,11 @@ def fetch_events_between(
     end = min(end, season_end)
     if start > end:
         return [], 0
-    for lower, upper in date_windows_between(start, end):
-        date_range = f"{lower:%Y%m%d}-{upper:%Y%m%d}"
-        url = BASE_URL.format(league=spec.league)
-        payload = fetch_json(f"{url}?dates={date_range}&limit=250&lang=pt&region=br")
-        requests += 1
-        for event in payload.get("events") or []:
-            if isinstance(event, dict) and event.get("id"):
+    for lower, upper in date_windows_between(start, end, days=SCOREBOARD_WINDOW_DAYS):
+        rows, used = _scoreboard_payload_resilient(spec, lower, upper, fetcher=fetcher)
+        requests += used
+        for event in rows:
+            if event.get("id"):
                 events[str(event["id"])] = event
     return sorted(
         events.values(), key=lambda item: (str(item.get("date") or ""), str(item.get("id") or ""))
@@ -2157,13 +2197,22 @@ def run_update(
         and all(snapshot.get("status") == "ok" for snapshot in after_snapshots.values())
         and all(row.get("status") in accepted_rows for row in audit_rows)
     )
+    preserved_count = sum(
+        1 for row in audit_rows
+        if str(row.get("status") or "").startswith("preservado_apos_falha")
+    )
     audit = {
         "schema_version": 2,
         "projeto": "AF-Previsão Continental",
         "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
         "gerado_em": now_brt().isoformat(),
         "status": "ok" if ready else "parcial_com_snapshot_preservado",
+        # Compatibilidade: este campo histórico significa "seguro para o AF".
+        # HOTFIX 8 separa explicitamente isso de frescor da agenda operacional.
         "coleta_confiavel": ready,
+        "af_snapshot_seguro": ready,
+        "agenda_operacional_fresca": bool(ready and preserved_count == 0),
+        "snapshots_preservados": preserved_count,
         "mudanca_esportiva": before_hash != after_hash,
         "hash_estado_antes": before_hash,
         "hash_estado_depois": after_hash,
@@ -2180,6 +2229,8 @@ def run_update(
             "janela_de_jogo_horas_apos_inicio": live_window_hours,
             "janela_incremental_dias_passado": past_days,
             "janela_incremental_dias_futuro": future_days,
+            "janela_scoreboard_dias": SCOREBOARD_WINDOW_DAYS,
+            "fallback_janela_scoreboard": "subdivisão progressiva até 1 dia em erro HTTP/transporte",
             "reconstrucao_completa_horas": full_refresh_hours,
             "falha_de_rede": "preserva o último snapshot íntegro; --strict transforma a falha em erro",
             "nenhum_json_vazio": True,
@@ -2724,6 +2775,25 @@ def self_test() -> None:
     assert pen_final and pen_final["vencedor"] == "Liga de Quito"
     assert pen_final["vencedor_penaltis"] == "Palmeiras"
     assert pen_final["penaltis"] == {"mandante": 3, "visitante": 4}
+
+    # HOTFIX 8: uma faixa rejeitada precisa cair para subfaixas sem perder jogos.
+    fake_spec = COMPETITIONS[1]
+    calls: list[str] = []
+    def fake_scoreboard(url: str) -> dict[str, Any]:
+        calls.append(url)
+        m = re.search(r"dates=(\d{8})-(\d{8})", url)
+        assert m
+        if m.group(1) != m.group(2):
+            raise RuntimeError("HTTP 400 simulado para faixa ampla")
+        return {"events": [{"id": m.group(1), "date": m.group(1)}]}
+    rows, used = fetch_events_between(
+        fake_spec,
+        datetime(2026, 10, 13, tzinfo=BRT),
+        datetime(2026, 10, 14, 23, 59, tzinfo=BRT),
+        fetcher=fake_scoreboard,
+    )
+    assert {row["id"] for row in rows} == {"20261013", "20261014"}
+    assert used == 3 and len(calls) == 3, (used, calls)
 
     print("Self-test coleta AF-Previsão Continental incremental: OK")
 

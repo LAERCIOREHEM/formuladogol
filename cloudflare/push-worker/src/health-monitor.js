@@ -244,15 +244,32 @@ export function dailyDigestDecision(br,lastDate,{lastAttemptAt='',now=Date.now()
   return {state:lastAttemptAt?'retrying':'pending',due:true};
 }
 
+export function continentalAgendaHealth(agenda = {}, now = Date.now()) {
+  const integrity = agenda?.integridade_continental || {};
+  const missing = Array.isArray(integrity?.faltantes) ? integrity.faltantes : [];
+  const games = Array.isArray(agenda?.jogos) ? agenda.jogos : [];
+  const continental = games.filter((g) => ['libertadores','sul_americana'].includes(String(g?.competicao_chave || '')));
+  const next = continental
+    .map((g) => ({...g, when: Date.parse(String(g?.data_iso || ''))}))
+    .filter((g) => Number.isFinite(g.when) && g.when >= now - 6 * 3600000)
+    .sort((a,b) => a.when - b.when)[0];
+  if (missing.length) return { severity:'red', detail:`${missing.length} jogo(s) oficial(is) ausente(s) da agenda continental` };
+  if (String(integrity?.status || '') !== 'ok') return { severity:'yellow', detail:'integridade continental ainda não confirmada pela agenda publicada' };
+  const fallback = Number(integrity?.fallbacks_documentais_ativos || 0);
+  const nextText = next ? `${text((next.mandante||{}).nome)} x ${text((next.visitante||{}).nome)} · ${fmtDate(next.data_iso)}` : 'nenhum jogo continental próximo no recorte';
+  return { severity: fallback > 0 ? 'yellow' : 'green', detail:`${nextText}${fallback>0?` · ${fallback} fallback(s) CONMEBOL ativo(s)`:''}` };
+}
+
 export async function collectHealthSnapshot(env, monitor = null, now = Date.now(), force = false) {
   const previous = safeJson(await metaGet(env,'snapshot'),null);
   if (!force && previous && Number(previous.policyVersion) === HEALTH_POLICY_VERSION && now-(Date.parse(previous.at)||0)<SNAPSHOT_TTL_MS) return previous;
-  const [site, publicAudit, factualAuditResponse, ragManifestResponse, reliabilitySnapshotResponse, orchHealth, orchStatus, ai, providers, post, postRowsRaw, postCost, cfBilling, opsIntelligence] = await Promise.all([
+  const [site, publicAudit, factualAuditResponse, ragManifestResponse, reliabilitySnapshotResponse, continentalAgendaResponse, orchHealth, orchStatus, ai, providers, post, postRowsRaw, postCost, cfBilling, opsIntelligence] = await Promise.all([
     fetchJson(`${text(env.SITE_BASE)||SITE}/`),
     fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/auditoria-publicos.json`),
     fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/auditoria-publicos-identidade.json`),
     fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/rag-manifest.json`),
     fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/estado-confiabilidade.json`),
+    fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/agenda-clubes-br.json`),
     fetchJson(`${ORCH}/health`), fetchJson(`${ORCH}/status`), aiUsageSummary(env,24), providerUsageSummary(env,24),
     env.DB.prepare(`SELECT COUNT(*) total,
       COALESCE(SUM(CASE WHEN public_status='resolved' THEN 1 ELSE 0 END),0) public_resolved,
@@ -314,6 +331,8 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   const factualAudit=factualAuditResponse?.ok&&factualAuditResponse?.body&&typeof factualAuditResponse.body==='object'?factualAuditResponse.body:{};
   const ragManifest=ragManifestResponse?.ok&&ragManifestResponse?.body&&typeof ragManifestResponse.body==='object'?ragManifestResponse.body:{};
   const reliabilitySnapshot=reliabilitySnapshotResponse?.ok&&reliabilitySnapshotResponse?.body&&typeof reliabilitySnapshotResponse.body==='object'?reliabilitySnapshotResponse.body:{};
+  const continentalAgenda=continentalAgendaResponse?.ok&&continentalAgendaResponse?.body&&typeof continentalAgendaResponse.body==='object'?continentalAgendaResponse.body:{};
+  const continentalAgendaIndicator=continentalAgendaHealth(continentalAgenda,now);
   const reliabilityIndicators=reliabilityIntelligenceIndicators({orchestratorHealth:orchHealth?.body||{},orchestratorStatus:os,reliabilitySnapshot,factualAudit,ragManifest,opsIntelligence});
   const seasonCoverage={
     finalizados:n(auditBody.total_jogos_finalizados),
@@ -337,6 +356,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     indicator('orchestrator','Orchestrator',orchHealth.ok&&orchStatus.ok?'green':'red',orchHealth.ok?`${text(os.workloadMode)||'modo desconhecido'} · próximo: ${fmtDate(os.nextRelevantMatchAt)}`:'health/status indisponível'),
     indicator('github','GitHub Actions',githubSeverity.severity,githubSeverity.detail),
     indicator('brasileirao','Brasileirão / ESPN',m.ok===false?'red':'green',m.ok===false?'Sports Monitor reportou falha':'monitor esportivo operacional'),
+    indicator('continentais','Agenda continental',continentalAgendaIndicator.severity,continentalAgendaIndicator.detail),
     // R10.1: readiness possui alerta dedicado por partida. O Health Monitor não
     // abre um segundo incidente CRÍTICO para a mesma causa. Só monitor ao vivo
     // realmente stale continua vermelho; readiness pendente aparece amarelo.

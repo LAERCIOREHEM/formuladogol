@@ -178,6 +178,63 @@ export function normalizeAgenda(payload) {
   return games;
 }
 
+export function continentalPhaseTransitionGuard(games, officialSchedule, continentalAudit, now = new Date()) {
+  const current = parseDate(now) || new Date();
+  const expected = (officialSchedule?.jogos || []).filter((row) => {
+    const kickoff = parseDate(row?.data_iso);
+    if (!kickoff) return false;
+    const home = row?.mandante || {};
+    const away = row?.visitante || {};
+    if (!(home?.serie_a_2026 === true || away?.serie_a_2026 === true)) return false;
+    return kickoff.getTime() >= current.getTime() - 6 * 3600000
+      && kickoff.getTime() <= current.getTime() + 45 * 86400000;
+  });
+  // O guard compara contra as linhas BRUTAS da agenda, não contra normalizeAgenda().
+  // Isso é deliberado: fallbacks oficiais podem ainda não ter event_id ESPN e,
+  // portanto, não devem entrar no polling ao vivo do orquestrador, mas contam
+  // como cobertura válida da agenda pública até a ESPN reconciliar o ID.
+  const agendaRows = Array.isArray(games) ? games : [];
+  const normalized = (value) => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const agendaLeague = (game) => String(game?.league || game?.espn_league || '');
+  const agendaHome = (game) => teamName(game?.home ?? game?.mandante);
+  const agendaAway = (game) => teamName(game?.away ?? game?.visitante);
+  const agendaKickoff = (game) => parseDate(game?.kickoff ?? game?.data_iso);
+  const missing = expected.filter((row) => {
+    const kickoff = parseDate(row?.data_iso);
+    const home = normalized(teamName(row?.mandante));
+    const away = normalized(teamName(row?.visitante));
+    const league = String(row?.espn_league || '');
+    return !agendaRows.some((game) => {
+      if (league && agendaLeague(game) !== league) return false;
+      if (normalized(agendaHome(game)) !== home || normalized(agendaAway(game)) !== away) return false;
+      const when = agendaKickoff(game);
+      return Boolean(when && Math.abs(when.getTime() - kickoff.getTime()) <= 12 * 3600000);
+    });
+  });
+  const staleRows = (continentalAudit?.competicoes || []).filter((row) =>
+    String(row?.status || '').startsWith('preservado_apos_falha')
+  );
+  const nextMissingMs = missing.map((row) => parseDate(row?.data_iso)?.getTime()).filter(Number.isFinite).sort((a,b)=>a-b)[0];
+  const hoursToMissing = Number.isFinite(nextMissingMs) ? (nextMissingMs - current.getTime()) / 3600000 : Infinity;
+  const urgent = missing.length > 0 && hoursToMissing <= 24;
+  const refreshNeeded = missing.length > 0 || staleRows.length > 0;
+  const fingerprint = [
+    ...missing.map((row) => `${row?.competicao_chave || ''}:${row?.data_iso || ''}:${teamName(row?.mandante)}>${teamName(row?.visitante)}`),
+    ...staleRows.map((row) => `stale:${row?.competicao || ''}:${row?.gerado_em || ''}`),
+  ].sort().join('|');
+  return {
+    state: missing.length ? (urgent ? 'critical' : 'degraded') : (staleRows.length ? 'stale_snapshot' : 'green'),
+    refreshNeeded, urgent, fingerprint,
+    retryMinutes: urgent ? 30 : 360,
+    missingOfficial: missing.map((row) => ({
+      competition: String(row?.competicao_chave || ''),
+      kickoff: String(row?.data_iso || ''),
+      home: teamName(row?.mandante), away: teamName(row?.visitante),
+    })),
+    staleCompetitions: staleRows.map((row) => String(row?.competicao || '')).filter(Boolean),
+  };
+}
+
 export function relevantSportsGames(games, now, beforeMinutes = POLICY.sports.beforeMinutes, afterMinutes = POLICY.sports.afterMinutes) {
   const t = parseDate(now)?.getTime() ?? Date.now();
   return games.filter((g) => {

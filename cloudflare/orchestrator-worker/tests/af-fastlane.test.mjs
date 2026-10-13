@@ -40,11 +40,11 @@ test('contract.js é a fonte canônica de versão e Wrangler é renderizado por 
   const wrangler = await read('cloudflare/orchestrator-worker/wrangler.template.jsonc');
   const pkg = JSON.parse(await read('cloudflare/orchestrator-worker/package.json'));
 
-  assert.match(contract, /version:\s*'2\.4\.0'/);
+  assert.match(contract, /version:\s*'2\.5\.0'/);
   assert.match(contract, /afPostFinalFastlane:\s*true/);
   assert.match(wrangler, /\"ORCHESTRATOR_VERSION\":\s*\"__ORCHESTRATOR_VERSION__\"/);
   assert.match(render, /ORCHESTRATOR_CONTRACT\.version/);
-  assert.equal(pkg.version, '2.4.0');
+  assert.equal(pkg.version, '2.5.0');
   assert.match(deploy, /EXPECTED_ORCHESTRATOR_VERSION/);
   assert.match(deploy, /ORCHESTRATOR_CONTRACT\.health/);
 });

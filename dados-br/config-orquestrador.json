@@ -151,22 +151,19 @@
     "knowledge_base": {
       "ativo": true,
       "diretorio": "docs/operations",
-      "rag_em_producao": true,
-      "runtime": "fdg-ops-rag",
-      "runtime_version": 1,
-      "retrieval": "deterministic_bm25_lexical",
-      "critical_path": false
-    },
-    "ops_intelligence": {
-      "ativo": true,
-      "versao": 1,
-      "rag_runtime": true,
-      "mcp_ops": true,
-      "mcp_endpoint": "https://push.formuladogol.com.br/mcp",
-      "mcp_protocol_version": "2026-07-28",
-      "mcp_read_only": true,
-      "external_ai_per_retrieval": false,
-      "fine_tuning": "not_used_by_design"
+      "rag_em_producao": false
     }
+  },
+  "continental_phase_transition_guard": {
+    "ativo": true,
+    "versao": 1,
+    "agenda_oficial": "dados-br/correcoes/agenda-continentais-oficial.json",
+    "auditoria_coleta": "dados-br/auditoria-competicoes-af-previsao.json",
+    "janela_scoreboard_dias": 7,
+    "subdivisao_scoreboard_ate_dias": 1,
+    "janela_urgente_horas": 24,
+    "retentativa_urgente_minutos": 30,
+    "retentativa_snapshot_preservado_minutos": 360,
+    "politica": "Fase continental encerrada nao pode desaparecer da agenda. CONMEBOL oficial cobre agenda futura quando a ESPN ainda nao materializou a fase; placar e FINAL continuam exigindo fonte esportiva estruturada. Snapshot seguro para AF nao equivale a agenda operacional fresca."
   }
 }

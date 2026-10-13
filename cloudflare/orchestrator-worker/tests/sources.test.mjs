@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { fetchRepositoryJson, fetchSiteBundle, probeEspn, probeEspnAvailability, repositoryFallbacks } from '../src/sources.js';
 
 function env() {
@@ -194,4 +195,11 @@ test('cheap ESPN availability probe accepts an empty healthy scoreboard', async 
   const probe = await probeEspnAvailability({ league: 'bra.1', day: '20260916' });
   assert.equal(probe.ok, true);
   assert.equal(probe.source, 'espn_cdn_league');
+});
+
+
+test('phase-transition inputs are repository-authoritative', async () => {
+  const src = await readFile(new URL('../src/sources.js', import.meta.url), 'utf8');
+  assert.match(src, /auditoria-competicoes-af-previsao\.json/);
+  assert.match(src, /agenda-continentais-oficial\.json/);
 });

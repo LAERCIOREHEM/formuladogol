@@ -4,6 +4,7 @@ import {
   brasileiraoSourceGate,
   continentalAgendaSignature,
   continentalDecision,
+  continentalPhaseTransitionGuard,
   continentalEligibility,
   continentalNextCheck,
   cupEditorialDecision,
@@ -39,6 +40,10 @@ import { fetchPostgameFastlane, fetchSiteBundle, probeEspn, probeEspnAvailabilit
 const FAST_PATHS = [
   'dados-br/agenda-clubes-br.json',
   'dados-br/status-atualizacao.json',
+  // Pequenos artefatos autoritativos: permitem detectar uma transição de fase
+  // perdida sem baixar snapshots continentais de ~150 KB a cada cinco minutos.
+  'dados-br/auditoria-competicoes-af-previsao.json',
+  'dados-br/correcoes/agenda-continentais-oficial.json',
 ];
 
 const EDITORIAL_CLOSURE_PATHS = [
@@ -550,6 +555,28 @@ export class OrchestratorState {
             stateUpdates: { 'reliability:lastTrace': { traceId, eventId: game.eventId, detectedAt: now.toISOString(), stage: 'fallback_final_detected' } },
           };
           break;
+        }
+      }
+
+      // HOTFIX 8 — PHASE TRANSITION GUARD. A agenda oficial publicada pela
+      // CONMEBOL e a auditoria da coleta são pequenas e rodam no fast path.
+      // Se uma semifinal oficial sumiu da agenda (ou os snapshots seguem
+      // preservados após falha), força uma reconstrução continental sem IA.
+      if (!candidate) {
+        const officialSchedule = data(fastBundle, 'dados-br/correcoes/agenda-continentais-oficial.json', { jogos: [] });
+        const continentalAudit = data(fastBundle, 'dados-br/auditoria-competicoes-af-previsao.json', { competicoes: [] });
+        const transition = continentalPhaseTransitionGuard(agendaPayload?.jogos || [], officialSchedule, continentalAudit, now);
+        hints.continentalPhaseTransition = transition;
+        if (transition.refreshNeeded) {
+          candidate = {
+            action: 'refresh_continentais',
+            traceId: 'continental-phase-transition',
+            fingerprint: transition.fingerprint || 'continental-stale',
+            retryMinutes: transition.retryMinutes,
+            reason: transition.missingOfficial.length
+              ? `PHASE TRANSITION GUARD: ${transition.missingOfficial.length} jogo(s) continental(is) oficial(is) ausente(s) da agenda; reconstruir fontes.`
+              : `PHASE TRANSITION GUARD: snapshot continental preservado após falha (${transition.staleCompetitions.join(', ') || 'fonte desconhecida'}); retentar coleta adaptativa.`,
+          };
         }
       }
 

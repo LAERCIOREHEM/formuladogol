@@ -4,6 +4,8 @@ const DEFAULT_TIMEOUT_MS = 8000;
 const REPOSITORY_AUTHORITATIVE_PATHS = new Set([
   'dados-br/estado-editorial-continentais.json',
   'dados-br/status-atualizacao.json',
+  'dados-br/auditoria-competicoes-af-previsao.json',
+  'dados-br/correcoes/agenda-continentais-oficial.json',
   // O fechamento continental acontece logo após writers esportivos atualizarem
   // a main. Para não esperar o Pages propagar um snapshot antigo, a decisão
   // editorial lê o conjunto continental diretamente do repositório.

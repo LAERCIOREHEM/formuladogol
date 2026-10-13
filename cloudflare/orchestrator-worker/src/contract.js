@@ -4,7 +4,7 @@
 // metadados e são bloqueadas por testes de drift.
 export const ORCHESTRATOR_CONTRACT = Object.freeze({
   service: 'formula-do-gol-orchestrator',
-  version: '2.4.0',
+  version: '2.5.0',
   configSchemaVersion: 8,
   cron: '*/5 * * * *',
   reliability: Object.freeze({
@@ -57,6 +57,10 @@ export const ORCHESTRATOR_CONTRACT = Object.freeze({
     targetedPublicResearch: true,
     continentalPhaseFingerprints: true,
     continentalAgendaAware: true,
+    continentalPhaseTransitionGuardian: true,
+    continentalPhaseTransitionGuardianVersion: 1,
+    continentalAdaptiveScoreboardWindows: true,
+    continentalOfficialScheduleFallback: true,
     continentalStateIdempotency: true,
     continentalEditorialSingleAuthority: true,
     continentalHighlightsIndependent: true,

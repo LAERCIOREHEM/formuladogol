@@ -10,6 +10,7 @@ import {
   continentalDecision,
   continentalEligibility,
   continentalNextCheck,
+  continentalPhaseTransitionGuard,
   cupEditorialDecision,
   latestEligibleRound,
   liveCheckpointDue,
@@ -352,6 +353,10 @@ test('public pending fingerprint tracks only the fields that are still missing',
   assert.equal(publicPendingFingerprint({ missingFields: [] }), 'reconciliar');
 });
 test('dispatch mapping is targeted and deterministic', () => {
+  assert.deepEqual(dispatchSpec({ action: 'refresh_continentais', traceId: 'continental-phase-transition' }), {
+    workflow: 'atualizar-brasileirao.yml',
+    inputs: { forcar_fontes_continentais: 'true', reconstruir_fontes: 'false', forcar_af: 'false', trace_id: 'continental-phase-transition' },
+  });
   assert.deepEqual(dispatchSpec({ action: 'melhores_momentos', eventId: '401' }), {
     workflow: 'buscar-melhores-momentos-getv.yml', inputs: { modo: 'incremental', event_id: '401', origem_fastlane: 'false' },
   });
@@ -453,4 +458,33 @@ test('continental highlights dispatch is targeted and independent from editorial
     workflow: 'atualizar-melhores-momentos-continentais.yml',
     inputs: { event_id: 'cont-1', fase_ordem: '800' },
   });
+});
+
+
+test('phase transition guard detects official semi-final missing from local agenda', () => {
+  const official = { jogos: [{
+    competicao_chave:'sul_americana', espn_league:'conmebol.sudamericana', data_iso:'2026-10-13T21:30:00-03:00',
+    mandante:{nome:'Boca Juniors',serie_a_2026:false}, visitante:{nome:'Vasco da Gama',serie_a_2026:true},
+  }]};
+  const audit = { competicoes: [{competicao:'sul_americana',status:'preservado_apos_falha_seguro',gerado_em:'2026-09-18T11:40:56-03:00'}]};
+  const out = continentalPhaseTransitionGuard([], official, audit, new Date('2026-10-13T18:40:00-03:00'));
+  assert.equal(out.refreshNeeded, true);
+  assert.equal(out.urgent, true);
+  assert.equal(out.retryMinutes, 30);
+  assert.equal(out.missingOfficial.length, 1);
+});
+
+test('phase transition guard clears official gap once fixture is in raw agenda, mesmo sem event_id ESPN', () => {
+  const official = { jogos: [{
+    competicao_chave:'libertadores', espn_league:'conmebol.libertadores', data_iso:'2026-10-14T21:30:00-03:00',
+    mandante:{nome:'Fluminense',serie_a_2026:true}, visitante:{nome:'Palmeiras',serie_a_2026:true},
+  }]};
+  const games = [{
+    event_id:'', competicao_chave:'libertadores', espn_league:'conmebol.libertadores', data_iso:'2026-10-14T21:30:00-03:00',
+    fallback_agenda_oficial:true, mandante:{nome:'Fluminense'}, visitante:{nome:'Palmeiras'},
+  }];
+  const out = continentalPhaseTransitionGuard(games, official, {competicoes:[]}, new Date('2026-10-13T18:40:00-03:00'));
+  assert.equal(out.state, 'green');
+  assert.equal(out.refreshNeeded, false);
+  assert.equal(out.missingOfficial.length, 0);
 });

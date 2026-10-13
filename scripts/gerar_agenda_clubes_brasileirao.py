@@ -34,6 +34,7 @@ from fontes_brasileirao import CBFAgendaPartida, buscar_agenda_cbf  # noqa: E402
 
 TZ = ZoneInfo("America/Sao_Paulo")
 OUTPUT = ROOT / "dados-br" / "agenda-clubes-br.json"
+OFFICIAL_CONTINENTAL_SCHEDULE = ROOT / "dados-br" / "correcoes" / "agenda-continentais-oficial.json"
 
 COMPETICOES = (
     {
@@ -377,6 +378,91 @@ def _continental_aggregate(data: Mapping[str, Any], raw: Mapping[str, Any]) -> d
     }
 
 
+def official_continental_games(root: Path) -> Iterable[dict[str, Any]]:
+    """Agenda oficial documental usada apenas quando o snapshot estruturado atrasar.
+
+    Não inventa event_id ESPN nem placar. O browser pode reconciliar o confronto
+    por times/data com o scoreboard direto e, quando o coletor voltar, o evento
+    estruturado assume naturalmente a mesma partida.
+    """
+    path = root / "dados-br" / "correcoes" / "agenda-continentais-oficial.json"
+    data = load_json(path, {"jogos": []})
+    for raw in data.get("jogos") or []:
+        if not isinstance(raw, Mapping):
+            continue
+        home = team_from_cup(raw.get("mandante"))
+        away = team_from_cup(raw.get("visitante"))
+        if not (home["serie_a_2026"] or away["serie_a_2026"]):
+            continue
+        yield {
+            "event_id": "",
+            "competicao_chave": str(raw.get("competicao_chave") or ""),
+            "competicao_nome": "CONMEBOL Libertadores" if raw.get("competicao_chave") == "libertadores" else "CONMEBOL Sudamericana",
+            "competicao_nome_curto": "Libertadores" if raw.get("competicao_chave") == "libertadores" else "Sul-Americana",
+            "espn_league": str(raw.get("espn_league") or ""),
+            "data_iso": str(raw.get("data_iso") or ""),
+            "estado": "pre",
+            "concluido": False,
+            "status": str(raw.get("status") or "Agendado"),
+            "rodada": 0,
+            "fase": str(raw.get("fase") or ""),
+            "perna": raw.get("perna"),
+            "estadio": str(raw.get("estadio") or ""),
+            "mandante": home,
+            "visitante": away,
+            "placar_mandante": None,
+            "placar_visitante": None,
+            "adiado": False,
+            "data_definir": not bool(raw.get("data_iso")),
+            "possui_clube_serie_a_2026": True,
+            "probabilidades_disponiveis": False,
+            "fonte": str(path.relative_to(root)),
+            "fonte_calendario": str(raw.get("fonte") or "CONMEBOL oficial"),
+            "fonte_url": str(raw.get("fonte_url") or ""),
+            "fallback_agenda_oficial": True,
+        }
+
+
+def fixture_signature(item: Mapping[str, Any]) -> tuple[str, str, str, str]:
+    date = parse_dt(item.get("data_iso"))
+    return (
+        str(item.get("competicao_chave") or ""),
+        norm((item.get("mandante") or {}).get("nome") if isinstance(item.get("mandante"), Mapping) else item.get("mandante")),
+        norm((item.get("visitante") or {}).get("nome") if isinstance(item.get("visitante"), Mapping) else item.get("visitante")),
+        date.strftime("%Y-%m-%dT%H:%M") if date else "",
+    )
+
+
+def merge_schedule_candidates(candidates: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Deduplica snapshot ESPN x fallback oficial, preferindo event_id estruturado."""
+    merged: dict[tuple[str, str, str, str], dict[str, Any]] = {}
+    passthrough: list[dict[str, Any]] = []
+    for item in candidates:
+        sig = fixture_signature(item)
+        if not all(sig):
+            passthrough.append(item)
+            continue
+        previous = merged.get(sig)
+        if previous is None:
+            merged[sig] = dict(item)
+            continue
+        prev_id = str(previous.get("event_id") or "")
+        new_id = str(item.get("event_id") or "")
+        if new_id and not prev_id:
+            preferred, secondary = dict(item), previous
+        else:
+            preferred, secondary = previous, item
+        # Conserva a evidência oficial de calendário mesmo quando o snapshot ESPN
+        # é a linha principal do jogo.
+        if secondary.get("fonte_calendario") and not preferred.get("fonte_calendario"):
+            preferred["fonte_calendario"] = secondary.get("fonte_calendario")
+        if secondary.get("fonte_url") and not preferred.get("fonte_url"):
+            preferred["fonte_url"] = secondary.get("fonte_url")
+        preferred["fallback_agenda_oficial"] = bool(preferred.get("fallback_agenda_oficial") and not new_id and not prev_id)
+        merged[sig] = preferred
+    return list(merged.values()) + passthrough
+
+
 def cup_games(spec: Mapping[str, Any]) -> Iterable[dict[str, Any]]:
     data = load_json(Path(spec["arquivo"]), {"eventos": []})
     competition = data.get("competicao") if isinstance(data.get("competicao"), Mapping) else {}
@@ -427,6 +513,10 @@ def build(
     candidates = list(brasileirao_games(root, probs, official_schedule))
     for spec in COMPETICOES:
         candidates.extend(cup_games(spec))
+    # A fonte documental CONMEBOL cobre transições de fase quando o snapshot
+    # ESPN está preservado por falha de coleta. Ela não substitui placar/FINAL.
+    candidates.extend(official_continental_games(root))
+    candidates = merge_schedule_candidates(candidates)
 
     games: list[dict[str, Any]] = []
     seen: set[tuple[str, str]] = set()
@@ -462,6 +552,30 @@ def build(
         key = str(game.get("competicao_chave") or "")
         counts[key] = counts.get(key, 0) + 1
 
+    official_expected = [
+        item for item in official_continental_games(root)
+        if (dt := parse_dt(item.get("data_iso"))) is not None and start <= dt <= end
+    ]
+    present_signatures = {fixture_signature(item) for item in games}
+    missing_official = [
+        {
+            "competicao": str(item.get("competicao_chave") or ""),
+            "data_iso": str(item.get("data_iso") or ""),
+            "mandante": str((item.get("mandante") or {}).get("nome") or ""),
+            "visitante": str((item.get("visitante") or {}).get("nome") or ""),
+        }
+        for item in official_expected if fixture_signature(item) not in present_signatures
+    ]
+    fallback_count = sum(1 for item in games if item.get("fallback_agenda_oficial") is True)
+    continental_integrity = {
+        "status": "ok" if not missing_official else "degraded",
+        "fonte_documental": str(OFFICIAL_CONTINENTAL_SCHEDULE.relative_to(root)),
+        "esperados_no_periodo": len(official_expected),
+        "faltantes": missing_official,
+        "fallbacks_documentais_ativos": fallback_count,
+        "regra": "fase seguinte oficial não pode desaparecer da agenda por falha do scoreboard amplo",
+    }
+
     return {
         "schema_version": 1,
         "projeto": "Fórmula do Gol",
@@ -482,6 +596,7 @@ def build(
             "total_jogos": len(games),
             "por_competicao": counts,
         },
+        "integridade_continental": continental_integrity,
         "jogos": games,
     }
 
@@ -534,6 +649,15 @@ def selftest() -> None:
         {"rodada": 26, "data_iso": "2026-09-05T15:00", "estado": "pre"}
         for _ in range(3)
     ]) == set()
+    official_row = {
+        "event_id": "", "competicao_chave": "sul_americana", "data_iso": "2026-10-13T21:30:00-03:00",
+        "mandante": {"nome": "Boca Juniors"}, "visitante": {"nome": "Vasco da Gama"},
+        "fonte_calendario": "CONMEBOL oficial", "fallback_agenda_oficial": True,
+    }
+    espn_row = {**official_row, "event_id": "401999999", "fonte": "snapshot", "fallback_agenda_oficial": False}
+    merged = merge_schedule_candidates([official_row, espn_row])
+    assert len(merged) == 1 and merged[0]["event_id"] == "401999999"
+    assert merged[0]["fonte_calendario"] == "CONMEBOL oficial"
     print("self-test OK")
 
 
