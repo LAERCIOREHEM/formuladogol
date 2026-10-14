@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+const context={window:{}};
+vm.runInNewContext(fs.readFileSync('js/br-live-goal-sync.js','utf8'),context);
+const guard=context.window.FDGLiveGoalSync;
+assert.equal(guard.version,1);
+function facts(home,away,goals){return {integrity:{expectedHome:home,expectedAway:away,expectedGoals:home+away,mathematicallyValid:true,scoreComplete:goals.length===home+away,missingScorers:goals.filter(g=>!g.scorer).length},goals};}
+const goal={scorer:'Jogador validado',scorerId:'11',minute:"54'",teamId:'vas',side:'away',scoreAfter:{home:0,away:1}};
+const saved=facts(0,1,[goal]);
+const empty=facts(0,1,[{...goal,scorer:'',scorerId:'',minute:''}]);
+const recovered=guard.reconcile(saved,empty);
+assert.equal(recovered.goals[0].scorer,'Jogador validado');
+assert.equal(recovered.integrity.missingScorers,0);
+assert.equal(recovered.goals[0].minute,"54'");
+assert.equal(guard.reconcile(saved,null).goals[0].scorer,'Jogador validado');
+assert.equal(guard.reconcile(saved,facts(0,2,[{...goal,scorer:'',scoreAfter:{home:0,away:2}}])).goals[0].scorer,'','mudança de placar não reaproveita autor');
+assert.equal(guard.reconcile(saved,facts(0,1,[{...goal,scorer:'',teamId:'other'}])).goals[0].scorer,'','outro clube nunca herda autor');
+assert.equal(guard.reconcile(saved,facts(0,1,[{...goal,scorer:'',side:'home'}])).goals[0].scorer,'','outro lado nunca herda autor');
+assert.equal(guard.reconcile(saved,facts(0,1,[{...goal,scorer:'',scorerConflict:true}])).goals[0].scorer,'','conflito explícito não herda');
+assert.equal(guard.reconcile(saved,facts(0,1,[{...goal,scorer:'Novo autor confirmado'}])).goals[0].scorer,'Novo autor confirmado','correção de autoria oficial deve vencer cache');
+assert.equal(guard.reconcile(saved,facts(0,1,[{...goal,scorer:'',scoreAfter:{home:1,away:0},side:'home',teamId:'boca'}])).goals[0].scorer,'Jogador validado','resposta matematicamente inválida não deve apagar dado validado');
+assert.equal(guard.reconcile(null,saved),saved);
+// Integração real de arquivos: página não pode continuar bloqueando id documental.
+const page=fs.readFileSync('js/br-aovivo.js','utf8');
+assert.match(page,/FDGLiveGoalSync\?\.reconcile/);
+assert.doesNotMatch(page,/if\(!selected\|\|!\/\^\\d\{5,15\}/);
+assert.match(page,/Evento documental sem dados do monitor/);
+assert.match(fs.readFileSync('aovivo.html','utf8'),/br-live-goal-sync\.js\?v=20261014-r10r17-2/);
+console.log('br-live-goal-sync R10R17.2: PASS');

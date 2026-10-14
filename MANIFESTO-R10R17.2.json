@@ -1,0 +1,85 @@
+{
+  "execution": "R10R17.2",
+  "description": "LIVE GOAL SCORER SYNCHRONIZATION & PERSISTENCE GUARD",
+  "baseline": "formuladogol-main(6).zip plus R10R17.1 ZIP overlay",
+  "workflow_cloudflare": "Deploy Push Worker",
+  "workflow_pages": "Deploy site (GitHub Pages)",
+  "files": [
+    {
+      "path": ".github/workflows/deploy.yml",
+      "bytes": 94397,
+      "sha256": "2a67b36dec0504504f1e7a721bb9699761375cece61762fcf73cba173f32d0b5"
+    },
+    {
+      "path": ".github/workflows/deploy-push-worker.yml",
+      "bytes": 56044,
+      "sha256": "37b0c16b9a1a7c00f07f984441471c31c45a762676a7dbd077bdf341ba66f916"
+    },
+    {
+      "path": "aovivo.html",
+      "bytes": 10830,
+      "sha256": "7787c10b91c09ae7befd2e770cb992af93fe6670e73f3eac585956776ae37199"
+    },
+    {
+      "path": "js/br-aovivo.js",
+      "bytes": 147627,
+      "sha256": "bf56dfebdd9779daae68af778a31b9b840d56c464c9373e4fe7a092ecfc279fb"
+    },
+    {
+      "path": "js/br-live-goal-sync.js",
+      "bytes": 2916,
+      "sha256": "98ba4906dec755749eeb55d19aed9a676e359a7863106b23b88e8c9deb68f7af"
+    },
+    {
+      "path": "cloudflare/push-worker/src/index.js",
+      "bytes": 44803,
+      "sha256": "4dc86bcc347227c2fda5c291d72584a72e610756b565c6775d53f1dd37b0a15e"
+    },
+    {
+      "path": "cloudflare/push-worker/src/sports-monitor.js",
+      "bytes": 72908,
+      "sha256": "d650d3f6a72102b75e0854861783fe9449ad246ec909d48714fa1bc9045346ff"
+    },
+    {
+      "path": "cloudflare/push-worker/src/live-goal-identity.js",
+      "bytes": 1382,
+      "sha256": "a66b221a23c8b72669c13b711ace0e91fc60bb0749d5a7adc83649a6954e5bdc"
+    },
+    {
+      "path": "cloudflare/push-worker/package.json",
+      "bytes": 3538,
+      "sha256": "53f88a4905fba53e92702328a8624d26013b6e7f5a1eefae0a118bc6da297aab"
+    },
+    {
+      "path": "cloudflare/push-worker/tests/test-live-goal-identity.mjs",
+      "bytes": 2358,
+      "sha256": "ee820dad05e90f48fa23eacdd904adec24b5e22e7ac9db56b24649e6c3931e8d"
+    },
+    {
+      "path": "cloudflare/push-worker/tests/test-sports-monitor.mjs",
+      "bytes": 17195,
+      "sha256": "c5c035ca729405c4d4c23cfec2ea077d13efca99abe12412143aff9163feead5"
+    },
+    {
+      "path": "tests/test-br-live-goal-sync.mjs",
+      "bytes": 2505,
+      "sha256": "f46d1b4a1dc6bcfe3b3c62e0a865fd41b9a6dfdc29bc2e16758c12d099bb5701"
+    },
+    {
+      "path": "docs/operations/runbooks/LIVE-GOAL-SCORER-SYNC.md",
+      "bytes": 3274,
+      "sha256": "589e5ae0a0210eba16e25d991c0132c70166db818c83a02f042eca1163d10796"
+    },
+    {
+      "path": "docs/operations/RAG-MANIFEST.json",
+      "bytes": 1574,
+      "sha256": "e70b855e9f08a142f7793c88b84d317a1de1ae58fe6a643abf147ee525ff8c3f"
+    },
+    {
+      "path": "dados-br/ops-rag-index.json",
+      "bytes": 32948,
+      "sha256": "7fe3bc2453d942666eda943355d556a6544789f65104a46bf2314adbb72270cb"
+    }
+  ],
+  "limitations": "npm run test:sports not run in local environment: npm install unavailable; must run in GitHub Actions before deploy"
+}

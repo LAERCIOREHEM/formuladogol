@@ -24,6 +24,7 @@ import { buildHotEspnTestEvent, detectHotEspnMutation, HOT_ESPN_TEST_CONSTANTS, 
 import { buildHotMatchPrematchEvent, hotMatchNextPollDelay, hotMatchPrematchDue, hotMatchTargetEvent, HOT_MATCH_TEST_CONSTANTS, markHotMatchTechnicalEvent, publicHotMatchTest } from './hot-match-test.js';
 import { recordPostgameFinal } from './postgame-fastlane.js';
 import { buildSportsMonitorLiveFacts, SPORTS_MONITOR_FACTS_VERSION } from './monitor-live-facts.js';
+import { resolveTrackedLiveGoalMatch, LIVE_GOAL_IDENTITY_VERSION } from './live-goal-identity.js';
 import { sendMail, mailConfig } from './mailer.js';
 import { countWebSearchCalls, recordAiUsage, recordProviderUsage } from './ai-usage.js';
 import { fetchOpenAiResponses, openAiUsage } from './ai-router.js';
@@ -33,6 +34,8 @@ const ALLOWED_LEAGUES = new Set(['bra.1', 'bra.copa_do_brazil', 'conmebol.libert
 const PRE_WINDOW_MS = 6 * 60 * 60_000;
 const POST_WINDOW_MS = 5 * 60 * 60_000;
 const PRESERVE_WATCH_MS = 6 * 60 * 60_000;
+// R10R17.2: apenas retenção de facts após FINAL; NÃO estende polling ESPN.
+const FINAL_FACTS_RETENTION_MS = 24 * 60 * 60_000;
 const FINAL_RETENTION_MS = 10 * 60_000;
 const FAST_POLL_MS = 10_000;
 const FETCH_TIMEOUT_MS = 10_000;
@@ -1207,7 +1210,7 @@ export class SportsMonitor {
 
     let recentEvents = [...snapshot.recentEvents, ...newlyEmitted];
     if (recentEvents.length > MAX_RECENT_EVENTS) recentEvents = recentEvents.slice(-MAX_RECENT_EVENTS);
-    const finishedCutoff = startedAt - PRESERVE_WATCH_MS;
+    const finishedCutoff = startedAt - FINAL_FACTS_RETENTION_MS;
     for (const [eventId, match] of Object.entries(matches)) {
       const kickoff = Date.parse(match?.kickoff || '');
       if (match?.state === 'post' && Number.isFinite(kickoff) && kickoff < finishedCutoff) delete matches[eventId];
@@ -1330,13 +1333,18 @@ export class SportsMonitor {
       const eventId = text(url.searchParams.get('event'));
       if (!eventId) return Response.json({ ok: false, error: 'invalid_event' }, { status: 400 });
       const matches = await this.state.storage.get('matches') || {};
-      const match = matches && typeof matches === 'object' ? matches[eventId] : null;
-      if (!match) return Response.json({ ok: false, error: 'match_not_tracked', eventId }, { status: 404 });
+      const watchlist = await this.state.storage.get('watchlist') || {};
+      const matchResolved = resolveTrackedLiveGoalMatch(matches, watchlist, eventId, text(url.searchParams.get('league')));
+      if (!matchResolved) return Response.json({ ok: false, error: 'match_not_tracked', eventId }, { status: 404 });
+      const match = matchResolved.match;
       const facts = buildSportsMonitorLiveFacts(match);
       return Response.json({
         ok: Boolean(facts),
         monitorFactsVersion: SPORTS_MONITOR_FACTS_VERSION,
-        eventId,
+        identityVersion: LIVE_GOAL_IDENTITY_VERSION,
+        eventId: matchResolved.key,
+        requestedEventId: eventId,
+        identityStrategy: matchResolved.strategy,
         facts,
         lastObservedAt: num(match?.lastObservedAt, 0)
       });

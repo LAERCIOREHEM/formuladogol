@@ -774,19 +774,24 @@ export default {
       if (url.pathname === '/v1/live/summary' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'live-summary'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
         const eventId = cleanId(url.searchParams.get('event'));
+        const league = String(url.searchParams.get('league') || '');
+        const isEspnEvent = /^\d{5,15}$/.test(eventId);
+        // ID documental nunca é enviado para a ESPN como se fosse um eventId externo.
         const monitorPromise = eventId
-          ? singletonMonitor(env).fetch(`https://internal/live-facts?event=${encodeURIComponent(eventId)}`).catch(() => null)
+          ? singletonMonitor(env).fetch(`https://internal/live-facts?event=${encodeURIComponent(eventId)}&league=${encodeURIComponent(league)}`).catch(() => null)
           : Promise.resolve(null);
-        const resultPromise = resolveLiveSummary(url, {
+        const resultPromise = isEspnEvent ? resolveLiveSummary(url, {
           apiFootballKey: env.API_FOOTBALL_KEY,
           statsStore: createLiveStatsStore(env.DB)
-        });
+        }) : Promise.resolve({ status: 404, body: { ok: false, error: 'documentary_match_not_tracked' } });
         const [result, monitorResponse] = await Promise.all([resultPromise, monitorPromise]);
         let monitorFacts = null;
+        let monitorIdentity = null;
         if (monitorResponse && monitorResponse.ok) {
           try {
             const payload = await monitorResponse.json();
             monitorFacts = payload?.facts || null;
+            monitorIdentity = payload?.identityStrategy || null;
           } catch (_) { monitorFacts = null; }
         }
         const expectedHomeRaw = url.searchParams.get('expectedHome');
@@ -808,6 +813,7 @@ export default {
               facts: mergedFacts,
               factsIntegrity: mergedFacts?.integrity || null,
               factsAuthority,
+              factsIdentityStrategy: monitorIdentity,
               factsMonitorVersion: Number(mergedFacts?.monitorFactsVersion || SPORTS_MONITOR_FACTS_VERSION),
               factsBestKnownApplied: supplementalFactsApplied,
               goalCount: Number(mergedFacts?.integrity?.observedGoalCount || 0),
@@ -828,6 +834,7 @@ export default {
               facts: mergedFacts,
               factsIntegrity: mergedFacts?.integrity || null,
               factsAuthority,
+              factsIdentityStrategy: monitorIdentity,
               factsMonitorVersion: Number(mergedFacts?.monitorFactsVersion || SPORTS_MONITOR_FACTS_VERSION),
               expectedHome: Number(mergedFacts?.integrity?.expectedHome || 0),
               expectedAway: Number(mergedFacts?.integrity?.expectedAway || 0),

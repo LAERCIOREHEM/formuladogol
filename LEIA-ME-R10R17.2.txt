@@ -1,0 +1,35 @@
+FDG — R10R17.2: LIVE GOAL SCORER SYNCHRONIZATION & PERSISTENCE GUARD
+
+BASE
+- Repositório fornecido: formuladogol-main(6).zip
+- Patch anterior obrigatório: FDG-R10R17.1-POSTGAME-COMPETITION-ELIGIBILITY-GUARD.zip
+- Se R10R17.1 não foi publicado, publicá-lo primeiro. NÃO sobrescrever commits mais novos sem comparar.
+
+COMO PUBLICAR
+1. Extraia este pacote.
+2. GitHub > repositório > Add file > Upload files.
+3. Envie os arquivos preservando caminhos/pastas; commit diretamente em main.
+4. Os workflows "Deploy Push Worker" e "Deploy site (GitHub Pages)" são acionados pelo push; verifique ambos VERDES.
+5. Após o deploy, abra /aovivo.html (recarregamento forçado) e confira o próximo gol continental.
+
+O QUE MUDA
+- Sincronização alias ESPN validado ↔ evento documental agenda no monitor; liga obrigatoriamente correspondente.
+- Ao Vivo aceita factos canônicos do monitor mesmo sem ID ESPN numérico; não pesquisa ESPN com ID documental.
+- Recupera autoria persistida do monitor e a mantém diante de respostas incompletas do mesmo gol/time.
+- Retém partidas FINAL no estado do monitor até 24h desde kickoff, sem prolongar polling ESPN.
+- Inclui testes e workflow Pages para publicar o novo js/br-live-goal-sync.js.
+- Atualiza runbook e RAG operacional; não ativa pesquisas adicionais de IA.
+
+VALIDAÇÕES LOCAIS
+PASS: tests/test-br-live-goal-sync.mjs, test-live-goal-identity.mjs,
+      test-monitor-live-facts.mjs, test-live-facts.mjs, test-live-api.mjs,
+      Push Worker npm run check, regressões de incidentes 8/8,
+      RAG index --check (18 fontes, 44 chunks), sintaxe YAML dos workflows.
+PENDENTE EM CI: npm run test:sports e integração SportsMonitor, pois a
+biblioteca externa @block65/webcrypto-web-push não pôde ser instalada localmente.
+O deploy Push Worker executa o test:sports ANTES de publicar.
+
+IMPORTANTE
+- Não é possível confirmar correção em produção até rodar workflows e analisar o próximo gol.
+- O estado de partidas já removidas antes deste patch não pode ser recriado retroativamente.
+- Nenhuma configuração de secret nem intervenção no D1 é exigida.

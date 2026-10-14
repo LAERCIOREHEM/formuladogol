@@ -156,6 +156,10 @@ try {
   assert.equal(liveFactsPayload.facts.integrity.expectedGoals, 1);
   assert.equal(liveFactsPayload.facts.goals.length, 1);
   assert.equal(liveFactsPayload.facts.goals[0].scorer, 'João Pedro');
+  const wrongLeague = await monitor.fetch(new Request(`https://internal/live-facts?event=${eventId}&league=conmebol.sudamericana`));
+  assert.equal(wrongLeague.status, 404, 'identidade exige a liga correta');
+  const unknownMatch = await monitor.fetch(new Request('https://internal/live-facts?event=401999999&league=bra.copa_do_brazil'));
+  assert.equal(unknownMatch.status, 404, 'jogo desconhecido não herda autor');
 
   now += 10_000;
   await monitor.alarm();

@@ -4,10 +4,10 @@
   "runtime_version": 1,
   "retrieval": "deterministic_bm25_lexical",
   "authority": "diagnosis_and_context_only",
-  "source_sha256": "e8d2bb94384188615e8aa97ec4f870e17ce33333973b43307e2ec3e228d48e49",
-  "source_count": 17,
-  "chunk_count": 39,
-  "token_count": 2080,
+  "source_sha256": "f8fc90a51fdf2c7dc1be0f3f23426befa33e53b80431c7bcc13d0f78e0ca93f1",
+  "source_count": 18,
+  "chunk_count": 44,
+  "token_count": 2461,
   "sources": [
     "docs/operations/CONTRACTS.md",
     "docs/operations/R10R16-ROLLBACK.md",
@@ -22,6 +22,7 @@
     "docs/operations/incidents/FDG-INC-20261009-EDITORIAL-CLOSURE.md",
     "docs/operations/incidents/FDG-INC-20261009-PUBLIC-REVENUE-FIELD-COLLISION.md",
     "docs/operations/incidents/FDG-INC-INDEX.md",
+    "docs/operations/runbooks/LIVE-GOAL-SCORER-SYNC.md",
     "docs/operations/runbooks/OPS-INTELLIGENCE-RAG-MCP.md",
     "docs/operations/runbooks/POSTGAME-COMPETITION-ELIGIBILITY.md",
     "docs/operations/runbooks/POSTGAME-FACTUAL-INTEGRITY.md",
@@ -227,6 +228,46 @@
       "scope": "incidents",
       "text": "- FINAL_STATE_REGRESSION - CONTRACT_VERSION_DRIFT - AF_COVERAGE_MISMATCH - SOURCE_IDENTITY_MISMATCH - FALSE_RED_CARD - MIGRATION_SLA_FALSE_CRITICAL - EDITORIAL_CLOSURE_STARVATION - PUBLIC_REVENUE_FIELD_COLLISION\n\nCada novo incidente crítico deve resultar em: código estável, diagnóstico estruturado, regra de prevenção, teste de regressão e atualização deste corpus.",
       "token_count": 28
+    },
+    {
+      "id": "d93d2902bf50e419",
+      "path": "docs/operations/runbooks/LIVE-GOAL-SCORER-SYNC.md",
+      "heading": "Incidente de referência",
+      "scope": "runbooks",
+      "text": "14/10/2026: usuário informou que a notificação de gol continha o autor, mas a página `/aovivo.html` de Boca Juniors × Vasco (Sul-Americana) não exibia o marcador. Identidade de agenda `fdg-conmebol-...`, distinta do ID numérico ESPN. O incidente é evidência da divergência vista pelo usuário, não comprova qual resposta HTTP ocorreu em produção.",
+      "token_count": 46
+    },
+    {
+      "id": "921e8986a3178c8a",
+      "path": "docs/operations/runbooks/LIVE-GOAL-SCORER-SYNC.md",
+      "heading": "Contrato operacional",
+      "scope": "runbooks",
+      "text": "- O monitor esportivo persiste os `plays` validados que alimentam a notificação de gol. A página NÃO consulta notificações push já entregues; o Worker expõe o mesmo estado factual canônico via `/v1/live/summary`. - `/live-facts` do Durable Object encontra a chave da agenda diretamente ou, apenas para ID numérico, aceita o `sourceEventId` ESPN **previamente reconciliado** na watchlist. Um alias ambíguo ou liga divergente falha fechado (404). Não unir jogos pelo nome dos clubes nem apenas pelo placar. - `fdg-*` não é ID ESPN: o gateway consulta somente o monitor e nunca envia o identificador documental a `resolveLiveSummary`/ESPN. Para IDs numéricos conserva a consulta estatística ESPN e acrescenta Live Facts do monitor quando coincidem com placar esperado. - O navegador pode solicitar Live Facts para IDs documentais; renderiza autoria somente após confronto entre gols, times e placar. A camada `br-live-goal-sync.js` preserva um autor anteriormente confirmado quando o *mesmo gol e equipe* vierem sem autor, sem ressuscitar autoria após VAR, mudança de placar ou conflito explícito. - Após FINAL, `matches` ficam disponíveis por até 24 horas desde o kickoff no Durable Object, **sem** aumentar a janela de polling das APIs. Depois da retenção, dependemos dos fatos disponíveis nas fontes históricas ou cache do navegador. - Nenhuma chamada adicional a Gemini ou OpenAI é criada por esta m\n\nudança.",
+      "token_count": 187
+    },
+    {
+      "id": "f9f1e210a2e3ac1a",
+      "path": "docs/operations/runbooks/LIVE-GOAL-SCORER-SYNC.md",
+      "heading": "Testes obrigatórios",
+      "scope": "runbooks",
+      "text": "1. `node cloudflare/push-worker/tests/test-live-goal-identity.mjs`: identidade documental, alias validado, liga errada e duplicidade. 2. `node tests/test-br-live-goal-sync.mjs`: mesmo gol preservado; gols/equipes diferentes e conflito rejeitados. 3. `node cloudflare/push-worker/tests/test-monitor-live-facts.mjs`, `node cloudflare/push-worker/tests/test-live-facts.mjs`, `node cloudflare/push-worker/tests/test-live-api.mjs`. 4. CI `npm run test:sports` após `npm install` para a integração real Sports Monitor, e workflow Pages com inclusão de `js/br-live-goal-sync.js` no `PUBLIC_JS`.",
+      "token_count": 63
+    },
+    {
+      "id": "50d4a92149e6e719",
+      "path": "docs/operations/runbooks/LIVE-GOAL-SCORER-SYNC.md",
+      "heading": "Implantação e verificação",
+      "scope": "runbooks",
+      "text": "1. Publicar Push Worker e GitHub Pages por workflows automáticos no commit em `main`. 2. Verificar se ambos os deploys estão verdes, especialmente `npm run test:sports` e publicação de `js/br-live-goal-sync.js`. 3. Durante um gol continental, comparar autor na notificação e em `/v1/live/summary?league=...&event=...&expectedHome=...&expectedAway=...`, depois conferir `/aovivo.html`. 4. Se o monitor ainda não confirmou a autoria, a página continuará mostrando `Autor sendo confirmado` ou apenas placar — nunca inventar jogador.",
+      "token_count": 68
+    },
+    {
+      "id": "6fe19c7f4def820a",
+      "path": "docs/operations/runbooks/LIVE-GOAL-SCORER-SYNC.md",
+      "heading": "Rollback",
+      "scope": "runbooks",
+      "text": "Reverter conjuntamente as alterações do Push Worker, JS, HTML e `.github/workflows`, mantendo intacta a R10R17.1. O Fastlane não é alterado.",
+      "token_count": 17
     },
     {
       "id": "a01c3a0459851616",

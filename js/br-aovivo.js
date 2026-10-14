@@ -744,8 +744,10 @@
       if (!envelope || envelope.ok !== true || !envelope.data || typeof envelope.data !== "object") {
         throw new Error("Gateway de summary retornou payload inválido");
       }
-      envelope.data.__fdgLiveFacts = envelope.facts || null;
-      envelope.data.__fdgLiveFactsIntegrity = envelope.factsIntegrity || (envelope.facts && envelope.facts.integrity) || null;
+      const incomingFacts = envelope.facts || null;
+      const priorFacts = state.resumoPorId[eventId]?.__fdgLiveFacts || null;
+      envelope.data.__fdgLiveFacts = window.FDGLiveGoalSync?.reconcile(priorFacts, incomingFacts) || incomingFacts;
+      envelope.data.__fdgLiveFactsIntegrity = envelope.data.__fdgLiveFacts?.integrity || envelope.factsIntegrity || null;
       envelope.data.__fdgLiveMeta = {
         statsProvider: String(envelope.statsProvider || "espn"),
         statsCoverage: envelope.statsCoverage || null,
@@ -767,7 +769,7 @@
       // Site API que historicamente abastece esta página diretamente. Não há
       // API externa: escolhemos apenas a resposta ESPN com estatísticas mais
       // informativas para este mesmo eventId.
-      if (league === "bra.1" && game.state === "in") {
+      if (league === "bra.1" && game.state === "in" && /^\d{5,15}$/.test(eventId)) {
         const gatewayRows = extractStatsRows(game, envelope.data);
         const gatewayScore = statsRowsFreshnessScore(gatewayRows);
         const meta = envelope.data.__fdgLiveMeta || {};
@@ -810,6 +812,8 @@
       gatewayError = error;
     }
 
+    // Um ID documental só é válido no monitor; jamais consultar Summary ESPN com ele.
+    if (!/^\d{5,15}$/.test(eventId)) throw gatewayError || new Error("Evento documental sem dados do monitor");
     try {
       const directUrl = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/summary?event=" + encodeURIComponent(eventId) + "&_=" + Date.now();
       const direct = await fetchJson(directUrl, {
@@ -820,7 +824,7 @@
         const previousFacts = state.resumoPorId[eventId] && state.resumoPorId[eventId].__fdgLiveFacts;
         const previousIntegrity = previousFacts && previousFacts.integrity || {};
         const sameScore = Number(previousIntegrity.expectedHome) === expectedHome && Number(previousIntegrity.expectedAway) === expectedAway;
-        if (sameScore) {
+        if (sameScore && previousFacts?.integrity?.mathematicallyValid !== false) {
           direct.__fdgLiveFacts = previousFacts;
           direct.__fdgLiveFactsIntegrity = previousIntegrity;
         }
@@ -2578,7 +2582,7 @@
   async function loadSummary(g) {
     // A identidade ESPN é o ID numérico reconciliado, não a origem visual do card.
     // A agenda local pode continuar como fonte do card continental.
-    if (!g || !/^\d{5,15}$/.test(String(g.id)) || !g.espnLeague) return null;
+    if (!g || !String(g.id || '') || !g.espnLeague) return null;
     const eventId = String(g.id);
     const requestSerial = ++state.summaryRequestSerial;
     if (state.summaryAbortController) state.summaryAbortController.abort();
@@ -2601,7 +2605,7 @@
       // atualizado, mas o summary da ESPN ainda chegou apenas com as métricas
       // básicas. O cooldown impede excesso de chamadas em competições cuja fonte
       // realmente ofereça somente um conjunto reduzido.
-      if (looksPartial && now - lastRetry >= PARTIAL_STATS_RETRY_COOLDOWN_MS) {
+      if (/^\d{5,15}$/.test(eventId) && looksPartial && now - lastRetry >= PARTIAL_STATS_RETRY_COOLDOWN_MS) {
         state.statsRetryAt[eventId] = now;
         try {
           await waitWithSignal(PARTIAL_STATS_RETRY_DELAY_MS, signal);
@@ -2797,7 +2801,7 @@
     // IDs documentais (fdg-conmebol-...) nunca podem ser enviados como ESPN.
     // Mas um evento continental reconciliado com ID ESPN deve consultar facts
     // mesmo se a agenda local foi a fonte primária do card.
-    if(!selected||!/^\d{5,15}$/.test(eventId)||!selected.espnLeague)return;
+    if(!selected||!eventId||!selected.espnLeague)return;
     const scoreKey=`${numericScore(selected.home&&selected.home.score)??""}:${numericScore(selected.away&&selected.away.score)??""}`;
     const age=Date.now()-Number(state.summaryFetchedAt[eventId]||0), scoreChanged=state.summaryScoreKey[eventId]!==scoreKey;
     const expectedGoals=Math.max(0,Number(numericScore(selected.home?.score)||0))+Math.max(0,Number(numericScore(selected.away?.score)||0));
