@@ -1,0 +1,105 @@
+{
+  "execution": "R10R17.1 — POSTGAME COMPETITION ELIGIBILITY GUARD",
+  "source_archive": "formuladogol-main(6).zip",
+  "source_archive_sha256": "48aca8d00d2b5cc0ab3f6acd23389cb1a564d7991a8954d24b08228521c2f437",
+  "root_paths": "relative_to_repository_root",
+  "files_changed_or_added": 15,
+  "requires_cloudflare_d1_migration": "Executed by Fastlane v14 at the next maintenance cycle; no standalone migration needed.",
+  "version_targets": {
+    "postgame_fastlane": 14,
+    "health_policy": 11,
+    "orchestrator_runtime": "unchanged 2.5.0"
+  },
+  "files": [
+    {
+      "path": ".github/workflows/deploy-push-worker.yml",
+      "action": "replace",
+      "original_sha256": "27de00c146039128aee2d1c66a88077577a9c25956ff5dba3a69e36333e19404",
+      "new_sha256": "663a2937423e691ca7c9393984a829ee52618f138e07642cd4f489890b62423b"
+    },
+    {
+      "path": "cloudflare/push-worker/package.json",
+      "action": "replace",
+      "original_sha256": "93061d05f74256b7cbd4f1a3be6b0454a170e8f2dd94035f5890987238d90af8",
+      "new_sha256": "2c58de4ac27f91391fdefa1fa5823bcc59b01c3f1e7f2b390fae86640f6f52c5"
+    },
+    {
+      "path": "cloudflare/push-worker/src/health-monitor.js",
+      "action": "replace",
+      "original_sha256": "ad1a0410c04b2d5f4186b9dc379fc3eee3a87d3591011d4ef5f5ff41193092fb",
+      "new_sha256": "a8fd40563650bf4be102523e283340897927792b53258bd849d69cd7b323fca8"
+    },
+    {
+      "path": "cloudflare/push-worker/src/index.js",
+      "action": "replace",
+      "original_sha256": "5fe4ee720fb9c62c64fda73f6c6b5b2c7eeef4ef9f35c292c73a5db41f1df5f4",
+      "new_sha256": "709465a50d26eca66236a9715d8d8e6b444d6454f3d93a3ae263bf7c7be0a83e"
+    },
+    {
+      "path": "cloudflare/push-worker/src/ops-mcp.js",
+      "action": "replace",
+      "original_sha256": "d6ed55b91cebb168d8dd1f1c85e0d489fd6cd52ee06aeff601921001eb4bc3c7",
+      "new_sha256": "12c411bb1c3d965042a1f7960656e699a9552702db4737b333018cd74cd58288"
+    },
+    {
+      "path": "cloudflare/push-worker/src/postgame-competition-eligibility.js",
+      "action": "add",
+      "original_sha256": null,
+      "new_sha256": "be67edde61077331e49fb38f31b5b1bb36bd22b65d7d5792e54d79af28931863"
+    },
+    {
+      "path": "cloudflare/push-worker/src/postgame-fastlane.js",
+      "action": "replace",
+      "original_sha256": "b44a061c539820ee2ccc10393588b76fcc0a3c57507d8d3df7adb99c47acded4",
+      "new_sha256": "cfc895bea2b8a75db78e4e2b0cd982d587b36800847ad7c0f8389b986cede9c0"
+    },
+    {
+      "path": "cloudflare/push-worker/tests/test-postgame-competition-eligibility.mjs",
+      "action": "add",
+      "original_sha256": null,
+      "new_sha256": "57347a01ad1c1d00b9805d015eaa4b5ee85fe24a55a339c65a362c6cd4e5631b"
+    },
+    {
+      "path": "cloudflare/push-worker/tests/test-postgame-fastlane.mjs",
+      "action": "replace",
+      "original_sha256": "adda996663f3e980fc46821acd06b4f8fe12ac39658b8a0414754289cdb8ff36",
+      "new_sha256": "493ea31090f13207d9241a77a9b1530d0cbbbf58121859d7678304ff4dcfdaf3"
+    },
+    {
+      "path": "dados-br/ops-rag-index.json",
+      "action": "replace",
+      "original_sha256": "6698544e1c8294cc7809301fc2ac2208ef6723f4cca0dc8677fe2e2ba39d5657",
+      "new_sha256": "526677be0a7f491dc122cfaeb5eb10ce884be597e79198ab4a1b9a5700aadf2b"
+    },
+    {
+      "path": "docs/operations/RAG-MANIFEST.json",
+      "action": "replace",
+      "original_sha256": "8dd9686635bcad841f1ae464b10c82630b49806f8bb314c5ce5ccda4708e2bef",
+      "new_sha256": "2e797753991fa2889fb0099fea73a3028e93448581d8c2e937538f893614310e"
+    },
+    {
+      "path": "docs/operations/README.md",
+      "action": "replace",
+      "original_sha256": "94b0eabad20c379124b2ce187678972413631f71dda2b2acda39129ed127b02d",
+      "new_sha256": "a1d2abfe0b1007597c57f7690d1b2320901003daf027747af21d2b35781c997b"
+    },
+    {
+      "path": "docs/operations/incidents/2026-10-14-CONMEBOL-ATTENDANCE-UNNECESSARY-SEARCH.md",
+      "action": "add",
+      "original_sha256": null,
+      "new_sha256": "3a40f24e537dbb54a69f3248d3a86f2abf54e530c237a3fda054721813e0361b"
+    },
+    {
+      "path": "docs/operations/runbooks/POSTGAME-COMPETITION-ELIGIBILITY.md",
+      "action": "add",
+      "original_sha256": null,
+      "new_sha256": "f0a95d924422d1b39adeea2902aca6e23c89b05f849e0c71381b428eda84d2ff"
+    },
+    {
+      "path": "tests/incidents/test_reliability_incidents.py",
+      "action": "replace",
+      "original_sha256": "52c805e60520dd4589cf5782ec48d4b2fa6e3c3b36f3f6192b2f05269a634376",
+      "new_sha256": "c0d760fa8c29a370dbac66d0fc522f59f56c303995272383aeb27286bdc44b09"
+    }
+  ]
+}

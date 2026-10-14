@@ -13,7 +13,7 @@ const CF_WORKERS_CPU_INCLUDED_MS = 30_000_000;
 const CF_WORKERS_REQUESTS_INCLUDED = 10_000_000;
 const CF_CPU_OVERAGE_PER_MILLION_USD = 0.02;
 const CF_REQUEST_OVERAGE_PER_MILLION_USD = 0.30;
-const HEALTH_POLICY_VERSION = 10;
+const HEALTH_POLICY_VERSION = 11;
 
 function text(v) { return String(v ?? '').trim(); }
 function n(v) { const x = Number(v); return Number.isFinite(x) ? x : 0; }
@@ -272,11 +272,13 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/agenda-clubes-br.json`),
     fetchJson(`${ORCH}/health`), fetchJson(`${ORCH}/status`), aiUsageSummary(env,24), providerUsageSummary(env,24),
     env.DB.prepare(`SELECT COUNT(*) total,
-      COALESCE(SUM(CASE WHEN public_status='resolved' THEN 1 ELSE 0 END),0) public_resolved,
-      COALESCE(SUM(CASE WHEN public_status='pending' THEN 1 ELSE 0 END),0) public_searching,
-      COALESCE(SUM(CASE WHEN public_status='overdue' THEN 1 ELSE 0 END),0) public_overdue,
-      COALESCE(SUM(CASE WHEN public_status='budget_guard' THEN 1 ELSE 0 END),0) public_budget_guard,
-      COALESCE(SUM(CASE WHEN public_status<>'resolved' THEN 1 ELSE 0 END),0) public_pending,
+      COALESCE(SUM(CASE WHEN league='bra.1' AND public_status='resolved' THEN 1 ELSE 0 END),0) public_resolved,
+      COALESCE(SUM(CASE WHEN league='bra.1' AND public_status='pending' THEN 1 ELSE 0 END),0) public_searching,
+      COALESCE(SUM(CASE WHEN league='bra.1' AND public_status='overdue' THEN 1 ELSE 0 END),0) public_overdue,
+      COALESCE(SUM(CASE WHEN league='bra.1' AND public_status='budget_guard' THEN 1 ELSE 0 END),0) public_budget_guard,
+      COALESCE(SUM(CASE WHEN league='bra.1' AND public_status NOT IN ('resolved','not_applicable','eligibility_pending') THEN 1 ELSE 0 END),0) public_pending,
+      COALESCE(SUM(CASE WHEN league<>'bra.1' AND TRIM(league)<>'' THEN 1 ELSE 0 END),0) public_not_applicable,
+      COALESCE(SUM(CASE WHEN TRIM(league)='' THEN 1 ELSE 0 END),0) public_eligibility_pending,
       COALESCE(SUM(CASE WHEN highlight_status<>'resolved' THEN 1 ELSE 0 END),0) highlight_pending
       FROM postgame_fastlane`).first(),
     env.DB.prepare(`SELECT p.event_id,p.home,p.away,p.home_score,p.away_score,p.kickoff,p.final_at,
@@ -286,7 +288,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
       FROM postgame_fastlane p
       LEFT JOIN postgame_public_ai a ON a.event_id=p.event_id
       LEFT JOIN postgame_match_context c ON c.event_id=p.event_id
-      WHERE p.public_status<>'resolved' ORDER BY p.final_at ASC LIMIT 20`).all(),
+      WHERE p.league='bra.1' AND p.public_status NOT IN ('resolved','not_applicable','eligibility_pending') ORDER BY p.final_at ASC LIMIT 20`).all(),
     postgamePublicCostSummary(env,now),
     cloudflareBillingSummary(env,now),
     opsIntelligenceStatus(env)
@@ -315,6 +317,8 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   const postOverdue=n(post?.public_overdue);
   const postBudget=n(post?.public_budget_guard);
   const postResolved=n(post?.public_resolved);
+  const postExempt=n(post?.public_not_applicable);
+  const postUnclassified=n(post?.public_eligibility_pending);
   const highlight=n(post?.highlight_pending);
   const perEventAnomaly=(providers.byEvent||[]).find(r=>n(r.searches)>8);
   const providerFailures=n(providers.failures);
@@ -371,7 +375,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     ),
     // OVERDUE é amarelo: o Hunter já envia um alerta específico em T+2h e
     // continua pesquisando. Vermelho fica reservado ao budget guard.
-    indicator('postgame','Pós-jogo',postBudget>0?'red':postPending>0?'yellow':'green',`${postPending} pendência(s) · ${postOverdue} >2h · ${postBudget} budget guard · busca persistente`),
+    indicator('postgame','Pós-jogo',postBudget>0?'red':postPending>0||postUnclassified>0?'yellow':'green',`${postPending} pendência(s) Brasileirão · ${postOverdue} >2h · ${postBudget} budget guard · ${postExempt} dispensada(s) · ${postUnclassified} sem competição identificada`),
     ...reliabilityIndicators,
     indicator('highlights','Melhores Momentos',highlight>0?'yellow':'green',`${highlight} pendência(s)`),
     indicator('editorial','Editorial / Transmissões',Array.isArray(os.errors)&&os.errors.length?'yellow':'green',Array.isArray(os.errors)&&os.errors.length?`${os.errors.length} erro(s) no último ciclo`:'sem erro reportado pelo Orchestrator'),
@@ -379,7 +383,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     indicator('openai','IA / Custos',hunterBudgetPct>=100?'red':hunterBudgetPct>=warningPct?'yellow':!geminiReady||!workersAiReady||!gatewayAuthReady?'yellow':perEventAnomaly?'yellow':providerFailures>3?'yellow':'green',`${providers.calls} chamada(s) multi-provider · ${providers.searches} busca(s) web · Hunter ${fmtUsd(hunterMonthUsd)}/${fmtUsd(monthlyBudgetUsd)} (${fmtPct(hunterBudgetPct)}) · ${providerFailures} falha(s) /24h`),
     indicator('cloudflare','Cloudflare / CPU & Requests',cloudflareSeverity(cfBilling),cloudflareDetail(cfBilling)),
   ];
-  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY)),fineTuning:'not_used_by_design'},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches},reliabilityIntelligence:{sportingState:text(os.reliabilityState)||text(reliabilitySnapshot.state),factualAuditSchema:n(factualAudit.schema_version),factualCritical:n(factualAudit.total_criticos),factualWarnings:n(factualAudit.total_avisos),ragKnowledgeBaseReady:Number(ragManifest.schema_version||0)>=2&&Array.isArray(ragManifest.collections)&&ragManifest.collections.length>0,ragRuntimeEnabled:opsIntelligence?.rag?.ready===true,ragRuntimeVersion:n(opsIntelligence?.rag?.version),ragSourceCount:n(opsIntelligence?.rag?.sourceCount),ragChunkCount:n(opsIntelligence?.rag?.chunkCount),ragSourceSha256:text(opsIntelligence?.rag?.sourceSha256),mcpOpsEnabled:opsIntelligence?.mcp?.enabled===true,mcpOpsReadOnly:opsIntelligence?.mcp?.readOnly===true,mcpProtocolVersion:text(opsIntelligence?.mcp?.protocolVersion),mcpTools:n(opsIntelligence?.mcp?.tools),mcpResources:n(opsIntelligence?.mcp?.resources),fineTuning:'not_used_by_design'},postgame:{pending:postPending,searching:postSearching,overdue:postOverdue,budgetGuard:postBudget,resolved:postResolved,seasonCoverage,highlightPending:highlight,persistentUntilResolved:true,pendingRows,cost:{...postCost,budget:{monthlyBudgetUsd,eventBudgetUsd,warningPct,monthPct:hunterBudgetPct}}},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
+  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY)),fineTuning:'not_used_by_design'},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches},reliabilityIntelligence:{sportingState:text(os.reliabilityState)||text(reliabilitySnapshot.state),factualAuditSchema:n(factualAudit.schema_version),factualCritical:n(factualAudit.total_criticos),factualWarnings:n(factualAudit.total_avisos),ragKnowledgeBaseReady:Number(ragManifest.schema_version||0)>=2&&Array.isArray(ragManifest.collections)&&ragManifest.collections.length>0,ragRuntimeEnabled:opsIntelligence?.rag?.ready===true,ragRuntimeVersion:n(opsIntelligence?.rag?.version),ragSourceCount:n(opsIntelligence?.rag?.sourceCount),ragChunkCount:n(opsIntelligence?.rag?.chunkCount),ragSourceSha256:text(opsIntelligence?.rag?.sourceSha256),mcpOpsEnabled:opsIntelligence?.mcp?.enabled===true,mcpOpsReadOnly:opsIntelligence?.mcp?.readOnly===true,mcpProtocolVersion:text(opsIntelligence?.mcp?.protocolVersion),mcpTools:n(opsIntelligence?.mcp?.tools),mcpResources:n(opsIntelligence?.mcp?.resources),fineTuning:'not_used_by_design'},postgame:{pending:postPending,searching:postSearching,overdue:postOverdue,budgetGuard:postBudget,resolved:postResolved,notApplicable:postExempt,eligibilityPending:postUnclassified,requiredLeague:'bra.1',seasonCoverage,highlightPending:highlight,persistentUntilResolved:true,pendingRows,cost:{...postCost,budget:{monthlyBudgetUsd,eventBudgetUsd,warningPct,monthPct:hunterBudgetPct}}},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
   await metaPut(env,'snapshot',JSON.stringify(snapshot));
   return snapshot;
 }
@@ -405,7 +409,7 @@ function cloudflareDigestLines(cf){
 }
 
 export function postgameDigestLines(postgame={}, now=Date.now()) {
-  const pending=n(postgame.pending), searching=n(postgame.searching), overdue=n(postgame.overdue), guard=n(postgame.budgetGuard), resolved=n(postgame.resolved);
+  const pending=n(postgame.pending), searching=n(postgame.searching), overdue=n(postgame.overdue), guard=n(postgame.budgetGuard), resolved=n(postgame.resolved), exempt=n(postgame.notApplicable), unclassified=n(postgame.eligibilityPending);
   const cost=postgame.cost||{}; const budget=cost.budget||{}; const monthUsd=n(cost?.month?.estimatedUsd); const dayUsd=n(cost?.last24h?.estimatedUsd); const monthlyBudget=n(budget.monthlyBudgetUsd)||10; const monthPct=monthlyBudget>0?monthUsd/monthlyBudget*100:0;
   const rows=Array.isArray(postgame.pendingRows)?postgame.pendingRows:[];
   const cov=postgame.seasonCoverage||{};
@@ -413,7 +417,8 @@ export function postgameDigestLines(postgame={}, now=Date.now()) {
   const lines=[
     'PÓS-JOGO — PÚBLICO & RENDA',
     coverageLine,
-    `✅ Resolvidos na fila monitorada: ${resolved}`,
+    `✅ Resolvidos no Brasileirão: ${resolved}`,
+    `ℹ️ Dispensados (Copa do Brasil/internacionais): ${exempt} · sem competição identificada: ${unclassified}`,
     `🟡 Em busca (<2h): ${searching}`,
     `🔴 Atrasados (>2h): ${overdue}`,
     `🛑 Budget guard: ${guard}`,

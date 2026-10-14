@@ -1,0 +1,54 @@
+FÓRMULA DO GOL — EXECUÇÃO R10R17.1
+POSTGAME COMPETITION ELIGIBILITY GUARD
+=======================================
+
+BASE UTILIZADA
+formuladogol-main(6).zip — confira o hash no MANIFESTO-R10R17.1.json.
+O pacote contém APENAS arquivos novos/alterados, com caminhos relativos à raiz do repositório GitHub.
+
+IMPLEMENTAÇÃO
+• Coleta de público/renda e alerta de SLA somente na liga ESPN bra.1 (Brasileirão Série A).
+• Copa do Brasil e competições internacionais: not_applicable (dispensa, não dado inventado).
+• Liga não informada: eligibility_pending (sem busca/IA; aguarda classificação explícita).
+• Fastlane Policy 14 / Health Policy 11 / MCP com contadores novos.
+• D1 migrado no próximo ciclo do próprio Worker (idempotente, SQL, sem IA); mantém dados/attempts.
+• Não modifica o motor esportivo, probabilidades AF nem Orchestrator 2.5.0.
+• E-mails anteriores não são apagados; somente futuros alertas indevidos deixam de ocorrer.
+• Melhor momento permanece independente do estado público/renda.
+• Incluído runbook e incidente no RAG; índice regenerado deterministicamente.
+
+COMO PUBLICAR
+1. Extraia este ZIP no computador.
+2. No repositório GitHub atualizado correspondente à base, use Add file > Upload files.
+3. Envie as pastas e arquivos mantendo EXACTAMENTE a estrutura de subpastas.
+4. Commit directly to main (não crie uma pasta FDG-R10R17.1 no repositório).
+5. Acompanhe Deploy Push Worker, Deploy site (GitHub Pages), Reliability Control Plane CI.
+6. O Deploy Orchestrator Worker também poderá ser iniciado automaticamente devido às alterações
+   em docs/operations e tests/incidents; o runtime permanece 2.5.0.
+7. NÃO dispare workflows manualmente enquanto os automáticos estiverem rodando.
+8. Confirme /v1/postgame/status: version=14, storedPolicyVersion=14,
+   attendanceEligibilityPolicyVersion=1, attendanceRequiredLeague=bra.1,
+   publicNotApplicable e publicEligibilityPending numéricos.
+9. Confirme no /v1/postgame?event_ids=fdg-conmebol-sul-americana-202610132130-boca-juniors-vasco-da-gama
+   que, se o registro estiver presente, public_status=not_applicable e public_next_at vazio.
+
+TESTES REALIZADOS NESTA ENTREGA
+• npm run check: PASS
+• node tests/test-postgame-fastlane.mjs: PASS
+• node tests/test-postgame-competition-eligibility.mjs: PASS (SQLite em memória)
+• node tests/test-health-monitor.mjs: PASS
+• node tests/test-espn-source.mjs: PASS
+• node tests/test-ops-intelligence.mjs: PASS
+• python scripts/validar_contrato_publicos_fastlane.py: PASS
+• python -m unittest discover -s tests/incidents: 8/8 PASS
+• Orchestrator npm run validate: 81/81 PASS
+• scripts/build_ops_rag_index.py --check: PASS
+• workflow YAML parsing: PASS
+• full npm run test:sports / MCP: NÃO EXECUTADO LOCALMENTE por dependências externas
+  indisponíveis (npm install excedeu o timeout); exigido pelo GitHub Actions.
+• D1 remoto / deploy: NÃO EXECUTADOS nesta sessão.
+
+ALERTA DE BASE
+O arquivo tests/incidents/test_reliability_incidents.py tinha pin preexistente 2.4.0,
+mas a base atual está em Orchestrator 2.5.0. O teste foi corrigido para verificar
+coerência e preservação de 2.5.0, sem alterar o código do Orchestrator.

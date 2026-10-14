@@ -8,6 +8,7 @@
     "docs/operations/incidents/*.md",
     "docs/operations/R10R16-ROLLBACK.md",
     "docs/operations/runbooks/POSTGAME-FACTUAL-INTEGRITY.md",
+    "docs/operations/runbooks/POSTGAME-COMPETITION-ELIGIBILITY.md",
     "docs/operations/README.md",
     "docs/operations/runbooks/OPS-INTELLIGENCE-RAG-MCP.md"
   ],
@@ -15,7 +16,7 @@
     "placar": "structured_source_only",
     "classificacao": "deterministic_only",
     "probabilidades": "deterministic_only",
-    "publico_renda": "match_identity_plus_factual_integrity_plus_verified_corrections",
+    "publico_renda": "bra.1_only_then_match_identity_plus_factual_integrity_plus_verified_corrections",
     "rag": "diagnosis_and_context_only"
   },
   "runtime": {

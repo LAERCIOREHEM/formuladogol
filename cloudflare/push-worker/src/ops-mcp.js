@@ -46,7 +46,7 @@ function compactHealth(status){
 function compactPostgame(status){
   return {
     ok:status?.ok===true, engine:status?.engine||'', version:Number(status?.version||0), storedPolicyVersion:Number(status?.storedPolicyVersion||0),
-    total:Number(status?.total||0), publicResolved:Number(status?.publicResolved||0), publicPending:Number(status?.publicPending||0),
+    total:Number(status?.total||0), publicEligibleTotal:Number(status?.publicEligibleTotal||0), publicNotApplicable:Number(status?.publicNotApplicable||0), publicEligibilityPending:Number(status?.publicEligibilityPending||0), attendanceEligibilityPolicyVersion:Number(status?.attendanceEligibilityPolicyVersion||0), attendanceRequiredLeague:status?.attendanceRequiredLeague||'', publicResolved:Number(status?.publicResolved||0), publicPending:Number(status?.publicPending||0),
     publicSearching:Number(status?.publicSearching||0), publicOverdue:Number(status?.publicOverdue||0), publicBudgetGuard:Number(status?.publicBudgetGuard||0),
     highlightPending:Number(status?.highlightPending||0), lastRun:status?.lastRun||null,
     factualIntegrity:{matchIdentityGateVersion:Number(status?.matchIdentityGateVersion||0),sourceScopedExtraction:status?.sourceScopedExtraction===true,modelValuesAuthoritative:status?.modelValuesAuthoritative===true,verifiedCorrectionsOverrideD1:status?.verifiedCorrectionsOverrideD1===true},

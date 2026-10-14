@@ -158,7 +158,7 @@ assert.deepEqual(PUBLIC_POLICY.geminiScheduleMinutes,[5,15,25,35,45,60,90,120]);
 assert.deepEqual(PUBLIC_POLICY.openaiScheduleMinutes,[45,90,120]);
 assert.equal(PUBLIC_POLICY.overdueMinutes,120);
 assert.equal(PUBLIC_POLICY.migrationGraceMinutes,15);
-const oldFinished={final_at:'2026-10-07T22:00:00.000Z'};
+const oldFinished={league:'bra.1',final_at:'2026-10-07T22:00:00.000Z'};
 const reopenedAt='2026-10-08T15:00:00.000Z';
 const reopenedNow=Date.parse('2026-10-08T15:10:00.000Z');
 assert.equal(publicSlaAgeMinutes(oldFinished,reopenedNow,reopenedAt),10);
@@ -233,7 +233,7 @@ assert.equal(shouldImmediateOpenAiFallback({ageMinutes:20,forcedUpgrade:true,bud
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:false},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),false);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:1,httpStatus:200,found:true},discoveredCount:2,refreshedFoundAny:true,complete:true}),false);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:1,httpStatus:200,found:true},discoveredCount:2,refreshedFoundAny:true,complete:false}),true);
-console.log('postgame-fastlane v13 policy + factual integrity + SLA suppression + circuit tests: PASS');
+console.log('postgame-fastlane v14 policy + eligibility guard + factual integrity + SLA suppression + circuit tests: PASS');
 
 // ============================ R10R15 Match Identity Gate ============================
 {

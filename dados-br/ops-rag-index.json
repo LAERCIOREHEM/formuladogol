@@ -4,14 +4,15 @@
   "runtime_version": 1,
   "retrieval": "deterministic_bm25_lexical",
   "authority": "diagnosis_and_context_only",
-  "source_sha256": "92cdf33f1030681f1098c44a8e63ef01ba79f118c8ebe249fcf8df0d72882b68",
-  "source_count": 15,
-  "chunk_count": 33,
-  "token_count": 1479,
+  "source_sha256": "e8d2bb94384188615e8aa97ec4f870e17ce33333973b43307e2ec3e228d48e49",
+  "source_count": 17,
+  "chunk_count": 39,
+  "token_count": 2080,
   "sources": [
     "docs/operations/CONTRACTS.md",
     "docs/operations/R10R16-ROLLBACK.md",
     "docs/operations/README.md",
+    "docs/operations/incidents/2026-10-14-CONMEBOL-ATTENDANCE-UNNECESSARY-SEARCH.md",
     "docs/operations/incidents/FDG-INC-20261007-FALSE-RED-CARD.md",
     "docs/operations/incidents/FDG-INC-20261007-WRONG-MATCH-ATTENDANCE.md",
     "docs/operations/incidents/FDG-INC-20261008-AF-COVERAGE.md",
@@ -22,6 +23,7 @@
     "docs/operations/incidents/FDG-INC-20261009-PUBLIC-REVENUE-FIELD-COLLISION.md",
     "docs/operations/incidents/FDG-INC-INDEX.md",
     "docs/operations/runbooks/OPS-INTELLIGENCE-RAG-MCP.md",
+    "docs/operations/runbooks/POSTGAME-COMPETITION-ELIGIBILITY.md",
     "docs/operations/runbooks/POSTGAME-FACTUAL-INTEGRITY.md",
     "docs/operations/runbooks/SPORTING-INTEGRITY.md"
   ],
@@ -97,6 +99,30 @@
       "scope": "operations",
       "text": "- `dados-br/ops-rag-index.json`: índice operacional determinístico derivado deste corpus. - `cloudflare/push-worker/src/ops-intelligence.js`: retrieval BM25 lexical, cache e contexto operacional. - `cloudflare/push-worker/src/ops-mcp.js`: gateway MCP `2026-07-28`, somente leitura, com compatibilidade stateless para clientes 2025. - Endpoint MCP: `https://push.formuladogol.com.br/mcp`. - O retrieval não chama Gemini/OpenAI nem busca web; o modelo do cliente MCP interpreta o contexto recuperado. - RAG/MCP são `fail-open` para o site: indisponibilidade dessa camada nunca bloqueia resultado, tabela, AF, pós-jogo ou editorial. - Fine Tuning permanece `not_used_by_design`.",
       "token_count": 74
+    },
+    {
+      "id": "3f1a7f36f96dd015",
+      "path": "docs/operations/README.md",
+      "heading": "R10R17.1 — Competition Eligibility",
+      "scope": "operations",
+      "text": "- `docs/operations/runbooks/POSTGAME-COMPETITION-ELIGIBILITY.md`: buscas de público/renda somente no Brasileirão Série A; D1 v14, Health v11, `not_applicable`/`eligibility_pending`, sem varredura histórica por IA. - `docs/operations/incidents/2026-10-14-CONMEBOL-ATTENDANCE-UNNECESSARY-SEARCH.md`: causa e regressão do alerta indevido Boca Juniors × Vasco.",
+      "token_count": 35
+    },
+    {
+      "id": "70ab86fd7c056384",
+      "path": "docs/operations/incidents/2026-10-14-CONMEBOL-ATTENDANCE-UNNECESSARY-SEARCH.md",
+      "heading": "Incidente — Busca de público/renda indevida na Sul-Americana, 14/10/2026",
+      "scope": "incidents",
+      "text": "O Health enviou um alerta de SLA de 120 minutos para Boca Juniors x Vasco da Gama, com o identificador interno `fdg-conmebol-sul-americana-202610132130-boca-juniors-vasco-da-gama`, informando 25 consultas determinísticas ESPN, 8 buscas Gemini e 2 chamadas OpenAI, sem localizar público, pagantes ou renda. O ID tem prefixo documental `fdg-conmebol-`, não é um identificador ESPN.\n\n**Causa:** o Fastlane v13 criava pendências para finais de qualquer liga, e seu `claimDue` selecionava `public_status <> resolved` sem política de elegibilidade. O Health v10 contava esses registros como pendências, tornando permanente a procura por dados não exigidos para Copa do Brasil e competições internacionais.\n\n**Correção R10R17.1:** coletar público/renda somente para `bra.1`; definir estados `not_applicable` e `eligibility_pending`; migração SQL no D1 sem IA nem reinvestigação histórica; impedir reativação por novos seeds; bloquear requisições ESPN por ID documental; restringir pendências e alertas T+120; preservar melhores momentos, monitor continental e Factual Integrity Guard. Ver runbook `POSTGAME-COMPETITION-ELIGIBILITY.md`.",
+      "token_count": 129
+    },
+    {
+      "id": "62517d1c8a836b83",
+      "path": "docs/operations/incidents/2026-10-14-CONMEBOL-ATTENDANCE-UNNECESSARY-SEARCH.md",
+      "heading": "Incidente — Busca de público/renda indevida na Sul-Americana, 14/10/2026",
+      "scope": "incidents",
+      "text": "**Verificação:** o teste de integração SQLite cobre Sul-Americana, Libertadores, Copa do Brasil, Brasileirão, identificação desconhecida, reconciliação e migração. O workflow GitHub Actions exige o contrato de produção, e a confirmação da remediação requer a conclusão efetiva do deploy e a inspeção do registro no D1.",
+      "token_count": 36
     },
     {
       "id": "de68e5937dfb774b",
@@ -249,6 +275,30 @@
       "scope": "runbooks",
       "text": "O Health Policy v10 separa cinco indicadores de confiabilidade/inteligência:\n\n1. Sporting Integrity / R10R16; 2. Integridade Factual / Público & Renda; 3. Knowledge Base / RAG Runtime; 4. Operational Diagnostics / Control Plane; 5. MCP Ops / Read-only Gateway.\n\nFine Tuning continua `not_used_by_design`.",
       "token_count": 37
+    },
+    {
+      "id": "e1a50e1ff0adf132",
+      "path": "docs/operations/runbooks/POSTGAME-COMPETITION-ELIGIBILITY.md",
+      "heading": "Contrato de elegibilidade factual",
+      "scope": "runbooks",
+      "text": "A coleta obrigatória de `publico`, `publico_pagante` (quando divulgado) e `renda` pertence exclusivamente ao Campeonato Brasileiro Série A identificado por `league = bra.1`. Copa do Brasil (`bra.copa_do_brazil`), Libertadores (`conmebol.libertadores`), Sul-Americana (`conmebol.sudamericana`) e todas as demais competições com `league` explícito são dispensadas. Isso NÃO cancela resultados, classificações, eventos ao vivo, publicação editorial, highlights nem monitor de agenda continental.\n\nUma partida com `league` ausente ou vazio não deve ser presumida como Brasileirão: fica em `public_status = eligibility_pending`, com `public_next_at = NULL`, até que a competição seja classificada por fonte estruturada. Uma partida explicitamente não-brasileirão recebe `public_status = not_applicable`, também com `public_next_at = NULL`. O estado `not_applicable` não é equivalente a `resolved`: ele representa dispensa da obrigação de coleta.\n\nO importador `resultados.json`, dedicado exclusivamente ao Brasileirão, atribui `league = bra.1` explicitamente. O monitor geral não recebe esse valor automaticamente quando o campo vem ausente. Só `bra.1` pode entrar na fila de busca de público/renda e disparar e-mail de SLA T+120 minutos.",
+      "token_count": 140
+    },
+    {
+      "id": "b8949ee76d18588a",
+      "path": "docs/operations/runbooks/POSTGAME-COMPETITION-ELIGIBILITY.md",
+      "heading": "Contrato de integridade e migração D1",
+      "scope": "runbooks",
+      "text": "A política Fastlane v14 migra diretamente via SQL os registros de competições não obrigatórias. Não há pesquisa ou IA na migração. São preservados placares, dados de público/renda já coletados, fontes, histórico de tentativas de IA, alertas anteriores e estado independente de melhores momentos. Na reentrada de `upsertTask()`, nenhum novo seed reabre uma partida dispensada; uma retificação estruturada para `bra.1` volta a habilitar a coleta legítima.\n\n`claimDue(public)` impõe `league='bra.1'` em ambas as fases de seleção e lock. `processPublicTask` tem barreira de redundância, o alerta SLA bloqueia competição não elegível, e a ESPN não recebe IDs documentais `fdg-*` como IDs numéricos. `cleanup` pode encerrar registros `resolved` ou `not_applicable` após 30 dias, SOMENTE quando melhores momentos também estão resolvidos. Registros desconhecidos (`eligibility_pending`) são preservados até classificação.\n\nHealth v11 contabiliza pendências e resolvidos SOMENTE para `bra.1`; apresenta à parte dispensas e competições não identificadas (estas últimas podem justificar alerta amarelo de classificação). MCP `fdg_postgame_status` transmite as mesmas contagens, sem novas ferramentas de escrita. Factual Integrity Guard v1, RAG/MCP operacional e demais políticas continuam independentes.",
+      "token_count": 162
+    },
+    {
+      "id": "b03f0528502f1a83",
+      "path": "docs/operations/runbooks/POSTGAME-COMPETITION-ELIGIBILITY.md",
+      "heading": "Operação / aceite",
+      "scope": "runbooks",
+      "text": "Testar: `cd cloudflare/push-worker && npm run check && npm run test:sports`. O teste `test-postgame-competition-eligibility.mjs` utiliza SQLite real em memória, sem rede, para provar `bra.1`, Copa do Brasil, Libertadores, Sul-Americana, desconhecidos, migração idempotente v13→v14, histórico preservado, SLA e highlights não bloqueados. O deploy `Deploy Push Worker` realiza migrações já existentes e valida o contrato v14/Health v11 contra produção. O Pages regenerará automaticamente o índice RAG a partir do corpus atualizado.\n\nApós publicar, consultar `/v1/postgame/status` (`storedPolicyVersion=14`, `attendanceEligibilityPolicyVersion=1`, `publicNotApplicable`, `publicEligibilityPending`) e `/v1/postgame?event_id=...` para garantir que o jogo Boca Juniors x Vasco esteja com `not_applicable` e sem `public_next_at`. A leitura no D1 em produção, e não o ZIP, é a prova definitiva da regularização.",
+      "token_count": 99
     },
     {
       "id": "962af75f4e95f687",

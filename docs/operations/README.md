@@ -30,3 +30,8 @@ Princípio de arquitetura: **dados estruturados → regras determinísticas → 
 - O retrieval não chama Gemini/OpenAI nem busca web; o modelo do cliente MCP interpreta o contexto recuperado.
 - RAG/MCP são `fail-open` para o site: indisponibilidade dessa camada nunca bloqueia resultado, tabela, AF, pós-jogo ou editorial.
 - Fine Tuning permanece `not_used_by_design`.
+
+## R10R17.1 — Competition Eligibility
+
+- `docs/operations/runbooks/POSTGAME-COMPETITION-ELIGIBILITY.md`: buscas de público/renda somente no Brasileirão Série A; D1 v14, Health v11, `not_applicable`/`eligibility_pending`, sem varredura histórica por IA.
+- `docs/operations/incidents/2026-10-14-CONMEBOL-ATTENDANCE-UNNECESSARY-SEARCH.md`: causa e regressão do alerta indevido Boca Juniors × Vasco.

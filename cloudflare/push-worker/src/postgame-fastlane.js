@@ -4,6 +4,7 @@ import { countWebSearchCalls, recordAiUsage, recordProviderUsage, postgamePublic
 import { searchPublicWithGemini, fetchSourceText, extractPublicWithWorkersAI, fetchOpenAiResponses, openAiUsage } from './ai-router.js';
 import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, evaluateSourceMatchIdentity, buildAttendanceSearchQueries, attendanceSourcePolicyText, officialClubDomainsForTask, PREFERRED_EDITORIAL_SOURCE_SUFFIXES, isMultiMatchRoundupSource, verifiedStadiumCapacity } from './postgame-search-profile.js';
 import { FACTUAL_INTEGRITY_POLICY_VERSION, FACTUAL_INCIDENTS, inspectPostgameFactualIntegrity, quarantinePostgameFactualIntegrity } from './postgame-factual-integrity.js';
+import { attendanceEligibility, POSTGAME_ELIGIBILITY_VERSION, ATTENDANCE_REQUIRED_LEAGUE } from './postgame-competition-eligibility.js';
 
 const DEFAULT_SITE_BASE = 'https://formuladogol.com.br';
 // Fase definitiva (uma única chamada por partida). O Sol é reservado a ela e aos editoriais.
@@ -14,10 +15,10 @@ const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
-const POSTGAME_POLICY_VERSION = 13;
+const POSTGAME_POLICY_VERSION = 14;
 
 /*
- * Attendance/Revenue Hunter v13 — R10R16.1 Factual Integrity + R10R15.1 SLA Migration Suppression:
+ * Attendance/Revenue Hunter v14 — R10R17.1 (eligibility) + R10R16.1 Factual Integrity + R10R15.1 SLA Migration Suppression:
  *   - Mantém aliases de TODOS os clubes, imprensa nacional/regional e sites oficiais
  *     SOMENTE dos dois participantes para fatos documentais de ficha técnica.
  *   - Gemini Interactions vira DESCOBRIDOR DE FONTES: google_search real, sem JSON
@@ -552,9 +553,11 @@ export function parseEspnAttendance(summary) {
 }
 
 async function fetchEspnAttendance(task) {
-  const league = text(task.league) || 'bra.1';
+  const league = attendanceEligibility(task.league).league;
   const eventId = text(task.event_id);
-  if (!eventId) return { publico: null, error: 'event_id_missing' };
+  if (league !== ATTENDANCE_REQUIRED_LEAGUE) return { publico: null, error: 'attendance_not_required' };
+  // IDs fdg-* são documentais; o endpoint ESPN exige o ID ESPN numérico.
+  if (!/^\d{5,15}$/.test(eventId)) return { publico: null, error: 'espn_event_id_noncanonical' };
   try {
     const summary = await fetchEspnSummary(league, eventId);
     const publico = parseEspnAttendance(summary?.data);
@@ -585,6 +588,7 @@ export function publicSlaAgeMinutes(task, now = Date.now(), reopenedAt = '') {
 }
 
 export function publicSlaAlertAllowed(task, now = Date.now(), reopenedAt = '', graceMinutes = PUBLIC_POLICY.migrationGraceMinutes) {
+  if (!attendanceEligibility(task?.league).required) return false;
   const reopenedMs = Date.parse(text(reopenedAt));
   if (Number.isFinite(reopenedMs) && reopenedMs <= now && now - reopenedMs < Number(graceMinutes || 0) * 60_000) return false;
   return publicSlaAgeMinutes(task, now, reopenedAt) >= PUBLIC_POLICY.overdueMinutes;
@@ -661,6 +665,8 @@ async function upsertTask(env, row, staticData = {}) {
   const publicComplete = publico != null && renda != null;
   const highlightResolved = Boolean(highlight?.url && highlight?.video_id);
   const finalAt = text(row.final_at || row.finalAt || row.finalizado_em) || nowIso();
+  const league = attendanceEligibility(row.league ?? row.espn_league);
+  const initialPublicStatus = league.required ? (publicComplete ? 'resolved' : 'pending') : league.publicStatus;
   const now = nowIso();
   await env.DB.prepare(`
     INSERT INTO postgame_fastlane (
@@ -680,16 +686,29 @@ async function upsertTask(env, row, staticData = {}) {
       publico_pagante=COALESCE(postgame_fastlane.publico_pagante,excluded.publico_pagante),
       renda=COALESCE(postgame_fastlane.renda,excluded.renda),
       public_sources_json=CASE WHEN postgame_fastlane.public_sources_json IS NULL OR postgame_fastlane.public_sources_json='' THEN excluded.public_sources_json ELSE postgame_fastlane.public_sources_json END,
-      public_status=CASE WHEN postgame_fastlane.public_status='resolved' OR excluded.public_status<>'resolved' THEN postgame_fastlane.public_status ELSE 'resolved' END,
-      public_next_at=CASE WHEN postgame_fastlane.public_status='resolved' OR excluded.public_status='resolved' THEN NULL ELSE COALESCE(postgame_fastlane.public_next_at,excluded.public_next_at) END,
+      -- Só um campeonato explicitamente classificado como bra.1 pode reativar coleta.
+      public_status=CASE
+        WHEN (CASE WHEN excluded.league<>'' THEN excluded.league ELSE postgame_fastlane.league END) = 'bra.1'
+          THEN CASE
+            WHEN postgame_fastlane.public_status IN ('not_applicable','eligibility_pending')
+              THEN CASE WHEN COALESCE(postgame_fastlane.publico,excluded.publico)>0 AND COALESCE(postgame_fastlane.renda,excluded.renda)>0 THEN 'resolved' ELSE 'pending' END
+            WHEN postgame_fastlane.public_status='resolved' OR excluded.public_status<>'resolved' THEN postgame_fastlane.public_status
+            ELSE 'resolved' END
+        WHEN (CASE WHEN excluded.league<>'' THEN excluded.league ELSE postgame_fastlane.league END) = '' THEN 'eligibility_pending'
+        ELSE 'not_applicable' END,
+      public_next_at=CASE
+        WHEN (CASE WHEN excluded.league<>'' THEN excluded.league ELSE postgame_fastlane.league END) <> 'bra.1' THEN NULL
+        WHEN postgame_fastlane.public_status IN ('not_applicable','eligibility_pending') THEN CASE WHEN COALESCE(postgame_fastlane.publico,excluded.publico)>0 AND COALESCE(postgame_fastlane.renda,excluded.renda)>0 THEN NULL ELSE excluded.public_next_at END
+        WHEN postgame_fastlane.public_status='resolved' OR excluded.public_status='resolved' THEN NULL
+        ELSE COALESCE(postgame_fastlane.public_next_at,excluded.public_next_at) END,
       highlight_json=COALESCE(postgame_fastlane.highlight_json,excluded.highlight_json),
       highlight_status=CASE WHEN postgame_fastlane.highlight_status='resolved' OR excluded.highlight_status<>'resolved' THEN postgame_fastlane.highlight_status ELSE 'resolved' END,
       highlight_next_at=CASE WHEN postgame_fastlane.highlight_status='resolved' OR excluded.highlight_status='resolved' THEN NULL ELSE COALESCE(postgame_fastlane.highlight_next_at,excluded.highlight_next_at) END,
       updated_at=CURRENT_TIMESTAMP
   `).bind(
-    eventId, text(row.league || row.espn_league || 'bra.1'), text(row.home || row.mandante?.nome || row.mandante), text(row.away || row.visitante?.nome || row.visitante),
+    eventId, league.league, text(row.home || row.mandante?.nome || row.mandante), text(row.away || row.visitante?.nome || row.visitante),
     text(row.kickoff || row.data_iso), finalAt, homeScore, awayScore,
-    publico, pagantes, renda, staticData.public_sources ? JSON.stringify(staticData.public_sources) : null, publicComplete ? 'resolved' : 'pending', publicComplete ? null : now,
+    publico, pagantes, renda, staticData.public_sources ? JSON.stringify(staticData.public_sources) : null, initialPublicStatus, initialPublicStatus === 'pending' ? now : null,
     highlightResolved ? JSON.stringify(highlight) : null, highlightResolved ? 'resolved' : 'pending', highlightResolved ? null : now,
     now, now
   ).run();
@@ -703,8 +722,8 @@ async function upsertTask(env, row, staticData = {}) {
       publico_pagante=CASE WHEN ? IS NOT NULL THEN ? ELSE publico_pagante END,
       renda=CASE WHEN ? IS NOT NULL THEN ? ELSE renda END,
       public_sources_json=CASE WHEN ? IS NOT NULL AND ?<>'' THEN ? ELSE public_sources_json END,
-      public_status=CASE WHEN COALESCE(?,publico) IS NOT NULL AND COALESCE(?,renda) IS NOT NULL THEN 'resolved' ELSE public_status END,
-      public_next_at=CASE WHEN COALESCE(?,publico) IS NOT NULL AND COALESCE(?,renda) IS NOT NULL THEN NULL ELSE public_next_at END,
+      public_status=CASE WHEN league='bra.1' AND COALESCE(?,publico) IS NOT NULL AND COALESCE(?,renda) IS NOT NULL THEN 'resolved' ELSE public_status END,
+      public_next_at=CASE WHEN league='bra.1' AND COALESCE(?,publico) IS NOT NULL AND COALESCE(?,renda) IS NOT NULL THEN NULL ELSE public_next_at END,
       public_last_error='',updated_at=CURRENT_TIMESTAMP
       WHERE event_id=?`)
       .bind(publico,publico,pagantes,pagantes,renda,renda,src,src||'',src,publico,renda,publico,renda,eventId).run();
@@ -737,7 +756,7 @@ async function upsertTask(env, row, staticData = {}) {
 export async function recordPostgameFinal(env, game, observation = null, detectedAt = Date.now()) {
   const row = {
     event_id: text(game?.eventId || observation?.eventId),
-    league: text(game?.league || observation?.league || 'bra.1'),
+    league: text(game?.league || observation?.league),
     home: text(game?.home?.name || game?.home || observation?.home?.name),
     away: text(game?.away?.name || game?.away || observation?.away?.name),
     kickoff: text(game?.kickoff || observation?.kickoff),
@@ -816,7 +835,7 @@ async function seedFromStatic(env, now = Date.now()) {
       // invalidar. Correção documental verificada continua autoritativa.
       const pub = Object.keys(verifiedPub).length > 0 ? { ...basePub, ...verifiedPub } : (existing ? {} : basePub);
       const mm = mmMap[eventId] || null;
-      await upsertTask(env, result, {
+      await upsertTask(env, { ...result, league: 'bra.1' }, {
         publico: pub.publico,
         publico_pagante: verifiedPub.pagantes_status === 'nao_divulgado' ? null : (pub.pagantes ?? pub.publico_pagante),
         renda: pub.renda,
@@ -845,7 +864,7 @@ function taskAgeHours(task, now = Date.now()) {
   return Math.max(0, (now - finalAt) / 3_600_000);
 }
 
-async function claimDue(env, kind, now = Date.now()) {
+export async function claimDue(env, kind, now = Date.now()) {
   const prefix = kind === 'highlight' ? 'highlight' : 'public';
   const iso = nowIso(now);
   // Público/renda recente tem prioridade para que um backlog antigo nunca segure
@@ -855,12 +874,12 @@ async function claimDue(env, kind, now = Date.now()) {
     : `COALESCE(p.highlight_last_at,'1970-01-01T00:00:00.000Z') ASC, p.final_at DESC`;
   const row = await env.DB.prepare(`SELECT p.*, c.round, c.stadium FROM postgame_fastlane p
     LEFT JOIN postgame_match_context c ON c.event_id=p.event_id
-    WHERE p.${prefix}_status<>'resolved' AND COALESCE(p.${prefix}_next_at,'1970-01-01T00:00:00.000Z')<=?
+    WHERE p.${prefix}_status<>'resolved' ${kind === 'public' ? "AND p.league='bra.1' AND p.public_status NOT IN ('not_applicable','eligibility_pending')" : ''} AND COALESCE(p.${prefix}_next_at,'1970-01-01T00:00:00.000Z')<=?
     ORDER BY ${orderBy} LIMIT 1`).bind(iso).first();
   if (!row) return null;
   const currentNext = text(row[`${prefix}_next_at`]);
   const lockUntil = nowIso(now + 10 * 60_000);
-  const result = await env.DB.prepare(`UPDATE postgame_fastlane SET ${prefix}_next_at=?, updated_at=CURRENT_TIMESTAMP WHERE event_id=? AND ${prefix}_status<>'resolved' AND COALESCE(${prefix}_next_at,'')=?`).bind(lockUntil, row.event_id, currentNext).run();
+  const result = await env.DB.prepare(`UPDATE postgame_fastlane SET ${prefix}_next_at=?, updated_at=CURRENT_TIMESTAMP WHERE event_id=? AND ${prefix}_status<>'resolved' ${kind === 'public' ? "AND league='bra.1' AND public_status NOT IN ('not_applicable','eligibility_pending')" : ''} AND COALESCE(${prefix}_next_at,'')=?`).bind(lockUntil, row.event_id, currentNext).run();
   if (Number(result?.meta?.changes || 0) < 1) return null;
   return row;
 }
@@ -1242,6 +1261,11 @@ async function maybeProbeMailer(env, now = Date.now()) {
 
 async function processPublicTask(env, task, now = Date.now()) {
   const eventId=text(task.event_id);
+  if (!attendanceEligibility(task.league).required || ['not_applicable','eligibility_pending'].includes(text(task.public_status))) return {eventId, attempted:false, status:'skipped_competition_ineligible'};
+  // Revalidar o D1 após o claim: um seed/retificação concorrente pode ter
+  // alterado a competição entre a seleção e o início da busca.
+  const current = await env.DB.prepare('SELECT league,public_status FROM postgame_fastlane WHERE event_id=?').bind(eventId).first();
+  if (!current || !attendanceEligibility(current.league).required || ['not_applicable','eligibility_pending'].includes(text(current.public_status))) return {eventId, attempted:false, status:'skipped_competition_reclassified'};
   const [ai,diag]=await Promise.all([readPublicAiState(env,eventId),readSearchDiag(env,eventId)]);
   const values={publico:num(task.publico),publico_pagante:num(task.publico_pagante),renda:num(task.renda)};
   let sources=safeJson(task.public_sources_json,{})||{};
@@ -1397,8 +1421,11 @@ async function processPublicTask(env, task, now = Date.now()) {
       // O D1 pode estar pendente enquanto o Pages ja publicou uma correcao.
       // Sem conseguir ler o snapshot autoritativo, nao afirmar por e-mail que
       // publico/renda nao foram localizados. A busca/retry segue normalmente.
+      const stillEligible = await env.DB.prepare('SELECT league,public_status FROM postgame_fastlane WHERE event_id=?').bind(eventId).first();
       const staticSeedError=await metaGet(env,'static_seed_error');
-      if(staticSeedError){
+      if (!stillEligible || !attendanceEligibility(stillEligible.league).required || ['not_applicable','eligibility_pending'].includes(text(stillEligible.public_status))) {
+        next.alert_status='suppressed_competition_reclassified';
+      } else if(staticSeedError){
         next.alert_status='suppressed_static_seed_unavailable';
       }else{
         next.alert_status=await sendPublicNotFoundEmail(env,publicAlertMessage(task,values,sources,next,lastError,env,costSummary,nextAt));
@@ -1412,8 +1439,9 @@ async function processPublicTask(env, task, now = Date.now()) {
     if(!next.alert_at) next.alert_status='recovered_by_verified_or_grounded_correction';
   }
 
-  await env.DB.prepare(`UPDATE postgame_fastlane SET publico=?,publico_pagante=?,renda=?,public_sources_json=?,public_status=?,public_attempts=?,public_last_at=?,public_next_at=?,public_last_error=?,updated_at=CURRENT_TIMESTAMP WHERE event_id=?`)
+  const persisted = await env.DB.prepare(`UPDATE postgame_fastlane SET publico=?,publico_pagante=?,renda=?,public_sources_json=?,public_status=?,public_attempts=?,public_last_at=?,public_next_at=?,public_last_error=?,updated_at=CURRENT_TIMESTAMP WHERE event_id=? AND league='bra.1' AND public_status NOT IN ('not_applicable','eligibility_pending')`)
     .bind(num(values.publico),num(values.publico_pagante),num(values.renda),JSON.stringify(sources),status,Number(task.public_attempts||0)+1,nowIso(now),nextAt,complete?'':text(lastError).slice(0,1000),eventId).run();
+  if (Number(persisted?.meta?.changes || 0) < 1) return {eventId, attempted:false, status:'skipped_competition_reclassified'};
   await writePublicAiState(env,eventId,next);
   return{eventId,phase:plan.phase,status,nextAt,model:next.last_model||'',alert:next.alert_status||'',reason:complete?'':lastError,budget:budget.reason||'',estimatedUsd:Number(costSummary?.event?.estimatedUsd||0)};
 }
@@ -1432,7 +1460,7 @@ async function processPublic(env, now = Date.now()) {
   return { attempted: true, processed: results.length, results };
 }
 
-async function ensurePolicyVersion(env, now = Date.now()) {
+export async function ensurePolicyVersion(env, now = Date.now()) {
   const current = Number(await metaGet(env, 'policy_version') || 0);
   if (current >= POSTGAME_POLICY_VERSION) return false;
   const isoNow = nowIso(now);
@@ -1509,6 +1537,20 @@ async function ensurePolicyVersion(env, now = Date.now()) {
     }
   }
 
+  // R10R17.1/v14: migração D1 exclusivamente SQL, sem reabrir histórico
+  // nem disparar IA. Preserva tentativas, fontes, público, renda e highlights.
+  if (current < 14) {
+    await env.DB.prepare("UPDATE postgame_fastlane SET league='bra.1' WHERE LOWER(TRIM(league))='bra.1' AND league<>'bra.1'").run();
+    await env.DB.prepare(`UPDATE postgame_fastlane
+      SET public_status='not_applicable', public_next_at=NULL, updated_at=CURRENT_TIMESTAMP
+      WHERE league<>'bra.1' AND TRIM(league)<>''
+        AND (public_status<>'not_applicable' OR public_next_at IS NOT NULL)`).run();
+    await env.DB.prepare(`UPDATE postgame_fastlane
+      SET public_status='eligibility_pending', public_next_at=NULL, updated_at=CURRENT_TIMESTAMP
+      WHERE TRIM(league)=''
+        AND (public_status<>'eligibility_pending' OR public_next_at IS NOT NULL)`).run();
+  }
+
   await metaPut(env, 'policy_version', String(POSTGAME_POLICY_VERSION));
   return true;
 }
@@ -1519,7 +1561,7 @@ async function cleanup(env, now = Date.now()) {
   // só pode ser removida após ambos os fluxos (público/renda + highlights)
   // estarem resolvidos e já tiverem mais de 30 dias.
   await env.DB.prepare(`DELETE FROM postgame_fastlane
-    WHERE final_at<? AND public_status='resolved' AND highlight_status='resolved'`).bind(cutoff).run();
+    WHERE final_at<? AND public_status IN ('resolved','not_applicable') AND highlight_status='resolved'`).bind(cutoff).run();
   await env.DB.prepare(`DELETE FROM postgame_public_ai WHERE event_id NOT IN (SELECT event_id FROM postgame_fastlane)`).run();
   await env.DB.prepare(`DELETE FROM postgame_source_cache WHERE event_id NOT IN (SELECT event_id FROM postgame_fastlane)`).run();
   await env.DB.prepare(`DELETE FROM postgame_match_context WHERE event_id NOT IN (SELECT event_id FROM postgame_fastlane)`).run();
@@ -1545,7 +1587,7 @@ export async function runPostgameMaintenance(env, monitor, now = Date.now()) {
 function publicRow(row) {
   const highlight = safeJson(row.highlight_json, null);
   return {
-    event_id: text(row.event_id), home: text(row.home), away: text(row.away), kickoff: text(row.kickoff), final_at: text(row.final_at),
+    event_id: text(row.event_id), league: text(row.league), public_eligibility: attendanceEligibility(row.league).state, home: text(row.home), away: text(row.away), kickoff: text(row.kickoff), final_at: text(row.final_at),
     round: row.round == null ? null : Number(row.round), stadium: text(row.stadium),
     publico: num(row.publico), publico_pagante: num(row.publico_pagante), renda: num(row.renda),
     public_status: text(row.public_status), public_attempts: Number(row.public_attempts || 0), public_next_at: text(row.public_next_at),
@@ -1649,11 +1691,14 @@ export async function postgameStatus(env) {
   const probeRaw = await metaGet(env, 'mailer_probe');
   const counts = await env.DB.prepare(`SELECT
     COUNT(*) AS total,
-    SUM(CASE WHEN public_status='pending' THEN 1 ELSE 0 END) AS public_searching,
-    SUM(CASE WHEN public_status='overdue' THEN 1 ELSE 0 END) AS public_overdue,
-    SUM(CASE WHEN public_status='budget_guard' THEN 1 ELSE 0 END) AS public_budget_guard,
-    SUM(CASE WHEN public_status<>'resolved' THEN 1 ELSE 0 END) AS public_pending,
-    SUM(CASE WHEN public_status='resolved' THEN 1 ELSE 0 END) AS public_resolved,
+    SUM(CASE WHEN league='bra.1' AND public_status='pending' THEN 1 ELSE 0 END) AS public_searching,
+    SUM(CASE WHEN league='bra.1' AND public_status='overdue' THEN 1 ELSE 0 END) AS public_overdue,
+    SUM(CASE WHEN league='bra.1' AND public_status='budget_guard' THEN 1 ELSE 0 END) AS public_budget_guard,
+    SUM(CASE WHEN league='bra.1' AND public_status NOT IN ('resolved','not_applicable','eligibility_pending') THEN 1 ELSE 0 END) AS public_pending,
+    SUM(CASE WHEN league='bra.1' AND public_status='resolved' THEN 1 ELSE 0 END) AS public_resolved,
+    SUM(CASE WHEN league='bra.1' THEN 1 ELSE 0 END) AS public_eligible_total,
+    SUM(CASE WHEN league<>'bra.1' AND TRIM(league)<>'' THEN 1 ELSE 0 END) AS public_not_applicable,
+    SUM(CASE WHEN TRIM(league)='' THEN 1 ELSE 0 END) AS public_eligibility_pending,
     SUM(CASE WHEN highlight_status<>'resolved' THEN 1 ELSE 0 END) AS highlight_pending
     FROM postgame_fastlane`).first();
   const cfg = mailConfig(env);
@@ -1693,9 +1738,16 @@ export async function postgameStatus(env) {
     verifiedCorrectionsOverrideD1: true,
     recentResolvedIdentityRevalidation: true,
     preferredEditorialSourceCount: PREFERRED_EDITORIAL_SOURCE_SUFFIXES.length,
+    attendanceEligibilityPolicyVersion: POSTGAME_ELIGIBILITY_VERSION,
+    attendanceRequiredLeague: ATTENDANCE_REQUIRED_LEAGUE,
+    publicExemptStatus: 'not_applicable',
+    publicUnknownStatus: 'eligibility_pending',
     publicPersistentUntilResolved: true,
     publicGaveUp: 0,
     total: Number(counts?.total || 0),
+    publicEligibleTotal: Number(counts?.public_eligible_total || 0),
+    publicNotApplicable: Number(counts?.public_not_applicable || 0),
+    publicEligibilityPending: Number(counts?.public_eligibility_pending || 0),
     publicResolved: Number(counts?.public_resolved || 0),
     publicPending: Number(counts?.public_pending || 0),
     publicSearching: Number(counts?.public_searching || 0),
