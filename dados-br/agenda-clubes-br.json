@@ -3,9 +3,9 @@
   "projeto": "Fórmula do Gol",
   "tipo": "agenda_clubes_brasileirao",
   "descricao": "Agenda do Brasileirão e dos clubes da Série A 2026 na Copa do Brasil, Libertadores e Sul-Americana.",
-  "gerado_em": "2026-10-13T20:36:18-03:00",
+  "gerado_em": "2026-10-14T01:52:45-03:00",
   "periodo": {
-    "inicio": "2026-10-13T00:00:00-03:00",
+    "inicio": "2026-10-14T00:00:00-03:00",
     "fim": "2026-11-30T23:59:59.999999-03:00",
     "regra": "de hoje até o último dia do mês seguinte"
   },
@@ -15,9 +15,9 @@
     "probabilidades": "disponíveis apenas para partidas do Brasileirão com saída AF-Previsão publicada"
   },
   "resumo": {
-    "total_jogos": 52,
+    "total_jogos": 51,
     "por_competicao": {
-      "sul_americana": 4,
+      "sul_americana": 3,
       "libertadores": 4,
       "brasileirao": 40,
       "copa_do_brasil": 4
@@ -26,55 +26,12 @@
   "integridade_continental": {
     "status": "ok",
     "fonte_documental": "dados-br/correcoes/agenda-continentais-oficial.json",
-    "esperados_no_periodo": 8,
+    "esperados_no_periodo": 7,
     "faltantes": [],
-    "fallbacks_documentais_ativos": 8,
+    "fallbacks_documentais_ativos": 7,
     "regra": "fase seguinte oficial não pode desaparecer da agenda por falha do scoreboard amplo"
   },
   "jogos": [
-    {
-      "event_id": "fdg-conmebol-sul-americana-202610132130-boca-juniors-vasco-da-gama",
-      "event_id_origem": "documental_interno",
-      "espn_event_id": "",
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "CONMEBOL Sudamericana",
-      "competicao_nome_curto": "Sul-Americana",
-      "espn_league": "conmebol.sudamericana",
-      "data_iso": "2026-10-13T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Agendado",
-      "rodada": 0,
-      "fase": "Semifinal",
-      "perna": 1,
-      "estadio": "La Bombonera",
-      "mandante": {
-        "espn_id": "5",
-        "nome": "Boca Juniors",
-        "sigla": "CABJ",
-        "escudo": "https://a.espncdn.com/i/teamlogos/soccer/500/5.png",
-        "pais": "ARG",
-        "serie_a_2026": false
-      },
-      "visitante": {
-        "espn_id": "3454",
-        "nome": "Vasco da Gama",
-        "sigla": "VAS",
-        "escudo": "https://a.espncdn.com/i/teamlogos/soccer/500/3454.png",
-        "pais": "BRA",
-        "serie_a_2026": true
-      },
-      "placar_mandante": null,
-      "placar_visitante": null,
-      "adiado": false,
-      "data_definir": false,
-      "possui_clube_serie_a_2026": true,
-      "probabilidades_disponiveis": false,
-      "fonte": "dados-br/correcoes/agenda-continentais-oficial.json",
-      "fonte_calendario": "CONMEBOL oficial",
-      "fonte_url": "https://gol.conmebol.com/sudamericana/pt-br/news/en-busca-de-la-gran-conquista-todo-definido-para-las-semifinales-de-la-conmebol-sudamericana",
-      "fallback_agenda_oficial": true
-    },
     {
       "event_id": "fdg-conmebol-sul-americana-202610141900-atletico-mg-montevideo-city-torque",
       "event_id_origem": "documental_interno",
