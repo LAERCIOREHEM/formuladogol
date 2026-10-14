@@ -144,7 +144,7 @@ jobs:
           grep -q 'br-estatisticas.js?v=20260920-live-facts-v6' estatisticas.html
           grep -q 'br-aovivo.js?v=20261014-r10r17-2' aovivo.html
           grep -q 'br-live-goal-sync.js?v=20261014-r10r17-2' aovivo.html
-          echo 'OK: Ao Vivo, Tabela e Estatísticas usam LiveState v6 + Live Facts v2.'
+          echo 'OK: LiveState v7 + Live Facts v2 + R10R17.2 IDs documentais e fallback ESPN numérico.'
 
       - name: Validar instalação PWA da Home
         shell: bash
