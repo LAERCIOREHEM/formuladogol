@@ -771,8 +771,8 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const d = JSON.parse(fs.readFileSync('/tmp/fdg-dispatch-status.json', 'utf8'));
-          if (d.dispatchVersion !== 5) {
-            console.error(`dispatchVersion=${d.dispatchVersion} esperado=5`);
+          if (d.dispatchVersion !== 6) {
+            console.error(`dispatchVersion=${d.dispatchVersion} esperado=6`);
             process.exit(1);
           }
           console.log('Fila de alertas saudável.');
