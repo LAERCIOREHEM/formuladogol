@@ -1,40 +1,21 @@
-FORMULA DO GOL - Pagina Acuracia (UX) - v3
-==========================================
+FDG HOTFIX 8.3.1 — GITHUB PAGES CI CONTRACT
 
-ONDE COLOCAR CADA ARQUIVO:
+Base: formuladogol-main(5).zip fornecido pelo usuário.
 
-  acuracia.html          ->  acuracia.html          (raiz)
-  css/br-acuracia.css    ->  css/br-acuracia.css
-  js/br-acuracia.js      ->  js/br-acuracia.js
+Correção:
+- remove fallback que fabricava linhas "Autor sendo confirmado" a partir do placar quando __fdgLiveFacts não existia;
+- remove preenchimento artificial de gols faltantes até alcançar o placar;
+- preserva a melhoria do HOTFIX 8.3 de reconciliação/consulta continental;
+- mantém autoria exclusivamente dependente de Live Facts canônicos.
 
-Os tres caminhos ja estao no "paths" do deploy.yml: o Deploy site
-(GitHub Pages) dispara sozinho apos o push. Use Ctrl+F5 ao conferir.
+Arquivo a enviar ao GitHub preservando o caminho:
+js/br-aovivo.js
 
-CORRECAO DESTA VERSAO (v3)
---------------------------
-A tabela do celular repetia "R22" varias vezes com o mesmo valor.
-Causa: o historico grava varios snapshots dentro da mesma rodada, e a
-tabela listava os ultimos 8 REGISTROS, nao as ultimas 8 RODADAS.
-Agora agrupa por rodada e mostra o ultimo snapshot de cada uma
-(funcao byRound no JS). O grafico do desktop nao era afetado.
-
-CORRECOES DA v2 (mantidas)
---------------------------
-- Amostra dos bins e "previsoes", nao "jogos": cada partida gera 3
-  previsoes (vitoria, empate, derrota). 10 jogos = 30 previsoes.
-- Os 1.699 sao registros de previsao pre-jogo, nao partidas.
-- Painel de escopo com inicio (rodada 22), progresso e fim (rodada 38),
-  com barra: 10 de 170 jogos previstos.
-  Constantes RODADAS_TOTAL (38) e JOGOS_POR_RODADA (10) no topo do JS.
-
-DEMAIS MUDANCAS
----------------
-1. Os 4 cards do topo sairam; os numeros foram para a linha de chips.
-2. Calibracao em barras comparadas "modelo disse" x "aconteceu".
-3. Faixas com menos de 5 previsoes esmaecidas (constante MIN_BIN).
-4. Grafico do clube com escala dinamica e rotulo na ponta da linha.
-5. Tooltip nao sai do quadro e funciona por toque.
-6. Abaixo de 560px os graficos viram tabela.
-7. Painel de integridade SHA-256 no fim da pagina.
-
-NAO HOUVE MUDANCA METODOLOGICA. Apenas apresentacao.
+Validação local executada:
+node --check js/br-classificacao-live.js: PASS
+node --check js/br-estatisticas.js: PASS
+node --check js/br-aovivo.js: PASS
+node --check js/br-resultados-freshness.js: PASS
+node tests/test-br-classificacao-live.mjs: PASS
+node cloudflare/push-worker/tests/test-resultados-freshness.mjs: PASS
+greps do workflow PUBLICAR GITHUB PAGES: PASS

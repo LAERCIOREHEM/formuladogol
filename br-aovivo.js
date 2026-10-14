@@ -2,6 +2,10 @@
   "use strict";
 
   const ESPN_API_ROOT = "https://site.api.espn.com/apis/site/v2/sports/soccer";
+  const LIVE_GATEWAY_ROOT = "https://push.formuladogol.com.br/v1/live";
+  const LIVE_STATE_CONTRACT_VERSION = 1;
+  const LIVE_GATEWAY_TIMEOUT_MS = 4500;
+  const DIRECT_ESPN_FALLBACK_TIMEOUT_MS = 4500;
   const DEFAULT_LEAGUE = "bra.1";
   const LEAGUE_META = {
     "bra.1": { competitionKey: "brasileirao", competitionName: "Campeonato Brasileiro Série A", competitionShort: "Brasileirão" },
@@ -9,12 +13,19 @@
     "conmebol.libertadores": { competitionKey: "libertadores", competitionName: "CONMEBOL Libertadores", competitionShort: "Libertadores" },
     "conmebol.sudamericana": { competitionKey: "sul_americana", competitionName: "CONMEBOL Sudamericana", competitionShort: "Sul-Americana" }
   };
-  const REFRESH_MS = 30000;
+  const LIVE_REFRESH_MS = 10000;
+  const IDLE_REFRESH_MS = 30000;
+  const SUMMARY_REFRESH_MS = 30000;
+  const MISSING_SCORER_REFRESH_MS = 5000;
   const TZ = "America/Sao_Paulo";
   const FINAL_RETENTION_BR_MS = 5 * 60000;
   const FINAL_RETENTION_OTHER_MS = 60 * 60000;
   const PRE_GAME_WINDOW_BEFORE_MS = 30 * 60000;
   const PRE_GAME_WINDOW_AFTER_MS = 90 * 60000;
+  const FETCH_TIMEOUT_MS = 12000;
+  const STALE_DATA_MS = 35000;
+  const FRESHNESS_CHECK_MS = 5000;
+  const IMMEDIATE_REFRESH_DEBOUNCE_MS = 750;
 
   const $ = (sel) => document.querySelector(sel);
   const app = $("#live-app");
@@ -113,6 +124,14 @@
         { label: "Canal GE TV", url: "https://www.youtube.com/@getv" }
       ]
     },
+    sbt: {
+      label: "SBT",
+      aliases: ["sbt", "sbt sports", "sbt_sports", "+sbt"],
+      links: [
+        { label: "SBT no YouTube", url: "https://www.youtube.com/@sbt/streams" },
+        { label: "SBT ao vivo", url: "https://www.sbt.com.br/ao-vivo" }
+      ]
+    },
     cazetv: {
       label: "CazéTV",
       aliases: ["cazetv", "caze tv"],
@@ -131,13 +150,14 @@
     "paramountplus.com", "www.paramountplus.com",
     "sbt.com.br", "www.sbt.com.br",
     "record.r7.com", "www.record.r7.com", "r7.com", "www.r7.com",
-    "youtube.com", "www.youtube.com"
+    "youtube.com", "www.youtube.com", "youtu.be", "www.youtu.be"
   ]);
 
   const FINAL_CACHE_KEY = "br2026_finais_reais_v2";
-  const LIVE_STATS_CACHE_KEY = "br2026_estatisticas_ao_vivo_v2";
+  const LIVE_STATS_CACHE_KEY = "br2026_estatisticas_ao_vivo_v3";
   const LIVE_STATS_CACHE_MAX_AGE_MS = 6 * 3600000;
   const PARTIAL_STATS_THRESHOLD = 6;
+  const CONTINENTAL_PARTIAL_STATS_THRESHOLD = 14;
   const PARTIAL_STATS_RETRY_DELAY_MS = 1200;
   const PARTIAL_STATS_RETRY_COOLDOWN_MS = 60000;
 
@@ -181,25 +201,42 @@
     try { sessionStorage.setItem(LIVE_STATS_CACHE_KEY, JSON.stringify(state.statsPorId || {})); } catch (_) {}
   }
 
+  const initialRequestedEvent = new URLSearchParams(window.location.search || "").get("event") || "";
   const state = {
     agenda: [],
     eventosLocais: [],
     diretos: [],
     transmissoes: {},
     transmissoesTv: {},
-    selecionado: new URLSearchParams(window.location.search || "").get("event") || "",
+    selecionado: initialRequestedEvent,
+    selectionOrigin: initialRequestedEvent ? "user" : "auto",
     resumoPorId: {},
+    summaryFetchedAt: {},
+    summaryScoreKey: {},
+    summaryLoadingKey: {},
     statsPorId: cachedLiveStats(),
     statsRetryAt: {},
     summaryRequestSerial: 0,
     renderSerial: 0,
     summaryAbortController: null,
+    scorerRetryTimer: null,
     ultimaAtualizacao: null,
+    ultimaTentativa: null,
+    ultimoSucessoEspn: null,
     ultimaFalha: "",
     timer: null,
     tickTimer: null,
+    freshnessTimer: null,
     carregando: false,
+    carregandoDesde: 0,
     primeiraCarga: true,
+    refreshRequested: false,
+    pendingRefreshReason: "",
+    refreshGeneration: 0,
+    immediateRefreshAt: 0,
+    activeFetchControllers: new Set(),
+    espnSuccessByLeague: {},
+    espnFailureByLeague: {},
     finalizadosEm: cachedFinalTimes(),
     probabilidadesJogos: null
   };
@@ -301,6 +338,11 @@
     return dateKey(d).replace(/-/g, "");
   }
 
+  function sharedBrasileiraoLiveDates(reference = new Date()) {
+    const token = (date) => date.toISOString().slice(0, 10).replace(/-/g, "");
+    return token(new Date(reference.getTime() - 86400000)) + "-" + token(new Date(reference.getTime() + 86400000));
+  }
+
   function formatDateTime(d) {
     if (!d) return "Horário a definir";
     return new Intl.DateTimeFormat("pt-BR", {
@@ -361,6 +403,12 @@
       espnLeague: String(j.espn_league || DEFAULT_LEAGUE),
       fase: String(j.fase || ""),
       perna: Number(j.perna || 0),
+      confronto_id: String(j.confronto_id || ""),
+      partida_numero: Number(j.partida_numero || j.perna || 0),
+      partidas_total: Number(j.partidas_total || 0),
+      agregado_disponivel: j.agregado_disponivel === true,
+      agregado_mandante: Number(j.agregado_mandante || 0),
+      agregado_visitante: Number(j.agregado_visitante || 0),
       probabilitiesAvailable: j.probabilidades_disponiveis === true
     }));
   }
@@ -469,6 +517,7 @@
       raw: ev,
       competition: comp,
       source: "espn",
+      sourceFetchedAt: Number(info.sourceFetchedAt || 0),
       competitionKey: String(info.competitionKey || "brasileirao"),
       competitionName: String(info.competitionName || "Campeonato Brasileiro Série A"),
       competitionShort: String(info.competitionShort || "Brasileirão"),
@@ -542,14 +591,249 @@
       espnLeague: loc.espnLeague || game.espnLeague || DEFAULT_LEAGUE,
       fase: loc.fase || game.fase || "",
       perna: loc.perna || game.perna || 0,
+      confronto_id: loc.confronto_id || game.confronto_id || "",
+      partida_numero: loc.partida_numero || game.partida_numero || loc.perna || game.perna || 0,
+      partidas_total: loc.partidas_total || game.partidas_total || 0,
+      agregado_disponivel: loc.agregado_disponivel === true || game.agregado_disponivel === true,
+      agregado_mandante: loc.agregado_disponivel === true ? Number(loc.agregado_mandante || 0) : Number(game.agregado_mandante || 0),
+      agregado_visitante: loc.agregado_disponivel === true ? Number(loc.agregado_visitante || 0) : Number(game.agregado_visitante || 0),
       probabilitiesAvailable: loc.probabilitiesAvailable === true
     };
   }
 
+  function isAbortError(error) {
+    return Boolean(error && error.name === "AbortError");
+  }
+
+  function abortActiveFetches() {
+    if (state.summaryAbortController) {
+      try { state.summaryAbortController.abort(); } catch (_) {}
+    }
+    for (const controller of Array.from(state.activeFetchControllers)) {
+      try { controller.abort(); } catch (_) {}
+    }
+  }
+
   async function fetchJson(url, options = {}) {
-    const r = await fetch(url, Object.assign({ cache: "no-store" }, options));
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    return r.json();
+    const requestOptions = Object.assign({ cache: "no-store" }, options || {});
+    const explicitTimeout = Number(requestOptions.timeoutMs);
+    const timeoutMs = Number.isFinite(explicitTimeout) && explicitTimeout > 0 ? explicitTimeout : FETCH_TIMEOUT_MS;
+    delete requestOptions.timeoutMs;
+
+    const externalSignal = requestOptions.signal || null;
+    const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+    let timeoutId = null;
+    let timedOut = false;
+    let externalAbortHandler = null;
+
+    if (controller) {
+      if (externalSignal) {
+        externalAbortHandler = () => controller.abort();
+        if (externalSignal.aborted) controller.abort();
+        else externalSignal.addEventListener("abort", externalAbortHandler, { once: true });
+      }
+      requestOptions.signal = controller.signal;
+      state.activeFetchControllers.add(controller);
+      timeoutId = setTimeout(() => {
+        timedOut = true;
+        try { controller.abort(); } catch (_) {}
+      }, timeoutMs);
+    }
+
+    try {
+      const r = await fetch(url, requestOptions);
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return await r.json();
+    } catch (error) {
+      if (timedOut) {
+        const timeoutError = new Error("Tempo limite excedido ao consultar a fonte (" + Math.round(timeoutMs / 1000) + "s)");
+        timeoutError.name = "TimeoutError";
+        throw timeoutError;
+      }
+      throw error;
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (externalSignal && externalAbortHandler) externalSignal.removeEventListener("abort", externalAbortHandler);
+      if (controller) state.activeFetchControllers.delete(controller);
+    }
+  }
+
+  async function fetchScoreboardPayload(league, dates) {
+    const resolvedLeague = String(league || DEFAULT_LEAGUE);
+    const resolvedDates = resolvedLeague === DEFAULT_LEAGUE ? sharedBrasileiraoLiveDates(new Date()) : String(dates || "");
+    const params = new URLSearchParams({ league: resolvedLeague, dates: resolvedDates });
+    let gatewayError = null;
+
+    try {
+      const envelope = await fetchJson(LIVE_GATEWAY_ROOT + "/state?" + params.toString() + "&_=" + Date.now(), {
+        timeoutMs: LIVE_GATEWAY_TIMEOUT_MS,
+        mode: "cors"
+      });
+      if (!envelope || envelope.ok !== true || !envelope.data || !Array.isArray(envelope.data.events)) {
+        throw new Error("Gateway ao vivo retornou payload inválido");
+      }
+      if (Number(envelope.stateContractVersion || 0) !== LIVE_STATE_CONTRACT_VERSION || envelope.transport !== "worker-espn") {
+        throw new Error("Gateway ao vivo ainda não expõe o contrato LiveState esperado");
+      }
+      return {
+        data: envelope.data,
+        fetchedAt: Number(envelope.fetchedAt || Date.now()),
+        stale: envelope.stale === true,
+        source: String(envelope.source || "espn_gateway"),
+        transport: "gateway",
+        cacheStatus: String(envelope.cacheStatus || ""),
+        detail: String(envelope.upstreamError || "")
+      };
+    } catch (error) {
+      gatewayError = error;
+    }
+
+    try {
+      const directUrl = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/scoreboard?dates=" + encodeURIComponent(dates) + "&limit=100&_=" + Date.now();
+      const data = await fetchJson(directUrl, { timeoutMs: DIRECT_ESPN_FALLBACK_TIMEOUT_MS });
+      if (!data || !Array.isArray(data.events)) throw new Error("ESPN direta retornou payload inválido");
+      return {
+        data,
+        fetchedAt: Date.now(),
+        stale: false,
+        source: "espn_site_api_direct",
+        transport: "direct",
+        cacheStatus: "",
+        detail: gatewayError && gatewayError.message ? gatewayError.message : ""
+      };
+    } catch (directError) {
+      const parts = [];
+      if (gatewayError) parts.push("gateway: " + (gatewayError.message || String(gatewayError)));
+      parts.push("direta: " + (directError && directError.message ? directError.message : String(directError)));
+      const combined = new Error("ESPN indisponível após gateway e fallback direto (" + parts.join(" | ") + ")");
+      combined.gatewayError = gatewayError;
+      combined.directError = directError;
+      throw combined;
+    }
+  }
+
+  async function fetchSummaryPayload(game, options = {}) {
+    if (!game || !game.id) throw new Error("Jogo sem eventId para summary");
+    const league = game.espnLeague || DEFAULT_LEAGUE;
+    const eventId = String(game.id);
+    const expectedHome = Math.max(0, Number(numericScore(game.home && game.home.score) || 0));
+    const expectedAway = Math.max(0, Number(numericScore(game.away && game.away.score) || 0));
+    const expectedGoals = expectedHome + expectedAway;
+    const params = new URLSearchParams({
+      league: String(league),
+      event: eventId,
+      expectedHome: String(expectedHome),
+      expectedAway: String(expectedAway),
+      expectedGoals: String(expectedGoals),
+      state: String(game.state || "")
+    });
+    // Brasileirão ao vivo: sempre pede a camada ESPN multi-superfície fresca.
+    // O hot-cache de poucos segundos continua útil para outros consumidores,
+    // mas o painel visível não deve herdar os zeros do pré-jogo.
+    // Qualquer liga em andamento com gol pendente precisa de facts novos.
+    // Antes, a atualização forçada era exclusiva do Brasileirão.
+    if (options.forceFresh || (game.state === "in" && expectedGoals > 0)) params.set("fresh", "1");
+    let gatewayError = null;
+
+    try {
+      const envelope = await fetchJson(LIVE_GATEWAY_ROOT + "/summary?" + params.toString() + "&_=" + Date.now(), {
+        timeoutMs: LIVE_GATEWAY_TIMEOUT_MS,
+        mode: "cors",
+        signal: options.signal || undefined
+      });
+      if (!envelope || envelope.ok !== true || !envelope.data || typeof envelope.data !== "object") {
+        throw new Error("Gateway de summary retornou payload inválido");
+      }
+      envelope.data.__fdgLiveFacts = envelope.facts || null;
+      envelope.data.__fdgLiveFactsIntegrity = envelope.factsIntegrity || (envelope.facts && envelope.facts.integrity) || null;
+      envelope.data.__fdgLiveMeta = {
+        statsProvider: String(envelope.statsProvider || "espn"),
+        statsCoverage: envelope.statsCoverage || null,
+        statsQuality: envelope.statsQuality || null,
+        statsTargetMinPerTeam: Number(envelope.statsTargetMinPerTeam || 0) || null,
+        statsBestKnownApplied: envelope.statsBestKnownApplied === true,
+        statsFallback: envelope.statsFallback || null,
+        statsFallbacks: Array.isArray(envelope.statsFallbacks) ? envelope.statsFallbacks : [],
+        apiFootballBudget: envelope.apiFootballBudget || null,
+        cacheStatus: String(envelope.cacheStatus || ""),
+        stale: envelope.stale === true,
+        ageMs: Number(envelope.ageMs || 0) || 0,
+        observedState: String(envelope.observedState || ""),
+        espnOnly: envelope.espnOnly === true
+      };
+
+      // Segunda perna ESPN-only para o Brasileirão. Se o Worker recebeu uma
+      // superfície atrasada (ou precisou servir cache), confrontamos com o
+      // Site API que historicamente abastece esta página diretamente. Não há
+      // API externa: escolhemos apenas a resposta ESPN com estatísticas mais
+      // informativas para este mesmo eventId.
+      if (league === "bra.1" && game.state === "in") {
+        const gatewayRows = extractStatsRows(game, envelope.data);
+        const gatewayScore = statsRowsFreshnessScore(gatewayRows);
+        const meta = envelope.data.__fdgLiveMeta || {};
+        const shouldConfirmDirect = gatewayRows.length <= PARTIAL_STATS_THRESHOLD || gatewayScore < 100 || meta.stale || /stale/i.test(meta.cacheStatus || "");
+        if (shouldConfirmDirect) {
+          try {
+            const directUrl = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/summary?event=" + encodeURIComponent(eventId) + "&_fdg_live=" + Date.now();
+            const direct = await fetchJson(directUrl, {
+              timeoutMs: DIRECT_ESPN_FALLBACK_TIMEOUT_MS,
+              signal: options.signal || undefined,
+              cache: "no-store"
+            });
+            const directRows = extractStatsRows(game, direct);
+            const directScore = statsRowsFreshnessScore(directRows);
+            if (directScore > gatewayScore) {
+              direct.__fdgLiveFacts = envelope.facts || null;
+              direct.__fdgLiveFactsIntegrity = envelope.factsIntegrity || (envelope.facts && envelope.facts.integrity) || null;
+              direct.__fdgLiveMeta = {
+                statsProvider: "espn-direct-fresh",
+                statsCoverage: { minPerTeam: directRows.length, maxPerTeam: directRows.length },
+                statsQuality: directRows.length >= 17 ? "COMPLETE" : directRows.length >= 14 ? "GOOD" : directRows.length >= 10 ? "DEGRADED" : "CRITICAL",
+                statsTargetMinPerTeam: 10,
+                statsBestKnownApplied: false,
+                cacheStatus: "direct-fresh",
+                stale: false,
+                ageMs: 0,
+                observedState: "in",
+                espnOnly: true
+              };
+              return direct;
+            }
+          } catch (_) {
+            // A camada multi-superfície do Worker permanece como fonte ESPN.
+          }
+        }
+      }
+      return envelope.data;
+    } catch (error) {
+      if (isAbortError(error)) throw error;
+      gatewayError = error;
+    }
+
+    try {
+      const directUrl = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/summary?event=" + encodeURIComponent(eventId) + "&_=" + Date.now();
+      const direct = await fetchJson(directUrl, {
+        timeoutMs: DIRECT_ESPN_FALLBACK_TIMEOUT_MS,
+        signal: options.signal || undefined
+      });
+      if (direct && typeof direct === "object") {
+        const previousFacts = state.resumoPorId[eventId] && state.resumoPorId[eventId].__fdgLiveFacts;
+        const previousIntegrity = previousFacts && previousFacts.integrity || {};
+        const sameScore = Number(previousIntegrity.expectedHome) === expectedHome && Number(previousIntegrity.expectedAway) === expectedAway;
+        if (sameScore) {
+          direct.__fdgLiveFacts = previousFacts;
+          direct.__fdgLiveFactsIntegrity = previousIntegrity;
+        }
+        direct.__fdgLiveMeta = { statsProvider: "espn-direct", canonicalFactsPreserved: sameScore };
+      }
+      return direct;
+    } catch (directError) {
+      if (isAbortError(directError)) throw directError;
+      const parts = [];
+      if (gatewayError) parts.push("gateway: " + (gatewayError.message || String(gatewayError)));
+      parts.push("direta: " + (directError && directError.message ? directError.message : String(directError)));
+      throw new Error("Summary ESPN indisponível após gateway e fallback direto (" + parts.join(" | ") + ")");
+    }
   }
 
   function youtubeVideoId(value) {
@@ -582,20 +866,80 @@
     return raw.includes("cazetv") || raw.includes("caze tv") || raw === "caze" || raw === "cazetv";
   }
 
-  function isCommentaryOnlyTitle(value) {
+  function sourceIsSbt(value) {
     const raw = String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    return /\blances?\s+(?:em\s+tempo\s+real|ao\s+vivo)\b/.test(raw)
-      || /\blance\s+a\s+lance\b/.test(raw)
-      || raw.includes("noche de copa")
-      || raw.includes("watchalong")
-      || raw.includes("watch party")
-      || (raw.includes("sem imagens") && (raw.includes("ao vivo") || raw.includes("tempo real")));
+    return raw === "sbt" || raw === "sbt_sports" || raw.includes("sbt sports") || raw === "+sbt";
   }
 
-  function sanitizeLivePrincipal(principal) {
+  function sourceDisplayName(principal) {
+    if (!principal) return "YouTube";
+    if (principal.nome) return String(principal.nome);
+    if (sourceIsCaze(principal.fonte) || sourceIsCaze(principal.canal)) return "CazéTV";
+    if (sourceIsSbt(principal.fonte) || sourceIsSbt(principal.canal)) return "SBT";
+    if (String(principal.fonte || "").toLowerCase() === "getv") return "GE TV";
+    return String(principal.canal || principal.fonte || "YouTube");
+  }
+
+  function normalizedTransmissionText(value) {
+    return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  }
+
+  function isRejectedTransmissionTitle(value) {
+    const raw = normalizedTransmissionText(value);
+    if (!raw) return true;
+    const blockedFragments = [
+      "aquecimento", "esquenta", "pre-jogo", "pre jogo", "pre-game", "pregame",
+      "pos-jogo", "pos jogo", "post-game", "postgame", "melhores momentos", "highlights",
+      "watchalong", "watch party", "react", "reaction", "coletiva", "podcast",
+      "radio", "narracao", "narração", "sem imagens", "sem imagem", "audio apenas", "áudio apenas",
+      "lances em tempo real", "lances ao vivo", "lance a lance", "tempo real sem imagens",
+      "noche de copa", "programa esportivo", "compacto"
+    ];
+    return blockedFragments.some((term) => raw.includes(normalizedTransmissionText(term)))
+      || /\blances?\s+(?:em\s+tempo\s+real|ao\s+vivo)\b/.test(raw)
+      || /\blance\s+a\s+lance\b/.test(raw);
+  }
+
+  function providerKeyForPrincipal(principal) {
+    if (!principal) return "";
+    if (sourceIsCaze(principal.fonte) || sourceIsCaze(principal.nome) || sourceIsCaze(principal.canal)) return "cazetv";
+    if (sourceIsSbt(principal.fonte) || sourceIsSbt(principal.nome) || sourceIsSbt(principal.canal)) return "sbt";
+    if (String(principal.fonte || "").toLowerCase() === "getv" || normalizedTransmissionText(principal.nome || principal.canal).includes("ge tv")) return "getv";
+    return "";
+  }
+
+  function canonicalTvAllowsPrincipal(game, principal) {
+    const tvEntry = transmissionEntryForGame(game, state.transmissoesTv);
+    const canais = tvEntry && Array.isArray(tvEntry.canais) ? tvEntry.canais.filter(Boolean) : [];
+    // Uma grade confirmada é autoridade negativa também: se ela existe e lista
+    // Premiere/SporTV, um player GE TV/Cazé/SBT preservado em cache não pode aparecer.
+    const authoritative = !!(tvEntry && canais.length && (tvEntry.estavel === true || String(tvEntry.confianca || "").toLowerCase() === "confirmado"));
+    if (!authoritative) return true;
+    const providerKey = providerKeyForPrincipal(principal);
+    if (!providerKey) return false;
+    return canais.some((canal) => {
+      const provider = providerForChannel(canal);
+      return !!provider && provider.key === providerKey;
+    });
+  }
+
+  function sanitizeLivePrincipal(principal, game) {
     if (!principal || typeof principal !== "object") return null;
-    if (String(principal.video_id || "") === "Co2aqgVd5qk" || isCommentaryOnlyTitle(principal.titulo || principal.title)) return null;
+    const title = principal.titulo || principal.title || "";
+    if (String(principal.video_id || "") === "Co2aqgVd5qk" || isRejectedTransmissionTitle(title)) return null;
     const clean = Object.assign({}, principal);
+    const providerKey = providerKeyForPrincipal(clean);
+    const titleN = normalizedTransmissionText(title);
+    // GE TV só é tratada como transmissão integral quando o título fala em
+    // imagens/jogo completo OU a grade canônica confirmada lista GE TV.
+    if (providerKey === "getv") {
+      const explicitFullVideo = titleN.includes("com imagens") || titleN.includes("transmissao completa") || titleN.includes("jogo completo");
+      if (!explicitFullVideo && !canonicalTvAllowsPrincipal(game, clean)) return null;
+    }
+    // CazéTV/SBT podem não usar "com imagens" no título, mas precisam ser uma
+    // live da partida e jamais conteúdo editorial periférico.
+    if ((providerKey === "cazetv" || providerKey === "sbt") && !titleN.includes("ao vivo") && !canonicalTvAllowsPrincipal(game, clean)) return null;
+    if (game && !canonicalTvAllowsPrincipal(game, clean)) return null;
     if (sourceIsCaze(clean.fonte) || sourceIsCaze(clean.nome) || sourceIsCaze(clean.canal)) clean.embeddable = false;
     return clean;
   }
@@ -604,7 +948,8 @@
     const out = {};
     for (const [key, entry] of Object.entries(source && typeof source === "object" ? source : {})) {
       if (!entry || typeof entry !== "object") continue;
-      const principal = sanitizeLivePrincipal(entry.principal);
+      // Aqui ainda não há game normalizado; aplica apenas as travas textuais.
+      const principal = sanitizeLivePrincipal(entry.principal, null);
       if (!principal) continue;
       out[key] = Object.assign({}, entry, { principal });
     }
@@ -668,7 +1013,7 @@
     }
   }
 
-  const TRANSMISSION_CACHE_YT = "br2026_transmissoes_youtube_v2";
+  const TRANSMISSION_CACHE_YT = "br2026_transmissoes_youtube_v4";
   const TRANSMISSION_CACHE_TV = "br2026_transmissoes_tv_v1";
 
   function cachedTransmissionMap(key) {
@@ -683,9 +1028,8 @@
 
   function saveTransmissionMap(key, value) {
     try {
-      if (value && typeof value === "object" && Object.keys(value).length) {
-        localStorage.setItem(key, JSON.stringify(value));
-      }
+      if (value && typeof value === "object") localStorage.setItem(key, JSON.stringify(value));
+      else localStorage.removeItem(key);
     } catch (_) {}
   }
 
@@ -713,11 +1057,17 @@
       ? tvResult.value.jogos
       : {};
 
-    // Nunca apaga um link válido por causa de uma falha transitória, 404 durante
-    // deploy ou resposta vazia em um único ciclo. O manual prevalece sobre o robô.
-    const mergedYoutube = sanitizeTransmissionMap(Object.assign({}, previousYoutube, automatic, manual));
-    state.transmissoes = Object.keys(mergedYoutube).length ? mergedYoutube : sanitizeTransmissionMap(previousYoutube);
-    state.transmissoesTv = Object.keys(tv).length ? Object.assign({}, previousTv, tv) : previousTv;
+    // O arquivo publicado é autoritativo quando foi carregado com sucesso.
+    // Não fazemos union com cache antigo: essa estratégia ressuscitava players
+    // de aquecimento já removidos do JSON atual. Cache só é fallback de rede.
+    const automaticLoaded = youtubeResult.status === "fulfilled" && youtubeResult.value && youtubeResult.value.jogos && typeof youtubeResult.value.jogos === "object";
+    const manualLoaded = manualResult.status === "fulfilled" && manualResult.value && manualResult.value.jogos && typeof manualResult.value.jogos === "object";
+    const baseYoutube = automaticLoaded ? automatic : previousYoutube;
+    const mergedYoutube = Object.assign({}, baseYoutube, manualLoaded ? manual : {});
+    state.transmissoes = sanitizeTransmissionMap(mergedYoutube);
+
+    const tvLoaded = tvResult.status === "fulfilled" && tvResult.value && tvResult.value.jogos && typeof tvResult.value.jogos === "object";
+    state.transmissoesTv = tvLoaded ? tv : previousTv;
     saveTransmissionMap(TRANSMISSION_CACHE_YT, state.transmissoes);
     saveTransmissionMap(TRANSMISSION_CACHE_TV, state.transmissoesTv);
   }
@@ -743,8 +1093,9 @@
 
   function transmissionForGame(game) {
     const entry = transmissionEntryForGame(game, state.transmissoes);
-    if (!entry || !sanitizeLivePrincipal(entry.principal)) return null;
-    return Object.assign({}, entry, { principal: sanitizeLivePrincipal(entry.principal) });
+    const principal = entry && sanitizeLivePrincipal(entry.principal, game);
+    if (!entry || !principal) return null;
+    return Object.assign({}, entry, { principal });
   }
 
   function providerForChannel(channel) {
@@ -779,7 +1130,7 @@
   function transmissionLabel(game) {
     const yt = transmissionForGame(game);
     const principal = yt && yt.principal;
-    if (principal && safeYouTubeUrl(principal.url)) return principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : "GE TV");
+    if (principal && safeYouTubeUrl(principal.url)) return sourceDisplayName(principal);
     const closed = closedTransmissionForGame(game);
     const canais = closed && Array.isArray(closed.canais) ? closed.canais.filter(Boolean) : [];
     return canais.join(" / ");
@@ -791,6 +1142,16 @@
     const canais = Array.isArray(entry.canais) ? entry.canais.filter(Boolean) : [];
     if (!canais.length) return "";
 
+    const exact = transmissionForGame(game);
+    const exactPrincipal = exact && exact.principal;
+    const exactProvider = exactPrincipal
+      ? (sourceIsCaze(exactPrincipal.fonte) || sourceIsCaze(exactPrincipal.nome)
+          ? "cazetv"
+          : (sourceIsSbt(exactPrincipal.fonte) || sourceIsSbt(exactPrincipal.nome)
+              ? "sbt"
+              : (String(exactPrincipal.fonte || "").toLowerCase() === "getv" ? "getv" : "")))
+      : "";
+
     const links = [];
     const seen = new Set();
     const addLink = (label, value) => {
@@ -800,16 +1161,25 @@
       seen.add(key);
       links.push({ label: String(label || "Acessar"), url });
     };
+    const isGenericDuplicateOfExact = (label) => {
+      if (!exactProvider) return false;
+      const provider = providerForChannel(label);
+      return !!(provider && provider.key === exactProvider);
+    };
 
-    for (const item of (Array.isArray(entry.links) ? entry.links : [])) addLink(item.label, item.url);
+    for (const item of (Array.isArray(entry.links) ? entry.links : [])) {
+      if (!isGenericDuplicateOfExact(item.label || item.nome)) addLink(item.label, item.url);
+    }
     // O backend publica acessos oficiais em `acessos` (ex.: Paramount+).
-    // Esse campo é distinto de `canais`: direitos de transmissão e plataforma
-    // de acesso não devem ser confundidos, mas ambos precisam ser clicáveis.
+    // Quando já existe o vídeo EXATO da GE TV/SBT/CazéTV, omitimos o link genérico
+    // do canal para não competir com o player/link específico mostrado acima.
     for (const item of (Array.isArray(entry.acessos) ? entry.acessos : [])) {
-      addLink(item.nome || item.label || "Acessar", item.url);
+      const label = item.nome || item.label || "Acessar";
+      if (!isGenericDuplicateOfExact(label)) addLink(label, item.url);
     }
     for (const canal of canais) {
       const provider = providerForChannel(canal);
+      if (provider && provider.key === exactProvider) continue;
       for (const item of ((provider && provider.links) || [])) addLink(item.label, item.url);
     }
 
@@ -825,29 +1195,41 @@
     const entry = transmissionForGame(game);
     const principal = entry && entry.principal;
     const rawVideoId = principal ? youtubeVideoId(principal.video_id || principal.url) : "";
-    const url = rawVideoId ? "https://www.youtube.com/watch?v=" + rawVideoId : "";
+    const principalUrl = principal && principal.url ? safeOfficialUrl(principal.url) : "";
+    const url = rawVideoId
+      ? (principalUrl && youtubeVideoId(principalUrl) === rawVideoId ? principalUrl : "https://www.youtube.com/watch?v=" + rawVideoId)
+      : "";
     let youtube = "";
     if (rawVideoId && principal) {
-      const sourceName = principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : "GE TV");
-      const liveNow = String(principal.status || "").toLowerCase() === "live" || game.state === "in";
+      const sourceName = sourceDisplayName(principal);
+      const liveNow = String(principal.status || "").toLowerCase() === "live";
       const kickoff = game.date instanceof Date ? game.date.getTime() : NaN;
-      const preLive = !liveNow && isFinite(kickoff) && Date.now() >= kickoff - 60 * 60000;
+      const preLive = !liveNow && String(principal.status || "").toLowerCase() === "upcoming" && isFinite(kickoff) && Date.now() < kickoff && Date.now() >= kickoff - 60 * 60000;
       const liveStyle = liveNow || preLive;
       const finished = gameState(game).key === "post";
+      const isCaze = sourceIsCaze(principal.fonte) || sourceIsCaze(sourceName);
       const label = finished
         ? "▶ Rever na " + sourceName
-        : (liveNow ? "AO VIVO na " + sourceName : (preLive ? "AO VIVO em breve na " + sourceName : "▶ Assistir na " + sourceName));
+        : (isCaze
+            ? (liveNow ? "▶ Assistir ao vivo na CazéTV" : (preLive ? "▶ Assistir em breve na CazéTV" : "▶ Assistir na CazéTV"))
+            : (liveNow ? "AO VIVO na " + sourceName : (preLive ? "AO VIVO em breve na " + sourceName : "▶ Assistir na " + sourceName)));
       const note = finished
         ? "Transmissão oficial encerrada no YouTube"
         : (liveNow ? "Transmissão oficial ao vivo no YouTube" : (preLive ? "A bola rola em breve — transmissão oficial no YouTube" : "Transmissão oficial programada no YouTube"));
-      const externalOnly = principal.embeddable === false || sourceIsCaze(principal.fonte) || sourceIsCaze(sourceName);
+      // Só abre iframe quando o backend confirmou explicitamente status.embeddable=true.
+      // Isso evita inventar suporte a embed para SBT (ou qualquer outro canal).
+      const externalOnly = isCaze || principal.embeddable !== true;
       if (externalOnly) {
-        youtube = '<div class="live-stream-area"><a class="live-stream-button ' + (liveStyle ? "is-live" : "") + '" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a><div class="live-stream-note">' + esc(note) + ' · abre no canal oficial</div></div>';
+        youtube = '<div class="live-stream-area"><a class="live-stream-button ' + (liveStyle ? "is-live" : "") + '" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a><div class="live-stream-note">' + esc(note) + ' · link oficial exato</div></div>';
       } else {
         youtube = '<div class="live-stream-area"><button type="button" class="live-stream-button live-embed-open ' + (liveStyle ? "is-live" : "") + '" data-video-id="' + esc(rawVideoId) + '" data-video-title="' + esc((game.home && game.home.nome || "") + " x " + (game.away && game.away.nome || "")) + '" data-video-source="' + esc(sourceName) + '">' + esc(label) + '</button><div class="live-stream-note">' + esc(note) + ' · abre aqui no site</div></div>';
       }
     }
-    return youtube + renderClosedTransmission(game);
+    const closed = renderClosedTransmission(game);
+    // CazéTV nunca é embed. GE TV e SBT só abrem player interno quando
+    // status.embeddable=true foi confirmado pelo YouTube; caso contrário usam o link exato externo.
+    if (principal && (sourceIsCaze(principal.fonte) || sourceIsCaze(principal.nome))) return closed + youtube;
+    return youtube + closed;
   }
 
   async function loadProbabilityDataset() {
@@ -865,14 +1247,19 @@
   }
 
   async function loadLocal() {
-    const [agenda, eventos, probabilidades] = await Promise.all([
+    const [agenda, eventos] = await Promise.all([
       fetchJson("dados-br/agenda-clubes-br.json?t=" + Date.now()),
-      fetchJson("espn_eventos.json?t=" + Date.now()).catch(() => ({ eventos: [] })),
-      loadProbabilityDataset()
+      fetchJson("espn_eventos.json?t=" + Date.now()).catch(() => ({ eventos: [] }))
     ]);
     state.agenda = localGamesFromJson(agenda).filter((g) => !g.dataDefinir && g.date);
     state.eventosLocais = (eventos.eventos || []).slice();
-    state.probabilidadesJogos = probabilidades;
+    if (!state.probabilidadesJogos) {
+      loadProbabilityDataset().then((probabilidades) => {
+        state.probabilidadesJogos = probabilidades;
+        const selected = currentSelectedGame();
+        if (selected) renderMain(selected, state.resumoPorId[String(selected.id)] || null, allGames());
+      }).catch(() => {});
+    }
     for (const item of state.eventosLocais) {
       const key = String(item && item.event_id || "");
       const finalizado = parseDate(item && item.finalizado_em);
@@ -921,30 +1308,85 @@
       leagues.get(league).push(game);
     });
 
-    const requests = Array.from(leagues.entries()).map(async ([league, localGames]) => {
-      const url = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/scoreboard?dates=" + ini + "-" + fim + "&limit=100&_=" + Date.now();
-      const data = await fetchJson(url);
-      return (data.events || []).map((event) => {
+    const leagueEntries = Array.from(leagues.entries());
+    const requests = leagueEntries.map(async ([league, localGames]) => {
+      const result = await fetchScoreboardPayload(league, ini + "-" + fim);
+      const data = result.data || { events: [] };
+      const fetchedAt = Number(result.fetchedAt || Date.now());
+      const games = (data.events || []).map((event) => {
         const eventId = String(event && event.id || "");
         const local = localGames.find((game) => String(game.id || "") === eventId) || null;
         const leagueMeta = LEAGUE_META[league] || {};
-        const meta = local || {
+        const baseMeta = local || {
           espnLeague: league,
           competitionKey: leagueMeta.competitionKey || "",
           competitionName: leagueMeta.competitionName || "",
           competitionShort: leagueMeta.competitionShort || "",
           probabilitiesAvailable: league === DEFAULT_LEAGUE
         };
-        return normalizeEvent(event, meta);
+        return normalizeEvent(event, Object.assign({}, baseMeta, { sourceFetchedAt: fetchedAt }));
       }).filter(Boolean);
+      return {
+        league,
+        fetchedAt,
+        games,
+        degraded: result.stale === true,
+        source: result.source || "",
+        transport: result.transport || "",
+        cacheStatus: result.cacheStatus || "",
+        detail: result.detail || ""
+      };
     });
 
     const settled = await Promise.allSettled(requests);
-    const normalized = settled.flatMap((result) => result.status === "fulfilled" ? result.value : [])
+    const successfulLeagues = new Set();
+    const failedLeagues = new Set();
+    const freshNormalized = [];
+    let latestSuccessAt = 0;
+    let firstFailure = null;
+
+    settled.forEach((result, index) => {
+      const league = leagueEntries[index] && leagueEntries[index][0];
+      if (!league) return;
+      if (result.status === "fulfilled") {
+        successfulLeagues.add(league);
+        latestSuccessAt = Math.max(latestSuccessAt, Number(result.value.fetchedAt || 0));
+        state.espnSuccessByLeague[league] = Number(result.value.fetchedAt || Date.now());
+        if (result.value.degraded) {
+          state.espnFailureByLeague[league] = {
+            at: Date.now(),
+            message: result.value.detail || "Gateway ESPN usando último snapshot válido",
+            stale: true,
+            transport: result.value.transport || "gateway"
+          };
+        } else {
+          delete state.espnFailureByLeague[league];
+        }
+        freshNormalized.push(...(result.value.games || []));
+      } else {
+        failedLeagues.add(league);
+        const reason = result.reason && result.reason.message ? result.reason.message : String(result.reason || "Falha ESPN");
+        state.espnFailureByLeague[league] = { at: Date.now(), message: reason };
+        if (!firstFailure) firstFailure = result.reason;
+      }
+    });
+
+    if (leagueEntries.length && !successfulLeagues.size) {
+      if (firstFailure && isAbortError(firstFailure)) throw firstFailure;
+      throw firstFailure || new Error("ESPN indisponível para as competições consultadas");
+    }
+
+    const normalized = freshNormalized
       .filter((game) => directGameIsEligible(game))
       .map(mergeLocal);
-    if (!normalized.length && settled.some((result) => result.status === "rejected")) {
-      throw new Error("ESPN indisponível para as competições consultadas");
+
+    // Uma falha isolada de uma competição não pode apagar o último placar válido
+    // dessa mesma competição. Preservamos apenas esses registros e marcamos a fonte
+    // como defasada na interface até a ESPN responder novamente.
+    const preserved = state.diretos.filter((game) => failedLeagues.has(String(game.espnLeague || DEFAULT_LEAGUE)));
+    const nextDiretos = normalized.slice();
+    for (const oldGame of preserved) {
+      if (!nextDiretos.some((game) => sameFixture(game, oldGame))) nextDiretos.push(oldGame);
     }
 
     for (const game of normalized) {
@@ -962,7 +1404,15 @@
       if (Date.now() - state.finalizadosEm[key] > 12 * 3600000) delete state.finalizadosEm[key];
     }
     saveFinalTimes();
-    state.diretos = normalized;
+    state.diretos = nextDiretos;
+    if (latestSuccessAt > 0) state.ultimoSucessoEspn = new Date(latestSuccessAt);
+
+    return {
+      requestedLeagues: leagueEntries.map(([league]) => league),
+      successfulLeagues: Array.from(successfulLeagues),
+      failedLeagues: Array.from(failedLeagues),
+      latestSuccessAt
+    };
   }
 
   function sameFixture(a, b) {
@@ -1007,6 +1457,12 @@
       espnLeague: primary.espnLeague || secondary.espnLeague || DEFAULT_LEAGUE,
       fase: primary.fase || secondary.fase || "",
       perna: primary.perna || secondary.perna || 0,
+      confronto_id: primary.confronto_id || secondary.confronto_id || "",
+      partida_numero: primary.partida_numero || secondary.partida_numero || primary.perna || secondary.perna || 0,
+      partidas_total: primary.partidas_total || secondary.partidas_total || 0,
+      agregado_disponivel: primary.agregado_disponivel === true || secondary.agregado_disponivel === true,
+      agregado_mandante: primary.agregado_disponivel === true ? Number(primary.agregado_mandante || 0) : Number(secondary.agregado_mandante || 0),
+      agregado_visitante: primary.agregado_disponivel === true ? Number(primary.agregado_visitante || 0) : Number(secondary.agregado_visitante || 0),
       probabilitiesAvailable: primary.probabilitiesAvailable === true || secondary.probabilitiesAvailable === true
     };
   }
@@ -1105,12 +1561,16 @@
       requestedState === "pre" ||
       (requestedState === "post" && isRecentlyFinished(requested))
     );
-    let selected = requestedEligible ? requested : priorities[0] || null;
+    const userPinned = state.selectionOrigin === "user" && requestedEligible;
+    // Seleção automática nunca fica presa ao jogo futuro escolhido antes do
+    // primeiro scoreboard. Assim que existem jogos IN, o primeiro deles é a
+    // tela principal; apenas um clique/URL explícito fixa outra partida.
+    let selected = userPinned ? requested : priorities[0] || (requestedEligible ? requested : null);
     if (selected && !priorities.some((g) => sameFixture(g, selected))) {
       priorities = [selected].concat(priorities).slice(0, 8);
     }
     if (selected && selected.id) state.selecionado = selected.id;
-    else state.selecionado = null;
+    else { state.selecionado = null; state.selectionOrigin = "auto"; }
     return { selected, priorities };
   }
 
@@ -1878,28 +2338,24 @@
   }
 
   const LIVE_METRIC_RULES = [
-    { keys:["expected goals","expectedgoals","xg"], label:"xG", order:1 },
-    { keys:["possession pct","possession percent","possession percentage","possessionpct","possession","posse"], label:"Posse", order:2, percent:true },
-    { keys:["total shots","totalshots","shots total","shots","shot attempts","finalizacoes","finalizações"], label:"Finalizações", order:3 },
-    { keys:["shots on goal","shots on target","shotsongoal","shotsontarget","chutes no gol"], label:"Chutes no gol", order:4 },
-    { keys:["shots off target","shotsofftarget"], label:"Chutes para fora", order:5 },
-    { keys:["blocked shots","blockedshots"], label:"Chutes bloqueados", order:6 },
-    { keys:["shot pct","shot percent","shot percentage","shotpct","shooting percentage","aproveitamento dos chutes"], label:"Aproveitamento dos chutes", order:7, percent01:true, derived:"shotPct" },
-    { keys:["big chances created","bigchancescreated"], label:"Grandes chances", order:8 },
-    { keys:["big chances missed","bigchancesmissed"], label:"Chances perdidas", order:9 },
-    { keys:["fouls committed","foulscommitted","fouls"], label:"Faltas", order:10 },
-    { keys:["saves","goalkeeper saves"], label:"Defesas", order:11 },
-    { keys:["total passes","totalpasses","passes"], label:"Passes", order:12 },
-    { keys:["accurate passes","accuratepasses","completed passes","passes completed"], label:"Passes certos", order:13 },
-    { keys:["pass pct","pass percent","pass percentage","pass accuracy","passpct","passaccuracy"], label:"Precisão de passe", order:14, percent01:true },
-    { keys:["duels won","duelswon"], label:"Duelos vencidos", order:15 },
-    { keys:["tackles won","tackleswon","tackles"], label:"Desarmes", order:16 },
-    { keys:["interceptions"], label:"Interceptações", order:17 },
-    { keys:["crosses","total crosses","totalcrosses"], label:"Cruzamentos", order:18 },
-    { keys:["corner kicks","cornerkicks","won corners","woncorners","corners"], label:"Escanteios", order:19 },
-    { keys:["yellow cards","yellowcards"], label:"Amarelos", order:20 },
-    { keys:["red cards","redcards"], label:"Vermelhos", order:21 },
-    { keys:["offsides","offside"], label:"Impedimentos", order:22 }
+    { keys:["possession pct","possession percent","possession percentage","possessionpct","possession","posse"], label:"Posse", order:1, percent:true },
+    { keys:["total shots","totalshots","shots total","shots","shot attempts","finalizacoes","finalizações"], label:"Finalizações", order:2 },
+    { keys:["shots on goal","shots on target","shotsongoal","shotsontarget","chutes no gol"], label:"Chutes no gol", order:3 },
+    { keys:["blocked shots","blockedshots"], label:"Chutes bloqueados", order:4 },
+    { keys:["shot pct","shot percent","shot percentage","shotpct","shooting percentage","aproveitamento dos chutes"], label:"Aproveitamento dos chutes", order:5, percent01:true, derived:"shotPct" },
+    { keys:["fouls committed","foulscommitted","fouls"], label:"Faltas", order:6 },
+    { keys:["saves","goalkeeper saves"], label:"Defesas", order:7 },
+    { keys:["total passes","totalpasses","passes"], label:"Passes", order:8 },
+    { keys:["accurate passes","accuratepasses","completed passes","passes completed"], label:"Passes certos", order:9 },
+    { keys:["pass pct","pass percent","pass percentage","pass accuracy","passpct","passaccuracy"], label:"Precisão de passe", order:10, percent01:true },
+    { keys:["tackles won","tackleswon","tackles"], label:"Desarmes", order:11 },
+    { keys:["interceptions"], label:"Interceptações", order:12 },
+    { keys:["crosses","total crosses","totalcrosses"], label:"Cruzamentos", order:13 },
+    { keys:["clearances","clearance"], label:"Cortes", order:14 },
+    { keys:["corner kicks","cornerkicks","won corners","woncorners","corners"], label:"Escanteios", order:15 },
+    { keys:["yellow cards","yellowcards"], label:"Amarelos", order:16 },
+    { keys:["red cards","redcards"], label:"Vermelhos", order:17 },
+    { keys:["offsides","offside"], label:"Impedimentos", order:18 }
   ];
 
   function metricKey(s) {
@@ -1924,6 +2380,17 @@
   function numericStat(v) {
     const m = String(v == null ? "" : v).replace(",", ".").replace("%", "").match(/-?\d+(?:\.\d+)?/);
     return m ? Number(m[0]) : NaN;
+  }
+  function statsRowsFreshnessScore(rows) {
+    const list = Array.isArray(rows) ? rows : [];
+    let meaningful = 0;
+    for (const row of list) {
+      const h = numericStat(row && row.home), a = numericStat(row && row.away);
+      if ((Number.isFinite(h) && h !== 0) || (Number.isFinite(a) && a !== 0)) meaningful += 1;
+    }
+    // Um único valor não-zero vale mais que uma coleção inteira de placeholders
+    // 0/0; a cardinalidade desempata duas respostas ESPN já efetivamente vivas.
+    return meaningful * 100 + list.length;
   }
   function formatStatValue(rule, raw) {
     if (raw == null || raw === "") return "";
@@ -2005,10 +2472,17 @@
     const key = statsEventKey(g);
     if (!key) return currentRows;
     const fixtureKey = statsFixtureKey(g);
+
+    // Estatística pré-jogo 0/0 é placeholder da ESPN, não observação esportiva.
+    // Não a persistimos no sessionStorage. Assim ela não contamina o primeiro
+    // minuto quando o estado muda de PRE para IN.
+    if (g && g.state === "pre") return currentRows || [];
+
     let entry = state.statsPorId[key];
-    if (!entry || entry.fixtureKey !== fixtureKey || !entry.metrics || typeof entry.metrics !== "object") {
-      entry = { fixtureKey, updatedAt: 0, metrics: {} };
+    if (!entry || entry.fixtureKey !== fixtureKey || !entry.metrics || typeof entry.metrics !== "object" || (g && g.state === "in" && entry.gameState === "pre")) {
+      entry = { fixtureKey, updatedAt: 0, gameState: String(g && g.state || ""), metrics: {} };
     }
+    entry.gameState = String(g && g.state || entry.gameState || "");
 
     // A ESPN pode entregar primeiro um conjunto resumido e, segundos depois,
     // o boxscore completo. Atualizamos toda métrica presente, mas preservamos
@@ -2037,21 +2511,40 @@
   }
 
   function collectStats(g, summary) {
-    return mergeStatsRows(g, extractStatsRows(g, summary));
+    const rows = mergeStatsRows(g, extractStatsRows(g, summary));
+    const sorter = window.BREstatisticasOrdem;
+    return sorter ? sorter.sortStats(rows.map((row) => ({ ...row, nome: row.label }))).map(({ nome, ...row }) => row) : rows;
   }
 
   function goalsBySide(g, summary) {
-    const rows = eventRows(g, summary).filter(r => r.type.key === "goal");
-    const home = [], away = [];
-    const homeId = String(g.home.id || ""), awayId = String(g.away.id || "");
-    for (const row of rows) {
-      const item = { min: row.min, athlete: row.athlete || compactPlayerName(row.text.replace(/^Gol\s*[—-]?\s*/i, "")) || "Gol" };
-      if (row.teamId && row.teamId === homeId) home.push(item);
-      else if (row.teamId && row.teamId === awayId) away.push(item);
-      else if (row.team === g.home.nome) home.push(item);
-      else if (row.team === g.away.nome) away.push(item);
+    // Live Facts v6: autoria/assistência nunca é reconstruída a partir do JSON
+    // bruto no navegador. O scoreboard define QUANTOS gols existem; o Worker
+    // canônico define QUEM marcou. Na ausência do contrato canônico mostramos
+    // o placar sem inventar marcadores.
+    const canonical = summary && summary.__fdgLiveFacts;
+    const home=[], away=[];
+    // Sem Live Facts canônicos, o navegador não reconstrói nem fabrica
+    // linhas de gol a partir do placar ou dos eventos brutos.
+    if (!canonical || !Array.isArray(canonical.goals)) return {home,away};
+    const expectedHome=Math.max(0,Number(numericScore(g.home&&g.home.score)||0));
+    const expectedAway=Math.max(0,Number(numericScore(g.away&&g.away.score)||0));
+    const integrity=canonical.integrity||{};
+    if (Number(integrity.expectedHome)!==expectedHome || Number(integrity.expectedAway)!==expectedAway || integrity.mathematicallyValid===false) return {home,away};
+    const homeId=String(g.home.id||""), awayId=String(g.away.id||"");
+    for (const goal of canonical.goals) {
+      const item={min:String(goal.minute||""),athlete:compactPlayerName(goal.scorer||"")||(goal.ownGoal?"Gol contra":"Autor sendo confirmado")};
+      const teamId=String(goal.teamId||"");
+      // Identidade ESPN tem precedência absoluta sobre o side textual.
+      if (teamId && teamId===homeId) home.push(item);
+      else if (teamId && teamId===awayId) away.push(item);
+      else if (goal.team===g.home.nome) home.push(item);
+      else if (goal.team===g.away.nome) away.push(item);
+      else if (goal.side==="home") home.push(item);
+      else if (goal.side==="away") away.push(item);
     }
-    return { home, away };
+    // Só renderiza identidades efetivamente entregues pelo contrato canônico.
+    // O placar continua independente e não é usado para fabricar autores.
+    return {home:home.slice(0,expectedHome),away:away.slice(0,expectedAway)};
   }
 
   function renderGoalsUnderTeams(g, summary) {
@@ -2092,14 +2585,15 @@
     const signal = controller && controller.signal;
 
     try {
-      const league = g.espnLeague || DEFAULT_LEAGUE;
-      const makeUrl = (suffix) => ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/summary?event=" + encodeURIComponent(eventId) + "&_=" + Date.now() + (suffix || "");
-      let data = await fetchJson(makeUrl(""), signal ? { signal } : {});
+      let data = await fetchSummaryPayload(g, { signal });
       let rows = extractStatsRows(g, data);
       const previousCount = cachedStatsCount(g);
       const now = Date.now();
       const lastRetry = Number(state.statsRetryAt[eventId] || 0);
-      const looksPartial = rows.length < previousCount || (rows.length > 0 && rows.length <= PARTIAL_STATS_THRESHOLD);
+      const partialThreshold = String(g.espnLeague || "").startsWith("conmebol.")
+        ? CONTINENTAL_PARTIAL_STATS_THRESHOLD
+        : PARTIAL_STATS_THRESHOLD;
+      const looksPartial = rows.length < previousCount || (rows.length > 0 && rows.length <= partialThreshold);
 
       // Uma segunda leitura curta resolve a janela em que o scoreboard já está
       // atualizado, mas o summary da ESPN ainda chegou apenas com as métricas
@@ -2109,7 +2603,7 @@
         state.statsRetryAt[eventId] = now;
         try {
           await waitWithSignal(PARTIAL_STATS_RETRY_DELAY_MS, signal);
-          const retryData = await fetchJson(makeUrl("&retry=1"), signal ? { signal } : {});
+          const retryData = await fetchSummaryPayload(g, { signal, forceFresh: true });
           const retryRows = extractStatsRows(g, retryData);
           if (retryRows.length >= rows.length) {
             data = retryData;
@@ -2124,6 +2618,8 @@
 
       if (requestSerial !== state.summaryRequestSerial) return state.resumoPorId[eventId] || null;
       state.resumoPorId[eventId] = data;
+      state.summaryFetchedAt[eventId] = Date.now();
+      state.summaryScoreKey[eventId] = `${numericScore(g.home && g.home.score) ?? ""}:${numericScore(g.away && g.away.score) ?? ""}`;
       return data;
     } catch (e) {
       if (e && e.name !== "AbortError") console.warn("Summary ESPN indisponível para " + eventId + ":", e);
@@ -2154,21 +2650,49 @@
     switcher.querySelectorAll("[data-game-id]").forEach((btn) => {
       btn.addEventListener("click", async () => {
         state.selecionado = btn.getAttribute("data-game-id") || "";
+        state.selectionOrigin = "user";
         await renderPage();
         setTimeout(() => btn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }), 30);
       });
     });
   }
 
+  function statsSourceMeta(summary) {
+    const provider = String(summary && summary.__fdgLiveMeta && summary.__fdgLiveMeta.statsProvider || "espn");
+    const hasSportsDb = provider.includes("thesportsdb");
+    const hasApiFootball = provider.includes("api-football");
+    if (hasSportsDb || hasApiFootball) {
+      const parts = ["ESPN"];
+      if (hasApiFootball) parts.push("API-FOOTBALL");
+      if (hasSportsDb) parts.push("THESPORTSDB");
+      const complements = [];
+      if (hasApiFootball) complements.push("API-Football");
+      if (hasSportsDb) complements.push("TheSportsDB");
+      const meta = summary && summary.__fdgLiveMeta || {};
+      const preserved = meta.statsBestKnownApplied ? " O melhor estado factual já observado para a partida foi preservado para evitar regressão temporária da fonte." : "";
+      return {
+        badge: parts.join(" + "),
+        note: "A ESPN é a fonte principal. Quando o feed ao vivo vem incompleto, métricas factuais são complementadas por " + complements.join(" e ") + "." + preserved + " O site não estima dados ausentes."
+      };
+    }
+    return {
+      badge: "ESPN SUMMARY",
+      note: "Mostramos somente métricas disponibilizadas pela ESPN. O site não inventa dados ausentes."
+    };
+  }
+
   function renderStats(g, summary) {
+    if (g && g.state === "pre") return '<div class="live-empty">As estatísticas serão exibidas após o início da partida.</div>';
     const rows = collectStats(g, summary);
-    if (!rows.length) return '<div class="live-empty">As estatísticas serão exibidas quando estiverem disponíveis para esta partida.</div>';
+    const allZeroPlaceholder = g && g.state === "in" && rows.length > 0 && statsRowsFreshnessScore(rows) < 100;
+    if (!rows.length || allZeroPlaceholder) return '<div class="live-empty">A ESPN está atualizando as estatísticas deste jogo. O painel será preenchido automaticamente assim que os dados ao vivo forem publicados.</div>';
     const names = '<div class="live-stats-head"><div>' + esc(g.home.nome) + '</div><div>comparativo</div><div>' + esc(g.away.nome) + '</div></div>';
+    const sourceMeta = statsSourceMeta(summary);
     return '<div class="live-stats live-stats-complete">' + names + rows.map((r) => '<div class="live-stat-row">' +
       '<div class="live-stat-value"><strong>' + esc(r.home) + '</strong><div class="live-stat-mini"><span style="width:' + r.pct.toFixed(1) + '%"></span></div></div>' +
       '<div class="live-stat-label">' + esc(r.label) + (r.label === "Aproveitamento dos chutes" ? ' <small title="Chutes no gol ÷ finalizações">ⓘ</small>' : '') + '</div>' +
       '<div class="live-stat-value right"><strong>' + esc(r.away) + '</strong><div class="live-stat-mini"><span style="width:' + (100-r.pct).toFixed(1) + '%"></span></div></div>' +
-      '</div>').join("") + '<div class="live-stats-note">Mostramos somente métricas disponibilizadas pela ESPN. O site não inventa dados ausentes.</div></div>';
+      '</div>').join("") + '<div class="live-stats-note">' + esc(sourceMeta.note) + '</div></div>';
   }
 
   function renderNextList(all, selected) {
@@ -2189,13 +2713,16 @@
     if (g.competitionKey === "brasileirao") return g.rodada ? "Rodada " + g.rodada : "Brasileirão";
     const parts = [g.competitionShort || g.competitionName || "Competição"];
     if (g.fase) parts.push(g.fase);
-    if (Number(g.perna) === 1) parts.push("Ida");
-    if (Number(g.perna) === 2) parts.push("Volta");
+    if (Number(g.perna) === 1) parts.push("Partida 1 de 2");
+    if (Number(g.perna) === 2) parts.push("Partida 2 de 2");
+    if (Number(g.perna) === 2 && g.agregado_disponivel) parts.push("Agregado " + Number(g.agregado_mandante || 0) + "–" + Number(g.agregado_visitante || 0));
     return parts.join(" · ");
   }
 
   function renderMain(g, summary, all) {
     if (!g) {
+      delete app.dataset.eventId;
+      document.dispatchEvent(new CustomEvent('fdg:live-game-changed', { detail: { eventId: '' } }));
       app.innerHTML = '<div class="panel"><div class="panel-inner"><div class="live-empty">Nenhuma partida futura foi encontrada na agenda publicada. O robô continuará tentando atualizar os dados.</div></div></div>';
       return;
     }
@@ -2219,6 +2746,7 @@
     const probabilityDraw = probabilityDesktop && probabilityDesktop.draw ? probabilityDesktop.draw : "";
     const probabilityAway = probabilityDesktop && probabilityDesktop.away ? probabilityDesktop.away : "";
     contarVermelhos(g, summary);
+    app.dataset.eventId = String(g.id || '');
 
     app.innerHTML = '<section class="live-main-card"><div class="live-card-inner">' +
       '<div class="live-round-row"><span class="live-round-badge">' + esc(roundText + delayed) + '</span>' +
@@ -2234,28 +2762,57 @@
       '<div class="live-meta">' + venue + transmission + '</div>' +
       renderTransmission(g) +
       '<div class="live-message">' + esc(simpleMessage(g)) + '</div></div></section>' +
-      '<section class="panel live-subpanel live-stats-panel"><div class="panel-inner"><div class="live-section-head"><h2>📊 Estatísticas</h2><span class="live-section-note">ESPN summary</span></div>' + renderStats(g, summary) + '</div></section>' +
+      '<section class="panel live-subpanel live-stats-panel"><div class="panel-inner"><div class="live-section-head"><h2>📊 Estatísticas</h2><span class="live-section-note">' + esc(statsSourceMeta(summary).badge) + '</span></div>' + renderStats(g, summary) + '</div></section>' +
       renderLineups(g, summary) +
       renderNextList(all, g);
+    document.dispatchEvent(new CustomEvent('fdg:live-game-changed', { detail: { eventId: app.dataset.eventId || '' } }));
   }
 
-  async function renderPage() {
-    const renderSerial = ++state.renderSerial;
-    const all = allGames();
-    const { selected, priorities } = chooseGame(all);
-    const switchGames = priorities.length ? priorities : (selected ? [selected] : []);
-    renderSwitcher(switchGames, selected);
-    const summary = await loadSummary(selected);
-    // Ao trocar rapidamente de partida, uma resposta anterior pode chegar depois.
-    // Nunca permitimos que ela redesenhe o jogo atualmente selecionado.
-    if (renderSerial !== state.renderSerial) return;
-    renderMain(selected, summary, all);
-    updateCountdowns();
-    if (badge) {
-      badge.classList.toggle("is-live", Boolean(selected && selected.state === "in"));
-      badge.classList.remove("is-error");
-      badge.textContent = state.ultimaAtualizacao ? "Atualizado " + formatClockTime(state.ultimaAtualizacao) + " · 30s" : "Atualizando a cada 30s";
-    }
+  function scheduleMissingScorerRetry(eventId, summary) {
+    clearTimeout(state.scorerRetryTimer);
+    state.scorerRetryTimer = null;
+    const current = currentSelectedGame();
+    const expected = Math.max(0, Number(numericScore(current?.home?.score) || 0)) + Math.max(0, Number(numericScore(current?.away?.score) || 0));
+    const integrity = summary?.__fdgLiveFacts?.integrity;
+    // Sem facts também há autoria pendente; não esperar que o contrato ausente
+    // declare missingScorers para começar a recuperação.
+    const missing = integrity && Number(integrity.expectedGoals) === expected
+      ? Math.max(0, Number(integrity.missingScorers || 0))
+      : expected;
+    if (!(missing > 0) || document.hidden || current?.state !== "in") return;
+    state.scorerRetryTimer = setTimeout(() => {
+      const current = currentSelectedGame();
+      if (String(current && current.id || "") !== String(eventId || "") || document.hidden) return;
+      renderPage();
+    }, MISSING_SCORER_REFRESH_MS + 50);
+  }
+
+  function renderPage(expectedRefreshGeneration = null) {
+    const renderSerial=++state.renderSerial, all=allGames(), {selected,priorities}=chooseGame(all), switchGames=priorities.length?priorities:(selected?[selected]:[]);
+    renderSwitcher(switchGames,selected);
+    const eventId=String(selected?.id||""), cached=eventId?state.resumoPorId[eventId]||null:null;
+    renderMain(selected,cached,all); updateCountdowns(); updateFreshnessUi(selected);
+    // IDs documentais (fdg-conmebol-...) nunca podem ser enviados como ESPN.
+    // Mas um evento continental reconciliado com ID ESPN deve consultar facts
+    // mesmo se a agenda local foi a fonte primária do card.
+    if(!selected||!/^\d{5,15}$/.test(eventId)||!selected.espnLeague)return;
+    const scoreKey=`${numericScore(selected.home&&selected.home.score)??""}:${numericScore(selected.away&&selected.away.score)??""}`;
+    const age=Date.now()-Number(state.summaryFetchedAt[eventId]||0), scoreChanged=state.summaryScoreKey[eventId]!==scoreKey;
+    const expectedGoals=Math.max(0,Number(numericScore(selected.home?.score)||0))+Math.max(0,Number(numericScore(selected.away?.score)||0));
+    const integrity=cached?.__fdgLiveFacts?.integrity;
+    const missingScorers=integrity&&Number(integrity.expectedGoals)===expectedGoals
+      ? Math.max(0,Number(integrity.missingScorers||0)) : expectedGoals;
+    const summaryRefreshMs=selected.state==="in"&&missingScorers>0?MISSING_SCORER_REFRESH_MS:SUMMARY_REFRESH_MS;
+    if(cached&&!scoreChanged&&age<summaryRefreshMs)return;
+    if(state.summaryLoadingKey[eventId]===scoreKey)return;
+    state.summaryLoadingKey[eventId]=scoreKey;
+    loadSummary(selected).then((summary)=>{
+      const current=currentSelectedGame();
+      if(String(current?.id||"")!==eventId)return;
+      if(expectedRefreshGeneration!==null&&expectedRefreshGeneration!==state.refreshGeneration)return;
+      renderMain(current,summary,allGames()); updateCountdowns(); updateFreshnessUi(current);
+      scheduleMissingScorerRetry(eventId, summary);
+    }).catch(()=>{}).finally(()=>{if(state.summaryLoadingKey[eventId]===scoreKey)delete state.summaryLoadingKey[eventId];});
   }
 
   function updateCountdowns() {
@@ -2268,6 +2825,7 @@
   }
 
   function showAlert(msg) {
+    if (!alertBox) return;
     if (!msg) {
       alertBox.classList.remove("show");
       alertBox.textContent = "";
@@ -2277,40 +2835,208 @@
     alertBox.classList.add("show");
   }
 
-  async function refresh() {
-    if (state.carregando || document.hidden) return;
-    state.carregando = true;
+  function sourceTimestampForGame(game) {
+    if (!game) return 0;
+    const direct = Number(game.sourceFetchedAt || 0);
+    if (direct > 0) return direct;
+    const league = String(game.espnLeague || DEFAULT_LEAGUE);
+    return Number(state.espnSuccessByLeague[league] || 0);
+  }
+
+  function sourceFailureForGame(game) {
+    if (!game) return null;
+    const league = String(game.espnLeague || DEFAULT_LEAGUE);
+    return state.espnFailureByLeague[league] || null;
+  }
+
+  function isLiveGame(game) {
+    return Boolean(game && gameState(game).key === "live");
+  }
+
+  function isDisplayedDataStale(game, referenceMs = Date.now()) {
+    if (!isLiveGame(game)) return false;
+    if (String(game.source || "") !== "espn") return true;
+    const sourceTs = sourceTimestampForGame(game);
+    return !sourceTs || referenceMs - sourceTs > STALE_DATA_MS;
+  }
+
+  function updateFreshnessUi(selected) {
+    const live = isLiveGame(selected);
+    const sourceTs = sourceTimestampForGame(selected);
+    const stale = isDisplayedDataStale(selected);
+    const sourceFailure = sourceFailureForGame(selected);
+
+    if (badge) {
+      badge.classList.toggle("is-live", live && !stale && !sourceFailure);
+      badge.classList.toggle("is-stale", Boolean(live && (stale || sourceFailure)));
+      badge.classList.toggle("is-error", Boolean(state.ultimaFalha));
+
+      if (state.ultimaFalha) {
+        badge.textContent = sourceTs
+          ? "Dado preservado · ESPN " + formatClockTime(new Date(sourceTs))
+          : "Fonte temporariamente indisponível";
+      } else if (live && sourceFailure) {
+        badge.textContent = sourceTs
+          ? "Dado preservado · ESPN " + formatClockTime(new Date(sourceTs))
+          : "Reconectando à ESPN…";
+      } else if (stale) {
+        badge.textContent = sourceTs
+          ? "Atualização atrasada · ESPN " + formatClockTime(new Date(sourceTs))
+          : "Reconectando à ESPN…";
+      } else if (live && sourceTs) {
+        badge.textContent = "ESPN · " + formatClockTime(new Date(sourceTs)) + " · 10s";
+      } else if (state.ultimaAtualizacao) {
+        badge.textContent = "Atualizado " + formatClockTime(state.ultimaAtualizacao) + " · 30s";
+      } else {
+        badge.textContent = "Conectando à ESPN…";
+      }
+    }
+
+    if (state.ultimaFalha) {
+      const suffix = sourceTs ? " Último dado ESPN recebido às " + formatClockTime(new Date(sourceTs)) + "." : "";
+      showAlert("A ESPN não respondeu nesta tentativa. O último dado válido permanece identificado na tela e uma nova tentativa ocorrerá automaticamente." + suffix);
+    } else if (live && sourceFailure) {
+      const suffix = sourceTs ? " O placar exibido foi recebido às " + formatClockTime(new Date(sourceTs)) + "." : "";
+      showAlert("A ESPN não respondeu para esta partida na tentativa mais recente. O dado anterior foi preservado e o site já está tentando reconectar." + suffix);
+    } else if (stale) {
+      showAlert("A atualização desta partida está atrasada. O placar exibido está identificado como preservado e uma nova consulta à ESPN foi acionada.");
+    } else {
+      showAlert("");
+    }
+  }
+
+  function currentSelectedGame() {
     try {
-      if (state.primeiraCarga) await loadLocal();
-      await Promise.all([loadScoreboard(), loadTransmissions()]);
+      return chooseGame(allGames()).selected || null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function scheduleNextRefresh(delay = IDLE_REFRESH_MS, reason = "timer") {
+    clearTimeout(state.timer);
+    state.timer = setTimeout(() => refresh(reason), Math.max(0, Number(delay) || 0));
+  }
+
+  function requestImmediateRefresh(reason) {
+    if (document.hidden) {
+      state.refreshRequested = true;
+      state.pendingRefreshReason = reason || "visible";
+      return;
+    }
+
+    const now = Date.now();
+    if (now - state.immediateRefreshAt < IMMEDIATE_REFRESH_DEBOUNCE_MS) return;
+    state.immediateRefreshAt = now;
+    clearTimeout(state.timer);
+
+    if (state.carregando) {
+      state.refreshRequested = true;
+      state.pendingRefreshReason = reason || "superseded";
+      // Invalida a geração atual antes do abort para impedir que uma resposta
+      // velha redesenhe a tela enquanto a atualização nova é preparada.
+      state.refreshGeneration += 1;
+      abortActiveFetches();
+      return;
+    }
+
+    state.refreshRequested = false;
+    state.pendingRefreshReason = "";
+    refresh(reason || "immediate");
+  }
+
+  async function refresh(reason = "timer") {
+    if (document.hidden) {
+      state.refreshRequested = true;
+      state.pendingRefreshReason = reason;
+      return;
+    }
+    if (state.carregando) {
+      state.refreshRequested = true;
+      state.pendingRefreshReason = reason;
+      return;
+    }
+
+    clearTimeout(state.timer);
+    state.carregando = true;
+    state.carregandoDesde = Date.now();
+    state.ultimaTentativa = new Date();
+    const generation = ++state.refreshGeneration;
+
+    try {
+      if (state.primeiraCarga) {
+        await loadLocal();
+        if (generation !== state.refreshGeneration) return;
+        // Primeira pintura com o último snapshot local antes de qualquer chamada remota.
+        renderPage(generation);
+      }
+      if (generation !== state.refreshGeneration) return;
+
+      const transmissionPromise = loadTransmissions().catch((error) => { console.warn("Transmissões temporariamente indisponíveis:", error); });
+      const scoreboardHealth = await loadScoreboard();
+      if (generation !== state.refreshGeneration) return;
+
       state.ultimaAtualizacao = new Date();
       state.ultimaFalha = "";
       state.primeiraCarga = false;
-      showAlert("");
-      await renderPage();
-    } catch (e) {
-      console.warn("Ao vivo indisponível:", e);
-      state.ultimaFalha = e && e.message ? e.message : String(e);
-      if (badge) {
-        badge.classList.add("is-error");
-        badge.classList.remove("is-live");
-        badge.textContent = "Fonte temporariamente indisponível";
+      renderPage(generation);
+      transmissionPromise.then(() => { if (generation === state.refreshGeneration) renderPage(generation); });
+
+      // Se apenas outra competição falhou, a partida selecionada continua marcada
+      // pela sua própria fonte/idade; não transformamos uma falha parcial em erro
+      // global. O mapa por liga é consumido por updateFreshnessUi().
+      if (scoreboardHealth && scoreboardHealth.failedLeagues && scoreboardHealth.failedLeagues.length) {
+        updateFreshnessUi(currentSelectedGame());
       }
-      showAlert("A ESPN não respondeu nesta tentativa. A última informação válida permanece na tela e uma nova tentativa ocorrerá automaticamente.");
-      if (state.primeiraCarga) {
-        try {
-          await Promise.all([loadLocal(), loadTransmissions()]);
-          state.primeiraCarga = false;
-          await renderPage();
-        } catch (_) {
-          app.innerHTML = '<div class="panel"><div class="panel-inner"><div class="live-empty">Não foi possível carregar a agenda agora. Tente novamente em alguns instantes.</div></div></div>';
+    } catch (e) {
+      const superseded = generation !== state.refreshGeneration || (isAbortError(e) && state.refreshRequested);
+      if (!superseded) {
+        console.warn("Ao vivo indisponível:", e);
+        state.ultimaFalha = e && e.message ? e.message : String(e);
+        if (state.primeiraCarga) {
+          try {
+            await loadLocal();
+            if (generation !== state.refreshGeneration) return;
+            state.primeiraCarga = false;
+            renderPage(generation);
+            loadTransmissions().then(() => { if (generation === state.refreshGeneration) renderPage(generation); }).catch(() => {});
+          } catch (_) {
+            if (app) app.innerHTML = '<div class="panel"><div class="panel-inner"><div class="live-empty">Não foi possível carregar a agenda agora. Tente novamente em alguns instantes.</div></div></div>';
+          }
         }
+        updateFreshnessUi(currentSelectedGame());
       }
     } finally {
       state.carregando = false;
-      clearTimeout(state.timer);
-      state.timer = setTimeout(refresh, REFRESH_MS);
+      state.carregandoDesde = 0;
+
+      if (state.refreshRequested && !document.hidden) {
+        const nextReason = state.pendingRefreshReason || "pending";
+        state.refreshRequested = false;
+        state.pendingRefreshReason = "";
+        scheduleNextRefresh(0, nextReason);
+      } else {
+        const selected = currentSelectedGame();
+        scheduleNextRefresh(isLiveGame(selected) ? LIVE_REFRESH_MS : IDLE_REFRESH_MS, "timer");
+      }
     }
+  }
+
+  function freshnessWatchdog() {
+    if (document.hidden) return;
+    const selected = currentSelectedGame();
+    if (!isLiveGame(selected)) return;
+
+    const now = Date.now();
+    const stale = isDisplayedDataStale(selected, now);
+    if (!stale) return;
+
+    updateFreshnessUi(selected);
+
+    const lastAttemptAt = state.ultimaTentativa instanceof Date ? state.ultimaTentativa.getTime() : 0;
+    const requestTooOld = state.carregando && state.carregandoDesde > 0 && now - state.carregandoDesde > FETCH_TIMEOUT_MS + 1500;
+    const canRetry = !lastAttemptAt || now - lastAttemptAt >= Math.min(LIVE_REFRESH_MS, 10000);
+    if (requestTooOld || canRetry) requestImmediateRefresh("freshness-watchdog");
   }
 
   document.addEventListener("click", (event) => {
@@ -2326,12 +3052,23 @@
   });
 
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) {
-      clearTimeout(state.timer);
-      refresh();
-    }
+    if (!document.hidden) requestImmediateRefresh("visibilitychange");
+  });
+
+  window.addEventListener("pageshow", () => {
+    requestImmediateRefresh("pageshow");
+  });
+
+  window.addEventListener("focus", () => {
+    requestImmediateRefresh("focus");
+  });
+
+  window.addEventListener("online", () => {
+    requestImmediateRefresh("online");
   });
 
   state.tickTimer = setInterval(updateCountdowns, 1000);
-  refresh();
+  state.freshnessTimer = setInterval(freshnessWatchdog, FRESHNESS_CHECK_MS);
+  requestImmediateRefresh("initial");
+
 })();
