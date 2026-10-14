@@ -730,7 +730,9 @@
     // Brasileirão ao vivo: sempre pede a camada ESPN multi-superfície fresca.
     // O hot-cache de poucos segundos continua útil para outros consumidores,
     // mas o painel visível não deve herdar os zeros do pré-jogo.
-    if (options.forceFresh || (league === "bra.1" && game.state === "in")) params.set("fresh", "1");
+    // Qualquer liga em andamento com gol pendente precisa de facts novos.
+    // Antes, a atualização forçada era exclusiva do Brasileirão.
+    if (options.forceFresh || (game.state === "in" && expectedGoals > 0)) params.set("fresh", "1");
     let gatewayError = null;
 
     try {
@@ -2521,7 +2523,16 @@
     // o placar sem inventar marcadores.
     const canonical = summary && summary.__fdgLiveFacts;
     const home=[], away=[];
-    if (!canonical || !Array.isArray(canonical.goals)) return {home,away};
+    // Não atribuir nome sem evidência canônica. Mostrar estado pendente,
+    // em vez de ocultar completamente um gol confirmado pelo placar.
+    if (!canonical || !Array.isArray(canonical.goals)) {
+      const h = Math.max(0, Number(numericScore(g.home?.score) || 0));
+      const a = Math.max(0, Number(numericScore(g.away?.score) || 0));
+      return {
+        home: Array.from({length: Math.min(h, 10)}, () => ({min:"",athlete:"Autor sendo confirmado"})),
+        away: Array.from({length: Math.min(a, 10)}, () => ({min:"",athlete:"Autor sendo confirmado"}))
+      };
+    }
     const expectedHome=Math.max(0,Number(numericScore(g.home&&g.home.score)||0));
     const expectedAway=Math.max(0,Number(numericScore(g.away&&g.away.score)||0));
     const integrity=canonical.integrity||{};
@@ -2538,7 +2549,9 @@
       else if (goal.side==="home") home.push(item);
       else if (goal.side==="away") away.push(item);
     }
-    // Defesa final: marcadores jamais podem exceder o placar corrente.
+    // Placar canônico é a quantidade; a identidade não confirmada é explícita.
+    while (home.length < expectedHome) home.push({min:"",athlete:"Autor sendo confirmado"});
+    while (away.length < expectedAway) away.push({min:"",athlete:"Autor sendo confirmado"});
     return {home:home.slice(0,expectedHome),away:away.slice(0,expectedAway)};
   }
 
@@ -2766,8 +2779,15 @@
   function scheduleMissingScorerRetry(eventId, summary) {
     clearTimeout(state.scorerRetryTimer);
     state.scorerRetryTimer = null;
-    const missing = Number(summary && summary.__fdgLiveFacts && summary.__fdgLiveFacts.integrity && summary.__fdgLiveFacts.integrity.missingScorers || 0);
-    if (!(missing > 0) || document.hidden) return;
+    const current = currentSelectedGame();
+    const expected = Math.max(0, Number(numericScore(current?.home?.score) || 0)) + Math.max(0, Number(numericScore(current?.away?.score) || 0));
+    const integrity = summary?.__fdgLiveFacts?.integrity;
+    // Sem facts também há autoria pendente; não esperar que o contrato ausente
+    // declare missingScorers para começar a recuperação.
+    const missing = integrity && Number(integrity.expectedGoals) === expected
+      ? Math.max(0, Number(integrity.missingScorers || 0))
+      : expected;
+    if (!(missing > 0) || document.hidden || current?.state !== "in") return;
     state.scorerRetryTimer = setTimeout(() => {
       const current = currentSelectedGame();
       if (String(current && current.id || "") !== String(eventId || "") || document.hidden) return;
@@ -2780,11 +2800,17 @@
     renderSwitcher(switchGames,selected);
     const eventId=String(selected?.id||""), cached=eventId?state.resumoPorId[eventId]||null:null;
     renderMain(selected,cached,all); updateCountdowns(); updateFreshnessUi(selected);
-    if(!selected||selected.source!=="espn"||!eventId)return;
+    // IDs documentais (fdg-conmebol-...) nunca podem ser enviados como ESPN.
+    // Mas um evento continental reconciliado com ID ESPN deve consultar facts
+    // mesmo se a agenda local foi a fonte primária do card.
+    if(!selected||!/^\d{5,15}$/.test(eventId)||!selected.espnLeague)return;
     const scoreKey=`${numericScore(selected.home&&selected.home.score)??""}:${numericScore(selected.away&&selected.away.score)??""}`;
     const age=Date.now()-Number(state.summaryFetchedAt[eventId]||0), scoreChanged=state.summaryScoreKey[eventId]!==scoreKey;
-    const missingScorers=Number(cached&&cached.__fdgLiveFacts&&cached.__fdgLiveFacts.integrity&&cached.__fdgLiveFacts.integrity.missingScorers||0);
-    const summaryRefreshMs=missingScorers>0?MISSING_SCORER_REFRESH_MS:SUMMARY_REFRESH_MS;
+    const expectedGoals=Math.max(0,Number(numericScore(selected.home?.score)||0))+Math.max(0,Number(numericScore(selected.away?.score)||0));
+    const integrity=cached?.__fdgLiveFacts?.integrity;
+    const missingScorers=integrity&&Number(integrity.expectedGoals)===expectedGoals
+      ? Math.max(0,Number(integrity.missingScorers||0)) : expectedGoals;
+    const summaryRefreshMs=selected.state==="in"&&missingScorers>0?MISSING_SCORER_REFRESH_MS:SUMMARY_REFRESH_MS;
     if(cached&&!scoreChanged&&age<summaryRefreshMs)return;
     if(state.summaryLoadingKey[eventId]===scoreKey)return;
     state.summaryLoadingKey[eventId]=scoreKey;
