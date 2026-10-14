@@ -1,0 +1,22 @@
+FDG R10R17.2 — HOTFIX 01 | DEPLOY PAGES CI LIVE IDS
+
+FALHA: tests/test-br-classificacao-live.mjs exigia um ID ESPN numerico na funcao loadSummary.
+Essa assertiva e incompatível com R10R17.2, que deve aceitar IDs documentais no Gateway Live Facts.
+
+ALTERACOES:
+- tests/test-br-classificacao-live.mjs: verifica que gateway aceita IDs documentais quando ha liga;
+  exige identificador no request; protege fallback ESPN direto para IDs numericos.
+- .github/workflows/deploy.yml: atualiza a mensagem de sucesso do teste para contrato atual.
+
+INSTALACAO:
+1. Ter aplicado o pacote completo R10R17.2 no GitHub antes deste hotfix.
+2. Extrair este ZIP e carregar apenas os 2 arquivos acima, mantendo as pastas, no main.
+3. Commit directly to main. O proprio commit dispara Deploy site (GitHub Pages).
+4. Nao e necessario disparar Deploy Push Worker ou Orchestrator.
+
+VALIDACAO LOCAL:
+- Suite do passo Validar LiveState ESPN compartilhado executada integralmente: PASS.
+- Teste de regressao de IDs documentais e fallback numérico: PASS.
+- YAML carregado sem erro.
+
+OBS: Este pacote NAO modifica JS da pagina, Worker, RAG, futebol ou banco.

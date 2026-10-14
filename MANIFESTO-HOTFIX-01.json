@@ -1,0 +1,24 @@
+{
+  "execution": "R10R17.2-HOTFIX-01",
+  "purpose": "Remove outdated numeric-only assertion on live summary; preserve numeric ESPN direct fallback check",
+  "baseline": "R10R17.2 applied; expected current site JS br-aovivo version 20261014-r10r17-2",
+  "files": [
+    {
+      "path": "tests/test-br-classificacao-live.mjs",
+      "bytes": 13491,
+      "sha256": "f0d87d36ce86f99ac2b66d0e0949c8513e7523d5c4f0abf00114a02ca341f29f"
+    },
+    {
+      "path": ".github/workflows/deploy.yml",
+      "bytes": 94413,
+      "sha256": "0f1f983767a844b5fd2c5071139228fbfd92ef5c69e6d9fb24ba67afc931abe4"
+    }
+  ],
+  "validated": [
+    "node tests/test-br-classificacao-live.mjs",
+    "node tests/test-br-live-goal-sync.mjs",
+    "node cloudflare/push-worker/tests/test-resultados-freshness.mjs",
+    "GitHub Pages LiveState validation step exact commands",
+    "workflow YAML parsed"
+  ]
+}

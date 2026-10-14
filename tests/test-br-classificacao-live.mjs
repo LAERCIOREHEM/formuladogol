@@ -228,7 +228,16 @@ const workerPayload = {
   assert.match(liveSource, /renderMain\(selected,cached,all\); updateCountdowns\(\); updateFreshnessUi\(selected\);/);
   assert.match(liveSource, /summaryScoreKey/);
   assert.ok(!liveSource.includes('g.source !== "espn"'), "summary não pode bloquear partida continental reconciliada por origem do card");
-  assert.match(liveSource, /if \(!g \|\| !\/\^\\d\{5,15\}\$\/\.test\(String\(g\.id\)\) \|\| !g\.espnLeague\) return null;/, "summary deve exigir ID ESPN numérico e liga");
+  // R10R17.2: o gateway aceita também IDs documentais da agenda continental,
+  // desde que a liga esteja identificada. Exigir apenas ID ESPN numérico aqui
+  // quebraria a sincronização com o Sports Monitor já validada em produção.
+  assert.match(liveSource, /if \(!g \|\| !String\(g\.id \|\| '\'\) \|\| !g\.espnLeague\) return null;/,
+    'summary via gateway deve aceitar ID documental quando a liga é conhecida');
+  assert.match(liveSource, /event: eventId,/,
+    'summary deve encaminhar o identificador do jogo ao gateway');
+  // Somente consultas ESPN DIRETAS dependem de um eventId numérico.
+  assert.match(liveSource, /if \(league === "bra\.1" && game\.state === "in" && \/\^\\d\{5,15\}\$\/\.test\(eventId\)\) \{/,
+    'fallback ESPN direto deve continuar restrito a IDs ESPN numéricos');
   assert.match(liveSource, /if \(!canonical \|\| !Array\.isArray\(canonical\.goals\)\) return \{home,away\};/, 'Ao Vivo não pode cair para parser bruto de gols');
   assert.ok(!liveSource.includes('eventRows(g,summary).filter(r=>r.type.key==="goal")'), 'parser bruto de gols deve estar eliminado do render');
   assert.ok(liveSource.indexOf('if (teamId && teamId===homeId)') < liveSource.indexOf('else if (goal.side==="home")'), 'teamId precisa ter precedência sobre side');
