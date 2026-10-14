@@ -2523,16 +2523,9 @@
     // o placar sem inventar marcadores.
     const canonical = summary && summary.__fdgLiveFacts;
     const home=[], away=[];
-    // Não atribuir nome sem evidência canônica. Mostrar estado pendente,
-    // em vez de ocultar completamente um gol confirmado pelo placar.
-    if (!canonical || !Array.isArray(canonical.goals)) {
-      const h = Math.max(0, Number(numericScore(g.home?.score) || 0));
-      const a = Math.max(0, Number(numericScore(g.away?.score) || 0));
-      return {
-        home: Array.from({length: Math.min(h, 10)}, () => ({min:"",athlete:"Autor sendo confirmado"})),
-        away: Array.from({length: Math.min(a, 10)}, () => ({min:"",athlete:"Autor sendo confirmado"}))
-      };
-    }
+    // Sem Live Facts canônicos, o navegador não reconstrói nem fabrica
+    // linhas de gol a partir do placar ou dos eventos brutos.
+    if (!canonical || !Array.isArray(canonical.goals)) return {home,away};
     const expectedHome=Math.max(0,Number(numericScore(g.home&&g.home.score)||0));
     const expectedAway=Math.max(0,Number(numericScore(g.away&&g.away.score)||0));
     const integrity=canonical.integrity||{};
@@ -2549,9 +2542,8 @@
       else if (goal.side==="home") home.push(item);
       else if (goal.side==="away") away.push(item);
     }
-    // Placar canônico é a quantidade; a identidade não confirmada é explícita.
-    while (home.length < expectedHome) home.push({min:"",athlete:"Autor sendo confirmado"});
-    while (away.length < expectedAway) away.push({min:"",athlete:"Autor sendo confirmado"});
+    // Só renderiza identidades efetivamente entregues pelo contrato canônico.
+    // O placar continua independente e não é usado para fabricar autores.
     return {home:home.slice(0,expectedHome),away:away.slice(0,expectedAway)};
   }
 
