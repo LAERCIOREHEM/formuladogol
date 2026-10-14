@@ -1,0 +1,88 @@
+{
+  "package": "FDG-R10R17.3-LIVE-GOAL-EVENT-INTEGRITY-GUARD",
+  "baseline_repository": "LAERCIOREHEM/formuladogol",
+  "baseline_commit": "338a71f79bf79e38897fdd66320bf6b92d162b30",
+  "file_count": 14,
+  "changes": {
+    ".github/workflows/deploy-push-worker.yml": {
+      "sha256": "18c4fc7bbfc6d031b195070d2fddedb29dd3f9aceb3db0c5d42b835ad5d4951c",
+      "size": 56308,
+      "baseline_git_blob_sha": "3475171c535e4291e3de743a909e99f2ba8d7f87"
+    },
+    ".github/workflows/deploy.yml": {
+      "sha256": "bf49aaafa1a22e37ffb06eba6f6e8cfcdf1f3f6f37790cf6b0dc990116dafb94",
+      "size": 94417,
+      "baseline_git_blob_sha": "d8ceeb2a57dd667e31fde00ef0313322e4a11f76"
+    },
+    "aovivo.html": {
+      "sha256": "d1b04d29ead0a5f92f171617474deaa9bbd9706aad926241d167bded1caf2c28",
+      "size": 10830,
+      "baseline_git_blob_sha": null
+    },
+    "js/br-aovivo.js": {
+      "sha256": "6845ddc6f0148035aba136ab75a52d5bac4c72d3d960b4f608ffdf5272502a94",
+      "size": 148233,
+      "baseline_git_blob_sha": null
+    },
+    "tests/test-br-live-goal-sync.mjs": {
+      "sha256": "4ccfa175c54004efa98da62a83ca08f7222d5a90e18ae503072bca696e0f9f74",
+      "size": 3211,
+      "baseline_git_blob_sha": null
+    },
+    "cloudflare/push-worker/src/sports-engine.js": {
+      "sha256": "1606b8be06008ee4a2398e8fb0e7a96643884cc6995e4b3979f96cad62edb033",
+      "size": 69406,
+      "baseline_git_blob_sha": "b1fad3a8bbfd0bb5ddf8c5362d79223a4e951cf8"
+    },
+    "cloudflare/push-worker/src/sports-monitor.js": {
+      "sha256": "ae46937ca9b5599666c708d623d89cd8731f664ab885f76129a2398f4e7090fb",
+      "size": 73962,
+      "baseline_git_blob_sha": "36c694c089b46a0bce8c3338b7bea87d8e8c19ad"
+    },
+    "cloudflare/push-worker/src/push-dispatch.js": {
+      "sha256": "96b9d8ecf61a10c1a4bdd4f844327e29a4866b2e10cc4aa51fe0218150479e5d",
+      "size": 22795,
+      "baseline_git_blob_sha": "e9b80da46377b6ff0796ace708d75940a5c2a2e3"
+    },
+    "cloudflare/push-worker/src/ops.js": {
+      "sha256": "ef848a90868e0a139dd15bae6e18a995b07d4f873d7f969dffe4c35bcaeb8916",
+      "size": 14035,
+      "baseline_git_blob_sha": "cfca7b00c32461e95e924bab3a397113c1fea8d2"
+    },
+    "cloudflare/push-worker/tests/test-sports-engine.mjs": {
+      "sha256": "ac7e6cd849ac94c0b72615ba919dcc12473807291263fe0c0c5daf40d4cb9d31",
+      "size": 43657,
+      "baseline_git_blob_sha": null
+    },
+    "cloudflare/push-worker/tests/test-sports-monitor.mjs": {
+      "sha256": "a7a45aa8fb89cc25d1db4bd12cf22cb28f8ee25ee75ef23eb5d83c041782c394",
+      "size": 18217,
+      "baseline_git_blob_sha": null
+    },
+    "cloudflare/push-worker/tests/test-end-to-end.mjs": {
+      "sha256": "1873bfe2d2c5e94a1b7af5984c13eef31706425309b291aeae2a9178ed381e7b",
+      "size": 3332,
+      "baseline_git_blob_sha": null
+    },
+    "cloudflare/push-worker/tests/test-live-goal-event-integrity.mjs": {
+      "sha256": "6c5709e38d384ef4a1cea5136a87d26291c3c806deb2118c1d5f631f8462ad39",
+      "size": 5706,
+      "baseline_git_blob_sha": null
+    },
+    "cloudflare/push-worker/tests/test-live-goal-outbox.mjs": {
+      "sha256": "cf92bd2972579134fc52d0c917816061d634f7f8ddce3591d7019561901e2ebf",
+      "size": 1870,
+      "baseline_git_blob_sha": null
+    }
+  },
+  "deploy": [
+    "Deploy Push Worker",
+    "Deploy site (GitHub Pages)"
+  ],
+  "d1_migration_required": false,
+  "caveats": [
+    "No production deploy performed.",
+    "npm run test:sports stopped only on missing @modelcontextprotocol/server in isolated local environment; workflow installs real deps.",
+    "Do not ship temporary dependency stubs."
+  ]
+}

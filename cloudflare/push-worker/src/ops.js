@@ -1,4 +1,4 @@
-import { recoverPendingDispatches, recoverStuckDeliveries } from './push-dispatch.js';
+import { recoverOrphanedGoalDispatches, recoverPendingDispatches, recoverStuckDeliveries } from './push-dispatch.js';
 
 const OPS_VERSION = 7;
 const STALE_ACTIVE_POLL_MS = 35_000;
@@ -258,6 +258,7 @@ export async function opsStatus(env, monitor) {
 export async function runOperationalMaintenance(env, monitorStub) {
   const started = Date.now();
   let recoveredDispatches = 0;
+  let recoveredOrphanedGoals = 0;
   let recoveredDeliveries = 0;
   let cleanup = { ran: false };
   try {
@@ -265,7 +266,8 @@ export async function runOperationalMaintenance(env, monitorStub) {
       monitorStub.fetch('https://internal/bootstrap', { method: 'POST' }),
       recoverPendingDispatches(env),
       recoverStuckDeliveries(env),
-      cleanupOldRows(env)
+      cleanupOldRows(env),
+      recoverOrphanedGoalDispatches(env)
     ]);
     const monitorResult = tasks[0];
     if (monitorResult.status === 'fulfilled') {
@@ -275,6 +277,7 @@ export async function runOperationalMaintenance(env, monitorStub) {
     if (tasks[1].status === 'fulfilled') recoveredDispatches = num(tasks[1].value, 0);
     if (tasks[2].status === 'fulfilled') recoveredDeliveries = num(tasks[2].value, 0);
     if (tasks[3].status === 'fulfilled') cleanup = tasks[3].value || cleanup;
+    if (tasks[4].status === 'fulfilled') recoveredOrphanedGoals = num(tasks[4].value, 0);
 
     const failures = tasks
       .map((item, index) => item.status === 'rejected' ? `${index}:${text(item.reason?.message || item.reason)}` : '')
@@ -285,9 +288,9 @@ export async function runOperationalMaintenance(env, monitorStub) {
     await writeState(env, 'last_cron_error', '');
     console.log(JSON.stringify({
       event: 'fdg_ops_cron_ok', durationMs: Date.now() - started,
-      recoveredDispatches, recoveredDeliveries, cleanup
+      recoveredDispatches, recoveredOrphanedGoals, recoveredDeliveries, cleanup
     }));
-    return { ok: true, recoveredDispatches, recoveredDeliveries, cleanup };
+    return { ok: true, recoveredDispatches, recoveredOrphanedGoals, recoveredDeliveries, cleanup };
   } catch (error) {
     const message = text(error?.message || error).slice(0, 1500);
     try { await writeState(env, 'last_cron_error', message); } catch (_) {}

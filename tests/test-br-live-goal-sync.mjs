@@ -27,4 +27,12 @@ assert.match(page,/FDGLiveGoalSync\?\.reconcile/);
 assert.doesNotMatch(page,/if\(!selected\|\|!\/\^\\d\{5,15\}/);
 assert.match(page,/Evento documental sem dados do monitor/);
 assert.match(fs.readFileSync('aovivo.html','utf8'),/br-live-goal-sync\.js\?v=20261014-r10r17-2/);
+// R10R17.3: autoria confirmada aparece antes do retry de estatísticas parciais.
+const firstSummaryIndex = page.indexOf('let data = await fetchSummaryPayload(g, { signal });');
+const earlyFactsIndex = page.indexOf('renderMain(currentSelectedGame(), data, allGames());', firstSummaryIndex);
+const statsRetryIndex = page.indexOf('await waitWithSignal(PARTIAL_STATS_RETRY_DELAY_MS', firstSummaryIndex);
+assert.ok(firstSummaryIndex >= 0 && earlyFactsIndex > firstSummaryIndex && statsRetryIndex > earlyFactsIndex,
+  'R10R17.3 deve exibir o autor assim que o gateway entrega facts, antes do retry das estatísticas');
+assert.match(fs.readFileSync('aovivo.html','utf8'), /br-aovivo\.js\?v=20261014-r10r17-3/);
+
 console.log('br-live-goal-sync R10R17.2: PASS');

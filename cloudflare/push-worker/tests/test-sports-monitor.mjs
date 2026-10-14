@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { SportsMonitor } from '../src/sports-monitor.js';
+import { SportsMonitor, promoteObservationFromPlays } from '../src/sports-monitor.js';
 import { buildHotEspnTestEvent, detectHotEspnMutation, hotEspnSnapshot } from '../src/hot-espn-test.js';
 import { buildHotMatchPrematchEvent, hotMatchPrematchDue, hotMatchTargetEvent, markHotMatchTechnicalEvent } from '../src/hot-match-test.js';
 
@@ -345,3 +345,17 @@ console.log('sports-monitor: PASS');
 }
 
 console.log('hot-match H3 integration: PASS');
+
+// R10R17.3: a ESPN pode manter no PBP um gol já removido do scoreboard.
+// A promoção só é válida para um gol novo, nunca para esconder rollback.
+{
+  const scoreboardZero = { home: { score: 0 }, away: { score: 0 }, state: 'in' };
+  const pbpGoal = [{ homeScoreAfter: 1, awayScoreAfter: 0, shootout: false, description: 'Goal' }];
+  const previousZero = { initialized: true, home: { score: 0 }, away: { score: 0 } };
+  const previousOne = { initialized: true, home: { score: 1 }, away: { score: 0 } };
+  assert.equal(promoteObservationFromPlays(scoreboardZero, pbpGoal, previousZero).home.score, 1, 'gol novo pode antecipar scoreboard');
+  assert.equal(promoteObservationFromPlays(scoreboardZero, pbpGoal, previousOne).home.score, 0, 'PBP antigo não mascara rollback');
+  assert.equal(promoteObservationFromPlays(scoreboardZero, [
+    { ...pbpGoal[0], description: 'Goal overturned after VAR' }
+  ], previousZero).home.score, 0, 'gol expressamente anulado não pode elevar placar');
+}

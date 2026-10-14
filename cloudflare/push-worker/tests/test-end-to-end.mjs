@@ -55,7 +55,11 @@ revertedObs.clock = "16'";
 let reverted = applyObservation(feedGap.match, revertedObs, [], t0 + 66_000);
 assert.equal(reverted.emitted.length, 0);
 reverted = applyObservation(reverted.match, revertedObs, [], t0 + 76_000);
-assert.equal(reverted.emitted.length, 1);
+assert.equal(reverted.emitted.length, 0, 'duas respostas atrasadas não comprovam anulação');
+for (const offset of [86_000, 156_000, 166_000]) {
+  reverted = applyObservation(reverted.match, revertedObs, [], t0 + offset);
+}
+assert.equal(reverted.emitted.length, 1, 'correção sustentada pode avisar sobre gol previamente notificado');
 assert.equal(reverted.emitted[0].type, 'goal_overturned');
 const overturnedPush = buildSportsPushPayload(reverted.emitted[0]);
 assert.equal(overturnedPush.title, '🚫 GOL ANULADO');

@@ -178,6 +178,34 @@ export async function enqueueSportsEvent(env, eventKey, options = {}) {
   }
 }
 
+// R10R17.3: INSERT sports_events can succeed while the process exits before
+// inserting push_event_dispatch. Recover only very recent confirmed goals,
+// avoiding any historical notification backlog after deploy or outage.
+export async function recoverOrphanedGoalDispatches(env, limit = 20) {
+  if (!env.PUSH_QUEUE || !env.DB) return 0;
+  const result = await env.DB.prepare(`
+    SELECT e.event_key
+    FROM sports_events e
+    LEFT JOIN push_event_dispatch d ON d.event_key=e.event_key
+    WHERE e.event_type='goal'
+      AND e.created_at >= datetime('now','-15 minutes')
+      AND d.event_key IS NULL
+    ORDER BY e.created_at ASC
+    LIMIT ?
+  `).bind(Math.max(1, Math.min(100, Number(limit) || 20))).all();
+  let recovered = 0;
+  for (const row of result.results || []) {
+    const key = text(row.event_key);
+    if (!key) continue;
+    try {
+      if (await enqueueSportsEvent(env, key)) recovered += 1;
+    } catch (error) {
+      console.error('fdg_orphaned_goal_enqueue_retry', key, text(error?.message || error));
+    }
+  }
+  return recovered;
+}
+
 export async function recoverPendingDispatches(env, limit = 20) {
   if (!env.PUSH_QUEUE) return 0;
   const result = await env.DB.prepare(`
@@ -519,7 +547,7 @@ export async function dispatchStatus(env) {
   ]);
   return {
     ok: true,
-    dispatchVersion: 5,
+    dispatchVersion: 6,
     segmentedTestVersion: '6-T1',
     hotEspnTestVersion: '6-H1',
     hotMatchTestVersion: '6-H3',

@@ -93,11 +93,16 @@ state = step.match;
 assert.equal(step.emitted.length, 0, 'primeira evidência de reversão não dispara correção');
 step = applyObservation(state, reverted, revertedPlays, t0 + 56_000);
 state = step.match;
-assert.equal(step.emitted.length, 1, 'segunda evidência confirma gol anulado');
-assert.equal(step.emitted[0].type, 'goal_overturned');
+assert.equal(step.emitted.length, 0, 'duas leituras ESPN não confirmam VAR');
+for (const offset of [76_000, 146_000, 156_000]) {
+  step = applyObservation(state, reverted, revertedPlays, t0 + offset);
+  state = step.match;
+}
+assert.equal(step.emitted.filter((event) => event.type === 'goal_overturned').length, 1,
+  'somente a regressão sustentada (90s, >=4 leituras) confirma e comunica anulação de gol notificado');
 
-// R10R4: VAR rápido — mesmo quando o gol é anulado antes dos 20 s e portanto
-// nunca houve push de GOL, duas leituras do placar revertido geram GOL ANULADO.
+// R10R17.3: VAR rápido ANTES do push não pode produzir uma notificação
+// isolada de anulação. A regressão precisa ser persistente, e a limpeza é silenciosa.
 {
   const varBase = normalizeScoreboardEvent(rawScore(1, 2, "70'"), game.league, game);
   const varBaseline = [
@@ -116,8 +121,14 @@ assert.equal(step.emitted[0].type, 'goal_overturned');
   varState = varStep.match;
   assert.equal(varStep.emitted.length, 0, 'primeira leitura do rollback não basta');
   varStep = applyObservation(varState, rolledBack, varBaseline, t0 + 20_000);
-  assert.equal(varStep.emitted.filter((event) => event.type === 'goal_overturned').length, 1, 'segunda leitura confirma o gol anulado mesmo sem push de gol anterior');
-  assert.equal(varStep.emitted[0].notificationDraft.title, '🚫 GOL ANULADO');
+  assert.equal(varStep.emitted.filter((event) => event.type === 'goal_overturned').length, 0, 'não alertar anulação sem push anterior');
+  varState = varStep.match;
+  for (const offset of [40_000, 105_000, 115_000, 125_000]) {
+    varStep = applyObservation(varState, rolledBack, varBaseline, t0 + offset);
+    varState = varStep.match;
+  }
+  assert.equal(varStep.emitted.filter((event) => event.type === 'goal_overturned').length, 0, 'rollback rápido é curado silenciosamente');
+  assert.equal(Object.values(varState.plays).filter(p => p.status === 'overturned').length, 1);
 }
 
 // R10R4 — regressão Mirassol × Vitória (13/09/2026): recovery em 0x2 com
@@ -388,7 +399,7 @@ assert.equal(r9r1Healed.match.plays[`${game.eventId}:legacy-extra`].status, 'rej
 
 // Se o deploy ocorrer muito depois, cura o estado mas NÃO cria backlog de gols.
 const r9r1StaleState = structuredClone(r9r1PersistedR9State);
-const r9r1Stale = applyObservation(r9r1StaleState, r9r1Three, r9r1Raw, t0 + 5 * 60_000);
+const r9r1Stale = applyObservation(r9r1StaleState, r9r1Three, r9r1Raw, t0 + 13 * 60_000);
 assert.equal(r9r1Stale.emitted.filter((event) => event.type === 'goal').length, 0, 'gols antigos não podem reaparecer como push retroativo');
 assert.equal(Object.values(r9r1Stale.match.plays).filter((play) => play.status === 'confirmed').length, 3, 'estado antigo deve ser curado silenciosamente');
 assert.equal(Object.values(r9r1Stale.match.plays).filter((play) => play.lateSuppressedAt > 0).length, 2, 'somente as pendências antigas ficam marcadas como suprimidas');
@@ -518,7 +529,7 @@ rollbackState = applyObservation(rollbackState, sbOne, [], t0 + 5_000).match;
 const rollbackObs = normalizeScoreboardEvent(rawScore(0, 0, "10'"), game.league, game);
 const rollbackStep = applyObservation(rollbackState, rollbackObs, [], t0 + 15_000);
 assert.equal(rollbackStep.emitted.length, 0);
-assert.equal(Object.values(rollbackStep.match.plays).find((p) => p.scoreFallback === true)?.status, 'rejected');
+assert.equal(Object.values(rollbackStep.match.plays).find((p) => p.scoreFallback === true)?.status, 'pending', 'recuo isolado não descarta gol pendente');
 
 // Gol contra e disputa de pênaltis são classificados separadamente.
 const special = extractScoringPlays(summary(
@@ -536,12 +547,12 @@ const agenda = { jogos: [
 ] };
 assert.deepEqual(selectAgendaCandidates(agenda, Date.parse('2026-09-01T23:50:00Z')).map((x) => x.eventId), [game.eventId]);
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_CONFIRM_MS, 20_000);
-assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_LATE_SUPPRESS_MS, 180_000);
-assert.equal(SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION, '6-R10R4');
+assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_LATE_SUPPRESS_MS, 12 * 60_000);
+assert.equal(SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION, '6-R10R17.3');
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION, '6-R8');
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_RECONCILIATION_POLICY_VERSION, '6-R9-R1');
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_SCORER_ENRICHMENT_POLICY_VERSION, '6-R10R6');
-assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_RECOVERY_POLICY_VERSION, '6-R10R4');
+assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_RECOVERY_POLICY_VERSION, '6-R10R17.3');
 assert.equal(SPORTS_ENGINE_CONSTANTS.ESSENTIAL_ALERT_POLICY_VERSION, '6-R10R4');
 
 // ESPN às vezes publica state=post sem completed; relógio ao vivo não pode virar final fantasma.

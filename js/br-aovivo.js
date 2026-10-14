@@ -2592,6 +2592,15 @@
 
     try {
       let data = await fetchSummaryPayload(g, { signal });
+      // R10R17.3: a identidade do goleador não espera a segunda rodada de
+      // recuperação de estatísticas. Publica os facts seguros imediatamente.
+      if (requestSerial === state.summaryRequestSerial && data?.__fdgLiveFacts &&
+          String(currentSelectedGame()?.id || "") === eventId) {
+        state.resumoPorId[eventId] = data;
+        state.summaryFetchedAt[eventId] = Date.now();
+        state.summaryScoreKey[eventId] = `${numericScore(g.home && g.home.score) ?? ""}:${numericScore(g.away && g.away.score) ?? ""}`;
+        renderMain(currentSelectedGame(), data, allGames());
+      }
       let rows = extractStatsRows(g, data);
       const previousCount = cachedStatsCount(g);
       const now = Date.now();

@@ -1,7 +1,12 @@
 const GOAL_CONFIRM_MS = 20_000;
 const GOAL_CONFIRM_OBSERVATIONS = 2;
 const OVERTURN_CONFIRM_OBSERVATIONS = 2;
-const GOAL_LATE_SUPPRESS_MS = 180_000;
+// R10R17.3: never interpret two lagging ESPN polls as a confirmed VAR decision.
+const ROLLBACK_MIN_CONFIRM_MS = 90_000;
+const ROLLBACK_MIN_OBSERVATIONS = 4;
+// A verified goal can arrive late after ESPN source oscillation, but old
+// restart baselines must not generate a full-match historical notification flood.
+const GOAL_LATE_SUPPRESS_MS = 12 * 60_000;
 
 function text(value) {
   return String(value == null ? '' : value).trim();
@@ -1044,9 +1049,58 @@ function lifecycleEvent(type, match, observation, now) {
   };
 }
 
+// Protect an already observed score against one or two older CDN snapshots.
+// Candidate regressions are stored in the Durable Object match state. A sustained
+// regression may be accepted after 90 s AND four observations; nothing in the
+// probationary interval is permitted to emit a public "goal overturned" event.
+// The scoreboard (not play-by-play) supplies the rollback candidate.
+export function guardScoreRollback(previous, rawObservation, nowMs = Date.now()) {
+  const now = num(nowMs, Date.now());
+  const observation = rawObservation || {};
+  const prevHome = num(previous?.home?.score, 0);
+  const prevAway = num(previous?.away?.score, 0);
+  const curHome = num(observation?.home?.score, 0);
+  const curAway = num(observation?.away?.score, 0);
+  const active = previous?.initialized === true &&
+    ['in', 'post'].includes(text(observation?.state)) &&
+    (curHome < prevHome || curAway < prevAway);
+  if (!active) return { observation, rollback: null, held: false };
+  const earlier = previous?.scoreRollback;
+  const same = earlier && num(earlier.home, -1) === curHome && num(earlier.away, -1) === curAway;
+  const rollback = {
+    home: curHome, away: curAway,
+    firstSeenAt: same ? num(earlier.firstSeenAt, now) : now,
+    observations: same ? num(earlier.observations, 0) + 1 : 1,
+    lastObservedAt: now,
+    previousHome: prevHome, previousAway: prevAway
+  };
+  const accepted = rollback.observations >= ROLLBACK_MIN_OBSERVATIONS &&
+    now - rollback.firstSeenAt >= ROLLBACK_MIN_CONFIRM_MS;
+  if (accepted) return { observation, rollback: null, held: false, accepted: true };
+  return {
+    observation: {
+      ...observation,
+      home: { ...(observation.home || {}), score: prevHome },
+      away: { ...(observation.away || {}), score: prevAway },
+      scoreRollbackHeld: true
+    },
+    rollback, held: true
+  };
+}
+
 export function applyObservation(previous, observation, scoringPlays, nowMs = Date.now()) {
   const now = num(nowMs, Date.now());
   const match = structuredClone(previous || initialMatchState(observation));
+  const rollbackGuard = guardScoreRollback(match, observation, now);
+  observation = rollbackGuard.observation;
+  match.scoreRollback = rollbackGuard.rollback;
+  // Remember that a legitimate CORE play led the lagging scoreboard; this
+  // distinguishes a short ESPN scoreboard lag from a later true regression.
+  match.scorePromotedFromPlayByPlay = observation.scorePromotedFromPlayByPlay === true;
+  match.pbpScoreFirstPromotedAt = match.scorePromotedFromPlayByPlay
+    ? (num(previous?.pbpScoreFirstPromotedAt, 0) || now) : 0;
+  if (rollbackGuard.held) match.scoreRollbackHeldCount = num(match.scoreRollbackHeldCount, 0) + 1;
+  if (rollbackGuard.accepted) match.scoreRollbackAcceptedCount = num(match.scoreRollbackAcceptedCount, 0) + 1;
   const emitted = [];
   const wasInitialized = Boolean(match.initialized);
   const previousState = text(match.state);
@@ -1273,16 +1327,15 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
           play.rejectedReason = 'r10r4_pending_without_score_evidence';
           continue;
         }
-        // R10R4: se a ESPN chegou a elevar o placar e o VAR devolveu o placar
-        // antes dos 20 s anti-VAR, o gol original não foi enviado — mas o usuário
-        // ainda deve receber a informação relevante de GOL ANULADO. Exigimos duas
-        // observações consecutivas do placar revertido para evitar falso rollback.
+        // R10R17.3: a pending goal was NEVER delivered as a goal notification.
+        // Resolve it silently if the regression persists; a public correction
+        // without the corresponding original goal is misleading.
         play.missingCount = num(play.missingCount, 0) + 1;
         if (play.missingCount >= OVERTURN_CONFIRM_OBSERVATIONS) {
           play.status = 'overturned';
           play.overturnedAt = now;
           play.overturnedBeforeGoalDispatch = true;
-          emitted.push(emittedEvent('goal_overturned', play, match, observation, now));
+          play.rollbackDiscardedWithoutGoalPushAt = now;
         }
         continue;
       }
@@ -1304,7 +1357,8 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
       if (play.missingCount >= OVERTURN_CONFIRM_OBSERVATIONS) {
         play.status = 'overturned';
         play.overturnedAt = now;
-        emitted.push(emittedEvent('goal_overturned', play, match, observation, now));
+        // Do not notify a goal that was confirmed only as a silent late backfill.
+        if (!num(play.lateSuppressedAt, 0)) emitted.push(emittedEvent('goal_overturned', play, match, observation, now));
       }
     }
   }
@@ -1331,6 +1385,9 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
 
   for (const play of Object.values(match.plays)) {
     if (play.status !== 'pending') continue;
+    // A pending goal cannot be confirmed while the incoming feed is in a
+    // probationary score regression: that would fabricate a goal push.
+    if (rollbackGuard.held) continue;
     if (!credibleRegulationPlay(play)) {
       play.status = 'rejected';
       play.rejectedAt = now;
@@ -1346,9 +1403,8 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
         && age >= GOAL_CONFIRM_MS) {
       play.status = 'confirmed';
       play.confirmedAt = now;
-      // Não cria backlog de gols antigos após deploy/outage. O estado é curado
-      // para que os próximos gols sejam detectados normalmente, mas uma pendência
-      // com mais de 3 minutos não reaparece como notificação retroativa.
+      // Baseline on startup prevents old full-match backlog. Still allow
+      // genuinely delayed live goals up to 12 minutes; >12m is silent recovery.
       if (age > GOAL_LATE_SUPPRESS_MS) {
         play.lateSuppressedAt = now;
         play.lateSuppressedReason = 'r9r1_stale_pending';
@@ -1401,6 +1457,9 @@ export function summarizeMatch(match) {
     confirmedGoals: plays.filter((p) => p.status === 'confirmed').length,
     overturnedGoals: plays.filter((p) => p.status === 'overturned').length,
     lateSuppressedGoals: plays.filter((p) => num(p?.lateSuppressedAt, 0) > 0).length,
+    scoreRollbackPending: match?.scoreRollback ? { home: match.scoreRollback.home, away: match.scoreRollback.away, observations: match.scoreRollback.observations, since: match.scoreRollback.firstSeenAt } : null,
+    scoreRollbackHeldCount: num(match?.scoreRollbackHeldCount, 0),
+    scoreRollbackAcceptedCount: num(match?.scoreRollbackAcceptedCount, 0),
     lastObservedAt: match?.lastObservedAt || 0,
     lastSummaryAt: match?.lastSummaryAt || 0
   };
@@ -1411,10 +1470,12 @@ export const SPORTS_ENGINE_CONSTANTS = Object.freeze({
   GOAL_CONFIRM_OBSERVATIONS,
   OVERTURN_CONFIRM_OBSERVATIONS,
   GOAL_LATE_SUPPRESS_MS,
-  OVERTURN_POLICY_VERSION: '6-R10R4',
+  ROLLBACK_MIN_CONFIRM_MS,
+  ROLLBACK_MIN_OBSERVATIONS,
+  OVERTURN_POLICY_VERSION: '6-R10R17.3',
   GOAL_DETECTION_POLICY_VERSION: '6-R8',
   GOAL_RECONCILIATION_POLICY_VERSION: '6-R9-R1',
   GOAL_SCORER_ENRICHMENT_POLICY_VERSION: '6-R10R6',
-  GOAL_RECOVERY_POLICY_VERSION: '6-R10R4',
+  GOAL_RECOVERY_POLICY_VERSION: '6-R10R17.3',
   ESSENTIAL_ALERT_POLICY_VERSION: '6-R10R4'
 });

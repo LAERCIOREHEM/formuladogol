@@ -304,6 +304,9 @@ function scoreFromLatestPlay(plays) {
   let home = null;
   let away = null;
   for (const play of regulationPlays(plays)) {
+    // A VAR/cancelled goal can remain in an ESPN play feed after the scoreboard
+    // has rolled back. It is not proof that the official score increased.
+    if (/\b(overturned|disallowed|annulled|cancelled|anulado|invalidado)\b/i.test(text(play?.description))) continue;
     if (play?.homeScoreAfter != null && Number.isFinite(Number(play.homeScoreAfter))) home = Number(play.homeScoreAfter);
     if (play?.awayScoreAfter != null && Number.isFinite(Number(play.awayScoreAfter))) away = Number(play.awayScoreAfter);
   }
@@ -311,9 +314,19 @@ function scoreFromLatestPlay(plays) {
   return { home: Math.max(0, home), away: Math.max(0, away) };
 }
 
-function promoteObservationFromPlays(observation, plays) {
+export function promoteObservationFromPlays(observation, plays, previousMatch = null) {
   const derived = scoreFromLatestPlay(plays);
   if (!derived) return observation;
+  // The scoreboard can legitimately roll back a goal after VAR while PBP still
+  // lists the historical scoring play. Never hide that rollback by promoting
+  // from stale PBP; the engine handles the candidate with a temporal guard.
+  const recentlyPromotedByPbp = previousMatch?.scorePromotedFromPlayByPlay === true &&
+    num(previousMatch?.pbpScoreFirstPromotedAt, 0) > 0 &&
+    Date.now() - num(previousMatch?.pbpScoreFirstPromotedAt, 0) <= 120_000;
+  if (previousMatch?.initialized && !recentlyPromotedByPbp && (
+    num(observation?.home?.score, 0) < num(previousMatch?.home?.score, 0) ||
+    num(observation?.away?.score, 0) < num(previousMatch?.away?.score, 0)
+  )) return observation;
   const scoreboardTotal = num(observation?.home?.score, 0) + num(observation?.away?.score, 0);
   const playTotal = derived.home + derived.away;
   if (playTotal <= scoreboardTotal) return observation;
@@ -547,7 +560,7 @@ export class SportsMonitor {
         try {
           const live = await fetchEspnTechnicalLivePlays(HOT_MATCH_TEST_CONSTANTS.LEAGUE, observation.eventId);
           plays = extractScoringPlays(live.data, observation);
-          observation = promoteObservationFromPlays(observation, plays);
+          observation = promoteObservationFromPlays(observation, plays, previousMatch);
           next.lastSource = text(live.source);
         } catch (error) {
           next.lastError = `play-by-play: ${text(error?.message || error)}`.slice(0, 500);
@@ -1010,7 +1023,7 @@ export class SportsMonitor {
             addCounter(summarySources, variant.source);
           }
           plays = mergeScoringPlayVariants(playVariants);
-          observation = promoteObservationFromPlays(observation, plays);
+          observation = promoteObservationFromPlays(observation, plays, previous);
           summariesFetched += 1;
           summaryGoalCounts[game.eventId] = regulationPlays(plays).length;
         } catch (error) {
@@ -1024,7 +1037,7 @@ export class SportsMonitor {
         const variant = extractedVariant('espn_scoreboard_details', { scoringPlays: scoreboardDetails }, observation);
         playVariants.push(variant);
         plays = mergeScoringPlayVariants(playVariants);
-        observation = promoteObservationFromPlays(observation, plays);
+        observation = promoteObservationFromPlays(observation, plays, previous);
         expectedGoals = num(observation.home?.score, 0) + num(observation.away?.score, 0);
         addCounter(summarySources, 'espn_scoreboard_details');
         summaryGoalCounts[game.eventId] = regulationPlays(plays).length;
@@ -1053,7 +1066,7 @@ export class SportsMonitor {
             addCounter(summarySources, variant.source);
           }
           plays = mergeScoringPlayVariants(playVariants);
-          observation = promoteObservationFromPlays(observation, plays);
+          observation = promoteObservationFromPlays(observation, plays, previous);
           expectedGoals = num(observation.home?.score, 0) + num(observation.away?.score, 0);
           summariesFetched += 1;
           summaryGoalCounts[game.eventId] = regulationPlays(plays).length;
@@ -1080,7 +1093,7 @@ export class SportsMonitor {
           fullSummaryData = summaryResult.data;
           fullSummarySource = summaryResult.source;
           plays = mergeScoringPlayVariants(playVariants);
-          observation = promoteObservationFromPlays(observation, plays);
+          observation = promoteObservationFromPlays(observation, plays, previous);
           expectedGoals = num(observation.home?.score, 0) + num(observation.away?.score, 0);
           summariesFetched += 1;
           addCounter(summarySources, summaryResult.source);
