@@ -95,7 +95,7 @@ jobs:
       - name: Validar código
         run: npm run check
 
-      - name: Testar motor esportivo
+      - name: Testar motor esportivo e identidade de autores (R10R17.2)
         run: npm run test:sports
 
       - name: R10R6 - regressao de autoria tardia e conflitos ESPN
