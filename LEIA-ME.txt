@@ -1,21 +1,11 @@
-FDG HOTFIX 8.3.1 — GITHUB PAGES CI CONTRACT
+HOTFIX 8.4 — Correção do bloqueio de summary continental
 
-Base: formuladogol-main(5).zip fornecido pelo usuário.
+Causa comprovada: renderPage aceitava evento ESPN numérico mesmo vindo da agenda local, mas loadSummary descartava o mesmo evento por g.source !== "espn".
 
-Correção:
-- remove fallback que fabricava linhas "Autor sendo confirmado" a partir do placar quando __fdgLiveFacts não existia;
-- remove preenchimento artificial de gols faltantes até alcançar o placar;
-- preserva a melhoria do HOTFIX 8.3 de reconciliação/consulta continental;
-- mantém autoria exclusivamente dependente de Live Facts canônicos.
+Corrigido: loadSummary exige ID numérico ESPN (5–15 dígitos) e liga, independentemente da origem visual. Não utiliza IDs fdg-... nem cria gols sem Live Facts canônicos.
 
-Arquivo a enviar ao GitHub preservando o caminho:
-js/br-aovivo.js
+Inclui teste de regressão. O workflow deploy.yml existente já executa esse teste e não precisa de alteração.
 
-Validação local executada:
-node --check js/br-classificacao-live.js: PASS
-node --check js/br-estatisticas.js: PASS
-node --check js/br-aovivo.js: PASS
-node --check js/br-resultados-freshness.js: PASS
-node tests/test-br-classificacao-live.mjs: PASS
-node cloudflare/push-worker/tests/test-resultados-freshness.mjs: PASS
-greps do workflow PUBLICAR GITHUB PAGES: PASS
+Instalar os arquivos nos caminhos indicados e executar Deploy site (GitHub Pages).
+
+Limite: somente resolve o bloqueio identificado; a autoria ainda depende de dados canônicos disponíveis no gateway.

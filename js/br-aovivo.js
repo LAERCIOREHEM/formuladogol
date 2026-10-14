@@ -2576,7 +2576,9 @@
   }
 
   async function loadSummary(g) {
-    if (!g || !g.id || g.source !== "espn") return null;
+    // A identidade ESPN é o ID numérico reconciliado, não a origem visual do card.
+    // A agenda local pode continuar como fonte do card continental.
+    if (!g || !/^\d{5,15}$/.test(String(g.id)) || !g.espnLeague) return null;
     const eventId = String(g.id);
     const requestSerial = ++state.summaryRequestSerial;
     if (state.summaryAbortController) state.summaryAbortController.abort();

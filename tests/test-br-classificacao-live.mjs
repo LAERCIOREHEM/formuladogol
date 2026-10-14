@@ -227,6 +227,8 @@ const workerPayload = {
   assert.match(liveSource, /const LIVE_REFRESH_MS = 10000/);
   assert.match(liveSource, /renderMain\(selected,cached,all\); updateCountdowns\(\); updateFreshnessUi\(selected\);/);
   assert.match(liveSource, /summaryScoreKey/);
+  assert.ok(!liveSource.includes('g.source !== "espn"'), "summary não pode bloquear partida continental reconciliada por origem do card");
+  assert.match(liveSource, /if \(!g \|\| !\/\^\\d\{5,15\}\$\/\.test\(String\(g\.id\)\) \|\| !g\.espnLeague\) return null;/, "summary deve exigir ID ESPN numérico e liga");
   assert.match(liveSource, /if \(!canonical \|\| !Array\.isArray\(canonical\.goals\)\) return \{home,away\};/, 'Ao Vivo não pode cair para parser bruto de gols');
   assert.ok(!liveSource.includes('eventRows(g,summary).filter(r=>r.type.key==="goal")'), 'parser bruto de gols deve estar eliminado do render');
   assert.ok(liveSource.indexOf('if (teamId && teamId===homeId)') < liveSource.indexOf('else if (goal.side==="home")'), 'teamId precisa ter precedência sobre side');
