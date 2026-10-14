@@ -110,7 +110,7 @@ jobs:
           node tests/test-scorer-recovery.mjs
 
       - name: HF6 - regressão do smoke SportsMonitor DO
-        run: node tests/verify-monitor-deploy.mjs --self-test
+        run: node tests/verify-monitor-deploy.mjs --self-test # R10R17.3-HF1: policies derived from sports-engine.js
 
       - name: Testar distribuição de push
         run: npm run test:push
