@@ -1,19 +1,17 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { SPORTS_ENGINE_CONSTANTS as policies } from '../src/sports-engine.js';
 
-// R10R17-HF6: Cloudflare publica Worker e Durable Object de forma
-// eventualmente consistente. Versão anterior R10R5 em partida AO VIVO
-// não é falha do deploy novo, desde que os demais contratos e o polling
-// estejam íntegros. O estado compatível é WARNING, nunca PASS estrito.
+// R10R17.3-HF1: contracts come from the deployed source, never stale literals.
 export function verifyMonitor(m, scorer, red, now = Date.now()) {
   const expected = {
     engineVersion: 5,
-    overturnPolicyVersion: '6-R10R4',
+    overturnPolicyVersion: policies.OVERTURN_POLICY_VERSION,
     livePolicyVersion: '6-R10',
-    goalReconciliationPolicyVersion: '6-R9-R1',
+    goalReconciliationPolicyVersion: policies.GOAL_RECONCILIATION_POLICY_VERSION,
     goalScorerEnrichmentPolicyVersion: scorer,
-    goalRecoveryPolicyVersion: '6-R10R4',
-    essentialAlertPolicyVersion: '6-R10R4',
+    goalRecoveryPolicyVersion: policies.GOAL_RECOVERY_POLICY_VERSION,
+    essentialAlertPolicyVersion: policies.ESSENTIAL_ALERT_POLICY_VERSION,
     readinessVersion: '6-R10.1',
     readinessLifecyclePolicyVersion: '6-R10.2',
     redCardEventPolicyVersion: red,
@@ -44,9 +42,9 @@ export function verifyMonitor(m, scorer, red, now = Date.now()) {
 function selfTest() {
   const now = Date.now();
   const baseline = {
-    ok:true, engineVersion:5, overturnPolicyVersion:'6-R10R4', livePolicyVersion:'6-R10',
-    goalReconciliationPolicyVersion:'6-R9-R1', goalScorerEnrichmentPolicyVersion:'6-R10R5',
-    goalRecoveryPolicyVersion:'6-R10R4', essentialAlertPolicyVersion:'6-R10R4',
+    ok:true, engineVersion:5, overturnPolicyVersion:policies.OVERTURN_POLICY_VERSION, livePolicyVersion:'6-R10',
+    goalReconciliationPolicyVersion:policies.GOAL_RECONCILIATION_POLICY_VERSION, goalScorerEnrichmentPolicyVersion:'6-R10R5',
+    goalRecoveryPolicyVersion:policies.GOAL_RECOVERY_POLICY_VERSION, essentialAlertPolicyVersion:policies.ESSENTIAL_ALERT_POLICY_VERSION,
     readinessVersion:'6-R10.1', readinessLifecyclePolicyVersion:'6-R10.2',
     redCardEventPolicyVersion:'6-R10R6', redCardAggregateStatsIgnored:true,
     redCardEventContextRequired:true, fastPollMs:10000, watchCount:2, activeGames:1,
@@ -55,11 +53,13 @@ function selfTest() {
   };
   assert.equal(verifyMonitor(baseline,'6-R10R6','6-R10R6',now).mode,'compatible_active');
   assert.equal(verifyMonitor({...baseline,goalScorerEnrichmentPolicyVersion:'6-R10R6'},'6-R10R6','6-R10R6',now).mode,'strict');
+  assert.equal(verifyMonitor({...baseline,overturnPolicyVersion:'6-R10R4',goalScorerEnrichmentPolicyVersion:'6-R10R6'},'6-R10R6','6-R10R6',now).mode,'fail');
+  assert.equal(verifyMonitor({...baseline,goalRecoveryPolicyVersion:'6-R10R4',goalScorerEnrichmentPolicyVersion:'6-R10R6'},'6-R10R6','6-R10R6',now).mode,'fail');
   assert.equal(verifyMonitor({...baseline,activeGames:0},'6-R10R6','6-R10R6',now).mode,'fail');
   assert.equal(verifyMonitor({...baseline,lastPollSuccessAt:now-240000},'6-R10R6','6-R10R6',now).mode,'fail');
   assert.equal(verifyMonitor({...baseline,redCardEventPolicyVersion:'old'},'6-R10R6','6-R10R6',now).mode,'fail');
   assert.equal(verifyMonitor({...baseline,scorerMissingAtDispatch:1},'6-R10R6','6-R10R6',now).mode,'fail');
-  console.log('SportsMonitor deploy strict / active DO skew / invalid regressions: PASS');
+  console.log('SportsMonitor deploy R10R17.3 dynamic contracts / strict / skew / regressions: PASS');
 }
 
 if (process.argv[1]?.endsWith('verify-monitor-deploy.mjs')) {
