@@ -142,9 +142,9 @@ jobs:
           grep -q 'br-resultados-freshness.js?v=20261004-r10r9' index.html
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' estatisticas.html
           grep -q 'br-estatisticas.js?v=20260920-live-facts-v6' estatisticas.html
-          grep -q 'br-aovivo.js?v=20261014-r10r17-2' aovivo.html
+          grep -q 'br-aovivo.js?v=20261014-r10r17-3' aovivo.html
           grep -q 'br-live-goal-sync.js?v=20261014-r10r17-2' aovivo.html
-          echo 'OK: LiveState v7 + Live Facts v2 + R10R17.2 IDs documentais e fallback ESPN numérico.'
+          echo 'OK: LiveState v7 + Live Facts v2 + R10R17.3 Goal Event Integrity + R10R17.2 ID documental.'
 
       - name: Validar instalação PWA da Home
         shell: bash
@@ -765,7 +765,7 @@ jobs:
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' _site/index.html
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' _site/estatisticas.html
           grep -q 'br-estatisticas.js?v=20260920-live-facts-v6' _site/estatisticas.html
-          grep -q 'br-aovivo.js?v=20261014-r10r17-2' _site/aovivo.html
+          grep -q 'br-aovivo.js?v=20261014-r10r17-3' _site/aovivo.html
           grep -q 'const LIVE_STATE_VERSION = "7"' _site/js/br-classificacao-live.js
           echo 'OK: pacote público contém LiveState v6 / Live Facts v2 e cache-bust correto.'
 
@@ -1563,7 +1563,7 @@ jobs:
           ativos_live = [
               (HOST + "/", "br-classificacao-live.js?v=20260920-monitor-facts-v7"),
               (HOST + "/estatisticas.html", "br-classificacao-live.js?v=20260920-monitor-facts-v7"),
-              (HOST + "/aovivo.html", "br-aovivo.js?v=20261014-r10r17-2"),
+              (HOST + "/aovivo.html", "br-aovivo.js?v=20261014-r10r17-3"),
               (HOST + "/js/br-classificacao-live.js", 'const LIVE_STATE_VERSION = "7"'),
           ]
 

@@ -95,8 +95,14 @@ jobs:
       - name: Validar código
         run: npm run check
 
-      - name: Testar motor esportivo e identidade de autores (R10R17.2)
+      - name: R10R17.3 - integridade de gols, rollback e recuperação de push
         run: npm run test:sports
+
+      - name: R10R17.3 - regressão específica Atlético-MG e recuos ESPN
+        run: node tests/test-live-goal-event-integrity.mjs
+
+      - name: R10R17.3 - recuperação idempotente de eventos sem fila
+        run: node tests/test-live-goal-outbox.mjs
 
       - name: R10R6 - regressao de autoria tardia e conflitos ESPN
         run: |
