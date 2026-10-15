@@ -98,6 +98,9 @@ jobs:
       - name: R10R17.3 - integridade de gols, rollback e recuperação de push
         run: npm run test:sports
 
+      - name: Regressão Continental Readiness R10R17.4
+        run: node tests/test-continental-readiness-guard.mjs
+
       - name: R10R17.3 - regressão específica Atlético-MG e recuos ESPN
         run: node tests/test-live-goal-event-integrity.mjs
 
