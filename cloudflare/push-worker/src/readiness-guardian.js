@@ -349,6 +349,19 @@ export function dueReadinessCheckpoints(game, preflightState = {}, nowMs = Date.
   return CHECKPOINTS.filter((cp) => now >= kickoff + cp.offsetMs && !preflightState?.[cp.key]?.completedAt);
 }
 
+
+// R10R17.4: diferir somente falso-alarme de status pré-jogo continental.
+// Falta de ID, erro de identidade ou monitor não inicializado permanecem críticos.
+export const CONTINENTAL_READINESS_GRACE_MS = 10 * 60_000;
+export function continentalReadinessPreOnly(game, readiness) {
+  const league = String(game?.league || '').toLowerCase();
+  const continental = league.startsWith('conmebol.') || league.startsWith('uefa.');
+  const reasons = Array.isArray(readiness?.reasons) ? readiness.reasons : [];
+  return continental && readiness?.ready === false
+    && readiness?.identityOk === true && readiness?.monitorInitialized === true
+    && reasons.length === 1 && reasons[0] === 'espn_still_pre_after_tplus3';
+}
+
 export function readinessSnapshot(game, resolved, match, audience = {}, checkpoint = '', nowMs = Date.now()) {
   const now = num(nowMs, Date.now());
   const kickoff = Date.parse(game?.kickoff || '');
@@ -371,7 +384,12 @@ export function readinessSnapshot(game, resolved, match, audience = {}, checkpoi
   const identityOk = Boolean(found && (teamsOk || exactEventId));
   const initialized = Boolean(match?.initialized);
   const afterStartGate = checkpoint === 'tplus3';
-  const startedOk = !afterStartGate || ['in', 'post'].includes(rawState);
+  const monitorState = text(match?.state).toLowerCase();
+  // R10R17.4: a observação confirmada pelo Sports Monitor é evidência de
+  // andamento, mesmo que um scoreboard ESPN atrasado ainda diga 'pre'.
+  const monitorStarted = initialized && ['in', 'post'].includes(monitorState);
+  const sourceStarted = ['in', 'post'].includes(rawState);
+  const startedOk = !afterStartGate || sourceStarted || monitorStarted;
   const ready = found && identityOk && initialized && startedOk;
   const reasons = [];
   const warnings = [];
@@ -381,11 +399,12 @@ export function readinessSnapshot(game, resolved, match, audience = {}, checkpoi
   if (exactEventId && kickoffDeltaMinutes != null && kickoffDeltaMinutes > 180) warnings.push('kickoff_time_mismatch_warning');
   if (!initialized) reasons.push('monitor_not_initialized');
   if (!startedOk) reasons.push('espn_still_pre_after_tplus3');
+  if (afterStartGate && !sourceStarted && monitorStarted) warnings.push('espn_pre_but_monitor_started');
   return {
     version: READINESS_VERSION, checkpoint, readiness: ready ? 'green' : 'red', ready,
     eventId: text(game?.eventId), sourceEventId, strategy: text(resolved?.strategy), league: text(game?.league),
     kickoff: text(game?.kickoff), checkedAt: new Date(now).toISOString(), minutesToKickoff: Number.isFinite(kickoff) ? Math.round((kickoff - now) / MINUTE * 10) / 10 : null,
-    sourceState: rawState, teamsOk, identityOk, identityAuthority: exactEventId ? 'event_id' : (teamsOk ? 'team_match' : ''),
+    sourceState: rawState, monitorState, monitorStarted, teamsOk, identityOk, identityAuthority: exactEventId ? 'event_id' : (teamsOk ? 'team_match' : ''),
     teamIdentityWarning: Boolean(exactEventId && !teamsOk), kickoffDeltaMinutes, monitorInitialized: initialized, reasons, warnings,
     audience: audience && typeof audience === 'object' ? audience : {}
   };

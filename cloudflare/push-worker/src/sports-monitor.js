@@ -17,7 +17,7 @@ import {
   PRECHECK_FROM_MS, PRECHECK_POLL_MS, READINESS_VERSION, RED_CARD_EVENT_POLICY_VERSION,
   resolveScoreboardEvent, extractRedCards, mergeRedCards, applyRedCardObservations,
   extractLineupSnapshot, applyLineupObservation, dueReadinessCheckpoints, readinessSnapshot,
-  aiResolverRequest, parseOpenAIJson
+  continentalReadinessPreOnly, CONTINENTAL_READINESS_GRACE_MS, aiResolverRequest, parseOpenAIJson
 } from './readiness-guardian.js';
 import { fetchEspnLivePlays, fetchEspnScorerEnrichment, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays, fetchEspnTechnicalLivePlays, fetchEspnTechnicalScoreboard } from './espn-source.js';
 import { buildHotEspnTestEvent, detectHotEspnMutation, HOT_ESPN_TEST_CONSTANTS, hotEspnSnapshot, publicHotEspnTest } from './hot-espn-test.js';
@@ -797,6 +797,10 @@ export class SportsMonitor {
     }
 
     if (!allowNotify || checkpoint === 't30') return;
+    // R10R17.4: uma única leitura ESPN 'pre' em T+3 não é incidente crítico
+    // continental. Continuamos registrando RED no D1 e reavaliamos após 10 min.
+    if (checkpoint === 'tplus3' && continentalReadinessPreOnly(game, readiness)
+        && Date.parse(readiness?.checkedAt || '') < Date.parse(game?.kickoff || '') + CONTINENTAL_READINESS_GRACE_MS) return;
     const previousStatus = String(current?.email_status || '');
     if (checkpoint === 't10' && /^(warning_sent|critical_sent)/.test(previousStatus)) return;
     if (checkpoint === 'tplus3' && /^critical_sent/.test(previousStatus)) return;
@@ -1207,6 +1211,14 @@ export class SportsMonitor {
             };
           }
         } else {
+          // T+10: se a ESPN ainda estiver em PRE e não houver evidência de
+          // partida iniciada, o atraso deixa de ser transitório. Notificar uma
+          // vez pelo mecanismo existente de incidentes, sem mascarar RED.
+          const kickoff = Date.parse(game?.kickoff || '');
+          if (Number.isFinite(kickoff) && startedAt >= kickoff + CONTINENTAL_READINESS_GRACE_MS
+              && continentalReadinessPreOnly(game, follow)) {
+            await this.persistPreflight(game, 'tplus3', follow, false, false, true);
+          }
           preflight[game.eventId] = {
             ...trackedPreflight,
             tplus3: { ...trackedTplus3, ...follow, completedAt: trackedTplus3.completedAt, lastRecheckAt: startedAt, recoveryStreak: 0 }

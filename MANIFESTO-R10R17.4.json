@@ -1,0 +1,10 @@
+{
+  "version": "R10R17.4",
+  "baseline": "R10R17.3 + HOTFIX-02",
+  "files": [
+    "cloudflare/push-worker/src/readiness-guardian.js",
+    "cloudflare/push-worker/src/sports-monitor.js",
+    "cloudflare/push-worker/tests/test-continental-readiness-guard.mjs",
+    ".github/workflows/deploy-push-worker.yml"
+  ]
+}
