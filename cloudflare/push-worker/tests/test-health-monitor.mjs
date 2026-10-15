@@ -8,7 +8,7 @@ assert.equal(countWebSearchCalls({}),0);
 assert.equal(githubActionsSeverity({dormant:true,dispatches:4,previousDispatches:4,pendingPostgameTasks:0,hoursToNext:240,hasPrevious:true}).severity,'green');
 assert.equal(githubActionsSeverity({dormant:true,dispatches:5,previousDispatches:4,pendingPostgameTasks:0,hoursToNext:240,hasPrevious:true}).severity,'red');
 assert.equal(githubActionsSeverity({dormant:true,dispatches:4,previousDispatches:0,pendingPostgameTasks:0,hoursToNext:240,hasPrevious:false}).severity,'green');
-assert.equal(githubActionsSeverity({dormant:false,dispatches:9,previousDispatches:8,pendingPostgameTasks:1,hoursToNext:1,hasPrevious:true}).severity,'yellow');
+assert.equal(githubActionsSeverity({dormant:false,dispatches:9,previousDispatches:8,pendingPostgameTasks:1,hoursToNext:1,hasPrevious:true}).severity,'green');
 
 // Janela normal + recuperação controlada até 11:59 BRT.
 assert.equal(isDailyDigestDue({date:'2026-09-26',hour:8,minute:1},''),true);
@@ -108,7 +108,7 @@ assert.equal(riBad[4].severity,'yellow');
 const continentalMissing=continentalAgendaHealth({integridade_continental:{status:'degraded',faltantes:[{x:1}]},jogos:[]},Date.parse('2026-10-13T21:40:00Z'));
 assert.equal(continentalMissing.severity,'red');
 const continentalFallback=continentalAgendaHealth({integridade_continental:{status:'ok',faltantes:[],fallbacks_documentais_ativos:4},jogos:[{competicao_chave:'sul_americana',data_iso:'2026-10-13T21:30:00-03:00',mandante:{nome:'Boca Juniors'},visitante:{nome:'Vasco da Gama'}}]},Date.parse('2026-10-13T21:40:00Z'));
-assert.equal(continentalFallback.severity,'yellow');
+assert.equal(continentalFallback.severity,'green');
 assert.match(continentalFallback.detail,/Boca Juniors x Vasco da Gama/);
 
 console.log('health-monitor/ai-usage tests: PASS');

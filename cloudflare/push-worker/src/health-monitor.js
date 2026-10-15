@@ -1,6 +1,7 @@
 import { sendMail, mailConfig, maskAddress } from './mailer.js';
 import { aiUsageSummary, providerUsageSummary, postgamePublicCostSummary } from './ai-usage.js';
 import { OPS_INTELLIGENCE_CONSTANTS, opsIntelligenceStatus } from './ops-intelligence.js';
+import { buildActionCenter, healthActionMessage, healthActionDigestLines, healthYellowDecision, HEALTH_ACTION_CENTER_VERSION } from './health-action-center.js';
 
 const SITE = 'https://formuladogol.com.br';
 const ORCH = 'https://orchestrator.formuladogol.com.br';
@@ -13,7 +14,7 @@ const CF_WORKERS_CPU_INCLUDED_MS = 30_000_000;
 const CF_WORKERS_REQUESTS_INCLUDED = 10_000_000;
 const CF_CPU_OVERAGE_PER_MILLION_USD = 0.02;
 const CF_REQUEST_OVERAGE_PER_MILLION_USD = 0.30;
-const HEALTH_POLICY_VERSION = 11;
+export const HEALTH_POLICY_VERSION = 12;
 
 function text(v) { return String(v ?? '').trim(); }
 function n(v) { const x = Number(v); return Number.isFinite(x) ? x : 0; }
@@ -222,7 +223,8 @@ export function githubActionsSeverity({ dormant=false, dispatches=0, previousDis
     const delta=current-previous;
     return {severity:'red',detail:`${current} dispatch(es) /24h · +${delta} novo(s) em modo dormant sem tarefa pendente`};
   }
-  if (current>8) return {severity:'yellow',detail:`${current} dispatch(es) nas últimas 24h · volume elevado, sem evidência de loop atual`};
+  // R10R17.6: volume alto não é incidente sem falha, loop ou gasto anômalo comprovados.
+  if (current>8) return {severity:'green',detail:`${current} dispatch(es) nas últimas 24h · atividade elevada (informativo; sem loop confirmado)`};
   if (quietWindow) return {severity:'green',detail:`${current} dispatch(es) nas últimas 24h · estável; nenhum novo dispatch anômalo em modo dormant`};
   return {severity:'green',detail:`${current} dispatch(es) nas últimas 24h`};
 }
@@ -257,7 +259,8 @@ export function continentalAgendaHealth(agenda = {}, now = Date.now()) {
   if (String(integrity?.status || '') !== 'ok') return { severity:'yellow', detail:'integridade continental ainda não confirmada pela agenda publicada' };
   const fallback = Number(integrity?.fallbacks_documentais_ativos || 0);
   const nextText = next ? `${text((next.mandante||{}).nome)} x ${text((next.visitante||{}).nome)} · ${fmtDate(next.data_iso)}` : 'nenhum jogo continental próximo no recorte';
-  return { severity: fallback > 0 ? 'yellow' : 'green', detail:`${nextText}${fallback>0?` · ${fallback} fallback(s) CONMEBOL ativo(s)`:''}` };
+  // Fallback documental oficial e agenda íntegra são defesa contra ausências, não falha.
+  return { severity: 'green', detail:`${nextText}${fallback>0?` · ${fallback} fallback(s) CONMEBOL válido(s) (informativo)`:''}` };
 }
 
 export async function collectHealthSnapshot(env, monitor = null, now = Date.now(), force = false) {
@@ -279,8 +282,9 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
       COALESCE(SUM(CASE WHEN league='bra.1' AND public_status NOT IN ('resolved','not_applicable','eligibility_pending') THEN 1 ELSE 0 END),0) public_pending,
       COALESCE(SUM(CASE WHEN league<>'bra.1' AND TRIM(league)<>'' THEN 1 ELSE 0 END),0) public_not_applicable,
       COALESCE(SUM(CASE WHEN TRIM(league)='' THEN 1 ELSE 0 END),0) public_eligibility_pending,
-      COALESCE(SUM(CASE WHEN highlight_status<>'resolved' THEN 1 ELSE 0 END),0) highlight_pending
-      FROM postgame_fastlane`).first(),
+      COALESCE(SUM(CASE WHEN highlight_status<>'resolved' THEN 1 ELSE 0 END),0) highlight_pending,
+      COALESCE(SUM(CASE WHEN highlight_status<>'resolved' AND (final_at IS NULL OR TRIM(final_at)='' OR datetime(final_at) IS NULL OR datetime(final_at)<=datetime(?,'-2 hours')) THEN 1 ELSE 0 END),0) highlight_overdue
+      FROM postgame_fastlane`).bind(iso(now)).first(),
     env.DB.prepare(`SELECT p.event_id,p.home,p.away,p.home_score,p.away_score,p.kickoff,p.final_at,
       p.publico,p.publico_pagante,p.renda,p.public_status,p.public_attempts,p.public_last_at,p.public_next_at,p.public_last_error,
       c.round,c.stadium,a.deterministic_checks,a.mini_attempts,a.sol_attempts,a.last_model,a.last_phase,
@@ -292,6 +296,23 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     postgamePublicCostSummary(env,now),
     cloudflareBillingSummary(env,now),
     opsIntelligenceStatus(env)
+  ]);
+  // Observabilidade factual: identificamos partidas pendentes e falhas por provedor.
+  // Erros de leitura aqui não podem derrubar o relatório das 08h.
+  const failureCutoff=iso(now-24*3600_000);
+  const [highlightRowsRaw,providerErrorsRaw,providerUnrecoveredRaw]=await Promise.all([
+    env.DB.prepare(`SELECT event_id,league,home,away,final_at,highlight_status,highlight_attempts,highlight_last_at,highlight_next_at,highlight_last_error
+      FROM postgame_fastlane WHERE highlight_status<>'resolved' ORDER BY final_at ASC LIMIT 12`).all().catch(()=>({results:[]})),
+    env.DB.prepare(`SELECT f.provider,f.purpose,f.event_id,f.phase,f.http_status,f.detail,f.created_at,
+      EXISTS(SELECT 1 FROM ai_provider_ledger s WHERE s.id>f.id AND s.ok=1 AND s.purpose=f.purpose
+        AND ((f.event_id<>'' AND s.event_id=f.event_id) OR (f.event_id='' AND s.event_id='' AND s.provider=f.provider))
+      ) recovered
+      FROM ai_provider_ledger f WHERE f.ok=0 AND datetime(f.created_at)>=datetime(?) ORDER BY f.id DESC LIMIT 12`).bind(failureCutoff).all().catch(()=>({results:[]})),
+    env.DB.prepare(`SELECT COUNT(*) total,
+      COALESCE(SUM(CASE WHEN NOT EXISTS(SELECT 1 FROM ai_provider_ledger s WHERE s.id>f.id AND s.ok=1 AND s.purpose=f.purpose
+        AND ((f.event_id<>'' AND s.event_id=f.event_id) OR (f.event_id='' AND s.event_id='' AND s.provider=f.provider))
+      ) THEN 1 ELSE 0 END),0) unresolved
+      FROM ai_provider_ledger f WHERE f.ok=0 AND datetime(f.created_at)>=datetime(?)`).bind(failureCutoff).first().catch(()=>null),
   ]);
   const cfg=mailConfig(env);
   let probe=null;
@@ -320,6 +341,19 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   const postExempt=n(post?.public_not_applicable);
   const postUnclassified=n(post?.public_eligibility_pending);
   const highlight=n(post?.highlight_pending);
+  const highlightOverdue=n(post?.highlight_overdue);
+  const highlightPendingRows=(highlightRowsRaw?.results||[]).map(r=>({
+    eventId:text(r.event_id),league:text(r.league),home:text(r.home),away:text(r.away),finalAt:text(r.final_at),
+    status:text(r.highlight_status),attempts:n(r.highlight_attempts),lastAt:text(r.highlight_last_at),nextAt:text(r.highlight_next_at),
+    lastError:text(r.highlight_last_error).slice(0,220)
+  }));
+  const providerFailureRows=(providerErrorsRaw?.results||[]).map(r=>({
+    provider:text(r.provider),purpose:text(r.purpose),eventId:text(r.event_id),phase:text(r.phase),
+    httpStatus:r.http_status==null?null:Number(r.http_status),detail:text(r.detail).slice(0,240),
+    at:text(r.created_at),recovered:Boolean(r.recovered)
+  }));
+  // Se a consulta do ledger falhar, manter a classificação conservadora, nunca mascarar falhas.
+  const providerUnrecoveredFailures=providerUnrecoveredRaw==null?null:n(providerUnrecoveredRaw.unresolved);
   const perEventAnomaly=(providers.byEvent||[]).find(r=>n(r.searches)>8);
   const providerFailures=n(providers.failures);
   const geminiReady=Boolean(text(env.GEMINI_API_KEY));
@@ -375,15 +409,23 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     ),
     // OVERDUE é amarelo: o Hunter já envia um alerta específico em T+2h e
     // continua pesquisando. Vermelho fica reservado ao budget guard.
-    indicator('postgame','Pós-jogo',postBudget>0?'red':postPending>0||postUnclassified>0?'yellow':'green',`${postPending} pendência(s) Brasileirão · ${postOverdue} >2h · ${postBudget} budget guard · ${postExempt} dispensada(s) · ${postUnclassified} sem competição identificada`),
+    indicator('postgame','Pós-jogo',postBudget>0?'red':postOverdue>0||postUnclassified>0?'yellow':'green',`${postPending} pendência(s) Brasileirão · ${postOverdue} >2h · ${postBudget} budget guard · ${postExempt} dispensada(s) · ${postUnclassified} sem competição identificada`),
     ...reliabilityIndicators,
-    indicator('highlights','Melhores Momentos',highlight>0?'yellow':'green',`${highlight} pendência(s)`),
+    indicator('highlights','Melhores Momentos',highlightOverdue>0?'yellow':'green',`${highlight} pendência(s) no total · ${highlightOverdue} com mais de 2h${highlightPendingRows[0]?` · mais antiga: ${highlightPendingRows[0].home} x ${highlightPendingRows[0].away}`:''}`),
     indicator('editorial','Editorial / Transmissões',Array.isArray(os.errors)&&os.errors.length?'yellow':'green',Array.isArray(os.errors)&&os.errors.length?`${os.errors.length} erro(s) no último ciclo`:'sem erro reportado pelo Orchestrator'),
     indicator('infra','Infraestrutura / E-mail',!cfg.configured||probe?.ok===false?'red':'green',`${cfg.transport} · ${maskAddress(cfg.to)}${probe?` · ${probe.status||`probe ${probe.ok?'OK':'FALHOU'}`}`:''}${cfg.fallbacks?.length?` · fallback ${cfg.fallbacks.join(' + ')}`:''}`),
-    indicator('openai','IA / Custos',hunterBudgetPct>=100?'red':hunterBudgetPct>=warningPct?'yellow':!geminiReady||!workersAiReady||!gatewayAuthReady?'yellow':perEventAnomaly?'yellow':providerFailures>3?'yellow':'green',`${providers.calls} chamada(s) multi-provider · ${providers.searches} busca(s) web · Hunter ${fmtUsd(hunterMonthUsd)}/${fmtUsd(monthlyBudgetUsd)} (${fmtPct(hunterBudgetPct)}) · ${providerFailures} falha(s) /24h`),
+    indicator('openai','IA / Custos',hunterBudgetPct>=100?'red':hunterBudgetPct>=warningPct?'yellow':!geminiReady||!workersAiReady||!gatewayAuthReady?'yellow':perEventAnomaly?'yellow':providerFailures>3 && (providerUnrecoveredFailures===null||providerUnrecoveredFailures>0)?'yellow':'green',`${providers.calls} chamada(s) multi-provider · ${providers.searches} busca(s) web · Hunter ${fmtUsd(hunterMonthUsd)}/${fmtUsd(monthlyBudgetUsd)} (${fmtPct(hunterBudgetPct)}) · ${providerFailures} falha(s) /24h`),
     indicator('cloudflare','Cloudflare / CPU & Requests',cloudflareSeverity(cfBilling),cloudflareDetail(cfBilling)),
   ];
-  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY)),fineTuning:'not_used_by_design'},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches},reliabilityIntelligence:{sportingState:text(os.reliabilityState)||text(reliabilitySnapshot.state),factualAuditSchema:n(factualAudit.schema_version),factualCritical:n(factualAudit.total_criticos),factualWarnings:n(factualAudit.total_avisos),ragKnowledgeBaseReady:Number(ragManifest.schema_version||0)>=2&&Array.isArray(ragManifest.collections)&&ragManifest.collections.length>0,ragRuntimeEnabled:opsIntelligence?.rag?.ready===true,ragRuntimeVersion:n(opsIntelligence?.rag?.version),ragSourceCount:n(opsIntelligence?.rag?.sourceCount),ragChunkCount:n(opsIntelligence?.rag?.chunkCount),ragSourceSha256:text(opsIntelligence?.rag?.sourceSha256),mcpOpsEnabled:opsIntelligence?.mcp?.enabled===true,mcpOpsReadOnly:opsIntelligence?.mcp?.readOnly===true,mcpProtocolVersion:text(opsIntelligence?.mcp?.protocolVersion),mcpTools:n(opsIntelligence?.mcp?.tools),mcpResources:n(opsIntelligence?.mcp?.resources),fineTuning:'not_used_by_design'},postgame:{pending:postPending,searching:postSearching,overdue:postOverdue,budgetGuard:postBudget,resolved:postResolved,notApplicable:postExempt,eligibilityPending:postUnclassified,requiredLeague:'bra.1',seasonCoverage,highlightPending:highlight,persistentUntilResolved:true,pendingRows,cost:{...postCost,budget:{monthlyBudgetUsd,eventBudgetUsd,warningPct,monthPct:hunterBudgetPct}}},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
+  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY)),fineTuning:'not_used_by_design'},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches,errors:Array.isArray(os.errors)?os.errors.slice(0,6).map(x=>text(x).slice(0,300)):[]},reliabilityIntelligence:{sportingState:text(os.reliabilityState)||text(reliabilitySnapshot.state),factualAuditSchema:n(factualAudit.schema_version),factualCritical:n(factualAudit.total_criticos),factualWarnings:n(factualAudit.total_avisos),ragKnowledgeBaseReady:Number(ragManifest.schema_version||0)>=2&&Array.isArray(ragManifest.collections)&&ragManifest.collections.length>0,ragRuntimeEnabled:opsIntelligence?.rag?.ready===true,ragRuntimeVersion:n(opsIntelligence?.rag?.version),ragSourceCount:n(opsIntelligence?.rag?.sourceCount),ragChunkCount:n(opsIntelligence?.rag?.chunkCount),ragSourceSha256:text(opsIntelligence?.rag?.sourceSha256),mcpOpsEnabled:opsIntelligence?.mcp?.enabled===true,mcpOpsReadOnly:opsIntelligence?.mcp?.readOnly===true,mcpProtocolVersion:text(opsIntelligence?.mcp?.protocolVersion),mcpTools:n(opsIntelligence?.mcp?.tools),mcpResources:n(opsIntelligence?.mcp?.resources),fineTuning:'not_used_by_design'},postgame:{pending:postPending,searching:postSearching,overdue:postOverdue,budgetGuard:postBudget,resolved:postResolved,notApplicable:postExempt,eligibilityPending:postUnclassified,requiredLeague:'bra.1',seasonCoverage,highlightPending:highlight,persistentUntilResolved:true,pendingRows,cost:{...postCost,budget:{monthlyBudgetUsd,eventBudgetUsd,warningPct,monthPct:hunterBudgetPct}}},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
+  snapshot.continentalAgenda={integrityOk:text(continentalAgenda?.integridade_continental?.status)==='ok' && !(continentalAgenda?.integridade_continental?.faltantes||[]).length,
+    fallbacks:n(continentalAgenda?.integridade_continental?.fallbacks_documentais_ativos)};
+  snapshot.postgame.highlightOverdue=highlightOverdue;
+  snapshot.postgame.highlightPendingRows=highlightPendingRows;
+  snapshot.providerFailureRows=providerFailureRows;
+  snapshot.providerUnrecoveredFailures=providerUnrecoveredFailures;
+  snapshot.actionCenter=buildActionCenter(snapshot,now);
+  snapshot.healthActionCenterVersion=HEALTH_ACTION_CENTER_VERSION;
   await metaPut(env,'snapshot',JSON.stringify(snapshot));
   return snapshot;
 }
@@ -451,6 +493,7 @@ function digestMessage(snapshot, now=Date.now()) {
     'FÓRMULA DO GOL — HEALTH REPORT', `${brParts(now).date} · relatório diário 08:00 BRT`, '',
     `ESTADO GERAL: ${icon(snapshot.state)} ${snapshot.state.toUpperCase()} — ${green}/${total} verdes`, '',
     ...snapshot.indicators.map(x=>`${icon(x.severity)} ${x.label}: ${x.detail}`), '',
+    ...healthActionDigestLines(snapshot), '',
     'CONFIABILIDADE / INTELIGÊNCIA OPERACIONAL',
     `RAG Knowledge Base: ${snapshot.reliabilityIntelligence?.ragKnowledgeBaseReady?'READY':'INDISPONÍVEL'}`,
     `RAG Runtime: ${snapshot.reliabilityIntelligence?.ragRuntimeEnabled?`ATIVO · v${snapshot.reliabilityIntelligence?.ragRuntimeVersion||1} · ${snapshot.reliabilityIntelligence?.ragSourceCount||0} fontes / ${snapshot.reliabilityIntelligence?.ragChunkCount||0} chunks · zero IA por retrieval`:'INDISPONÍVEL'}`,
@@ -462,7 +505,7 @@ function digestMessage(snapshot, now=Date.now()) {
     'IA / AI GATEWAY — últimas 24h', `Gateway: ${snapshot.aiStack?.gateway||'default'}`, `Chamadas registradas: ${snapshot.providers?.calls||0}`, `Buscas web registradas: ${snapshot.providers?.searches||0}`, `Tokens registrados: ${snapshot.providers?.totalTokens||0}`, `Falhas: ${snapshot.providers?.failures||0}`,
     ...(snapshot.providers?.byProvider||[]).map(r=>`- ${r.provider}: ${r.calls} chamada(s), ${r.searches} busca(s), ${r.total_tokens||0} tokens, ${r.failures||0} falha(s)`), '',
     ...cloudflareDigestLines(snapshot.cloudflareBilling), '',
-    snapshot.state==='green'?'Nenhuma ação necessária.':'Verifique os itens amarelos/vermelhos acima. Alertas de SLA do Hunter são enviados separadamente e não encerram a busca.'
+    snapshot.state==='green'?'Nenhuma ação manual necessária.':'As providências específicas constam da CENTRAL DE AÇÕES acima; verifique quem é responsável antes de agir.'
   ];
   return {subject:`[Fórmula do GOL] ${title}`,body:lines.join('\n')};
 }
@@ -503,9 +546,15 @@ function overallRecoveryMessage(snapshot, now = Date.now()) {
   };
 }
 
-async function syncOverallRecovery(env, previousSnapshot, snapshot, { dailySentThisRun = false, now = Date.now() } = {}) {
+export async function syncOverallRecovery(env, previousSnapshot, snapshot, { dailySentThisRun = false, coveredByActionRecovery = false, now = Date.now() } = {}) {
   const pendingRaw = await metaGet(env, 'overall_recovery_pending');
   const pending = safeJson(pendingRaw, null);
+  // Incidente específico já comunicou a recuperação; não enviar um segundo
+  // aviso genérico no mesmo ciclo nem deixar o estado geral pendente para amanhã.
+  if (coveredByActionRecovery && text(snapshot?.state) === 'green') {
+    if (pendingRaw) await metaPut(env, 'overall_recovery_pending', '');
+    return { sent:false, status:'covered_by_action_recovery' };
+  }
 
   if (text(snapshot?.state) !== 'green') {
     if (pendingRaw) await metaPut(env, 'overall_recovery_pending', '');
@@ -540,26 +589,95 @@ async function syncOverallRecovery(env, previousSnapshot, snapshot, { dailySentT
   return { sent: false, status: text(status) || 'failed' };
 }
 
-async function syncIncidents(env,snapshot,now=Date.now()){
-  const reds=snapshot.indicators.filter(x=>x.severity==='red'); const active=new Set(reds.map(x=>x.id));
-  for(const ind of reds){
-    const key=`health:${ind.id}`; const row=await env.DB.prepare('SELECT * FROM health_incidents WHERE incident_key=?').bind(key).first();
-    if(!row||text(row.status)!=='open'){
-      const status=await sendMail(env,incidentMessage(ind,snapshot,false));
+// R10R17.6: amarelo confirmado após 15 minutos; vermelho imediato.
+// Usa o D1 health_incidents já existente, sem migração, para deduplicar por indicador.
+export async function syncIncidents(env,snapshot,now=Date.now(),{dailySentThisRun=false}={}){
+  const activeActions=snapshot?.actionCenter?.requiresAttention||buildActionCenter(snapshot,now).requiresAttention;
+  const active=new Set();
+  let recoveredSent=0;
+  let alertsSent=0;
+  let silentRecovery=0;
+  for(const action of activeActions){
+    const key=`health:${text(action.id)}`;
+    active.add(key);
+    const row=await env.DB.prepare('SELECT * FROM health_incidents WHERE incident_key=?').bind(key).first();
+    const detail=text(action.problem);
+    if(action.severity==='yellow'){
+      const decision=healthYellowDecision(row,now);
+      if(decision==='observe'){
+        const covered=dailySentThisRun;
+        await env.DB.prepare(`INSERT INTO health_incidents(incident_key,indicator,severity,status,detail,opened_at,last_seen_at,resolved_at,first_email_at,recovery_email_at,email_status)
+          VALUES (?,?,'yellow',?,?,?,?,NULL,?,NULL,?)
+          ON CONFLICT(incident_key) DO UPDATE SET indicator=excluded.indicator,severity='yellow',status=excluded.status,detail=excluded.detail,
+          opened_at=excluded.opened_at,last_seen_at=excluded.last_seen_at,resolved_at=NULL,first_email_at=excluded.first_email_at,
+          recovery_email_at=NULL,email_status=excluded.email_status`)
+          .bind(key,action.label,covered?'open':'observing',detail,iso(now),iso(now),covered?iso(now):null,covered?'covered_by_daily':'observing').run();
+        continue;
+      }
+      if(decision==='wait'){
+        await env.DB.prepare('UPDATE health_incidents SET detail=?,last_seen_at=? WHERE incident_key=?')
+          .bind(detail,iso(now),key).run();
+        continue;
+      }
+      // Uma falha crítica desagravada permanece registrada, mas passa a amarelo.
+      const downgrade=row?.status==='open' && row?.severity==='red';
+      const previousMail=text(row?.email_status);
+      const retry=row?.status==='open' && row?.severity==='yellow' && !['sent','covered_by_daily'].includes(previousMail);
+      const shouldSend=decision==='send'||downgrade||retry;
+      let mailStatus=previousMail;
+      if(shouldSend){
+        mailStatus=dailySentThisRun?'covered_by_daily':await sendMail(env,healthActionMessage(action,snapshot,{now,downgraded:downgrade}));
+        if(mailStatus==='sent') alertsSent += 1;
+      }
+      await env.DB.prepare(`UPDATE health_incidents SET indicator=?,severity='yellow',status='open',detail=?,last_seen_at=?,
+        email_status=?,first_email_at=CASE WHEN ? IN ('sent','covered_by_daily') THEN COALESCE(first_email_at,?) ELSE first_email_at END WHERE incident_key=?`)
+        .bind(action.label,detail,iso(now),mailStatus,mailStatus,iso(now),key).run();
+      continue;
+    }
+    // RED: e-mail imediato; falha no transporte é reprocessada em novos ciclos.
+    const previousMail=text(row?.email_status);
+    const needSend=!row||row.status!=='open'||row.severity!=='red'||!['sent','covered_by_daily'].includes(previousMail);
+    const mailStatus=needSend?await sendMail(env,healthActionMessage(action,snapshot,{now})):previousMail;
+    if(needSend && mailStatus==='sent') alertsSent += 1;
+    if(!row||row.status!=='open'||row.severity!=='red'){
       await env.DB.prepare(`INSERT INTO health_incidents(incident_key,indicator,severity,status,detail,opened_at,last_seen_at,resolved_at,first_email_at,recovery_email_at,email_status)
-        VALUES(?,?,?,'open',?,?,?,NULL,?,NULL,?) ON CONFLICT(incident_key) DO UPDATE SET indicator=excluded.indicator,severity='red',status='open',detail=excluded.detail,opened_at=excluded.opened_at,last_seen_at=excluded.last_seen_at,resolved_at=NULL,first_email_at=excluded.first_email_at,recovery_email_at=NULL,email_status=excluded.email_status`)
-        .bind(key,ind.label,'red',ind.detail,iso(now),iso(now),iso(now),text(status)).run();
+        VALUES (?,?,'red','open',?,?,?,NULL,?,NULL,?)
+        ON CONFLICT(incident_key) DO UPDATE SET indicator=excluded.indicator,severity='red',status='open',detail=excluded.detail,
+          opened_at=excluded.opened_at,last_seen_at=excluded.last_seen_at,resolved_at=NULL,first_email_at=excluded.first_email_at,
+          recovery_email_at=NULL,email_status=excluded.email_status`)
+        .bind(key,action.label,detail,iso(now),iso(now),mailStatus==='sent'?iso(now):null,text(mailStatus)).run();
     } else {
-      await env.DB.prepare('UPDATE health_incidents SET detail=?,last_seen_at=CURRENT_TIMESTAMP WHERE incident_key=?').bind(ind.detail,key).run();
+      await env.DB.prepare(`UPDATE health_incidents SET detail=?,last_seen_at=?,email_status=?,
+        first_email_at=CASE WHEN ?='sent' THEN COALESCE(first_email_at,?) ELSE first_email_at END WHERE incident_key=?`)
+        .bind(detail,iso(now),text(mailStatus),text(mailStatus),iso(now),key).run();
     }
   }
-  const open=await env.DB.prepare("SELECT * FROM health_incidents WHERE status='open'").all();
-  for(const row of open?.results||[]){
-    const id=text(row.incident_key).replace(/^health:/,''); if(active.has(id)) continue;
-    const current=snapshot.indicators.find(x=>x.id===id)||{label:text(row.indicator),detail:'normalizado'};
-    const status=await sendMail(env,incidentMessage(current,snapshot,true));
-    await env.DB.prepare("UPDATE health_incidents SET status='resolved',resolved_at=CURRENT_TIMESTAMP,recovery_email_at=CURRENT_TIMESTAMP,email_status=? WHERE incident_key=?").bind(text(status),row.incident_key).run();
+  const rows=await env.DB.prepare("SELECT * FROM health_incidents WHERE status IN ('open','observing')").all();
+  for(const row of rows?.results||[]){
+    if(active.has(text(row.incident_key))) continue;
+    const id=text(row.incident_key).replace(/^health:/,'');
+    const current=snapshot.indicators.find(x=>x.id===id)||{id,label:text(row.indicator),detail:'normalizado'};
+    const hadAlert=['sent','covered_by_daily'].includes(text(row.email_status)) || text(row.email_status).startsWith('recovery_');
+    if(!hadAlert||row.status==='observing'){
+      silentRecovery += 1;
+      await env.DB.prepare("UPDATE health_incidents SET status='resolved',resolved_at=?,email_status='resolved_silent' WHERE incident_key=?")
+        .bind(iso(now),row.incident_key).run();
+      continue;
+    }
+    const action={id,label:text(current.label),severity:'green',problem:text(current.detail),impact:'Componente normalizado.',
+      evidence:[],responsibility:'OBSERVE',recommendation:'Nenhuma ação adicional.',nextCheck:'No ciclo seguinte.',
+      link:'https://push.formuladogol.com.br/v1/health-monitor/status'};
+    const status=await sendMail(env,healthActionMessage(action,snapshot,{recovered:true,now}));
+    if(status==='sent'){
+      recoveredSent += 1;
+      await env.DB.prepare("UPDATE health_incidents SET status='resolved',resolved_at=?,recovery_email_at=?,email_status='recovered_sent' WHERE incident_key=?")
+        .bind(iso(now),iso(now),row.incident_key).run();
+    } else {
+      await env.DB.prepare("UPDATE health_incidents SET email_status=? WHERE incident_key=?")
+        .bind('recovery_'+text(status).slice(0,100),row.incident_key).run();
+    }
   }
+  return {alertsSent,recoveredSent,silentRecovery};
 }
 
 async function markDailyAttempt(env,br,attempts,status,error='',now=Date.now()){
@@ -615,8 +733,9 @@ export async function runHealthMonitor(env, monitor=null, now=Date.now()){
       daily='sent';
     }
 
-    await syncIncidents(env,snapshot,now);
-    const overallRecovery=await syncOverallRecovery(env,previousSnapshot,snapshot,{dailySentThisRun,now});
+    const incidentSync=await syncIncidents(env,snapshot,now,{dailySentThisRun});
+    const overallRecovery=await syncOverallRecovery(env,previousSnapshot,snapshot,
+      {dailySentThisRun,coveredByActionRecovery:incidentSync.recoveredSent>0||incidentSync.silentRecovery>0,now});
     const completed={at:iso(now),state:snapshot.state,daily,overallRecovery:overallRecovery.status};
     await Promise.all([metaPut(env,'last_health_completed_at',iso(now)),metaPut(env,'last_health_run',JSON.stringify(completed)),metaPut(env,'last_health_error','')]);
     return {ok:true,state:snapshot.state,daily,snapshot};

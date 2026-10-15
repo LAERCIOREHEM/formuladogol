@@ -1,0 +1,55 @@
+{
+  "package": "FDG-R10R17.6-HEALTH-ACTION-CENTER-ACTIONABLE-ALERTS",
+  "base_repository": "LAERCIOREHEM/formuladogol",
+  "branch": "main",
+  "based_on_latest_validated_R10R17.5": true,
+  "health_monitor_git_blob_base": "b2bad5e563f37565f9ea2cd4beb4ddbc3502a115",
+  "workflow_git_blob_base": "3e6b14e112d922944bd3a669114f4d47143d3c94",
+  "health_policy_version": 12,
+  "action_center_version": 1,
+  "files": [
+    {
+      "path": "cloudflare/push-worker/src/health-action-center.js",
+      "size": 13054,
+      "sha256": "f098584070345ec72bbe1a34ac9ae2677d7b64ac237dae77bcb6e1011115e57c"
+    },
+    {
+      "path": "cloudflare/push-worker/src/health-monitor.js",
+      "size": 56840,
+      "sha256": "41e6b29da4fb12466658a38766c00cd51b304751004b77d65f79f6c4cd9a2358"
+    },
+    {
+      "path": "cloudflare/push-worker/src/index.js",
+      "size": 44984,
+      "sha256": "c65239fe157bdac2bd50396c905403aaae28e284b09dc1d1b2c3e0702be109a0"
+    },
+    {
+      "path": "cloudflare/push-worker/tests/test-health-action-center.mjs",
+      "size": 8120,
+      "sha256": "f713315affd6b95e9aeeb0a072b437ef5c733cc4ad0eba237e155cfa3ee00bb8"
+    },
+    {
+      "path": "cloudflare/push-worker/tests/test-health-action-snapshot.mjs",
+      "size": 5761,
+      "sha256": "35bf1cd1c77528908a53ce5cd2c45361d167287cb67ed97bab6d691e185ca5db"
+    },
+    {
+      "path": "cloudflare/push-worker/tests/test-health-monitor.mjs",
+      "size": 8549,
+      "sha256": "4726e04ca1194d7143378d4ac668ee85e72e0df8b24fc32ffe70d917d478cc3f"
+    },
+    {
+      "path": "cloudflare/push-worker/package.json",
+      "size": 3778,
+      "sha256": "1ef6c23e2ff23c0ecd642778752fa3eeef791f558e48c107923fd87c7502e5cc"
+    },
+    {
+      "path": ".github/workflows/deploy-push-worker.yml",
+      "size": 58261,
+      "sha256": "7b7cc8ec4796f9b623fe857e38d6e50d2b727f0b82d8a95ec499871b76eeeac1"
+    }
+  ],
+  "database_migration_required": false,
+  "new_provider_cost": false,
+  "workflow": ".github/workflows/deploy-push-worker.yml"
+}

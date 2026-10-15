@@ -9,7 +9,8 @@ import { LIVE_API_CONSTANTS, resolveLiveScoreboard, resolveLiveSummary } from '.
 import { createLiveStatsStore } from './live-stats-store.js';
 import { postgameSearchProbe, postgameStatus, readPostgameFastlane, runPostgameMaintenance } from './postgame-fastlane.js';
 import { feedbackNotifierConfigured, runFeedbackNotifier } from './feedback-notifier.js';
-import { healthMonitorStatus, runHealthMonitor } from './health-monitor.js';
+import { healthMonitorStatus, runHealthMonitor, HEALTH_POLICY_VERSION } from './health-monitor.js';
+import { HEALTH_ACTION_CENTER_VERSION } from './health-action-center.js';
 import { handleOpsMcp, OPS_MCP_CONSTANTS } from './ops-mcp.js';
 import { OPS_INTELLIGENCE_CONSTANTS, opsIntelligenceStatus, searchOpsRag } from './ops-intelligence.js';
 import { RED_CARD_EVENT_POLICY_VERSION } from './readiness-guardian.js';
@@ -683,7 +684,8 @@ export default {
         feedbackNotifier: true,
         feedbackNotifierConfigured: feedbackNotifierConfigured(env),
         healthEmailMonitor: true,
-        healthMonitorPolicyVersion: 11,
+        healthMonitorPolicyVersion: HEALTH_POLICY_VERSION,
+        healthActionCenterVersion: HEALTH_ACTION_CENTER_VERSION,
         healthEmailDailyBrt: '08:00',
         healthEmailRecoveryUntilBrt: '11:59',
         healthMonitorCron: '*/5 * * * *',
