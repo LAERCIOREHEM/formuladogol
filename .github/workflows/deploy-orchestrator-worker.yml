@@ -93,6 +93,9 @@ jobs:
       - name: Validar código e contratos
         run: npm run validate
 
+      - name: R10R17.7 - Regressão sem MM para Copa/CONMEBOL
+        run: node tests/test-no-cup-highlights.mjs
+
       - name: Calcular identidade da governança continental
         shell: bash
         run: |

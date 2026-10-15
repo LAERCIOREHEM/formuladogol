@@ -108,7 +108,7 @@ jobs:
 
       # R10R17.6-HF1: detectar regressões no contrato SQL com bind temporal
       # antes da suíte esportiva longa. A suíte também executa o teste.
-      - name: R10R17.6 HF1 - Integracao SQL Health e elegibilidade
+      - name: R10R17.7 - Elegibilidade BR Série A (público/renda e melhores momentos)
         run: node tests/test-postgame-competition-eligibility.mjs
 
       - name: R10R17.3 - integridade de gols, rollback e recuperação de push
@@ -410,6 +410,7 @@ jobs:
           if (Number(h.postgameFastlaneVersion) !== expectedPostgame) problems.push(`postgameFastlaneVersion=${h.postgameFastlaneVersion} esperado=${expectedPostgame}`);
           if (Number(h.postgameAttendanceHunterVersion) !== expectedPostgame) problems.push(`postgameAttendanceHunterVersion=${h.postgameAttendanceHunterVersion} esperado=${expectedPostgame}`);
           if (h.postgameCompetitionEligibilityGuard !== true || Number(h.postgameCompetitionEligibilityVersion) !== 1 || h.postgameAttendanceRequiredLeague !== 'bra.1') problems.push('postgameCompetitionEligibilityGuard inválido');
+          if (h.postgameHighlightEligibilityGuard !== true || Number(h.postgameHighlightEligibilityVersion) !== 1 || h.postgameHighlightRequiredLeague !== 'bra.1') problems.push('postgameHighlightEligibilityGuard inválido');
           if (h.postgameSearchAliasesAllClubs !== true) problems.push('postgameSearchAliasesAllClubs!=true');
           if (h.postgameOfficialClubSourcesScoped !== true) problems.push('postgameOfficialClubSourcesScoped!=true');
           if (h.postgameRegionalEditorialSources !== true) problems.push('postgameRegionalEditorialSources!=true');
@@ -600,7 +601,10 @@ jobs:
           if (Number(s.storedPolicyVersion) !== expectedPostgame) problems.push(`storedPolicyVersion=${s.storedPolicyVersion} esperado=${expectedPostgame}`);
           if (s.attendanceEligibilityPolicyVersion !== 1 || s.attendanceRequiredLeague !== 'bra.1' || s.publicExemptStatus !== 'not_applicable' || s.publicUnknownStatus !== 'eligibility_pending') problems.push('política de elegibilidade v1 ausente');
           if (!Number.isInteger(s.publicNotApplicable) || !Number.isInteger(s.publicEligibilityPending)) problems.push('contadores de elegibilidade ausentes');
+          if (s.highlightEligibilityPolicyVersion !== 1 || s.highlightRequiredLeague !== 'bra.1' || s.highlightExemptStatus !== 'not_applicable' || s.highlightUnknownStatus !== 'eligibility_pending') problems.push('política de highlights Série A ausente');
+          if (!Number.isInteger(s.highlightNotApplicable) || !Number.isInteger(s.highlightEligibilityPending)) problems.push('contadores de highlights dispensados ausentes');
           if (Number(s.lastRun?.policyVersion) !== expectedPostgame) problems.push(`lastRun.policyVersion=${s.lastRun?.policyVersion} esperado=${expectedPostgame}`);
+          if (Number(s.highlightNotApplicable) < 0 || Number(s.highlightEligibilityPending) < 0) problems.push('highlight eligibility counters inválidos');
           if (Number(s.searchProfileVersion) !== expectedSearch) problems.push(`searchProfileVersion=${s.searchProfileVersion} esperado=${expectedSearch}`);
           if (s.searchAliasesAllClubs !== true) problems.push('searchAliasesAllClubs!=true');
           if (s.officialClubSourcesScopedToParticipants !== true) problems.push('officialClubSourcesScopedToParticipants!=true');
@@ -691,7 +695,11 @@ jobs:
           for (const row of p.rows) {
             if (row.league && row.league !== 'bra.1' && (row.public_status !== 'not_applicable' || row.public_next_at)) throw new Error(`Competição dispensada entrou na fila: ${row.event_id}/${row.league}/${row.public_status}`);
             if (!row.league && (row.public_status !== 'eligibility_pending' || row.public_next_at)) throw new Error(`Competição desconhecida entrou na fila: ${row.event_id}/${row.public_status}`);
+            // R10R17.7: provas de produção para NÃO repetir o alerta Atlético-MG x Torque.
+            if (row.league && row.league !== 'bra.1' && (row.highlight_status !== 'not_applicable' || row.highlight_next_at)) throw new Error(`MM indevido Copa/CONMEBOL: ${row.event_id}/${row.league}/${row.highlight_status}`);
+            if (!row.league && (row.highlight_status !== 'eligibility_pending' || row.highlight_next_at)) throw new Error(`MM sem liga classificada: ${row.event_id}/${row.highlight_status}`);
           }
+          console.log('R10R17.7: Nenhuma partida não-bra.1 com MM pendente/reativado no recorte API.');
           const recentPending = p.rows.find((row) => row.league === 'bra.1' && !['resolved','not_applicable','eligibility_pending'].includes(row.public_status) && Date.parse(row.final_at || '') <= Date.now() - 5*60*1000);
           if (recentPending) {
             console.log(`Pendência recente ${recentPending.event_id}: Gemini API=${recentPending.public_search.gemini.api_calls}, buscas reais=${recentPending.public_search.gemini.search_calls}, fontes=${recentPending.public_search.gemini.sources_found}, cache=${recentPending.source_cache_count}.`);

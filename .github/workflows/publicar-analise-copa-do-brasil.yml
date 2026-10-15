@@ -56,10 +56,8 @@ jobs:
           python -m json.tool dados-br/historico-probabilidades-continentais.json >/dev/null
           python scripts/validar_artefatos_analises.py
 
-      - name: Atualizar melhores momentos oficiais da fase atual
-        env:
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-        run: python scripts/buscar_melhores_momentos_copa_do_brasil.py
+      # R10R17.7: Copa do Brasil não requer vídeo de Melhores Momentos.
+      # Publicação editorial e validações factuais permanecem intactas.
 
       - name: Detectar fechamento e gerar editorial jornalístico
         env:
