@@ -20,7 +20,6 @@ import {
   normalizeAgenda,
   parseDate,
   pendingHighlights,
-  pendingContinentalHighlights,
   pendingPublicsFromAudit,
   publicPendingFingerprint,
   relevantSportsGames,
@@ -149,23 +148,6 @@ function boundedNextSlowAt(now, games, hints = {}, afterAction = false) {
   if (!hinted) return cap;
   if (hinted < floor) return floor;
   return hinted < cap ? hinted : cap;
-}
-
-function cupPendingHighlights(cup, cupHighlights, now) {
-  const pendingIds = new Set((cupHighlights?.pendentes || []).map(String));
-  if (!pendingIds.size) return [];
-  const rows = [];
-  for (const event of cup?.eventos || []) {
-    const eventId = String(event?.event_id || '');
-    if (!eventId || !pendingIds.has(eventId) || !event?.concluido) continue;
-    const kickoff = parseDate(event?.data_iso);
-    const ended = kickoff ? new Date(kickoff.getTime() + 115 * 60000) : new Date(parseDate(now).getTime() - POLICY.melhoresMomentos.firstAfterFinalMinutes * 60000);
-    const ageMinutes = minutesBetween(ended, now);
-    if (ageMinutes < POLICY.melhoresMomentos.firstAfterFinalMinutes) continue;
-    if (ageMinutes > POLICY.melhoresMomentos.automaticWindowMinutes) continue;
-    rows.push({ eventId, ended, ageMinutes, row: event, round: 0 });
-  }
-  return rows;
 }
 
 function nextRelevantGame(games, now) {
@@ -932,57 +914,10 @@ export class OrchestratorState {
       concreteReady: 0, capped: mmCapped,
     };
 
-    const cupMmSourcesReady = ready('dados-br/competicoes-af-previsao/copa-do-brasil.json',
-      'dados-br/melhores-momentos-copa-do-brasil.json', 'dados-br/auditoria-melhores-momentos.json');
-    const cupMm = cupMmSourcesReady ? cupPendingHighlights(cup, cupHighlights, now) : [];
-    if (cupMm.length) {
-      const item = cupMm[0];
-      let last = await this.storageDate(`mmcup:${item.eventId}`);
-      if (!last && mmAuditTime && isAfter(mmAuditTime, item.ended)) last = mmAuditTime;
-      const interval = last ? mmRetryInterval(item.ageMinutes / 60) : 0;
-      if (!last || dueFromLast(last, now, interval)) {
-        return {
-          action: 'melhores_momentos', eventId: '',
-          reason: `Copa do Brasil: melhores momentos ainda pendentes para ${item.eventId}.`,
-          retryMinutes: Math.max(1, interval || 1), stateUpdates: { [`mmcup:${item.eventId}`]: now.toISOString() }, hints,
-        };
-      }
-    }
-
-    // 4c) CONMEBOL: vídeos são independentes do editorial. Só jogos
-    // continentais RECÉM-encerrados (janela de 24h) podem abrir este workflow;
-    // mudanças de vídeo nunca reabrem IA editorial.
-    const contMmReady = ready(
-      'dados-br/competicoes-af-previsao/libertadores.json',
-      'dados-br/competicoes-af-previsao/sul-americana.json',
-      'dados-br/melhores-momentos-continentais.json',
-    );
-    const contMmPending = contMmReady
-      ? pendingContinentalHighlights({ libertadores: lib, sul_americana: sula }, continentalHighlights, now)
-      : [];
-    if (contMmPending.length) {
-      const item = contMmPending[0];
-      const stateKey = `mmcont:${item.eventId}`;
-      const last = await this.storageDate(stateKey);
-      const interval = last ? mmRetryInterval(item.ageMinutes / 60) : 0;
-      if (!last || dueFromLast(last, now, interval)) {
-        hints.melhoresMomentosContinentais = {
-          pending: contMmPending.length,
-          eventId: item.eventId,
-          rank: item.rank,
-          nextDueAt: now.toISOString(),
-        };
-        return {
-          action: 'melhores_momentos_continentais',
-          eventId: item.eventId,
-          phaseRank: item.rank,
-          reason: `CONMEBOL: melhores momentos ainda ausentes para ${item.home || '?'} x ${item.away || '?'} (${item.eventId}); pipeline de vídeo independente do editorial.`,
-          retryMinutes: Math.max(1, interval || 1),
-          stateUpdates: { [stateKey]: now.toISOString() },
-          hints,
-        };
-      }
-    }
+    // R10R17.7: Copa do Brasil e competições CONMEBOL NÃO exigem
+    // Melhores Momentos no site. Não despachar workflows de vídeo,
+    // não criar pendências nem alterar os editoriais das duas competições.
+    // Apenas a rotina de Melhores Momentos do Brasileirão permanece ativa.
 
     // 5) Editoriais: só quando o estado esportivo fecha a unidade editorial.
     const cupEditorial = ready('dados-br/competicoes-af-previsao/copa-do-brasil.json', 'dados-br/analises.json')

@@ -282,8 +282,8 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
       COALESCE(SUM(CASE WHEN league='bra.1' AND public_status NOT IN ('resolved','not_applicable','eligibility_pending') THEN 1 ELSE 0 END),0) public_pending,
       COALESCE(SUM(CASE WHEN league<>'bra.1' AND TRIM(league)<>'' THEN 1 ELSE 0 END),0) public_not_applicable,
       COALESCE(SUM(CASE WHEN TRIM(league)='' THEN 1 ELSE 0 END),0) public_eligibility_pending,
-      COALESCE(SUM(CASE WHEN highlight_status<>'resolved' THEN 1 ELSE 0 END),0) highlight_pending,
-      COALESCE(SUM(CASE WHEN highlight_status<>'resolved' AND (final_at IS NULL OR TRIM(final_at)='' OR datetime(final_at) IS NULL OR datetime(final_at)<=datetime(?,'-2 hours')) THEN 1 ELSE 0 END),0) highlight_overdue
+      COALESCE(SUM(CASE WHEN league='bra.1' AND highlight_status NOT IN ('resolved','not_applicable','eligibility_pending') THEN 1 ELSE 0 END),0) highlight_pending,
+      COALESCE(SUM(CASE WHEN league='bra.1' AND highlight_status NOT IN ('resolved','not_applicable','eligibility_pending') AND (final_at IS NULL OR TRIM(final_at)='' OR datetime(final_at) IS NULL OR datetime(final_at)<=datetime(?,'-2 hours')) THEN 1 ELSE 0 END),0) highlight_overdue
       FROM postgame_fastlane`).bind(iso(now)).first(),
     env.DB.prepare(`SELECT p.event_id,p.home,p.away,p.home_score,p.away_score,p.kickoff,p.final_at,
       p.publico,p.publico_pagante,p.renda,p.public_status,p.public_attempts,p.public_last_at,p.public_next_at,p.public_last_error,
@@ -302,7 +302,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   const failureCutoff=iso(now-24*3600_000);
   const [highlightRowsRaw,providerErrorsRaw,providerUnrecoveredRaw]=await Promise.all([
     env.DB.prepare(`SELECT event_id,league,home,away,final_at,highlight_status,highlight_attempts,highlight_last_at,highlight_next_at,highlight_last_error
-      FROM postgame_fastlane WHERE highlight_status<>'resolved' ORDER BY final_at ASC LIMIT 12`).all().catch(()=>({results:[]})),
+      FROM postgame_fastlane WHERE league='bra.1' AND highlight_status NOT IN ('resolved','not_applicable','eligibility_pending') ORDER BY final_at ASC LIMIT 12`).all().catch(()=>({results:[]})),
     env.DB.prepare(`SELECT f.provider,f.purpose,f.event_id,f.phase,f.http_status,f.detail,f.created_at,
       EXISTS(SELECT 1 FROM ai_provider_ledger s WHERE s.id>f.id AND s.ok=1 AND s.purpose=f.purpose
         AND ((f.event_id<>'' AND s.event_id=f.event_id) OR (f.event_id='' AND s.event_id='' AND s.provider=f.provider))

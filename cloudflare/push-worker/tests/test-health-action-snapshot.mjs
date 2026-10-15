@@ -27,6 +27,10 @@ const env={DB:new D1(sqlite),SITE_BASE:'https://formuladogol.com.br',OPENAI_API_
 // Futebol brasileiro com vídeo ainda pendente há 3 horas.
 sqlite.prepare(`INSERT INTO postgame_fastlane(event_id,league,home,away,kickoff,final_at,home_score,away_score,public_status,highlight_status,highlight_attempts,highlight_last_error)
  VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`).run('e1','bra.1','Fluminense','Palmeiras','2026-10-15T04:00:00Z','2026-10-15T08:00:00Z',0,1,'resolved','pending',3,'video_not_yet_published');
+// Caso real: Atlético-MG x Montevideo City Torque é continental e NÃO pode
+// ser contado como pendência, mesmo se uma versão anterior gravou pending.
+sqlite.prepare(`INSERT INTO postgame_fastlane(event_id,league,home,away,kickoff,final_at,public_status,highlight_status,highlight_attempts,highlight_last_error)
+ VALUES (?,?,?,?,?,?,?,?,?,?)`).run('fdg-conmebol-sul-americana-202610141900-atletico-mg-montevideo-city-torque', 'conmebol.sudamericana', 'Atlético-MG', 'Montevideo City Torque', '2026-10-14T22:00:00Z', '2026-10-15T00:00:00Z', 'not_applicable','pending',21,'not_found');
 // Cinco falhas, com uma recuperação posterior no mesmo evento.
 for(let i=0;i<5;i++)sqlite.prepare(`INSERT INTO ai_provider_ledger(provider,purpose,event_id,phase,ok,http_status,detail,created_at)
  VALUES (?,?,?,?,?,?,?,?)`).run('gemini','postgame','e1','source_search',0,429,'rate_limited','2026-10-15T10:00:00Z');
@@ -63,6 +67,8 @@ try{
   assert.equal(shot.indicators.find(i=>i.id==='highlights')?.severity,'yellow');
   assert.equal(shot.indicators.find(i=>i.id==='openai')?.severity,'green','five failed attempts with success for same event become recovered informational');
   assert.equal(shot.postgame.highlightOverdue,1);
+  assert.equal(shot.postgame.highlightPending,1, 'continental legado pendente não contamina Health');
+  assert.equal(shot.postgame.highlightPendingRows.length,1, 'Action Center não indica partida continental');
   assert.equal(shot.postgame.highlightPendingRows[0].home,'Fluminense');
   assert.equal(shot.providerUnrecoveredFailures,0);
   assert.ok(shot.actionCenter.requiresAttention.some(x=>x.id==='highlights'));

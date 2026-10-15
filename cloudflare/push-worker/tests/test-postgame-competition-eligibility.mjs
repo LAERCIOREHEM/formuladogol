@@ -44,10 +44,17 @@ let br = await add('401841248', 'bra.1');
 await add('legacy-uppercase-test', 'bra.1');
 sqlite.prepare("UPDATE postgame_fastlane SET league='BRA.1',public_status='overdue',public_next_at='2026-10-14T02:10:00.000Z' WHERE event_id='legacy-uppercase-test'").run();
 assert.equal(sud.public_status, 'not_applicable');
+assert.equal(sud.highlight_status, 'not_applicable');
+assert.equal(sud.highlight_next_at, null);
 assert.equal(copa.public_status, 'not_applicable');
+assert.equal(copa.highlight_status, 'not_applicable');
+assert.equal(copa.highlight_next_at, null);
 assert.equal(lib.public_status, 'not_applicable');
+assert.equal(lib.highlight_status, 'not_applicable');
 assert.equal(unknown.public_status, 'eligibility_pending');
+assert.equal(unknown.highlight_status, 'eligibility_pending');
 assert.equal(br.public_status, 'pending');
+assert.equal(br.highlight_status, 'pending');
 for (const row of [sud, copa, lib, unknown]) {
   assert.equal(row.public_next_at, null, `sem agendamento de IA para ${row.event_id}`);
   assert.equal(publicSlaAlertAllowed(row, end + 180 * 60000), false, `sem alertas para ${row.event_id}`);
@@ -55,12 +62,14 @@ for (const row of [sud, copa, lib, unknown]) {
 assert.equal(publicSlaAlertAllowed(br, end + 180 * 60000), true);
 assert.equal((await claimDue(env, 'public', Date.now() + 120000)).event_id, '401841248', 'só o Brasileirão entra na fila');
 assert.equal(await claimDue(env, 'public', Date.now() + 120000), null, 'zero buscas para Copa/internacionais/desconhecidos');
-assert.ok(await claimDue(env, 'highlight', Date.now() + 120000), 'melhores momentos independentes da elegibilidade de público');
+const dueHighlight = await claimDue(env, 'highlight', Date.now() + 120000);
+assert.ok(dueHighlight && dueHighlight.league === 'bra.1', 'somente Série A entra na fila de vídeos');
+assert.equal(await claimDue(env, 'highlight', Date.now() + 120000), null, 'zero buscas Copa/CONMEBOL/indefinidos, segunda partida ainda sem liga normalizada');
 
 // Dados antigos, inclusive com erro ou resolved, devem ser encerrados por SQL,
 // preservando métricas e mantendo o histórico do Hunter auditável.
-sqlite.prepare("UPDATE postgame_fastlane SET public_status='overdue', public_next_at='2026-10-14T02:10:00.000Z', public_attempts=25, publico=15056, renda=708004.50 WHERE event_id=?").run(conmebol);
-sqlite.prepare("UPDATE postgame_fastlane SET public_status='resolved', publico=12000, renda=440000 WHERE event_id='copa-br-test'").run();
+sqlite.prepare("UPDATE postgame_fastlane SET public_status='overdue', public_next_at='2026-10-14T02:10:00.000Z', public_attempts=25, publico=15056, renda=708004.50,highlight_status='pending',highlight_next_at='2026-10-14T02:10:00.000Z',highlight_attempts=21 WHERE event_id=?").run(conmebol);
+sqlite.prepare(`UPDATE postgame_fastlane SET public_status='resolved', publico=12000, renda=440000, highlight_status='resolved', highlight_json='{"url":"https://youtube.com/watch?v=old","video_id":"old"}' WHERE event_id='copa-br-test'`).run();
 sqlite.prepare("UPDATE postgame_fastlane SET public_status='overdue', public_next_at='2026-10-14T02:10:00.000Z' WHERE event_id='unknown-test'").run();
 sqlite.prepare("INSERT INTO postgame_meta(key,value) VALUES('policy_version','13')").run();
 assert.equal(await ensurePolicyVersion(env, end + 100000), true);
@@ -68,31 +77,52 @@ sud = sqlite.prepare('SELECT * FROM postgame_fastlane WHERE event_id=?').get(con
 copa = sqlite.prepare("SELECT * FROM postgame_fastlane WHERE event_id='copa-br-test'").get();
 unknown = sqlite.prepare("SELECT * FROM postgame_fastlane WHERE event_id='unknown-test'").get();
 assert.equal(sud.public_status, 'not_applicable');
+assert.equal(sud.highlight_status, 'not_applicable');
+assert.equal(sud.highlight_next_at, null);
 assert.equal(sud.public_next_at, null);
 assert.equal(sqlite.prepare("SELECT league,public_status FROM postgame_fastlane WHERE event_id='legacy-uppercase-test'").get().league,'bra.1');
 assert.equal(sud.public_attempts, 25);
 assert.equal(sud.publico, 15056);
 assert.equal(sud.renda, 708004.50);
-assert.equal(sud.highlight_status, 'pending');
+assert.equal(sud.highlight_status, 'not_applicable');
+assert.equal(sud.highlight_next_at, null);
+assert.equal(sud.highlight_attempts, 21, 'tentativas históricas preservadas');
 assert.equal(copa.public_status, 'not_applicable');
+assert.equal(copa.highlight_status, 'not_applicable');
+assert.equal(copa.highlight_next_at, null);
 assert.equal(copa.publico, 12000);
+assert.equal(copa.highlight_status, 'not_applicable');
+assert.equal(copa.highlight_next_at, null);
+assert.ok(copa.highlight_json?.includes('youtube.com'), 'vídeos históricos não são apagados');
 assert.equal(copa.renda, 440000);
 assert.equal(unknown.public_status, 'eligibility_pending');
+assert.equal(unknown.highlight_status, 'eligibility_pending');
+assert.equal(unknown.highlight_next_at, null);
 assert.equal(unknown.public_next_at, null);
 assert.equal(await ensurePolicyVersion(env, end + 100000), false, 'migração idempotente');
 
 // Mesmo após múltiplos seeds, não se pode reativar o Hunter internacional.
 await add(conmebol, 'conmebol.sudamericana');
 assert.equal(sqlite.prepare('SELECT public_status FROM postgame_fastlane WHERE event_id=?').get(conmebol).public_status, 'not_applicable');
+assert.equal(sqlite.prepare('SELECT highlight_status FROM postgame_fastlane WHERE event_id=?').get(conmebol).highlight_status, 'not_applicable');
+const promotedBra = await claimDue(env, 'highlight', Date.now()+120000);
+assert.equal(promotedBra?.event_id, 'legacy-uppercase-test', 'liga brasileira normalizada pode buscar vídeo');
+assert.equal(await claimDue(env, 'highlight', Date.now()+120000), null, 'seed posterior não reabre busca continental');
 // Competições corrigidas de desconhecidas para Brasileirão reabrem somente se a classificação for explícita.
 await add('unknown-test', 'bra.1');
 unknown = sqlite.prepare("SELECT * FROM postgame_fastlane WHERE event_id='unknown-test'").get();
 assert.equal(unknown.public_status, 'pending');
 assert.ok(unknown.public_next_at);
+assert.equal(unknown.highlight_status, 'pending', 'reclassificação explícita para bra.1 reabre destaque');
+assert.ok(unknown.highlight_next_at);
 
 const status = await postgameStatus(env);
-assert.equal(status.version, 14);
-assert.equal(status.storedPolicyVersion, 14);
+assert.equal(status.version, 15);
+assert.equal(status.storedPolicyVersion, 15);
+assert.equal(status.highlightRequiredLeague, 'bra.1');
+assert.equal(status.highlightEligibilityPolicyVersion, 1);
+assert.equal(status.highlightNotApplicable, 3);
+assert.equal(status.highlightEligibilityPending, 0);
 assert.equal(status.attendanceRequiredLeague, 'bra.1');
 assert.equal(status.publicNotApplicable, 3);
 assert.equal(status.publicEligibilityPending, 0);
@@ -119,4 +149,6 @@ assert.equal(healthCounts.public_pending, status.publicPending);
 assert.equal(healthCounts.public_not_applicable, status.publicNotApplicable);
 assert.equal(healthCounts.public_eligibility_pending, status.publicEligibilityPending);
 assert.equal(healthCounts.public_overdue, status.publicOverdue);
-console.log('R10R17.1 SQLite integration: Copa do Brasil, CONMEBOL, desconhecidos, reclassificação, D1 v13->v14, highlights, SLA e métricas: PASS');
+assert.equal(healthCounts.highlight_pending, status.highlightPending);
+assert.equal(healthCounts.highlight_overdue, status.highlightPending, 'somente brasileiros históricos podem ficar vencidos; Copa/CONMEBOL nunca entram');
+console.log('R10R17.7 SQLite integration: BR Série A, COPA/CONMEBOL dispensadas, reclassificação, D1 v13->v15, preservação histórica e Health: PASS');

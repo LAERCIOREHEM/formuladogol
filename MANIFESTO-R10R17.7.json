@@ -1,0 +1,70 @@
+{
+  "package": "FDG-R10R17.7-HIGHLIGHT-COMPETITION-ELIGIBILITY-GUARD",
+  "created_on": "2026-10-15",
+  "base_repository": "LAERCIOREHEM/formuladogol",
+  "policy": "highlight_required_only_when_league_bra.1",
+  "postgame_policy_version": 15,
+  "health_monitor_policy_version": 12,
+  "requires_manual_d1_migration": false,
+  "deploy_workflows": [
+    "Deploy Push Worker",
+    "Deploy Orchestrator Worker"
+  ],
+  "files": [
+    {
+      "path": "cloudflare/push-worker/src/postgame-fastlane.js",
+      "bytes": 105202,
+      "sha256": "8f5ec32069d6fde67aee9b57395f4558bff0947272f956c63022bdb097516385"
+    },
+    {
+      "path": "cloudflare/push-worker/src/health-monitor.js",
+      "bytes": 57038,
+      "sha256": "d58094bf155751b99c86483cb9417dc13659590fdef1d1efdf9f97af388badea"
+    },
+    {
+      "path": "cloudflare/push-worker/src/index.js",
+      "bytes": 45131,
+      "sha256": "0e9eef39b0825532216cd4bfe236af7c4bc7fba14ac6186a090f4b0dd9511142"
+    },
+    {
+      "path": "cloudflare/push-worker/tests/test-postgame-competition-eligibility.mjs",
+      "bytes": 10372,
+      "sha256": "e6013bbd4ff480893167029acaac9127c1ab952b21fe80fae479c012369e8ab5"
+    },
+    {
+      "path": "cloudflare/push-worker/tests/test-postgame-fastlane.mjs",
+      "bytes": 26462,
+      "sha256": "d5c6b6042613fa2dc7b07cd440b7984f3a010dd6b2252b883c8ddd785c9d5515"
+    },
+    {
+      "path": "cloudflare/push-worker/tests/test-health-action-snapshot.mjs",
+      "bytes": 6565,
+      "sha256": "94952f83505dd1b0dfd5b628112e8855b07f50f4c091c16f8fc1ec0cb73aa6d3"
+    },
+    {
+      "path": ".github/workflows/deploy-push-worker.yml",
+      "bytes": 60005,
+      "sha256": "fa50cca5ef001d4b4e1b929745ce4d176185903bef92d1db2799c33bca0175db"
+    },
+    {
+      "path": "cloudflare/orchestrator-worker/src/orchestrator-state.js",
+      "bytes": 50526,
+      "sha256": "d8e2444a3c3c6a68ac8ba69a45d770941c5460333e7459c18bf6773b26e6b20f"
+    },
+    {
+      "path": "cloudflare/orchestrator-worker/tests/test-no-cup-highlights.mjs",
+      "bytes": 1688,
+      "sha256": "4413047d7439b4ede70fccdef49fbd1e1621ed860a34170074f024fc799c7ee2"
+    },
+    {
+      "path": ".github/workflows/deploy-orchestrator-worker.yml",
+      "bytes": 10777,
+      "sha256": "7cc41dfe61d8e3b3c15305a75df17dc7a28a8e2c40ae60d5e5405738f662f52f"
+    },
+    {
+      "path": ".github/workflows/publicar-analise-copa-do-brasil.yml",
+      "bytes": 5758,
+      "sha256": "8dfce287f0d59dceef97ed01432243ab0e5b85a5595e8334f724cda24a712831"
+    }
+  ]
+}

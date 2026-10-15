@@ -15,10 +15,10 @@ const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
-const POSTGAME_POLICY_VERSION = 14;
+const POSTGAME_POLICY_VERSION = 15;
 
 /*
- * Attendance/Revenue Hunter v14 — R10R17.1 (eligibility) + R10R16.1 Factual Integrity + R10R15.1 SLA Migration Suppression:
+ * Postgame Fastlane v15 — R10R17.7 (Melhores Momentos Série A) + R10R17.1 (attendance eligibility) + R10R16.1 Factual Integrity + R10R15.1 SLA Migration Suppression:
  *   - Mantém aliases de TODOS os clubes, imprensa nacional/regional e sites oficiais
  *     SOMENTE dos dois participantes para fatos documentais de ficha técnica.
  *   - Gemini Interactions vira DESCOBRIDOR DE FONTES: google_search real, sem JSON
@@ -667,6 +667,9 @@ async function upsertTask(env, row, staticData = {}) {
   const finalAt = text(row.final_at || row.finalAt || row.finalizado_em) || nowIso();
   const league = attendanceEligibility(row.league ?? row.espn_league);
   const initialPublicStatus = league.required ? (publicComplete ? 'resolved' : 'pending') : league.publicStatus;
+  // R10R17.7: vídeos só são exigidos em partidas da Série A.
+  // Liga desconhecida nunca abre buscas enquanto não houver classificação segura.
+  const initialHighlightStatus = league.required ? (highlightResolved ? 'resolved' : 'pending') : league.publicStatus;
   const now = nowIso();
   await env.DB.prepare(`
     INSERT INTO postgame_fastlane (
@@ -702,14 +705,29 @@ async function upsertTask(env, row, staticData = {}) {
         WHEN postgame_fastlane.public_status='resolved' OR excluded.public_status='resolved' THEN NULL
         ELSE COALESCE(postgame_fastlane.public_next_at,excluded.public_next_at) END,
       highlight_json=COALESCE(postgame_fastlane.highlight_json,excluded.highlight_json),
-      highlight_status=CASE WHEN postgame_fastlane.highlight_status='resolved' OR excluded.highlight_status<>'resolved' THEN postgame_fastlane.highlight_status ELSE 'resolved' END,
-      highlight_next_at=CASE WHEN postgame_fastlane.highlight_status='resolved' OR excluded.highlight_status='resolved' THEN NULL ELSE COALESCE(postgame_fastlane.highlight_next_at,excluded.highlight_next_at) END,
+      -- A política de highlight segue exatamente a liga efetiva após o upsert.
+      -- Não criar pendência para Copa do Brasil, CONMEBOL ou liga desconhecida.
+      highlight_status=CASE
+        WHEN (CASE WHEN excluded.league<>'' THEN excluded.league ELSE postgame_fastlane.league END)='bra.1'
+          THEN CASE
+            WHEN postgame_fastlane.highlight_status IN ('not_applicable','eligibility_pending')
+              THEN CASE WHEN NULLIF(TRIM(COALESCE(postgame_fastlane.highlight_json,excluded.highlight_json,'')),'') IS NOT NULL THEN 'resolved' ELSE 'pending' END
+            WHEN postgame_fastlane.highlight_status='resolved' OR excluded.highlight_status<>'resolved' THEN postgame_fastlane.highlight_status
+            ELSE 'resolved' END
+        WHEN (CASE WHEN excluded.league<>'' THEN excluded.league ELSE postgame_fastlane.league END)='' THEN 'eligibility_pending'
+        ELSE 'not_applicable' END,
+      highlight_next_at=CASE
+        WHEN (CASE WHEN excluded.league<>'' THEN excluded.league ELSE postgame_fastlane.league END)<>'bra.1' THEN NULL
+        WHEN postgame_fastlane.highlight_status IN ('not_applicable','eligibility_pending')
+          THEN CASE WHEN NULLIF(TRIM(COALESCE(postgame_fastlane.highlight_json,excluded.highlight_json,'')),'') IS NOT NULL THEN NULL ELSE excluded.highlight_next_at END
+        WHEN postgame_fastlane.highlight_status='resolved' OR excluded.highlight_status='resolved' THEN NULL
+        ELSE COALESCE(postgame_fastlane.highlight_next_at,excluded.highlight_next_at) END,
       updated_at=CURRENT_TIMESTAMP
   `).bind(
     eventId, league.league, text(row.home || row.mandante?.nome || row.mandante), text(row.away || row.visitante?.nome || row.visitante),
     text(row.kickoff || row.data_iso), finalAt, homeScore, awayScore,
     publico, pagantes, renda, staticData.public_sources ? JSON.stringify(staticData.public_sources) : null, initialPublicStatus, initialPublicStatus === 'pending' ? now : null,
-    highlightResolved ? JSON.stringify(highlight) : null, highlightResolved ? 'resolved' : 'pending', highlightResolved ? null : now,
+    highlightResolved ? JSON.stringify(highlight) : null, initialHighlightStatus, initialHighlightStatus === 'pending' ? now : null,
     now, now
   ).run();
 
@@ -866,6 +884,8 @@ function taskAgeHours(task, now = Date.now()) {
 
 export async function claimDue(env, kind, now = Date.now()) {
   const prefix = kind === 'highlight' ? 'highlight' : 'public';
+  const leagueGate = "AND p.league='bra.1'";
+  const claimGate = "AND league='bra.1'";
   const iso = nowIso(now);
   // Público/renda recente tem prioridade para que um backlog antigo nunca segure
   // o jogo que acabou de terminar. Depois dos recentes, preserva justiça por last_at.
@@ -874,12 +894,12 @@ export async function claimDue(env, kind, now = Date.now()) {
     : `COALESCE(p.highlight_last_at,'1970-01-01T00:00:00.000Z') ASC, p.final_at DESC`;
   const row = await env.DB.prepare(`SELECT p.*, c.round, c.stadium FROM postgame_fastlane p
     LEFT JOIN postgame_match_context c ON c.event_id=p.event_id
-    WHERE p.${prefix}_status<>'resolved' ${kind === 'public' ? "AND p.league='bra.1' AND p.public_status NOT IN ('not_applicable','eligibility_pending')" : ''} AND COALESCE(p.${prefix}_next_at,'1970-01-01T00:00:00.000Z')<=?
+    WHERE p.${prefix}_status NOT IN ('resolved','not_applicable','eligibility_pending') ${leagueGate} ${kind === 'public' ? "AND p.public_status NOT IN ('not_applicable','eligibility_pending')" : ''} AND COALESCE(p.${prefix}_next_at,'1970-01-01T00:00:00.000Z')<=?
     ORDER BY ${orderBy} LIMIT 1`).bind(iso).first();
   if (!row) return null;
   const currentNext = text(row[`${prefix}_next_at`]);
   const lockUntil = nowIso(now + 10 * 60_000);
-  const result = await env.DB.prepare(`UPDATE postgame_fastlane SET ${prefix}_next_at=?, updated_at=CURRENT_TIMESTAMP WHERE event_id=? AND ${prefix}_status<>'resolved' ${kind === 'public' ? "AND league='bra.1' AND public_status NOT IN ('not_applicable','eligibility_pending')" : ''} AND COALESCE(${prefix}_next_at,'')=?`).bind(lockUntil, row.event_id, currentNext).run();
+  const result = await env.DB.prepare(`UPDATE postgame_fastlane SET ${prefix}_next_at=?, updated_at=CURRENT_TIMESTAMP WHERE event_id=? AND ${prefix}_status NOT IN ('resolved','not_applicable','eligibility_pending') ${claimGate} ${kind === 'public' ? "AND public_status NOT IN ('not_applicable','eligibility_pending')" : ''} AND COALESCE(${prefix}_next_at,'')=?`).bind(lockUntil, row.event_id, currentNext).run();
   if (Number(result?.meta?.changes || 0) < 1) return null;
   return row;
 }
@@ -1551,6 +1571,23 @@ export async function ensurePolicyVersion(env, now = Date.now()) {
         AND (public_status<>'eligibility_pending' OR public_next_at IS NOT NULL)`).run();
   }
 
+  // v15: encerramento definitivo e idempotente de highlights sem seção no site.
+  // Não excluímos históricos, tentativas, gol, autoria ou vídeos já arquivados.
+  if (current < 15) {
+    await env.DB.prepare(`UPDATE postgame_fastlane SET
+      highlight_status=CASE WHEN TRIM(league)='' THEN 'eligibility_pending' ELSE 'not_applicable' END,
+      highlight_next_at=NULL, highlight_last_error='', updated_at=CURRENT_TIMESTAMP
+      WHERE league<>'bra.1' AND
+        (highlight_status NOT IN ('not_applicable','eligibility_pending') OR highlight_next_at IS NOT NULL OR
+         (highlight_status='not_applicable' AND TRIM(league)='') OR
+         (highlight_status='eligibility_pending' AND TRIM(league)<>''))`).run();
+    await env.DB.prepare(`UPDATE postgame_fastlane SET
+      highlight_status=CASE WHEN NULLIF(TRIM(COALESCE(highlight_json,'')),'') IS NOT NULL THEN 'resolved' ELSE 'pending' END,
+      highlight_next_at=CASE WHEN NULLIF(TRIM(COALESCE(highlight_json,'')),'') IS NOT NULL THEN NULL ELSE ? END,
+      updated_at=CURRENT_TIMESTAMP
+      WHERE league='bra.1' AND highlight_status IN ('not_applicable','eligibility_pending')`).bind(isoNow).run();
+  }
+
   await metaPut(env, 'policy_version', String(POSTGAME_POLICY_VERSION));
   return true;
 }
@@ -1561,7 +1598,7 @@ async function cleanup(env, now = Date.now()) {
   // só pode ser removida após ambos os fluxos (público/renda + highlights)
   // estarem resolvidos e já tiverem mais de 30 dias.
   await env.DB.prepare(`DELETE FROM postgame_fastlane
-    WHERE final_at<? AND public_status IN ('resolved','not_applicable') AND highlight_status='resolved'`).bind(cutoff).run();
+    WHERE final_at<? AND public_status IN ('resolved','not_applicable') AND highlight_status IN ('resolved','not_applicable')`).bind(cutoff).run();
   await env.DB.prepare(`DELETE FROM postgame_public_ai WHERE event_id NOT IN (SELECT event_id FROM postgame_fastlane)`).run();
   await env.DB.prepare(`DELETE FROM postgame_source_cache WHERE event_id NOT IN (SELECT event_id FROM postgame_fastlane)`).run();
   await env.DB.prepare(`DELETE FROM postgame_match_context WHERE event_id NOT IN (SELECT event_id FROM postgame_fastlane)`).run();
@@ -1615,7 +1652,7 @@ function publicRow(row) {
       }
     },
     highlight: highlight && highlight.url ? highlight : null,
-    highlight_status: text(row.highlight_status), highlight_attempts: Number(row.highlight_attempts || 0),
+    highlight_status: text(row.highlight_status), highlight_eligibility: attendanceEligibility(row.league).state, highlight_attempts: Number(row.highlight_attempts || 0),
     highlight_last_at: text(row.highlight_last_at), highlight_next_at: text(row.highlight_next_at),
     updated_at: text(row.updated_at)
   };
@@ -1699,7 +1736,9 @@ export async function postgameStatus(env) {
     SUM(CASE WHEN league='bra.1' THEN 1 ELSE 0 END) AS public_eligible_total,
     SUM(CASE WHEN league<>'bra.1' AND TRIM(league)<>'' THEN 1 ELSE 0 END) AS public_not_applicable,
     SUM(CASE WHEN TRIM(league)='' THEN 1 ELSE 0 END) AS public_eligibility_pending,
-    SUM(CASE WHEN highlight_status<>'resolved' THEN 1 ELSE 0 END) AS highlight_pending
+    SUM(CASE WHEN league='bra.1' AND highlight_status NOT IN ('resolved','not_applicable','eligibility_pending') THEN 1 ELSE 0 END) AS highlight_pending,
+    SUM(CASE WHEN league<>'bra.1' AND TRIM(league)<>'' THEN 1 ELSE 0 END) AS highlight_not_applicable,
+    SUM(CASE WHEN TRIM(league)='' THEN 1 ELSE 0 END) AS highlight_eligibility_pending
     FROM postgame_fastlane`).first();
   const cfg = mailConfig(env);
   const storedPolicyVersion = Number(await metaGet(env, 'policy_version') || 0);
@@ -1753,7 +1792,13 @@ export async function postgameStatus(env) {
     publicSearching: Number(counts?.public_searching || 0),
     publicOverdue: Number(counts?.public_overdue || 0),
     publicBudgetGuard: Number(counts?.public_budget_guard || 0),
+    highlightEligibilityPolicyVersion: 1,
+    highlightRequiredLeague: 'bra.1',
+    highlightExemptStatus: 'not_applicable',
+    highlightUnknownStatus: 'eligibility_pending',
     highlightPending: Number(counts?.highlight_pending || 0),
+    highlightNotApplicable: Number(counts?.highlight_not_applicable || 0),
+    highlightEligibilityPending: Number(counts?.highlight_eligibility_pending || 0),
     lastRun: safeJson(await metaGet(env, 'last_run'), null),
     mailer: { transport: cfg.transport, configured: cfg.configured, destino: maskAddress(cfg.to), remetente: cfg.from, fallbacks: cfg.fallbacks || [] },
     mailerProbe: (() => {
