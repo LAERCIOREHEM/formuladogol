@@ -95,6 +95,9 @@ jobs:
       - name: Validar código
         run: npm run check
 
+      - name: R10R17.5 - scorer enrichment and push reconciliation
+        run: node tests/test-scorer-push-reconciliation.mjs
+
       - name: R10R17.3 - integridade de gols, rollback e recuperação de push
         run: npm run test:sports
 
