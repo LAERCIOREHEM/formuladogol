@@ -102,9 +102,19 @@ assert.equal(status.publicOverdue, 1);
 assert.equal(status.publicResolved, 0);
 // A consulta contábil do Health deve coincidir com o Fastlane; não contar COPA/CONMEBOL.
 const healthSource = readFileSync(new URL('../src/health-monitor.js', import.meta.url), 'utf8');
-const healthQuery = healthSource.match(/env\.DB\.prepare\(`(SELECT COUNT\(\*\) total,[\s\S]*?FROM postgame_fastlane)`\)\.first\(\)/)?.[1];
-assert.ok(healthQuery, 'query do Health precisa ser localizada para teste de integração');
-const healthCounts = sqlite.prepare(healthQuery).get();
+// R10R17.6-HF1: o Action Center acrescentou um bind(iso(now)) para medir
+// pendências de highlights >2h. Localizar a MESMA consulta do Health e
+// reproduzir o bind real; não alterar a SQL nem enfraquecer os asserts.
+const healthQueryMatch = healthSource.match(
+  /env\.DB\.prepare\(`(SELECT COUNT\(\*\) total,[\s\S]*?FROM postgame_fastlane)`\)(\.bind\(iso\(now\)\))?\.first\(\)/
+);
+assert.ok(healthQueryMatch, 'query do Health precisa ser localizada para teste de integração');
+const healthQuery = healthQueryMatch[1];
+const healthBindValues = healthQueryMatch[2] ? [new Date().toISOString()] : [];
+assert.equal((healthQuery.match(/\?/g) || []).length, healthBindValues.length,
+  'parâmetros SQL do Health devem coincidir com os binds esperados');
+const healthCounts = sqlite.prepare(healthQuery).get(...healthBindValues);
+assert.equal(typeof healthCounts.highlight_overdue, 'number', 'contador de highlights vencidos deve existir');
 assert.equal(healthCounts.public_pending, status.publicPending);
 assert.equal(healthCounts.public_not_applicable, status.publicNotApplicable);
 assert.equal(healthCounts.public_eligibility_pending, status.publicEligibilityPending);

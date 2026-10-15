@@ -1,0 +1,18 @@
+{
+  "release": "R10R17.6-HF1",
+  "reason": "CI test SQL query bind regression",
+  "baselineGitHubBlobs": {
+    "cloudflare/push-worker/tests/test-postgame-competition-eligibility.mjs": "9d4b170057bdf11743e6223abbd96e7f34613dba",
+    ".github/workflows/deploy-push-worker.yml": "dc8a0814e7f70a66aa29aadcd905d0f3a7920fcb"
+  },
+  "files": {
+    "cloudflare/push-worker/tests/test-postgame-competition-eligibility.mjs": {
+      "sha256": "d75d05e4e42d3f28d9e3b9c4878915e96184684d381b97081a32303bfd0534b4",
+      "bytes": 7922
+    },
+    ".github/workflows/deploy-push-worker.yml": {
+      "sha256": "b4c35f2b422c6766c4a8a9abf3f160d51b2ebec7acfae94df35fc100753398b2",
+      "bytes": 58547
+    }
+  }
+}
