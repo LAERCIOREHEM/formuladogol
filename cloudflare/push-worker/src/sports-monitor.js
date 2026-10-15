@@ -13,6 +13,7 @@ import {
   SPORTS_ENGINE_CONSTANTS
 } from './sports-engine.js';
 import { countEligibleTargets, enqueueSportsEvent } from './push-dispatch.js';
+import { reconcilePendingGoalScorers, SCORER_PUSH_GRACE_SECONDS } from './scorer-push-reconciliation.js';
 import {
   PRECHECK_FROM_MS, PRECHECK_POLL_MS, READINESS_VERSION, RED_CARD_EVENT_POLICY_VERSION,
   resolveScoreboardEvent, extractRedCards, mergeRedCards, applyRedCardObservations,
@@ -726,7 +727,7 @@ export class SportsMonitor {
     const created = Number(inserted?.meta?.changes || 0) > 0;
     if (created) {
       try {
-        await enqueueSportsEvent(this.env, row.event_key);
+        await enqueueSportsEvent(this.env, row.event_key, { delaySeconds: row.event_type === 'goal' && !row.athlete_name ? SCORER_PUSH_GRACE_SECONDS : 0 });
       } catch (error) {
         console.error('sports_event_queue_enqueue_failed', row.event_key, String(error?.message || error));
       }
@@ -1159,6 +1160,13 @@ export class SportsMonitor {
           else scorerMissingAtDispatchThisPoll += 1;
         }
         if (await this.recordEvent(event)) newlyEmitted.push(event);
+      }
+      // Enrich already-confirmed goals before the queue expands their recipients.
+      // Once expanded, do not silently rewrite a push that may already be delivered.
+      try {
+        await reconcilePendingGoalScorers(this.env, game.eventId, Object.values(nextMatch.plays || {}));
+      } catch (error) {
+        sourceWarnings.push(`${game.league}/${game.eventId}/scorer-push-reconcile: ${text(error?.message || error)}`);
       }
       matches[game.eventId] = nextMatch;
 
