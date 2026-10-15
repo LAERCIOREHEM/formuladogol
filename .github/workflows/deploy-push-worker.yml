@@ -95,6 +95,14 @@ jobs:
       - name: Validar código
         run: npm run check
 
+      - name: R10R17.6 - Action Center (sintaxe, evidências e ciclo de alertas)
+        run: |
+          node --check src/health-action-center.js
+          node --check tests/test-health-action-center.mjs
+          node tests/test-health-action-center.mjs
+          node --check tests/test-health-action-snapshot.mjs
+          node tests/test-health-action-snapshot.mjs
+
       - name: R10R17.5 - scorer enrichment and push reconciliation
         run: node tests/test-scorer-push-reconciliation.mjs
 
@@ -321,6 +329,18 @@ jobs:
           NODE
           )"
 
+          # R10R17.6: contratos do Health derivam das mesmas constantes do runtime.
+          EXPECTED_HEALTH_POLICY="$(node --input-type=module <<'NODE'
+          import { HEALTH_POLICY_VERSION } from './src/health-monitor.js';
+          process.stdout.write(String(HEALTH_POLICY_VERSION));
+          NODE
+          )"
+          EXPECTED_ACTION_CENTER="$(node --input-type=module <<'NODE'
+          import { HEALTH_ACTION_CENTER_VERSION } from './src/health-action-center.js';
+          process.stdout.write(String(HEALTH_ACTION_CENTER_VERSION));
+          NODE
+          )"
+
           # R10R17-HF2: recusar deploy sem a regressão de competição do Match Identity Gate.
           if [[ "${EXPECTED_SEARCH_PROFILE}" != "10" ]]; then
             echo "::error::Match Identity Search Profile v10 obrigatório para bloquear fontes de outra competição."
@@ -340,6 +360,8 @@ jobs:
                  EXPECTED_MONITOR_FACTS="$EXPECTED_MONITOR_FACTS" \
                  EXPECTED_RED_CARD_POLICY="$EXPECTED_RED_CARD_POLICY" \
                  EXPECTED_POSTGAME="$EXPECTED_POSTGAME" \
+                 EXPECTED_HEALTH_POLICY="$EXPECTED_HEALTH_POLICY" \
+                 EXPECTED_ACTION_CENTER="$EXPECTED_ACTION_CENTER" \
                  AIG_AUTH_EXPECTED="${FDG_PUSH_AI_GATEWAY_TOKEN:+1}" \
                  API_FOOTBALL_EXPECTED="${FDG_PUSH_API_FOOTBALL_KEY:+1}" \
                  FEEDBACK_EXPECTED="${FDG_PUSH_RESEND_API_KEY:+1}" \
@@ -354,6 +376,8 @@ jobs:
           const expectedMonitorFacts = Number(process.env.EXPECTED_MONITOR_FACTS);
           const expectedRedCardPolicy = process.env.EXPECTED_RED_CARD_POLICY;
           const expectedPostgame = Number(process.env.EXPECTED_POSTGAME);
+          const expectedHealthPolicy = Number(process.env.EXPECTED_HEALTH_POLICY);
+          const expectedActionCenter = Number(process.env.EXPECTED_ACTION_CENTER);
           const problems = [];
           if (h.ok !== true) problems.push(`ok=${h.ok}`);
           if (h.revision !== expectedRevision) problems.push(`revision=${h.revision} esperado=${expectedRevision}`);
@@ -424,7 +448,8 @@ jobs:
           if (h.geminiSearch !== true) problems.push('geminiSearch!=true');
           if (h.workersAiExtraction !== true) problems.push('workersAiExtraction!=true');
           if (h.healthEmailMonitor !== true) problems.push('healthEmailMonitor!=true');
-          if (Number(h.healthMonitorPolicyVersion) !== 11) problems.push(`healthMonitorPolicyVersion=${h.healthMonitorPolicyVersion}`);
+          if (Number(h.healthMonitorPolicyVersion) !== expectedHealthPolicy) problems.push(`healthMonitorPolicyVersion=${h.healthMonitorPolicyVersion} esperado=${expectedHealthPolicy}`);
+          if (Number(h.healthActionCenterVersion) !== expectedActionCenter) problems.push(`healthActionCenterVersion=${h.healthActionCenterVersion} esperado=${expectedActionCenter}`);
           if (h.healthEmailDailyBrt !== '08:00') problems.push(`healthEmailDailyBrt=${h.healthEmailDailyBrt}`);
           if (h.healthEmailRecoveryUntilBrt !== '11:59') problems.push(`healthEmailRecoveryUntilBrt=${h.healthEmailRecoveryUntilBrt}`);
           if (h.healthMonitorCron !== '*/5 * * * *') problems.push(`healthMonitorCron=${h.healthMonitorCron}`);
@@ -560,6 +585,8 @@ jobs:
           const fs = require('fs');
           const s = JSON.parse(fs.readFileSync('/tmp/fdg-postgame-status.json', 'utf8'));
           const expectedPostgame = Number(process.env.EXPECTED_POSTGAME);
+          const expectedHealthPolicy = Number(process.env.EXPECTED_HEALTH_POLICY);
+          const expectedActionCenter = Number(process.env.EXPECTED_ACTION_CENTER);
           const expectedSearch = Number(process.env.EXPECTED_SEARCH_PROFILE);
           const problems = [];
           if (s.ok !== true) problems.push(`ok=${s.ok}`);
