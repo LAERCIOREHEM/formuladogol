@@ -5,9 +5,9 @@
   "etapa": "Execução 5 — histórico encadeado e avaliação científica preparada",
   "gerado_em": "2026-10-12T22:56:00-03:00",
   "referencia_esportiva_em": "2026-10-12T22:56:00-03:00",
-  "calculado_em": "2026-10-12T23:32:51-03:00",
+  "calculado_em": "2026-10-16T20:29:48-03:00",
   "status": "ok",
-  "hash_entrada": "f8235ab50bffadbf0dcc73ee887302bfaf2bcb393a3bbdf4e7518750001c2c2a",
+  "hash_entrada": "db8d97b1ef46d758f0b578b580de667cb10cec502f3f7f0e223024b9f0814dda",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -328,12 +328,12 @@
     "convergencia": {
       "erro_padrao_maximo_pontos_percentuais": 0.035355,
       "margem_95_maxima_pontos_percentuais": 0.069296,
-      "maior_diferenca_entre_metades_pontos_percentuais": 0.1147
+      "maior_diferenca_entre_metades_pontos_percentuais": 0.1793
     },
     "desempate_residual": {
-      "simulacoes_com_empate_apos_pontos_vitorias_saldo_gols": 13375,
-      "percentual_simulacoes": 0.66875,
-      "pares_residuais": 13422
+      "simulacoes_com_empate_apos_pontos_vitorias_saldo_gols": 13287,
+      "percentual_simulacoes": 0.66435,
+      "pares_residuais": 13325
     }
   },
   "tendencia_recente": {
@@ -365,7 +365,7 @@
   "diagnostico_af_score": {
     "disponivel": true,
     "cobertura_clubes": 20,
-    "correlacao_pearson_com_forca_map": 0.878586,
+    "correlacao_pearson_com_forca_map": 0.878049,
     "aplicado_na_producao": false,
     "motivo": "O AF-Score não possui série histórica homogênea em 2023–2025. Incluí-lo agora impediria backtesting temporal equivalente e poderia introduzir vazamento."
   },
