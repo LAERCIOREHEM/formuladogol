@@ -18,7 +18,7 @@ import {
   PRECHECK_FROM_MS, PRECHECK_POLL_MS, READINESS_VERSION, RED_CARD_EVENT_POLICY_VERSION,
   resolveScoreboardEvent, extractRedCards, mergeRedCards, applyRedCardObservations,
   extractLineupSnapshot, applyLineupObservation, dueReadinessCheckpoints, readinessSnapshot,
-  continentalReadinessPreOnly, CONTINENTAL_READINESS_GRACE_MS, aiResolverRequest, parseOpenAIJson
+  continentalReadinessPreOnly, shouldDeferReadinessPreAlert, CONTINENTAL_READINESS_GRACE_MS, aiResolverRequest, parseOpenAIJson
 } from './readiness-guardian.js';
 import { fetchEspnLivePlays, fetchEspnScorerEnrichment, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays, fetchEspnTechnicalLivePlays, fetchEspnTechnicalScoreboard } from './espn-source.js';
 import { buildHotEspnTestEvent, detectHotEspnMutation, HOT_ESPN_TEST_CONSTANTS, hotEspnSnapshot, publicHotEspnTest } from './hot-espn-test.js';
@@ -786,9 +786,7 @@ export class SportsMonitor {
 
     // ESPN 'pre' isolado em T+3 é observação transitória, não incidente crítico.
     // Em T+10, se persistir, o recheck promoverá o incidente e enviará o alerta.
-    const transientPreGrace = checkpoint === 'tplus3'
-      && continentalReadinessPreOnly(game, readiness)
-      && Date.parse(readiness?.checkedAt || '') < Date.parse(game?.kickoff || '') + CONTINENTAL_READINESS_GRACE_MS;
+    const transientPreGrace = shouldDeferReadinessPreAlert(game, readiness, checkpoint);
     const severity = transientPreGrace ? 'observing' : checkpoint === 'tplus3' ? 'critical' : checkpoint === 't10' ? 'warning' : 'observing';
     if (!current) {
       await this.env.DB.prepare(`
