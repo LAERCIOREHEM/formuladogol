@@ -748,6 +748,18 @@ export async function runHealthMonitor(env, monitor=null, now=Date.now()){
       daily='sent';
     }
 
+    // Reenvio extraordinário solicitado explicitamente para 17/10/2026.
+    // Não altera daily_digest_date nem o cron das 08:00; uma única entrega
+    // após o deploy, com deduplicação persistente no D1.
+    if (br.date===ONE_SHOT_REPORT_DATE && lastDigest===br.date &&
+        await metaGet(env,ONE_SHOT_REPORT_KEY)!=='sent' && snapshot.state==='green') {
+      const corrected=digestMessage(snapshot,now);
+      corrected.subject='[Fórmula do GOL] ✅ Health Report corrigido — reenvio único 17/10';
+      corrected.body=corrected.body.replace('relatório diário 08:00 BRT','reenvio extraordinário único · programação diária permanece 08:00 BRT');
+      const resendStatus=await sendMail(env,corrected);
+      await metaPut(env,ONE_SHOT_REPORT_KEY,resendStatus==='sent'?'sent':`retry:${text(resendStatus)}`);
+    }
+
     const incidentSync=await syncIncidents(env,snapshot,now,{dailySentThisRun});
     const overallRecovery=await syncOverallRecovery(env,previousSnapshot,snapshot,
       {dailySentThisRun,coveredByActionRecovery:incidentSync.recoveredSent>0||incidentSync.silentRecovery>0,now});
