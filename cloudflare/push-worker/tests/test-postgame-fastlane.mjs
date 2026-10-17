@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI, geminiCircuitState, geminiStructuralFailure, staticSeedRefreshIntervalMs } from '../src/postgame-fastlane.js';
+import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI, geminiCircuitState, geminiStructuralFailure, staticSeedRefreshIntervalMs, publicBudgetDecision, PUBLIC_POLICY } from '../src/postgame-fastlane.js';
 
 assert.equal(highlightTitleValid('FLAMENGO 1 X 0 BRAGANTINO | MELHORES MOMENTOS | BRASILEIRÃO 2026', 'Flamengo', 'Bragantino'), true);
 assert.equal(highlightTitleValid('FLAMENGO X BRAGANTINO | AQUECIMENTO AO VIVO | BRASILEIRÃO', 'Flamengo', 'Bragantino'), false);
@@ -9,6 +9,11 @@ assert.equal(highlightTitleValid('SANTOS 2 X 1 REMO | MELHORES MOMENTOS', 'Remo'
 
 // O dado curado do Pages não pode permanecer até 10 minutos sem chegar ao D1
 // enquanto um budget_guard ainda desencadeia incidente CRÍTICO.
+assert.equal(PUBLIC_POLICY.monthlyBudgetUsd,50);
+assert.equal(PUBLIC_POLICY.eventBudgetUsd,1);
+assert.equal(publicBudgetDecision({}, {month:{estimatedUsd:40},event:{estimatedUsd:0.5}}).allowOpenAI,true,'80% do teto mensal não bloqueia OpenAI');
+assert.equal(publicBudgetDecision({}, {month:{estimatedUsd:49.9},event:{estimatedUsd:1}}).allowOpenAI,false,'US$ 1 por partida bloqueia OpenAI');
+assert.equal(publicBudgetDecision({}, {month:{estimatedUsd:50},event:{estimatedUsd:0.1}}).hardStop,true,'US$ 50 bloqueia mensalmente');
 assert.equal(staticSeedRefreshIntervalMs(), 10 * 60_000);
 assert.equal(staticSeedRefreshIntervalMs({seedError:true}), 2 * 60_000);
 assert.equal(staticSeedRefreshIntervalMs({hasBudgetGuard:true}), 60_000);
