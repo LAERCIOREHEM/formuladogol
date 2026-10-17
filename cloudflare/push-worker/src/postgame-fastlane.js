@@ -1153,7 +1153,7 @@ export function publicBudgetDecision(env = {}, costSummary = null) {
   const monthPct = monthlyBudgetUsd > 0 ? (monthEstimatedUsd / monthlyBudgetUsd) * 100 : 0;
   return {
     eventBudgetUsd, monthlyBudgetUsd, warningPct, eventEstimatedUsd, monthEstimatedUsd, monthPct,
-    allowGemini: monthEstimatedUsd < monthlyBudgetUsd,
+    allowGemini: eventEstimatedUsd < eventBudgetUsd && monthEstimatedUsd < monthlyBudgetUsd,
     allowOpenAI: eventEstimatedUsd < eventBudgetUsd && monthEstimatedUsd < monthlyBudgetUsd,
     hardStop: monthEstimatedUsd >= monthlyBudgetUsd,
     reason: monthEstimatedUsd >= monthlyBudgetUsd ? 'monthly_budget_exhausted'
