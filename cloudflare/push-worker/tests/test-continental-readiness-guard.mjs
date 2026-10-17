@@ -19,5 +19,6 @@ assert.equal(continentalReadinessPreOnly(game,absent),false);
 const notInitialized=readinessSnapshot(game,resolved,{initialized:false,state:'pre'}, {},'tplus3',now);
 assert.equal(continentalReadinessPreOnly(game,notInitialized),false);
 const br=readinessSnapshot({...game,league:'bra.1'},resolved,{initialized:true,state:'pre'}, {},'tplus3',now);
-assert.equal(continentalReadinessPreOnly({...game,league:'bra.1'},br),false);
-console.log('PASS R10R17.4: continental readiness and false-alarm guard');
+assert.equal(continentalReadinessPreOnly({...game,league:'bra.1'},br),true, 'R10R17.8: Série A também tem tolerância ESPN PRE');
+assert.equal(continentalReadinessPreOnly({...game,league:'bra.2'},br),false, 'outras ligas não ganham tolerância indevida');
+console.log('PASS R10R17.4/R10R17.8: continental + Serie A ESPN PRE false-alarm guard');
