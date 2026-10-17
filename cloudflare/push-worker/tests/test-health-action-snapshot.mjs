@@ -59,7 +59,7 @@ globalThis.fetch=async function(url){
 };
 try{
   const shot=await collectHealthSnapshot(env,{ok:true,activeGames:0,lastPollAt:now,readinessRed:0},now,true);
-  assert.equal(shot.policyVersion,12);
+  assert.equal(shot.policyVersion,13);
   assert.equal(shot.healthActionCenterVersion,1);
   assert.equal(shot.indicators.length,17);
   assert.equal(shot.indicators.find(i=>i.id==='github')?.severity,'green');
@@ -77,6 +77,9 @@ try{
   // Falhas ainda sem sucesso posterior devem passar a amarelo e expor causa/HTTP.
   for(let i=0;i<2;i++)sqlite.prepare(`INSERT INTO ai_provider_ledger(provider,purpose,event_id,phase,ok,http_status,detail,created_at)
     VALUES (?,?,?,?,?,?,?,?)`).run('openai','postgame','e2','source_search',0,503,'upstream_unavailable','2026-10-15T10:55:00Z');
+  // Falha só reduz saúde quando há uma tarefa elegível pendente com o mesmo ID.
+  sqlite.prepare(`INSERT INTO postgame_fastlane(event_id,league,home,away,kickoff,final_at,public_status,highlight_status)
+    VALUES (?,?,?,?,?,?,?,?)`).run('e2','bra.1','Mirassol','Internacional','2026-10-15T08:00:00Z','2026-10-15T10:00:00Z','pending','resolved');
   const ongoing=await collectHealthSnapshot(env,{ok:true,activeGames:0,lastPollAt:now,readinessRed:0},now,true);
   assert.equal(ongoing.indicators.find(i=>i.id==='openai')?.severity,'yellow');
   assert.equal(ongoing.providerUnrecoveredFailures,2);
