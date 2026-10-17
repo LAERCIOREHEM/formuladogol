@@ -682,6 +682,13 @@ export async function syncIncidents(env,snapshot,now=Date.now(),{dailySentThisRu
     const action={id,label:text(current.label),severity:'green',problem:text(current.detail),impact:'Componente normalizado.',
       evidence:[],responsibility:'OBSERVE',recommendation:'Nenhuma ação adicional.',nextCheck:'No ciclo seguinte.',
       link:'https://push.formuladogol.com.br/v1/health-monitor/status'};
+    // O relatório consolidado já comunica a recuperação: evitar segundo email no mesmo ciclo.
+    if (dailySentThisRun) {
+      await env.DB.prepare("UPDATE health_incidents SET status='resolved',resolved_at=?,email_status='recovered_covered_by_digest' WHERE incident_key=?")
+        .bind(iso(now),row.incident_key).run();
+      silentRecovery += 1;
+      continue;
+    }
     const status=await sendMail(env,healthActionMessage(action,snapshot,{recovered:true,now}));
     if(status==='sent'){
       recoveredSent += 1;
@@ -712,7 +719,7 @@ export async function runHealthMonitor(env, monitor=null, now=Date.now()){
     metaGet(env,'daily_digest_date'),metaGet(env,'last_daily_attempt_at'),metaGet(env,'daily_attempts_date'),metaGet(env,'daily_attempts_today'),metaGet(env,'last_daily_attempt_status')
   ]);
   const decision=dailyDigestDecision(br,lastDigest,{lastAttemptAt:attemptDate===br.date?lastAttemptAt:'',now});
-  let snapshot=null; let daily=decision.state; let dailySentThisRun=false;
+  let snapshot=null; let daily=decision.state; let dailySentThisRun=false; let correctedSentThisRun=false;
   try {
     const previousSnapshot=safeJson(await metaGet(env,'snapshot'),null);
     snapshot=await collectHealthSnapshot(env,monitor,now,false);
@@ -757,12 +764,13 @@ export async function runHealthMonitor(env, monitor=null, now=Date.now()){
       corrected.subject='[Fórmula do GOL] ✅ Health Report corrigido — reenvio único 17/10';
       corrected.body=corrected.body.replace('relatório diário 08:00 BRT','reenvio extraordinário único · programação diária permanece 08:00 BRT');
       const resendStatus=await sendMail(env,corrected);
-      await metaPut(env,ONE_SHOT_REPORT_KEY,resendStatus==='sent'?'sent':`retry:${text(resendStatus)}`);
+      correctedSentThisRun=resendStatus==='sent';
+      await metaPut(env,ONE_SHOT_REPORT_KEY,correctedSentThisRun?'sent':`retry:${text(resendStatus)}`);
     }
 
-    const incidentSync=await syncIncidents(env,snapshot,now,{dailySentThisRun});
+    const incidentSync=await syncIncidents(env,snapshot,now,{dailySentThisRun:dailySentThisRun||correctedSentThisRun});
     const overallRecovery=await syncOverallRecovery(env,previousSnapshot,snapshot,
-      {dailySentThisRun,coveredByActionRecovery:incidentSync.recoveredSent>0||incidentSync.silentRecovery>0,now});
+      {dailySentThisRun:dailySentThisRun||correctedSentThisRun,coveredByActionRecovery:incidentSync.recoveredSent>0||incidentSync.silentRecovery>0,now});
     const completed={at:iso(now),state:snapshot.state,daily,overallRecovery:overallRecovery.status};
     await Promise.all([metaPut(env,'last_health_completed_at',iso(now)),metaPut(env,'last_health_run',JSON.stringify(completed)),metaPut(env,'last_health_error','')]);
     return {ok:true,state:snapshot.state,daily,snapshot};
