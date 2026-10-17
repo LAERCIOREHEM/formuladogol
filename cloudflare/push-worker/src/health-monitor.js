@@ -277,7 +277,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/rag-manifest.json`),
     fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/estado-confiabilidade.json`),
     fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/agenda-clubes-br.json`),
-    fetchJson(`${ORCH}/health`), fetchJson(`${ORCH}/status`), aiUsageSummary(env,24), providerUsageSummary(env,24),
+    fetchJson(`${ORCH}/health`), fetchJson(`${ORCH}/status`), aiUsageSummary(env,24), providerUsageSummary(env,24,now),
     env.DB.prepare(`SELECT COUNT(*) total,
       COALESCE(SUM(CASE WHEN league='bra.1' AND public_status='resolved' THEN 1 ELSE 0 END),0) public_resolved,
       COALESCE(SUM(CASE WHEN league='bra.1' AND public_status='pending' THEN 1 ELSE 0 END),0) public_searching,
