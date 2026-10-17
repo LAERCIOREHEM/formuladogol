@@ -89,7 +89,7 @@ export async function recordAiUsage(env, row = {}) {
   }
 }
 
-export async function aiUsageSummary(env, hours = 24) {
+export async function aiUsageSummary(env, hours = 24, now = Date.now()) {
   const h = Math.min(168, Math.max(1, Number(hours || 24)));
   const cutoff = new Date(now - h * 3600_000).toISOString();
   const totals = await env.DB.prepare(`SELECT COUNT(*) calls, COALESCE(SUM(web_search_calls),0) web_searches,
@@ -125,7 +125,7 @@ export async function recordProviderUsage(env, row = {}) {
 
 export async function providerUsageSummary(env, hours = 24, now = Date.now()) {
   const h = Math.min(744, Math.max(1, Number(hours || 24)));
-  const cutoff = new Date(Date.now() - h * 3600_000).toISOString();
+  const cutoff = new Date(now - h * 3600_000).toISOString();
   try {
     const totals = await env.DB.prepare(`SELECT COUNT(*) calls, COALESCE(SUM(search_calls),0) searches,
       COALESCE(SUM(input_tokens),0) input_tokens, COALESCE(SUM(output_tokens),0) output_tokens,
