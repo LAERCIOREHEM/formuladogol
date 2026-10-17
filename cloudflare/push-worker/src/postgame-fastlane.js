@@ -57,9 +57,9 @@ export const PUBLIC_POLICY = Object.freeze({
   geminiProbeCacheMinutes: 15,
   openaiMaxToolCalls: 6,
   batchPerRun: 6,
-  eventBudgetUsd: 0.25,
-  monthlyBudgetUsd: 10.00,
-  monthlyWarningPct: 80,
+  eventBudgetUsd: 1.00,
+  monthlyBudgetUsd: 50.00,
+  monthlyWarningPct: 100,
 });
 
 const GEMINI_CIRCUIT_META_KEY = 'gemini_search_circuit_v10';
@@ -1154,11 +1154,10 @@ export function publicBudgetDecision(env = {}, costSummary = null) {
   return {
     eventBudgetUsd, monthlyBudgetUsd, warningPct, eventEstimatedUsd, monthEstimatedUsd, monthPct,
     allowGemini: monthEstimatedUsd < monthlyBudgetUsd,
-    allowOpenAI: eventEstimatedUsd < eventBudgetUsd && monthPct < warningPct,
+    allowOpenAI: eventEstimatedUsd < eventBudgetUsd && monthEstimatedUsd < monthlyBudgetUsd,
     hardStop: monthEstimatedUsd >= monthlyBudgetUsd,
     reason: monthEstimatedUsd >= monthlyBudgetUsd ? 'monthly_budget_exhausted'
-      : eventEstimatedUsd >= eventBudgetUsd ? 'event_budget_openai_guard'
-      : monthPct >= warningPct ? 'monthly_budget_openai_guard' : '',
+      : eventEstimatedUsd >= eventBudgetUsd ? 'event_budget_openai_guard' : '',
   };
 }
 
