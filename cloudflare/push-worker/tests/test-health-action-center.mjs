@@ -31,7 +31,7 @@ const recoveredAI=buildActionCenter({...mock,indicators:[{id:'openai',label:'IA 
 assert.equal(recoveredAI.requiresAttention.length,0,'35 falhas históricas não entram na Central de Ações');
 assert.ok(recoveredAI.informational.some(x=>x.includes('históricas/24h')));
 const spike=buildActionCenter({...mock,postgame:{...mock.postgame,cost:{last24h:{estimatedUsd:5.1},budget:{monthlyBudgetUsd:50}}}},now);
-assert.match(spike.requiresAttention.find(x=>x.id==='openai').recommendation,/US\\$ 5 em 24 horas/);
+assert.ok(spike.requiresAttention.find(x=>x.id==='openai').recommendation.includes('US$ 5 em 24 horas'));
 
 assert.equal(plan.requiresAttention.length,2);
 assert.ok(plan.requiresAttention.find(a=>a.id==='openai').evidence.some(x=>x.includes('HTTP 429')),'provider HTTP evidence');
