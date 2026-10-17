@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-16T22:15:58.974226-03:00",
+  "gerado_em": "2026-10-17T00:03:54.265511-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 300,
   "total_com_estatisticas": 300,
-  "total_com_publico": 298,
+  "total_com_publico": 299,
   "total_com_eventos": 300,
   "total_com_jogadores": 300,
   "total_eventos_validados": 300,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Estadio Municipal José Maria de Campos Maia",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 5931,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://noataque.com.br/futebol/brasileirao-serie-a/time/internacional/noticia/2026/10/16/goleiro-matheus-cunha-e-expulso-inter-perde-para-o-mirassol-e-segue-no-z4-do-brasileirao/",
       "arbitro": "",
       "stats": [
         {
@@ -605,7 +605,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-16T22:15:58.887905-03:00"
+      "atualizado_em": "2026-10-16T22:15:58.887905-03:00",
+      "renda": 149435
     },
     "401841260": {
       "event_id": "401841260",
@@ -169596,5 +169597,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 271,
+  "total_com_renda": 299
 }
