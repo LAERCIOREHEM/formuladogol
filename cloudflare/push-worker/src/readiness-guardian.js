@@ -350,14 +350,16 @@ export function dueReadinessCheckpoints(game, preflightState = {}, nowMs = Date.
 }
 
 
-// R10R17.4: diferir somente falso-alarme de status pré-jogo continental.
-// Falta de ID, erro de identidade ou monitor não inicializado permanecem críticos.
-export const CONTINENTAL_READINESS_GRACE_MS = 10 * 60_000;
+// R10R17.8: a ESPN pode manter 'pre' por alguns minutos após o início
+// tanto no Brasileirão quanto nas competições continentais. Somente o
+// status PRE isolado recebe tolerância até T+10; falha de identidade, evento
+// ausente ou monitor não inicializado continuam gerando alertas imediatos.
+export const CONTINENTAL_READINESS_GRACE_MS = 10 * 60_000; // nome legado, agora compartilhado
 export function continentalReadinessPreOnly(game, readiness) {
   const league = String(game?.league || '').toLowerCase();
-  const continental = league.startsWith('conmebol.') || league.startsWith('uefa.');
+  const eligible = league === 'bra.1' || league.startsWith('conmebol.') || league.startsWith('uefa.');
   const reasons = Array.isArray(readiness?.reasons) ? readiness.reasons : [];
-  return continental && readiness?.ready === false
+  return eligible && readiness?.ready === false
     && readiness?.identityOk === true && readiness?.monitorInitialized === true
     && reasons.length === 1 && reasons[0] === 'espn_still_pre_after_tplus3';
 }
