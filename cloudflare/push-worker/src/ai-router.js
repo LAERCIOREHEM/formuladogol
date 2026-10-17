@@ -208,8 +208,22 @@ export async function fetchSourceText(url){
  try{ const r=await fetch(u,{redirect:'follow',headers:{'user-agent':'Mozilla/5.0 (compatible; FormulaDoGol/1.0; +https://formuladogol.com.br)','accept':'text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.5','accept-language':'pt-BR,pt;q=0.9,en;q=0.5'}}); if(!r.ok)return{ok:false,url:r.url||u,text:'',reason:`http_${r.status}`}; const type=text(r.headers.get('content-type')); const raw=await r.text(); return {ok:true,url:normalizeUrl(r.url)||u,text:type.includes('html')?htmlToText(raw):text(raw).slice(0,50000)}; }catch(e){return{ok:false,url:u,text:'',reason:`fetch_error:${text(e?.message||e).slice(0,160)}`};}
 }
 
+// R10R17.8: somente IDs de modelos Workers AI ativos e documentados podem
+// ser usados na extração factual; overrides legados/depreciados caem no modelo seguro.
+export const WORKERS_AI_EXTRACT_DEFAULT_MODEL = '@cf/meta/llama-3.1-8b-instruct-fp8';
+const WORKERS_AI_EXTRACT_SUPPORTED_MODELS = new Set([
+  WORKERS_AI_EXTRACT_DEFAULT_MODEL,
+  '@cf/meta/llama-3.1-8b-instruct-fast',
+  '@cf/meta/llama-3.1-8b-instruct-fp8-fast',
+  '@cf/meta/llama-3.3-70b-instruct-fp8-fast'
+]);
+export function resolveWorkersAiExtractModel(env){
+  const configured=text(env?.WORKERS_AI_EXTRACT_MODEL);
+  return WORKERS_AI_EXTRACT_SUPPORTED_MODELS.has(configured) ? configured : WORKERS_AI_EXTRACT_DEFAULT_MODEL;
+}
+
 export async function extractPublicWithWorkersAI(env,task,source){
- const model=text(env?.WORKERS_AI_EXTRACT_MODEL)||'@cf/meta/llama-3.1-8b-instruct';
+ const model=resolveWorkersAiExtractModel(env);
  if(!workersAiConfigured(env)||!source?.text) return {found:false,reason:'workers_ai_unavailable',model};
  const prompt=`Extraia somente dados explícitos deste texto sobre ${text(task.home)} x ${text(task.away)}. Não estime. Retorne APENAS JSON válido: {"encontrado":true|false,"publico":integer|null,"publico_pagante":integer|null,"renda":number|null,"confianca":number}. Público é presença total; pagantes é separado; renda em reais. TEXTO: ${source.text}`;
  const started=Date.now();
