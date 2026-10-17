@@ -180,8 +180,8 @@ assert.equal(publicSlaAlertAllowed(oldFinished,Date.parse('2026-10-08T17:00:00.0
 assert.equal(publicSlaAlertAllowed(oldFinished,Date.parse('2026-10-08T17:00:00.000Z'),''),true);
 assert.equal(PUBLIC_POLICY.overdueGeminiEveryMinutes,60);
 assert.equal(PUBLIC_POLICY.overdueOpenaiEveryMinutes,180);
-assert.equal(PUBLIC_POLICY.eventBudgetUsd,0.25);
-assert.equal(PUBLIC_POLICY.monthlyBudgetUsd,10);
+assert.equal(PUBLIC_POLICY.eventBudgetUsd,1);
+assert.equal(PUBLIC_POLICY.monthlyBudgetUsd,50);
 assert.equal(PUBLIC_POLICY.geminiCircuitStructuralMinutes,30);
 assert.equal(PUBLIC_POLICY.geminiCircuitSoftMinutes,15);
 assert.equal(PUBLIC_POLICY.geminiProbeCacheMinutes,15);
@@ -222,9 +222,9 @@ assert.equal(sourceQuality('https://x.com/qualquer/status/1'),'rejected');
 
 const decision=publicBudgetDecision({POSTGAME_PUBLIC_EVENT_BUDGET_USD:'0.25',POSTGAME_PUBLIC_MONTHLY_BUDGET_USD:'10',POSTGAME_PUBLIC_MONTHLY_WARNING_PCT:'80'}, {event:{estimatedUsd:0.26},month:{estimatedUsd:1}});
 assert.equal(decision.allowOpenAI,false);
-assert.equal(decision.allowGemini,true);
+assert.equal(decision.allowGemini,false);
 assert.equal(decision.reason,'event_budget_openai_guard');
-const hard=publicBudgetDecision({}, {event:{estimatedUsd:0.01},month:{estimatedUsd:10.1}});
+const hard=publicBudgetDecision({}, {event:{estimatedUsd:0.01},month:{estimatedUsd:50.1}});
 assert.equal(hard.allowOpenAI,false); assert.equal(hard.allowGemini,false); assert.equal(hard.hardStop,true);
 
 assert.equal(parseEspnAttendance({gameInfo:{attendance:42317}}),42317);
