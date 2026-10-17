@@ -1,9 +1,21 @@
 import assert from 'node:assert/strict';
 import { countWebSearchCalls, estimateProviderCost } from '../src/ai-usage.js';
-import { dailyDigestDecision, githubActionsSeverity, isDailyDigestDue, summarizeCloudflareWorkersUsage, postgameDigestLines, overallRecoveryDecision, reliabilityIntelligenceIndicators, continentalAgendaHealth } from '../src/health-monitor.js';
+import { dailyDigestDecision, githubActionsSeverity, isDailyDigestDue, summarizeCloudflareWorkersUsage, postgameDigestLines, overallRecoveryDecision, aiCostHealthSeverity, HUNTER_DAILY_WARNING_USD, HUNTER_DAILY_CRITICAL_USD, reliabilityIntelligenceIndicators, continentalAgendaHealth } from '../src/health-monitor.js';
 
 assert.equal(countWebSearchCalls({output:[{type:'web_search_call'},{type:'message'},{type:'web_search_call'}]}),2);
 assert.equal(countWebSearchCalls({}),0);
+
+// R10R17.9 — 35 erros já superados + 0 pendências não degradam a saúde.
+assert.equal(HUNTER_DAILY_WARNING_USD,5);
+assert.equal(HUNTER_DAILY_CRITICAL_USD,10);
+assert.equal(aiCostHealthSeverity({dayUsd:0.3718,activePending:0,providerFailures:35,unrecovered:27,providersReady:true,perEventAnomaly:true}),'green');
+assert.equal(aiCostHealthSeverity({dayUsd:4.9999}),'green');
+assert.equal(aiCostHealthSeverity({dayUsd:5}),'yellow');
+assert.equal(aiCostHealthSeverity({dayUsd:10}),'red');
+assert.equal(aiCostHealthSeverity({dayUsd:0.1,activePending:1,providerFailures:9,unrecovered:8}),'yellow');
+assert.equal(aiCostHealthSeverity({dayUsd:0.1,activePending:1,providerFailures:9,unrecovered:0}),'green');
+assert.equal(aiCostHealthSeverity({dayUsd:0.1,activePending:1,providersReady:false}),'yellow');
+
 
 assert.equal(githubActionsSeverity({dormant:true,dispatches:4,previousDispatches:4,pendingPostgameTasks:0,hoursToNext:240,hasPrevious:true}).severity,'green');
 assert.equal(githubActionsSeverity({dormant:true,dispatches:5,previousDispatches:4,pendingPostgameTasks:0,hoursToNext:240,hasPrevious:true}).severity,'red');
