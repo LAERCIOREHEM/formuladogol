@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI, geminiCircuitState, geminiStructuralFailure, staticSeedRefreshIntervalMs, publicBudgetDecision, PUBLIC_POLICY } from '../src/postgame-fastlane.js';
+import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI, geminiCircuitState, geminiStructuralFailure, staticSeedRefreshIntervalMs } from '../src/postgame-fastlane.js';
 
 assert.equal(highlightTitleValid('FLAMENGO 1 X 0 BRAGANTINO | MELHORES MOMENTOS | BRASILEIRÃO 2026', 'Flamengo', 'Bragantino'), true);
 assert.equal(highlightTitleValid('FLAMENGO X BRAGANTINO | AQUECIMENTO AO VIVO | BRASILEIRÃO', 'Flamengo', 'Bragantino'), false);
