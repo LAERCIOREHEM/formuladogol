@@ -763,7 +763,7 @@ export async function runHealthMonitor(env, monitor=null, now=Date.now()){
     // Não altera daily_digest_date nem o cron das 08:00; uma única entrega
     // após o deploy, com deduplicação persistente no D1.
     if (br.date===ONE_SHOT_REPORT_DATE && lastDigest===br.date &&
-        await metaGet(env,ONE_SHOT_REPORT_KEY)!=='sent' && snapshot.state==='green') {
+        await metaGet(env,ONE_SHOT_REPORT_KEY)!=='sent') {
       const corrected=digestMessage(snapshot,now);
       corrected.subject='[Fórmula do GOL] ✅ Health Report corrigido — reenvio único 17/10';
       corrected.body=corrected.body.replace('relatório diário 08:00 BRT','reenvio extraordinário único · programação diária permanece 08:00 BRT');
@@ -799,6 +799,7 @@ export async function healthMonitorStatus(env,now=Date.now()){
     dailyDigestDate:digestDate,
     dailyDelivery:{targetDate:targetDate||br.date,state:deliveryState,attemptsToday:attemptDate===br.date?n(attemptsRaw):0,lastAttemptAt,lastAttemptStatus,lastAttemptError,lastSentAt,nextAttemptAt:decision.nextAttemptAt||null,recoveryWindowBrt:'08:00-11:59'},
     overallRecovery:{lastSentAt:lastOverallRecoveryAt,lastStatus:lastOverallRecoveryStatus,pending:Boolean(safeJson(overallRecoveryPending,null)),preservesDailySchedule:true},
+    correctedReport:{date:ONE_SHOT_REPORT_DATE,status:(await metaGet(env,ONE_SHOT_REPORT_KEY))==='sent'?'SENT':'PENDING',extraOnly:true,dailySchedulePreserved:true},
     scheduler:{healthCron:'*/5 * * * *',lastStartedAt:startedAt,lastCompletedAt:completedAt,stale,lastError:lastHealthError}
   };
 }
