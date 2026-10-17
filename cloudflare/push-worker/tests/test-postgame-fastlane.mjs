@@ -1,11 +1,18 @@
 import assert from 'node:assert/strict';
-import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI, geminiCircuitState, geminiStructuralFailure } from '../src/postgame-fastlane.js';
+import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI, geminiCircuitState, geminiStructuralFailure, staticSeedRefreshIntervalMs } from '../src/postgame-fastlane.js';
 
 assert.equal(highlightTitleValid('FLAMENGO 1 X 0 BRAGANTINO | MELHORES MOMENTOS | BRASILEIRÃO 2026', 'Flamengo', 'Bragantino'), true);
 assert.equal(highlightTitleValid('FLAMENGO X BRAGANTINO | AQUECIMENTO AO VIVO | BRASILEIRÃO', 'Flamengo', 'Bragantino'), false);
 assert.equal(highlightTitleValid('CORINTHIANS 1 X 3 FLUMINENSE | GOLS E MELHORES MOMENTOS', 'Corinthians', 'Fluminense'), true);
 assert.equal(highlightTitleValid('CORINTHIANS X FLUMINENSE | AO VIVO SEM IMAGENS', 'Corinthians', 'Fluminense'), false);
 assert.equal(highlightTitleValid('SANTOS 2 X 1 REMO | MELHORES MOMENTOS', 'Remo', 'Santos'), true);
+
+// O dado curado do Pages não pode permanecer até 10 minutos sem chegar ao D1
+// enquanto um budget_guard ainda desencadeia incidente CRÍTICO.
+assert.equal(staticSeedRefreshIntervalMs(), 10 * 60_000);
+assert.equal(staticSeedRefreshIntervalMs({seedError:true}), 2 * 60_000);
+assert.equal(staticSeedRefreshIntervalMs({hasBudgetGuard:true}), 60_000);
+assert.equal(staticSeedRefreshIntervalMs({seedError:true,hasBudgetGuard:true}), 60_000);
 
 assert.equal(retryMinutes('highlight', 1, 0), 1);
 assert.equal(retryMinutes('highlight', 4, 0), 5);
