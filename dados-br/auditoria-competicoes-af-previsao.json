@@ -2,7 +2,7 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-10-16T20:28:10-03:00",
+  "gerado_em": "2026-10-16T22:17:45-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "af_snapshot_seguro": true,
@@ -19,12 +19,12 @@
       "status": "preservado_apos_falha_seguro",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
       "gerado_em": "2026-09-15T05:13:36-03:00",
-      "cache_efetivo_minutos": 0,
+      "cache_efetivo_minutos": 45,
       "erro": "copa_do_brasil: RuntimeError: copa_do_brasil: scoreboard ESPN falhou também em janela diária 20260925-20260925: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard?dates=20260925-20260925&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request",
       "fallback_seguro_para_af": true,
       "motivos_fallback": [],
       "alertas_fallback": [
-        "snapshot anterior tem 759.2h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
+        "snapshot anterior tem 761.1h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
       ],
       "summary_partidas_iniciadas": {
         "consultados": 0,
@@ -48,12 +48,12 @@
       "status": "preservado_apos_falha_seguro",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
       "gerado_em": "2026-09-18T11:40:56-03:00",
-      "cache_efetivo_minutos": 0,
+      "cache_efetivo_minutos": 45,
       "erro": "libertadores: RuntimeError: libertadores: scoreboard ESPN falhou também em janela diária 20260925-20260925: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=20260925-20260925&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request",
       "fallback_seguro_para_af": true,
       "motivos_fallback": [],
       "alertas_fallback": [
-        "snapshot anterior tem 680.8h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
+        "snapshot anterior tem 682.6h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
       ],
       "summary_partidas_iniciadas": {
         "consultados": 0,
@@ -77,12 +77,12 @@
       "status": "preservado_apos_falha_seguro",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
       "gerado_em": "2026-09-18T11:40:56-03:00",
-      "cache_efetivo_minutos": 0,
+      "cache_efetivo_minutos": 45,
       "erro": "sul_americana: RuntimeError: sul_americana: scoreboard ESPN falhou também em janela diária 20260925-20260925: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard?dates=20260925-20260925&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request",
       "fallback_seguro_para_af": true,
       "motivos_fallback": [],
       "alertas_fallback": [
-        "snapshot anterior tem 680.8h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
+        "snapshot anterior tem 682.6h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
       ],
       "summary_partidas_iniciadas": {
         "consultados": 0,
@@ -111,14 +111,14 @@
   "fontes_totalmente_atualizadas": false,
   "snapshots_prontos_para_af": true,
   "regras_operacionais": {
-    "cache_padrao_minutos": 0,
+    "cache_padrao_minutos": 45,
     "cache_janela_de_jogo_minutos": 5,
     "janela_de_jogo_horas_apos_inicio": 4,
     "janela_incremental_dias_passado": 21,
     "janela_incremental_dias_futuro": 120,
     "janela_scoreboard_dias": 7,
     "fallback_janela_scoreboard": "subdivisão progressiva até 1 dia em erro HTTP/transporte",
-    "reconstrucao_completa_horas": 0,
+    "reconstrucao_completa_horas": 168,
     "falha_de_rede": "preserva o último snapshot íntegro; --strict transforma a falha em erro",
     "nenhum_json_vazio": true
   }
