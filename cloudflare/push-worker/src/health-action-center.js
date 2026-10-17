@@ -71,21 +71,20 @@ export function buildActionCenter(snapshot = {}, now = Date.now()) {
         action.evidence = [...byProvider.slice(0,4), ...failures.slice(0,MAX_ERROR_ROWS).map(v =>
           clean(`${v.provider}/${v.purpose}${v.eventId ? ` [${v.eventId}]` : ''} · HTTP ${v.httpStatus == null ? 'sem resposta' : v.httpStatus} · ${v.detail || 'detalhe não informado'} · ${v.recovered ? 'sucesso posterior no mesmo evento/finalidade' : 'sem recuperação comprovada'}`, 350))];
         const budget = snapshot.postgame?.cost?.budget || {};
-        const pct = n(budget.monthPct);
+        const dayUsd=n(snapshot.postgame?.cost?.last24h?.estimatedUsd);
         const failed = n(p.failures);
-        const unresolved = snapshot.providerUnrecoveredFailures;
-        action.impact = 'Falhas de provedores podem atrasar enriquecimento factual; o orçamento do Hunter pode limitar buscas pagas.';
-        if (pct >= 100) {
+        action.impact = 'Consumo anormal em 24h ou falha ativa de IA afetando uma tarefa.';
+        if (dayUsd >= 5) {
           action.responsibility = 'MANUAL';
-          action.recommendation = 'Orçamento mensal atingido. Revisar consumo e fontes; qualquer aumento do teto exige decisão explícita. Não aumentar automaticamente.';
-        } else if (failed > 3 && (unresolved == null || n(unresolved)>0)) {
+          action.recommendation = dayUsd >= 10
+            ? 'Pico crítico de US$ 10 em 24 horas. Conferir ledger e suspender loops anômalos; não elevar automaticamente limites.'
+            : 'Pico de US$ 5 em 24 horas. Conferir tarefas e distribuição de custos; sem necessidade de alterar orçamento automaticamente.';
+          action.evidence.unshift(`Consumo Hunter 24h: US$ ${dayUsd.toFixed(4)}; orçamento mensal: US$ ${n(budget.monthlyBudgetUsd||50).toFixed(2)} (informativo)`);
+        } else if (n(snapshot.postgame?.pending)>0 && failed > 3) {
           action.responsibility = 'AUTO';
-          action.recommendation = 'Consultar os HTTP/códigos de erro acima. O fallback continua ativo; intervir somente se houver tarefa sem resultado ou erro persistente de autenticação.';
-        } else if (pct >= n(budget.warningPct || 80)) {
-          action.responsibility = 'MANUAL';
-          action.recommendation = 'Consumo próximo do teto mensal. Revisar buscas por evento e decidir se mantém o limite atual; não atualizar secrets nem ampliar orçamento sem diagnóstico.';
+          action.recommendation = 'Falhas ainda impactam partidas pendentes. Verificar HTTP, autenticação e fallback; não intervir se o fluxo se recuperar.';
         } else {
-          action.recommendation = 'Revisar logs de IA e confirmar se alguma tarefa continua pendente; não trocar chaves preventivamente.';
+          action.recommendation = 'Verificar conectividade e configurações de provedores necessárias para tarefas ainda pendentes.';
         }
         action.link = 'https://push.formuladogol.com.br/v1/health-monitor/status';
         break;
@@ -139,8 +138,10 @@ export function buildActionCenter(snapshot = {}, now = Date.now()) {
   if(postWait>0) result.informational.push(`Pós-jogo: ${postWait} pendência(s) ainda dentro do SLA de público/renda; Hunter em operação.`);
   const highlightWait = n(snapshot.postgame?.highlightPending) - n(snapshot.postgame?.highlightOverdue);
   if(highlightWait>0) result.informational.push(`Melhores Momentos: ${highlightWait} pendência(s) ainda no prazo de tolerância.`);
-  if (n(p.failures)>0 && n(snapshot.providerUnrecoveredFailures)===0 && snapshot.providerUnrecoveredFailures != null) {
-    result.informational.push(`IA: ${p.failures} falha(s) com sucesso posterior registrado no mesmo evento/finalidade; acompanhar sem intervenção.`);
+  if (n(p.failures)>0 && n(snapshot.postgame?.pending)===0 && !result.requiresAttention.some(a=>a.id==='openai')) {
+    result.informational.push(`IA: ${p.failures} falha(s) históricas/24h, sem tarefa de público/renda pendente; não reduzem a saúde geral.`);
+  } else if (n(p.failures)>0 && n(snapshot.providerUnrecoveredFailures)===0 && snapshot.providerUnrecoveredFailures != null) {
+    result.informational.push(`IA: ${p.failures} falha(s) com recuperação registrada; acompanhar sem intervenção.`);
   }
   return result;
 }
