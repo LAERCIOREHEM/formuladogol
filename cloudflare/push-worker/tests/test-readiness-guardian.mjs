@@ -6,6 +6,9 @@ import {
   resolveScoreboardEvent,
   dueReadinessCheckpoints,
   readinessSnapshot,
+  continentalReadinessPreOnly,
+  shouldDeferReadinessPreAlert,
+  CONTINENTAL_READINESS_GRACE_MS,
   extractRedCards,
   applyRedCardObservations,
   extractLineupSnapshot,
@@ -67,6 +70,28 @@ assert.equal(readiness.ready, false);
 assert.ok(readiness.reasons.includes('espn_still_pre_after_tplus3'));
 readiness = readinessSnapshot(game, resolveScoreboardEvent([raw('401912542','in')], game), initialized, {}, 'tplus3', Date.parse(kickoff)+3*60_000);
 assert.equal(readiness.ready, true);
+
+// R10R17.8: Brasileirão e continental não devem disparar alerta crítico
+// por um único status 'pre' da ESPN em T+3; em T+10 a falha passa a ser real.
+const brGame = { ...game, league:'bra.1', eventId:'401841268' };
+const brRaw = raw('401841268','pre');
+const at = (minutes) => Date.parse(kickoff) + minutes * 60_000;
+assert.equal(CONTINENTAL_READINESS_GRACE_MS, 10 * 60_000);
+for (const leagueGame of [game, brGame]) {
+  const source = leagueGame === game ? raw('401912542','pre') : brRaw;
+  const resolvedPre = resolveScoreboardEvent([source], leagueGame);
+  const t3 = readinessSnapshot(leagueGame, resolvedPre, initialized, {}, 'tplus3', at(3));
+  assert.equal(t3.ready, false, 'o preflight mantém a falha registrada');
+  assert.equal(continentalReadinessPreOnly(leagueGame, t3), true);
+  assert.equal(shouldDeferReadinessPreAlert(leagueGame, t3, 'tplus3'), true, 'T+3: sem e-mail');
+  assert.equal(shouldDeferReadinessPreAlert(leagueGame, { ...t3, checkedAt:new Date(at(9)).toISOString() }, 'tplus3'), true, 'T+9: sem e-mail');
+  assert.equal(shouldDeferReadinessPreAlert(leagueGame, { ...t3, checkedAt:new Date(at(10)).toISOString() }, 'tplus3'), false, 'T+10: escalada permitida');
+  assert.equal(shouldDeferReadinessPreAlert(leagueGame, t3, 't10'), false, 'sem suprimir falhas no T-10');
+  assert.equal(shouldDeferReadinessPreAlert(leagueGame, { ...t3, identityOk:false, reasons:['team_identity_mismatch','espn_still_pre_after_tplus3'] }, 'tplus3'), false, 'identidade errada permanece crítica');
+  assert.equal(shouldDeferReadinessPreAlert(leagueGame, { ...t3, monitorInitialized:false, reasons:['monitor_not_initialized','espn_still_pre_after_tplus3'] }, 'tplus3'), false, 'monitor ausente permanece crítico');
+  assert.equal(shouldDeferReadinessPreAlert(leagueGame, { ...t3, checkedAt:'invalid' }, 'tplus3'), false, 'horário inválido não pode mascarar falha');
+}
+assert.equal(continentalReadinessPreOnly({ ...brGame, league:'bra.2' }, { ready:false, identityOk:true, monitorInitialized:true, reasons:['espn_still_pre_after_tplus3'] }), false, 'não estender guarda a ligas não monitoradas');
 
 // Regressão R10.1: event_id ESPN exato é autoridade de identidade. Diferença
 // editorial/alias de clube não pode derrubar a partida para NOT READY.
