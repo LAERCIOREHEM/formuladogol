@@ -91,7 +91,7 @@ export async function recordAiUsage(env, row = {}) {
 
 export async function aiUsageSummary(env, hours = 24) {
   const h = Math.min(168, Math.max(1, Number(hours || 24)));
-  const cutoff = new Date(Date.now() - h * 3600_000).toISOString();
+  const cutoff = new Date(now - h * 3600_000).toISOString();
   const totals = await env.DB.prepare(`SELECT COUNT(*) calls, COALESCE(SUM(web_search_calls),0) web_searches,
       COALESCE(SUM(CASE WHEN ok=0 THEN 1 ELSE 0 END),0) failures
       FROM ai_usage_ledger WHERE datetime(created_at)>=datetime(?)`).bind(cutoff).first();
@@ -123,7 +123,7 @@ export async function recordProviderUsage(env, row = {}) {
   }
 }
 
-export async function providerUsageSummary(env, hours = 24) {
+export async function providerUsageSummary(env, hours = 24, now = Date.now()) {
   const h = Math.min(744, Math.max(1, Number(hours || 24)));
   const cutoff = new Date(Date.now() - h * 3600_000).toISOString();
   try {
