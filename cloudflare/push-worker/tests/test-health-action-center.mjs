@@ -27,6 +27,12 @@ const mock={
   continentalAgenda:{integrityOk:true,fallbacks:5},
 };
 const plan=buildActionCenter(mock,now);
+const recoveredAI=buildActionCenter({...mock,indicators:[{id:'openai',label:'IA / Custos',severity:'green',detail:'custo normal'}],postgame:{...mock.postgame,pending:0},providers:{...mock.providers,failures:35}},now);
+assert.equal(recoveredAI.requiresAttention.length,0,'35 falhas históricas não entram na Central de Ações');
+assert.ok(recoveredAI.informational.some(x=>x.includes('históricas/24h')));
+const spike=buildActionCenter({...mock,postgame:{...mock.postgame,cost:{last24h:{estimatedUsd:5.1},budget:{monthlyBudgetUsd:50}}}},now);
+assert.match(spike.requiresAttention.find(x=>x.id==='openai').recommendation,/US\\$ 5 em 24 horas/);
+
 assert.equal(plan.requiresAttention.length,2);
 assert.ok(plan.requiresAttention.find(a=>a.id==='openai').evidence.some(x=>x.includes('HTTP 429')),'provider HTTP evidence');
 assert.ok(plan.requiresAttention.find(a=>a.id==='highlights').evidence.some(x=>x.includes('Fluminense x Palmeiras')),'actual game in diagnostic');
