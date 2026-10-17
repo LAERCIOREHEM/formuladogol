@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-17T08:36:43.777890-03:00",
+  "gerado_em": "2026-10-17T10:51:53.778264-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 300,
   "total_com_estatisticas": 300,
-  "total_com_publico": 299,
+  "total_com_publico": 300,
   "total_com_eventos": 300,
   "total_com_jogadores": 300,
   "total_eventos_validados": 300,
@@ -618,9 +618,9 @@
       "placar_mandante": 4,
       "placar_visitante": 2,
       "estadio": "Estádio Municipal Cicero de Souza Marques",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 3968,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.oliberal.com/esportes/red-bull-bragantino-faz-3-gols-em-30-minutos-segura-reacao-do-cruzeiro-e-encerra-jejum-1.1181890",
       "arbitro": "",
       "stats": [
         {
@@ -1198,7 +1198,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-14T01:51:21.223040-03:00"
+      "atualizado_em": "2026-10-14T01:51:21.223040-03:00",
+      "renda": 160450
     },
     "401841265": {
       "event_id": "401841265",
@@ -169597,5 +169598,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 271,
+  "total_com_renda": 300
 }
