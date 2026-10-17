@@ -784,7 +784,12 @@ export class SportsMonitor {
       return;
     }
 
-    const severity = checkpoint === 'tplus3' ? 'critical' : checkpoint === 't10' ? 'warning' : 'observing';
+    // ESPN 'pre' isolado em T+3 é observação transitória, não incidente crítico.
+    // Em T+10, se persistir, o recheck promoverá o incidente e enviará o alerta.
+    const transientPreGrace = checkpoint === 'tplus3'
+      && continentalReadinessPreOnly(game, readiness)
+      && Date.parse(readiness?.checkedAt || '') < Date.parse(game?.kickoff || '') + CONTINENTAL_READINESS_GRACE_MS;
+    const severity = transientPreGrace ? 'observing' : checkpoint === 'tplus3' ? 'critical' : checkpoint === 't10' ? 'warning' : 'observing';
     if (!current) {
       await this.env.DB.prepare(`
         INSERT OR IGNORE INTO monitor_incidents (incident_key,event_id,checkpoint,severity,detail,email_status)
@@ -798,10 +803,8 @@ export class SportsMonitor {
     }
 
     if (!allowNotify || checkpoint === 't30') return;
-    // R10R17.4: uma única leitura ESPN 'pre' em T+3 não é incidente crítico
-    // continental. Continuamos registrando RED no D1 e reavaliamos após 10 min.
-    if (checkpoint === 'tplus3' && continentalReadinessPreOnly(game, readiness)
-        && Date.parse(readiness?.checkedAt || '') < Date.parse(game?.kickoff || '') + CONTINENTAL_READINESS_GRACE_MS) return;
+    // A falha permanece auditável no preflight, sem e-mail prematuro.
+    if (transientPreGrace) return;
     const previousStatus = String(current?.email_status || '');
     if (checkpoint === 't10' && /^(warning_sent|critical_sent)/.test(previousStatus)) return;
     if (checkpoint === 'tplus3' && /^critical_sent/.test(previousStatus)) return;
