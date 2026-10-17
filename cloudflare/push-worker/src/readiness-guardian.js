@@ -364,6 +364,14 @@ export function continentalReadinessPreOnly(game, readiness) {
     && reasons.length === 1 && reasons[0] === 'espn_still_pre_after_tplus3';
 }
 
+export function shouldDeferReadinessPreAlert(game, readiness, checkpoint) {
+  const kickoffMs = Date.parse(game?.kickoff || '');
+  const checkedMs = Date.parse(readiness?.checkedAt || '');
+  return checkpoint === 'tplus3' && Number.isFinite(kickoffMs) && Number.isFinite(checkedMs)
+    && checkedMs >= kickoffMs && checkedMs < kickoffMs + CONTINENTAL_READINESS_GRACE_MS
+    && continentalReadinessPreOnly(game, readiness);
+}
+
 export function readinessSnapshot(game, resolved, match, audience = {}, checkpoint = '', nowMs = Date.now()) {
   const now = num(nowMs, Date.now());
   const kickoff = Date.parse(game?.kickoff || '');
