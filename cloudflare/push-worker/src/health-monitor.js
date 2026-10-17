@@ -14,7 +14,11 @@ const CF_WORKERS_CPU_INCLUDED_MS = 30_000_000;
 const CF_WORKERS_REQUESTS_INCLUDED = 10_000_000;
 const CF_CPU_OVERAGE_PER_MILLION_USD = 0.02;
 const CF_REQUEST_OVERAGE_PER_MILLION_USD = 0.30;
-export const HEALTH_POLICY_VERSION = 12;
+export const HEALTH_POLICY_VERSION = 13;
+export const HUNTER_DAILY_WARNING_USD = 5;
+export const HUNTER_DAILY_CRITICAL_USD = 10;
+const ONE_SHOT_REPORT_DATE = "2026-10-17";
+const ONE_SHOT_REPORT_KEY = "health_digest_r10r17_9_once_2026_10_17";
 
 function text(v) { return String(v ?? '').trim(); }
 function n(v) { const x = Number(v); return Number.isFinite(x) ? x : 0; }
@@ -359,10 +363,11 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   const geminiReady=Boolean(text(env.GEMINI_API_KEY));
   const gatewayAuthReady=Boolean(text(env.AI_GATEWAY_TOKEN));
   const workersAiReady=Boolean(env.AI);
-  const monthlyBudgetUsd=Number(env.POSTGAME_PUBLIC_MONTHLY_BUDGET_USD||10)||10;
-  const eventBudgetUsd=Number(env.POSTGAME_PUBLIC_EVENT_BUDGET_USD||0.25)||0.25;
-  const warningPct=Number(env.POSTGAME_PUBLIC_MONTHLY_WARNING_PCT||80)||80;
+  const monthlyBudgetUsd=Number(env.POSTGAME_PUBLIC_MONTHLY_BUDGET_USD||50)||50;
+  const eventBudgetUsd=Number(env.POSTGAME_PUBLIC_EVENT_BUDGET_USD||1)||1;
+  const warningPct=Number(env.POSTGAME_PUBLIC_MONTHLY_WARNING_PCT||100)||100;
   const hunterMonthUsd=n(postCost?.month?.estimatedUsd);
+  const hunterDayUsd=n(postCost?.last24h?.estimatedUsd);
   const hunterBudgetPct=monthlyBudgetUsd>0?hunterMonthUsd/monthlyBudgetUsd*100:0;
   const eventCosts=new Map((postCost?.events||[]).map((r)=>[text(r.eventId),r]));
   const auditBody=publicAudit?.ok&&publicAudit?.body&&typeof publicAudit.body==='object'?publicAudit.body:{};
@@ -414,7 +419,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     indicator('highlights','Melhores Momentos',highlightOverdue>0?'yellow':'green',`${highlight} pendência(s) no total · ${highlightOverdue} com mais de 2h${highlightPendingRows[0]?` · mais antiga: ${highlightPendingRows[0].home} x ${highlightPendingRows[0].away}`:''}`),
     indicator('editorial','Editorial / Transmissões',Array.isArray(os.errors)&&os.errors.length?'yellow':'green',Array.isArray(os.errors)&&os.errors.length?`${os.errors.length} erro(s) no último ciclo`:'sem erro reportado pelo Orchestrator'),
     indicator('infra','Infraestrutura / E-mail',!cfg.configured||probe?.ok===false?'red':'green',`${cfg.transport} · ${maskAddress(cfg.to)}${probe?` · ${probe.status||`probe ${probe.ok?'OK':'FALHOU'}`}`:''}${cfg.fallbacks?.length?` · fallback ${cfg.fallbacks.join(' + ')}`:''}`),
-    indicator('openai','IA / Custos',hunterBudgetPct>=100?'red':hunterBudgetPct>=warningPct?'yellow':!geminiReady||!workersAiReady||!gatewayAuthReady?'yellow':perEventAnomaly?'yellow':providerFailures>3 && (providerUnrecoveredFailures===null||providerUnrecoveredFailures>0)?'yellow':'green',`${providers.calls} chamada(s) multi-provider · ${providers.searches} busca(s) web · Hunter ${fmtUsd(hunterMonthUsd)}/${fmtUsd(monthlyBudgetUsd)} (${fmtPct(hunterBudgetPct)}) · ${providerFailures} falha(s) /24h`),
+    indicator('openai','IA / Custos',aiCostHealthSeverity({dayUsd:hunterDayUsd,activePending:postPending,providerFailures,unrecovered:providerUnrecoveredFailures,providersReady:geminiReady&&workersAiReady&&gatewayAuthReady,perEventAnomaly:Boolean(perEventAnomaly)}),`${providers.calls} chamada(s) multi-provider · ${providers.searches} busca(s) web · Hunter 24h ${fmtUsd(hunterDayUsd)} (alerta ${fmtUsd(HUNTER_DAILY_WARNING_USD)}) · mês ${fmtUsd(hunterMonthUsd)}/${fmtUsd(monthlyBudgetUsd)} · ${providerFailures} falha(s) históricas/24h`),
     indicator('cloudflare','Cloudflare / CPU & Requests',cloudflareSeverity(cfBilling),cloudflareDetail(cfBilling)),
   ];
   const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY)),fineTuning:'not_used_by_design'},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches,errors:Array.isArray(os.errors)?os.errors.slice(0,6).map(x=>text(x).slice(0,300)):[]},reliabilityIntelligence:{sportingState:text(os.reliabilityState)||text(reliabilitySnapshot.state),factualAuditSchema:n(factualAudit.schema_version),factualCritical:n(factualAudit.total_criticos),factualWarnings:n(factualAudit.total_avisos),ragKnowledgeBaseReady:Number(ragManifest.schema_version||0)>=2&&Array.isArray(ragManifest.collections)&&ragManifest.collections.length>0,ragRuntimeEnabled:opsIntelligence?.rag?.ready===true,ragRuntimeVersion:n(opsIntelligence?.rag?.version),ragSourceCount:n(opsIntelligence?.rag?.sourceCount),ragChunkCount:n(opsIntelligence?.rag?.chunkCount),ragSourceSha256:text(opsIntelligence?.rag?.sourceSha256),mcpOpsEnabled:opsIntelligence?.mcp?.enabled===true,mcpOpsReadOnly:opsIntelligence?.mcp?.readOnly===true,mcpProtocolVersion:text(opsIntelligence?.mcp?.protocolVersion),mcpTools:n(opsIntelligence?.mcp?.tools),mcpResources:n(opsIntelligence?.mcp?.resources),fineTuning:'not_used_by_design'},postgame:{pending:postPending,searching:postSearching,overdue:postOverdue,budgetGuard:postBudget,resolved:postResolved,notApplicable:postExempt,eligibilityPending:postUnclassified,requiredLeague:'bra.1',seasonCoverage,highlightPending:highlight,persistentUntilResolved:true,pendingRows,cost:{...postCost,budget:{monthlyBudgetUsd,eventBudgetUsd,warningPct,monthPct:hunterBudgetPct}}},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
@@ -484,6 +489,16 @@ export function postgameDigestLines(postgame={}, now=Date.now()) {
     'Estimativa conservadora: não desconta franquia gratuita do Google Search; Workers AI é acompanhado pelo billing Cloudflare.'
   );
   return lines;
+}
+
+export function aiCostHealthSeverity({dayUsd=0,activePending=0,providerFailures=0,unrecovered=0,providersReady=true,perEventAnomaly=false}={}) {
+  if (n(dayUsd)>=HUNTER_DAILY_CRITICAL_USD) return 'red';
+  if (n(dayUsd)>=HUNTER_DAILY_WARNING_USD) return 'yellow';
+  // Erros antigos não são falha operacional se os dados já foram entregues.
+  if (n(activePending)>0 && !providersReady) return 'yellow';
+  if (n(activePending)>0 && n(providerFailures)>3 && (unrecovered==null || n(unrecovered)>0)) return 'yellow';
+  if (n(activePending)>0 && perEventAnomaly) return 'yellow';
+  return 'green';
 }
 
 function digestMessage(snapshot, now=Date.now()) {
