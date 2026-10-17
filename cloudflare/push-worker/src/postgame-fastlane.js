@@ -803,6 +803,15 @@ async function seedFromMonitor(env, monitor) {
   } catch (_) { return 0; }
 }
 
+// Snapshot de fonte curada chega do GitHub Pages em momento diferente da atualização
+// do D1. Quando existir budget_guard, reavaliar a fonte gratuitamente a cada minuto
+// para evitar um CRÍTICO que já foi corrigido documentalmente.
+export function staticSeedRefreshIntervalMs({seedError=false,hasBudgetGuard=false}={}) {
+  if (hasBudgetGuard) return 60_000;
+  if (seedError) return 2 * 60_000;
+  return STATIC_SEED_INTERVAL_MS;
+}
+
 async function seedFromStatic(env, now = Date.now()) {
   // Reconciliacao inicial imediata ao instalar o contrato Pages↔D1.
   // Em falha de Pages, reconsulta gratuita a cada 2 minutos ate normalizar.
@@ -812,7 +821,10 @@ async function seedFromStatic(env, now = Date.now()) {
     await metaPut(env, 'static_seed_at', '1970-01-01T00:00:00.000Z');
   }
   const seedError=await metaGet(env, 'static_seed_error');
-  const intervalMs=seedError ? 2 * 60_000 : STATIC_SEED_INTERVAL_MS;
+  // Consulta local D1: não há nova pesquisa de IA, custo Hunter ou mutação.
+  const pendingGuard=await env.DB.prepare(`SELECT event_id FROM postgame_fastlane
+    WHERE league='bra.1' AND public_status='budget_guard' LIMIT 1`).first().catch(()=>null);
+  const intervalMs=staticSeedRefreshIntervalMs({seedError:Boolean(seedError),hasBudgetGuard:Boolean(pendingGuard)});
   const last = Date.parse(await metaGet(env, 'static_seed_at')) || 0;
   if (now - last < intervalMs) return 0;
   await metaPut(env, 'static_seed_at', nowIso(now));
