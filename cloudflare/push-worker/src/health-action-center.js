@@ -68,7 +68,10 @@ export function buildActionCenter(snapshot = {}, now = Date.now()) {
       case 'openai': {
         const byProvider = (p.byProvider || []).filter(v => n(v.failures)>0)
           .map(v => `${v.provider}: ${n(v.failures)} falha(s)/${n(v.calls)} chamada(s)`);
-        action.evidence = [...byProvider.slice(0,4), ...failures.slice(0,MAX_ERROR_ROWS).map(v =>
+        const outcome=snapshot.providerFailureSummary;
+        action.evidence = [
+          ...(outcome ? [`Ledger 24h: ${n(outcome.total)} falha(s); ${n(outcome.recovered)} com sucesso posterior; ${n(outcome.unresolved)} sem sucesso posterior; ${n(outcome.activeUnresolved)} em partidas ainda pendentes.`] : []),
+          ...byProvider.slice(0,4), ...failures.slice(0,MAX_ERROR_ROWS).map(v =>
           clean(`${v.provider}/${v.purpose}${v.eventId ? ` [${v.eventId}]` : ''} · HTTP ${v.httpStatus == null ? 'sem resposta' : v.httpStatus} · ${v.detail || 'detalhe não informado'} · ${v.recovered ? 'sucesso posterior no mesmo evento/finalidade' : 'sem recuperação comprovada'}`, 350))];
         const budget = snapshot.postgame?.cost?.budget || {};
         const dayUsd=n(snapshot.postgame?.cost?.last24h?.estimatedUsd);
@@ -139,7 +142,9 @@ export function buildActionCenter(snapshot = {}, now = Date.now()) {
   const highlightWait = n(snapshot.postgame?.highlightPending) - n(snapshot.postgame?.highlightOverdue);
   if(highlightWait>0) result.informational.push(`Melhores Momentos: ${highlightWait} pendência(s) ainda no prazo de tolerância.`);
   if (n(p.failures)>0 && n(snapshot.postgame?.pending)===0 && !result.requiresAttention.some(a=>a.id==='openai')) {
-    result.informational.push(`IA: ${p.failures} falha(s) históricas/24h, sem tarefa de público/renda pendente; não reduzem a saúde geral.`);
+    const recovery=snapshot.providerFailureSummary;
+    const breakdown=recovery ? ` (${n(recovery.recovered)} recuperada(s); ${n(recovery.unresolved)} sem sucesso posterior; 0 partidas pendentes)` : '';
+    result.informational.push(`IA: ${p.failures} falha(s) históricas/24h${breakdown}, sem tarefa de público/renda pendente; não reduzem a saúde geral.`);
   } else if (n(p.failures)>0 && n(snapshot.providerUnrecoveredFailures)===0 && snapshot.providerUnrecoveredFailures != null) {
     result.informational.push(`IA: ${p.failures} falha(s) com recuperação registrada; acompanhar sem intervenção.`);
   }
