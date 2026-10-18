@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-17T23:15:34.815206-03:00",
+  "gerado_em": "2026-10-17T23:38:22.081139-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 304,
   "total_com_estatisticas": 304,
-  "total_com_publico": 300,
+  "total_com_publico": 303,
   "total_com_eventos": 304,
   "total_com_jogadores": 304,
   "total_eventos_validados": 304,
@@ -573,9 +573,9 @@
       "placar_mandante": 0,
       "placar_visitante": 2,
       "estadio": "Arena da Baixada",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 35852,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.oliberal.com/esportes/palmeiras-tem-inicio-avassalador-bate-athletico-com-um-a-menos-e-dorme-na-lideranca-1.1183828",
       "arbitro": "",
       "stats": [
         {
@@ -1121,7 +1121,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-17T23:15:26.953037-03:00"
+      "atualizado_em": "2026-10-17T23:15:26.953037-03:00",
+      "renda": 2568960
     },
     "401841270": {
       "event_id": "401841270",
@@ -1133,9 +1134,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Arena MRV",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 25085,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.oliberal.com/esportes/atletico-mg-fura-bloqueio-do-coritiba-vence-mais-uma-em-casa-e-segue-na-cola-do-g-4-1.1183813",
       "arbitro": "",
       "stats": [
         {
@@ -1653,7 +1654,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-17T23:15:29.617816-03:00"
+      "atualizado_em": "2026-10-17T23:15:29.617816-03:00",
+      "renda": 1226342.86
     },
     "401841268": {
       "event_id": "401841268",
@@ -1665,9 +1667,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Joao Havelange Stadium",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 23306,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/botafogo-bate-a-chapecoense-com-gol-de-tiquinho-soares-na-primeira-vitoria-de-tite-cmvd0qoze02ff014lwnowe6wi.html",
       "arbitro": "",
       "stats": [
         {
@@ -2185,7 +2187,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-17T23:15:32.277175-03:00"
+      "atualizado_em": "2026-10-17T23:15:32.277175-03:00",
+      "renda": 579140
     },
     "401841275": {
       "event_id": "401841275",
@@ -171775,5 +171778,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 271,
+  "total_com_renda": 303
 }
