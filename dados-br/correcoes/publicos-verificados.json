@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "_comentario": "Correções documentais verificadas manualmente. O coletor mescla somente os event_ids e campos explicitamente listados; não substitui o restante do snapshot.",
-  "verificado_em": "2026-10-03T08:34:42-03:00",
+  "verificado_em": "2026-10-18T20:18:52-03:00",
   "jogos": {
     "401841169": {
       "confronto": "São Paulo 1 x 2 Santos",
       "rodada": 21,
       "publico": 43398,
-      "renda": 2034540.0,
+      "renda": 2034540,
       "tipo": "presente",
       "fonte_publico": "https://www.gazetaesportiva.com/campeonatos/brasileiro-serie-a/sao-paulo-x-santos-brasileirao-2026/",
       "fonte_renda": "https://www.gazetaesportiva.com/campeonatos/brasileiro-serie-a/sao-paulo-x-santos-brasileirao-2026/",
@@ -66,7 +66,7 @@
       "rodada": 29,
       "publico": 13934,
       "pagantes": 13773,
-      "renda": 285132.0,
+      "renda": 285132,
       "tipo": "presente",
       "fonte_publico": "https://www.bahianoticias.com.br/esportes/vitoria/31622-confira-publico-e-renda-de-vitoria-x-chapecoense-pelo-campeonato-brasileiro",
       "fonte_pagantes": "https://arenarubronegra.com/confira-o-publico-de-todos-os-jogos-do-vitoria-em-2026-no-barradao/",
@@ -80,7 +80,7 @@
       "rodada": 29,
       "publico": 23596,
       "pagantes": 22071,
-      "renda": 801180.0,
+      "renda": 801180,
       "tipo": "presente",
       "fonte_publico": "https://www.correiobraziliense.com.br/esportes/2026/10/7516875-em-classico-eletrizante-vasco-bate-o-botafogo-no-nilton-santos.html",
       "fonte_pagantes": "https://vasconoticias.com.br/noticias/publico-e-renda-de-botafogo-1-x-2-vasco-pela-29a-rodada-do-brasileiro/",
@@ -118,7 +118,7 @@
       "rodada": 30,
       "publico": 63300,
       "pagantes": 58246,
-      "renda": 7006350.0,
+      "renda": 7006350,
       "tipo": "presente",
       "fonte_publico": "https://sports.sbt.com.br/noticia/brasileirao/flamengo-vence-fluminense-e-segue-na-lideranca-do-brasileirao",
       "fonte_pagantes": "https://sports.sbt.com.br/noticia/brasileirao/flamengo-vence-fluminense-e-segue-na-lideranca-do-brasileirao",
@@ -132,7 +132,7 @@
       "rodada": 30,
       "publico": 3924,
       "pagantes_status": "nao_divulgado",
-      "renda": 169490.0,
+      "renda": 169490,
       "tipo": "presente",
       "fonte_publico": "https://www.bol.uol.com.br/esporte/2026/10/12/athletico-pr-goleia-chapecoense-com-dois-gols-do-artilheiro-viveros.htm",
       "fonte_renda": "https://www.bol.uol.com.br/esporte/2026/10/12/athletico-pr-goleia-chapecoense-com-dois-gols-do-artilheiro-viveros.htm",
@@ -145,7 +145,7 @@
       "rodada": 30,
       "publico": 28704,
       "pagantes_status": "nao_divulgado",
-      "renda": 935545.0,
+      "renda": 935545,
       "tipo": "presente",
       "fonte_publico": "https://www.bahianoticias.com.br/esportes/bahia/34166-confira-publico-e-renda-de-bahia-x-mirassol-pela-30a-rodada-do-brasileirao",
       "fonte_renda": "https://www.bahianoticias.com.br/esportes/bahia/34166-confira-publico-e-renda-de-bahia-x-mirassol-pela-30a-rodada-do-brasileirao",
@@ -177,6 +177,20 @@
       "origem": "correção documental verificada",
       "verificado_em": "2026-10-17T03:01:47.791Z",
       "nota": "No Ataque e UOL/Agência, fichas técnicas de 16/10/2026, rodada 31: público presente de 5.931 torcedores e renda R$ 149.435,00. Público pagante não divulgado; não inferir."
+    },
+    "401841277": {
+      "confronto": "Fluminense 1 x 2 Santos",
+      "rodada": 31,
+      "publico": 27697,
+      "pagantes": 25471,
+      "renda": 1658380.5,
+      "tipo": "presente",
+      "fonte_publico": "https://share.google/iBk2z1AObJa98YdEu",
+      "fonte_pagantes": "https://share.google/iBk2z1AObJa98YdEu",
+      "fonte_renda": "https://share.google/iBk2z1AObJa98YdEu",
+      "origem": "correção documental verificada — foto do placar do estádio",
+      "verificado_em": "2026-10-18T20:18:52-03:00",
+      "nota": "Imagem do post @fimdejogo no X de 18/10/2026 (17:56), fornecida pelo mantenedor, exibe painel do estádio com renda R$ 1.658.380,50 e texto com 27.697 presentes e 25.471 pagantes. A foto comprova diretamente a renda; presentes e pagantes constam no post. Jogo validado por event_id 401841277; não confundir pagantes com presentes."
     }
   }
 }
