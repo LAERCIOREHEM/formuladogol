@@ -13,7 +13,12 @@ on:
       - 'scripts/auditar_publicos_identidade.py'
       - 'scripts/curar_publicos_hotfix6.py'
       - 'scripts/postgame_factual_integrity.py'
+      - 'scripts/reconciliar_publicos_analitico.py'
+      - 'scripts/gerar_estatisticas_competicao_brasileirao.py'
       - '.github/workflows/atualizar-publicos-brasileirao.yml'
+  schedule:
+    # Backstop gratuito: o Orchestrator segue responsavel pela conciliacao rapida.
+    - cron: '13,43 * * * *'
   workflow_dispatch:
     inputs:
       modo:
@@ -83,13 +88,15 @@ jobs:
             scripts/importar_postgame_fastlane.py \
             scripts/auditar_publicos_identidade.py \
             scripts/curar_publicos_hotfix6.py \
-            scripts/postgame_factual_integrity.py
+            scripts/postgame_factual_integrity.py \
+            scripts/reconciliar_publicos_analitico.py
           python scripts/atualizar_publicos_brasileirao.py --self-test
           python scripts/completar_publicos_ia.py --self-test
           python scripts/importar_postgame_fastlane.py --self-test
           python scripts/curar_publicos_hotfix6.py --self-test
           python scripts/auditar_publicos_identidade.py --self-test
           python scripts/postgame_factual_integrity.py
+          python scripts/reconciliar_publicos_analitico.py --self-test
           python -m json.tool resultados.json >/dev/null
           python -m json.tool dados-br/jogos-detalhes.json >/dev/null
           python -m json.tool dados-br/publicos-complementares.json >/dev/null
@@ -118,7 +125,7 @@ jobs:
           # Push de correção documental já curada NÃO abre pesquisa de IA. Apenas
           # propaga o JSON verificado para os derivados. Isso evita uma chamada
           # paga redundante justamente quando a informação já veio no commit.
-          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+          if [[ "${GITHUB_EVENT_NAME}" == "push" || "${GITHUB_EVENT_NAME}" == "schedule" ]]; then
             echo "Push de correção curada: consolidação offline, sem rede e sem IA."
             python scripts/atualizar_publicos_brasileirao.py --sem-rede
             MODO="curated_push"
@@ -228,6 +235,9 @@ jobs:
 
           fi
 
+          # R10R18: consultar gratuitamente apenas fatos recentes ja existentes no D1.
+          python scripts/reconciliar_publicos_analitico.py --importar-fastlane
+
           # A camada de IA grava complementos e propaga para jogos-detalhes, mas
           # não reescreve a auditoria. Sem esta reconsolidação (offline, sem rede)
           # auditoria-publicos.json fica defasada e as asserções de cobertura da
@@ -258,14 +268,32 @@ jobs:
             echo "Nenhum público novo encontrado nesta tentativa. O snapshot publicado não será tocado."
           fi
 
-      - name: Regenerar somente a visão de público das Estatísticas
-        if: steps.coleta.outputs.novos == 'true'
+      - name: R10R18 · reconciliar analitico independentemente de novos complementos
+        id: reconcile
         shell: bash
         run: |
           set -euo pipefail
           # O próprio coletor já propagou os novos números para jogos-detalhes.json
           # sem reconsultar a ESPN e sem mexer na auditoria técnica dos detalhes.
           python scripts/gerar_estatisticas_competicao_brasileirao.py
+          python scripts/reconciliar_publicos_analitico.py --auditar
+          # Nao disparar novo deploy apenas por timestamp de geracao de JSON identico.
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          p=Path('dados-br/estatisticas-competicao.json')
+          try:
+              old_raw=subprocess.check_output(['git','show','HEAD:'+str(p)]).decode('utf-8')
+              old=json.loads(old_raw)
+          except Exception:
+              old_raw=''
+              old={}
+          new=json.loads(p.read_text(encoding='utf-8'))
+          old.pop('atualizado_em',None)
+          new.pop('atualizado_em',None)
+          if old_raw and old == new:
+              p.write_text(old_raw,encoding='utf-8')
+          PY
           python - <<'PY'
           import json
           from pathlib import Path
@@ -288,6 +316,11 @@ jobs:
               f"renda {resumo.get('jogos_com_renda')}/{resumo.get('jogos_finalizados')}"
           )
           PY
+          if git diff --quiet -- dados-br/publicos-complementares.json dados-br/jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-publicos.json dados-br/auditoria-publicos-identidade.json && [[ -f dados-br/auditoria-reconciliacao-publicos.json ]] && git ls-files --error-unmatch dados-br/auditoria-reconciliacao-publicos.json >/dev/null 2>&1 && git diff --quiet -- dados-br/auditoria-reconciliacao-publicos.json; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Resumir tentativa
         if: always()
@@ -357,9 +390,9 @@ jobs:
       - name: Commitar públicos novos e o estado da camada de IA
         id: publish
         env:
-          NOVOS_PUBLICOS: ${{ steps.coleta.outputs.novos }}
+          NOVOS_PUBLICOS: ${{ steps.reconcile.outputs.changed }}
         # No-op absoluto: tentativa sem dado factual novo não gera commit nem deploy.
-        if: ${{ inputs.dry_run != true && steps.coleta.outputs.novos == 'true' }}
+        if: ${{ inputs.dry_run != true && steps.reconcile.outputs.changed == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -374,6 +407,7 @@ jobs:
             "dados-br/auditoria-publicos-identidade.json"
             "dados-br/jogos-detalhes.json"
             "dados-br/estatisticas-competicao.json"
+            "dados-br/auditoria-reconciliacao-publicos.json"
           )
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
@@ -417,7 +451,7 @@ jobs:
           exit 1
 
       - name: Disparar deploy após público publicado
-        if: ${{ steps.publish.outputs.published == 'true' && steps.coleta.outputs.novos == 'true' }}
+        if: ${{ steps.publish.outputs.published == 'true' && steps.reconcile.outputs.changed == 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash

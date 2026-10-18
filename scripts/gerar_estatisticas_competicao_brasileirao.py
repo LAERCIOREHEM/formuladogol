@@ -243,7 +243,10 @@ def attendance_stats(results: list[dict[str, Any]], details: dict[str, Any]) -> 
         rows.append(row)
     rows.sort(key=lambda x: int(x["publico"]), reverse=True)
     total = sum(int(x["publico"]) for x in rows)
-    revenue_rows = [x for x in rows if isinstance(x.get("renda"), (int, float)) and float(x.get("renda") or 0) > 0]
+    # R10R18: renda independente da divulgacao de publico presente.
+    revenue_rows = [game_brief(g, details.get(str(g.get("event_id") or ""), {})) for g in results
+                    if isinstance(details.get(str(g.get("event_id") or ""), {}).get("renda"), (int, float))
+                    and float(details.get(str(g.get("event_id") or ""), {}).get("renda") or 0) > 0]
     total_revenue = round(sum(float(x.get("renda") or 0) for x in revenue_rows), 2)
     return {
         "jogos_com_publico": len(rows),
@@ -336,7 +339,7 @@ def main() -> None:
         "resumo": {
             "jogos_finalizados": len(results),
             "jogos_com_estatisticas": sum(1 for x in games_index if x["tem_estatisticas"]),
-            "jogos_com_publico": sum(1 for x in games_index if x.get("publico") not in (None, "")),
+            "jogos_com_publico": sum(1 for x in games_index if isinstance(x.get("publico"), (int, float)) and x["publico"] > 0),
             "jogos_com_renda": sum(1 for x in games_index if isinstance(x.get("renda"), (int, float)) and float(x.get("renda") or 0) > 0),
             "clubes": len(table),
             "gols_contra": sum(int(x.get("gols_contra_favorecendo") or 0) for x in club_goals(table, leaders, details)),
