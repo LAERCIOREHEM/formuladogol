@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-18T18:16:02.615446-03:00",
+  "gerado_em": "2026-10-18T20:09:17.948276-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 306,
   "total_com_estatisticas": 306,
-  "total_com_publico": 304,
+  "total_com_publico": 306,
   "total_com_eventos": 306,
   "total_com_jogadores": 306,
   "total_eventos_validados": 306,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 2,
       "estadio": "Estadio do Maracana",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 27697,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.estadao.com.br/tipo_conteudo/analise/santos-estreia-quarteto-ofensivo-vira-contra-o-fluminense-e-continua-sonhando-com-libertadores",
       "arbitro": "",
       "stats": [
         {
@@ -584,9 +584,9 @@
       "placar_mandante": 2,
       "placar_visitante": 4,
       "estadio": "Arena do Grêmio",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 31256,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.oliberal.com/esportes/cruzeiro-bate-o-gremio-com-hat-trick-de-kaio-jorge-e-chega-forte-na-briga-pelo-g-4-1.1184000",
       "arbitro": "",
       "stats": [
         {
@@ -1163,7 +1163,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-18T18:15:49.777415-03:00"
+      "atualizado_em": "2026-10-18T18:15:49.777415-03:00",
+      "renda": 1638336.99
     },
     "401841273": {
       "event_id": "401841273",
@@ -172934,5 +172935,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 271,
+  "total_com_renda": 305
 }
