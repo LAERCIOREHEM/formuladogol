@@ -116,6 +116,38 @@ async function fetchGemini(env,url,body,{gateway=false}={}){
   return fetch(url,{method:'POST',headers,body:JSON.stringify(body)});
 }
 
+// R10R19: erros de compatibilidade do endpoint Interactions não devem se
+// repetir a cada partida. Retentar Interactions depois de seis horas.
+const GEMINI_INTERACTIONS_META_KEY = 'gemini_interactions_compat_cooldown_r10r19';
+export const GEMINI_INTERACTIONS_COOLDOWN_MS = 6 * 60 * 60_000;
+export function geminiInteractionsCompatibilityFailure(status) {
+  return [400, 404, 405, 422].includes(Number(status));
+}
+async function readGeminiInteractionsCooldown(env) {
+  if (!env?.DB) return false;
+  try {
+    const row = await env.DB.prepare('SELECT value FROM postgame_meta WHERE key=?').bind(GEMINI_INTERACTIONS_META_KEY).first();
+    const data = safeJson(row?.value, null);
+    return Number(data?.until || 0) > Date.now();
+  } catch (_) { return false; }
+}
+async function markGeminiInteractionsCooldown(env, status) {
+  if (!env?.DB || !geminiInteractionsCompatibilityFailure(status)) return;
+  try {
+    const payload = JSON.stringify({version:1,until:Date.now()+GEMINI_INTERACTIONS_COOLDOWN_MS,httpStatus:Number(status)});
+    await env.DB.prepare(`INSERT INTO postgame_meta(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP)
+      ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP`)
+      .bind(GEMINI_INTERACTIONS_META_KEY,payload).run();
+  } catch (_) { /* Fallback direto independe da persistência. */ }
+}
+function geminiSafeErrorSummary(raw) {
+  const error = raw?.error;
+  if (!error || typeof error !== 'object') return '';
+  const code = text(error.status || error.code).replace(/[^a-zA-Z0-9_-]/g,'').slice(0,36);
+  const message = text(error.message).replace(/(?:AIza[0-9A-Za-z_-]{25,}|sk-[0-9A-Za-z_-]{16,})/g,'[REDACTED]').replace(/[\r\n\t]+/g,' ').slice(0,150);
+  return [code,message].filter(Boolean).join(':');
+}
+
 function retryDirectForGatewayStatus(status,detail=''){
   const n=Number(status||0);
   return isAiGatewayPreProviderFailure(n,detail)||[400,404,405,408,500,502,503,504].includes(n);
@@ -134,7 +166,8 @@ async function runGeminiCall(env,{url,body,gateway,kind,route,model,task,started
   const parsed=safeJson(cleanModelText(output),null);
   const usage=kind==='interaction'?tokenUsageGeminiInteraction(raw):tokenUsageGeminiLegacy(raw);
   const ok=Boolean(response?.ok&&raw&&searches>0&&sources.length>0);
-  await recordProviderUsage(env,{provider:'gemini',purpose:'postgame_public',eventId:task.event_id,model,phase:'search',searchCalls:searches,inputTokens:usage.input,outputTokens:usage.output,totalTokens:usage.total,responded:Boolean(raw),ok,httpStatus:status,durationMs:Date.now()-started,detail:`${route}:${kind}:searches=${searches}:sources=${sources.length}:${parsed?'json_optional':'discovery_text'}${response?.ok?'':`:http_${status||0}`}`});
+   const errorSummary=!response?.ok?geminiSafeErrorSummary(raw):'';
+  await recordProviderUsage(env,{provider:'gemini',purpose:'postgame_public',eventId:task.event_id,model,phase:'search',searchCalls:searches,inputTokens:usage.input,outputTokens:usage.output,totalTokens:usage.total,responded:Boolean(raw),ok,httpStatus:status,durationMs:Date.now()-started,detail:`${route}:${kind}:searches=${searches}:sources=${sources.length}:${parsed?'json_optional':'discovery_text'}${response?.ok?'':`:http_${status||0}${errorSummary?`:error=${errorSummary}`:''}`}`});
   return {response,raw,detail,status,searches,sources,parsed,output,usage,ok,route,kind};
 }
 
@@ -160,7 +193,12 @@ export async function searchPublicWithGemini(env,task,missing){
    // R10R8: Gemini Web Search pula o AI Gateway. Cloudflare documenta o proxy
    // Google AI Studio principalmente para endpoints generateContent; a Interactions
    // API nova é chamada diretamente para eliminar uma camada de incompatibilidade.
-   await run({url:directInteractionUrl,body:interactionBody,gateway:false,kind:'interaction',route:'direct_interactions_v10_discovery'});
+   if (!(await readGeminiInteractionsCooldown(env))) {
+      const first=await run({url:directInteractionUrl,body:interactionBody,gateway:false,kind:'interaction',route:'direct_interactions_v10_discovery'});
+      if (geminiInteractionsCompatibilityFailure(first.status) && !first.response?.ok) {
+        await markGeminiInteractionsCooldown(env,first.status);
+      }
+    }
 
    let totalSearches=attempts.reduce((sum,a)=>sum+Number(a.searches||0),0);
    // Se a Interactions API falhar, não pesquisar ou não expor nenhuma fonte,
