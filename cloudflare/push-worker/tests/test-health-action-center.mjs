@@ -30,6 +30,18 @@ const plan=buildActionCenter(mock,now);
 const recoveredAI=buildActionCenter({...mock,indicators:[{id:'openai',label:'IA / Custos',severity:'green',detail:'custo normal'}],postgame:{...mock.postgame,pending:0},providers:{...mock.providers,failures:35}},now);
 assert.equal(recoveredAI.requiresAttention.length,0,'35 falhas históricas não entram na Central de Ações');
 assert.ok(recoveredAI.informational.some(x=>x.includes('históricas/24h')));
+const withBreakdown=buildActionCenter({
+  ...mock,
+  providerFailureSummary:{total:5,recovered:4,unresolved:1,activeUnresolved:1}
+},now);
+assert.ok(withBreakdown.requiresAttention.find(a=>a.id==='openai').evidence.some(x=>x.includes('4 com sucesso posterior')));
+const closedWithBreakdown=buildActionCenter({
+  ...mock,indicators:[{id:'openai',label:'IA / Custos',severity:'green',detail:'saudável'}],
+  postgame:{...mock.postgame,pending:0},
+  providerFailureSummary:{total:5,recovered:4,unresolved:1,activeUnresolved:0}
+},now);
+assert.ok(closedWithBreakdown.informational.some(x=>x.includes('4 recuperada(s)')));
+
 const spike=buildActionCenter({...mock,postgame:{...mock.postgame,cost:{last24h:{estimatedUsd:5.1},budget:{monthlyBudgetUsd:50}}}},now);
 assert.ok(spike.requiresAttention.find(x=>x.id==='openai').recommendation.includes('US$ 5 em 24 horas'));
 
