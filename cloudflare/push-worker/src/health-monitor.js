@@ -312,11 +312,19 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
         AND ((f.event_id<>'' AND s.event_id=f.event_id) OR (f.event_id='' AND s.event_id='' AND s.provider=f.provider))
       ) recovered
       FROM ai_provider_ledger f WHERE f.ok=0 AND datetime(f.created_at)>=datetime(?) ORDER BY f.id DESC LIMIT 12`).bind(failureCutoff).all().catch(()=>({results:[]})),
-    env.DB.prepare(`SELECT COUNT(*) total,
-      COALESCE(SUM(CASE WHEN NOT EXISTS(SELECT 1 FROM ai_provider_ledger s WHERE s.id>f.id AND s.ok=1 AND s.purpose=f.purpose
-        AND ((f.event_id<>'' AND s.event_id=f.event_id) OR (f.event_id='' AND s.event_id='' AND s.provider=f.provider))
-      ) THEN 1 ELSE 0 END),0) unresolved
-      FROM ai_provider_ledger f WHERE f.ok=0 AND datetime(f.created_at)>=datetime(?)`).bind(failureCutoff).first().catch(()=>null),
+    env.DB.prepare(`WITH failures AS (
+         SELECT f.event_id,
+           NOT EXISTS(SELECT 1 FROM ai_provider_ledger s WHERE s.id>f.id AND s.ok=1 AND s.purpose=f.purpose
+             AND ((f.event_id<>'' AND s.event_id=f.event_id) OR (f.event_id='' AND s.event_id='' AND s.provider=f.provider))) unresolved
+         FROM ai_provider_ledger f WHERE f.ok=0 AND datetime(f.created_at)>=datetime(?)
+       )
+       SELECT COUNT(*) total,
+         COALESCE(SUM(CASE WHEN unresolved THEN 1 ELSE 0 END),0) unresolved,
+         COALESCE(SUM(CASE WHEN unresolved AND EXISTS(
+           SELECT 1 FROM postgame_fastlane p WHERE p.event_id=failures.event_id
+           AND p.public_status NOT IN ('resolved','not_applicable','eligibility_pending')
+         ) THEN 1 ELSE 0 END),0) active_unresolved
+       FROM failures`).bind(failureCutoff).first().catch(()=>null),
   ]);
   const cfg=mailConfig(env);
   let probe=null;
@@ -358,6 +366,13 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   }));
   // Se a consulta do ledger falhar, manter a classificação conservadora, nunca mascarar falhas.
   const providerUnrecoveredFailures=providerUnrecoveredRaw==null?null:n(providerUnrecoveredRaw.unresolved);
+  // Erros na janela de 24h não são automaticamente incidentes ativos.
+  const providerFailureSummary=providerUnrecoveredRaw==null?null:{
+    total:n(providerUnrecoveredRaw.total),
+    recovered:Math.max(0,n(providerUnrecoveredRaw.total)-n(providerUnrecoveredRaw.unresolved)),
+    unresolved:n(providerUnrecoveredRaw.unresolved),
+    activeUnresolved:n(providerUnrecoveredRaw.active_unresolved)
+  };
   const perEventAnomaly=(providers.byEvent||[]).find(r=>n(r.searches)>8);
   const providerFailures=n(providers.failures);
   const geminiReady=Boolean(text(env.GEMINI_API_KEY));
@@ -395,8 +410,13 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     estimatedUsd:n(eventCosts.get(text(r.event_id))?.estimatedUsd)
   }));
   const activePublicIds=new Set(pendingRows.map(r=>r.eventId));
-  const activeProviderFailure=providerFailureRows.some(r=>!r.recovered &&
+  const activeProviderFailure=Boolean(providerFailureSummary?.activeUnresolved) || providerFailureRows.some(r=>!r.recovered &&
     ((r.eventId && activePublicIds.has(r.eventId)) || (!r.eventId && /auth|unauthoriz|invalid.key|forbidden|quota/i.test(r.detail))));
+  for (const row of providerFailureRows) {
+    row.impact=row.recovered?'recovered_later'
+      : row.eventId && activePublicIds.has(row.eventId)?'active_pending'
+      :'historical_without_later_success';
+  }
   const activeSearchAnomaly=(providers.byEvent||[]).some(r=>activePublicIds.has(text(r.eventId||r.event_id)) && n(r.searches)>8);
   const indicators=[
     indicator('site','Site / Pages',site.ok?'green':'red',site.ok?`HTTP ${site.status}`:`indisponível (HTTP ${site.status||'erro'})`),
@@ -423,7 +443,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     indicator('highlights','Melhores Momentos',highlightOverdue>0?'yellow':'green',`${highlight} pendência(s) no total · ${highlightOverdue} com mais de 2h${highlightPendingRows[0]?` · mais antiga: ${highlightPendingRows[0].home} x ${highlightPendingRows[0].away}`:''}`),
     indicator('editorial','Editorial / Transmissões',Array.isArray(os.errors)&&os.errors.length?'yellow':'green',Array.isArray(os.errors)&&os.errors.length?`${os.errors.length} erro(s) no último ciclo`:'sem erro reportado pelo Orchestrator'),
     indicator('infra','Infraestrutura / E-mail',!cfg.configured||probe?.ok===false?'red':'green',`${cfg.transport} · ${maskAddress(cfg.to)}${probe?` · ${probe.status||`probe ${probe.ok?'OK':'FALHOU'}`}`:''}${cfg.fallbacks?.length?` · fallback ${cfg.fallbacks.join(' + ')}`:''}`),
-    indicator('openai','IA / Custos',aiCostHealthSeverity({dayUsd:hunterDayUsd,activePending:postPending,providerFailures,unrecovered:activeProviderFailure?1:0,providersReady:geminiReady&&workersAiReady&&gatewayAuthReady,perEventAnomaly:activeSearchAnomaly}),`${providers.calls} chamada(s) multi-provider · ${providers.searches} busca(s) web · Hunter 24h ${fmtUsd(hunterDayUsd)} (alerta ${fmtUsd(HUNTER_DAILY_WARNING_USD)}) · mês ${fmtUsd(hunterMonthUsd)}/${fmtUsd(monthlyBudgetUsd)} · ${providerFailures} falha(s) históricas/24h`),
+    indicator('openai','IA / Custos',aiCostHealthSeverity({dayUsd:hunterDayUsd,activePending:postPending,providerFailures,unrecovered:activeProviderFailure?1:0,providersReady:geminiReady&&workersAiReady&&gatewayAuthReady,perEventAnomaly:activeSearchAnomaly}),`${providers.calls} chamada(s) multi-provider · ${providers.searches} busca(s) web · Hunter 24h ${fmtUsd(hunterDayUsd)} (alerta ${fmtUsd(HUNTER_DAILY_WARNING_USD)}) · mês ${fmtUsd(hunterMonthUsd)}/${fmtUsd(monthlyBudgetUsd)} · ${providerFailures} falha(s) históricas/24h${providerFailureSummary?` (${providerFailureSummary.recovered} recuperada(s), ${providerFailureSummary.unresolved} sem sucesso posterior, ${providerFailureSummary.activeUnresolved} em partidas pendentes)`:``}`),
     indicator('cloudflare','Cloudflare / CPU & Requests',cloudflareSeverity(cfBilling),cloudflareDetail(cfBilling)),
   ];
   const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY)),fineTuning:'not_used_by_design'},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches,errors:Array.isArray(os.errors)?os.errors.slice(0,6).map(x=>text(x).slice(0,300)):[]},reliabilityIntelligence:{sportingState:text(os.reliabilityState)||text(reliabilitySnapshot.state),factualAuditSchema:n(factualAudit.schema_version),factualCritical:n(factualAudit.total_criticos),factualWarnings:n(factualAudit.total_avisos),ragKnowledgeBaseReady:Number(ragManifest.schema_version||0)>=2&&Array.isArray(ragManifest.collections)&&ragManifest.collections.length>0,ragRuntimeEnabled:opsIntelligence?.rag?.ready===true,ragRuntimeVersion:n(opsIntelligence?.rag?.version),ragSourceCount:n(opsIntelligence?.rag?.sourceCount),ragChunkCount:n(opsIntelligence?.rag?.chunkCount),ragSourceSha256:text(opsIntelligence?.rag?.sourceSha256),mcpOpsEnabled:opsIntelligence?.mcp?.enabled===true,mcpOpsReadOnly:opsIntelligence?.mcp?.readOnly===true,mcpProtocolVersion:text(opsIntelligence?.mcp?.protocolVersion),mcpTools:n(opsIntelligence?.mcp?.tools),mcpResources:n(opsIntelligence?.mcp?.resources),fineTuning:'not_used_by_design'},postgame:{pending:postPending,searching:postSearching,overdue:postOverdue,budgetGuard:postBudget,resolved:postResolved,notApplicable:postExempt,eligibilityPending:postUnclassified,requiredLeague:'bra.1',seasonCoverage,highlightPending:highlight,persistentUntilResolved:true,pendingRows,cost:{...postCost,budget:{monthlyBudgetUsd,eventBudgetUsd,warningPct,monthPct:hunterBudgetPct}}},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
@@ -433,6 +453,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   snapshot.postgame.highlightPendingRows=highlightPendingRows;
   snapshot.providerFailureRows=providerFailureRows;
   snapshot.providerUnrecoveredFailures=providerUnrecoveredFailures;
+  snapshot.providerFailureSummary=providerFailureSummary;
   snapshot.actionCenter=buildActionCenter(snapshot,now);
   snapshot.healthActionCenterVersion=HEALTH_ACTION_CENTER_VERSION;
   await metaPut(env,'snapshot',JSON.stringify(snapshot));
