@@ -1,7 +1,8 @@
 import { fetchEspnSummary } from './espn-source.js';
 import { sendMail, probeMail, mailConfig, maskAddress } from './mailer.js';
 import { countWebSearchCalls, recordAiUsage, recordProviderUsage, postgamePublicCostSummary } from './ai-usage.js';
-import { searchPublicWithGemini, fetchSourceText, extractPublicWithWorkersAI, fetchOpenAiResponses, openAiUsage } from './ai-router.js';
+import { searchPublicWithGemini, fetchSourceText, extractPublicWithWorkersAI, resolveWorkersAiExtractModel, fetchOpenAiResponses, openAiUsage } from './ai-router.js';
+import { extractSourceWithCache } from './source-extraction-cache.js';
 import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, evaluateSourceMatchIdentity, buildAttendanceSearchQueries, attendanceSourcePolicyText, officialClubDomainsForTask, PREFERRED_EDITORIAL_SOURCE_SUFFIXES, isMultiMatchRoundupSource, verifiedStadiumCapacity } from './postgame-search-profile.js';
 import { FACTUAL_INTEGRITY_POLICY_VERSION, FACTUAL_INCIDENTS, inspectPostgameFactualIntegrity, quarantinePostgameFactualIntegrity } from './postgame-factual-integrity.js';
 import { attendanceEligibility, POSTGAME_ELIGIBILITY_VERSION, ATTENDANCE_REQUIRED_LEAGUE } from './postgame-competition-eligibility.js';
@@ -980,9 +981,16 @@ async function refreshCachedPublicSources(env,task,values,sources){
     // Só gasta Workers AI quando a página realmente fala da partida e o parser
     // de rótulos não conseguiu extrair nenhum campo confiável.
     if(!valid){
-      const extracted=await extractPublicWithWorkersAI(env,task,scopedSource);
+      // R10R19: cache persistente por evento, URL, modelo e SHA-256 do TEXTO
+      // escopado. Revalida o payload armazenado pelo mesmo guard factual antes
+      // de reutilizá-lo. Falhas expiram em 20 min; página alterada reabre a IA.
+      const extracted=await extractSourceWithCache(env,task,scopedSource,{
+        model:resolveWorkersAiExtractModel(env),
+        extract:()=>extractPublicWithWorkersAI(env,task,scopedSource),
+        validate:(parsed)=>Boolean(validateGroundedValues(parsed,source.url,task)),
+      });
       valid=validateGroundedValues(extracted.parsed,source.url,task);
-      extractor='workers-ai';
+      extractor=extracted.cacheState==='hit_positive'?'workers-ai-cache':'workers-ai';
       if(!valid&&extracted.reason)lastError=text(extracted.reason);
     }
 

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { aiGatewayId, gatewayBase, aiGatewayAuthHeaders, aiGatewayAuthConfigured, geminiConfigured, geminiGroundingSources, geminiSearchCount, geminiInteractionSearchCount, geminiInteractionSources, geminiInteractionText, geminiInteractionRequest, searchPublicWithGemini, isAiGatewayPreProviderFailure, fetchOpenAiResponses, publicSchemaInstruction, resolveWorkersAiExtractModel, WORKERS_AI_EXTRACT_DEFAULT_MODEL } from '../src/ai-router.js';
+import { aiGatewayId, gatewayBase, aiGatewayAuthHeaders, aiGatewayAuthConfigured, geminiConfigured, geminiGroundingSources, geminiSearchCount, geminiInteractionSearchCount, geminiInteractionSources, geminiInteractionText, geminiInteractionRequest, searchPublicWithGemini, isAiGatewayPreProviderFailure, fetchOpenAiResponses, publicSchemaInstruction, resolveWorkersAiExtractModel, WORKERS_AI_EXTRACT_DEFAULT_MODEL, geminiInteractionsCompatibilityFailure, GEMINI_INTERACTIONS_COOLDOWN_MS } from '../src/ai-router.js';
 import { POSTGAME_SEARCH_PROFILE_VERSION, TEAM_SEARCH_PROFILES, buildAttendanceSearchQueries, officialClubDomainsForTask, attendanceSourceQuality } from '../src/postgame-search-profile.js';
 
 // R10R17.8: a configuração histórica/depreciada não deve chegar a env.AI.run().
@@ -233,6 +233,45 @@ try {
     assert.equal(routed.apiCalls,2);
     assert.match(routed.detail,/gateway transport failed/);
   } finally { globalThis.fetch=previousFetch; }
+}
+
+
+// R10R19: após um 400 no Interactions, próximas partidas usam o fallback
+// generateContent sem repetir o mesmo HTTP 400 até expirar o cooldown.
+assert.equal(geminiInteractionsCompatibilityFailure(400),true);
+assert.equal(geminiInteractionsCompatibilityFailure(404),true);
+assert.equal(geminiInteractionsCompatibilityFailure(422),true);
+assert.equal(geminiInteractionsCompatibilityFailure(429),false);
+assert.equal(GEMINI_INTERACTIONS_COOLDOWN_MS,6*60*60_000);
+{
+  const oldFetch=globalThis.fetch;
+  const rows=new Map();
+  const db={prepare(){return {bind(...args){return {
+    async first(){return {value:rows.get(args[0]) ?? null};},
+    async run(){rows.set(args[0],args[1]);return {success:true};}
+  };}};}};
+  const urls=[];
+  try{
+    globalThis.fetch=async (url)=>{
+      urls.push(String(url));
+      if(String(url).endsWith('/interactions'))
+        return new Response(JSON.stringify({error:{code:400,status:'INVALID_ARGUMENT',message:'Unsupported request payload'}}),{status:400});
+      return new Response(JSON.stringify({
+        candidates:[{content:{parts:[{text:'Busca concluída'}]},groundingMetadata:{webSearchQueries:['consulta'],groundingChunks:[{web:{uri:'https://ge.globo.com/futebol/ficha'}}]}}],
+        usageMetadata:{promptTokenCount:4,candidatesTokenCount:5,totalTokenCount:9}
+      }),{status:200});
+    };
+    const env={DB:db,GEMINI_API_KEY:'gem-test'};
+    const first=await searchPublicWithGemini(env,hunterTask,['público presente']);
+    assert.equal(first.apiCalls,2);
+    assert.equal(first.searchObserved,true);
+    assert.equal(urls.filter(u=>u.endsWith('/interactions')).length,1);
+    const next=await searchPublicWithGemini(env,hunterTask,['renda']);
+    assert.equal(next.apiCalls,1,'cooldown deve evitar tentativa redundante');
+    assert.equal(next.searchObserved,true);
+    assert.equal(urls.filter(u=>u.endsWith('/interactions')).length,1);
+    assert.equal(urls.filter(u=>u.includes(':generateContent')).length,2);
+  } finally {globalThis.fetch=oldFetch;}
 }
 
 console.log('ai-router tests: PASS');
