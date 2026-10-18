@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-18T02:51:44.373177-03:00",
+  "gerado_em": "2026-10-18T04:25:58.016056-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 304,
   "total_com_estatisticas": 304,
-  "total_com_publico": 303,
+  "total_com_publico": 304,
   "total_com_eventos": 304,
   "total_com_jogadores": 304,
   "total_eventos_validados": 304,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Estádio Cícero Pompeu de Toledo",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 31501,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.saopaulofc.net/no-morumbis-sao-paulo-vence-o-vasco-pelo-brasileirao",
       "arbitro": "",
       "stats": [
         {
@@ -561,7 +561,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-18T02:51:35.125668-03:00"
+      "atualizado_em": "2026-10-18T02:51:35.125668-03:00",
+      "renda": 1190350
     },
     "401841271": {
       "event_id": "401841271",
@@ -171778,5 +171779,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 271,
+  "total_com_renda": 304
 }

@@ -2,30 +2,23 @@
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
   "jogos_finalizados": 304,
-  "jogos_com_publico": 303,
-  "jogos_sem_publico": 1,
-  "publico_total": 7475224,
-  "jogos_com_renda": 303,
-  "aguardando_fonte": [
-    {
-      "event_id": "401841273",
-      "mandante": "São Paulo",
-      "visitante": "Vasco da Gama",
-      "estado": "AGUARDANDO_FONTE"
-    }
-  ],
+  "jogos_com_publico": 304,
+  "jogos_sem_publico": 0,
+  "publico_total": 7506725,
+  "jogos_com_renda": 304,
+  "aguardando_fonte": [],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
     {
       "event_id": "401841273",
-      "tipo_publico": "",
-      "publico_presente": null,
+      "tipo_publico": "presente",
+      "publico_presente": 31501,
       "publico_pagante": null,
-      "renda": null,
-      "fonte_publico": "",
-      "origem": "",
-      "estado": "AGUARDANDO_FONTE"
+      "renda": 1190350.0,
+      "fonte_publico": "https://www.saopaulofc.net/no-morumbis-sao-paulo-vence-o-vasco-pelo-brasileirao",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
     },
     {
       "event_id": "401841271",
@@ -3058,5 +3051,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-10-17T23:38:23.045137-03:00"
+  "gerado_em": "2026-10-18T04:25:58.996681-03:00"
 }
