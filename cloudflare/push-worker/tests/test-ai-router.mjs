@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { aiGatewayId, gatewayBase, aiGatewayAuthHeaders, aiGatewayAuthConfigured, geminiConfigured, geminiGroundingSources, geminiSearchCount, geminiInteractionSearchCount, geminiInteractionSources, geminiInteractionText, geminiInteractionRequest, searchPublicWithGemini, isAiGatewayPreProviderFailure, fetchOpenAiResponses, publicSchemaInstruction, resolveWorkersAiExtractModel, WORKERS_AI_EXTRACT_DEFAULT_MODEL, geminiInteractionsCompatibilityFailure, GEMINI_INTERACTIONS_COOLDOWN_MS } from '../src/ai-router.js';
-import { POSTGAME_SEARCH_PROFILE_VERSION, TEAM_SEARCH_PROFILES, buildAttendanceSearchQueries, officialClubDomainsForTask, attendanceSourceQuality } from '../src/postgame-search-profile.js';
+import { POSTGAME_SEARCH_PROFILE_VERSION, TEAM_SEARCH_PROFILES, buildAttendanceSearchQueries, officialClubDomainsForTask, attendanceSourceQuality, matchDayEditorialSources } from '../src/postgame-search-profile.js';
 
 // R10R17.8: a configuração histórica/depreciada não deve chegar a env.AI.run().
 assert.equal(WORKERS_AI_EXTRACT_DEFAULT_MODEL, '@cf/meta/llama-3.1-8b-instruct-fp8');
@@ -10,6 +10,15 @@ for (const old of ['@cf/meta/llama-3.1-8b-instruct', '@cf/meta/infire-llama-3.1-
 assert.equal(resolveWorkersAiExtractModel({}), WORKERS_AI_EXTRACT_DEFAULT_MODEL);
 assert.equal(resolveWorkersAiExtractModel({WORKERS_AI_EXTRACT_MODEL:'@cf/meta/llama-3.1-8b-instruct-fast'}), '@cf/meta/llama-3.1-8b-instruct-fast');
 assert.equal(resolveWorkersAiExtractModel({WORKERS_AI_EXTRACT_MODEL:'@cf/meta/llama-3.1-8b-instruct-fp8-fast'}), '@cf/meta/llama-3.1-8b-instruct-fp8-fast');
+
+// R10R20: endereço da ficha ge do próprio jogo derivado de data e clubes,
+// sem confundir horário em UTC com o dia local de Brasília.
+const geRemoUrl='https://ge.globo.com/pa/futebol/brasileirao-serie-a/jogo/18-10-2026/remo-bragantino.ghtml';
+assert.deepEqual(matchDayEditorialSources({home:'Remo',away:'Bragantino',kickoff:'2026-10-18T19:30:00-03:00'}),[geRemoUrl]);
+assert.deepEqual(matchDayEditorialSources({home:'Clube do Remo',away:'Red Bull Bragantino',kickoff:'2026-10-18T22:30:00Z'}),[geRemoUrl]);
+assert.deepEqual(matchDayEditorialSources({home:'Corinthians',away:'Vitória',kickoff:'2026-10-19T23:00:00Z'}),['https://ge.globo.com/sp/futebol/brasileirao-serie-a/jogo/19-10-2026/corinthians-vitoria.ghtml']);
+assert.deepEqual(matchDayEditorialSources({home:'Remo',away:'Bragantino',kickoff:'data inválida'}),[]);
+assert.deepEqual(matchDayEditorialSources({home:'Clube Desconhecido',away:'Bragantino',kickoff:'2026-10-18'}),[]);
 
 assert.equal(aiGatewayId({}), 'default');
 assert.equal(gatewayBase({AI_GATEWAY_ACCOUNT_ID:'abc',AI_GATEWAY_ID:'default'},'openai'),'https://gateway.ai.cloudflare.com/v1/abc/default/openai');
