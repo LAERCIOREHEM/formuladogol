@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "_comentario": "Correções documentais verificadas manualmente. O coletor mescla somente os event_ids e campos explicitamente listados; não substitui o restante do snapshot.",
-  "verificado_em": "2026-10-18T20:18:52-03:00",
+  "verificado_em": "2026-10-18T22:55:58-03:00",
   "jogos": {
     "401841169": {
       "confronto": "São Paulo 1 x 2 Santos",
@@ -164,6 +164,25 @@
       "origem": "correção documental verificada",
       "verificado_em": "2026-10-11T21:00:00-03:00",
       "nota": "UOL/Agência, Gre-Nal 455 do Brasileirão em 11/10/2026: 53.528 torcedores e renda R$ 4.106.188,74. Corrige 55.337 erroneamente importados de notícia antiga da Copa do Brasil."
+    },
+    "401841274": {
+      "confronto": "Remo 1 x 1 Bragantino",
+      "rodada": 31,
+      "publico": 13089,
+      "pagantes": 9390,
+      "renda": 311660,
+      "tipo": "presente",
+      "publico_status": "divulgado",
+      "pagantes_status": "divulgado",
+      "renda_status": "divulgado",
+      "fonte": "https://ge.globo.com/pa/futebol/brasileirao-serie-a/jogo/18-10-2026/remo-bragantino.ghtml",
+      "fonte_publico": "https://ge.globo.com/pa/futebol/brasileirao-serie-a/jogo/18-10-2026/remo-bragantino.ghtml",
+      "fonte_pagantes": "https://ge.globo.com/pa/futebol/brasileirao-serie-a/jogo/18-10-2026/remo-bragantino.ghtml",
+      "fonte_renda": "https://ge.globo.com/pa/futebol/brasileirao-serie-a/jogo/18-10-2026/remo-bragantino.ghtml",
+      "fonte_adicional": "https://ge.globo.com/gato-mestre/noticia/2026/10/18/bahia-0-x-3-flamengo-tem-o-maior-publico-da-31a-rodada-do-brasileiro-veja-a-lista.ghtml",
+      "origem": "correção documental verificada — ge (página da partida e Gato Mestre)",
+      "verificado_em": "2026-10-18T22:55:58-03:00",
+      "nota": "Usuário enviou captura de tela da seção PÚBLICO E RENDA na ficha ge de Remo 1 x 1 Bragantino (18/10/2026). Público total 13.089 = 9.390 pagantes + 3.699 não pagantes; renda bruta R$ 311.660,00. Confirmação independente ge/Gato Mestre na reportagem da 31ª rodada, bloco Remo 1 x 1 Bragantino. Preservar público presente/total distinto de pagantes; nunca usar números do bloco adjacente."
     },
     "401841275": {
       "confronto": "Mirassol 2 x 0 Internacional",
