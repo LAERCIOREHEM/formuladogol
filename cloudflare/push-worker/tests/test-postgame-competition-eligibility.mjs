@@ -117,8 +117,8 @@ assert.equal(unknown.highlight_status, 'pending', 'reclassificação explícita 
 assert.ok(unknown.highlight_next_at);
 
 const status = await postgameStatus(env);
-assert.equal(status.version, 15);
-assert.equal(status.storedPolicyVersion, 15);
+assert.equal(status.version, 16);
+assert.equal(status.storedPolicyVersion, 16);
 assert.equal(status.highlightRequiredLeague, 'bra.1');
 assert.equal(status.highlightEligibilityPolicyVersion, 1);
 assert.equal(status.highlightNotApplicable, 3);
