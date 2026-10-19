@@ -1,23 +1,50 @@
 {
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
-  "jogos_finalizados": 306,
-  "jogos_com_publico": 306,
-  "jogos_sem_publico": 0,
-  "publico_total": 7565678,
-  "jogos_com_renda": 305,
-  "aguardando_fonte": [],
+  "jogos_finalizados": 308,
+  "jogos_com_publico": 307,
+  "jogos_sem_publico": 1,
+  "publico_total": 7613143,
+  "jogos_com_renda": 307,
+  "aguardando_fonte": [
+    {
+      "event_id": "401841274",
+      "mandante": "Remo",
+      "visitante": "Bragantino",
+      "estado": "AGUARDANDO_FONTE"
+    }
+  ],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
     {
+      "event_id": "401841274",
+      "tipo_publico": "",
+      "publico_presente": null,
+      "publico_pagante": null,
+      "renda": null,
+      "fonte_publico": "",
+      "origem": "",
+      "estado": "AGUARDANDO_FONTE"
+    },
+    {
+      "event_id": "401841269",
+      "tipo_publico": "presente",
+      "publico_presente": 47465,
+      "publico_pagante": null,
+      "renda": 2764829.0,
+      "fonte_publico": "https://www.estadao.com.br/esportes/futebol/flamengo-desencanta-no-2-tempo-vence-o-bahia-e-mantem-lideranca-do-brasileirao",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
+    },
+    {
       "event_id": "401841277",
       "tipo_publico": "presente",
       "publico_presente": 27697,
-      "publico_pagante": null,
-      "renda": null,
-      "fonte_publico": "https://www.estadao.com.br/tipo_conteudo/analise/santos-estreia-quarteto-ofensivo-vira-contra-o-fluminense-e-continua-sonhando-com-libertadores",
-      "origem": "cloudflare-postgame-fastlane",
+      "publico_pagante": 25471,
+      "renda": 1658380.5,
+      "fonte_publico": "https://share.google/iBk2z1AObJa98YdEu",
+      "origem": "correção documental verificada — foto do placar do estádio",
       "estado": "CONFIRMADO"
     },
     {
@@ -3071,5 +3098,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-10-18T20:09:18.949632-03:00"
+  "gerado_em": "2026-10-18T22:15:02.951176-03:00"
 }
