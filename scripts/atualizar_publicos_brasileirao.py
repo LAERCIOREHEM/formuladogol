@@ -873,9 +873,14 @@ def executar_coleta(
             # Dedup preservando ordem. Cada URL de artigo do ge é consultada também
             # em AMP para contornar defasagem de cache entre representações.
             urls_base = list(dict.fromkeys(urls_base))
-            artigo_itens: list[dict[str, Any]] = []
-            url_encontrada = ""
+            # R10R21: não encerrar a procura na PRIMEIRA matéria com algum
+            # confronto. Artigos de rodada podem estar desatualizados ou ainda
+            # não conter o jogo recém-finalizado. Buscar até preencher todos os
+            # CAMPOS faltantes dos jogos-alvo, sem misturar números entre jogos.
+            fonte_aplicada = ""
             for url_base in urls_base:
+                if all(not precisa_enriquecimento(jogo) for jogo in jogos_rodada):
+                    break
                 fontes_parseadas: list[tuple[str, list[dict[str, Any]]]] = []
                 for url in variantes_url_ge(url_base):
                     try:
@@ -889,45 +894,67 @@ def executar_coleta(
                     fontes_consultadas.append({"rodada": rodada, "url": url, "itens": len(parsed)})
                     if parsed:
                         fontes_parseadas.append((url, parsed))
-                if fontes_parseadas:
-                    artigo_itens, conflitos_variantes = mesclar_itens_artigos(fontes_parseadas)
-                    conflitos.extend(conflitos_variantes)
-                    if artigo_itens:
-                        url_encontrada = url_base
-                        break
-            if not artigo_itens:
-                continue
-
-            fonte_atual = fontes_rodadas.get(str(rodada))
-            if not isinstance(fonte_atual, dict) or fonte_atual.get("url") != url_encontrada:
-                fontes_rodadas[str(rodada)] = {
-                    "url": url_encontrada,
-                    "fonte": "ge/Gato Mestre",
-                }
-            for jogo in jogos_rodada:
-                eid = str(jogo.get("event_id") or "")
-                item = next((x for x in artigo_itens if _match_artigo_resultado(x, jogo)), None)
-                if not item:
+                if not fontes_parseadas:
                     continue
-                publico_artigo = numero_publico(item.get("publico"))
-                pagantes_artigo = numero_publico(item.get("pagantes"))
-                renda_artigo = numero_renda(item.get("renda"))
-                statuses = (str(item.get("publico_status") or ""), str(item.get("pagantes_status") or ""), str(item.get("renda_status") or ""))
-                if publico_artigo is None and pagantes_artigo is None and renda_artigo is None and not any(statuses):
-                    continue
-                fonte_item = str(item.get("_fonte_url") or url_encontrada)
-                mudou, conflito = _registrar_complemento(
-                    mapa, eid, publico_artigo, fonte_item,
-                    pagantes=pagantes_artigo,
-                    renda=renda_artigo,
-                    publico_status=statuses[0],
-                    pagantes_status=statuses[1],
-                    renda_status=statuses[2],
-                    fonte_adicional="Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
-                )
-                inseridos += int(mudou)
-                if conflito:
-                    conflitos.append(conflito)
+                artigo_itens, conflitos_variantes = mesclar_itens_artigos(fontes_parseadas)
+                conflitos.extend(conflitos_variantes)
+                for jogo in jogos_rodada:
+                    if not precisa_enriquecimento(jogo):
+                        continue
+                    eid = str(jogo.get("event_id") or "")
+                    item = next((x for x in artigo_itens if _match_artigo_resultado(x, jogo)), None)
+                    if not item:
+                        continue
+                    atual = mapa.get(eid) or {}
+                    detalhe = detalhes_jogos.get(eid) or {}
+                    # Corrigir apenas lacunas. O Gato Mestre pode publicar
+                    # outros jogos/versões com números diferentes; uma fonte
+                    # não pode sobrescrever fatos previamente verificados.
+                    precisa_publico = not tem_publico(jogo) and str(atual.get("publico_status") or "") != "nao_divulgado"
+                    precisa_pagantes = numero_publico(detalhe.get("publico_pagante")) is None and numero_publico(atual.get("pagantes")) is None and str(atual.get("pagantes_status") or "") != "nao_divulgado"
+                    precisa_renda = numero_renda(detalhe.get("renda")) is None and numero_renda(atual.get("renda")) is None and str(atual.get("renda_status") or "") != "nao_divulgado"
+                    publico_artigo = numero_publico(item.get("publico")) if precisa_publico else None
+                    pagantes_artigo = numero_publico(item.get("pagantes")) if precisa_pagantes else None
+                    renda_artigo = numero_renda(item.get("renda")) if precisa_renda else None
+                    statuses = tuple(
+                        str(item.get(k) or "") if precisa else ""
+                        for k, precisa in (
+                            ("publico_status", precisa_publico),
+                            ("pagantes_status", precisa_pagantes),
+                            ("renda_status", precisa_renda),
+                        )
+                    )
+                    if all(v is None for v in (publico_artigo, pagantes_artigo, renda_artigo)) and not any(statuses):
+                        continue
+                    fonte_item = str(item.get("_fonte_url") or url_base)
+                    mudou, conflito = _registrar_complemento(
+                        mapa, eid, publico_artigo, fonte_item,
+                        pagantes=pagantes_artigo,
+                        renda=renda_artigo,
+                        publico_status=statuses[0],
+                        pagantes_status=statuses[1],
+                        renda_status=statuses[2],
+                        fonte_adicional="Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+                    )
+                    inseridos += int(mudou)
+                    if conflito:
+                        conflitos.append(conflito)
+                    if mudou:
+                        for campo, disponivel in (
+                            ("fonte_publico", publico_artigo is not None),
+                            ("fonte_pagantes", pagantes_artigo is not None),
+                            ("fonte_renda", renda_artigo is not None),
+                        ):
+                            if disponivel:
+                                mapa[eid][campo] = fonte_item
+                        fonte_aplicada = url_base
+            if fonte_aplicada:
+                fonte_atual = fontes_rodadas.get(str(rodada))
+                if not isinstance(fonte_atual, dict) or fonte_atual.get("url") != fonte_aplicada:
+                    fontes_rodadas[str(rodada)] = {
+                        "url": fonte_aplicada,
+                        "fonte": "ge/Gato Mestre",
+                    }
 
     propagados, conflitos_dup = propagar_duplicados(finalizados, mapa)
     inseridos += propagados
@@ -1250,7 +1277,55 @@ def self_test() -> None:
     from postgame_factual_integrity import inspect_factual_integrity
     assert inspect_factual_integrity(15056, None, 15056)["quarantine_fields"] == ["renda"]
     assert not inspect_factual_integrity(15056, None, 708004.50)["critical"]
-    print("SELF-TEST OK: parser GE + R10R16.1 factual integrity guard.")
+    # R10R21: Gato Mestre atualiza a matéria depois do fim do jogo.
+    # Uma versão antiga pode listar algumas partidas, mas não renda do alvo.
+    # O coletor DEVE continuar e reconciliar cada campo pelo confronto.
+    from unittest.mock import patch
+    stale = "https://ge.globo.com/gato-mestre/noticia/2026/10/18/versao-antiga-31a-rodada.ghtml"
+    fresh = "https://ge.globo.com/gato-mestre/noticia/2026/10/18/versao-atualizada-31a-rodada.ghtml"
+    stale_html = (
+        "<h2>Fluminense 1 x 2 Santos (Maracanã)</h2>"
+        "<p>Público presente: 27.697</p><p>Renda: R$ 1.658.381</p>"
+        "<h2>Remo 1 x 1 Bragantino (Mangueirão)</h2>"
+        "<p>Público presente: 13.089</p>"
+    )
+    fresh_html = (
+        "<h2>Remo 1 x 1 Bragantino (Mangueirão)</h2>"
+        "<p>Público pagante: 9.390</p>"
+        "<p>Renda: R$ 311.660,00</p>"
+        "<h2>Grêmio 2 x 4 Cruzeiro</h2><p>Renda: R$ 1.638.337</p>"
+    )
+    def html_fixture(url: str, *args: Any, **kwargs: Any) -> str:
+        if "versao-antiga" in url:
+            return stale_html
+        if "versao-atualizada" in url:
+            return fresh_html
+        raise FileNotFoundError(url)
+    jogo_remo = {
+        "event_id": "r10r21-fixture", "rodada": 31, "data_iso": "2026-10-18T19:30",
+        "estado": "post", "mandante": {"nome": "Remo"},
+        "visitante": {"nome": "Bragantino"},
+        "placar_mandante": 1, "placar_visitante": 1,
+    }
+    with (
+        patch(__name__ + ".buscar_html", side_effect=html_fixture),
+        patch(__name__ + ".descobrir_urls_ge_por_sitemap", return_value=([fresh], [], [])),
+    ):
+        after, audit = executar_coleta(
+            [jogo_remo], {"jogos": {}},
+            {"jogos": {}, "fontes_rodadas": {"31": {"url": stale}}},
+            max_rodadas=1, event_id_alvo="r10r21-fixture",
+        )
+    remo = after["jogos"]["r10r21-fixture"]
+    assert remo["publico"] == 13089 and remo["pagantes"] == 9390
+    assert remo["renda"] == 311660
+    assert remo["fonte_publico"].startswith(stale)
+    assert remo["fonte_renda"].startswith(fresh)
+    assert after["fontes_rodadas"]["31"]["url"] == fresh
+    assert audit["total_sem_publico"] == 0 and audit["total_sem_renda"] == 0
+    assert remo["renda"] != 1658381, "renda do confronto anterior nunca deve vazar"
+
+    print("SELF-TEST OK: parser GE + R10R16.1 integrity + R10R21 progressive roundup recovery.")
 
 
 def main() -> None:
