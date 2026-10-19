@@ -16,7 +16,7 @@ const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
-const POSTGAME_POLICY_VERSION = 16;
+export const POSTGAME_POLICY_VERSION = 16;
 
 /*
  * Postgame Fastlane v15 — R10R17.7 (Melhores Momentos Série A) + R10R17.1 (attendance eligibility) + R10R16.1 Factual Integrity + R10R15.1 SLA Migration Suppression:
