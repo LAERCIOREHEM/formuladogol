@@ -1281,7 +1281,7 @@ export function publicAlertMessage(task, values, sources, ai, lastError, env = {
     '- Workers AI não entra nesta estimativa em USD; seu consumo aparece no billing Cloudflare.',
     '',
     `Próxima tentativa: ${nextAt ? brDateTime(nextAt) : 'calculando'}`,
-    'Depois de 2h o Hunter tenta novamente a cada 1h; OpenAI é usado seletivamente a cada ~3h e pode ser suspenso pelo budget guard.',
+    'Depois de 2h o Hunter reconsulta fontes gratuitas a cada 5–15 min no primeiro dia (depois em intervalos maiores); IA continua limitada por circuit breaker e orçamento.',
     'A partida só sai da fila quando público e renda estiverem resolvidos.'
   ].join('\n');
   return { subject, body };
