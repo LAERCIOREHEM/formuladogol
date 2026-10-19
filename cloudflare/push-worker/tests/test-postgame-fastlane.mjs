@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI, geminiCircuitState, geminiStructuralFailure, staticSeedRefreshIntervalMs } from '../src/postgame-fastlane.js';
+import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI, geminiCircuitState, geminiStructuralFailure, staticSeedRefreshIntervalMs, hasLabeledFinancialEvidence } from '../src/postgame-fastlane.js';
 
 assert.equal(highlightTitleValid('FLAMENGO 1 X 0 BRAGANTINO | MELHORES MOMENTOS | BRASILEIRÃO 2026', 'Flamengo', 'Bragantino'), true);
 assert.equal(highlightTitleValid('FLAMENGO X BRAGANTINO | AQUECIMENTO AO VIVO | BRASILEIRÃO', 'Flamengo', 'Bragantino'), false);
@@ -151,11 +151,11 @@ const zero={mini_attempts:0,sol_attempts:0,sol_completed:0};
 const fullBudget={allowGemini:true,allowOpenAI:true};
 
 assert.equal(planPublicStep(task,zero,at(1),fullBudget).phase,'deterministic');
-assert.equal(planPublicStep(task,zero,at(5),fullBudget).phase,'gemini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(14),fullBudget).phase,'deterministic');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(15),fullBudget).phase,'gemini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:2},at(30),fullBudget).phase,'gemini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:3},at(45),fullBudget).phase,'openai');
+assert.equal(planPublicStep(task,zero,at(3),fullBudget).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(8),fullBudget).phase,'deterministic');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(9),fullBudget).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:2},at(18),fullBudget).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:3},at(20),fullBudget).phase,'openai');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:3,sol_attempts:1},at(60),fullBudget).phase,'gemini');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:7,sol_attempts:1},at(90),fullBudget).phase,'openai');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:8,sol_attempts:2},at(120),fullBudget).phase,'openai');
@@ -166,8 +166,8 @@ assert.notEqual(planPublicStep(task,{mini_attempts:99,sol_attempts:99,sol_comple
 assert.equal(planPublicStep(task,{...zero,mini_attempts:3},at(45),{allowGemini:true,allowOpenAI:false}).phase,'gemini');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:5},at(45),{allowGemini:false,allowOpenAI:false}).phase,'budget_guard');
 
-assert.deepEqual(PUBLIC_POLICY.geminiScheduleMinutes,[5,15,25,35,45,60,90,120]);
-assert.deepEqual(PUBLIC_POLICY.openaiScheduleMinutes,[45,90,120]);
+assert.deepEqual(PUBLIC_POLICY.geminiScheduleMinutes,[3,9,18,30,45,60,90,120]);
+assert.deepEqual(PUBLIC_POLICY.openaiScheduleMinutes,[20,50,100]);
 assert.equal(PUBLIC_POLICY.overdueMinutes,120);
 assert.equal(PUBLIC_POLICY.migrationGraceMinutes,15);
 const oldFinished={league:'bra.1',final_at:'2026-10-07T22:00:00.000Z'};
@@ -198,9 +198,9 @@ assert.equal(circuitOpen.remainingMs,15*60_000);
 assert.equal(geminiCircuitState({openUntil:'2026-10-04T07:20:00.000Z'},circuitNow).open,false);
 
 assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'gemini'},at(4),zero),at(5));
-assert.equal(nextPublicAttemptMs(task,'gemini',{phase:'deterministic'},at(5),{...zero,mini_attempts:1}),at(10));
-assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'budget_guard'},at(46),{mini_attempts:3,sol_attempts:0}),at(51));
-assert.equal(nextPublicAttemptMs(task,'gemini',{phase:'deterministic'},at(181),{mini_attempts:9,sol_attempts:3}),at(240));
+assert.equal(nextPublicAttemptMs(task,'gemini',{phase:'deterministic'},at(5),{...zero,mini_attempts:1}),at(8));
+assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'budget_guard'},at(46),{mini_attempts:3,sol_attempts:0}),at(49));
+assert.equal(nextPublicAttemptMs(task,'gemini',{phase:'deterministic'},at(181),{mini_attempts:9,sol_attempts:3}),at(186));
 
 const terra=publicSearchRequest(task,['renda'],{},'openai');
 assert.equal(terra.model,'gpt-5.6-terra'); assert.equal(terra.max_tool_calls,6); assert.equal(terra.reasoning.effort,'low');
@@ -235,16 +235,24 @@ assert.equal(isPublicComplete({publico:42000,renda:null}),false);
 assert.equal(taskEndMs({kickoff:'2026-09-20T18:00:00.000Z'}),Date.parse('2026-09-20T19:55:00.000Z'));
 const msg=publicAlertMessage(task,{publico:null,publico_pagante:null,renda:null},{},{deterministic_checks:15,mini_attempts:5,sol_attempts:2},'not_found',{}, {event:{estimatedUsd:0.06},month:{estimatedUsd:1.84}}, new Date(at(180)).toISOString());
 assert.match(msg.body,/busca automática CONTINUA/);
-assert.match(msg.body,/Depois de 2h o Hunter tenta novamente a cada 1h/);
+assert.match(msg.body,/reconsulta fontes gratuitas a cada 5–15 min/);
 assert.doesNotMatch(msg.body,/Nenhuma nova busca automática será feita/);
 
 // R10R9: falha Gemini em jogo >=45min precisa acionar OpenAI NO MESMO CICLO.
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),true);
-assert.equal(shouldImmediateOpenAiFallback({ageMinutes:20,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),false);
+assert.equal(shouldImmediateOpenAiFallback({ageMinutes:19,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),false);
+assert.equal(shouldImmediateOpenAiFallback({ageMinutes:20,budget:{allowOpenAI:true},complete:false}),true);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:20,forcedUpgrade:true,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),true);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:false},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),false);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:1,httpStatus:200,found:true},discoveredCount:2,refreshedFoundAny:true,complete:true}),false);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:1,httpStatus:200,found:true},discoveredCount:2,refreshedFoundAny:true,complete:false}),true);
+// R10R20: resultado simples NÃO deve consumir Workers AI.
+assert.equal(hasLabeledFinancialEvidence('Remo 1 x 1 Bragantino, final no Mangueirão.'), false);
+assert.equal(hasLabeledFinancialEvidence('Público presente: 9.432 Renda: R$ 399.000'), true);
+assert.equal(hasLabeledFinancialEvidence('Renda: R$ 1.658.380,50'), true);
+assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'deterministic'},at(7*60),zero),at(7*60+15));
+assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'deterministic'},at(25*60),zero),at(26*60));
+assert.equal(PUBLIC_POLICY.deterministicEveryMinutes,3);
 console.log('postgame-fastlane v15 policy + eligibility guard + factual integrity + SLA suppression + circuit tests: PASS');
 
 // ============================ R10R15 Match Identity Gate ============================
