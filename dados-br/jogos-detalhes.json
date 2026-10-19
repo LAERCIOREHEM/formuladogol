@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-18T22:15:02.253626-03:00",
+  "gerado_em": "2026-10-18T23:06:26.753754-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 308,
   "total_com_estatisticas": 308,
-  "total_com_publico": 307,
+  "total_com_publico": 308,
   "total_com_eventos": 308,
   "total_com_jogadores": 308,
   "total_eventos_validados": 308,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Mangueirão",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 13089,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/pa/futebol/brasileirao-serie-a/jogo/18-10-2026/remo-bragantino.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -561,7 +561,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-18T22:00:18.836830-03:00"
+      "atualizado_em": "2026-10-18T22:00:18.836830-03:00",
+      "publico_pagante": 9390,
+      "renda": 311660,
+      "dados_publico_fonte_adicional": "ge/Gato Mestre 31ª rodada: https://ge.globo.com/gato-mestre/noticia/2026/10/18/bahia-0-x-3-flamengo-tem-o-maior-publico-da-31a-rodada-do-brasileiro-veja-a-lista.ghtml"
     },
     "401841269": {
       "event_id": "401841269",
@@ -174075,6 +174078,6 @@
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
   },
-  "total_com_publico_pagante": 272,
-  "total_com_renda": 307
+  "total_com_publico_pagante": 273,
+  "total_com_renda": 308
 }
