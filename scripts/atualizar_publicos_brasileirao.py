@@ -873,9 +873,14 @@ def executar_coleta(
             # Dedup preservando ordem. Cada URL de artigo do ge é consultada também
             # em AMP para contornar defasagem de cache entre representações.
             urls_base = list(dict.fromkeys(urls_base))
-            artigo_itens: list[dict[str, Any]] = []
-            url_encontrada = ""
+            # R10R21: não encerrar a procura na PRIMEIRA matéria com algum
+            # confronto. Artigos de rodada podem estar desatualizados ou ainda
+            # não conter o jogo recém-finalizado. Buscar até preencher todos os
+            # CAMPOS faltantes dos jogos-alvo, sem misturar números entre jogos.
+            fonte_aplicada = ""
             for url_base in urls_base:
+                if all(not precisa_enriquecimento(jogo) for jogo in jogos_rodada):
+                    break
                 fontes_parseadas: list[tuple[str, list[dict[str, Any]]]] = []
                 for url in variantes_url_ge(url_base):
                     try:
@@ -889,45 +894,67 @@ def executar_coleta(
                     fontes_consultadas.append({"rodada": rodada, "url": url, "itens": len(parsed)})
                     if parsed:
                         fontes_parseadas.append((url, parsed))
-                if fontes_parseadas:
-                    artigo_itens, conflitos_variantes = mesclar_itens_artigos(fontes_parseadas)
-                    conflitos.extend(conflitos_variantes)
-                    if artigo_itens:
-                        url_encontrada = url_base
-                        break
-            if not artigo_itens:
-                continue
-
-            fonte_atual = fontes_rodadas.get(str(rodada))
-            if not isinstance(fonte_atual, dict) or fonte_atual.get("url") != url_encontrada:
-                fontes_rodadas[str(rodada)] = {
-                    "url": url_encontrada,
-                    "fonte": "ge/Gato Mestre",
-                }
-            for jogo in jogos_rodada:
-                eid = str(jogo.get("event_id") or "")
-                item = next((x for x in artigo_itens if _match_artigo_resultado(x, jogo)), None)
-                if not item:
+                if not fontes_parseadas:
                     continue
-                publico_artigo = numero_publico(item.get("publico"))
-                pagantes_artigo = numero_publico(item.get("pagantes"))
-                renda_artigo = numero_renda(item.get("renda"))
-                statuses = (str(item.get("publico_status") or ""), str(item.get("pagantes_status") or ""), str(item.get("renda_status") or ""))
-                if publico_artigo is None and pagantes_artigo is None and renda_artigo is None and not any(statuses):
-                    continue
-                fonte_item = str(item.get("_fonte_url") or url_encontrada)
-                mudou, conflito = _registrar_complemento(
-                    mapa, eid, publico_artigo, fonte_item,
-                    pagantes=pagantes_artigo,
-                    renda=renda_artigo,
-                    publico_status=statuses[0],
-                    pagantes_status=statuses[1],
-                    renda_status=statuses[2],
-                    fonte_adicional="Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
-                )
-                inseridos += int(mudou)
-                if conflito:
-                    conflitos.append(conflito)
+                artigo_itens, conflitos_variantes = mesclar_itens_artigos(fontes_parseadas)
+                conflitos.extend(conflitos_variantes)
+                for jogo in jogos_rodada:
+                    if not precisa_enriquecimento(jogo):
+                        continue
+                    eid = str(jogo.get("event_id") or "")
+                    item = next((x for x in artigo_itens if _match_artigo_resultado(x, jogo)), None)
+                    if not item:
+                        continue
+                    atual = mapa.get(eid) or {}
+                    detalhe = detalhes_jogos.get(eid) or {}
+                    # Corrigir apenas lacunas. O Gato Mestre pode publicar
+                    # outros jogos/versões com números diferentes; uma fonte
+                    # não pode sobrescrever fatos previamente verificados.
+                    precisa_publico = not tem_publico(jogo) and str(atual.get("publico_status") or "") != "nao_divulgado"
+                    precisa_pagantes = numero_publico(detalhe.get("publico_pagante")) is None and numero_publico(atual.get("pagantes")) is None and str(atual.get("pagantes_status") or "") != "nao_divulgado"
+                    precisa_renda = numero_renda(detalhe.get("renda")) is None and numero_renda(atual.get("renda")) is None and str(atual.get("renda_status") or "") != "nao_divulgado"
+                    publico_artigo = numero_publico(item.get("publico")) if precisa_publico else None
+                    pagantes_artigo = numero_publico(item.get("pagantes")) if precisa_pagantes else None
+                    renda_artigo = numero_renda(item.get("renda")) if precisa_renda else None
+                    statuses = tuple(
+                        str(item.get(k) or "") if precisa else ""
+                        for k, precisa in (
+                            ("publico_status", precisa_publico),
+                            ("pagantes_status", precisa_pagantes),
+                            ("renda_status", precisa_renda),
+                        )
+                    )
+                    if all(v is None for v in (publico_artigo, pagantes_artigo, renda_artigo)) and not any(statuses):
+                        continue
+                    fonte_item = str(item.get("_fonte_url") or url_base)
+                    mudou, conflito = _registrar_complemento(
+                        mapa, eid, publico_artigo, fonte_item,
+                        pagantes=pagantes_artigo,
+                        renda=renda_artigo,
+                        publico_status=statuses[0],
+                        pagantes_status=statuses[1],
+                        renda_status=statuses[2],
+                        fonte_adicional="Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+                    )
+                    inseridos += int(mudou)
+                    if conflito:
+                        conflitos.append(conflito)
+                    if mudou:
+                        for campo, disponivel in (
+                            ("fonte_publico", publico_artigo is not None),
+                            ("fonte_pagantes", pagantes_artigo is not None),
+                            ("fonte_renda", renda_artigo is not None),
+                        ):
+                            if disponivel:
+                                mapa[eid][campo] = fonte_item
+                        fonte_aplicada = url_base
+            if fonte_aplicada:
+                fonte_atual = fontes_rodadas.get(str(rodada))
+                if not isinstance(fonte_atual, dict) or fonte_atual.get("url") != fonte_aplicada:
+                    fontes_rodadas[str(rodada)] = {
+                        "url": fonte_aplicada,
+                        "fonte": "ge/Gato Mestre",
+                    }
 
     propagados, conflitos_dup = propagar_duplicados(finalizados, mapa)
     inseridos += propagados
