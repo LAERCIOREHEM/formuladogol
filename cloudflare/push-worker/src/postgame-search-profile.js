@@ -36,6 +36,53 @@ export const TEAM_SEARCH_PROFILES = Object.freeze({
   'Vitória': Object.freeze({ aliases: ['Vitória','Vitoria','EC Vitória','EC Vitoria'], officialDomains: ['ecvitoria.com.br'] }),
 });
 
+// R10R20: consulta GRATUITA da página da própria partida antes de buscas com IA.
+// Região e slugs são conhecidos; a URL é apenas uma CANDIDATA, não prova de
+// público ou renda. Nenhum campo é aceito sem Match Identity Gate + parser.
+const GE_MATCH_HOME_STATE = Object.freeze({
+  'Athletico-PR':'pr','Atlético-MG':'mg','Bahia':'ba','Botafogo':'rj',
+  'Bragantino':'sp','Chapecoense':'sc','Corinthians':'sp','Coritiba':'pr',
+  'Cruzeiro':'mg','Flamengo':'rj','Fluminense':'rj','Grêmio':'rs',
+  'Internacional':'rs','Mirassol':'sp','Palmeiras':'sp','Remo':'pa',
+  'Santos':'sp','São Paulo':'sp','Vasco da Gama':'rj','Vitória':'ba'
+});
+const GE_MATCH_SLUG = Object.freeze({
+  'Athletico-PR':'athletico-pr','Atlético-MG':'atletico-mg',
+  'Bragantino':'bragantino','Grêmio':'gremio','São Paulo':'sao-paulo',
+  'Vasco da Gama':'vasco','Vitória':'vitoria'
+});
+function brazilKickoffDate(value) {
+  const raw=text(value);
+  if (/^20\d{2}-\d{2}-\d{2}T/.test(raw) && /(?:Z|[+-]\d{2}:\d{2})$/i.test(raw)) {
+    const instant=new Date(raw);
+    if(!Number.isNaN(instant.getTime())){
+      const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(instant);
+      const get=(kind)=>parts.find(part=>part.type===kind)?.value||'';
+      return `${get('year')}-${get('month')}-${get('day')}`;
+    }
+  }
+  return /^20\d{2}-\d{2}-\d{2}/.test(raw)?raw.slice(0,10):'';
+}
+function geMatchSlug(value){
+  const profile=lookupProfile(value);
+  const canonical=Object.keys(TEAM_SEARCH_PROFILES).find(name=>TEAM_SEARCH_PROFILES[name]===profile);
+  if(!canonical)return '';
+  return GE_MATCH_SLUG[canonical]||normalizeText(canonical).replace(/ /g,'-');
+}
+export function matchDayEditorialSources(task={}) {
+  const homeProfile=lookupProfile(task.home), awayProfile=lookupProfile(task.away);
+  const homeName=Object.keys(TEAM_SEARCH_PROFILES).find(name=>TEAM_SEARCH_PROFILES[name]===homeProfile);
+  if(!homeName||!awayProfile)return [];
+  const dt=brazilKickoffDate(task.kickoff||task.data_iso);
+  if(!dt)return [];
+  const [year,month,day]=dt.split('-');
+  const home=geMatchSlug(task.home),away=geMatchSlug(task.away);
+  if(!home||!away)return [];
+  const state=GE_MATCH_HOME_STATE[homeName];
+  if(!state)return [];
+  return [`https://ge.globo.com/${state}/futebol/brasileirao-serie-a/jogo/${day}-${month}-${year}/${home}-${away}.ghtml`];
+}
+
 export const PREFERRED_EDITORIAL_SOURCE_SUFFIXES = Object.freeze([
   'cbf.com.br',
   'ge.globo.com', 'globoesporte.globo.com', 'sportv.globo.com', 'oglobo.globo.com',
