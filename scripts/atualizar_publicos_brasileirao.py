@@ -1277,7 +1277,55 @@ def self_test() -> None:
     from postgame_factual_integrity import inspect_factual_integrity
     assert inspect_factual_integrity(15056, None, 15056)["quarantine_fields"] == ["renda"]
     assert not inspect_factual_integrity(15056, None, 708004.50)["critical"]
-    print("SELF-TEST OK: parser GE + R10R16.1 factual integrity guard.")
+    # R10R21: Gato Mestre atualiza a matéria depois do fim do jogo.
+    # Uma versão antiga pode listar algumas partidas, mas não renda do alvo.
+    # O coletor DEVE continuar e reconciliar cada campo pelo confronto.
+    from unittest.mock import patch
+    stale = "https://ge.globo.com/gato-mestre/noticia/2026/10/18/versao-antiga-31a-rodada.ghtml"
+    fresh = "https://ge.globo.com/gato-mestre/noticia/2026/10/18/versao-atualizada-31a-rodada.ghtml"
+    stale_html = (
+        "<h2>Fluminense 1 x 2 Santos (Maracanã)</h2>"
+        "<p>Público presente: 27.697</p><p>Renda: R$ 1.658.381</p>"
+        "<h2>Remo 1 x 1 Bragantino (Mangueirão)</h2>"
+        "<p>Público presente: 13.089</p>"
+    )
+    fresh_html = (
+        "<h2>Remo 1 x 1 Bragantino (Mangueirão)</h2>"
+        "<p>Público pagante: 9.390</p>"
+        "<p>Renda: R$ 311.660,00</p>"
+        "<h2>Grêmio 2 x 4 Cruzeiro</h2><p>Renda: R$ 1.638.337</p>"
+    )
+    def html_fixture(url: str, *args: Any, **kwargs: Any) -> str:
+        if "versao-antiga" in url:
+            return stale_html
+        if "versao-atualizada" in url:
+            return fresh_html
+        raise FileNotFoundError(url)
+    jogo_remo = {
+        "event_id": "r10r21-fixture", "rodada": 31, "data_iso": "2026-10-18T19:30",
+        "estado": "post", "mandante": {"nome": "Remo"},
+        "visitante": {"nome": "Bragantino"},
+        "placar_mandante": 1, "placar_visitante": 1,
+    }
+    with (
+        patch(__name__ + ".buscar_html", side_effect=html_fixture),
+        patch(__name__ + ".descobrir_urls_ge_por_sitemap", return_value=([fresh], [], [])),
+    ):
+        after, audit = executar_coleta(
+            [jogo_remo], {"jogos": {}},
+            {"jogos": {}, "fontes_rodadas": {"31": {"url": stale}}},
+            max_rodadas=1, event_id_alvo="r10r21-fixture",
+        )
+    remo = after["jogos"]["r10r21-fixture"]
+    assert remo["publico"] == 13089 and remo["pagantes"] == 9390
+    assert remo["renda"] == 311660
+    assert remo["fonte_publico"].startswith(stale)
+    assert remo["fonte_renda"].startswith(fresh)
+    assert after["fontes_rodadas"]["31"]["url"] == fresh
+    assert audit["total_sem_publico"] == 0 and audit["total_sem_renda"] == 0
+    assert remo["renda"] != 1658381, "renda do confronto anterior nunca deve vazar"
+
+    print("SELF-TEST OK: parser GE + R10R16.1 integrity + R10R21 progressive roundup recovery.")
 
 
 def main() -> None:
