@@ -156,7 +156,7 @@ assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(8),fullBudget).pha
 assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(9),fullBudget).phase,'gemini');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:2},at(18),fullBudget).phase,'gemini');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:3},at(20),fullBudget).phase,'openai');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:3,sol_attempts:1},at(60),fullBudget).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:3,sol_attempts:2},at(60),fullBudget).phase,'gemini');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:7,sol_attempts:1},at(90),fullBudget).phase,'openai');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:8,sol_attempts:2},at(120),fullBudget).phase,'openai');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:4,sol_attempts:3},at(120),fullBudget).phase,'gemini');
