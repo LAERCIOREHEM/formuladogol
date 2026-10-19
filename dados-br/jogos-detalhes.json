@@ -1,15 +1,568 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-18T21:01:49.717235-03:00",
+  "gerado_em": "2026-10-18T22:00:35.403252-03:00",
   "fonte": "ESPN summary + scoreboard",
-  "total_jogos": 307,
-  "total_com_estatisticas": 307,
+  "total_jogos": 308,
+  "total_com_estatisticas": 308,
   "total_com_publico": 306,
-  "total_com_eventos": 307,
-  "total_com_jogadores": 307,
-  "total_eventos_validados": 307,
+  "total_com_eventos": 308,
+  "total_com_jogadores": 308,
+  "total_eventos_validados": 308,
   "total_eventos_pendentes_detalhes": 0,
   "jogos": {
+    "401841274": {
+      "event_id": "401841274",
+      "event_id_fonte_detalhes": "401841274",
+      "rodada": 31,
+      "data_iso": "2026-10-18T19:30",
+      "mandante": "Remo",
+      "visitante": "Bragantino",
+      "placar_mandante": 1,
+      "placar_visitante": 1,
+      "estadio": "Mangueirão",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "54.3%",
+          "away": "45.7%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "25",
+          "away": "16"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "6",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "13",
+          "away": "6"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "15"
+        },
+        {
+          "nome": "Defesas",
+          "home": "4",
+          "away": "4"
+        },
+        {
+          "nome": "Passes",
+          "home": "498",
+          "away": "441"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "433",
+          "away": "370"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "11",
+          "away": "12"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "13",
+          "away": "7"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "10",
+          "away": "17"
+        },
+        {
+          "nome": "Cortes",
+          "home": "19",
+          "away": "36"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "14",
+          "away": "3"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "4",
+          "away": "1"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "54.3%",
+          "away": "45.7%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "25",
+          "away": "16"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "6",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "13",
+          "away": "6"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "15"
+        },
+        {
+          "nome": "Defesas",
+          "home": "4",
+          "away": "4"
+        },
+        {
+          "nome": "Passes",
+          "home": "498",
+          "away": "441"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "433",
+          "away": "370"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "11",
+          "away": "12"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "13",
+          "away": "7"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "10",
+          "away": "17"
+        },
+        {
+          "nome": "Cortes",
+          "home": "19",
+          "away": "36"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "14",
+          "away": "3"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "4",
+          "away": "1"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "10'",
+          "jogador": "Lucas Barbosa",
+          "time": "Bragantino",
+          "assistencias": [],
+          "descricao": "Goal 70 Goal! Remo 0, RB Bragantino 1. Lucas Barbosa (RB Bragantino) left footed shot from the centre of the box to the top left corner. Lucas Barbosa Goal"
+        },
+        {
+          "minuto": "55'",
+          "jogador": "Jajá",
+          "time": "Remo",
+          "assistencias": [
+            "Gabriel Taliari"
+          ],
+          "descricao": "Goal 70 Goal! Remo 1, RB Bragantino 1. Jája Silva (Remo) right footed shot from outside the box to the bottom left corner. Assisted by Gabriel Taliari. Jajá Goal"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "48'",
+          "jogador": "Zé Ivaldo",
+          "time": "Remo",
+          "descricao": "Yellow Card 94 Zé Ivaldo (Remo) is shown the yellow card for a bad foul. Zé Ivaldo Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "64'",
+          "jogador": "Ramires",
+          "time": "Bragantino",
+          "descricao": "Yellow Card 94 Eric Ramires (RB Bragantino) is shown the yellow card for a bad foul. Ramires Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "79'",
+          "jogador": "Gabriel Taliari",
+          "time": "Remo",
+          "descricao": "Yellow Card 94 Gabriel Taliari (Remo) is shown the yellow card for a bad foul. Gabriel Taliari Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "199680",
+          "nome": "Eduardo Sasha",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "307934",
+          "nome": "Fabinho",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "267902",
+          "nome": "Fernando",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "334375",
+          "nome": "Gustavo Marques",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "302225",
+          "nome": "Guzmán Rodríguez",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "229555",
+          "nome": "Juninho Capixaba",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "248584",
+          "nome": "Lucas Barbosa",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "279941",
+          "nome": "Ramires",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "418512",
+          "nome": "Ryan Augusto",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "145092",
+          "nome": "Tiago Volpi",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "358167",
+          "nome": "Wallace Yan",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "257335",
+          "nome": "Alix Vinicius",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "171993",
+          "nome": "Gabriel",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "335360",
+          "nome": "José Herrera",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "225538",
+          "nome": "Matheus Fernandes",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "361460",
+          "nome": "Patrick Silva",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "254464",
+          "nome": "Antonio Galeano",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "359364",
+          "nome": "David Francisco",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "235385",
+          "nome": "Gabriel Taliari",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "202493",
+          "nome": "Ivan",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "201793",
+          "nome": "José Welison",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "304826",
+          "nome": "Marcelinho",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "157743",
+          "nome": "Marllon",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "215815",
+          "nome": "Marlon Lopes",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "198362",
+          "nome": "Patrick",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "319270",
+          "nome": "Zé Ivaldo",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "276661",
+          "nome": "Zé Ricardo",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "338668",
+          "nome": "Eduardo",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "301185",
+          "nome": "Jajá",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "286532",
+          "nome": "Leonel Picco",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "200775",
+          "nome": "Vitor Bueno",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "186832",
+          "nome": "Yago Pikachu",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Remo": 1,
+          "Bragantino": 1
+        },
+        "gols_extraidos": {
+          "Remo": 1,
+          "Bragantino": 1
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Remo": {
+            "amarelo": 2,
+            "vermelho": 0
+          },
+          "Bragantino": {
+            "amarelo": 1,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Remo": {
+            "amarelo": 2,
+            "vermelho": 0
+          },
+          "Bragantino": {
+            "amarelo": 1,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-10-18T22:00:18.836830-03:00"
+    },
     "401841269": {
       "event_id": "401841269",
       "event_id_fonte_detalhes": "401841269",
@@ -591,7 +1144,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-18T21:01:35.639556-03:00"
+      "atualizado_em": "2026-10-18T22:00:21.193156-03:00"
     },
     "401841277": {
       "event_id": "401841277",
@@ -1155,7 +1708,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-18T21:01:38.088592-03:00",
+      "atualizado_em": "2026-10-18T22:00:23.678245-03:00",
       "publico_pagante": 25471,
       "renda": 1658380.5
     },
@@ -1748,7 +2301,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-18T21:01:40.461588-03:00",
+      "atualizado_em": "2026-10-18T22:00:26.008783-03:00",
       "renda": 1638336.99
     },
     "401841273": {
@@ -2302,7 +2855,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-18T21:01:42.679436-03:00",
+      "atualizado_em": "2026-10-18T22:00:28.398584-03:00",
       "renda": 1190350
     },
     "401841271": {
@@ -2863,7 +3416,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-18T21:01:45.227305-03:00",
+      "atualizado_em": "2026-10-18T22:00:30.795816-03:00",
       "renda": 2568960
     },
     "401841270": {
@@ -3396,7 +3949,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-18T21:01:47.472233-03:00",
+      "atualizado_em": "2026-10-18T22:00:33.136109-03:00",
       "renda": 1226342.86
     },
     "401841268": {
@@ -3929,7 +4482,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-18T21:01:49.634456-03:00",
+      "atualizado_em": "2026-10-18T22:00:35.316368-03:00",
       "renda": 579140
     },
     "401841275": {
