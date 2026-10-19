@@ -447,7 +447,10 @@ jobs:
           if (h.postgameMigrationSlaSuppression !== true) problems.push('postgameMigrationSlaSuppression!=true');
           if (Number(h.postgameMigrationGraceMinutes) !== 15) problems.push(`postgameMigrationGraceMinutes=${h.postgameMigrationGraceMinutes}`);
           if (h.postgameAdministrativeReopenSlaAnchor !== true) problems.push('postgameAdministrativeReopenSlaAnchor!=true');
-          if (h.postgamePublicHourlyAfterSla !== true) problems.push('postgamePublicHourlyAfterSla!=true');
+          if (h.postgamePublicHourlyAfterSla !== false) problems.push('postgamePublicHourlyAfterSla!=false (R10R20)');
+          if (h.postgameGeMatchdaySourceFirst !== true) problems.push('postgameGeMatchdaySourceFirst!=true');
+          if (Number(h.postgameFreeSourceCadenceMinutes) !== 3) problems.push('postgameFreeSourceCadenceMinutes!=3');
+          if (JSON.stringify(h.postgameFreeSourceAfterSlaMinutes) !== '[5,15,60]') problems.push('postgameFreeSourceAfterSlaMinutes!=[5,15,60]');
           if (h.postgamePublicBudgetGuard !== true) problems.push('postgamePublicBudgetGuard!=true');
           if (h.aiGateway !== 'default') problems.push(`aiGateway=${h.aiGateway}`);
           if (process.env.AIG_AUTH_EXPECTED === '1' && h.aiGatewayAuthenticated !== true) problems.push('aiGatewayAuthenticated!=true');
