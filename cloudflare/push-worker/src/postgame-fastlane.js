@@ -16,7 +16,7 @@ const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
-const POSTGAME_POLICY_VERSION = 15;
+const POSTGAME_POLICY_VERSION = 16;
 
 /*
  * Postgame Fastlane v15 — R10R17.7 (Melhores Momentos Série A) + R10R17.1 (attendance eligibility) + R10R16.1 Factual Integrity + R10R15.1 SLA Migration Suppression:
@@ -1627,6 +1627,19 @@ export async function ensurePolicyVersion(env, now = Date.now()) {
       highlight_next_at=CASE WHEN NULLIF(TRIM(COALESCE(highlight_json,'')),'') IS NOT NULL THEN NULL ELSE ? END,
       updated_at=CURRENT_TIMESTAMP
       WHERE league='bra.1' AND highlight_status IN ('not_applicable','eligibility_pending')`).bind(isoNow).run();
+  }
+
+  // R10R20/v16: antecipação NÃO destrutiva. Apenas pendências recentes
+  // de Série A, sem alterar valores, tentativas, orçamento ou dados históricos.
+  // A migração roda uma única vez e libera o primeiro probe logo no deploy.
+  if(current<16){
+    await env.DB.prepare(`UPDATE postgame_fastlane
+      SET public_next_at=?,updated_at=CURRENT_TIMESTAMP
+      WHERE league='bra.1'
+        AND public_status NOT IN ('resolved','not_applicable','eligibility_pending')
+        AND julianday(final_at)>=julianday(?)
+        AND (public_next_at IS NULL OR julianday(public_next_at)>julianday(?))`)
+      .bind(isoNow,nowIso(now-48*60*60_000),isoNow).run();
   }
 
   await metaPut(env, 'policy_version', String(POSTGAME_POLICY_VERSION));
