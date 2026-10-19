@@ -7,7 +7,7 @@ import { opsStatus, runOperationalMaintenance } from './ops.js';
 import { probeEspnSources } from './espn-source.js';
 import { LIVE_API_CONSTANTS, resolveLiveScoreboard, resolveLiveSummary } from './live-api.js';
 import { createLiveStatsStore } from './live-stats-store.js';
-import { postgameSearchProbe, postgameStatus, readPostgameFastlane, runPostgameMaintenance } from './postgame-fastlane.js';
+import { postgameSearchProbe, postgameStatus, readPostgameFastlane, runPostgameMaintenance, POSTGAME_POLICY_VERSION } from './postgame-fastlane.js';
 import { feedbackNotifierConfigured, runFeedbackNotifier } from './feedback-notifier.js';
 import { healthMonitorStatus, runHealthMonitor, HEALTH_POLICY_VERSION } from './health-monitor.js';
 import { HEALTH_ACTION_CENTER_VERSION } from './health-action-center.js';
@@ -633,8 +633,8 @@ export default {
         continentalStatsTargetMinPerTeam: LIVE_API_CONSTANTS.CONTINENTAL_STATS_TARGET,
         bestKnownStatsCache: true,
         postgameFastlane: true,
-        postgameFastlaneVersion: 15,
-        postgameAttendanceHunterVersion: 15,
+        postgameFastlaneVersion: POSTGAME_POLICY_VERSION,
+        postgameAttendanceHunterVersion: POSTGAME_POLICY_VERSION,
         postgameHighlightEligibilityGuard: true,
         postgameHighlightEligibilityVersion: 1,
         postgameHighlightRequiredLeague: 'bra.1',
@@ -646,7 +646,10 @@ export default {
         postgameMigrationSlaSuppression: true,
         postgameMigrationGraceMinutes: 15,
         postgameAdministrativeReopenSlaAnchor: true,
-        postgamePublicHourlyAfterSla: true,
+        postgamePublicHourlyAfterSla: false,
+        postgameFreeSourceCadenceMinutes: 3,
+        postgameFreeSourceAfterSlaMinutes: [5, 15, 60],
+        postgameGeMatchdaySourceFirst: true,
         postgamePublicBudgetGuard: true,
         postgameSearchAliasesAllClubs: true,
         postgameOfficialClubSourcesScoped: true,
