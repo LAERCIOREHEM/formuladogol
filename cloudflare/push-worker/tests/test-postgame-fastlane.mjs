@@ -1,11 +1,19 @@
 import assert from 'node:assert/strict';
-import { highlightTitleValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI, geminiCircuitState, geminiStructuralFailure, staticSeedRefreshIntervalMs, hasLabeledFinancialEvidence } from '../src/postgame-fastlane.js';
+import { highlightTitleValid, highlightTaskValid, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI, geminiCircuitState, geminiStructuralFailure, staticSeedRefreshIntervalMs, hasLabeledFinancialEvidence } from '../src/postgame-fastlane.js';
 
 assert.equal(highlightTitleValid('FLAMENGO 1 X 0 BRAGANTINO | MELHORES MOMENTOS | BRASILEIRÃO 2026', 'Flamengo', 'Bragantino'), true);
 assert.equal(highlightTitleValid('FLAMENGO X BRAGANTINO | AQUECIMENTO AO VIVO | BRASILEIRÃO', 'Flamengo', 'Bragantino'), false);
 assert.equal(highlightTitleValid('CORINTHIANS 1 X 3 FLUMINENSE | GOLS E MELHORES MOMENTOS', 'Corinthians', 'Fluminense'), true);
 assert.equal(highlightTitleValid('CORINTHIANS X FLUMINENSE | AO VIVO SEM IMAGENS', 'Corinthians', 'Fluminense'), false);
 assert.equal(highlightTitleValid('SANTOS 2 X 1 REMO | MELHORES MOMENTOS', 'Remo', 'Santos'), true);
+// R10R25: não repetir a vinculação indevida de retrospectiva 2009 ao FINAL 2026.
+const gremio2026 = { home: 'Grêmio', away: 'Cruzeiro', kickoff: '2026-10-18T19:00:00Z', home_score: 2, away_score: 4 };
+assert.equal(highlightTaskValid('GRÊMIO X CRUZEIRO | MELHORES MOMENTOS | BRASILEIRÃO 2009 | ge tv', gremio2026), false);
+assert.equal(highlightTaskValid('GRÊMIO 2 X 4 CRUZEIRO | MELHORES MOMENTOS | 31ª RODADA | BRASILEIRÃO 2026', gremio2026), true);
+assert.equal(highlightTaskValid('GRÊMIO 1 X 0 CRUZEIRO | MELHORES MOMENTOS | BRASILEIRÃO 2026', gremio2026), false);
+assert.equal(highlightTaskValid('GRÊMIO X CRUZEIRO | MELHORES MOMENTOS', gremio2026), true);
+assert.equal(highlightTaskValid('GRÊMIO X CRUZEIRO | AQUECIMENTO', gremio2026), false);
+
 
 // O dado curado do Pages não pode permanecer até 10 minutos sem chegar ao D1
 // enquanto um budget_guard ainda desencadeia incidente CRÍTICO.
