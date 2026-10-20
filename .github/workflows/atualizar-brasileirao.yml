@@ -1001,6 +1001,58 @@ jobs:
           gh workflow run deploy.yml --ref main
           echo "Deploy do site disparado para o main recém-publicado."
 
+      - name: Garantir publicação editorial de rodada fechada
+        # R10R23: o resultado FINAL pode chegar via updater completo, mesmo
+        # quando o orquestrador não despacha editorial_rodada. O gate editorial
+        # é idempotente: sem rodada elegível pendente, não chama a IA.
+        if: >-
+          steps.publish_main.outputs.published == 'true' ||
+          steps.publish_independent.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timedelta, timezone
+          from pathlib import Path
+          from scripts.gerar_analise_rodada import estado_rodada
+
+          config = json.loads(Path('dados-br/config-analises.json').read_text(encoding='utf-8'))
+          manifesto = json.loads(Path('dados-br/analises.json').read_text(encoding='utf-8'))
+          publicados = {
+              int(x.get('rodada') or 0): int(x.get('jogos_concluidos') or 0)
+              for x in (manifesto.get('artigos') or [])
+              if x.get('tipo') == 'brasileirao_rodada'
+          }
+          now = datetime.now(timezone(timedelta(hours=-3)))
+          elegiveis = []
+          for rodada in range(1, 39):
+              estado = estado_rodada(rodada, now, config)
+              if estado['elegivel'] and (
+                  publicados.get(rodada, 0) < estado['jogos_concluidos']
+                  or not Path(f'analises/brasileirao-2026-rodada-{rodada}.html').exists()
+              ):
+                  elegiveis.append(rodada)
+          alvo = max(elegiveis, default=0)
+          print(f'Editorial closure: pendentes={elegiveis}, escolhido={alvo}, cobertura_publicada={publicados.get(alvo, 0)}')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'editorial_round={alvo}\\n')
+          PY
+          # Somente aciona se houver uma rodada elegível ainda não publicada.
+          # O dispatch precisa ser feito explicitamente porque pushes via
+          # GITHUB_TOKEN não iniciam novos workflows por evento push.
+          # A detecção é repetida no gerador; não força rodada incompleta.
+          RODADA="$(grep '^editorial_round=' "$GITHUB_OUTPUT" | tail -1 | cut -d= -f2)"
+          if [[ -n "$RODADA" && "$RODADA" != "0" ]]; then
+            gh workflow run publicar-analise-rodada.yml --ref main -f rodada="$RODADA"
+            echo "::notice title=Editorial R${RODADA} enfileirado::Publicação automática após fechamento esportivo."
+          else
+            echo "Nenhum editorial de rodada elegível pendente."
+          fi
+
 
   # Alerta integrado ao próprio workflow. Substitui o antigo workflow
   # "Monitorar Atualizar Brasileirao" e evita uma execução cinza a cada hora.
