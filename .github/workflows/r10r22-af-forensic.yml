@@ -1,0 +1,52 @@
+name: AF R10R22 sync forensic (temporary)
+on:
+  push:
+    branches:
+      - fix/af-fastlane-r10r22-espn-standings-sync
+    paths:
+      - '.github/workflows/r10r22-af-forensic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/af-fastlane-r10r22-espn-standings-sync
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-af-previsao.txt
+      - name: Requirements
+        run: python -m pip install -r requirements-af-previsao.txt
+      - name: Refresh ESPN without publication
+        env:
+          ESPN_MAX_TENTATIVAS_SINCRONIA: '1'
+          ESPN_ESPERA_SINCRONIA_SEGUNDOS: '0'
+        run: |
+          python atualizar_espn.py
+          python - <<'PY'
+          import json
+          from scripts.gerar_probabilidades_brasileirao import load_current_matches, load_current_state, validate_current_results_against_table, current_publication_freshness
+          from atualizar_espn import diagnosticar_sincronia_tabela_resultados, _delta_resultados_manuais
+          read=lambda p: json.load(open(p,encoding='utf-8'))
+          t,r,e=read('tabela.json'),read('resultados.json'),read('espn_eventos.json')
+          teams={'Corinthians','Vitória'}
+          sr=[x for x in r['resultados'] if ({x['mandante']['nome'],x['visitante']['nome']} & teams) and (x.get('rodada')==31 or x.get('event_id')=='401841272')]
+          ev=[x for x in e['eventos'] if str(x.get('event_id'))=='401841272']
+          print('FORENSIC SUMMARY',json.dumps({'results':len(r['resultados']),'events':len(e['eventos']),'table':[{k:v for k,v in x.items() if k in ('time','jogos','pontos','empates')} for x in t['tabela'] if x['time'] in teams],'match':sr,'event':ev,'manualDelta':_delta_resultados_manuais()},ensure_ascii=False,default=str))
+          print('DIAGNOSTIC UPDATE',json.dumps(diagnosticar_sincronia_tabela_resultados(t,r)[:15],ensure_ascii=False))
+          try:
+              state=load_current_state(t)
+              matches=load_current_matches(e,set(state.teams),r)
+              print('MATCHES IN MODEL',len(matches))
+              validate_current_results_against_table(matches,state)
+              print('MODEL SYNC PASS')
+          except Exception as exc:
+              print('MODEL SYNC FAIL',type(exc).__name__,str(exc))
+          print('FRESHNESS',json.dumps(current_publication_freshness(),ensure_ascii=False))
+          PY
