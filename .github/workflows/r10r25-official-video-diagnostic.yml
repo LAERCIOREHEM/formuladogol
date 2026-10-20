@@ -1,0 +1,55 @@
+name: R10R25 official video identity diagnostic (temporary)
+on:
+  push:
+    branches: [fix/r10r25-highlight-identity-2026]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Query verified GE TV uploads for 2026 Grêmio 2 x 4 Cruzeiro
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.parse, urllib.request, unicodedata, re
+          key=os.environ.get('YOUTUBE_API_KEY','')
+          if not key:
+              print('YouTube key unavailable'); raise SystemExit(1)
+          def get(resource,**params):
+              url='https://www.googleapis.com/youtube/v3/'+resource+'?'+urllib.parse.urlencode(dict(params,key=key))
+              req=urllib.request.Request(url,headers={'User-Agent':'FormulaDoGol-Forensic/1.0'})
+              with urllib.request.urlopen(req,timeout=25) as f:return json.load(f)
+          cid='UCgCKagVhzGnZcuP9bSMgMCg'
+          info=get('channels',part='contentDetails',id=cid)
+          upload=(info.get('items') or [{}])[0].get('contentDetails',{}).get('relatedPlaylists',{}).get('uploads')
+          if not upload:raise SystemExit('GE TV official uploads playlist unavailable')
+          candidates=[]
+          token=None
+          for page in range(8):
+              kw=dict(part='snippet,contentDetails',playlistId=upload,maxResults=50)
+              if token:kw['pageToken']=token
+              batch=get('playlistItems',**kw)
+              for row in batch.get('items') or []:
+                  snippet=row.get('snippet') or {}
+                  title=str(snippet.get('title') or '')
+                  norm=''.join(c for c in unicodedata.normalize('NFD',title.casefold()) if unicodedata.category(c)!='Mn')
+                  if 'gremio' in norm and 'cruzeiro' in norm:
+                      candidates.append({'video_id':(row.get('contentDetails') or {}).get('videoId'),'title':title,'published_at':snippet.get('publishedAt')})
+              token=batch.get('nextPageToken')
+              if not token:break
+          print('GE TV uploads scanned pages:',page+1)
+          print('Candidate matches:',json.dumps(candidates,ensure_ascii=False))
+          good=[x for x in candidates if '2026' in x['title'] and '2 X 4' in x['title'].upper() and 'MELHORES MOMENTOS' in x['title'].upper()]
+          if not good:
+              q=get('search',part='snippet',channelId=cid,q='Grêmio 2 x 4 Cruzeiro melhores momentos 2026',type='video',order='date',publishedAfter='2026-10-17T00:00:00Z',maxResults=15)
+              print('Search fallback:',json.dumps([{'video_id':(x.get('id') or {}).get('videoId'),'title':(x.get('snippet') or {}).get('title'),'published_at':(x.get('snippet') or {}).get('publishedAt')} for x in q.get('items') or []],ensure_ascii=False))
+          else:
+              print('VERIFIED_2026_GE_VIDEO=',json.dumps(good[0],ensure_ascii=False))
+          PY
