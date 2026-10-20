@@ -1,0 +1,78 @@
+name: R10R24 editorial media forensic (temporary)
+on:
+  push:
+    branches: [fix/r10r24-editorial-highlights-fastlane-bridge]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline tests and YAML contract
+        run: |
+          set -euo pipefail
+          python -m pip install pyyaml -q
+          python scripts/importar_postgame_fastlane.py --self-test
+          python scripts/sincronizar_midias_editoriais.py --self-test
+          python scripts/gerar_analise_rodada.py --self-test
+          python - <<'PY'
+          import ast, json, yaml
+          from pathlib import Path
+          y=yaml.safe_load(Path('.github/workflows/publicar-analise-rodada.yml').read_text(encoding='utf-8'))
+          steps=y['jobs']['publicar']['steps']
+          by={x.get('name'):x for x in steps}
+          media=by['Consolidar vídeos Fastlane antes de publicar editorial']
+          imp=by['Importar mídias verificadas do Cloudflare Fastlane']
+          sync=by['Sincronizar somente vídeos nos artigos publicados e medir cobertura']
+          pub=by['Publicar no repositório com push robusto']
+          fallback=by['Recuperar automaticamente vídeos ainda ausentes da rodada']
+          assert media['id']=='media'
+          assert "steps.media.outputs.event_ids != ''" in imp['if']
+          assert 'importar_postgame_fastlane.py --tipo melhores_momentos' in imp['run']
+          assert 'sincronizar_midias_editoriais.py --rodada' in sync['run']
+          assert 'dados-br/melhores-momentos.json' in pub['run']
+          assert 'buscar-melhores-momentos-getv.yml' in fallback['run']
+          for step in (media,sync):
+              lines=step['run'].splitlines()
+              i=next(i for i,l in enumerate(lines) if l.strip()=="python - <<'PY'")
+              j=next(i for i in range(i+1,len(lines)) if lines[i].strip()=="PY")
+              ast.parse('\n'.join(lines[i+1:j]),filename=step['name'])
+          print('R10R24 workflow contract & inline Python syntax: PASS')
+          PY
+      - name: Read-only live Fastlane import coverage and editorial HTML sync
+        run: |
+          set -euo pipefail
+          IDS="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('resultados.json').read_text(encoding='utf-8'))
+          print(','.join(str(x['event_id']) for x in j['resultados'] if int(x.get('rodada') or 0)==31))
+          PY
+          )"
+          echo "Round31 IDs: $IDS"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('dados-br/melhores-momentos.json').read_text(encoding='utf-8'))
+          r=json.loads(Path('resultados.json').read_text(encoding='utf-8'))
+          rows=[x for x in r['resultados'] if int(x.get('rodada') or 0)==31]
+          print('Before import:',sum(str(x['event_id']) in j['jogos'] for x in rows),'/',len(rows))
+          PY
+          python scripts/importar_postgame_fastlane.py --tipo melhores_momentos --event-ids "$IDS"
+          python scripts/sincronizar_midias_editoriais.py --rodada 31 --dry-run
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('dados-br/melhores-momentos.json').read_text(encoding='utf-8'))
+          r=json.loads(Path('resultados.json').read_text(encoding='utf-8'))
+          rows=[x for x in r['resultados'] if int(x.get('rodada') or 0)==31]
+          missing=[(str(x['event_id']),str(x.get('mandante')),str(x.get('visitante'))) for x in rows if str(x['event_id']) not in j['jogos']]
+          print('After import:',len(rows)-len(missing),'/',len(rows))
+          print('Still missing:',missing)
+          PY
