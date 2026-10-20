@@ -100,7 +100,51 @@ def self_test() -> None:
         {"estado_pronto": None, "motivos": []},
     ):
         assert classify_readiness(bad) == "fatal", bad
-    print("R10R22 AF sync gate: PASS (ready/deferred/fatal)", flush=True)
+    # Retentativa simulada: o guard só libera o AF após obter prova objetiva
+    # de consistência. Não usa rede, não executa simulações nem grava D1.
+    from unittest.mock import patch
+
+    lag = {"estado_pronto": False, "motivos": [
+        ESPN_STANDINGS_LAG + " Vitória jogos=30/31; Corinthians jogos=30/31"
+    ]}
+    ready = {"estado_pronto": True, "motivos": ["AF ainda precisa ser atualizado"]}
+    fatal = {"estado_pronto": False, "motivos": ["AF_COVERAGE_MISMATCH"]}
+
+    with (
+        patch(__name__ + ".current_publication_freshness", side_effect=[lag, lag, ready]),
+        patch(__name__ + ".refresh_espn") as refresh,
+        patch(__name__ + ".time.sleep") as sleep,
+    ):
+        state, _, attempts = check_with_retries(2, 0)
+        assert state == "ready" and attempts == 2
+        assert refresh.call_count == 2 and sleep.call_count == 2
+
+    with (
+        patch(__name__ + ".current_publication_freshness", side_effect=[lag, lag, lag]),
+        patch(__name__ + ".refresh_espn") as refresh,
+    ):
+        state, _, attempts = check_with_retries(2, 0)
+        assert state == "deferred" and attempts == 2
+        assert refresh.call_count == 2
+
+    with (
+        patch(__name__ + ".current_publication_freshness", return_value=fatal),
+        patch(__name__ + ".refresh_espn") as refresh,
+    ):
+        state, _, attempts = check_with_retries(2, 0)
+        assert state == "fatal" and attempts == 0
+        refresh.assert_not_called()
+
+    # O modo deferred nunca deve declarar ready=true, mesmo com job encerrado 0.
+    import tempfile
+    with tempfile.TemporaryDirectory() as directory:
+        path = Path(directory) / "outputs"
+        with patch.dict(os.environ, {"GITHUB_OUTPUT": str(path)}):
+            write_outputs("deferred", lag["motivos"][0], 2)
+        outputs = path.read_text(encoding="utf-8")
+        assert "ready=false" in outputs and "deferred=true" in outputs
+        assert "classification=deferred" in outputs
+    print("R10R22 AF sync gate: PASS (ready/deferred/fatal + bounded retries + outputs)", flush=True)
 
 
 def main() -> int:
