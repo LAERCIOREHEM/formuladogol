@@ -746,6 +746,25 @@ async function upsertTask(env, row, staticData = {}) {
     now, now
   ).run();
 
+  // R10R25: correção editorial verificada do vídeo é autoritativa somente
+  // quando corresponde à temporada, aos clubes e ao placar do event_id.
+  // Um D1 com highlight_status=resolved pode guardar retrospectiva histórica;
+  // COALESCE do upsert acima não a substitui. Atualização idempotente, sem IA.
+  if (highlightResolved && highlight?.verificado_editorialmente === true && highlightTaskValid(highlight.titulo, {
+    home: text(row.home || row.mandante?.nome || row.mandante),
+    away: text(row.away || row.visitante?.nome || row.visitante),
+    kickoff: text(row.kickoff || row.data_iso || finalAt),
+    home_score: homeScore,
+    away_score: awayScore,
+  })) {
+    const authoritative = JSON.stringify(highlight);
+    await env.DB.prepare(`UPDATE postgame_fastlane
+      SET highlight_json=?,highlight_status='resolved',highlight_next_at=NULL,
+          highlight_last_error='',updated_at=CURRENT_TIMESTAMP
+      WHERE event_id=? AND league='bra.1' AND COALESCE(highlight_json,'')<>?`)
+      .bind(authoritative, eventId, authoritative).run();
+  }
+
   // R10R15: correções documentais verificadas são autoritativas por campo e
   // precisam corrigir também o D1, não apenas o JSON estático do site.
   if (staticData?.verified === true && (publico != null || pagantes != null || renda != null || staticData.clear_unverified_paid === true)) {
