@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-19T23:01:01.002922-03:00",
+  "gerado_em": "2026-10-20T01:45:12.441188-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 309,
   "total_com_estatisticas": 309,
-  "total_com_publico": 308,
+  "total_com_publico": 309,
   "total_com_eventos": 309,
   "total_com_jogadores": 309,
   "total_eventos_validados": 309,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Neo Química Arena",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 41137,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.corinthians.com.br/noticias/timao-empata-com-o-vitoria-e-soma-mais-um-ponto-no-brasileirao-2026",
       "arbitro": "",
       "stats": [
         {
@@ -544,7 +544,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-19T23:00:51.338645-03:00"
+      "atualizado_em": "2026-10-19T23:00:51.338645-03:00",
+      "publico_pagante": 40765,
+      "renda": 2602813.86
     },
     "401841274": {
       "event_id": "401841274",
@@ -174613,5 +174615,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 274,
+  "total_com_renda": 309
 }
