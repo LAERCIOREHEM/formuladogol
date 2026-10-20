@@ -1,6 +1,13 @@
 name: Publicar análise editorial da rodada
 
 on:
+  # R10R23: publica a primeira matéria após o fechamento esportivo.
+  # A execução por push é limitada ao arquivo de acionamento; os commits
+  # do próprio editorial não o modificam e não geram recursão.
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publicar-analise-rodada.yml'
   workflow_dispatch:
     inputs:
       rodada:
