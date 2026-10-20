@@ -14,7 +14,7 @@ import sys
 import urllib.parse
 import urllib.request
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -226,6 +226,43 @@ def material_highlight_view(row: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in row.items() if k not in {"atualizado_em", "verificado_em"}}
 
 
+def video_compatibilidade_temporada(highlight: dict[str, Any], game: dict[str, Any]) -> tuple[bool, str]:
+    """R10R25: event_id correto NÃO garante que um vídeo histórico seja correto.
+
+    Bloqueia temporadas, placares e datas contraditórias antes de consolidar
+    no JSON público. Vídeos antigos podem ser republicados hoje no YouTube.
+    """
+    titulo = str(highlight.get("titulo") or "").strip()
+    url = str(highlight.get("url") or "").strip()
+    video = youtube_id(url)
+    declarado = str(highlight.get("video_id") or "").strip()
+    if not titulo or not video or (declarado and declarado != video):
+        return False, "título ausente, URL inválida ou video_id incompatível"
+
+    data_jogo = str(game.get("data_iso") or "").strip()
+    temporada = data_jogo[:4] if re.fullmatch(r"\d{4}", data_jogo[:4]) else "2026"
+    anos = set(re.findall(r"(?<!\d)(?:19|20)\d{2}(?!\d)", titulo))
+    if anos and anos != {temporada}:
+        return False, f"vídeo de outra temporada: título contém {sorted(anos)}, jogo é {temporada}"
+
+    placar = re.search(r"(?<!\d)(\d{1,2})\s*[x×]\s*(\d{1,2})(?!\d)", titulo, flags=re.I)
+    if placar:
+        casa, fora = game.get("placar_mandante"), game.get("placar_visitante")
+        if casa is not None and fora is not None and (int(placar[1]), int(placar[2])) != (int(casa), int(fora)):
+            return False, f"placar do vídeo {placar[1]}x{placar[2]} difere do jogo {casa}x{fora}"
+
+    publicado = str(highlight.get("published_at") or "").strip()
+    if publicado and re.fullmatch(r"\d{4}-\d{2}-\d{2}", data_jogo[:10]):
+        try:
+            data_publicacao = datetime.fromisoformat(publicado.replace("Z", "+00:00")).date()
+            data_partida = datetime.fromisoformat(data_jogo[:10]).date()
+        except ValueError:
+            return False, "data de publicação inválida"
+        if data_publicacao < data_partida - timedelta(days=2):
+            return False, "vídeo publicado antes da janela esportiva desta partida"
+    return True, "ok"
+
+
 def apply_highlight_rows(payload: dict[str, Any], rows: list[dict[str, Any]], results: dict[str, dict[str, Any]], stamp: str) -> tuple[dict[str, Any], list[str]]:
     out = deepcopy(payload) if isinstance(payload, dict) else {}
     jogos = out.get("jogos") if isinstance(out.get("jogos"), dict) else {}
@@ -235,7 +272,21 @@ def apply_highlight_rows(payload: dict[str, Any], rows: list[dict[str, Any]], re
         eid = str(source.get("event_id") or "").strip()
         game = results.get(eid)
         highlight = source.get("highlight") if isinstance(source.get("highlight"), dict) else None
-        if not eid or not game or not highlight:
+        if not eid or not game:
+            continue
+        previous = jogos.get(eid) if isinstance(jogos.get(eid), dict) else None
+        if previous:
+            valido_anterior, motivo_anterior = video_compatibilidade_temporada(previous, game)
+            if not valido_anterior:
+                del jogos[eid]
+                if eid not in changed:
+                    changed.append(eid)
+                print(f"::warning title=Melhores momentos em quarentena::{eid}: {motivo_anterior}", file=sys.stderr)
+        if not highlight:
+            continue
+        valido, motivo = video_compatibilidade_temporada(highlight, game)
+        if not valido:
+            print(f"::warning title=Fastlane vídeo rejeitado::{eid}: {motivo}", file=sys.stderr)
             continue
         url = str(highlight.get("url") or "").strip()
         vid = str(highlight.get("video_id") or youtube_id(url)).strip()
@@ -268,7 +319,8 @@ def apply_highlight_rows(payload: dict[str, Any], rows: list[dict[str, Any]], re
             continue
         item["verificado_em"] = stamp
         jogos[eid] = item
-        changed.append(eid)
+        if eid not in changed:
+            changed.append(eid)
     if changed:
         out["atualizado_em"] = stamp
         out["modo_ultima_execucao"] = "cloudflare-fastlane"
@@ -323,6 +375,38 @@ def self_test() -> None:
         "fonte": "GE TV / YouTube", "channel_title": "GE TV", "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg", "embed": True,
     }}], {"1": {"event_id": "1", "rodada": 1, "mandante": {"nome": "A"}, "visitante": {"nome": "B"}, "placar_mandante": 1, "placar_visitante": 0}}, stamp)
     assert mids == ["1"] and mm["jogos"]["1"]["video_id"] == "AbCdEf12345"
+    gremio = {
+        "event_id": "401841276", "rodada": 31, "data_iso": "2026-10-18T16:00",
+        "mandante": {"nome": "Grêmio"}, "visitante": {"nome": "Cruzeiro"},
+        "placar_mandante": 2, "placar_visitante": 4,
+    }
+    historico = {
+        "video_id": "u6sN9rau6c0", "url": "https://www.youtube.com/watch?v=u6sN9rau6c0",
+        "titulo": "GRÊMIO X CRUZEIRO | MELHORES MOMENTOS | BRASILEIRÃO 2009 | ge tv",
+        "published_at": "2026-10-15T14:00:00Z",
+    }
+    ok, reason = video_compatibilidade_temporada(historico, gremio)
+    assert not ok and "outra temporada" in reason
+    novo = {
+        "video_id": "ZzZzZz12345", "url": "https://www.youtube.com/watch?v=ZzZzZz12345",
+        "titulo": "GRÊMIO 2 X 4 CRUZEIRO | MELHORES MOMENTOS | 31ª RODADA | BRASILEIRÃO 2026",
+        "published_at": "2026-10-18T22:00:00Z",
+    }
+    assert video_compatibilidade_temporada(novo, gremio)[0]
+    assert not video_compatibilidade_temporada({**novo, "titulo": novo["titulo"].replace("2 X 4", "1 X 0")}, gremio)[0]
+    assert not video_compatibilidade_temporada({**novo, "published_at": "2026-10-10T00:00:00Z"}, gremio)[0]
+    assert not video_compatibilidade_temporada({**novo, "video_id": "AbCdEf12345"}, gremio)[0]
+    bad, rejected = apply_highlight_rows(
+        {"jogos": {"401841276": historico}},
+        [{"event_id": "401841276", "highlight": historico}],
+        {"401841276": gremio}, stamp,
+    )
+    assert rejected == ["401841276"] and "401841276" not in bad["jogos"]
+    good, repaired = apply_highlight_rows(
+        bad, [{"event_id": "401841276", "highlight": novo}], {"401841276": gremio}, stamp,
+    )
+    assert repaired == ["401841276"] and good["jogos"]["401841276"]["video_id"] == "ZzZzZz12345"
+    print("R10R25: PASS (ano, placar, data, identidade e quarentena retroativa).")
     print("SELF-TEST OK: importador Fastlane é material/idempotente.")
 
 
