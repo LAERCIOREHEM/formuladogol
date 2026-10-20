@@ -1039,7 +1039,7 @@ jobs:
           alvo = max(elegiveis, default=0)
           print(f'Editorial closure: pendentes={elegiveis}, escolhido={alvo}, cobertura_publicada={publicados.get(alvo, 0)}')
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
-              output.write(f'editorial_round={alvo}\n')
+              output.write(f'editorial_round={alvo}\\n')
           PY
           # Somente aciona se houver uma rodada elegível ainda não publicada.
           # O dispatch precisa ser feito explicitamente porque pushes via
