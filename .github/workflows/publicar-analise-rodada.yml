@@ -93,22 +93,30 @@ jobs:
               raise SystemExit(f'R{round_number}: resultados sem event_id único, importação bloqueada')
           print(f'R{round_number}: {len(ids)} event_ids para consolidação de vídeos Fastlane')
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
-              output.write(f'round={round_number}\\n')
-              output.write(f'event_ids={",".join(ids)}\\n')
+              output.write(f'round={round_number}\n')
+              output.write(f'event_ids={",".join(ids)}\n')
           PY
-          if [[ -n "${{ steps.media.outputs.event_ids }}" ]]; then
+      - name: Importar mídias verificadas do Cloudflare Fastlane
+        if: steps.media.outputs.event_ids != ''
+        env:
+          FDG_PUSH_BASE_URL: https://push.formuladogol.com.br
+          EVENT_IDS: ${{ steps.media.outputs.event_ids }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$EVENT_IDS" ]]; then
             # Falha transitória do endpoint não deve impedir uma matéria factual.
             # A cobertura ausente será recuperada pelo workflow de vídeos.
             imported=false
             for attempt in 1 2 3; do
-              if python scripts/importar_postgame_fastlane.py --tipo melhores_momentos --event-ids "${{ steps.media.outputs.event_ids }}"; then
+              if python scripts/importar_postgame_fastlane.py --tipo melhores_momentos --event-ids "$EVENT_IDS"; then
                 imported=true
                 break
               fi
               echo "::warning title=Fastlane mídia indisponível::Tentativa $attempt/3; editorial será preservado."
               sleep 4
             done
-            echo "imported=$imported" >> "$GITHUB_OUTPUT"
+            echo "imported=$imported" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Detectar fechamento e gerar análise jornalística
@@ -153,7 +161,7 @@ jobs:
           missing = len(games) - found
           print(f'::notice title=Cobertura de vídeos R{round_number}::{found}/{len(games)} jogos com link oficial; faltam {missing}.')
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
-              output.write(f'missing={missing}\\n')
+              output.write(f'missing={missing}\n')
           PY
           if ! git diff --quiet -- dados-br/melhores-momentos.json; then
             python scripts/gerar_auditoria_cobertura_resultados.py
