@@ -23,6 +23,31 @@ jobs:
           cache-dependency-path: requirements-af-previsao.txt
       - name: Requirements
         run: python -m pip install -r requirements-af-previsao.txt
+      - name: R10R22 unit tests and workflow contract
+        run: |
+          python -m pip install pyyaml --disable-pip-version-check -q
+          python -m py_compile scripts/af_fastlane_sync_gate.py
+          python scripts/af_fastlane_sync_gate.py --self-test
+          python - <<'PY'
+          import yaml
+          from pathlib import Path
+          y=yaml.safe_load(Path('.github/workflows/af-previsao-fastlane-pos-final.yml').read_text(encoding='utf-8'))
+          steps=y['jobs']['fastlane']['steps']
+          byname={x.get('name'):x for x in steps}
+          ready=byname['Confirmar e recuperar sincronização ESPN para o AF']
+          defer=byname['Registrar pendência transitória e enfileirar recuperação completa']
+          recalc=byname['Recalcular AF imediatamente']
+          publish=byname['Publicar transação rápida no main']
+          assert ready['id']=='af_ready'
+          assert "scripts/af_fastlane_sync_gate.py" in ready['run']
+          assert "steps.af_ready.outputs.deferred == 'true'" in defer['if']
+          assert "gh workflow run atualizar-brasileirao.yml" in defer['run']
+          assert "steps.af_ready.outputs.ready == 'true'" in recalc['if']
+          assert "steps.af_ready.outputs.ready == 'true'" in publish['if']
+          assert "if: success()" not in str(recalc)
+          print("AF Fastlane R10R22 workflow contract: PASS")
+          PY
+
       - name: Refresh ESPN without publication
         env:
           ESPN_MAX_TENTATIVAS_SINCRONIA: '1'
