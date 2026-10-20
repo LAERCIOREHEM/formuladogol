@@ -74,8 +74,10 @@ jobs:
           python - <<'PY'
           import json
           import os
+          import sys
           from pathlib import Path
-          from scripts.gerar_analise_rodada import agora_br, carregar_json, estado_rodada, ARQUIVO_CONFIG
+          sys.path.insert(0, str(Path('scripts').resolve()))
+          from gerar_analise_rodada import agora_br, carregar_json, estado_rodada, ARQUIVO_CONFIG
 
           requested = str(os.environ.get('RODADA') or '').strip()
           if requested:
@@ -150,8 +152,10 @@ jobs:
           python - <<'PY'
           import json
           import os
+          import sys
           from pathlib import Path
-          from scripts.gerar_analise_rodada import indice_complementos_jogos
+          sys.path.insert(0, str(Path('scripts').resolve()))
+          from gerar_analise_rodada import indice_complementos_jogos
 
           round_number = int(os.environ.get('RODADA') or 0)
           results = json.loads(Path('resultados.json').read_text(encoding='utf-8')).get('resultados') or []
