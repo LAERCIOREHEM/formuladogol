@@ -38,6 +38,12 @@ jobs:
           defer=byname['Registrar pendência transitória e enfileirar recuperação completa']
           recalc=byname['Recalcular AF imediatamente']
           publish=byname['Publicar transação rápida no main']
+          delta=byname['Detectar FINAL novo ou AF antigo pendente']
+          assert "af_requested={'true' if required else 'false'}" in delta['run']
+          assert "freshness.get('atualizado') is not True" in delta['run']
+          assert "steps.delta.outputs.af_requested == 'true'" in ready['if']
+          assert "steps.delta.outputs.af_requested == 'true'" in recalc['if']
+          assert "steps.delta.outputs.af_requested == 'true'" in publish['if']
           assert ready['id']=='af_ready'
           assert "scripts/af_fastlane_sync_gate.py" in ready['run']
           assert "steps.af_ready.outputs.deferred == 'true'" in defer['if']
@@ -75,3 +81,4 @@ jobs:
               print('MODEL SYNC FAIL',type(exc).__name__,str(exc))
           print('FRESHNESS',json.dumps(current_publication_freshness(),ensure_ascii=False))
           PY
+          python scripts/af_fastlane_sync_gate.py --max-retries 0 --wait-seconds 0
