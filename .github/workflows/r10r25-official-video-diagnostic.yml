@@ -13,6 +13,32 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Validate historical-video rejection and safe reimport
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/importar_postgame_fastlane.py
+          python scripts/importar_postgame_fastlane.py --self-test
+          python scripts/sincronizar_midias_editoriais.py --self-test
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('dados-br/melhores-momentos.json').read_text(encoding='utf-8'))
+          r=json.loads(Path('resultados.json').read_text(encoding='utf-8'))
+          ids=[str(x['event_id']) for x in r['resultados'] if int(x.get('rodada') or 0)==31]
+          assert len(ids)==10 and all(x in m['jogos'] for x in ids)
+          assert m['jogos']['401841276']['video_id']=='bMi5A-0h4so'
+          print('Verified official 2026 media baseline: 10/10')
+          PY
+          python scripts/importar_postgame_fastlane.py --tipo melhores_momentos --event-ids 401841276
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('dados-br/melhores-momentos.json').read_text(encoding='utf-8'))
+          assert m['jogos']['401841276']['video_id']=='bMi5A-0h4so'
+          print('Live Fastlane reimport cannot overwrite verified 2026 video with 2009: PASS')
+          PY
+          python scripts/sincronizar_midias_editoriais.py --rodada 31 --dry-run
+
       - name: Query verified GE TV uploads for 2026 Grêmio 2 x 4 Cruzeiro
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
