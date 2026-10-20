@@ -49,14 +49,77 @@ jobs:
       - name: Validar gerador e dados editoriais
         run: |
           set -euo pipefail
-          python -m py_compile scripts/editorial_ia.py scripts/gerar_analise_rodada.py scripts/gerar_marcos_af_previsao.py scripts/validar_artefatos_analises.py
+          python -m py_compile scripts/editorial_ia.py scripts/gerar_analise_rodada.py scripts/gerar_marcos_af_previsao.py scripts/validar_artefatos_analises.py scripts/importar_postgame_fastlane.py scripts/sincronizar_midias_editoriais.py scripts/gerar_auditoria_cobertura_resultados.py
           python scripts/editorial_ia.py --self-test
           python scripts/gerar_analise_rodada.py --self-test
+          python scripts/importar_postgame_fastlane.py --self-test
+          python scripts/sincronizar_midias_editoriais.py --self-test
           python scripts/gerar_marcos_af_previsao.py --self-test
           python scripts/gerar_marcos_af_previsao.py
           python scripts/gerar_marcos_af_previsao.py --validar
           python -m json.tool dados-br/config-analises.json >/dev/null
           python scripts/validar_artefatos_analises.py
+
+      - name: Consolidar vídeos Fastlane antes de publicar editorial
+        id: media
+        env:
+          RODADA: ${{ inputs.rodada }}
+          FDG_PUSH_BASE_URL: https://push.formuladogol.com.br
+        shell: bash
+        run: |
+          set -euo pipefail
+          # A aba Resultados exibe /v1/postgame ao vivo, mas o editorial usa
+          # dados-br/melhores-momentos.json. Consolidar a MESMA fonte factual
+          # ANTES de renderizar os cards, sem repetir busca no YouTube.
+          python - <<'PY'
+          import json
+          import os
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path('scripts').resolve()))
+          from gerar_analise_rodada import agora_br, carregar_json, estado_rodada, ARQUIVO_CONFIG
+
+          requested = str(os.environ.get('RODADA') or '').strip()
+          if requested:
+              round_number = int(requested)
+              if not 1 <= round_number <= 38:
+                  raise SystemExit('Rodada fora do intervalo 1..38')
+          else:
+              config = carregar_json(ARQUIVO_CONFIG)
+              eligible = [r for r in range(1, 39) if estado_rodada(r, agora_br(), config)['elegivel']]
+              round_number = max(eligible, default=0)
+          results = json.loads(Path('resultados.json').read_text(encoding='utf-8')).get('resultados') or []
+          rows = [row for row in results if int(row.get('rodada') or 0) == round_number]
+          ids = sorted({str(row.get('event_id') or '').strip() for row in rows if str(row.get('event_id') or '').strip()})
+          if round_number and len(ids) != len(rows):
+              raise SystemExit(f'R{round_number}: resultados sem event_id único, importação bloqueada')
+          print(f'R{round_number}: {len(ids)} event_ids para consolidação de vídeos Fastlane')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'round={round_number}\n')
+              output.write(f'event_ids={",".join(ids)}\n')
+          PY
+      - name: Importar mídias verificadas do Cloudflare Fastlane
+        if: steps.media.outputs.event_ids != ''
+        env:
+          FDG_PUSH_BASE_URL: https://push.formuladogol.com.br
+          EVENT_IDS: ${{ steps.media.outputs.event_ids }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$EVENT_IDS" ]]; then
+            # Falha transitória do endpoint não deve impedir uma matéria factual.
+            # A cobertura ausente será recuperada pelo workflow de vídeos.
+            imported=false
+            for attempt in 1 2 3; do
+              if python scripts/importar_postgame_fastlane.py --tipo melhores_momentos --event-ids "$EVENT_IDS"; then
+                imported=true
+                break
+              fi
+              echo "::warning title=Fastlane mídia indisponível::Tentativa $attempt/3; editorial será preservado."
+              sleep 4
+            done
+            echo "imported=$imported" >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Detectar fechamento e gerar análise jornalística
         env:
@@ -76,10 +139,43 @@ jobs:
           if [[ "${FORCAR:-false}" == "true" ]]; then args+=(--forcar); fi
           python scripts/gerar_analise_rodada.py "${args[@]}"
 
+      - name: Sincronizar somente vídeos nos artigos publicados e medir cobertura
+        id: media_coverage
+        env:
+          RODADA: ${{ steps.media.outputs.round }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "${RODADA:-}" && "$RODADA" != "0" ]]; then
+            python scripts/sincronizar_midias_editoriais.py --rodada "$RODADA"
+          fi
+          python - <<'PY'
+          import json
+          import os
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path('scripts').resolve()))
+          from gerar_analise_rodada import indice_complementos_jogos
+
+          round_number = int(os.environ.get('RODADA') or 0)
+          results = json.loads(Path('resultados.json').read_text(encoding='utf-8')).get('resultados') or []
+          games = [x for x in results if int(x.get('rodada') or 0) == round_number]
+          videos, _ = indice_complementos_jogos()
+          found = sum(bool((videos.get(str(x.get('event_id') or '')) or {}).get('url')) for x in games)
+          missing = len(games) - found
+          print(f'::notice title=Cobertura de vídeos R{round_number}::{found}/{len(games)} jogos com link oficial; faltam {missing}.')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'missing={missing}\n')
+          PY
+          if ! git diff --quiet -- dados-br/melhores-momentos.json; then
+            python scripts/gerar_auditoria_cobertura_resultados.py
+          fi
+
       - name: Validar artefatos gerados
         run: |
           set -euo pipefail
           python -m json.tool dados-br/analises.json >/dev/null
+          python -m json.tool dados-br/melhores-momentos.json >/dev/null
           python scripts/validar_artefatos_analises.py
 
       - name: Publicar no repositório com push robusto
@@ -93,7 +189,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          FILES=(analises css/br-analises.css dados-br/analises.json dados-br/marcos-af-previsao.json sitemap.xml news-sitemap.xml feed.xml)
+          FILES=(analises css/br-analises.css dados-br/analises.json dados-br/marcos-af-previsao.json dados-br/melhores-momentos.json dados-br/auditoria-cobertura-resultados.json sitemap.xml news-sitemap.xml feed.xml)
           EXISTING=()
           for f in "${FILES[@]}"; do [[ -e "$f" ]] && EXISTING+=("$f"); done
           FILES=("${EXISTING[@]}")
@@ -149,3 +245,17 @@ jobs:
           set -euo pipefail
           gh workflow run deploy.yml --ref main
           echo "Deploy disparado para o editorial recém-publicado."
+
+      - name: Recuperar automaticamente vídeos ainda ausentes da rodada
+        if: steps.media_coverage.outputs.missing != '0' && steps.media.outputs.round != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RODADA: ${{ steps.media.outputs.round }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Busca oficial fica fora do caminho crítico do editorial; o workflow
+          # de vídeos já sincroniza os cards e dispara deploy se encontrar mídia.
+          gh workflow run buscar-melhores-momentos-getv.yml --ref main \
+            -f modo=incremental -f rodada_inicio="$RODADA" -f rodada_fim="$RODADA"
+          echo "::notice title=Busca de mídia complementar::R$RODADA enfileirada para preencher vídeos ainda ausentes."
