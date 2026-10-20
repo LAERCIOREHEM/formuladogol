@@ -19,6 +19,10 @@ jobs:
           python -m py_compile scripts/importar_postgame_fastlane.py
           python scripts/importar_postgame_fastlane.py --self-test
           python scripts/sincronizar_midias_editoriais.py --self-test
+          python scripts/substituir_fontes_preferidas_mm.py --selftest
+          python scripts/buscar_melhores_momentos_getv.py --dry-run --modo incremental
+          node --check cloudflare/push-worker/src/postgame-fastlane.js
+          node cloudflare/push-worker/tests/test-postgame-fastlane.mjs
           python - <<'PY'
           import json
           from pathlib import Path
