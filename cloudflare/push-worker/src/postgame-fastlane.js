@@ -149,6 +149,20 @@ export function highlightTitleValid(title, home, away) {
   return titleHasTeam(raw, home) && titleHasTeam(raw, away);
 }
 
+export function highlightTaskValid(title, task) {
+  // R10R25: título com clubes corretos pode ser retrospectiva histórica.
+  // Ex.: Grêmio x Cruzeiro 2009 republicado no dia do jogo de 2026.
+  if (!highlightTitleValid(title, task?.home, task?.away)) return false;
+  const expectedYear = text(task?.kickoff || task?.final_at).slice(0, 4);
+  const years = [...text(title).matchAll(/(?<!\d)(?:19|20)\d{2}(?!\d)/g)].map((m) => m[0]);
+  if (years.length && expectedYear && years.some((year) => year !== expectedYear)) return false;
+  const score = text(title).match(/(?<!\d)(\d{1,2})\s*[x×]\s*(\d{1,2})(?!\d)/i);
+  const home = num(task?.home_score);
+  const away = num(task?.away_score);
+  if (score && home !== null && away !== null && (Number(score[1]) !== home || Number(score[2]) !== away)) return false;
+  return true;
+}
+
 export function retryMinutes(kind, attempt, ageHours = 0) {
   const list = kind === 'highlight' ? HIGHLIGHT_RETRY_MINUTES : PUBLIC_RETRY_MINUTES;
   const idx = Math.max(0, Number(attempt || 1) - 1);
@@ -382,7 +396,7 @@ export async function findOfficialHighlight(env, task, now = Date.now()) {
         const publishedAt = text(item?.contentDetails?.videoPublishedAt || item?.snippet?.publishedAt);
         const publishedMs = Date.parse(publishedAt || '');
         return { videoId, title, publishedAt, publishedMs };
-      }).filter((row) => row.videoId && row.title && (!Number.isFinite(row.publishedMs) || row.publishedMs >= minPublished) && highlightTitleValid(row.title, task.home, task.away));
+      }).filter((row) => row.videoId && row.title && (!Number.isFinite(row.publishedMs) || row.publishedMs >= minPublished) && highlightTaskValid(row.title, task));
       candidates.sort((a, b) => (b.publishedMs || 0) - (a.publishedMs || 0));
       if (candidates.length) {
         const hit = candidates[0];
