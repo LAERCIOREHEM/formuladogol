@@ -131,7 +131,7 @@ jobs:
       - name: Atualizar agenda mínima para fechar o gatilho do FINAL
         run: python scripts/gerar_agenda_clubes_brasileirao.py
 
-      - name: Detectar FINAL material novo
+      - name: Detectar FINAL novo ou AF antigo pendente
         id: delta
         shell: bash
         env:
@@ -141,17 +141,24 @@ jobs:
           python - <<'PY' >> "$GITHUB_OUTPUT"
           import json, os
           from pathlib import Path
+          from scripts.gerar_probabilidades_brasileirao import current_publication_freshness
           r=json.loads(Path('resultados.json').read_text(encoding='utf-8'))
           after=int(r.get('total_resultados') or len(r.get('resultados') or []))
           before=int(os.environ.get('BEFORE_RESULTS') or 0)
           print(f"before={before}")
           print(f"after={after}")
           print(f"new_final={'true' if after > before else 'false'}")
+          # Mesmo que outro writer tenha publicado os resultados antes de
+          # atualizar o AF, a próxima execução deve recuperá-lo.
+          freshness=current_publication_freshness()
+          required=after > before or freshness.get('atualizado') is not True
+          print(f"af_requested={'true' if required else 'false'}")
+          print(f"af_stale={'true' if freshness.get('atualizado') is not True else 'false'}")
           PY
 
       - name: Confirmar e recuperar sincronização ESPN para o AF
         id: af_ready
-        if: steps.delta.outputs.new_final == 'true'
+        if: steps.delta.outputs.af_requested == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -161,7 +168,7 @@ jobs:
           python scripts/af_fastlane_sync_gate.py --max-retries 2 --wait-seconds 25
 
       - name: Registrar pendência transitória e enfileirar recuperação completa
-        if: steps.delta.outputs.new_final == 'true' && steps.af_ready.outputs.deferred == 'true'
+        if: steps.delta.outputs.af_requested == 'true' && steps.af_ready.outputs.deferred == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -173,7 +180,7 @@ jobs:
 
       - name: Recalcular AF imediatamente
         id: af
-        if: steps.delta.outputs.new_final == 'true' && steps.af_ready.outputs.ready == 'true'
+        if: steps.delta.outputs.af_requested == 'true' && steps.af_ready.outputs.ready == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -182,7 +189,7 @@ jobs:
           python scripts/reconciliar_af_continental.py --force --max-attempts 2
 
       - name: Sporting Snapshot Integrity Guard
-        if: steps.delta.outputs.new_final == 'true' && steps.af_ready.outputs.ready == 'true'
+        if: steps.delta.outputs.af_requested == 'true' && steps.af_ready.outputs.ready == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -198,12 +205,12 @@ jobs:
         run: python scripts/registrar_slo_confiabilidade.py --event-id "${{ inputs.event_id }}" --trace-id "$FDG_TRACE_ID"
 
       - name: Atualizar estado CORE / ENRICHMENT
-        if: steps.delta.outputs.new_final == 'true' && steps.af_ready.outputs.ready == 'true'
+        if: steps.delta.outputs.af_requested == 'true' && steps.af_ready.outputs.ready == 'true'
         run: python scripts/gerar_estado_confiabilidade.py --profile fastlane
 
       - name: Preparar artefatos atômicos
         id: material
-        if: steps.delta.outputs.new_final == 'true' && steps.af_ready.outputs.ready == 'true'
+        if: steps.delta.outputs.af_requested == 'true' && steps.af_ready.outputs.ready == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -234,7 +241,7 @@ jobs:
 
       - name: Publicar transação rápida no main
         id: publish
-        if: steps.delta.outputs.new_final == 'true' && steps.af_ready.outputs.ready == 'true' && steps.material.outputs.changed == 'true'
+        if: steps.delta.outputs.af_requested == 'true' && steps.af_ready.outputs.ready == 'true' && steps.material.outputs.changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -333,6 +340,8 @@ jobs:
             echo "- Concluídos antes: \`${{ steps.before.outputs.resultados || '?' }}\`"
             echo "- Concluídos depois: \`${{ steps.delta.outputs.after || '?' }}\`"
             echo "- FINAL material novo: \`${{ steps.delta.outputs.new_final || 'false' }}\`"
+            echo "- Recalcular AF necessário: \`${{ steps.delta.outputs.af_requested || 'false' }}\`"
+            echo "- AF antigo pendente: \`${{ steps.delta.outputs.af_stale || 'false' }}\`"
             echo "- Readiness ESPN/AF: \`${{ steps.af_ready.outputs.classification || 'not_requested' }}\`"
             echo "- Refreshes controlados: \`${{ steps.af_ready.outputs.refresh_attempts || '0' }}\`"
             echo "- ESPN dessincronizada (AF pendente): \`${{ steps.af_ready.outputs.deferred || 'false' }}\`"
