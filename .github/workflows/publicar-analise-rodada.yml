@@ -8,6 +8,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/publicar-analise-rodada.yml'
+      - 'scripts/importar_postgame_fastlane.py'
   workflow_dispatch:
     inputs:
       rodada:

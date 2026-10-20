@@ -343,6 +343,13 @@ def uol_fallback_liberado(jogo: Dict[str, Any], agora: Optional[datetime] = None
 
 
 def video_serve_para_jogo(titulo: Any, jogo: Dict[str, Any]) -> bool:
+    # R10R25: o canal pode publicar retrospectivas históricas durante uma
+    # rodada atual (ex.: Grêmio x Cruzeiro 2009 em 18/10/2026).
+    # Um título com ano explícito incompatível nunca é um highlight atual.
+    ano_partida = str(jogo.get("data_iso") or jogo.get("finalizado_em") or "2026")[:4]
+    anos_titulo = set(re.findall(r"(?<!\d)(?:19|20)\d{2}(?!\d)", str(titulo or "")))
+    if anos_titulo and anos_titulo != {ano_partida}:
+        return False
     if titulo_tem_termo_ruim(titulo):
         return False
     if not titulo_parece_mm(titulo):
@@ -963,6 +970,8 @@ def selftest() -> int:
     jogo = {"rodada": 18, "mandante": {"nome": "Remo"}, "visitante": {"nome": "São Paulo"}, "placar_mandante": 1, "placar_visitante": 0}
     c(video_serve_para_jogo("REMO 1 X 0 SÃO PAULO | MELHORES MOMENTOS | 18ª RODADA BRASILEIRÃO 2026 | ge.globo", jogo), "aceita título correto se vier de canal permitido")
     c(not video_serve_para_jogo("REMO 2 X 0 SÃO PAULO | MELHORES MOMENTOS | 18ª RODADA", jogo), "rejeita placar errado")
+    c(not video_serve_para_jogo("REMO X SÃO PAULO | MELHORES MOMENTOS | BRASILEIRÃO 2009", {**jogo, "data_iso": "2026-07-18T20:00:00-03:00"}), "rejeita ano histórico 2009")
+    c(video_serve_para_jogo("REMO 1 X 0 SÃO PAULO | MELHORES MOMENTOS | BRASILEIRÃO 2026", {**jogo, "data_iso": "2026-07-18T20:00:00-03:00"}), "aceita ano da temporada 2026")
     c(not video_serve_para_jogo("REMO 1 X 0 SÃO PAULO AO VIVO", jogo), "rejeita ao vivo")
     c(not video_serve_para_jogo("REMO 1 X 0 SÃO PAULO | COLETIVA", jogo), "rejeita conteúdo que não é melhores momentos")
     c(not preferido({"channel_title": "Futebol Raiz TV", "titulo": "REMO 1 X 0 SÃO PAULO ge.globo"}), "não aceita falso ge.globo por título")

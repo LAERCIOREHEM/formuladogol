@@ -309,6 +309,12 @@ def video_tem_melhores_momentos(video: Dict[str, Any]) -> bool:
 
 def pontuar_match(jogo: Jogo, video: Dict[str, Any], config: Dict[str, Any]) -> Tuple[float, List[str]]:
     titulo = norm(video.get("titulo"))
+    # R10R25: não atribuir confiança a retrospectiva histórica só por
+    # coincidir o par de clubes (caso real: Grêmio x Cruzeiro 2009).
+    temporada = str(jogo.data_iso or "2026")[:4]
+    anos = set(re.findall(r"(?<!\d)(?:19|20)\d{2}(?!\d)", titulo))
+    if anos and anos != {temporada}:
+        return 0.0, ["temporada explícita incompatível"]
     rodada_playlist = video.get("rodada_playlist")
     rodada_titulo = rodada_do_texto(video.get("titulo") or "")
     motivos: List[str] = []
@@ -343,9 +349,10 @@ def pontuar_match(jogo: Jogo, video: Dict[str, Any], config: Dict[str, Any]) -> 
     placares = re.findall(r"(\d+)\s*x\s*(\d+)", titulo)
     if placares and jogo.placar_mandante is not None and jogo.placar_visitante is not None:
         pm, pv = str(jogo.placar_mandante), str(jogo.placar_visitante)
-        if any(a == pm and b == pv for a, b in placares):
-            score += 0.08
-            motivos.append("placar confere")
+        if not any(a == pm and b == pv for a, b in placares):
+            return 0.0, ["placar do vídeo difere do FINAL"]
+        score += 0.08
+        motivos.append("placar confere")
 
     return min(score, 1.0), motivos
 
