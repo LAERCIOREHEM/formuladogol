@@ -252,6 +252,13 @@ async function handleSubscribe(request, env) {
   }
 
   const subscriptionId = await sha256Base64Url(endpoint);
+  // Uma instalação deve ter no máximo um endpoint ativo. Rotação do FCM,
+  // reinstalação PWA e novas inscrições nunca duplicam os gols neste aparelho.
+  await env.DB.prepare(`
+    UPDATE push_subscriptions
+    SET active=0, updated_at=CURRENT_TIMESTAMP
+    WHERE installation_id=? AND endpoint<>? AND active=1
+  `).bind(installationId, endpoint).run();
   await env.DB.prepare(`
     INSERT INTO push_subscriptions
       (subscription_id, installation_id, endpoint, p256dh, auth, expiration_time, user_agent, active, updated_at)
