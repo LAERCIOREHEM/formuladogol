@@ -507,8 +507,24 @@ export async function fetchEspnScoreboardFresh(league, dates, fetchImpl = global
     }
   }));
   if (!successful.length) {
-    const fallback = await fetchEspnScoreboard(league, dates, fetchImpl);
-    return { ...fallback, selectedSources: {}, source: fallback.source };
+    // O fallback antigo tentava até três origens em série, cada uma com timeout
+    // de 10 s. Em jogo ao vivo isso bloqueava o próximo poll e o push do gol.
+    // A contingência usa as mesmas fontes em paralelo com orçamento de 3,5 s.
+    const fallback = await parallelSuccessful(
+      scoreboardCandidates(league, dates).map((candidate) => ({
+        ...candidate, transform: unwrapScoreboard
+      })),
+      fetchImpl,
+      LIVE_FETCH_TIMEOUT_MS
+    );
+    attempts.push(...fallback.attempts);
+    successful.push(...fallback.successful);
+    if (!successful.length) {
+      const error = new Error(attempts.map((item) =>
+        `${item.source}: ${item.error || 'indisponível'}`).join(' | ') || 'scoreboard ESPN indisponível');
+      error.attempts = attempts;
+      throw error;
+    }
   }
 
   const merged = new Map();
