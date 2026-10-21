@@ -2200,6 +2200,22 @@ def run_update(
             )
     after_snapshots = load_existing_snapshots()
     after_hash = snapshots_state_hash(after_snapshots)
+    # R10R26: um snapshot de setembro pode ser estruturalmente válido, mas
+    # omitir toda a semifinal de outubro. Não permitir Monte Carlo com essa
+    # fotografia só porque o último scoreboard falhou sem partidas pendentes.
+    from verificar_cobertura_continental import load_coverage
+    try:
+        official_gaps = load_coverage()
+    except (OSError, ValueError, KeyError) as coverage_exc:
+        official_gaps = [{"motivo": "agenda_indisponivel", "erro": str(coverage_exc)}]
+    if official_gaps:
+        blocking_failures.append(
+            "agenda CONMEBOL não reconciliada com os snapshots: "
+            + "; ".join(
+                f"{gap.get('competicao', '')} {gap.get('jogo', '')} {gap.get('motivo', '')}"
+                for gap in official_gaps[:8]
+            )
+        )
     accepted_rows = {"atualizado", "cache_valido", "preservado_apos_falha_seguro"}
     ready = (
         not blocking_failures
@@ -2231,6 +2247,7 @@ def run_update(
         "competicoes": audit_rows,
         "falhas": failures,
         "falhas_bloqueantes": blocking_failures,
+        "cobertura_agenda_oficial": {"ok": not official_gaps, "pendencias": official_gaps},
         "fontes_totalmente_atualizadas": not failures,
         "snapshots_prontos_para_af": ready,
         "regras_operacionais": {
