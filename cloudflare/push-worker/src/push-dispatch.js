@@ -563,7 +563,7 @@ export async function handleQueueBatch(batch, env) {
 }
 
 export async function dispatchStatus(env) {
-  const [subscriptions, pending, deliveries] = await Promise.all([
+  const [subscriptions, pending, deliveries, recentGoals] = await Promise.all([
     env.DB.prepare(`SELECT COUNT(*) AS count FROM push_subscriptions WHERE active=1`).first(),
     env.DB.prepare(`SELECT COUNT(*) AS count FROM push_event_dispatch WHERE status IN ('pending','enqueued')`).first(),
     env.DB.prepare(`
@@ -573,7 +573,17 @@ export async function dispatchStatus(env) {
         SUM(CASE WHEN status='gone' THEN 1 ELSE 0 END) AS gone,
         SUM(CASE WHEN status='failed' THEN 1 ELSE 0 END) AS failed
       FROM push_deliveries
-    `).first()
+    `).first(),
+    env.DB.prepare(`
+      SELECT e.event_id, e.event_key, e.detected_at, e.confirmed_at,
+             e.created_at AS recorded_at, MIN(d.sent_at) AS first_sent_at
+      FROM sports_events e
+      LEFT JOIN push_deliveries d ON d.event_key=e.event_key AND d.status='sent'
+      WHERE e.event_type='goal'
+      GROUP BY e.event_key
+      ORDER BY e.created_at DESC
+      LIMIT 8
+    `).all()
   ]);
   return {
     ok: true,
@@ -583,6 +593,16 @@ export async function dispatchStatus(env) {
     hotMatchTestVersion: '6-H3',
     activeSubscriptions: num(subscriptions?.count, 0),
     pendingEvents: num(pending?.count, 0),
+    // Diagnóstico sem qualquer identificador de assinante: permite separar
+    // demora ESPN/monitor, fila Web Push e atraso posterior do celular.
+    recentGoals: (recentGoals?.results || []).map((row) => ({
+      eventId: text(row.event_id),
+      eventKey: text(row.event_key),
+      detectedAt: text(row.detected_at),
+      confirmedAt: text(row.confirmed_at),
+      recordedAt: text(row.recorded_at),
+      firstSentAt: text(row.first_sent_at)
+    })),
     deliveries: {
       sent: num(deliveries?.sent, 0),
       retry: num(deliveries?.retry, 0),
