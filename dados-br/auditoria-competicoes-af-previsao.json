@@ -2,15 +2,15 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-10-21T18:07:23-03:00",
+  "gerado_em": "2026-10-21T19:12:28-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "af_snapshot_seguro": true,
   "agenda_operacional_fresca": true,
   "snapshots_preservados": 0,
-  "mudanca_esportiva": false,
+  "mudanca_esportiva": true,
   "hash_estado_antes": "1e7d7ba395dba422a8d2c49b2e76d169b5cdd831039b7285842dbb2b162925ad",
-  "hash_estado_depois": "1e7d7ba395dba422a8d2c49b2e76d169b5cdd831039b7285842dbb2b162925ad",
+  "hash_estado_depois": "2d3486484cbe95f123b5018cc9104b0ebf421f560d452605d453e5b5b4d2e21f",
   "fonte": "ESPN + API-Football contingencial",
   "temporada": 2026,
   "competicoes": [
@@ -18,7 +18,7 @@
       "competicao": "copa_do_brasil",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-10-21T18:07:11-03:00",
+      "gerado_em": "2026-10-21T19:12:15-03:00",
       "cache_efetivo_minutos": 0,
       "eventos": 155,
       "finalizados": 150,
@@ -102,7 +102,7 @@
       "competicao": "libertadores",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-10-21T18:07:18-03:00",
+      "gerado_em": "2026-10-21T19:12:24-03:00",
       "cache_efetivo_minutos": 0,
       "eventos": 155,
       "finalizados": 152,
@@ -163,7 +163,7 @@
       "competicao": "sul_americana",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-10-21T18:07:21-03:00",
+      "gerado_em": "2026-10-21T19:12:26-03:00",
       "cache_efetivo_minutos": 0,
       "eventos": 157,
       "finalizados": 155,
@@ -176,10 +176,12 @@
         "eventos_pendentes": 1
       },
       "summary_partidas_iniciadas": {
-        "consultados": 0,
-        "confirmados": 0,
-        "atualizados": 0,
-        "ao_vivo": [],
+        "consultados": 1,
+        "confirmados": 1,
+        "atualizados": 1,
+        "ao_vivo": [
+          "401913956"
+        ],
         "finalizados": [],
         "pendentes": [],
         "pendentes_vencidos": [],
@@ -215,7 +217,17 @@
         "janela_fim": "2027-02-18T23:59:59-03:00",
         "requisicoes": 4,
         "ultima_completa_em": "2026-09-12T05:15:07-03:00",
-        "ajustes_editoriais_aplicados": 0
+        "ajustes_editoriais_aplicados": 0,
+        "summary_partidas_iniciadas": {
+          "consultados": 1,
+          "confirmados": 1,
+          "atualizados": 1,
+          "ao_vivo": [
+            "401913956"
+          ],
+          "finalizados": [],
+          "erros": []
+        }
       }
     }
   ],
