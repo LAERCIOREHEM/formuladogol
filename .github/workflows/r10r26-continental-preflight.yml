@@ -28,6 +28,8 @@ jobs:
           python scripts/atualizar_competicoes_af_previsao.py --self-test
           python scripts/orquestrar_workflows.py --self-test
           python -S scripts/gerar_analise_continental.py --self-test
+          python -S scripts/verificar_cobertura_continental.py --self-test
+          node --test cloudflare/orchestrator-worker/tests/logic.test.mjs
       - name: Probe ESPN date formats for CONMEBOL
         run: |
           python - <<'PY'
