@@ -216,7 +216,17 @@ export function continentalPhaseTransitionGuard(games, officialSchedule, contine
   );
   const nextMissingMs = missing.map((row) => parseDate(row?.data_iso)?.getTime()).filter(Number.isFinite).sort((a,b)=>a-b)[0];
   const hoursToMissing = Number.isFinite(nextMissingMs) ? (nextMissingMs - current.getTime()) / 3600000 : Infinity;
-  const urgent = missing.length > 0 && hoursToMissing <= 24;
+  // R10R26: snapshot continental preservado desde setembro deve disparar
+  // coleta urgente durante as semifinais de outubro, mesmo se o fallback
+  // CONMEBOL já cobrir a agenda e missingOfficial estiver vazio.
+  const nearKickoff = expected.some((row) => {
+    const kickoff = parseDate(row?.data_iso);
+    if (!kickoff) return false;
+    const hours = (kickoff.getTime() - current.getTime()) / 3600000;
+    return hours >= -6 && hours <= 24;
+  });
+  const urgent = (missing.length > 0 && hoursToMissing <= 24)
+    || (staleRows.length > 0 && nearKickoff);
   const refreshNeeded = missing.length > 0 || staleRows.length > 0;
   const fingerprint = [
     ...missing.map((row) => `${row?.competicao_chave || ''}:${row?.data_iso || ''}:${teamName(row?.mandante)}>${teamName(row?.visitante)}`),
