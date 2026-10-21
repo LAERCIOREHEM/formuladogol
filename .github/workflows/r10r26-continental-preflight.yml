@@ -27,6 +27,14 @@ jobs:
         run: |
           python scripts/atualizar_competicoes_af_previsao.py --self-test
           python scripts/orquestrar_workflows.py --self-test
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'scripts')
+          from orquestrar_workflows import editorial_continental_lock_active
+          blocked,state=editorial_continental_lock_active()
+          print('EDITORIAL_BREAKER',blocked,state.get('motivo'))
+          assert not blocked, 'editorial continental continua travado no código novo'
+          PY
           python -S scripts/gerar_analise_continental.py --self-test
           python -S scripts/verificar_cobertura_continental.py --self-test
           node --test cloudflare/orchestrator-worker/tests/logic.test.mjs
@@ -51,6 +59,7 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/atualizar_competicoes_af_previsao.py --force --max-age-minutes 0 --full-refresh-hours 0 --past-days 10 --future-days 20
+          python -S scripts/verificar_cobertura_continental.py --strict
           python - <<'PY'
           import json
           from pathlib import Path
