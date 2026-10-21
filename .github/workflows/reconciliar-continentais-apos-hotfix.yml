@@ -6,6 +6,7 @@ on:
     paths:
       - 'scripts/atualizar_competicoes_af_previsao.py'
       - 'scripts/verificar_cobertura_continental.py'
+      - '.github/workflows/atualizar-brasileirao.yml'
       - '.github/workflows/reconciliar-continentais-apos-hotfix.yml'
   workflow_dispatch:
 permissions:
