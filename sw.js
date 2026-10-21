@@ -5,12 +5,13 @@
  * de placares, agenda, probabilidades ou qualquer dado esportivo dinâmico.
  */
 
-const SW_VERSION = '20260905-push-resiliencia-v1';
+const SW_VERSION = '20261020-goal-dedupe-r1';
 const DEFAULT_ICON = '/notification-fg-192.png';
 const DEFAULT_BADGE = '/notification-fg-96.png';
 const DEFAULT_URL = '/aovivo.html';
 const BADGE_DB = 'fdg-pwa-state-v1';
 const BADGE_STORE = 'state';
+const GOAL_DEDUPE_MS = 10 * 60_000;
 
 function openStateDb() {
   return new Promise((resolve, reject) => {
@@ -101,6 +102,82 @@ async function setBadgeFromPayload(payload) {
   }
 }
 
+// Deduplicação transacional por placar. Mesmo com duas assinaturas antigas,
+ // redelivery do provedor ou chaves diferentes entre ESPN CORE/CDN, um gol
+ // somente é exibido uma vez no contexto deste Service Worker.
+function goalNoticeKey(payload) {
+  const data = payload?.data || {};
+  const type = String(data.type || '');
+  if (type !== 'goal' && type !== 'goal_overturned') return '';
+  const eventId = String(data.eventId || '');
+  const score = data.scoreAfter;
+  if (eventId && score && Number.isInteger(Number(score.home))
+      && Number.isInteger(Number(score.away))
+      && score.home != null && score.away != null) {
+    return `seen:${type}:${eventId}:${Number(score.home)}-${Number(score.away)}`;
+  }
+  const eventKey = String(data.eventKey || '');
+  return eventKey ? `seen:${eventKey}` : '';
+}
+
+async function claimGoalNotice(key) {
+  if (!key || typeof indexedDB === 'undefined') return true;
+  const db = await openStateDb();
+  try {
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(BADGE_STORE, 'readwrite');
+      const store = tx.objectStore(BADGE_STORE);
+      let claimed = false;
+      const request = store.get(key);
+      request.onsuccess = () => {
+        const now = Date.now();
+        if (Number(request.result || 0) > now) return;
+        store.put(now + GOAL_DEDUPE_MS, key);
+        claimed = true;
+      };
+      tx.oncomplete = () => resolve(claimed);
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
+    });
+  } finally {
+    db.close();
+  }
+}
+
+async function displayUniqueNotification(payload, title, options) {
+  const key = goalNoticeKey(payload);
+  let claimed = false;
+  try {
+    claimed = await claimGoalNotice(key);
+  } catch (_) {
+    // IndexedDB pode estar bloqueado pelo navegador. Preserva push;
+    // a tag canônica ainda substitui uma notificação anterior.
+    claimed = true;
+  }
+  if (!claimed) return;
+  try {
+    await self.registration.showNotification(title, options);
+    await setBadgeFromPayload(payload);
+  } catch (error) {
+    if (key && typeof indexedDB !== 'undefined') {
+      // Se exibir falhou, permitir uma tentativa posterior legítima.
+      try {
+        const db = await openStateDb();
+        try {
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(BADGE_STORE, 'readwrite');
+            tx.objectStore(BADGE_STORE).delete(key);
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error);
+            tx.onabort = () => reject(tx.error);
+          });
+        } finally { db.close(); }
+      } catch (_) {}
+    }
+    throw error;
+  }
+}
+
 self.addEventListener('push', (event) => {
   const payload = normalizePushPayload(event);
   const title = String(payload.title || 'Fórmula do Gol');
@@ -123,10 +200,7 @@ self.addEventListener('push', (event) => {
     options.actions = payload.actions.slice(0, 2);
   }
 
-  event.waitUntil(Promise.all([
-    self.registration.showNotification(title, options),
-    setBadgeFromPayload(payload)
-  ]));
+  event.waitUntil(displayUniqueNotification(payload, title, options));
 });
 
 async function focusOrOpen(url) {
