@@ -643,12 +643,34 @@ def fetch_events_between(
     end = min(end, season_end)
     if start > end:
         return [], 0
-    for lower, upper in date_windows_between(start, end, days=SCOREBOARD_WINDOW_DAYS):
-        rows, used = _scoreboard_payload_resilient(spec, lower, upper, fetcher=fetcher)
+    # R10R26: ESPN CONMEBOL aceita dates=YYYYMM (HTTP 200 com os quatro
+    # jogos das semifinais de outubro), mas rejeita YYYYMMDD-YYYYMMDD.
+    # Buscar meses reduz ~400 consultas diárias para ~18 mensais nas três
+    # competições. Só recorrer aos dias se o mês falhar; não usar IA.
+    fetcher = fetcher or fetch_json
+    month = datetime(start.year, start.month, 1, tzinfo=BRT)
+    while month <= end:
+        next_month = datetime(month.year + (month.month == 12), month.month % 12 + 1, 1, tzinfo=BRT)
+        lower = max(start, month)
+        upper = min(end, next_month - timedelta(seconds=1))
+        url = BASE_URL.format(league=spec.league)
+        try:
+            payload = fetcher(f"{url}?dates={month:%Y%m}&limit=250&lang=pt&region=br")
+            rows = [row for row in (payload.get("events") or []) if isinstance(row, dict)]
+            used = 1
+        except Exception:  # noqa: BLE001
+            rows = []
+            used = 1  # contabiliza tentativa mensal rejeitada
+            for day_start, day_end in date_windows_between(lower, upper, days=1):
+                daily, calls = _scoreboard_payload_resilient(spec, day_start, day_end, fetcher=fetcher)
+                rows.extend(daily)
+                used += calls
         requests += used
         for event in rows:
-            if event.get("id"):
+            date = parse_datetime(event.get("date"))
+            if date and lower.date() <= date.astimezone(BRT).date() <= upper.date() and event.get("id"):
                 events[str(event["id"])] = event
+        month = next_month
     return sorted(
         events.values(), key=lambda item: (str(item.get("date") or ""), str(item.get("id") or ""))
     ), requests
@@ -2839,16 +2861,18 @@ def self_test() -> None:
     assert pen_final["vencedor_penaltis"] == "Palmeiras"
     assert pen_final["penaltis"] == {"mandante": 3, "visitante": 4}
 
-    # HOTFIX 8: uma faixa rejeitada precisa cair para subfaixas sem perder jogos.
+    # R10R26: a API responde a mês (YYYYMM); fallback diário só após falha.
     fake_spec = COMPETITIONS[1]
     calls: list[str] = []
     def fake_scoreboard(url: str) -> dict[str, Any]:
         calls.append(url)
-        m = re.search(r"dates=(\d{8})(?:-(\d{8}))?", url)
-        assert m
-        if m.group(2) and m.group(1) != m.group(2):
-            raise RuntimeError("HTTP 400 simulado para faixa ampla")
-        return {"events": [{"id": m.group(1), "date": m.group(1)}]}
+        if "dates=202610&" in url:
+            return {"events": [
+                {"id": "20261013", "date": "2026-10-13T22:30:00Z"},
+                {"id": "20261014", "date": "2026-10-14T22:30:00Z"},
+                {"id": "20261025", "date": "2026-10-25T22:30:00Z"},
+            ]}
+        raise RuntimeError("não deve pesquisar dia se o mês respondeu")
     rows, used = fetch_events_between(
         fake_spec,
         datetime(2026, 10, 13, tzinfo=BRT),
@@ -2856,8 +2880,23 @@ def self_test() -> None:
         fetcher=fake_scoreboard,
     )
     assert {row["id"] for row in rows} == {"20261013", "20261014"}
-    assert used == 2 and len(calls) == 2, (used, calls)
-    assert all(re.search(r"dates=\d{8}&", url) for url in calls), calls
+    assert used == 1 and len(calls) == 1, (used, calls)
+    calls.clear()
+    def fake_month_fails(url: str) -> dict[str, Any]:
+        calls.append(url)
+        if "dates=202610&" in url:
+            raise RuntimeError("HTTP 400 mensal simulado")
+        m = re.search(r"dates=(\\d{8})&", url)
+        assert m, url
+        return {"events": [{"id": m.group(1), "date": f"{m.group(1)[:4]}-{m.group(1)[4:6]}-{m.group(1)[6:]}T22:30:00Z"}]}
+    rows, used = fetch_events_between(
+        fake_spec,
+        datetime(2026, 10, 13, tzinfo=BRT),
+        datetime(2026, 10, 14, 23, 59, tzinfo=BRT),
+        fetcher=fake_month_fails,
+    )
+    assert {row["id"] for row in rows} == {"20261013", "20261014"}
+    assert used == 3 and len(calls) == 3, (used, calls)
 
     print("Self-test coleta AF-Previsão Continental incremental: OK")
 
