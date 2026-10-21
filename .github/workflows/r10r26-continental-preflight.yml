@@ -62,3 +62,13 @@ jobs:
               semis=[e for e in j.get('eventos',[]) if int(e.get('fase_ordem') or 0)==800]
               print('SEMIFINAL',key,len(semis),[(e.get('data_iso'),(e.get('mandante') or {}).get('nome'),(e.get('visitante') or {}).get('nome'),e.get('concluido')) for e in semis])
           PY
+          python - <<'PY'
+          import json,urllib.request
+          from scripts.atualizar_competicoes_af_previsao import COMPETITIONS, extract_event
+          for spec in COMPETITIONS[1:]:
+              url=f"https://site.api.espn.com/apis/site/v2/sports/soccer/{spec.league}/scoreboard?dates=202610&limit=250&lang=pt&region=br"
+              payload=json.load(urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0"}),timeout=15))
+              for e in payload.get("events",[]):
+                  n=extract_event(e,spec)
+                  print('RAW_OCT',spec.key,e.get('id'),e.get('date'),e.get('name'),(e.get('status') or {}).get('type'), 'PARSED',n and {k:n.get(k) for k in ('data_iso','fase','fase_ordem','perna','concluido','vencedor')},flush=True)
+          PY
