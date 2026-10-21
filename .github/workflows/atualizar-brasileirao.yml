@@ -1033,8 +1033,13 @@ jobs:
               if x.get('tipo') == 'brasileirao_rodada'
           }
           now = datetime.now(timezone(timedelta(hours=-3)))
+          # R10R26: a automação de fechamento não é um backfill histórico.
+          # Rodadas 1–19 não possuem editorial por decisão do catálogo; não
+          # disparar IA para elas só porque o manifesto começa na rodada 20.
+          # A última rodada publicada permanece elegível a complemento.
+          primeira_rodada_operacional = max(publicados, default=1)
           elegiveis = []
-          for rodada in range(1, 39):
+          for rodada in range(primeira_rodada_operacional, 39):
               estado = estado_rodada(rodada, now, config)
               if estado['elegivel'] and (
                   publicados.get(rodada, 0) < estado['jogos_concluidos']
