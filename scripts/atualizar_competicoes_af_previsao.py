@@ -1318,6 +1318,11 @@ def normalize_generic_pending_knockout_cohorts(events: list[dict[str, Any]]) -> 
         int(event.get("fase_ordem") or 0)
         for event in events
         if not event.get("concluido") and phase_metadata_is_specific(event)
+        # R10R26: a ESPN já cadastra FINAL TBD x TBD em novembro. Esse
+        # placeholder (rank 900) NÃO é âncora para as semifinais de outubro.
+        and 0 < int(event.get("fase_ordem") or 0) < 900
+        and all(team and not str(team.get("nome") or "").lower().startswith("tbd")
+                for team in (event.get("mandante") or {}, event.get("visitante") or {}))
     ]
     anchor_rank = min(pending_specific) if pending_specific else specific_ranks[0]
     anchor_events = [
@@ -2931,11 +2936,13 @@ def self_test() -> None:
         fixture("sf-b1", "2026-10-14T19:00:00-03:00", "Atlético-MG", "Montevideo City Torque", 1, True),
         fixture("sf-a2", "2026-10-20T21:30:00-03:00", "Vasco da Gama", "Boca Juniors", 2, False, 100, "Volta"),
         fixture("sf-b2", "2026-10-21T19:00:00-03:00", "Montevideo City Torque", "Atlético-MG", 2, False, 100, "Volta"),
+        fixture("final-placeholder", "2026-11-28T17:00:00-03:00", "TBD Home", "TBD Away", 0, False, 900, "Final"),
     ]
     count = normalize_generic_pending_knockout_cohorts(semifinal)
     assert count == 4, (count, semifinal)
     assert all(row["fase_ordem"] == 800 for row in semifinal if row["event_id"].startswith("sf-"))
     assert semifinal[0]["fase_ordem"] == 700
+    assert semifinal[-1]["fase_ordem"] == 900
 
     print("Self-test coleta AF-Previsão Continental incremental: OK")
 
