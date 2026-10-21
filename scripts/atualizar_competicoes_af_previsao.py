@@ -67,7 +67,10 @@ SNAPSHOT_SCHEMA_VERSION = 2
 # A coleta continental usa lotes curtos e, se um lote ainda falhar, divide-o
 # progressivamente até um único dia antes de desistir. Isso impede que uma
 # consulta de 42 dias apague semanas inteiras de agenda futura.
-SCOREBOARD_WINDOW_DAYS = max(1, min(14, int(os.environ.get("AF_CONTINENTAL_ESPN_WINDOW_DAYS", "7"))))
+# ESPN CONMEBOL rejeita intervalos com HTTP 400; o endpoint de dia único
+# YYYYMMDD respondeu HTTP 200 em teste real de 20/10/2026. Um dia por
+# requisição é mais barato do que subdividir repetidamente intervalos inválidos.
+SCOREBOARD_WINDOW_DAYS = max(1, min(14, int(os.environ.get("AF_CONTINENTAL_ESPN_WINDOW_DAYS", "1"))))
 BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{league}/scoreboard"
 SUMMARY_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{league}/summary"
 API_FOOTBALL_ROOT = "https://v3.football.api-sports.io"
@@ -596,25 +599,28 @@ def _scoreboard_payload_resilient(
     fetcher = fetcher or fetch_json
     date_range = f"{lower:%Y%m%d}-{upper:%Y%m%d}"
     url = BASE_URL.format(league=spec.league)
+    total_days = (upper.date() - lower.date()).days + 1
+    if total_days <= 1:
+        # O endpoint CONMEBOL responde 200 a YYYYMMDD, mas 400 a
+        # YYYYMMDD-YYYYMMDD. Preferir data simples, evitando 6 tentativas
+        # inúteis (curl-cffi + urllib + retry) por dia.
+        single_day = f"{lower:%Y%m%d}"
+        try:
+            payload = fetcher(f"{url}?dates={single_day}&limit=250&lang=pt&region=br")
+            return [event for event in (payload.get("events") or []) if isinstance(event, dict)], 1
+        except Exception as day_exc:  # noqa: BLE001
+            try:
+                payload = fetcher(f"{url}?dates={date_range}&limit=250&lang=pt&region=br")
+                return [event for event in (payload.get("events") or []) if isinstance(event, dict)], 2
+            except Exception as range_exc:  # noqa: BLE001
+                raise RuntimeError(
+                    f"{spec.key}: ESPN rejeitou data simples {single_day} e "
+                    f"faixa diária {date_range}: day={day_exc}; range={range_exc}"
+                ) from range_exc
     try:
         payload = fetcher(f"{url}?dates={date_range}&limit=250&lang=pt&region=br")
         return [event for event in (payload.get("events") or []) if isinstance(event, dict)], 1
     except Exception as exc:  # noqa: BLE001
-        total_days = (upper.date() - lower.date()).days + 1
-        if total_days <= 1:
-            # R10R26: ESPN passou a rejeitar inclusive YYYYMMDD-YYYYMMDD
-            # (HTTP 400). O formato canônico para um dia é YYYYMMDD,
-            # não uma faixa de início/fim idênticos. Não mascarar falhas:
-            # se ambas as rotas falharem, o snapshot íntegro é preservado.
-            single_day = f"{lower:%Y%m%d}"
-            try:
-                payload = fetcher(f"{url}?dates={single_day}&limit=250&lang=pt&region=br")
-                return [event for event in (payload.get("events") or []) if isinstance(event, dict)], 2
-            except Exception as daily_exc:  # noqa: BLE001
-                raise RuntimeError(
-                    f"{spec.key}: ESPN rejeitou faixa diária {date_range} e data "
-                    f"simples {single_day}: range={exc}; day={daily_exc}"
-                ) from daily_exc
         left_days = max(1, total_days // 2)
         left_end_date = lower.date() + timedelta(days=left_days - 1)
         right_start_date = left_end_date + timedelta(days=1)
@@ -2322,7 +2328,7 @@ def self_test() -> None:
         spec, datetime(2026, 9, 29, tzinfo=BRT),
         datetime(2026, 9, 29, 23, 59, tzinfo=BRT), fetcher=mock_espn_day,
     )
-    assert day_calls == 2 and day_events[0]["id"] == "fixture-2026-09-29"
+    assert day_calls == 1 and day_events[0]["id"] == "fixture-2026-09-29"
     assert any("dates=20260929&" in url for url in attempts)
     # Se nem a data simples responder, não declarar sucesso nem zerar a fase.
     def mock_espn_failure(url):
