@@ -61,6 +61,10 @@ jobs:
               j=json.loads(Path('dados-br/competicoes-af-previsao/'+key+'.json').read_text())
               semis=[e for e in j.get('eventos',[]) if int(e.get('fase_ordem') or 0)==800]
               print('SEMIFINAL',key,len(semis),[(e.get('data_iso'),(e.get('mandante') or {}).get('nome'),(e.get('visitante') or {}).get('nome'),e.get('concluido')) for e in semis])
+              print('CURRENT_PHASE',key,j.get('fase_atual'))
+              for e in j.get('eventos',[]):
+                  if str(e.get('data_iso','')).startswith('2026-10'):
+                      print('SNAP_OCT',key,e.get('event_id'),e.get('data_iso'),e.get('fase_ordem'),e.get('fase'),e.get('perna'),e.get('concluido'))
           PY
           python - <<'PY'
           import json,urllib.request
