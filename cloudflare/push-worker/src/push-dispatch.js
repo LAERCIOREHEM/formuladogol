@@ -73,12 +73,21 @@ export function buildSportsPushPayload(event) {
   const goalFamily = type === 'goal' || type === 'goal_overturned';
   const technicalEspnTest = item.technicalEspnTest === true;
   if (!PUBLIC_ALERT_TYPES.has(type)) throw new Error(`unsupported_public_alert_type:${type || 'empty'}`);
-  const tagSeed = technicalEspnTest ? `technical-espn-${sourcePlayKey}` : goalFamily ? `${type}-${sourcePlayKey}` : `${type}-${eventId || sourcePlayKey}`;
+  // Identidade de gol estável entre ESPN CORE, CDN e fallback de placar.
+  const score = item.scoreAfter || {};
+  const hasScore = score.home != null && score.away != null
+    && Number.isInteger(Number(score.home)) && Number.isInteger(Number(score.away));
+  const canonicalGoal = goalFamily && eventId && hasScore
+    ? `${type}-${eventId}-score-${Number(score.home)}-${Number(score.away)}`
+    : `${type}-${text(item.eventKey || sourcePlayKey)}`;
+  const tagSeed = technicalEspnTest ? `technical-espn-${sourcePlayKey}`
+    : goalFamily ? canonicalGoal : `${type}-${eventId || sourcePlayKey}`;
   return {
     title: text(draft.title || defaultTitle(type)),
     body: text(draft.body || 'Atualização do Fórmula do Gol.'),
     tag: `fdg-${tagSeed}`.slice(0, 120),
-    renotify: true,
+    // Nova pontuação alerta; substituição da mesma notificação não vibra.
+    renotify: !goalFamily,
     badgeIncrement: 1,
     timestamp: Number.isFinite(Date.parse(item.confirmedAt || '')) ? Date.parse(item.confirmedAt) : Date.now(),
     data: {
@@ -86,7 +95,8 @@ export function buildSportsPushPayload(event) {
       eventId,
       eventKey: text(item.eventKey),
       type,
-      sourcePlayKey
+      sourcePlayKey,
+      scoreAfter: hasScore ? { home: Number(score.home), away: Number(score.away) } : null
     }
   };
 }
@@ -154,10 +164,12 @@ export async function enqueueSportsEvent(env, eventKey, options = {}) {
   const key = text(eventKey);
   if (!key || !env.PUSH_QUEUE) return false;
   const delaySeconds = Math.max(0, Math.min(86400, Math.floor(num(options?.delaySeconds, 0))));
-  await env.DB.prepare(`
+  const inserted = await env.DB.prepare(`
     INSERT OR IGNORE INTO push_event_dispatch (event_key, status)
     VALUES (?, 'pending')
   `).bind(key).run();
+  // Não reencaminhar para a Queue uma chave de evento já conhecida.
+  if (num(inserted?.meta?.changes, 0) === 0) return false;
   try {
     const message = { kind: 'event_dispatch', eventKey: key, afterSubscriptionId: '' };
     if (delaySeconds > 0) await env.PUSH_QUEUE.send(message, { delaySeconds });
@@ -295,6 +307,14 @@ export async function eligibleTargets(env, event, afterSubscriptionId = '') {
     WHERE s.active=1
       AND s.subscription_id > ?
       AND (?='' OR s.installation_id=?)
+      AND NOT EXISTS (
+        SELECT 1 FROM push_subscriptions newer
+        WHERE newer.active=1 AND newer.installation_id=s.installation_id
+          AND (
+            newer.updated_at>s.updated_at
+            OR (newer.updated_at=s.updated_at AND newer.subscription_id>s.subscription_id)
+          )
+      )
       AND ${flagColumn}=1
       AND (
         p.all_games=1
@@ -346,8 +366,18 @@ async function expandSportsEvent(messageBody, env) {
   const page = hasMore ? rows.slice(0, TARGET_PAGE_SIZE) : rows;
   const ids = page.map((row) => text(row.subscription_id)).filter(Boolean);
   const batches = chunkArray(ids, DELIVERY_BATCH_SIZE);
-  for (const subscriptionIds of batches) {
-    await env.PUSH_QUEUE.send({ kind: 'delivery_batch', eventKey, subscriptionIds });
+  // Evitar espera serial por cada grupo de cinco destinatários.
+  if (typeof env.PUSH_QUEUE.sendBatch === 'function') {
+    for (let i = 0; i < batches.length; i += 100) {
+      await env.PUSH_QUEUE.sendBatch(batches.slice(i, i + 100).map((subscriptionIds) => ({
+        body: { kind: 'delivery_batch', eventKey, subscriptionIds }
+      })));
+    }
+  } else {
+    for (let i = 0; i < batches.length; i += 10) {
+      await Promise.all(batches.slice(i, i + 10).map((subscriptionIds) =>
+        env.PUSH_QUEUE.send({ kind: 'delivery_batch', eventKey, subscriptionIds })));
+    }
   }
 
   await env.DB.prepare(`
