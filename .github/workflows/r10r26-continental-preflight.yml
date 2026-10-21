@@ -1,0 +1,47 @@
+name: R10R26 continental source preflight
+on:
+  push:
+    branches:
+      - fix/r10r26-continental-2026-readiness
+    paths:
+      - '.github/workflows/r10r26-continental-preflight.yml'
+      - 'scripts/atualizar_competicoes_af_previsao.py'
+      - 'scripts/orquestrar_workflows.py'
+      - 'scripts/gerar_analise_continental.py'
+      - 'cloudflare/orchestrator-worker/src/logic.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install AF dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
+      - name: Verify offline safeguards
+        run: |
+          python scripts/atualizar_competicoes_af_previsao.py --self-test
+          python scripts/orquestrar_workflows.py --self-test
+          python -S scripts/gerar_analise_continental.py --self-test
+      - name: Probe ESPN date formats for CONMEBOL
+        run: |
+          python - <<'PY'
+          import urllib.request, urllib.error
+          base="https://site.api.espn.com/apis/site/v2/sports/soccer"
+          for league in ("conmebol.libertadores","conmebol.sudamericana"):
+              for dates in ("20260929-20260929","20260929","20261020","20261020-20261020"):
+                  url=f"{base}/{league}/scoreboard?dates={dates}&limit=250&lang=pt&region=br"
+                  try:
+                      with urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0","Accept":"application/json"}),timeout=12) as r:
+                          body=r.read()
+                          import json
+                          obj=json.loads(body)
+                          print(league,dates,r.status,len(obj.get("events",[])),len(body),flush=True)
+                  except Exception as exc:
+                      print(league,dates,type(exc).__name__,str(exc)[:180],flush=True)
+          PY
