@@ -602,9 +602,19 @@ def _scoreboard_payload_resilient(
     except Exception as exc:  # noqa: BLE001
         total_days = (upper.date() - lower.date()).days + 1
         if total_days <= 1:
-            raise RuntimeError(
-                f"{spec.key}: scoreboard ESPN falhou também em janela diária {date_range}: {exc}"
-            ) from exc
+            # R10R26: ESPN passou a rejeitar inclusive YYYYMMDD-YYYYMMDD
+            # (HTTP 400). O formato canônico para um dia é YYYYMMDD,
+            # não uma faixa de início/fim idênticos. Não mascarar falhas:
+            # se ambas as rotas falharem, o snapshot íntegro é preservado.
+            single_day = f"{lower:%Y%m%d}"
+            try:
+                payload = fetcher(f"{url}?dates={single_day}&limit=250&lang=pt&region=br")
+                return [event for event in (payload.get("events") or []) if isinstance(event, dict)], 2
+            except Exception as daily_exc:  # noqa: BLE001
+                raise RuntimeError(
+                    f"{spec.key}: ESPN rejeitou faixa diária {date_range} e data "
+                    f"simples {single_day}: range={exc}; day={daily_exc}"
+                ) from daily_exc
         left_days = max(1, total_days // 2)
         left_end_date = lower.date() + timedelta(days=left_days - 1)
         right_start_date = left_end_date + timedelta(days=1)
@@ -2279,6 +2289,36 @@ def self_test() -> None:
             }
         ],
     }
+    # R10R26: reproduz HTTP 400 em intervalo, inclusive de um dia, sem rede.
+    # Data simples é a via alternativa documentada do scoreboard ESPN.
+    attempts = []
+    def mock_espn_day(url):
+        attempts.append(url)
+        if "dates=20260929-20260929" in url or "dates=20260929-20261001" in url:
+            raise RuntimeError("HTTP 400 Bad Request")
+        if "dates=20260929&" in url:
+            return {"events": [{"id": "fixture-2026-09-29"}]}
+        if "dates=20260930-20261001" in url:
+            return {"events": [{"id": "fixture-2026-09-30"}]}
+        raise AssertionError(f"requisição inesperada: {url}")
+    day_events, day_calls = _scoreboard_payload_resilient(
+        spec, datetime(2026, 9, 29, tzinfo=BRT),
+        datetime(2026, 9, 29, 23, 59, tzinfo=BRT), fetcher=mock_espn_day,
+    )
+    assert day_calls == 2 and day_events[0]["id"] == "fixture-2026-09-29"
+    assert any("dates=20260929&" in url for url in attempts)
+    # Se nem a data simples responder, não declarar sucesso nem zerar a fase.
+    def mock_espn_failure(url):
+        raise RuntimeError("HTTP 400")
+    try:
+        _scoreboard_payload_resilient(
+            spec, datetime(2026, 9, 29, tzinfo=BRT),
+            datetime(2026, 9, 29, tzinfo=BRT), fetcher=mock_espn_failure,
+        )
+    except RuntimeError as exc:
+        assert "data simples 20260929" in str(exc)
+    else:
+        raise AssertionError("falha dupla ESPN não pode ser ignorada")
     parsed = extract_event(synthetic, spec)
     assert parsed is not None
     assert parsed["fase_ordem"] == 700
