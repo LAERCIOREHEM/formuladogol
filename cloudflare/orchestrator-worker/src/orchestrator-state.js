@@ -557,7 +557,9 @@ export class OrchestratorState {
             retryMinutes: transition.retryMinutes,
             reason: transition.missingOfficial.length
               ? `PHASE TRANSITION GUARD: ${transition.missingOfficial.length} jogo(s) continental(is) oficial(is) ausente(s) da agenda; reconstruir fontes.`
-              : `PHASE TRANSITION GUARD: snapshot continental preservado após falha (${transition.staleCompetitions.join(', ') || 'fonte desconhecida'}); retentar coleta adaptativa.`,
+              : transition.staleCompetitions.length
+                ? `PHASE TRANSITION GUARD: snapshot continental preservado após falha (${transition.staleCompetitions.join(', ')}); retentar coleta adaptativa.`
+                : `PHASE TRANSITION GUARD: ${transition.liveOfficialCount} jogo(s) continental(is) na janela oficial; consultar FINAL estruturado e recalcular AF se houver fato novo.`,
           };
         }
       }
