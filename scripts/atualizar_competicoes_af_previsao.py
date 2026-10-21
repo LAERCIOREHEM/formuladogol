@@ -1387,6 +1387,25 @@ def normalize_generic_pending_knockout_cohorts(events: list[dict[str, Any]]) -> 
             event["fase_ordem"] = rank_cursor
             event["fase"] = label
             changed += 1
+            # R10R26: ESPN rotula AMBAS as pernas da semifinal apenas
+            # como Ida/Volta (rank 100). A normalização anterior promovia
+            # somente a volta pendente; a ida já FINAL ficava no rank 100,
+            # fazendo o AF rejeitar a chave como 'sem ida e volta'.
+            # Promover a ida por identidade EXATA de confronto, perna e
+            # proximidade temporal, nunca por nomes isolados ou heurística IA.
+            if int(event.get("perna") or 0) == 2:
+                for first in events:
+                    if (not first.get("concluido")
+                        or int(first.get("perna") or 0) != 1
+                        or phase_metadata_is_specific(first)
+                        or event_pair_key(first) != pair):
+                        continue
+                    first_date = parse_datetime(first.get("data_iso"))
+                    if first_date is None or not (_when - timedelta(days=21) <= first_date <= _when):
+                        continue
+                    first["fase_ordem"] = rank_cursor
+                    first["fase"] = label
+                    changed += 1
     return changed
 
 def normalize_active_knockout_stage(events: list[dict[str, Any]]) -> None:
@@ -2897,6 +2916,26 @@ def self_test() -> None:
     )
     assert {row["id"] for row in rows} == {"20261013", "20261014"}
     assert used == 3 and len(calls) == 3, (used, calls)
+
+    # Regressão real de 20/10: ESPN dá rank 100 à ida FINAL e à
+    # volta pendente de Boca x Vasco e Atlético-MG x Torque.
+    def fixture(event_id, date, home, away, leg, done, rank=100, stage="Ida"):
+        return {
+            "event_id": event_id, "data_iso": date, "fase_ordem": rank,
+            "fase": stage, "perna": leg, "concluido": done,
+            "mandante": {"nome": home}, "visitante": {"nome": away},
+        }
+    semifinal = [
+        fixture("qf-anchor", "2026-09-16T21:30:00-03:00", "São Paulo", "Boca Juniors", 2, True, 700, "Quartas de final"),
+        fixture("sf-a1", "2026-10-13T21:30:00-03:00", "Boca Juniors", "Vasco da Gama", 1, True),
+        fixture("sf-b1", "2026-10-14T19:00:00-03:00", "Atlético-MG", "Montevideo City Torque", 1, True),
+        fixture("sf-a2", "2026-10-20T21:30:00-03:00", "Vasco da Gama", "Boca Juniors", 2, False, 100, "Volta"),
+        fixture("sf-b2", "2026-10-21T19:00:00-03:00", "Montevideo City Torque", "Atlético-MG", 2, False, 100, "Volta"),
+    ]
+    count = normalize_generic_pending_knockout_cohorts(semifinal)
+    assert count == 4, (count, semifinal)
+    assert all(row["fase_ordem"] == 800 for row in semifinal if row["event_id"].startswith("sf-"))
+    assert semifinal[0]["fase_ordem"] == 700
 
     print("Self-test coleta AF-Previsão Continental incremental: OK")
 
