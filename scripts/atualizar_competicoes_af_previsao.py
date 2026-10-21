@@ -2844,9 +2844,9 @@ def self_test() -> None:
     calls: list[str] = []
     def fake_scoreboard(url: str) -> dict[str, Any]:
         calls.append(url)
-        m = re.search(r"dates=(\d{8})-(\d{8})", url)
+        m = re.search(r"dates=(\d{8})(?:-(\d{8}))?", url)
         assert m
-        if m.group(1) != m.group(2):
+        if m.group(2) and m.group(1) != m.group(2):
             raise RuntimeError("HTTP 400 simulado para faixa ampla")
         return {"events": [{"id": m.group(1), "date": m.group(1)}]}
     rows, used = fetch_events_between(
@@ -2856,7 +2856,8 @@ def self_test() -> None:
         fetcher=fake_scoreboard,
     )
     assert {row["id"] for row in rows} == {"20261013", "20261014"}
-    assert used == 3 and len(calls) == 3, (used, calls)
+    assert used == 2 and len(calls) == 2, (used, calls)
+    assert all(re.search(r"dates=\d{8}&", url) for url in calls), calls
 
     print("Self-test coleta AF-Previsão Continental incremental: OK")
 
