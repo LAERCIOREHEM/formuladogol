@@ -489,6 +489,10 @@ test('R10R26: stale snapshot triggers urgent refresh near semifinal even with of
   assert.equal(near.refreshNeeded, true);
   assert.equal(near.urgent, true);
   assert.equal(near.retryMinutes, 30);
+  const healthy = continentalPhaseTransitionGuard(games, official, {competicoes:[]}, new Date('2026-10-20T22:00:00-03:00'));
+  assert.equal(healthy.state, 'match_window');
+  assert.equal(healthy.refreshNeeded, true, 'FINAL continental não depende de snapshot stale');
+  assert.equal(healthy.retryMinutes, 30);
   const far = continentalPhaseTransitionGuard(games, official, audit, new Date('2026-10-01T22:00:00-03:00'));
   assert.equal(far.urgent, false);
   assert.equal(far.retryMinutes, 360);
