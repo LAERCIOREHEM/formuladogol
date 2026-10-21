@@ -577,12 +577,14 @@ export async function dispatchStatus(env) {
     env.DB.prepare(`
       SELECT e.event_id, e.event_key, e.detected_at, e.confirmed_at,
              e.created_at AS recorded_at, MIN(d.sent_at) AS first_sent_at
-      FROM sports_events e
+      FROM (
+        SELECT event_id, event_key, detected_at, confirmed_at, created_at
+        FROM sports_events WHERE event_type='goal'
+        ORDER BY created_at DESC LIMIT 8
+      ) e
       LEFT JOIN push_deliveries d ON d.event_key=e.event_key AND d.status='sent'
-      WHERE e.event_type='goal'
       GROUP BY e.event_key
       ORDER BY e.created_at DESC
-      LIMIT 8
     `).all()
   ]);
   return {
