@@ -2905,7 +2905,7 @@ def self_test() -> None:
         calls.append(url)
         if "dates=202610&" in url:
             raise RuntimeError("HTTP 400 mensal simulado")
-        m = re.search(r"dates=(\\d{8})&", url)
+        m = re.search(r"dates=(\d{8})&", url)
         assert m, url
         return {"events": [{"id": m.group(1), "date": f"{m.group(1)[:4]}-{m.group(1)[4:6]}-{m.group(1)[6:]}T22:30:00Z"}]}
     rows, used = fetch_events_between(
