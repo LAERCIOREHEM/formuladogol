@@ -2,11 +2,11 @@
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
     "jogos_na_janela": 47,
-    "jogos_com_transmissao": 31,
-    "jogos_sem_transmissao_na_janela": 16,
-    "jogos_sem_transmissao_14d": 5,
+    "jogos_com_transmissao": 32,
+    "jogos_sem_transmissao_na_janela": 15,
+    "jogos_sem_transmissao_14d": 4,
     "jogos_sem_transmissao_fora_14d": 11,
-    "jogos_criticos_sem_transmissao_72h": 3,
+    "jogos_criticos_sem_transmissao_72h": 2,
     "registros_preservados": 25,
     "jogos_guardiao_ia": 0,
     "jogos_estaveis_sem_reconsulta_editorial": 0,
@@ -26,18 +26,18 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 26106
+      "duracao_ms": 9423
     },
     "ge_agenda": {
       "ok": true,
       "jogos_com_canal": 0,
-      "duracao_ms": 9351
+      "duracao_ms": 7888
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 5,
-      "jogos_com_canal": 0,
-      "duracao_ms": 95554
+      "jogos_com_canal": 1,
+      "duracao_ms": 69196
     },
     "espn": {
       "ok": false,
@@ -50,19 +50,11 @@
   },
   "sem_transmissao": [
     {
-      "event_id": "401913956",
-      "rodada": 0,
-      "jogo": "Montevideo City Torque x Atlético-MG",
-      "data_iso": "2026-10-21T19:00:00-03:00",
-      "faltam_horas": 15.1,
-      "nivel": "critico"
-    },
-    {
       "event_id": "401912520",
       "rodada": 0,
       "jogo": "Palmeiras x Fluminense",
       "data_iso": "2026-10-21T21:30:00-03:00",
-      "faltam_horas": 17.6,
+      "faltam_horas": 16.5,
       "nivel": "critico"
     },
     {
@@ -70,7 +62,7 @@
       "rodada": 0,
       "jogo": "Flamengo x Estudiantes de La Plata",
       "data_iso": "2026-10-22T21:30:00-03:00",
-      "faltam_horas": 41.6,
+      "faltam_horas": 40.5,
       "nivel": "critico"
     },
     {
@@ -78,7 +70,7 @@
       "rodada": 32,
       "jogo": "Chapecoense x Fluminense",
       "data_iso": "2026-10-24T19:30:00-03:00",
-      "faltam_horas": 87.6,
+      "faltam_horas": 86.5,
       "nivel": "aviso"
     },
     {
@@ -86,25 +78,17 @@
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-31T16:00:00-03:00",
-      "faltam_horas": 252.1,
+      "faltam_horas": 251.0,
       "nivel": "aviso"
     }
   ],
   "sem_transmissao_futura": [
     {
-      "event_id": "401913956",
-      "rodada": 0,
-      "jogo": "Montevideo City Torque x Atlético-MG",
-      "data_iso": "2026-10-21T19:00:00-03:00",
-      "faltam_horas": 15.1,
-      "nivel": "critico"
-    },
-    {
       "event_id": "401912520",
       "rodada": 0,
       "jogo": "Palmeiras x Fluminense",
       "data_iso": "2026-10-21T21:30:00-03:00",
-      "faltam_horas": 17.6,
+      "faltam_horas": 16.5,
       "nivel": "critico"
     },
     {
@@ -112,7 +96,7 @@
       "rodada": 0,
       "jogo": "Flamengo x Estudiantes de La Plata",
       "data_iso": "2026-10-22T21:30:00-03:00",
-      "faltam_horas": 41.6,
+      "faltam_horas": 40.5,
       "nivel": "critico"
     },
     {
@@ -120,7 +104,7 @@
       "rodada": 32,
       "jogo": "Chapecoense x Fluminense",
       "data_iso": "2026-10-24T19:30:00-03:00",
-      "faltam_horas": 87.6,
+      "faltam_horas": 86.5,
       "nivel": "aviso"
     },
     {
@@ -128,7 +112,7 @@
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-31T16:00:00-03:00",
-      "faltam_horas": 252.1,
+      "faltam_horas": 251.0,
       "nivel": "aviso"
     },
     {
@@ -136,7 +120,7 @@
       "rodada": 34,
       "jogo": "Palmeiras x Remo",
       "data_iso": "2026-11-05T19:30:00-03:00",
-      "faltam_horas": 375.6,
+      "faltam_horas": 374.5,
       "nivel": "futuro"
     },
     {
@@ -144,7 +128,7 @@
       "rodada": 35,
       "jogo": "Vasco da Gama x Internacional",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 685.1,
+      "faltam_horas": 684.0,
       "nivel": "futuro"
     },
     {
@@ -152,7 +136,7 @@
       "rodada": 35,
       "jogo": "São Paulo x Fluminense",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 685.1,
+      "faltam_horas": 684.0,
       "nivel": "futuro"
     },
     {
@@ -160,7 +144,7 @@
       "rodada": 35,
       "jogo": "Remo x Chapecoense",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 685.1,
+      "faltam_horas": 684.0,
       "nivel": "futuro"
     },
     {
@@ -168,7 +152,7 @@
       "rodada": 35,
       "jogo": "Mirassol x Atlético-MG",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 685.1,
+      "faltam_horas": 684.0,
       "nivel": "futuro"
     },
     {
@@ -176,7 +160,7 @@
       "rodada": 35,
       "jogo": "Grêmio x Bahia",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 685.1,
+      "faltam_horas": 684.0,
       "nivel": "futuro"
     },
     {
@@ -184,7 +168,7 @@
       "rodada": 35,
       "jogo": "Flamengo x Athletico-PR",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 685.1,
+      "faltam_horas": 684.0,
       "nivel": "futuro"
     },
     {
@@ -192,7 +176,7 @@
       "rodada": 35,
       "jogo": "Cruzeiro x Palmeiras",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 685.1,
+      "faltam_horas": 684.0,
       "nivel": "futuro"
     },
     {
@@ -200,7 +184,7 @@
       "rodada": 35,
       "jogo": "Coritiba x Santos",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 685.1,
+      "faltam_horas": 684.0,
       "nivel": "futuro"
     },
     {
@@ -208,7 +192,7 @@
       "rodada": 35,
       "jogo": "Corinthians x Botafogo",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 685.1,
+      "faltam_horas": 684.0,
       "nivel": "futuro"
     },
     {
@@ -216,7 +200,7 @@
       "rodada": 35,
       "jogo": "Vitória x Bragantino",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 685.1,
+      "faltam_horas": 684.0,
       "nivel": "futuro"
     }
   ],
@@ -444,11 +428,11 @@
     "ESPN: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261019-20261222&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
   ],
   "artigos_ge_descobertos": [
+    "https://ge.globo.com/sp/futebol/libertadores/noticia/2026/10/21/palmeiras-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
     "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/10/20/remo-tem-menos-de-1percent-de-chance-de-permanecer-na-serie-a-apos-a-31a-rodada.ghtml",
     "https://ge.globo.com/sp/tem-esporte/futebol/times/mirassol/noticia/2026/10/20/mirassol-tem-rodada-perfeita-e-fica-mais-perto-de-afastar-ameaca-do-rebaixamento.ghtml",
     "https://ge.globo.com/gato-mestre/noticia/2026/10/20/palpite-ge-2026-rodada-tem-empate-triplo-entre-os-vencedores-veja-acertos-e-erros.ghtml",
-    "https://ge.globo.com/cartola/craque-da-rodada/noticia/2026/10/20/cartola-2026-kaio-jorge-faz-hat-trick-na-goleada-do-cruzeiro-e-e-o-craque-da-rodada-31.ghtml",
-    "https://ge.globo.com/sc/futebol/times/chapecoense/noticia/2026/10/19/chapecoense-tem-zagueiro-suspenso-e-retorno-de-artilheiro-para-a-proxima-rodada.ghtml"
+    "https://ge.globo.com/cartola/craque-da-rodada/noticia/2026/10/20/cartola-2026-kaio-jorge-faz-hat-trick-na-goleada-do-cruzeiro-e-e-o-craque-da-rodada-31.ghtml"
   ],
-  "atualizado_em": "2026-10-21T03:51:42-03:00"
+  "atualizado_em": "2026-10-21T05:01:40-03:00"
 }
