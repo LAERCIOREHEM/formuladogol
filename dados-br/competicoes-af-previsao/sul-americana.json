@@ -9,27 +9,27 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-09-18T11:40:56-03:00",
+  "gerado_em": "2026-10-20T21:55:35-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
-    "status": "encerrada",
-    "ordem": 700,
-    "nome": "Quartas de final",
-    "eventos": 8,
-    "eventos_pendentes": 0
+    "status": "em_andamento",
+    "ordem": 800,
+    "nome": "Semifinal",
+    "eventos": 4,
+    "eventos_pendentes": 2
   },
   "resumo": {
-    "eventos": 152,
-    "finalizados": 152,
-    "pendentes": 0,
-    "equipes": 56,
+    "eventos": 157,
+    "finalizados": 154,
+    "pendentes": 3,
+    "equipes": 58,
     "equipes_serie_a_2026": 7
   },
   "coleta": {
-    "modo": "recuperacao_canônica",
-    "janela_inicio": "2026-08-25T00:00:00-03:00",
-    "janela_fim": "2027-01-13T23:59:59-03:00",
+    "modo": "incremental",
+    "janela_inicio": "2026-09-29T00:00:00-03:00",
+    "janela_fim": "2027-02-17T23:59:59-03:00",
     "requisicoes": 4,
     "ultima_completa_em": "2026-09-12T05:15:07-03:00",
     "ajustes_editoriais_aplicados": 0,
@@ -37,14 +37,12 @@
       "consultados": 1,
       "confirmados": 1,
       "atualizados": 1,
-      "ao_vivo": [],
-      "finalizados": [
-        "401913072"
+      "ao_vivo": [
+        "401913957"
       ],
+      "finalizados": [],
       "erros": []
-    },
-    "recuperacao_incidente": "continentais-2026-quartas-20260918",
-    "fonte_recuperacao": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana"
+    }
   },
   "equipes": [
     {
@@ -90,7 +88,7 @@
       "sigla": "CAM",
       "pais": null,
       "serie_a_2026": true,
-      "jogos": 10
+      "jogos": 12
     },
     {
       "espn_id": "5264",
@@ -135,7 +133,7 @@
       "sigla": "CABJ",
       "pais": null,
       "serie_a_2026": false,
-      "jogos": 6
+      "jogos": 8
     },
     {
       "espn_id": "2681",
@@ -387,7 +385,7 @@
       "sigla": "MCT",
       "pais": null,
       "serie_a_2026": false,
-      "jogos": 11
+      "jogos": 13
     },
     {
       "espn_id": "2684",
@@ -516,6 +514,24 @@
       "jogos": 1
     },
     {
+      "espn_id": "131554",
+      "nome": "TBD Away",
+      "nome_espn": "TBD Away",
+      "sigla": "TBD Away",
+      "pais": null,
+      "serie_a_2026": false,
+      "jogos": 1
+    },
+    {
+      "espn_id": "131556",
+      "nome": "TBD Home",
+      "nome_espn": "TBD Home",
+      "sigla": "TBD Home",
+      "pais": null,
+      "serie_a_2026": false,
+      "jogos": 1
+    },
+    {
       "espn_id": "7767",
       "nome": "Tigre",
       "nome_espn": "Tigre",
@@ -549,7 +565,7 @@
       "sigla": "VAS",
       "pais": null,
       "serie_a_2026": true,
-      "jogos": 12
+      "jogos": 14
     }
   ],
   "eventos": [
@@ -6076,6 +6092,198 @@
         "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
         "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
+    },
+    {
+      "event_id": "401913958",
+      "data_iso": "2026-10-13T21:30:00-03:00",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
+      "fase": "Semifinal",
+      "fase_ordem": 800,
+      "semana": null,
+      "perna": 1,
+      "estadio": "Alberto José Armando (La Bombonera)",
+      "mandante": {
+        "espn_id": "5",
+        "nome": "Boca Juniors",
+        "nome_espn": "Boca Juniors",
+        "sigla": "CABJ",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "3454",
+        "nome": "Vasco da Gama",
+        "nome_espn": "Vasco da Gama",
+        "sigla": "VAS",
+        "pais": null,
+        "serie_a_2026": true,
+        "mandante": false,
+        "vencedor": true,
+        "placar": 1
+      },
+      "vencedor": "Vasco da Gama",
+      "penaltis": false,
+      "vencedor_penaltis": null
+    },
+    {
+      "event_id": "401913916",
+      "data_iso": "2026-10-14T19:00:00-03:00",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
+      "fase": "Semifinal",
+      "fase_ordem": 800,
+      "semana": null,
+      "perna": 1,
+      "estadio": "Arena MRV",
+      "mandante": {
+        "espn_id": "7632",
+        "nome": "Atlético-MG",
+        "nome_espn": "Atlético-MG",
+        "sigla": "CAM",
+        "pais": null,
+        "serie_a_2026": true,
+        "mandante": true,
+        "vencedor": true,
+        "placar": 3
+      },
+      "visitante": {
+        "espn_id": "19002",
+        "nome": "Montevideo City Torque",
+        "nome_espn": "Montevideo City Torque",
+        "sigla": "MCT",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": "Atlético-MG",
+      "penaltis": false,
+      "vencedor_penaltis": null
+    },
+    {
+      "event_id": "401913957",
+      "data_iso": "2026-10-20T21:30:00-03:00",
+      "estado": "in",
+      "concluido": false,
+      "status": "24'",
+      "fase": "Semifinal",
+      "fase_ordem": 800,
+      "semana": null,
+      "perna": 2,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "3454",
+        "nome": "Vasco da Gama",
+        "nome_espn": "Vasco da Gama",
+        "sigla": "VAS",
+        "pais": null,
+        "serie_a_2026": true,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "5",
+        "nome": "Boca Juniors",
+        "nome_espn": "Boca Juniors",
+        "sigla": "CABJ",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 1
+      },
+      "vencedor": null,
+      "penaltis": false,
+      "vencedor_penaltis": null
+    },
+    {
+      "event_id": "401913956",
+      "data_iso": "2026-10-21T19:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "Qua., Outubro 21º at 6:00 PM EDT",
+      "fase": "Semifinal",
+      "fase_ordem": 800,
+      "semana": null,
+      "perna": 2,
+      "estadio": "Estadio Centenario",
+      "mandante": {
+        "espn_id": "19002",
+        "nome": "Montevideo City Torque",
+        "nome_espn": "Montevideo City Torque",
+        "sigla": "MCT",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "7632",
+        "nome": "Atlético-MG",
+        "nome_espn": "Atlético-MG",
+        "sigla": "CAM",
+        "pais": null,
+        "serie_a_2026": true,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false,
+      "vencedor_penaltis": null
+    },
+    {
+      "event_id": "401913961",
+      "data_iso": "2026-11-21T17:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Final",
+      "fase_ordem": 900,
+      "semana": null,
+      "perna": null,
+      "estadio": "Metropolitano Roberto Meléndez",
+      "mandante": {
+        "espn_id": "131556",
+        "nome": "TBD Home",
+        "nome_espn": "TBD Home",
+        "sigla": "TBD Home",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "131554",
+        "nome": "TBD Away",
+        "nome_espn": "TBD Away",
+        "sigla": "TBD Away",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false,
+      "vencedor_penaltis": null
     }
-  ]
+  ],
+  "validacao_af": {
+    "status": "pronto",
+    "fase": "Semifinal",
+    "fase_ordem": 800,
+    "chaves": 2,
+    "equipes_ativas": 4
+  }
 }

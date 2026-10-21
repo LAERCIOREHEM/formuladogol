@@ -2,30 +2,34 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-10-20T21:13:21-03:00",
+  "gerado_em": "2026-10-20T21:55:36-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "af_snapshot_seguro": true,
-  "agenda_operacional_fresca": false,
-  "snapshots_preservados": 3,
-  "mudanca_esportiva": false,
+  "agenda_operacional_fresca": true,
+  "snapshots_preservados": 0,
+  "mudanca_esportiva": true,
   "hash_estado_antes": "7a9e1aafb277f53782bfbc3414b60ccbb299ef2895ce55542d74a967591305e8",
-  "hash_estado_depois": "7a9e1aafb277f53782bfbc3414b60ccbb299ef2895ce55542d74a967591305e8",
+  "hash_estado_depois": "23889ac28c6fed9d1813664beeb472123d9833f92e51ae3560055d06573ab795",
   "fonte": "ESPN + API-Football contingencial",
   "temporada": 2026,
   "competicoes": [
     {
       "competicao": "copa_do_brasil",
-      "status": "preservado_apos_falha_seguro",
+      "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-09-15T05:13:36-03:00",
+      "gerado_em": "2026-10-20T21:55:26-03:00",
       "cache_efetivo_minutos": 0,
-      "erro": "copa_do_brasil: RuntimeError: copa_do_brasil: scoreboard ESPN falhou também em janela diária 20260929-20260929: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard?dates=20260929-20260929&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request",
-      "fallback_seguro_para_af": true,
-      "motivos_fallback": [],
-      "alertas_fallback": [
-        "snapshot anterior tem 856.0h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
-      ],
+      "eventos": 155,
+      "finalizados": 150,
+      "pendentes": 5,
+      "fase_atual": {
+        "status": "em_andamento",
+        "ordem": 800,
+        "nome": "Semifinal",
+        "eventos": 4,
+        "eventos_pendentes": 4
+      },
       "summary_partidas_iniciadas": {
         "consultados": 0,
         "confirmados": 0,
@@ -41,20 +45,75 @@
         "finalizados": [],
         "requisicoes": 0,
         "erros": []
+      },
+      "api_football_auditoria_penaltis": {
+        "consultados": 33,
+        "corrigidos": [],
+        "datas_consultadas": [],
+        "requisicoes": 33,
+        "remaining": null,
+        "reserva": 12,
+        "erros": [
+          "401858546: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858698: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858674: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858545: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858553: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858660: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858653: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858657: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858647: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858556: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858663: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858557: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858649: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858661: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858642: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858646: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858668: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858654: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858648: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401858643: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401862881: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401862626: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401862686: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401862684: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401862653: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401862688: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401863526: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401864119: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401864127: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401864130: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401864131: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401866362: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401866349: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}"
+        ]
+      },
+      "coleta": {
+        "modo": "incremental",
+        "janela_inicio": "2026-09-29T00:00:00-03:00",
+        "janela_fim": "2027-02-17T23:59:59-03:00",
+        "requisicoes": 4,
+        "ultima_completa_em": "2026-09-12T05:15:01-03:00",
+        "ajustes_editoriais_aplicados": 0
       }
     },
     {
       "competicao": "libertadores",
-      "status": "preservado_apos_falha_seguro",
+      "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-09-18T11:40:56-03:00",
+      "gerado_em": "2026-10-20T21:55:32-03:00",
       "cache_efetivo_minutos": 0,
-      "erro": "libertadores: RuntimeError: libertadores: scoreboard ESPN falhou também em janela diária 20260929-20260929: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=20260929-20260929&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request",
-      "fallback_seguro_para_af": true,
-      "motivos_fallback": [],
-      "alertas_fallback": [
-        "snapshot anterior tem 777.5h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
-      ],
+      "eventos": 155,
+      "finalizados": 152,
+      "pendentes": 3,
+      "fase_atual": {
+        "status": "em_andamento",
+        "ordem": 800,
+        "nome": "Semifinal",
+        "eventos": 4,
+        "eventos_pendentes": 2
+      },
       "summary_partidas_iniciadas": {
         "consultados": 0,
         "confirmados": 0,
@@ -70,25 +129,59 @@
         "finalizados": [],
         "requisicoes": 0,
         "erros": []
+      },
+      "api_football_auditoria_penaltis": {
+        "consultados": 10,
+        "corrigidos": [],
+        "datas_consultadas": [],
+        "requisicoes": 43,
+        "remaining": null,
+        "reserva": 12,
+        "erros": [
+          "401842614: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401842613: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401842651: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401842645: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401842644: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401842648: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401862630: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401874156: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401874143: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401874142: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}"
+        ]
+      },
+      "coleta": {
+        "modo": "incremental",
+        "janela_inicio": "2026-09-29T00:00:00-03:00",
+        "janela_fim": "2027-02-17T23:59:59-03:00",
+        "requisicoes": 4,
+        "ultima_completa_em": "2026-09-13T05:13:02-03:00",
+        "ajustes_editoriais_aplicados": 1
       }
     },
     {
       "competicao": "sul_americana",
-      "status": "preservado_apos_falha_seguro",
+      "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-09-18T11:40:56-03:00",
+      "gerado_em": "2026-10-20T21:55:35-03:00",
       "cache_efetivo_minutos": 0,
-      "erro": "sul_americana: RuntimeError: sul_americana: scoreboard ESPN falhou também em janela diária 20260929-20260929: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard?dates=20260929-20260929&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request",
-      "fallback_seguro_para_af": true,
-      "motivos_fallback": [],
-      "alertas_fallback": [
-        "snapshot anterior tem 777.5h; limite de observabilidade=24h (não bloqueante sem fato esportivo novo)"
-      ],
+      "eventos": 157,
+      "finalizados": 154,
+      "pendentes": 3,
+      "fase_atual": {
+        "status": "em_andamento",
+        "ordem": 800,
+        "nome": "Semifinal",
+        "eventos": 4,
+        "eventos_pendentes": 2
+      },
       "summary_partidas_iniciadas": {
-        "consultados": 0,
-        "confirmados": 0,
-        "atualizados": 0,
-        "ao_vivo": [],
+        "consultados": 1,
+        "confirmados": 1,
+        "atualizados": 1,
+        "ao_vivo": [
+          "401913957"
+        ],
         "finalizados": [],
         "pendentes": [],
         "pendentes_vencidos": [],
@@ -99,16 +192,52 @@
         "finalizados": [],
         "requisicoes": 0,
         "erros": []
+      },
+      "api_football_auditoria_penaltis": {
+        "consultados": 8,
+        "corrigidos": [],
+        "datas_consultadas": [],
+        "requisicoes": 51,
+        "remaining": null,
+        "reserva": 12,
+        "erros": [
+          "401843575: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401842452: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401842619: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401842623: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401842621: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401842618: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401874164: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
+          "401903295: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}"
+        ]
+      },
+      "coleta": {
+        "modo": "incremental",
+        "janela_inicio": "2026-09-29T00:00:00-03:00",
+        "janela_fim": "2027-02-17T23:59:59-03:00",
+        "requisicoes": 4,
+        "ultima_completa_em": "2026-09-12T05:15:07-03:00",
+        "ajustes_editoriais_aplicados": 0,
+        "summary_partidas_iniciadas": {
+          "consultados": 1,
+          "confirmados": 1,
+          "atualizados": 1,
+          "ao_vivo": [
+            "401913957"
+          ],
+          "finalizados": [],
+          "erros": []
+        }
       }
     }
   ],
-  "falhas": [
-    "copa_do_brasil: RuntimeError: copa_do_brasil: scoreboard ESPN falhou também em janela diária 20260929-20260929: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.copa_do_brazil/scoreboard?dates=20260929-20260929&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request",
-    "libertadores: RuntimeError: libertadores: scoreboard ESPN falhou também em janela diária 20260929-20260929: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=20260929-20260929&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request",
-    "sul_americana: RuntimeError: sul_americana: scoreboard ESPN falhou também em janela diária 20260929-20260929: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard?dates=20260929-20260929&limit=250&lang=pt&region=br: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
-  ],
+  "falhas": [],
   "falhas_bloqueantes": [],
-  "fontes_totalmente_atualizadas": false,
+  "cobertura_agenda_oficial": {
+    "ok": true,
+    "pendencias": []
+  },
+  "fontes_totalmente_atualizadas": true,
   "snapshots_prontos_para_af": true,
   "regras_operacionais": {
     "cache_padrao_minutos": 0,
@@ -116,7 +245,7 @@
     "janela_de_jogo_horas_apos_inicio": 4,
     "janela_incremental_dias_passado": 21,
     "janela_incremental_dias_futuro": 120,
-    "janela_scoreboard_dias": 7,
+    "janela_scoreboard_dias": 1,
     "fallback_janela_scoreboard": "subdivisão progressiva até 1 dia em erro HTTP/transporte",
     "reconstrucao_completa_horas": 0,
     "falha_de_rede": "preserva o último snapshot íntegro; --strict transforma a falha em erro",
