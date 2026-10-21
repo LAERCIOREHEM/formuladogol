@@ -32,6 +32,7 @@ jobs:
         run: |
           set -euo pipefail
           python -S scripts/gerar_analise_continental.py --self-test
+          python -S scripts/verificar_cobertura_continental.py --self-test
 
       - name: Respeitar circuit breaker persistente
         id: breaker
@@ -64,7 +65,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python scripts/gerar_analise_continental.py --dispatch-decision > /tmp/continental-eligibility.json
+          # Não publicar análise de quartas como se fosse fechamento de
+          # semifinais: agenda oficial e snapshots precisam cobrir os jogos
+          # já iniciados, com FINAL confirmado após a janela de tolerância.
+          if python -S scripts/verificar_cobertura_continental.py --strict; then
+            python scripts/gerar_analise_continental.py --dispatch-decision > /tmp/continental-eligibility.json
+          else
+            echo '{"action":"none","rank":0,"reason":"Semifinais continentais ainda não reconciliadas com os resultados esportivos estruturados"}' > /tmp/continental-eligibility.json
+            echo "::warning title=Editorial continental adiado::Aguardar coleta factual das semifinais; nenhuma IA será chamada."
+          fi
           cat /tmp/continental-eligibility.json
           python - <<'PY'
           import json

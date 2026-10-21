@@ -1,0 +1,34 @@
+name: Reconciliar continentais após hotfix
+run-name: AF Continental · reconciliação inicial após correção
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/atualizar_competicoes_af_previsao.py'
+      - 'scripts/verificar_cobertura_continental.py'
+      - '.github/workflows/reconciliar-continentais-apos-hotfix.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: fdg-continental-bootstrap-dispatch
+  cancel-in-progress: false
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Reconciliar semifinais e recalcular AF se houver fato novo
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run atualizar-brasileirao.yml \
+            --repo "${GITHUB_REPOSITORY}" --ref main \
+            -f forcar_fontes_continentais=true \
+            -f reconstruir_fontes=false \
+            -f forcar_af=false \
+            -f trace_id=continental-r10r26-bootstrap
+          echo 'Dispatch confirmado; o writer de Atualizar Brasileirão controla AF e publicação.'

@@ -216,14 +216,34 @@ export function continentalPhaseTransitionGuard(games, officialSchedule, contine
   );
   const nextMissingMs = missing.map((row) => parseDate(row?.data_iso)?.getTime()).filter(Number.isFinite).sort((a,b)=>a-b)[0];
   const hoursToMissing = Number.isFinite(nextMissingMs) ? (nextMissingMs - current.getTime()) / 3600000 : Infinity;
-  const urgent = missing.length > 0 && hoursToMissing <= 24;
-  const refreshNeeded = missing.length > 0 || staleRows.length > 0;
+  // R10R26: snapshot continental preservado desde setembro deve disparar
+  // coleta urgente durante as semifinais de outubro, mesmo se o fallback
+  // CONMEBOL já cobrir a agenda e missingOfficial estiver vazio.
+  const nearKickoff = expected.some((row) => {
+    const kickoff = parseDate(row?.data_iso);
+    if (!kickoff) return false;
+    const hours = (kickoff.getTime() - current.getTime()) / 3600000;
+    return hours >= -6 && hours <= 24;
+  });
+  // Independentemente do estado da coleta, a agenda oficial garante
+  // sondagem durante cada semifinal brasileira. Um FINAL pode acontecer
+  // depois de a auditoria anterior ficar verde; não depender de staleRows.
+  const liveOfficial = expected.filter((row) => {
+    const kickoff = parseDate(row?.data_iso);
+    if (!kickoff) return false;
+    const hours = (kickoff.getTime() - current.getTime()) / 3600000;
+    return hours >= -6 && hours <= 2;
+  });
+  const urgent = (missing.length > 0 && hoursToMissing <= 24)
+    || (staleRows.length > 0 && nearKickoff) || liveOfficial.length > 0;
+  const refreshNeeded = missing.length > 0 || staleRows.length > 0 || liveOfficial.length > 0;
   const fingerprint = [
     ...missing.map((row) => `${row?.competicao_chave || ''}:${row?.data_iso || ''}:${teamName(row?.mandante)}>${teamName(row?.visitante)}`),
     ...staleRows.map((row) => `stale:${row?.competicao || ''}:${row?.gerado_em || ''}`),
+    ...liveOfficial.map((row) => `live:${row?.competicao_chave || ''}:${row?.data_iso || ''}`),
   ].sort().join('|');
   return {
-    state: missing.length ? (urgent ? 'critical' : 'degraded') : (staleRows.length ? 'stale_snapshot' : 'green'),
+    state: missing.length ? (urgent ? 'critical' : 'degraded') : (staleRows.length ? 'stale_snapshot' : (liveOfficial.length ? 'match_window' : 'green')),
     refreshNeeded, urgent, fingerprint,
     retryMinutes: urgent ? 30 : 360,
     missingOfficial: missing.map((row) => ({
@@ -232,6 +252,7 @@ export function continentalPhaseTransitionGuard(games, officialSchedule, contine
       home: teamName(row?.mandante), away: teamName(row?.visitante),
     })),
     staleCompetitions: staleRows.map((row) => String(row?.competicao || '')).filter(Boolean),
+    liveOfficialCount: liveOfficial.length,
   };
 }
 

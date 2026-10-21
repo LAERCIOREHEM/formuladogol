@@ -67,7 +67,10 @@ SNAPSHOT_SCHEMA_VERSION = 2
 # A coleta continental usa lotes curtos e, se um lote ainda falhar, divide-o
 # progressivamente até um único dia antes de desistir. Isso impede que uma
 # consulta de 42 dias apague semanas inteiras de agenda futura.
-SCOREBOARD_WINDOW_DAYS = max(1, min(14, int(os.environ.get("AF_CONTINENTAL_ESPN_WINDOW_DAYS", "7"))))
+# ESPN CONMEBOL rejeita intervalos com HTTP 400; o endpoint de dia único
+# YYYYMMDD respondeu HTTP 200 em teste real de 20/10/2026. Um dia por
+# requisição é mais barato do que subdividir repetidamente intervalos inválidos.
+SCOREBOARD_WINDOW_DAYS = max(1, min(14, int(os.environ.get("AF_CONTINENTAL_ESPN_WINDOW_DAYS", "1"))))
 BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{league}/scoreboard"
 SUMMARY_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{league}/summary"
 API_FOOTBALL_ROOT = "https://v3.football.api-sports.io"
@@ -596,15 +599,28 @@ def _scoreboard_payload_resilient(
     fetcher = fetcher or fetch_json
     date_range = f"{lower:%Y%m%d}-{upper:%Y%m%d}"
     url = BASE_URL.format(league=spec.league)
+    total_days = (upper.date() - lower.date()).days + 1
+    if total_days <= 1:
+        # O endpoint CONMEBOL responde 200 a YYYYMMDD, mas 400 a
+        # YYYYMMDD-YYYYMMDD. Preferir data simples, evitando 6 tentativas
+        # inúteis (curl-cffi + urllib + retry) por dia.
+        single_day = f"{lower:%Y%m%d}"
+        try:
+            payload = fetcher(f"{url}?dates={single_day}&limit=250&lang=pt&region=br")
+            return [event for event in (payload.get("events") or []) if isinstance(event, dict)], 1
+        except Exception as day_exc:  # noqa: BLE001
+            try:
+                payload = fetcher(f"{url}?dates={date_range}&limit=250&lang=pt&region=br")
+                return [event for event in (payload.get("events") or []) if isinstance(event, dict)], 2
+            except Exception as range_exc:  # noqa: BLE001
+                raise RuntimeError(
+                    f"{spec.key}: ESPN rejeitou data simples {single_day} e "
+                    f"faixa diária {date_range}: day={day_exc}; range={range_exc}"
+                ) from range_exc
     try:
         payload = fetcher(f"{url}?dates={date_range}&limit=250&lang=pt&region=br")
         return [event for event in (payload.get("events") or []) if isinstance(event, dict)], 1
     except Exception as exc:  # noqa: BLE001
-        total_days = (upper.date() - lower.date()).days + 1
-        if total_days <= 1:
-            raise RuntimeError(
-                f"{spec.key}: scoreboard ESPN falhou também em janela diária {date_range}: {exc}"
-            ) from exc
         left_days = max(1, total_days // 2)
         left_end_date = lower.date() + timedelta(days=left_days - 1)
         right_start_date = left_end_date + timedelta(days=1)
@@ -627,12 +643,34 @@ def fetch_events_between(
     end = min(end, season_end)
     if start > end:
         return [], 0
-    for lower, upper in date_windows_between(start, end, days=SCOREBOARD_WINDOW_DAYS):
-        rows, used = _scoreboard_payload_resilient(spec, lower, upper, fetcher=fetcher)
+    # R10R26: ESPN CONMEBOL aceita dates=YYYYMM (HTTP 200 com os quatro
+    # jogos das semifinais de outubro), mas rejeita YYYYMMDD-YYYYMMDD.
+    # Buscar meses reduz ~400 consultas diárias para ~18 mensais nas três
+    # competições. Só recorrer aos dias se o mês falhar; não usar IA.
+    fetcher = fetcher or fetch_json
+    month = datetime(start.year, start.month, 1, tzinfo=BRT)
+    while month <= end:
+        next_month = datetime(month.year + (month.month == 12), month.month % 12 + 1, 1, tzinfo=BRT)
+        lower = max(start, month)
+        upper = min(end, next_month - timedelta(seconds=1))
+        url = BASE_URL.format(league=spec.league)
+        try:
+            payload = fetcher(f"{url}?dates={month:%Y%m}&limit=250&lang=pt&region=br")
+            rows = [row for row in (payload.get("events") or []) if isinstance(row, dict)]
+            used = 1
+        except Exception:  # noqa: BLE001
+            rows = []
+            used = 1  # contabiliza tentativa mensal rejeitada
+            for day_start, day_end in date_windows_between(lower, upper, days=1):
+                daily, calls = _scoreboard_payload_resilient(spec, day_start, day_end, fetcher=fetcher)
+                rows.extend(daily)
+                used += calls
         requests += used
         for event in rows:
-            if event.get("id"):
+            date = parse_datetime(event.get("date"))
+            if date and lower.date() <= date.astimezone(BRT).date() <= upper.date() and event.get("id"):
                 events[str(event["id"])] = event
+        month = next_month
     return sorted(
         events.values(), key=lambda item: (str(item.get("date") or ""), str(item.get("id") or ""))
     ), requests
@@ -1280,6 +1318,11 @@ def normalize_generic_pending_knockout_cohorts(events: list[dict[str, Any]]) -> 
         int(event.get("fase_ordem") or 0)
         for event in events
         if not event.get("concluido") and phase_metadata_is_specific(event)
+        # R10R26: a ESPN já cadastra FINAL TBD x TBD em novembro. Esse
+        # placeholder (rank 900) NÃO é âncora para as semifinais de outubro.
+        and 0 < int(event.get("fase_ordem") or 0) < 900
+        and all(team and not str(team.get("nome") or "").lower().startswith("tbd")
+                for team in (event.get("mandante") or {}, event.get("visitante") or {}))
     ]
     anchor_rank = min(pending_specific) if pending_specific else specific_ranks[0]
     anchor_events = [
@@ -1349,6 +1392,25 @@ def normalize_generic_pending_knockout_cohorts(events: list[dict[str, Any]]) -> 
             event["fase_ordem"] = rank_cursor
             event["fase"] = label
             changed += 1
+            # R10R26: ESPN rotula AMBAS as pernas da semifinal apenas
+            # como Ida/Volta (rank 100). A normalização anterior promovia
+            # somente a volta pendente; a ida já FINAL ficava no rank 100,
+            # fazendo o AF rejeitar a chave como 'sem ida e volta'.
+            # Promover a ida por identidade EXATA de confronto, perna e
+            # proximidade temporal, nunca por nomes isolados ou heurística IA.
+            if int(event.get("perna") or 0) == 2:
+                for first in events:
+                    if (not first.get("concluido")
+                        or int(first.get("perna") or 0) != 1
+                        or phase_metadata_is_specific(first)
+                        or event_pair_key(first) != pair):
+                        continue
+                    first_date = parse_datetime(first.get("data_iso"))
+                    if first_date is None or not (_when - timedelta(days=21) <= first_date <= _when):
+                        continue
+                    first["fase_ordem"] = rank_cursor
+                    first["fase"] = label
+                    changed += 1
     return changed
 
 def normalize_active_knockout_stage(events: list[dict[str, Any]]) -> None:
@@ -2190,6 +2252,22 @@ def run_update(
             )
     after_snapshots = load_existing_snapshots()
     after_hash = snapshots_state_hash(after_snapshots)
+    # R10R26: um snapshot de setembro pode ser estruturalmente válido, mas
+    # omitir toda a semifinal de outubro. Não permitir Monte Carlo com essa
+    # fotografia só porque o último scoreboard falhou sem partidas pendentes.
+    from verificar_cobertura_continental import load_coverage
+    try:
+        official_gaps = load_coverage()
+    except (OSError, ValueError, KeyError) as coverage_exc:
+        official_gaps = [{"motivo": "agenda_indisponivel", "erro": str(coverage_exc)}]
+    if official_gaps:
+        blocking_failures.append(
+            "agenda CONMEBOL não reconciliada com os snapshots: "
+            + "; ".join(
+                f"{gap.get('competicao', '')} {gap.get('jogo', '')} {gap.get('motivo', '')}"
+                for gap in official_gaps[:8]
+            )
+        )
     accepted_rows = {"atualizado", "cache_valido", "preservado_apos_falha_seguro"}
     ready = (
         not blocking_failures
@@ -2221,6 +2299,7 @@ def run_update(
         "competicoes": audit_rows,
         "falhas": failures,
         "falhas_bloqueantes": blocking_failures,
+        "cobertura_agenda_oficial": {"ok": not official_gaps, "pendencias": official_gaps},
         "fontes_totalmente_atualizadas": not failures,
         "snapshots_prontos_para_af": ready,
         "regras_operacionais": {
@@ -2279,6 +2358,36 @@ def self_test() -> None:
             }
         ],
     }
+    # R10R26: reproduz HTTP 400 em intervalo, inclusive de um dia, sem rede.
+    # Data simples é a via alternativa documentada do scoreboard ESPN.
+    attempts = []
+    def mock_espn_day(url):
+        attempts.append(url)
+        if "dates=20260929-20260929" in url or "dates=20260929-20261001" in url:
+            raise RuntimeError("HTTP 400 Bad Request")
+        if "dates=20260929&" in url:
+            return {"events": [{"id": "fixture-2026-09-29"}]}
+        if "dates=20260930-20261001" in url:
+            return {"events": [{"id": "fixture-2026-09-30"}]}
+        raise AssertionError(f"requisição inesperada: {url}")
+    day_events, day_calls = _scoreboard_payload_resilient(
+        spec, datetime(2026, 9, 29, tzinfo=BRT),
+        datetime(2026, 9, 29, 23, 59, tzinfo=BRT), fetcher=mock_espn_day,
+    )
+    assert day_calls == 1 and day_events[0]["id"] == "fixture-2026-09-29"
+    assert any("dates=20260929&" in url for url in attempts)
+    # Se nem a data simples responder, não declarar sucesso nem zerar a fase.
+    def mock_espn_failure(url):
+        raise RuntimeError("HTTP 400")
+    try:
+        _scoreboard_payload_resilient(
+            spec, datetime(2026, 9, 29, tzinfo=BRT),
+            datetime(2026, 9, 29, tzinfo=BRT), fetcher=mock_espn_failure,
+        )
+    except RuntimeError as exc:
+        assert "data simples 20260929" in str(exc)
+    else:
+        raise AssertionError("falha dupla ESPN não pode ser ignorada")
     parsed = extract_event(synthetic, spec)
     assert parsed is not None
     assert parsed["fase_ordem"] == 700
@@ -2776,16 +2885,18 @@ def self_test() -> None:
     assert pen_final["vencedor_penaltis"] == "Palmeiras"
     assert pen_final["penaltis"] == {"mandante": 3, "visitante": 4}
 
-    # HOTFIX 8: uma faixa rejeitada precisa cair para subfaixas sem perder jogos.
+    # R10R26: a API responde a mês (YYYYMM); fallback diário só após falha.
     fake_spec = COMPETITIONS[1]
     calls: list[str] = []
     def fake_scoreboard(url: str) -> dict[str, Any]:
         calls.append(url)
-        m = re.search(r"dates=(\d{8})-(\d{8})", url)
-        assert m
-        if m.group(1) != m.group(2):
-            raise RuntimeError("HTTP 400 simulado para faixa ampla")
-        return {"events": [{"id": m.group(1), "date": m.group(1)}]}
+        if "dates=202610&" in url:
+            return {"events": [
+                {"id": "20261013", "date": "2026-10-13T22:30:00Z"},
+                {"id": "20261014", "date": "2026-10-14T22:30:00Z"},
+                {"id": "20261025", "date": "2026-10-25T22:30:00Z"},
+            ]}
+        raise RuntimeError("não deve pesquisar dia se o mês respondeu")
     rows, used = fetch_events_between(
         fake_spec,
         datetime(2026, 10, 13, tzinfo=BRT),
@@ -2793,7 +2904,45 @@ def self_test() -> None:
         fetcher=fake_scoreboard,
     )
     assert {row["id"] for row in rows} == {"20261013", "20261014"}
+    assert used == 1 and len(calls) == 1, (used, calls)
+    calls.clear()
+    def fake_month_fails(url: str) -> dict[str, Any]:
+        calls.append(url)
+        if "dates=202610&" in url:
+            raise RuntimeError("HTTP 400 mensal simulado")
+        m = re.search(r"dates=(\d{8})&", url)
+        assert m, url
+        return {"events": [{"id": m.group(1), "date": f"{m.group(1)[:4]}-{m.group(1)[4:6]}-{m.group(1)[6:]}T22:30:00Z"}]}
+    rows, used = fetch_events_between(
+        fake_spec,
+        datetime(2026, 10, 13, tzinfo=BRT),
+        datetime(2026, 10, 14, 23, 59, tzinfo=BRT),
+        fetcher=fake_month_fails,
+    )
+    assert {row["id"] for row in rows} == {"20261013", "20261014"}
     assert used == 3 and len(calls) == 3, (used, calls)
+
+    # Regressão real de 20/10: ESPN dá rank 100 à ida FINAL e à
+    # volta pendente de Boca x Vasco e Atlético-MG x Torque.
+    def fixture(event_id, date, home, away, leg, done, rank=100, stage="Ida"):
+        return {
+            "event_id": event_id, "data_iso": date, "fase_ordem": rank,
+            "fase": stage, "perna": leg, "concluido": done,
+            "mandante": {"nome": home}, "visitante": {"nome": away},
+        }
+    semifinal = [
+        fixture("qf-anchor", "2026-09-16T21:30:00-03:00", "São Paulo", "Boca Juniors", 2, True, 700, "Quartas de final"),
+        fixture("sf-a1", "2026-10-13T21:30:00-03:00", "Boca Juniors", "Vasco da Gama", 1, True),
+        fixture("sf-b1", "2026-10-14T19:00:00-03:00", "Atlético-MG", "Montevideo City Torque", 1, True),
+        fixture("sf-a2", "2026-10-20T21:30:00-03:00", "Vasco da Gama", "Boca Juniors", 2, False, 100, "Volta"),
+        fixture("sf-b2", "2026-10-21T19:00:00-03:00", "Montevideo City Torque", "Atlético-MG", 2, False, 100, "Volta"),
+        fixture("final-placeholder", "2026-11-28T17:00:00-03:00", "TBD Home", "TBD Away", 0, False, 900, "Final"),
+    ]
+    count = normalize_generic_pending_knockout_cohorts(semifinal)
+    assert count == 4, (count, semifinal)
+    assert all(row["fase_ordem"] == 800 for row in semifinal if row["event_id"].startswith("sf-"))
+    assert semifinal[0]["fase_ordem"] == 700
+    assert semifinal[-1]["fase_ordem"] == 900
 
     print("Self-test coleta AF-Previsão Continental incremental: OK")
 
