@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-10-20T22:00:55-03:00",
+  "gerado_em": "2026-10-21T01:32:00-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,32 +17,22 @@
     "ordem": 800,
     "nome": "Semifinal",
     "eventos": 4,
-    "eventos_pendentes": 2
+    "eventos_pendentes": 1
   },
   "resumo": {
     "eventos": 157,
-    "finalizados": 154,
-    "pendentes": 3,
+    "finalizados": 155,
+    "pendentes": 2,
     "equipes": 58,
     "equipes_serie_a_2026": 7
   },
   "coleta": {
     "modo": "incremental",
-    "janela_inicio": "2026-09-29T00:00:00-03:00",
-    "janela_fim": "2027-02-17T23:59:59-03:00",
+    "janela_inicio": "2026-09-30T00:00:00-03:00",
+    "janela_fim": "2027-02-18T23:59:59-03:00",
     "requisicoes": 4,
     "ultima_completa_em": "2026-09-12T05:15:07-03:00",
-    "ajustes_editoriais_aplicados": 0,
-    "summary_partidas_iniciadas": {
-      "consultados": 1,
-      "confirmados": 1,
-      "atualizados": 1,
-      "ao_vivo": [
-        "401913957"
-      ],
-      "finalizados": [],
-      "erros": []
-    }
+    "ajustes_editoriais_aplicados": 0
   },
   "equipes": [
     {
@@ -6170,14 +6160,14 @@
     {
       "event_id": "401913957",
       "data_iso": "2026-10-20T21:30:00-03:00",
-      "estado": "in",
-      "concluido": false,
-      "status": "24'",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Semifinal",
       "fase_ordem": 800,
       "semana": null,
       "perna": 2,
-      "estadio": "",
+      "estadio": "Estadio do Maracana",
       "mandante": {
         "espn_id": "3454",
         "nome": "Vasco da Gama",
@@ -6187,7 +6177,7 @@
         "serie_a_2026": true,
         "mandante": true,
         "vencedor": false,
-        "placar": 0
+        "placar": 1
       },
       "visitante": {
         "espn_id": "5",
@@ -6197,10 +6187,10 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": false,
-        "vencedor": false,
-        "placar": 1
+        "vencedor": true,
+        "placar": 3
       },
-      "vencedor": null,
+      "vencedor": "Boca Juniors",
       "penaltis": false,
       "vencedor_penaltis": null
     },
@@ -6284,6 +6274,6 @@
     "fase": "Semifinal",
     "fase_ordem": 800,
     "chaves": 2,
-    "equipes_ativas": 4
+    "equipes_ativas": 3
   }
 }

@@ -3,9 +3,9 @@
   "projeto": "Fórmula do Gol",
   "tipo": "agenda_clubes_brasileirao",
   "descricao": "Agenda do Brasileirão e dos clubes da Série A 2026 na Copa do Brasil, Libertadores e Sul-Americana.",
-  "gerado_em": "2026-10-20T21:55:36-03:00",
+  "gerado_em": "2026-10-21T01:32:01-03:00",
   "periodo": {
-    "inicio": "2026-10-20T00:00:00-03:00",
+    "inicio": "2026-10-21T00:00:00-03:00",
     "fim": "2026-11-30T23:59:59.999999-03:00",
     "regra": "de hoje até o último dia do mês seguinte"
   },
@@ -15,9 +15,9 @@
     "probabilidades": "disponíveis apenas para partidas do Brasileirão com saída AF-Previsão publicada"
   },
   "resumo": {
-    "total_jogos": 48,
+    "total_jogos": 47,
     "por_competicao": {
-      "sul_americana": 2,
+      "sul_americana": 1,
       "libertadores": 2,
       "brasileirao": 40,
       "copa_do_brasil": 4
@@ -26,59 +26,12 @@
   "integridade_continental": {
     "status": "ok",
     "fonte_documental": "dados-br/correcoes/agenda-continentais-oficial.json",
-    "esperados_no_periodo": 4,
+    "esperados_no_periodo": 3,
     "faltantes": [],
     "fallbacks_documentais_ativos": 0,
     "regra": "fase seguinte oficial não pode desaparecer da agenda por falha do scoreboard amplo"
   },
   "jogos": [
-    {
-      "event_id": "401913957",
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "CONMEBOL Sudamericana",
-      "competicao_nome_curto": "Sul-Americana",
-      "espn_league": "conmebol.sudamericana",
-      "data_iso": "2026-10-20T21:30:00-03:00",
-      "estado": "in",
-      "concluido": false,
-      "status": "24'",
-      "rodada": 0,
-      "fase": "Semifinal",
-      "perna": 2,
-      "confronto_id": "3454-5",
-      "partida_numero": 2,
-      "partidas_total": 2,
-      "agregado_mandante": 1,
-      "agregado_visitante": 1,
-      "agregado_disponivel": true,
-      "estadio": "",
-      "mandante": {
-        "espn_id": "3454",
-        "nome": "Vasco da Gama",
-        "sigla": "VAS",
-        "escudo": "https://a.espncdn.com/i/teamlogos/soccer/500/3454.png",
-        "pais": "",
-        "serie_a_2026": true
-      },
-      "visitante": {
-        "espn_id": "5",
-        "nome": "Boca Juniors",
-        "sigla": "CABJ",
-        "escudo": "https://a.espncdn.com/i/teamlogos/soccer/500/5.png",
-        "pais": "",
-        "serie_a_2026": false
-      },
-      "placar_mandante": 0,
-      "placar_visitante": 1,
-      "adiado": false,
-      "data_definir": false,
-      "possui_clube_serie_a_2026": true,
-      "probabilidades_disponiveis": false,
-      "fonte": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "fonte_calendario": "CONMEBOL oficial",
-      "fonte_url": "https://gol.conmebol.com/sudamericana/pt-br/news/en-busca-de-la-gran-conquista-todo-definido-para-las-semifinales-de-la-conmebol-sudamericana",
-      "fallback_agenda_oficial": false
-    },
     {
       "event_id": "401913956",
       "competicao_chave": "sul_americana",
