@@ -15,6 +15,7 @@ const event = {
   scoringTeam: { name: 'Cruzeiro' },
   athlete: { name: 'Kaio Jorge' },
   minute: "34'",
+  scoreAfter: { home: 0, away: 1 },
   confirmedAt: '2026-09-02T00:35:00.000Z',
   notificationDraft: {
     title: '⚽ GOL DO CRUZEIRO!',
@@ -26,11 +27,26 @@ assert.equal(payload.title, '⚽ GOL DO CRUZEIRO!');
 assert.match(payload.body, /Kaio Jorge/);
 assert.equal(payload.data.url, '/aovivo.html?event=401909112');
 assert.equal(payload.badgeIncrement, 1);
-assert.match(payload.tag, /^fdg-goal-/);
+assert.equal(payload.tag, 'fdg-goal-401909112-score-0-1');
+assert.deepEqual(payload.data.scoreAfter, { home: 0, away: 1 });
+assert.equal(payload.renotify, false, 'reentrega de gol não deve vibrar outra vez');
+const fromAnotherFeed = buildSportsPushPayload({
+  ...event, eventKey: 'goal:401909112:score:0-1:away',
+  sourcePlayKey: 'score-fallback:0-1'
+});
+assert.equal(fromAnotherFeed.tag, payload.tag, 'CORE/CDN/fallback usam a mesma identidade');
+const nextRealGoal = buildSportsPushPayload({
+  ...event, eventKey: 'goal:401909112:score:0-2:away',
+  sourcePlayKey: '401909112:g3', scoreAfter: { home: 0, away: 2 }
+});
+assert.notEqual(nextRealGoal.tag, payload.tag, 'outro gol precisa de nova notificação');
+
 
 const overturned = buildSportsPushPayload({ ...event, eventKey: 'goal_overturned:401909112:score:0-0:away', type: 'goal_overturned', notificationDraft: { title: '🚫 GOL ANULADO', body: 'O placar voltou para Atlético-MG 0 × 0 Cruzeiro' } });
 assert.equal(overturned.title, '🚫 GOL ANULADO');
-assert.match(overturned.tag, /^fdg-goal_overturned-/);
+assert.equal(overturned.tag, 'fdg-goal_overturned-401909112-score-0-1');
+assert.notEqual(overturned.tag, payload.tag, 'anulação é aviso diferente do gol');
+
 assert.equal(overturned.data.url, '/aovivo.html?event=401909112');
 
 const prematch = buildSportsPushPayload({ ...event, eventKey: 'prematch_15:401909112:1788307200000', type: 'prematch_15', notificationDraft: { title: '⏰ Jogo começa em 15 minutos', body: 'Atlético-MG × Cruzeiro · 21:00' } });
