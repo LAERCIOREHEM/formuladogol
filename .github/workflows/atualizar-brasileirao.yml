@@ -1018,6 +1018,11 @@ jobs:
           import os
           from datetime import datetime, timedelta, timezone
           from pathlib import Path
+          import sys
+          # gerar_analise_rodada importa editorial_ia por nome de módulo;
+          # ao importar como scripts.*, Python não inclui scripts/ no sys.path.
+          # R10R26: evitar vermelho falso depois de AF continental publicado.
+          sys.path.insert(0, str(Path.cwd() / 'scripts'))
           from scripts.gerar_analise_rodada import estado_rodada
 
           config = json.loads(Path('dados-br/config-analises.json').read_text(encoding='utf-8'))
