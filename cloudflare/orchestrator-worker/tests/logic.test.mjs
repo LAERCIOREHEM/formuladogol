@@ -474,6 +474,26 @@ test('phase transition guard detects official semi-final missing from local agen
   assert.equal(out.missingOfficial.length, 1);
 });
 
+test('R10R26: stale snapshot triggers urgent refresh near semifinal even with official fixture in agenda', () => {
+  const official = { jogos: [{
+    competicao_chave:'sul_americana', espn_league:'conmebol.sudamericana', data_iso:'2026-10-20T21:30:00-03:00',
+    mandante:{nome:'Vasco da Gama',serie_a_2026:true}, visitante:{nome:'Boca Juniors',serie_a_2026:false},
+  }] };
+  const games = [{
+    league:'conmebol.sudamericana', data_iso:'2026-10-20T21:30:00-03:00',
+    mandante:{nome:'Vasco da Gama'}, visitante:{nome:'Boca Juniors'},
+  }];
+  const audit = { competicoes:[{competicao:'sul_americana',status:'preservado_apos_falha_seguro',gerado_em:'2026-09-18T11:40:56-03:00'}] };
+  const near = continentalPhaseTransitionGuard(games, official, audit, new Date('2026-10-20T22:00:00-03:00'));
+  assert.equal(near.missingOfficial.length, 0);
+  assert.equal(near.refreshNeeded, true);
+  assert.equal(near.urgent, true);
+  assert.equal(near.retryMinutes, 30);
+  const far = continentalPhaseTransitionGuard(games, official, audit, new Date('2026-10-01T22:00:00-03:00'));
+  assert.equal(far.urgent, false);
+  assert.equal(far.retryMinutes, 360);
+});
+
 test('phase transition guard clears official gap once fixture is in raw agenda, mesmo sem event_id ESPN', () => {
   const official = { jogos: [{
     competicao_chave:'libertadores', espn_league:'conmebol.libertadores', data_iso:'2026-10-14T21:30:00-03:00',
