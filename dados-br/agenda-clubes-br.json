@@ -3,7 +3,7 @@
   "projeto": "Fórmula do Gol",
   "tipo": "agenda_clubes_brasileirao",
   "descricao": "Agenda do Brasileirão e dos clubes da Série A 2026 na Copa do Brasil, Libertadores e Sul-Americana.",
-  "gerado_em": "2026-10-22T01:32:03-03:00",
+  "gerado_em": "2026-10-22T19:32:29-03:00",
   "periodo": {
     "inicio": "2026-10-22T00:00:00-03:00",
     "fim": "2026-11-30T23:59:59.999999-03:00",
@@ -15,11 +15,12 @@
     "probabilidades": "disponíveis apenas para partidas do Brasileirão com saída AF-Previsão publicada"
   },
   "resumo": {
-    "total_jogos": 45,
+    "total_jogos": 46,
     "por_competicao": {
       "libertadores": 1,
       "brasileirao": 40,
-      "copa_do_brasil": 4
+      "copa_do_brasil": 4,
+      "sul_americana": 1
     }
   },
   "integridade_continental": {
@@ -1869,6 +1870,44 @@
       "fonte_calendario": "ESPN",
       "origem_calendario": "",
       "data_fonte_anterior": ""
+    },
+    {
+      "event_id": "401913961",
+      "competicao_chave": "sul_americana",
+      "competicao_nome": "CONMEBOL Sudamericana",
+      "competicao_nome_curto": "Sul-Americana",
+      "espn_league": "conmebol.sudamericana",
+      "data_iso": "2026-11-21T17:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "rodada": 0,
+      "fase": "Final",
+      "perna": null,
+      "estadio": "Metropolitano Roberto Meléndez",
+      "mandante": {
+        "espn_id": "7632",
+        "nome": "Atlético-MG",
+        "sigla": "CAM",
+        "escudo": "https://a.espncdn.com/i/teamlogos/soccer/500/7632.png",
+        "pais": "",
+        "serie_a_2026": true
+      },
+      "visitante": {
+        "espn_id": "5",
+        "nome": "Boca Juniors",
+        "sigla": "CABJ",
+        "escudo": "https://a.espncdn.com/i/teamlogos/soccer/500/5.png",
+        "pais": "",
+        "serie_a_2026": false
+      },
+      "placar_mandante": 0,
+      "placar_visitante": 0,
+      "adiado": false,
+      "data_definir": false,
+      "possui_clube_serie_a_2026": true,
+      "probabilidades_disponiveis": false,
+      "fonte": "dados-br/competicoes-af-previsao/sul-americana.json"
     }
   ]
 }
