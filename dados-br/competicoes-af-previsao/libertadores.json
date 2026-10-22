@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-10-21T23:18:44-03:00",
+  "gerado_em": "2026-10-22T01:31:59-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,32 +17,22 @@
     "ordem": 800,
     "nome": "Semifinal",
     "eventos": 4,
-    "eventos_pendentes": 2
+    "eventos_pendentes": 1
   },
   "resumo": {
     "eventos": 155,
-    "finalizados": 152,
-    "pendentes": 3,
+    "finalizados": 153,
+    "pendentes": 2,
     "equipes": 49,
     "equipes_serie_a_2026": 8
   },
   "coleta": {
     "modo": "incremental",
-    "janela_inicio": "2026-09-30T00:00:00-03:00",
-    "janela_fim": "2027-02-18T23:59:59-03:00",
-    "requisicoes": 4,
+    "janela_inicio": "2026-10-01T00:00:00-03:00",
+    "janela_fim": "2027-02-19T23:59:59-03:00",
+    "requisicoes": 3,
     "ultima_completa_em": "2026-09-13T05:13:02-03:00",
-    "ajustes_editoriais_aplicados": 0,
-    "summary_partidas_iniciadas": {
-      "consultados": 1,
-      "confirmados": 1,
-      "atualizados": 1,
-      "ao_vivo": [
-        "401912520"
-      ],
-      "finalizados": [],
-      "erros": []
-    }
+    "ajustes_editoriais_aplicados": 0
   },
   "equipes": [
     {
@@ -6049,14 +6039,14 @@
     {
       "event_id": "401912520",
       "data_iso": "2026-10-21T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qua., Outubro 21º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "PF - Pen",
       "fase": "Semifinal",
       "fase_ordem": 800,
       "semana": null,
       "perna": 2,
-      "estadio": "",
+      "estadio": "Allianz Parque",
       "mandante": {
         "espn_id": "2029",
         "nome": "Palmeiras",
@@ -6076,12 +6066,15 @@
         "pais": null,
         "serie_a_2026": true,
         "mandante": false,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 1
       },
-      "vencedor": null,
-      "penaltis": false,
-      "vencedor_penaltis": null
+      "vencedor": "Fluminense",
+      "penaltis": {
+        "mandante": 5,
+        "visitante": 3
+      },
+      "vencedor_penaltis": "Palmeiras"
     },
     {
       "event_id": "401912521",
@@ -6163,6 +6156,6 @@
     "fase": "Semifinal",
     "fase_ordem": 800,
     "chaves": 2,
-    "equipes_ativas": 4
+    "equipes_ativas": 3
   }
 }
