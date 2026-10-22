@@ -9,20 +9,20 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-10-21T19:12:26-03:00",
+  "gerado_em": "2026-10-21T22:37:14-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
-    "status": "em_andamento",
+    "status": "encerrada",
     "ordem": 800,
     "nome": "Semifinal",
     "eventos": 4,
-    "eventos_pendentes": 1
+    "eventos_pendentes": 0
   },
   "resumo": {
     "eventos": 157,
-    "finalizados": 155,
-    "pendentes": 2,
+    "finalizados": 156,
+    "pendentes": 1,
     "equipes": 57,
     "equipes_serie_a_2026": 7
   },
@@ -32,17 +32,7 @@
     "janela_fim": "2027-02-18T23:59:59-03:00",
     "requisicoes": 4,
     "ultima_completa_em": "2026-09-12T05:15:07-03:00",
-    "ajustes_editoriais_aplicados": 0,
-    "summary_partidas_iniciadas": {
-      "consultados": 1,
-      "confirmados": 1,
-      "atualizados": 1,
-      "ao_vivo": [
-        "401913956"
-      ],
-      "finalizados": [],
-      "erros": []
-    }
+    "ajustes_editoriais_aplicados": 0
   },
   "equipes": [
     {
@@ -6198,14 +6188,14 @@
     {
       "event_id": "401913956",
       "data_iso": "2026-10-21T19:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qua., Outubro 21º at 6:00 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Semifinal",
       "fase_ordem": 800,
       "semana": null,
       "perna": 2,
-      "estadio": "",
+      "estadio": "Estadio Centenario",
       "mandante": {
         "espn_id": "19002",
         "nome": "Montevideo City Torque",
@@ -6215,7 +6205,7 @@
         "serie_a_2026": false,
         "mandante": true,
         "vencedor": false,
-        "placar": 0
+        "placar": 2
       },
       "visitante": {
         "espn_id": "7632",
@@ -6225,10 +6215,10 @@
         "pais": null,
         "serie_a_2026": true,
         "mandante": false,
-        "vencedor": false,
+        "vencedor": true,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Atlético-MG",
       "penaltis": false,
       "vencedor_penaltis": null
     },
@@ -6275,6 +6265,6 @@
     "fase": "Semifinal",
     "fase_ordem": 800,
     "chaves": 2,
-    "equipes_ativas": 3
+    "equipes_ativas": 2
   }
 }

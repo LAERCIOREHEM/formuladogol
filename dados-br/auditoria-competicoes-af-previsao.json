@@ -2,15 +2,15 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-10-21T19:12:28-03:00",
+  "gerado_em": "2026-10-21T22:37:15-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "af_snapshot_seguro": true,
   "agenda_operacional_fresca": true,
   "snapshots_preservados": 0,
   "mudanca_esportiva": true,
-  "hash_estado_antes": "1e7d7ba395dba422a8d2c49b2e76d169b5cdd831039b7285842dbb2b162925ad",
-  "hash_estado_depois": "2d3486484cbe95f123b5018cc9104b0ebf421f560d452605d453e5b5b4d2e21f",
+  "hash_estado_antes": "2d3486484cbe95f123b5018cc9104b0ebf421f560d452605d453e5b5b4d2e21f",
+  "hash_estado_depois": "414d78d21bda4547a4c088c8d794c805b2730b1ec4e4de6c63280ebda91d4a49",
   "fonte": "ESPN + API-Football contingencial",
   "temporada": 2026,
   "competicoes": [
@@ -18,7 +18,7 @@
       "competicao": "copa_do_brasil",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-10-21T19:12:15-03:00",
+      "gerado_em": "2026-10-21T22:37:07-03:00",
       "cache_efetivo_minutos": 0,
       "eventos": 155,
       "finalizados": 150,
@@ -54,39 +54,39 @@
         "remaining": null,
         "reserva": 12,
         "erros": [
-          "401858546: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858698: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858674: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858545: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858553: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858660: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858653: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858657: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858647: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858556: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858663: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858557: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858649: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858661: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858642: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858646: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858668: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858654: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858648: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401858643: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401862881: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401862626: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401862686: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401862684: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401862653: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401862688: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401863526: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401864119: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401864127: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401864130: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401864131: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401866362: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401866349: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}"
+          "401858546: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858698: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858674: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858545: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858553: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858660: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858653: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858657: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858647: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858556: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858663: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858557: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858649: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858661: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858642: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858646: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858668: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858654: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858648: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401858643: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401862881: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401862626: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401862686: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401862684: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401862653: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401862688: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401863526: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401864119: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401864127: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401864130: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401864131: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401866362: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401866349: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}"
         ]
       },
       "coleta": {
@@ -102,7 +102,7 @@
       "competicao": "libertadores",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-10-21T19:12:24-03:00",
+      "gerado_em": "2026-10-21T22:37:12-03:00",
       "cache_efetivo_minutos": 0,
       "eventos": 155,
       "finalizados": 152,
@@ -115,10 +115,12 @@
         "eventos_pendentes": 2
       },
       "summary_partidas_iniciadas": {
-        "consultados": 0,
-        "confirmados": 0,
-        "atualizados": 0,
-        "ao_vivo": [],
+        "consultados": 1,
+        "confirmados": 1,
+        "atualizados": 1,
+        "ao_vivo": [
+          "401912520"
+        ],
         "finalizados": [],
         "pendentes": [],
         "pendentes_vencidos": [],
@@ -138,16 +140,16 @@
         "remaining": null,
         "reserva": 12,
         "erros": [
-          "401842614: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401842613: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401842651: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401842645: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401842644: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401842648: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401862630: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401874156: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401874143: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401874142: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}"
+          "401842614: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401842613: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401842651: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401842645: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401842644: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401842648: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401862630: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401874156: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401874143: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401874142: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}"
         ]
       },
       "coleta": {
@@ -156,32 +158,40 @@
         "janela_fim": "2027-02-18T23:59:59-03:00",
         "requisicoes": 4,
         "ultima_completa_em": "2026-09-13T05:13:02-03:00",
-        "ajustes_editoriais_aplicados": 0
+        "ajustes_editoriais_aplicados": 0,
+        "summary_partidas_iniciadas": {
+          "consultados": 1,
+          "confirmados": 1,
+          "atualizados": 1,
+          "ao_vivo": [
+            "401912520"
+          ],
+          "finalizados": [],
+          "erros": []
+        }
       }
     },
     {
       "competicao": "sul_americana",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-10-21T19:12:26-03:00",
+      "gerado_em": "2026-10-21T22:37:14-03:00",
       "cache_efetivo_minutos": 0,
       "eventos": 157,
-      "finalizados": 155,
-      "pendentes": 2,
+      "finalizados": 156,
+      "pendentes": 1,
       "fase_atual": {
-        "status": "em_andamento",
+        "status": "encerrada",
         "ordem": 800,
         "nome": "Semifinal",
         "eventos": 4,
-        "eventos_pendentes": 1
+        "eventos_pendentes": 0
       },
       "summary_partidas_iniciadas": {
-        "consultados": 1,
-        "confirmados": 1,
-        "atualizados": 1,
-        "ao_vivo": [
-          "401913956"
-        ],
+        "consultados": 0,
+        "confirmados": 0,
+        "atualizados": 0,
+        "ao_vivo": [],
         "finalizados": [],
         "pendentes": [],
         "pendentes_vencidos": [],
@@ -201,14 +211,14 @@
         "remaining": null,
         "reserva": 12,
         "erros": [
-          "401843575: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401842452: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401842619: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401842623: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401842621: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401842618: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401874164: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}",
-          "401903295: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-20 to 2026-10-22.'}"
+          "401843575: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401842452: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401842619: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401842623: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401842621: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401842618: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401874164: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}",
+          "401903295: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-21 to 2026-10-23.'}"
         ]
       },
       "coleta": {
@@ -217,17 +227,7 @@
         "janela_fim": "2027-02-18T23:59:59-03:00",
         "requisicoes": 4,
         "ultima_completa_em": "2026-09-12T05:15:07-03:00",
-        "ajustes_editoriais_aplicados": 0,
-        "summary_partidas_iniciadas": {
-          "consultados": 1,
-          "confirmados": 1,
-          "atualizados": 1,
-          "ao_vivo": [
-            "401913956"
-          ],
-          "finalizados": [],
-          "erros": []
-        }
+        "ajustes_editoriais_aplicados": 0
       }
     }
   ],
