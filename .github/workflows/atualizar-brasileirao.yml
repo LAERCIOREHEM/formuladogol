@@ -1,9 +1,15 @@
 name: Atualizar Brasileirao (ESPN)
 
 on:
-  # Execução operacional exclusiva por workflow_dispatch. O orquestrador
-  # inteligente chama este gatilho quando existe trabalho esportivo real;
-  # o botão "Run workflow" continua disponível para uso excepcional.
+  # Recuperação automática do fechamento continental: execução disparada
+  # pela própria publicação de um resultado FINAL na fonte estruturada.
+  # O workflow já possui gate de mudança esportiva e reconciliação idempotente.
+  push:
+    branches: [main]
+    paths:
+      - 'dados-br/competicoes-af-previsao/sul-americana.json'
+      - 'dados-br/competicoes-af-previsao/libertadores.json'
+      - 'dados-br/correcoes/agenda-continentais-oficial.json'
   workflow_dispatch:
     inputs:
       forcar_af:
