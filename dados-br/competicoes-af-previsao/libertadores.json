@@ -9,40 +9,30 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-10-22T21:42:22-03:00",
+  "gerado_em": "2026-10-23T01:34:16-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
-    "status": "em_andamento",
+    "status": "encerrada",
     "ordem": 800,
     "nome": "Semifinal",
     "eventos": 4,
-    "eventos_pendentes": 1
+    "eventos_pendentes": 0
   },
   "resumo": {
     "eventos": 155,
-    "finalizados": 153,
-    "pendentes": 2,
+    "finalizados": 154,
+    "pendentes": 1,
     "equipes": 49,
     "equipes_serie_a_2026": 8
   },
   "coleta": {
     "modo": "incremental",
-    "janela_inicio": "2026-10-01T00:00:00-03:00",
-    "janela_fim": "2027-02-19T23:59:59-03:00",
+    "janela_inicio": "2026-10-02T00:00:00-03:00",
+    "janela_fim": "2027-02-20T23:59:59-03:00",
     "requisicoes": 3,
     "ultima_completa_em": "2026-09-13T05:13:02-03:00",
-    "ajustes_editoriais_aplicados": 0,
-    "summary_partidas_iniciadas": {
-      "consultados": 1,
-      "confirmados": 1,
-      "atualizados": 1,
-      "ao_vivo": [
-        "401912521"
-      ],
-      "finalizados": [],
-      "erros": []
-    }
+    "ajustes_editoriais_aplicados": 0
   },
   "equipes": [
     {
@@ -6089,14 +6079,14 @@
     {
       "event_id": "401912521",
       "data_iso": "2026-10-22T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qui., Outubro 22º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "PF - Pen",
       "fase": "Semifinal",
       "fase_ordem": 800,
       "semana": null,
       "perna": 2,
-      "estadio": "",
+      "estadio": "Estadio do Maracana",
       "mandante": {
         "espn_id": "819",
         "nome": "Flamengo",
@@ -6116,12 +6106,15 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": false,
-        "vencedor": false,
+        "vencedor": true,
         "placar": 0
       },
-      "vencedor": null,
-      "penaltis": false,
-      "vencedor_penaltis": null
+      "vencedor": "Estudiantes de La Plata",
+      "penaltis": {
+        "mandante": 2,
+        "visitante": 3
+      },
+      "vencedor_penaltis": "Estudiantes de La Plata"
     },
     {
       "event_id": "401912519",
@@ -6166,6 +6159,6 @@
     "fase": "Semifinal",
     "fase_ordem": 800,
     "chaves": 2,
-    "equipes_ativas": 3
+    "equipes_ativas": 2
   }
 }

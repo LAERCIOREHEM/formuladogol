@@ -2,15 +2,15 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-10-22T21:42:26-03:00",
+  "gerado_em": "2026-10-23T01:34:19-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "af_snapshot_seguro": true,
   "agenda_operacional_fresca": true,
   "snapshots_preservados": 0,
   "mudanca_esportiva": true,
-  "hash_estado_antes": "9d37273ec94a901b7970c62f71d52906d4de2140fbb1c31b2dbdbbe44b8f36c8",
-  "hash_estado_depois": "630307ba7382518e34f1d12b21c3e26284ae50340446a0fdeb5a3a470f86d17c",
+  "hash_estado_antes": "630307ba7382518e34f1d12b21c3e26284ae50340446a0fdeb5a3a470f86d17c",
+  "hash_estado_depois": "237fe5a04dea0b5e1d1899f78a40c5da6a8d9c7524833e89af05d62012391c11",
   "fonte": "ESPN + API-Football contingencial",
   "temporada": 2026,
   "competicoes": [
@@ -18,7 +18,7 @@
       "competicao": "copa_do_brasil",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-10-22T21:42:16-03:00",
+      "gerado_em": "2026-10-23T01:34:10-03:00",
       "cache_efetivo_minutos": 0,
       "eventos": 155,
       "finalizados": 150,
@@ -91,8 +91,8 @@
       },
       "coleta": {
         "modo": "incremental",
-        "janela_inicio": "2026-10-01T00:00:00-03:00",
-        "janela_fim": "2027-02-19T23:59:59-03:00",
+        "janela_inicio": "2026-10-02T00:00:00-03:00",
+        "janela_fim": "2027-02-20T23:59:59-03:00",
         "requisicoes": 3,
         "ultima_completa_em": "2026-09-12T05:15:01-03:00",
         "ajustes_editoriais_aplicados": 0
@@ -102,25 +102,23 @@
       "competicao": "libertadores",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-10-22T21:42:22-03:00",
+      "gerado_em": "2026-10-23T01:34:16-03:00",
       "cache_efetivo_minutos": 0,
       "eventos": 155,
-      "finalizados": 153,
-      "pendentes": 2,
+      "finalizados": 154,
+      "pendentes": 1,
       "fase_atual": {
-        "status": "em_andamento",
+        "status": "encerrada",
         "ordem": 800,
         "nome": "Semifinal",
         "eventos": 4,
-        "eventos_pendentes": 1
+        "eventos_pendentes": 0
       },
       "summary_partidas_iniciadas": {
-        "consultados": 1,
-        "confirmados": 1,
-        "atualizados": 1,
-        "ao_vivo": [
-          "401912521"
-        ],
+        "consultados": 0,
+        "confirmados": 0,
+        "atualizados": 0,
+        "ao_vivo": [],
         "finalizados": [],
         "pendentes": [],
         "pendentes_vencidos": [],
@@ -154,28 +152,18 @@
       },
       "coleta": {
         "modo": "incremental",
-        "janela_inicio": "2026-10-01T00:00:00-03:00",
-        "janela_fim": "2027-02-19T23:59:59-03:00",
+        "janela_inicio": "2026-10-02T00:00:00-03:00",
+        "janela_fim": "2027-02-20T23:59:59-03:00",
         "requisicoes": 3,
         "ultima_completa_em": "2026-09-13T05:13:02-03:00",
-        "ajustes_editoriais_aplicados": 0,
-        "summary_partidas_iniciadas": {
-          "consultados": 1,
-          "confirmados": 1,
-          "atualizados": 1,
-          "ao_vivo": [
-            "401912521"
-          ],
-          "finalizados": [],
-          "erros": []
-        }
+        "ajustes_editoriais_aplicados": 0
       }
     },
     {
       "competicao": "sul_americana",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-10-22T21:42:24-03:00",
+      "gerado_em": "2026-10-23T01:34:18-03:00",
       "cache_efetivo_minutos": 0,
       "eventos": 157,
       "finalizados": 156,
@@ -223,8 +211,8 @@
       },
       "coleta": {
         "modo": "incremental",
-        "janela_inicio": "2026-10-01T00:00:00-03:00",
-        "janela_fim": "2027-02-19T23:59:59-03:00",
+        "janela_inicio": "2026-10-02T00:00:00-03:00",
+        "janela_fim": "2027-02-20T23:59:59-03:00",
         "requisicoes": 3,
         "ultima_completa_em": "2026-09-12T05:15:07-03:00",
         "ajustes_editoriais_aplicados": 0
