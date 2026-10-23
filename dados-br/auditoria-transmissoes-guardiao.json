@@ -5703,37 +5703,80 @@
       ],
       "overlay_alterado": true,
       "resumo": "Confirmado: Bragantino x Cruzeiro, Brasileirão 2026 (30ª rodada), nesta segunda-feira, 12 de outubro de 2026, às 21h (horário de Brasília). A transmissão integral no Brasil é de SporTV e Premiere. O link da GE TV no YouTube é identificado como “Aquecimento ao vivo”, portanto é pré-jogo e não transmissão completa da partida."
+    },
+    {
+      "event_id": "401841287",
+      "jogo": "Cruzeiro x Remo",
+      "data_iso": "2026-10-23T20:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-10-23T18:34:09-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Premiere",
+        "SporTV",
+        "Prime Video"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/23/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-32a-rodada.ghtml",
+        "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+        "https://ge.globo.com/futebol/times/cruzeiro/noticia/2026/10/23/brasileiro-de-80-times-e-gol-de-heroi-a-ultima-vitoria-do-cruzeiro-sobre-o-remo-no-mineirao.ghtml",
+        "https://ge.globo.com/google/amp/pa/futebol/times/remo/noticia/2026/09/29/pos-data-fifa-remo-tera-maratona-de-seis-jogos-na-serie-a-em-um-mes-veja-datas.ghtml",
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/jogo/23-10-2026/cruzeiro-remo.ghtml",
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/10/23/cruzeiro-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/10/19/carpini-formara-quinto-setor-ofensivo-diferente-no-remo-diante-do-cruzeiro.ghtml",
+        "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/10/21/vivendo-seca-de-vitorias-remo-nao-vence-como-visitante-na-serie-a-ha-sete-meses.ghtml",
+        "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/10/22/com-voltas-de-rangel-e-tchamba-mas-baixas-na-defesa-e-ataque-remo-define-relacionados-contra-o-cruzeiro.ghtml",
+        "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/08/17/internacional-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/10/12/bragantino-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://www.primevideo.com/channel/65837b7c-1c81-4f8a-80f5-d1bba5cde8f1"
+      ],
+      "canais_depois": [
+        "Premiere",
+        "SporTV"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/10/23/cruzeiro-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/23/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-32a-rodada.ghtml"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado: Cruzeiro x Remo, Campeonato Brasileiro (32ª rodada), sexta-feira, 23 de outubro de 2026, às 20h (horário de Brasília), no Mineirão. A transmissão integral oficial no Brasil é de Premiere e SporTV. Prime Video não consta como transmissora independente da partida; a listagem encontrada é do canal Premiere disponível dentro do Prime Video."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841260",
-    "jogo": "Bragantino x Cruzeiro",
-    "data_iso": "2026-10-12T21:00:00-03:00",
+    "event_id": "401841287",
+    "jogo": "Cruzeiro x Remo",
+    "data_iso": "2026-10-23T20:00:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-10-12T19:43:33-03:00",
+    "executado_em": "2026-10-23T18:34:09-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "GE TV",
       "Premiere",
-      "SporTV"
+      "SporTV",
+      "Prime Video"
     ],
     "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/agenda",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/10/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-30a-rodada.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/04/12/cruzeiro-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/20/flamengo-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/10/03/atletico-mg-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/10/07/cruzeiro-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/07/17/fluminense-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/08/29/sao-paulo-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/10/10/sao-paulo-x-vitoria-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/ribeirao-preto-e-regiao/futebol/futebol-feminino/copa-do-brasil-feminina/noticia/2026/10/12/ferroviaria-x-bragantino-na-copa-do-brasil-feminina-onde-assistir-ao-vivo-e-horario.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/09/12/santos-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/jogo/12-10-2026/bragantino-cruzeiro.ghtml",
-      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/10/12/bragantino-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/23/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-32a-rodada.ghtml",
+      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+      "https://ge.globo.com/futebol/times/cruzeiro/noticia/2026/10/23/brasileiro-de-80-times-e-gol-de-heroi-a-ultima-vitoria-do-cruzeiro-sobre-o-remo-no-mineirao.ghtml",
+      "https://ge.globo.com/google/amp/pa/futebol/times/remo/noticia/2026/09/29/pos-data-fifa-remo-tera-maratona-de-seis-jogos-na-serie-a-em-um-mes-veja-datas.ghtml",
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/jogo/23-10-2026/cruzeiro-remo.ghtml",
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/10/23/cruzeiro-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/10/19/carpini-formara-quinto-setor-ofensivo-diferente-no-remo-diante-do-cruzeiro.ghtml",
+      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/10/21/vivendo-seca-de-vitorias-remo-nao-vence-como-visitante-na-serie-a-ha-sete-meses.ghtml",
+      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/10/22/com-voltas-de-rangel-e-tchamba-mas-baixas-na-defesa-e-ataque-remo-define-relacionados-contra-o-cruzeiro.ghtml",
+      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/08/17/internacional-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/10/12/bragantino-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://www.primevideo.com/channel/65837b7c-1c81-4f8a-80f5-d1bba5cde8f1"
     ],
     "canais_depois": [
       "Premiere",
@@ -5742,22 +5785,13 @@
     "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/10/12/bragantino-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/10/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-30a-rodada.ghtml"
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/10/23/cruzeiro-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/23/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-32a-rodada.ghtml"
     ],
-    "youtube": [
-      {
-        "url": "https://www.youtube.com/watch?v=7zFuTKhYbD4",
-        "scope": "pre_game",
-        "valid_for_match": false,
-        "reason": "O título informado no dossiê é “BRAGANTINO X CRUZEIRO | AQUECIMENTO AO VIVO”, com início previsto às 20h, uma hora antes da bola rolar. Trata-se de cobertura de aquecimento/pré-jogo, sem evidência de exibição integral do confronto."
-      }
-    ],
-    "youtube_removidos": [
-      "https://www.youtube.com/watch?v=7zFuTKhYbD4"
-    ],
+    "youtube": [],
+    "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado: Bragantino x Cruzeiro, Brasileirão 2026 (30ª rodada), nesta segunda-feira, 12 de outubro de 2026, às 21h (horário de Brasília). A transmissão integral no Brasil é de SporTV e Premiere. O link da GE TV no YouTube é identificado como “Aquecimento ao vivo”, portanto é pré-jogo e não transmissão completa da partida."
+    "resumo": "Confirmado: Cruzeiro x Remo, Campeonato Brasileiro (32ª rodada), sexta-feira, 23 de outubro de 2026, às 20h (horário de Brasília), no Mineirão. A transmissão integral oficial no Brasil é de Premiere e SporTV. Prime Video não consta como transmissora independente da partida; a listagem encontrada é do canal Premiere disponível dentro do Prime Video."
   },
-  "atualizado_em": "2026-10-12T19:43:33-03:00"
+  "atualizado_em": "2026-10-23T18:34:09-03:00"
 }
