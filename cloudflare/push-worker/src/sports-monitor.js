@@ -341,6 +341,13 @@ export function promoteObservationFromPlays(observation, plays, previousMatch = 
 
 function shouldPollGame(entry, match, now) {
   if (match?.state === 'in') return true;
+  // O gol pode estar confirmado no placar, mas sem autoria. Continue
+  // consultando durante a retenção pós-FINAL, sem reemitir o evento.
+  if (match?.state === 'post' && Object.values(match?.plays || {}).some(
+    (play) => play?.status === 'pending' ||
+      (play?.status === 'confirmed' && play?.scorerConflict !== true &&
+       !play?.ownGoal && !text(play?.athleteName))
+  )) return true;
   if (Object.values(match?.plays || {}).some((play) => play?.status === 'pending')) return true;
   const kickoff = Date.parse(entry?.kickoff || match?.kickoff || '');
   if (!Number.isFinite(kickoff)) return false;
