@@ -17,7 +17,7 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 9,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 44,
+    "candidatos_oficiais_encontrados": 43,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
@@ -69,18 +69,6 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841285",
-      "rodada": 32,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Internacional x Botafogo",
-      "data_iso": "2026-10-24T16:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
       "event_id": "401841280",
       "rodada": 32,
       "competicao_chave": "brasileirao",
@@ -93,6 +81,18 @@
       ],
       "manual": false,
       "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401841283",
+      "rodada": 32,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Palmeiras x Bragantino",
+      "data_iso": "2026-10-24T18:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841281",
@@ -312,12 +312,13 @@
       "video_id": "FDo01YVDsNE",
       "url": "https://www.youtube.com/watch?v=FDo01YVDsNE",
       "titulo": "AO VIVO: VASCO X CORINTHIANS | BRASILEIRÃO 2026 | 32ª RODADA",
-      "status": "upcoming",
-      "confianca": 0.875,
+      "status": "live",
+      "confianca": 0.925,
       "motivos": [
         "os dois clubes aparecem no título",
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
+        "transmissão já está ao vivo",
         "horário compatível (90 min de diferença)"
       ]
     },
@@ -363,16 +364,6 @@
       "titulo": "SBT Ao Vivo",
       "status": "live",
       "inicio_programado": "2026-10-20T17:35:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "iwiaWUguZg8",
-      "url": "https://www.youtube.com/watch?v=iwiaWUguZg8",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: VALENCIA X VILLARREAL | LALIGA 26/27 | 10ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-10-24T13:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -466,6 +457,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "_bEcEj22kXA",
+      "url": "https://www.youtube.com/watch?v=_bEcEj22kXA",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: MACKENZIE X OSASCO | SUPERLIGA FEMININA DE VÔLEI 2026/27 | ge tv",
+      "status": "live",
+      "inicio_programado": "2026-10-24T15:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "hNog7bqOalc",
       "url": "https://www.youtube.com/watch?v=hNog7bqOalc",
       "fonte": "getv",
@@ -526,16 +527,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "KE2TyAeDoZA",
-      "url": "https://www.youtube.com/watch?v=KE2TyAeDoZA",
-      "fonte": "sbt",
-      "canal": "SBT",
-      "titulo": "Raphaela Santos CANTA SEUS SUCESSOS! E Dona Vita pode GANHAR R$ 10 MIL | Eita Lucas (24/10/26)",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-24T16:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "8MKR0qBP6lQ",
       "url": "https://www.youtube.com/watch?v=8MKR0qBP6lQ",
       "fonte": "cazetv",
@@ -556,16 +547,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "JKlJyU1v7MU",
-      "url": "https://www.youtube.com/watch?v=JKlJyU1v7MU",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ATLÉTICO DE MADRID X A CORUÑA | LALIGA 26/27 | 10ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-24T15:25:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "Q1ccB92YYFA",
       "url": "https://www.youtube.com/watch?v=Q1ccB92YYFA",
       "fonte": "cazetv",
@@ -581,7 +562,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: LENS X PARIS FC | LIGUE 1 26/27 | 8ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-10-24T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -626,6 +607,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "iwiaWUguZg8",
+      "url": "https://www.youtube.com/watch?v=iwiaWUguZg8",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ATLÉTICO DE MADRID X A CORUÑA | LALIGA 26/27 | 10ª RODADA",
+      "status": "live",
+      "inicio_programado": "2026-10-24T13:15:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "jZXkDVmpoU0",
       "url": "https://www.youtube.com/watch?v=jZXkDVmpoU0",
       "fonte": "cazetv",
@@ -651,7 +642,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: PALMEIRAS X SANTA FE | LIBERTADORES FEMININA 2026 | QUARTAS DE FINAL",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-10-24T16:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -709,24 +700,24 @@
   "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401841285",
+      "event_id": "401841283",
       "rodada": 32,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Internacional x Botafogo",
-      "data_iso": "2026-10-24T16:30:00-03:00",
+      "jogo": "Palmeiras x Bragantino",
+      "data_iso": "2026-10-24T18:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 88,
+    "unidades": 86,
     "requisicoes": {
       "channels": 4,
-      "videos": 44,
+      "videos": 42,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-10-24T15:27:36-03:00"
+  "atualizado_em": "2026-10-24T17:07:08-03:00"
 }

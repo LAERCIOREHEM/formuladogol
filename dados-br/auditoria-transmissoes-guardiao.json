@@ -5895,58 +5895,137 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: Internacional x Botafogo, Brasileirão Série A 2026, fase única, rodada 32, neste sábado (24/10/2026), às 16h30 (horário de Brasília), no Beira-Rio, em Porto Alegre. A transmissão integral oficial é de Globo e Premiere. A Globo pode ter cobertura regionalizada; GE oferece acompanhamento em tempo real, não transmissão do jogo."
+    },
+    {
+      "event_id": "401841281",
+      "jogo": "Vasco da Gama x Corinthians",
+      "data_iso": "2026-10-24T18:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-10-24T17:08:59-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "CazéTV"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/al/ultimas-noticias/noticia/2025/12/21/vasco-x-corinthians-saiba-como-assistir-ao-jogo-em-alagoas-na-tv-asa-branca.ghtml",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/23/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-32a-rodada.ghtml",
+        "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+        "https://ge.globo.com/futebol/times/corinthians/noticia/2026/10/24/corinthians-tenta-encerrar-jejum-no-brasileirao-e-repetir-reacao-do-primeiro-turno-contra-o-vasco.ghtml",
+        "https://ge.globo.com/futebol/times/vasco/noticia/2026/10/24/escalacao-do-vasco-puma-sera-titular-contra-o-corinthians-e-marino-pode-ganhar-chance.ghtml",
+        "https://ge.globo.com/google/amp/rs/futebol/brasileirao-serie-a/noticia/2026/10/24/vasco-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/rj/futebol/brasileirao-serie-a/jogo/24-10-2026/vasco-corinthians.ghtml",
+        "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/10/17/sao-paulo-x-vasco-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/vasco-da-gama-saf-x-corinthians/832202",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/vasco-goleia-coritiba-por-5-a-0-e-sai-do-z-4-do-brasileirao",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-serie-a/brasileirao-rodada-de-classicos-movimenta-fim-de-semana",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-serie-a/empate-entre-corinthians-e-vitoria-encerra-31-rodada-do-brasileirao"
+      ],
+      "canais_depois": [
+        "CazéTV",
+        "Premiere",
+        "Record"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/vasco-da-gama-saf-x-corinthians/832202",
+        "https://ge.globo.com/google/amp/rs/futebol/brasileirao-serie-a/noticia/2026/10/24/vasco-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=FDo01YVDsNE",
+          "scope": "match",
+          "valid_for_match": true,
+          "reason": "O dossiê identifica uma live oficial da CazéTV intitulada “AO VIVO: VASCO X CORINTHIANS | BRASILEIRÃO 2026 | 32ª RODADA”, iniciada antes da partida e classificada como escopo de partida. A CBF lista “YouTube / Cazé TV” entre as transmissões oficiais, e o ge confirma CazéTV como transmissora integral."
+        }
+      ],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Vasco da Gama x Corinthians, Brasileirão Série A 2026, rodada 32, sábado, 24 de outubro de 2026, às 18h30 (horário de Brasília), em São Januário. Transmissão integral por Premiere, Record e CazéTV. GE em Tempo Real não foi incluído como canal de transmissão."
+    },
+    {
+      "event_id": "401841283",
+      "jogo": "Palmeiras x Bragantino",
+      "data_iso": "2026-10-24T18:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-10-24T17:09:10-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Globo"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/16/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-31a-rodada.ghtml",
+        "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/10/17/andreas-pereira-e-piquerez-desfalcam-palmeiras-contra-o-bragantino-no-brasileiro.ghtml",
+        "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/10/23/escalacao-do-palmeiras-sem-dois-titulares-abel-prepara-mudancas-contra-o-bragantino.ghtml",
+        "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/10/24/palmeiras-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/jogo/24-10-2026/palmeiras-bragantino.ghtml",
+        "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/04/26/bragantino-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/times/bragantino/noticia/2026/10/20/bragantino-tem-um-suspenso-e-atletas-no-dm-para-partida-contra-o-palmeiras.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/palmeiras-galo-sao-paulo-e-fla-querem-manter-sequencia-de-vitorias-no-brasileirao",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/a/cbf-garante-duas-semanas-completas-de-futebol-para-rodadas-33-e-34-do-brasileirao-e-semis-da-copa-do-brasil",
+        "https://www.espn.com.br/futebol/partida/_/jogoId/401841283/red-bull-bragantino-palmeiras"
+      ],
+      "canais_depois": [
+        "Premiere"
+      ],
+      "exclusivo": true,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/10/24/palmeiras-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Palmeiras x Bragantino, Brasileirão Série A 2026, 32ª rodada, hoje (24/10/2026) às 18h30 BRT, na Arena Crefisa Barueri. A grade oficial consultada lista somente o Premiere como transmissão ao vivo. O ge fará acompanhamento em tempo real, que não é transmissão integral; Globo não consta na grade atual desta partida."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841285",
-    "jogo": "Internacional x Botafogo",
-    "data_iso": "2026-10-24T16:30:00-03:00",
+    "event_id": "401841283",
+    "jogo": "Palmeiras x Bragantino",
+    "data_iso": "2026-10-24T18:30:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-10-24T15:30:11-03:00",
+    "executado_em": "2026-10-24T17:09:10-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "GE TV",
-      "Premiere",
-      "SporTV",
-      "Globo",
-      "Prime Video",
-      "Paramount+",
-      "Disney+ / ESPN"
+      "Globo"
     ],
     "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://download.uol.com.br/files/2023/05/1667102178_20230526173425_357.pdf",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/jogo/24-10-2026/internacional-botafogo.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/10/24/internacional-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rs/futebol/times/internacional/noticia/2026/10/19/inter-faz-nova-promocao-abre-beira-rio-para-socios-e-reduz-preco-de-ingresso-para-torcida-em-geral.ghtml",
-      "https://globoplay.globo.com/v/15117224",
-      "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/10/21/internacional-x-botafogo-ao-vivo-onde-assistir-horario-e-informacoes-do-brasileirao.html",
-      "https://placar.uol.com.br/esporte/futebol/brasileirao/2026/10/24/internacional-x-botafogo.htm",
-      "https://sports.sbt.com.br/futebol/brasileirao/jogo/24-10-2026/internacional-x-botafogo",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/internacional-x-botafogo/832207",
-      "https://www.espn.com.br/futebol/time/calendario/_/id/6086/bra.2",
-      "https://www.uol.com.br/esporte/futebol/times/internacional",
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/10/24/jogo-do-botafogo-hoje-pelo-brasileirao-que-horas-comeca-e-onde-assistir.ghtm",
-      "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/24/com-alan-patrick-de-volta-internacional-recebe-botafogo-para-tentar-sair-do-z-4.htm",
-      "https://www.youtube.com/watch?v=4oNPAHaFaMk",
-      "https://www.youtube.com/watch?v=hbu2b_rzf4Y"
+      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/16/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-31a-rodada.ghtml",
+      "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/10/17/andreas-pereira-e-piquerez-desfalcam-palmeiras-contra-o-bragantino-no-brasileiro.ghtml",
+      "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/10/23/escalacao-do-palmeiras-sem-dois-titulares-abel-prepara-mudancas-contra-o-bragantino.ghtml",
+      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/10/24/palmeiras-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/jogo/24-10-2026/palmeiras-bragantino.ghtml",
+      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/04/26/bragantino-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/times/bragantino/noticia/2026/10/20/bragantino-tem-um-suspenso-e-atletas-no-dm-para-partida-contra-o-palmeiras.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/palmeiras-galo-sao-paulo-e-fla-querem-manter-sequencia-de-vitorias-no-brasileirao",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/a/cbf-garante-duas-semanas-completas-de-futebol-para-rodadas-33-e-34-do-brasileirao-e-semis-da-copa-do-brasil",
+      "https://www.espn.com.br/futebol/partida/_/jogoId/401841283/red-bull-bragantino-palmeiras"
     ],
     "canais_depois": [
-      "Globo",
       "Premiere"
     ],
-    "exclusivo": false,
+    "exclusivo": true,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/internacional-x-botafogo/832207",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/10/24/internacional-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/10/24/palmeiras-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
     ],
     "youtube": [],
     "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: Internacional x Botafogo, Brasileirão Série A 2026, fase única, rodada 32, neste sábado (24/10/2026), às 16h30 (horário de Brasília), no Beira-Rio, em Porto Alegre. A transmissão integral oficial é de Globo e Premiere. A Globo pode ter cobertura regionalizada; GE oferece acompanhamento em tempo real, não transmissão do jogo."
+    "resumo": "Confirmado para o Brasil: Palmeiras x Bragantino, Brasileirão Série A 2026, 32ª rodada, hoje (24/10/2026) às 18h30 BRT, na Arena Crefisa Barueri. A grade oficial consultada lista somente o Premiere como transmissão ao vivo. O ge fará acompanhamento em tempo real, que não é transmissão integral; Globo não consta na grade atual desta partida."
   },
-  "atualizado_em": "2026-10-24T15:30:11-03:00"
+  "atualizado_em": "2026-10-24T17:09:10-03:00"
 }
