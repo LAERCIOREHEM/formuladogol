@@ -83,7 +83,7 @@ const play = (key,name='',id='',structured=false,score=[1,0],ownGoal=false)=>({
   match.lastScorerRecoveryAt=1_060_000;
   assert.equal(shouldRetryMissingScorers(match,current,1,1_075_000),false,'limitar reconsultas');
   assert.equal(shouldRetryMissingScorers(match,current,1,1_090_000),true,'tentar novamente em 30s');
-  assert.equal(shouldRetryMissingScorers(match,obs(1,0,'post'),1,1_090_000),false,'não gastar buscas de jogo encerrado');
+  assert.equal(shouldRetryMissingScorers(match,obs(1,0,'post'),1,1_090_000),true,'continuar recuperação de autoria após FINAL dentro da janela de retenção');
   const withName=play('goal-13','Lucas Barbosa','lucas-123',true);
   const enriched=applyObservation(match,current,[withName],1_091_000);
   assert.equal(enriched.match.plays['goal-13'].athleteName,'Lucas Barbosa');
