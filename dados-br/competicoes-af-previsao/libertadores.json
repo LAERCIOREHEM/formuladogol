@@ -9,30 +9,29 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-10-23T02:18:07-03:00",
+  "gerado_em": "2026-10-23T22:06:31-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
-    "status": "encerrada",
-    "ordem": 800,
-    "nome": "Semifinal",
-    "eventos": 4,
-    "eventos_pendentes": 0
+    "status": "em_andamento",
+    "ordem": 900,
+    "nome": "Final",
+    "eventos": 1,
+    "eventos_pendentes": 1
   },
   "resumo": {
     "eventos": 155,
     "finalizados": 154,
     "pendentes": 1,
-    "equipes": 49,
+    "equipes": 47,
     "equipes_serie_a_2026": 8
   },
   "coleta": {
-    "modo": "incremental",
-    "janela_inicio": "2026-10-02T00:00:00-03:00",
-    "janela_fim": "2027-02-20T23:59:59-03:00",
-    "requisicoes": 3,
-    "ultima_completa_em": "2026-09-13T05:13:02-03:00",
-    "ajustes_editoriais_aplicados": 0
+    "modo": "completa",
+    "requisicoes": 12,
+    "ultima_completa_em": "2026-10-23T22:06:31-03:00",
+    "fases_preservadas_por_event_id": 29,
+    "ajustes_editoriais_aplicados": 7
   },
   "equipes": [
     {
@@ -213,7 +212,7 @@
       "sigla": "EST",
       "pais": null,
       "serie_a_2026": false,
-      "jogos": 12
+      "jogos": 13
     },
     {
       "espn_id": "819",
@@ -375,7 +374,7 @@
       "sigla": "PAL",
       "pais": null,
       "serie_a_2026": true,
-      "jogos": 12
+      "jogos": 13
     },
     {
       "espn_id": "2683",
@@ -412,24 +411,6 @@
       "pais": null,
       "serie_a_2026": false,
       "jogos": 10
-    },
-    {
-      "espn_id": "131554",
-      "nome": "TBD Away",
-      "nome_espn": "TBD Away",
-      "sigla": "TBD Away",
-      "pais": null,
-      "serie_a_2026": false,
-      "jogos": 1
-    },
-    {
-      "espn_id": "131556",
-      "nome": "TBD Home",
-      "nome_espn": "TBD Home",
-      "sigla": "TBD Home",
-      "pais": null,
-      "serie_a_2026": false,
-      "jogos": 1
     },
     {
       "espn_id": "2687",
@@ -512,7 +493,8 @@
         "placar": 1
       },
       "vencedor": "The Strongest",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842612",
@@ -548,7 +530,8 @@
         "placar": 0
       },
       "vencedor": "2 de Mayo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842611",
@@ -584,7 +567,8 @@
         "placar": 1
       },
       "vencedor": "Universidad Católica (Quito)",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842614",
@@ -620,7 +604,11 @@
         "placar": 0
       },
       "vencedor": "Deportivo Táchira",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 5,
+        "visitante": 3
+      },
+      "vencedor_penaltis": "Deportivo Táchira"
     },
     {
       "event_id": "401842635",
@@ -656,7 +644,8 @@
         "placar": 1
       },
       "vencedor": "2 de Mayo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842613",
@@ -692,7 +681,11 @@
         "placar": 4
       },
       "vencedor": "Juventud",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 3,
+        "visitante": 4
+      },
+      "vencedor_penaltis": "Juventud"
     },
     {
       "event_id": "401842643",
@@ -728,7 +721,8 @@
         "placar": 0
       },
       "vencedor": "Carabobo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842639",
@@ -764,7 +758,8 @@
         "placar": 2
       },
       "vencedor": "Independiente Medellín",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842640",
@@ -800,7 +795,8 @@
         "placar": 2
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842638",
@@ -836,7 +832,8 @@
         "placar": 0
       },
       "vencedor": "O'Higgins",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842636",
@@ -872,7 +869,8 @@
         "placar": 1
       },
       "vencedor": "Argentinos Juniors",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842637",
@@ -908,7 +906,8 @@
         "placar": 0
       },
       "vencedor": "Nacional Potosí",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842641",
@@ -944,7 +943,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842642",
@@ -980,7 +980,8 @@
         "placar": 1
       },
       "vencedor": "Deportes Tolima",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842649",
@@ -1016,7 +1017,8 @@
         "placar": 2
       },
       "vencedor": "Carabobo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842650",
@@ -1052,7 +1054,8 @@
         "placar": 0
       },
       "vencedor": "Independiente Medellín",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842651",
@@ -1088,7 +1091,11 @@
         "placar": 0
       },
       "vencedor": "Sporting Cristal",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 5,
+        "visitante": 4
+      },
+      "vencedor_penaltis": "Sporting Cristal"
     },
     {
       "event_id": "401842645",
@@ -1124,7 +1131,11 @@
         "placar": 1
       },
       "vencedor": "O'Higgins",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 3,
+        "visitante": 4
+      },
+      "vencedor_penaltis": "O'Higgins"
     },
     {
       "event_id": "401842644",
@@ -1160,7 +1171,11 @@
         "placar": 1
       },
       "vencedor": "Barcelona SC",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 4,
+        "visitante": 5
+      },
+      "vencedor_penaltis": "Barcelona SC"
     },
     {
       "event_id": "401842646",
@@ -1196,7 +1211,8 @@
         "placar": 0
       },
       "vencedor": "Botafogo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842647",
@@ -1232,7 +1248,8 @@
         "placar": 2
       },
       "vencedor": "Juventud",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842648",
@@ -1268,7 +1285,8 @@
         "placar": 1
       },
       "vencedor": "Deportes Tolima",
-      "penaltis": true
+      "penaltis": true,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401862714",
@@ -1304,7 +1322,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401862629",
@@ -1340,7 +1359,8 @@
         "placar": 1
       },
       "vencedor": "Sporting Cristal",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401862669",
@@ -1376,7 +1396,8 @@
         "placar": 0
       },
       "vencedor": "O'Higgins",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401862877",
@@ -1412,7 +1433,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401862715",
@@ -1448,7 +1470,8 @@
         "placar": 1
       },
       "vencedor": "Barcelona SC",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401862630",
@@ -1484,7 +1507,11 @@
         "placar": 2
       },
       "vencedor": "Sporting Cristal",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 3,
+        "visitante": 2
+      },
+      "vencedor_penaltis": "Sporting Cristal"
     },
     {
       "event_id": "401862670",
@@ -1520,7 +1547,8 @@
         "placar": 0
       },
       "vencedor": "Deportes Tolima",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401862878",
@@ -1556,7 +1584,8 @@
         "placar": 1
       },
       "vencedor": "Independiente Medellín",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865478",
@@ -1592,7 +1621,8 @@
         "placar": 0
       },
       "vencedor": "Independiente Rivadavia",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865480",
@@ -1628,7 +1658,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865369",
@@ -1664,7 +1695,8 @@
         "placar": 1
       },
       "vencedor": "Liga de Quito",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865484",
@@ -1700,7 +1732,8 @@
         "placar": 1
       },
       "vencedor": "Cruzeiro",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865370",
@@ -1736,7 +1769,8 @@
         "placar": 2
       },
       "vencedor": "Boca Juniors",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865481",
@@ -1772,7 +1806,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865475",
@@ -1808,7 +1843,8 @@
         "placar": 0
       },
       "vencedor": "Mirassol",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865483",
@@ -1844,7 +1880,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865479",
@@ -1880,7 +1917,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865476",
@@ -1916,7 +1954,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865482",
@@ -1952,7 +1991,8 @@
         "placar": 2
       },
       "vencedor": "Flamengo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865472",
@@ -1988,7 +2028,8 @@
         "placar": 0
       },
       "vencedor": "Sporting Cristal",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865471",
@@ -2024,7 +2065,8 @@
         "placar": 1
       },
       "vencedor": "UCV FC",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865473",
@@ -2060,7 +2102,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865474",
@@ -2096,7 +2139,8 @@
         "placar": 2
       },
       "vencedor": "Corinthians",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865477",
@@ -2132,7 +2176,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865487",
@@ -2168,7 +2213,8 @@
         "placar": 1
       },
       "vencedor": "Nacional",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865494",
@@ -2204,7 +2250,8 @@
         "placar": 1
       },
       "vencedor": "Estudiantes de La Plata",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865497",
@@ -2240,7 +2287,8 @@
         "placar": 0
       },
       "vencedor": "Cerro Porteño",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865498",
@@ -2276,7 +2324,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865499",
@@ -2312,7 +2361,8 @@
         "placar": 0
       },
       "vencedor": "Boca Juniors",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865486",
@@ -2348,7 +2398,8 @@
         "placar": 2
       },
       "vencedor": "Coquimbo Unido",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865490",
@@ -2384,7 +2435,8 @@
         "placar": 0
       },
       "vencedor": "Liga de Quito",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865488",
@@ -2420,7 +2472,8 @@
         "placar": 1
       },
       "vencedor": "Rosário Central",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865495",
@@ -2456,7 +2509,8 @@
         "placar": 2
       },
       "vencedor": "Universidad Católica",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865492",
@@ -2492,7 +2546,8 @@
         "placar": 2
       },
       "vencedor": "Independiente Rivadavia",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865496",
@@ -2528,7 +2583,8 @@
         "placar": 0
       },
       "vencedor": "Corinthians",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865491",
@@ -2564,7 +2620,8 @@
         "placar": 1
       },
       "vencedor": "Independiente del Valle",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865489",
@@ -2600,7 +2657,8 @@
         "placar": 0
       },
       "vencedor": "Lanús",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865500",
@@ -2636,7 +2694,8 @@
         "placar": 1
       },
       "vencedor": "Palmeiras",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865485",
@@ -2672,7 +2731,8 @@
         "placar": 2
       },
       "vencedor": "Platense",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865493",
@@ -2708,7 +2768,8 @@
         "placar": 1
       },
       "vencedor": "Flamengo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865510",
@@ -2744,7 +2805,8 @@
         "placar": 0
       },
       "vencedor": "Lanús",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865511",
@@ -2780,7 +2842,8 @@
         "placar": 3
       },
       "vencedor": "Independiente del Valle",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865515",
@@ -2816,7 +2879,8 @@
         "placar": 3
       },
       "vencedor": "Rosário Central",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865505",
@@ -2852,7 +2916,8 @@
         "placar": 0
       },
       "vencedor": "Cruzeiro",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865506",
@@ -2888,7 +2953,8 @@
         "placar": 0
       },
       "vencedor": "Deportes Tolima",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865514",
@@ -2924,7 +2990,8 @@
         "placar": 0
       },
       "vencedor": "Sporting Cristal",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865512",
@@ -2960,7 +3027,8 @@
         "placar": 0
       },
       "vencedor": "Mirassol",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865513",
@@ -2996,7 +3064,8 @@
         "placar": 1
       },
       "vencedor": "Platense",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865501",
@@ -3032,7 +3101,8 @@
         "placar": 2
       },
       "vencedor": "Universidad Católica",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865503",
@@ -3068,7 +3138,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865507",
@@ -3104,7 +3175,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865516",
@@ -3140,7 +3212,8 @@
         "placar": 2
       },
       "vencedor": "Universitario",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865502",
@@ -3176,7 +3249,8 @@
         "placar": 0
       },
       "vencedor": "Bolívar",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865509",
@@ -3212,7 +3286,8 @@
         "placar": 1
       },
       "vencedor": "Independiente Rivadavia",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865504",
@@ -3248,7 +3323,8 @@
         "placar": 0
       },
       "vencedor": "Corinthians",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865508",
@@ -3284,7 +3360,8 @@
         "placar": 0
       },
       "vencedor": "Independiente Medellín",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865529",
@@ -3320,7 +3397,8 @@
         "placar": 0
       },
       "vencedor": "Rosário Central",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865530",
@@ -3356,7 +3434,8 @@
         "placar": 2
       },
       "vencedor": "Palmeiras",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865522",
@@ -3392,7 +3471,8 @@
         "placar": 0
       },
       "vencedor": "Barcelona SC",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865531",
@@ -3428,7 +3508,8 @@
         "placar": 0
       },
       "vencedor": "UCV FC",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865523",
@@ -3464,7 +3545,8 @@
         "placar": 0
       },
       "vencedor": "Always Ready",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865520",
@@ -3500,7 +3582,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865532",
@@ -3536,7 +3619,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865524",
@@ -3572,7 +3656,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865525",
@@ -3608,7 +3693,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865518",
@@ -3644,7 +3730,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865519",
@@ -3680,7 +3767,8 @@
         "placar": 0
       },
       "vencedor": "Deportes Tolima",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865527",
@@ -3716,7 +3804,8 @@
         "placar": 0
       },
       "vencedor": "Mirassol",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865528",
@@ -3752,7 +3841,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865521",
@@ -3788,7 +3878,8 @@
         "placar": 1
       },
       "vencedor": "Coquimbo Unido",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865517",
@@ -3824,7 +3915,8 @@
         "placar": 3
       },
       "vencedor": "Flamengo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865526",
@@ -3860,7 +3952,8 @@
         "placar": 1
       },
       "vencedor": "Cerro Porteño",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865533",
@@ -3896,7 +3989,8 @@
         "placar": 1
       },
       "vencedor": "Fluminense",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865537",
@@ -3932,7 +4026,8 @@
         "placar": 0
       },
       "vencedor": "Coquimbo Unido",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865542",
@@ -3968,7 +4063,8 @@
         "placar": 0
       },
       "vencedor": "Rosário Central",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865539",
@@ -4004,7 +4100,8 @@
         "placar": 2
       },
       "vencedor": "Mirassol",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865540",
@@ -4040,7 +4137,8 @@
         "placar": 1
       },
       "vencedor": "Independiente Santa Fe",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865538",
@@ -4076,7 +4174,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865548",
@@ -4112,7 +4211,8 @@
         "placar": 1
       },
       "vencedor": "Independiente del Valle",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865545",
@@ -4148,7 +4248,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865534",
@@ -4184,7 +4285,8 @@
         "placar": 0
       },
       "vencedor": "Flamengo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865544",
@@ -4220,7 +4322,8 @@
         "placar": 1
       },
       "vencedor": "Cerro Porteño",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865546",
@@ -4256,7 +4359,8 @@
         "placar": 0
       },
       "vencedor": "Liga de Quito",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865536",
@@ -4292,7 +4396,8 @@
         "placar": 3
       },
       "vencedor": "Independiente Medellín",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865547",
@@ -4328,7 +4433,8 @@
         "placar": 2
       },
       "vencedor": "Atlético Junior",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865535",
@@ -4364,7 +4470,8 @@
         "placar": 4
       },
       "vencedor": "Independiente Rivadavia",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865541",
@@ -4400,7 +4507,8 @@
         "placar": 0
       },
       "vencedor": "Universidad Católica",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865543",
@@ -4436,7 +4544,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865560",
@@ -4472,7 +4581,8 @@
         "placar": 0
       },
       "vencedor": "Lanús",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865561",
@@ -4508,7 +4618,8 @@
         "placar": 2
       },
       "vencedor": "Liga de Quito",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865550",
@@ -4544,7 +4655,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865554",
@@ -4580,7 +4692,8 @@
         "placar": 0
       },
       "vencedor": "Estudiantes de La Plata",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865555",
@@ -4616,7 +4729,8 @@
         "placar": 0
       },
       "vencedor": "Flamengo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865558",
@@ -4652,7 +4766,8 @@
         "placar": 0
       },
       "vencedor": "Nacional",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865559",
@@ -4688,7 +4803,8 @@
         "placar": 1
       },
       "vencedor": "UCV FC",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865562",
@@ -4724,7 +4840,8 @@
         "placar": 0
       },
       "vencedor": "Independiente del Valle",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865552",
@@ -4760,7 +4877,8 @@
         "placar": 2
       },
       "vencedor": "Platense",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865556",
@@ -4796,7 +4914,8 @@
         "placar": 1
       },
       "vencedor": "Independiente Santa Fe",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865563",
@@ -4832,7 +4951,8 @@
         "placar": 1
       },
       "vencedor": "Fluminense",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865564",
@@ -4868,7 +4988,8 @@
         "placar": 3
       },
       "vencedor": "Independiente Rivadavia",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865551",
@@ -4904,7 +5025,8 @@
         "placar": 0
       },
       "vencedor": "Cerro Porteño",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865557",
@@ -4940,7 +5062,8 @@
         "placar": 1
       },
       "vencedor": "Palmeiras",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865549",
@@ -4976,7 +5099,8 @@
         "placar": 1
       },
       "vencedor": "Universidad Católica",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865553",
@@ -5012,7 +5136,8 @@
         "placar": 0
       },
       "vencedor": "Cruzeiro",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874070",
@@ -5048,7 +5173,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874145",
@@ -5084,7 +5210,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874074",
@@ -5120,7 +5247,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874076",
@@ -5156,7 +5284,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874153",
@@ -5192,7 +5321,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874073",
@@ -5228,7 +5358,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874075",
@@ -5264,7 +5395,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874156",
@@ -5300,7 +5432,11 @@
         "placar": 1
       },
       "vencedor": "Fluminense",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 4,
+        "visitante": 5
+      },
+      "vencedor_penaltis": "Fluminense"
     },
     {
       "event_id": "401874152",
@@ -5336,7 +5472,8 @@
         "placar": 1
       },
       "vencedor": "Independiente del Valle",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874163",
@@ -5372,7 +5509,8 @@
         "placar": 3
       },
       "vencedor": "Estudiantes de La Plata",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874143",
@@ -5408,7 +5546,11 @@
         "placar": 0
       },
       "vencedor": "Platense",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 6,
+        "visitante": 7
+      },
+      "vencedor_penaltis": "Platense"
     },
     {
       "event_id": "401874155",
@@ -5444,7 +5586,8 @@
         "placar": 1
       },
       "vencedor": "Palmeiras",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874141",
@@ -5480,7 +5623,8 @@
         "placar": 1
       },
       "vencedor": "Flamengo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874142",
@@ -5516,7 +5660,11 @@
         "placar": 0
       },
       "vencedor": "Liga de Quito",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 5,
+        "visitante": 4
+      },
+      "vencedor_penaltis": "Liga de Quito"
     },
     {
       "event_id": "401874149",
@@ -5552,7 +5700,8 @@
         "placar": 0
       },
       "vencedor": "Corinthians",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874147",
@@ -5588,7 +5737,8 @@
         "placar": 1
       },
       "vencedor": "Independiente del Valle",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401912518",
@@ -5625,15 +5775,10 @@
       },
       "vencedor": "Fluminense",
       "penaltis": false,
+      "vencedor_penaltis": null,
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
-      },
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -5671,15 +5816,10 @@
       },
       "vencedor": "Palmeiras",
       "penaltis": false,
+      "vencedor_penaltis": null,
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
-      },
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -5717,15 +5857,10 @@
       },
       "vencedor": null,
       "penaltis": false,
+      "vencedor_penaltis": null,
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
-      },
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -5763,15 +5898,10 @@
       },
       "vencedor": "Flamengo",
       "penaltis": false,
+      "vencedor_penaltis": null,
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
-      },
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -5809,15 +5939,10 @@
       },
       "vencedor": "Platense",
       "penaltis": false,
+      "vencedor_penaltis": null,
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
-      },
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -5825,7 +5950,7 @@
       "data_iso": "2026-09-16T19:00:00-03:00",
       "estado": "post",
       "concluido": true,
-      "status": "Finalizado",
+      "status": "PF - Pen",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5839,7 +5964,7 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": true,
-        "vencedor": true,
+        "vencedor": false,
         "placar": 3
       },
       "visitante": {
@@ -5850,24 +5975,18 @@
         "pais": null,
         "serie_a_2026": true,
         "mandante": false,
-        "vencedor": false,
+        "vencedor": true,
         "placar": 2
       },
-      "vencedor": "Liga de Quito",
+      "vencedor": "Palmeiras",
       "penaltis": {
         "mandante": 3,
         "visitante": 4
       },
+      "vencedor_penaltis": "Palmeiras",
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
-      },
-      "vencedor_penaltis": "Palmeiras",
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -5905,15 +6024,10 @@
       },
       "vencedor": "Estudiantes de La Plata",
       "penaltis": false,
+      "vencedor_penaltis": null,
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
-      },
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -5935,7 +6049,7 @@
         "pais": null,
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": false,
+        "vencedor": true,
         "placar": 1
       },
       "visitante": {
@@ -5949,17 +6063,12 @@
         "vencedor": false,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Flamengo",
       "penaltis": false,
+      "vencedor_penaltis": null,
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
         "url": "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml"
-      },
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/libertadores/pt-br/news/quatro-pelo-trono-estao-definidas-semifinais-da-conmebol-libertadores",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
       }
     },
     {
@@ -6128,21 +6237,21 @@
       "perna": null,
       "estadio": "Estadio Centenario",
       "mandante": {
-        "espn_id": "131556",
-        "nome": "TBD Home",
-        "nome_espn": "TBD Home",
-        "sigla": "TBD Home",
+        "espn_id": "2029",
+        "nome": "Palmeiras",
+        "nome_espn": "Palmeiras",
+        "sigla": "PAL",
         "pais": null,
-        "serie_a_2026": false,
+        "serie_a_2026": true,
         "mandante": true,
         "vencedor": false,
         "placar": 0
       },
       "visitante": {
-        "espn_id": "131554",
-        "nome": "TBD Away",
-        "nome_espn": "TBD Away",
-        "sigla": "TBD Away",
+        "espn_id": "8",
+        "nome": "Estudiantes de La Plata",
+        "nome_espn": "Estudiantes de La Plata",
+        "sigla": "EST",
         "pais": null,
         "serie_a_2026": false,
         "mandante": false,
@@ -6156,9 +6265,9 @@
   ],
   "validacao_af": {
     "status": "pronto",
-    "fase": "Semifinal",
-    "fase_ordem": 800,
-    "chaves": 2,
+    "fase": "Final",
+    "fase_ordem": 900,
+    "chaves": 1,
     "equipes_ativas": 2
   }
 }

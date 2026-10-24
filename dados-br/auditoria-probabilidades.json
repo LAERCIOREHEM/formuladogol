@@ -5,9 +5,9 @@
   "etapa": "Execução 5 — histórico encadeado e avaliação científica preparada",
   "gerado_em": "2026-10-23T22:01:52-03:00",
   "referencia_esportiva_em": "2026-10-23T22:01:52-03:00",
-  "calculado_em": "2026-10-23T22:03:59-03:00",
+  "calculado_em": "2026-10-23T22:07:45-03:00",
   "status": "ok",
-  "hash_entrada": "09d7f98de597db6f92a622632f10fca3865154cffc7ce6f66929abee90ceef69",
+  "hash_entrada": "2f2d12478992a113dfd36a458f3ba2e31e3e8fc85eed5f64027f15e7abd03c9e",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -360,12 +360,12 @@
     "motivo": "A Execução 1 mostrou melhora de calibração, mas piora nas três regras próprias de pontuação. A versão 1.0 mantém rho=0 e publica esta sensibilidade para reavaliação versionada.",
     "diferenca_media_absoluta_1x2_pontos_percentuais": 1.244593,
     "diferenca_maxima_1x2_pontos_percentuais": 2.13707,
-    "alteracao_media_massa_placares_baixos_pontos_percentuais": -0.0
+    "alteracao_media_massa_placares_baixos_pontos_percentuais": 0.0
   },
   "diagnostico_af_score": {
     "disponivel": true,
     "cobertura_clubes": 20,
-    "correlacao_pearson_com_forca_map": 0.894322,
+    "correlacao_pearson_com_forca_map": 0.893633,
     "aplicado_na_producao": false,
     "motivo": "O AF-Score não possui série histórica homogênea em 2023–2025. Incluí-lo agora impediria backtesting temporal equivalente e poderia introduzir vazamento."
   },
@@ -410,28 +410,27 @@
       },
       "libertadores": {
         "status": "simulado",
-        "fase_atual": "Semifinal",
-        "fase_ordem": 800,
-        "chaves_atuais": 2,
+        "fase_atual": "Final",
+        "fase_ordem": 900,
+        "chaves_atuais": 1,
         "equipes_ativas": 2,
         "clubes_ativos": [
           "Estudiantes de La Plata",
           "Palmeiras"
         ],
         "rodadas_simuladas_tamanhos": [
-          2,
           1
         ],
-        "pareamento_futuro": "chave",
+        "pareamento_futuro": "não aplicável",
         "partidas_concluidas_no_ajuste": 154,
         "principais_chances_titulo": [
           {
-            "clube": "Estudiantes de La Plata",
-            "probabilidade_pct": 52.6625
+            "clube": "Palmeiras",
+            "probabilidade_pct": 55.0537
           },
           {
-            "clube": "Palmeiras",
-            "probabilidade_pct": 47.3375
+            "clube": "Estudiantes de La Plata",
+            "probabilidade_pct": 44.9463
           }
         ]
       },
@@ -465,14 +464,14 @@
     "alocacao_vagas": {
       "vagas_brasileirao_base": 5,
       "vagas_sul_americana": 6,
-      "media_clubes_serie_a_2026_na_libertadores": 7.847328,
+      "media_clubes_serie_a_2026_na_libertadores": 7.92449,
       "minimo_clubes_serie_a_2026_na_libertadores": 7,
       "maximo_clubes_serie_a_2026_na_libertadores": 9,
-      "media_total_clubes_brasileiros_na_libertadores": 7.847328,
+      "media_total_clubes_brasileiros_na_libertadores": 7.92449,
       "minimo_total_clubes_brasileiros_na_libertadores": 7,
       "maximo_total_clubes_brasileiros_na_libertadores": 9,
       "media_vagas_consumidas_por_clubes_brasileiros_fora_da_serie_a_2026": 0.0,
-      "soma_probabilidades_libertadores_pct": 784.7328,
+      "soma_probabilidades_libertadores_pct": 792.449,
       "soma_probabilidades_sul_americana_pct": 600.0,
       "regra_decomposicao": "vias exclusivas: G5 do Brasileirão primeiro; títulos/copa apenas quando necessários; sobreposições descem como repasse",
       "regra_elegibilidade": "títulos da Copa do Brasil, Libertadores e Sul-Americana classificam mesmo que o clube seja rebaixado; a posição na liga limita apenas as vagas obtidas pelo Brasileirão"
@@ -490,7 +489,7 @@
         {
           "chave": "copa_do_brasil",
           "nome": "Copa do Brasil",
-          "gerado_em": "2026-10-23T02:18:01-03:00",
+          "gerado_em": "2026-10-23T22:06:30-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 800,
@@ -500,27 +499,27 @@
           },
           "eventos_finalizados": 150,
           "eventos_pendentes": 5,
-          "modo_coleta": "incremental"
+          "modo_coleta": "completa"
         },
         {
           "chave": "libertadores",
           "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-10-23T02:18:07-03:00",
+          "gerado_em": "2026-10-23T22:06:31-03:00",
           "fase_atual": {
-            "status": "encerrada",
-            "ordem": 800,
-            "nome": "Semifinal",
-            "eventos": 4,
-            "eventos_pendentes": 0
+            "status": "em_andamento",
+            "ordem": 900,
+            "nome": "Final",
+            "eventos": 1,
+            "eventos_pendentes": 1
           },
           "eventos_finalizados": 154,
           "eventos_pendentes": 1,
-          "modo_coleta": "incremental"
+          "modo_coleta": "completa"
         },
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-10-23T02:18:09-03:00",
+          "gerado_em": "2026-10-23T22:06:33-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -530,12 +529,12 @@
           },
           "eventos_finalizados": 156,
           "eventos_pendentes": 1,
-          "modo_coleta": "incremental"
+          "modo_coleta": "completa"
         }
       ],
-      "referencia_mais_antiga_em": "2026-10-23T02:18:01-03:00",
-      "referencia_mais_recente_em": "2026-10-23T02:18:09-03:00",
-      "snapshots_atualizados_em": "2026-10-23T02:18:09-03:00"
+      "referencia_mais_antiga_em": "2026-10-23T22:06:30-03:00",
+      "referencia_mais_recente_em": "2026-10-23T22:06:33-03:00",
+      "snapshots_atualizados_em": "2026-10-23T22:06:33-03:00"
     }
   },
   "validacoes": {
@@ -543,7 +542,7 @@
     "soma_campeao_pct": 100.0,
     "soma_g4_pct": 400.0,
     "soma_g6_pct": 600.0,
-    "soma_libertadores_consolidada_pct": 784.7328,
+    "soma_libertadores_consolidada_pct": 792.449,
     "soma_sul_americana_base_pct": 600.0,
     "soma_sul_americana_consolidada_pct": 600.0,
     "soma_rebaixamento_pct": 400.0,

@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-10-23T02:18:09-03:00",
+  "gerado_em": "2026-10-23T22:06:33-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -27,11 +27,10 @@
     "equipes_serie_a_2026": 7
   },
   "coleta": {
-    "modo": "incremental",
-    "janela_inicio": "2026-10-02T00:00:00-03:00",
-    "janela_fim": "2027-02-20T23:59:59-03:00",
-    "requisicoes": 3,
-    "ultima_completa_em": "2026-09-12T05:15:07-03:00",
+    "modo": "completa",
+    "requisicoes": 12,
+    "ultima_completa_em": "2026-10-23T22:06:33-03:00",
+    "fases_preservadas_por_event_id": 29,
     "ajustes_editoriais_aplicados": 0
   },
   "equipes": [
@@ -575,7 +574,8 @@
         "placar": 0
       },
       "vencedor": "Montevideo City Torque",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401843575",
@@ -611,7 +611,11 @@
         "placar": 0
       },
       "vencedor": "Independiente Petrolero",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 3,
+        "visitante": 2
+      },
+      "vencedor_penaltis": "Independiente Petrolero"
     },
     {
       "event_id": "401842452",
@@ -647,7 +651,11 @@
         "placar": 0
       },
       "vencedor": "Academia Puerto Cabello",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 5,
+        "visitante": 3
+      },
+      "vencedor_penaltis": "Academia Puerto Cabello"
     },
     {
       "event_id": "401842619",
@@ -683,7 +691,11 @@
         "placar": 1
       },
       "vencedor": "Audax Italiano",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 2,
+        "visitante": 3
+      },
+      "vencedor_penaltis": "Audax Italiano"
     },
     {
       "event_id": "401842453",
@@ -719,7 +731,8 @@
         "placar": 0
       },
       "vencedor": "Alianza Atlético",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842623",
@@ -755,7 +768,11 @@
         "placar": 0
       },
       "vencedor": "Caracas FC",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 4,
+        "visitante": 3
+      },
+      "vencedor_penaltis": "Caracas FC"
     },
     {
       "event_id": "401843600",
@@ -791,7 +808,8 @@
         "placar": 0
       },
       "vencedor": "Blooming",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842615",
@@ -827,7 +845,8 @@
         "placar": 3
       },
       "vencedor": "Millonarios",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842617",
@@ -863,7 +882,8 @@
         "placar": 2
       },
       "vencedor": "Palestino",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842622",
@@ -899,7 +919,8 @@
         "placar": 1
       },
       "vencedor": "Club Olimpia",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401843516",
@@ -935,7 +956,8 @@
         "placar": 0
       },
       "vencedor": "Deportivo Cuenca",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842616",
@@ -971,7 +993,8 @@
         "placar": 0
       },
       "vencedor": "Boston River",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842621",
@@ -1007,7 +1030,11 @@
         "placar": 1
       },
       "vencedor": "Deportivo Recoleta",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 4,
+        "visitante": 5
+      },
+      "vencedor_penaltis": "Deportivo Recoleta"
     },
     {
       "event_id": "401842454",
@@ -1043,7 +1070,8 @@
         "placar": 1
       },
       "vencedor": "América de Cali",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401842618",
@@ -1079,7 +1107,11 @@
         "placar": 1
       },
       "vencedor": "Cienciano del Cusco",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 5,
+        "visitante": 4
+      },
+      "vencedor_penaltis": "Cienciano del Cusco"
     },
     {
       "event_id": "401843517",
@@ -1115,7 +1147,8 @@
         "placar": 1
       },
       "vencedor": "Macará",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865374",
@@ -1151,7 +1184,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865384",
@@ -1187,7 +1221,8 @@
         "placar": 3
       },
       "vencedor": "Racing Club",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865380",
@@ -1223,7 +1258,8 @@
         "placar": 0
       },
       "vencedor": "O'Higgins",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865372",
@@ -1259,7 +1295,8 @@
         "placar": 1
       },
       "vencedor": "São Paulo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865376",
@@ -1295,7 +1332,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865379",
@@ -1331,7 +1369,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865385",
@@ -1367,7 +1406,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865386",
@@ -1403,7 +1443,8 @@
         "placar": 0
       },
       "vencedor": "Deportivo Cuenca",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865375",
@@ -1439,7 +1480,8 @@
         "placar": 2
       },
       "vencedor": "Club Olimpia",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865373",
@@ -1475,7 +1517,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865381",
@@ -1511,7 +1554,8 @@
         "placar": 0
       },
       "vencedor": "Montevideo City Torque",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865377",
@@ -1547,7 +1591,8 @@
         "placar": 1
       },
       "vencedor": "Academia Puerto Cabello",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865371",
@@ -1583,7 +1628,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865383",
@@ -1619,7 +1665,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865378",
@@ -1655,7 +1702,8 @@
         "placar": 0
       },
       "vencedor": "Carabobo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865382",
@@ -1691,7 +1739,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865391",
@@ -1727,7 +1776,8 @@
         "placar": 0
       },
       "vencedor": "Grêmio",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865395",
@@ -1763,7 +1813,8 @@
         "placar": 0
       },
       "vencedor": "São Paulo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865388",
@@ -1799,7 +1850,8 @@
         "placar": 2
       },
       "vencedor": "Audax Italiano",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865396",
@@ -1835,7 +1887,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865401",
@@ -1871,7 +1924,8 @@
         "placar": 2
       },
       "vencedor": "Montevideo City Torque",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865389",
@@ -1907,7 +1961,8 @@
         "placar": 0
       },
       "vencedor": "Caracas FC",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865399",
@@ -1943,7 +1998,8 @@
         "placar": 3
       },
       "vencedor": "Botafogo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865393",
@@ -1979,7 +2035,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865398",
@@ -2015,7 +2072,8 @@
         "placar": 0
       },
       "vencedor": "River Plate",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865387",
@@ -2051,7 +2109,8 @@
         "placar": 1
       },
       "vencedor": "América de Cali",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865392",
@@ -2087,7 +2146,8 @@
         "placar": 0
       },
       "vencedor": "Millonarios",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865394",
@@ -2123,7 +2183,8 @@
         "placar": 1
       },
       "vencedor": "Macará",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865402",
@@ -2159,7 +2220,8 @@
         "placar": 1
       },
       "vencedor": "Atlético-MG",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865397",
@@ -2195,7 +2257,8 @@
         "placar": 0
       },
       "vencedor": "San Lorenzo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865400",
@@ -2231,7 +2294,8 @@
         "placar": 2
       },
       "vencedor": "Bragantino",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865390",
@@ -2267,7 +2331,8 @@
         "placar": 0
       },
       "vencedor": "Cienciano del Cusco",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865405",
@@ -2303,7 +2368,8 @@
         "placar": 0
       },
       "vencedor": "Botafogo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865416",
@@ -2339,7 +2405,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865404",
@@ -2375,7 +2442,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865411",
@@ -2411,7 +2479,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865415",
@@ -2447,7 +2516,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865412",
@@ -2483,7 +2553,8 @@
         "placar": 0
       },
       "vencedor": "O'Higgins",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865407",
@@ -2519,7 +2590,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865409",
@@ -2555,7 +2627,8 @@
         "placar": 1
       },
       "vencedor": "Deportivo Riestra",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865410",
@@ -2591,7 +2664,8 @@
         "placar": 0
       },
       "vencedor": "Juventud",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865408",
@@ -2627,7 +2701,8 @@
         "placar": 0
       },
       "vencedor": "Cienciano del Cusco",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865413",
@@ -2663,7 +2738,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865406",
@@ -2699,7 +2775,8 @@
         "placar": 0
       },
       "vencedor": "Carabobo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865418",
@@ -2735,7 +2812,8 @@
         "placar": 0
       },
       "vencedor": "Vasco da Gama",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865417",
@@ -2771,7 +2849,8 @@
         "placar": 0
       },
       "vencedor": "Tigre",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865414",
@@ -2807,7 +2886,8 @@
         "placar": 1
       },
       "vencedor": "River Plate",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865403",
@@ -2843,7 +2923,8 @@
         "placar": 2
       },
       "vencedor": "Macará",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865428",
@@ -2879,7 +2960,8 @@
         "placar": 3
       },
       "vencedor": "Grêmio",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865429",
@@ -2915,7 +2997,8 @@
         "placar": 3
       },
       "vencedor": "Caracas FC",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865430",
@@ -2951,7 +3034,8 @@
         "placar": 2
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865420",
@@ -2987,7 +3071,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865425",
@@ -3023,7 +3108,8 @@
         "placar": 0
       },
       "vencedor": "Academia Puerto Cabello",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865427",
@@ -3059,7 +3145,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865423",
@@ -3095,7 +3182,8 @@
         "placar": 2
       },
       "vencedor": "Vasco da Gama",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865432",
@@ -3131,7 +3219,8 @@
         "placar": 0
       },
       "vencedor": "Montevideo City Torque",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865422",
@@ -3167,7 +3256,8 @@
         "placar": 2
       },
       "vencedor": "Club Olimpia",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865431",
@@ -3203,7 +3293,8 @@
         "placar": 2
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865419",
@@ -3239,7 +3330,8 @@
         "placar": 1
       },
       "vencedor": "Botafogo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865424",
@@ -3275,7 +3367,8 @@
         "placar": 2
       },
       "vencedor": "América de Cali",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865433",
@@ -3311,7 +3404,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865434",
@@ -3347,7 +3441,8 @@
         "placar": 4
       },
       "vencedor": "Millonarios",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865421",
@@ -3383,7 +3478,8 @@
         "placar": 6
       },
       "vencedor": "Bragantino",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865426",
@@ -3419,7 +3515,8 @@
         "placar": 2
       },
       "vencedor": "River Plate",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865438",
@@ -3455,7 +3552,8 @@
         "placar": 0
       },
       "vencedor": "Audax Italiano",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865448",
@@ -3491,7 +3589,8 @@
         "placar": 1
       },
       "vencedor": "Montevideo City Torque",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865443",
@@ -3527,7 +3626,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865435",
@@ -3563,7 +3663,8 @@
         "placar": 2
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865440",
@@ -3599,7 +3700,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865436",
@@ -3635,7 +3737,8 @@
         "placar": 2
       },
       "vencedor": "Boston River",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865444",
@@ -3671,7 +3774,8 @@
         "placar": 2
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865447",
@@ -3707,7 +3811,8 @@
         "placar": 1
       },
       "vencedor": "Club Olimpia",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865442",
@@ -3743,7 +3848,8 @@
         "placar": 0
       },
       "vencedor": "Grêmio",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865450",
@@ -3779,7 +3885,8 @@
         "placar": 3
       },
       "vencedor": "Botafogo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865445",
@@ -3815,7 +3922,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865439",
@@ -3851,7 +3959,8 @@
         "placar": 0
       },
       "vencedor": "Atlético-MG",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865441",
@@ -3887,7 +3996,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865446",
@@ -3923,7 +4033,8 @@
         "placar": 2
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865437",
@@ -3959,7 +4070,8 @@
         "placar": 2
       },
       "vencedor": "Carabobo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865449",
@@ -3995,7 +4107,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865455",
@@ -4031,7 +4144,8 @@
         "placar": 2
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865456",
@@ -4067,7 +4181,8 @@
         "placar": 2
       },
       "vencedor": "O'Higgins",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865459",
@@ -4103,7 +4218,8 @@
         "placar": 0
       },
       "vencedor": "São Paulo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865465",
@@ -4139,7 +4255,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865460",
@@ -4175,7 +4292,8 @@
         "placar": 0
       },
       "vencedor": "Santos",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865461",
@@ -4211,7 +4329,8 @@
         "placar": 1
       },
       "vencedor": "Deportivo Recoleta",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865452",
@@ -4247,7 +4366,8 @@
         "placar": 0
       },
       "vencedor": "Vasco da Gama",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865453",
@@ -4283,7 +4403,8 @@
         "placar": 3
       },
       "vencedor": "Botafogo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865454",
@@ -4319,7 +4440,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865457",
@@ -4355,7 +4477,8 @@
         "placar": 1
       },
       "vencedor": "Club Olimpia",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865463",
@@ -4391,7 +4514,8 @@
         "placar": 0
       },
       "vencedor": "Racing Club",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865466",
@@ -4427,7 +4551,8 @@
         "placar": 0
       },
       "vencedor": "Atlético-MG",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865462",
@@ -4463,7 +4588,8 @@
         "placar": 0
       },
       "vencedor": "River Plate",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865464",
@@ -4499,7 +4625,8 @@
         "placar": 0
       },
       "vencedor": "Bragantino",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865451",
@@ -4535,7 +4662,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401865458",
@@ -4571,7 +4699,8 @@
         "placar": 0
       },
       "vencedor": "Tigre",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874150",
@@ -4607,7 +4736,8 @@
         "placar": 3
       },
       "vencedor": "Tigre",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874072",
@@ -4643,7 +4773,8 @@
         "placar": 4
       },
       "vencedor": "Santos",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874157",
@@ -4679,7 +4810,8 @@
         "placar": 2
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874148",
@@ -4715,7 +4847,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874166",
@@ -4751,7 +4884,8 @@
         "placar": 0
       },
       "vencedor": "Lanús",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874144",
@@ -4787,7 +4921,8 @@
         "placar": 2
       },
       "vencedor": "Bolívar",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874154",
@@ -4823,7 +4958,8 @@
         "placar": 0
       },
       "vencedor": "Boca Juniors",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874165",
@@ -4859,7 +4995,8 @@
         "placar": 0
       },
       "vencedor": "Independiente Santa Fe",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874071",
@@ -4895,7 +5032,8 @@
         "placar": 2
       },
       "vencedor": "Tigre",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874146",
@@ -4931,7 +5069,8 @@
         "placar": 2
       },
       "vencedor": "Santos",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874167",
@@ -4967,7 +5106,8 @@
         "placar": 0
       },
       "vencedor": "Vasco da Gama",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874151",
@@ -5003,7 +5143,8 @@
         "placar": 0
       },
       "vencedor": "Bragantino",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874158",
@@ -5039,7 +5180,8 @@
         "placar": 0
       },
       "vencedor": "Cienciano del Cusco",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874159",
@@ -5075,7 +5217,8 @@
         "placar": 1
       },
       "vencedor": "Bolívar",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874162",
@@ -5111,7 +5254,8 @@
         "placar": 3
       },
       "vencedor": "Independiente Santa Fe",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401874164",
@@ -5147,7 +5291,11 @@
         "placar": 0
       },
       "vencedor": "Boca Juniors",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 3,
+        "visitante": 4
+      },
+      "vencedor_penaltis": "Boca Juniors"
     },
     {
       "event_id": "401903297",
@@ -5183,7 +5331,8 @@
         "placar": 1
       },
       "vencedor": "Boca Juniors",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401903296",
@@ -5219,7 +5368,8 @@
         "placar": 1
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401902573",
@@ -5255,7 +5405,8 @@
         "placar": 1
       },
       "vencedor": "Montevideo City Torque",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401902743",
@@ -5291,7 +5442,8 @@
         "placar": 1
       },
       "vencedor": "Atlético-MG",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401902572",
@@ -5327,7 +5479,8 @@
         "placar": 1
       },
       "vencedor": "Santos",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401902742",
@@ -5363,7 +5516,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401902715",
@@ -5399,7 +5553,8 @@
         "placar": 1
       },
       "vencedor": "Cienciano del Cusco",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401903231",
@@ -5435,7 +5590,8 @@
         "placar": 4
       },
       "vencedor": "Boca Juniors",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401903294",
@@ -5471,7 +5627,8 @@
         "placar": 1
       },
       "vencedor": "São Paulo",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401902714",
@@ -5507,7 +5664,8 @@
         "placar": 2
       },
       "vencedor": "Atlético-MG",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401902571",
@@ -5543,7 +5701,8 @@
         "placar": 1
       },
       "vencedor": "Montevideo City Torque",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401903232",
@@ -5579,7 +5738,8 @@
         "placar": 0
       },
       "vencedor": null,
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401902449",
@@ -5615,7 +5775,8 @@
         "placar": 0
       },
       "vencedor": "Santos",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401902740",
@@ -5651,7 +5812,8 @@
         "placar": 4
       },
       "vencedor": "Vasco da Gama",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401902741",
@@ -5687,7 +5849,8 @@
         "placar": 0
       },
       "vencedor": "Cienciano del Cusco",
-      "penaltis": false
+      "penaltis": false,
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401903295",
@@ -5723,7 +5886,11 @@
         "placar": 1
       },
       "vencedor": "Independiente Santa Fe",
-      "penaltis": true
+      "penaltis": {
+        "mandante": 7,
+        "visitante": 8
+      },
+      "vencedor_penaltis": "Independiente Santa Fe"
     },
     {
       "event_id": "401913960",
@@ -5760,12 +5927,7 @@
       },
       "vencedor": null,
       "penaltis": false,
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
-      }
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401912542",
@@ -5802,12 +5964,7 @@
       },
       "vencedor": "Boca Juniors",
       "penaltis": false,
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
-      }
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401913073",
@@ -5844,12 +6001,7 @@
       },
       "vencedor": "Santos",
       "penaltis": false,
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
-      }
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401913074",
@@ -5886,12 +6038,7 @@
       },
       "vencedor": "Cienciano del Cusco",
       "penaltis": false,
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
-      }
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401913959",
@@ -5903,7 +6050,7 @@
       "fase_ordem": 700,
       "semana": null,
       "perna": 2,
-      "estadio": "",
+      "estadio": "Estádio São Januário",
       "mandante": {
         "espn_id": "3454",
         "nome": "Vasco da Gama",
@@ -5928,12 +6075,7 @@
       },
       "vencedor": "Vasco da Gama",
       "penaltis": false,
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
-      }
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401912524",
@@ -5945,7 +6087,7 @@
       "fase_ordem": 700,
       "semana": null,
       "perna": 2,
-      "estadio": "",
+      "estadio": "Estádio Cícero Pompeu de Toledo",
       "mandante": {
         "espn_id": "2026",
         "nome": "São Paulo",
@@ -5965,29 +6107,24 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": false,
-        "vencedor": false,
+        "vencedor": true,
         "placar": 1
       },
-      "vencedor": null,
+      "vencedor": "Boca Juniors",
       "penaltis": false,
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
-      }
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401913071",
       "data_iso": "2026-09-16T19:00:00-03:00",
       "estado": "post",
       "concluido": true,
-      "status": "Finalizado",
+      "status": "PF - Pen",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
       "perna": 2,
-      "estadio": "",
+      "estadio": "Arena MRV",
       "mandante": {
         "espn_id": "7632",
         "nome": "Atlético-MG",
@@ -6015,13 +6152,7 @@
         "mandante": 3,
         "visitante": 1
       },
-      "vencedor_penaltis": "Atlético-MG",
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
-      }
+      "vencedor_penaltis": "Atlético-MG"
     },
     {
       "event_id": "401913072",
@@ -6033,7 +6164,7 @@
       "fase_ordem": 700,
       "semana": null,
       "perna": 2,
-      "estadio": "",
+      "estadio": "Estadio Centenario",
       "mandante": {
         "espn_id": "19002",
         "nome": "Montevideo City Torque",
@@ -6058,12 +6189,7 @@
       },
       "vencedor": "Montevideo City Torque",
       "penaltis": false,
-      "correcao_integridade": {
-        "incidente": "continentais-2026-quartas-20260918",
-        "fonte": "CONMEBOL",
-        "url": "https://gol.conmebol.com/sudamericana/pt-br/news/quatro-pela-grande-conquista-estao-definidas-semifinais-da-conmebol-sudamericana",
-        "regra": "vencedor do jogo e vencedor dos pênaltis são fatos distintos"
-      }
+      "vencedor_penaltis": null
     },
     {
       "event_id": "401913958",
