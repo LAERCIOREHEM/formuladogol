@@ -13,16 +13,16 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 45,
+    "jogos_na_janela": 52,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 9,
+    "descobertas_antecipadas": 7,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 41,
+    "candidatos_oficiais_encontrados": 37,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
-    "transmissoes_publicadas": 9,
-    "sem_transmissao": 1,
+    "transmissoes_publicadas": 8,
+    "sem_transmissao": 0,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -69,20 +69,6 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841280",
-      "rodada": 32,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Vitória x Athletico-PR",
-      "data_iso": "2026-10-24T16:30:00-03:00",
-      "principal": "GE TV",
-      "fontes_encontradas": [
-        "GE TV"
-      ],
-      "manual": false,
-      "descoberta_antecipada": true
-    },
-    {
       "event_id": "401841281",
       "rodada": 32,
       "competicao_chave": "brasileirao",
@@ -97,18 +83,6 @@
       "descoberta_antecipada": true
     },
     {
-      "event_id": "401841278",
-      "rodada": 32,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Chapecoense x Fluminense",
-      "data_iso": "2026-10-24T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
       "event_id": "401841282",
       "rodada": 32,
       "competicao_chave": "brasileirao",
@@ -120,7 +94,7 @@
         "GE TV"
       ],
       "manual": false,
-      "descoberta_antecipada": true
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841286",
@@ -209,12 +183,12 @@
   ],
   "aceitos": [
     {
-      "event_id": "401841280",
-      "jogo": "Vitória x Athletico-PR",
-      "fonte": "getv",
-      "video_id": "ITbRBWMF4W8",
-      "url": "https://www.youtube.com/watch?v=ITbRBWMF4W8",
-      "titulo": "AO VIVO: VITÓRIA X ATHLETICO PARANAENSE | BRASILEIRÃO 2026 | ge tv",
+      "event_id": "401841281",
+      "jogo": "Vasco da Gama x Corinthians",
+      "fonte": "cazetv",
+      "video_id": "FDo01YVDsNE",
+      "url": "https://www.youtube.com/watch?v=FDo01YVDsNE",
+      "titulo": "AO VIVO: VASCO X CORINTHIANS | BRASILEIRÃO 2026 | 32ª RODADA",
       "status": "live",
       "confianca": 0.925,
       "motivos": [
@@ -306,23 +280,6 @@
       ]
     },
     {
-      "event_id": "401841281",
-      "jogo": "Vasco da Gama x Corinthians",
-      "fonte": "cazetv",
-      "video_id": "FDo01YVDsNE",
-      "url": "https://www.youtube.com/watch?v=FDo01YVDsNE",
-      "titulo": "AO VIVO: VASCO X CORINTHIANS | BRASILEIRÃO 2026 | 32ª RODADA",
-      "status": "live",
-      "confianca": 0.925,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (90 min de diferença)"
-      ]
-    },
-    {
       "event_id": "401841306",
       "jogo": "Athletico-PR x Vasco da Gama",
       "fonte": "cazetv",
@@ -397,22 +354,12 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "KKl7y01TUCY",
-      "url": "https://www.youtube.com/watch?v=KKl7y01TUCY",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: PALMEIRAS X RED BULL BRAGANTINO | PRÉ-JOGO | BRASILEIRÃO 2026 | Premiere",
-      "status": "live",
-      "inicio_programado": "2026-10-24T17:30:00-03:00",
-      "motivo": "conteúdo rejeitado: pre jogo"
-    },
-    {
       "video_id": "O5D6XzFHRFs",
       "url": "https://www.youtube.com/watch?v=O5D6XzFHRFs",
       "fonte": "getv",
       "canal": "ge tv",
       "titulo": "OS 11 MELHORES ESTRANGEIROS DA HISTÓRIA DO FUTEBOL BRASILEIRO | 11+ | Tropa ge tv",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-10-24T19:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -454,16 +401,6 @@
       "titulo": "AO VIVO: MONTES CLAROS X CRUZEIRO | SUPERLIGA MASCULINA DE VÔLEI 2026/27 | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-10-26T17:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "_bEcEj22kXA",
-      "url": "https://www.youtube.com/watch?v=_bEcEj22kXA",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: MACKENZIE X OSASCO | SUPERLIGA FEMININA DE VÔLEI 2026/27 | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-10-24T15:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -617,16 +554,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "qWfdUKagXQE",
-      "url": "https://www.youtube.com/watch?v=qWfdUKagXQE",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: PALMEIRAS X SANTA FE | LIBERTADORES FEMININA 2026 | QUARTAS DE FINAL",
-      "status": "live",
-      "inicio_programado": "2026-10-24T16:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "qtUD9j9Mfd8",
       "url": "https://www.youtube.com/watch?v=qtUD9j9Mfd8",
       "fonte": "cazetv",
@@ -678,26 +605,16 @@
     }
   ],
   "search_api_pulados": [],
-  "sem_transmissao": [
-    {
-      "event_id": "401841278",
-      "rodada": 32,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Chapecoense x Fluminense",
-      "data_iso": "2026-10-24T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    }
-  ],
+  "sem_transmissao": [],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 86,
+    "unidades": 87,
     "requisicoes": {
       "channels": 4,
-      "videos": 42,
+      "videos": 43,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-10-24T18:01:50-03:00"
+  "atualizado_em": "2026-10-24T19:31:47-03:00"
 }
