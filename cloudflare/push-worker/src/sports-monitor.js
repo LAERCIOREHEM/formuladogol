@@ -54,7 +54,7 @@ const SCORER_RECOVERY_INTERVAL_MS = 30_000;
 // Recuperação permanente de autoria: novo gol busca imediatamente; gols antigos
 // com identidade ausente/conflitante voltam à ESPN a cada 30s, sem gastar IA.
 export function shouldRetryMissingScorers(previous, observation, missing, now = Date.now()) {
-  if (!(Number(missing) > 0) || text(observation?.state) !== 'in') return false;
+  if (!(Number(missing) > 0) || !['in', 'post'].includes(text(observation?.state))) return false;
   const oldTotal = num(previous?.home?.score, 0) + num(previous?.away?.score, 0);
   const newTotal = num(observation?.home?.score, 0) + num(observation?.away?.score, 0);
   if (newTotal > oldTotal) return true;
