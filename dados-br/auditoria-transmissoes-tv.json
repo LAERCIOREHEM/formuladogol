@@ -2,20 +2,20 @@
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
     "jogos_na_janela": 45,
-    "jogos_com_transmissao": 32,
-    "jogos_sem_transmissao_na_janela": 13,
-    "jogos_sem_transmissao_14d": 3,
+    "jogos_com_transmissao": 33,
+    "jogos_sem_transmissao_na_janela": 12,
+    "jogos_sem_transmissao_14d": 2,
     "jogos_sem_transmissao_fora_14d": 10,
-    "jogos_criticos_sem_transmissao_72h": 1,
+    "jogos_criticos_sem_transmissao_72h": 0,
     "registros_preservados": 20,
-    "jogos_guardiao_ia": 5,
-    "jogos_estaveis_sem_reconsulta_editorial": 3,
+    "jogos_guardiao_ia": 6,
+    "jogos_estaveis_sem_reconsulta_editorial": 6,
     "fontes_com_falha": 0
   },
   "fontes": {
     "guardiao_ia": {
       "ok": true,
-      "jogos_com_canal": 5
+      "jogos_com_canal": 6
     },
     "cbf": {
       "ok": true,
@@ -27,7 +27,7 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 4109
+      "duracao_ms": 5704
     },
     "espn": {
       "ok": true,
@@ -44,19 +44,11 @@
   },
   "sem_transmissao": [
     {
-      "event_id": "401841278",
-      "rodada": 32,
-      "jogo": "Chapecoense x Fluminense",
-      "data_iso": "2026-10-24T19:30:00-03:00",
-      "faltam_horas": 2.3,
-      "nivel": "critico"
-    },
-    {
       "event_id": "401841294",
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-31T16:00:00-03:00",
-      "faltam_horas": 166.8,
+      "faltam_horas": 165.9,
       "nivel": "aviso"
     },
     {
@@ -64,25 +56,17 @@
       "rodada": 34,
       "jogo": "Palmeiras x Remo",
       "data_iso": "2026-11-05T19:30:00-03:00",
-      "faltam_horas": 290.3,
+      "faltam_horas": 289.4,
       "nivel": "aviso"
     }
   ],
   "sem_transmissao_futura": [
     {
-      "event_id": "401841278",
-      "rodada": 32,
-      "jogo": "Chapecoense x Fluminense",
-      "data_iso": "2026-10-24T19:30:00-03:00",
-      "faltam_horas": 2.3,
-      "nivel": "critico"
-    },
-    {
       "event_id": "401841294",
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-31T16:00:00-03:00",
-      "faltam_horas": 166.8,
+      "faltam_horas": 165.9,
       "nivel": "aviso"
     },
     {
@@ -90,7 +74,7 @@
       "rodada": 34,
       "jogo": "Palmeiras x Remo",
       "data_iso": "2026-11-05T19:30:00-03:00",
-      "faltam_horas": 290.3,
+      "faltam_horas": 289.4,
       "nivel": "aviso"
     },
     {
@@ -98,7 +82,7 @@
       "rodada": 35,
       "jogo": "São Paulo x Fluminense",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 599.8,
+      "faltam_horas": 598.9,
       "nivel": "futuro"
     },
     {
@@ -106,7 +90,7 @@
       "rodada": 35,
       "jogo": "Remo x Chapecoense",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 599.8,
+      "faltam_horas": 598.9,
       "nivel": "futuro"
     },
     {
@@ -114,7 +98,7 @@
       "rodada": 35,
       "jogo": "Mirassol x Atlético-MG",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 599.8,
+      "faltam_horas": 598.9,
       "nivel": "futuro"
     },
     {
@@ -122,7 +106,7 @@
       "rodada": 35,
       "jogo": "Grêmio x Bahia",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 599.8,
+      "faltam_horas": 598.9,
       "nivel": "futuro"
     },
     {
@@ -130,7 +114,7 @@
       "rodada": 35,
       "jogo": "Flamengo x Athletico-PR",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 599.8,
+      "faltam_horas": 598.9,
       "nivel": "futuro"
     },
     {
@@ -138,7 +122,7 @@
       "rodada": 35,
       "jogo": "Coritiba x Santos",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 599.8,
+      "faltam_horas": 598.9,
       "nivel": "futuro"
     },
     {
@@ -146,7 +130,7 @@
       "rodada": 35,
       "jogo": "Corinthians x Botafogo",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 599.8,
+      "faltam_horas": 598.9,
       "nivel": "futuro"
     },
     {
@@ -154,7 +138,7 @@
       "rodada": 35,
       "jogo": "Vitória x Bragantino",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 599.8,
+      "faltam_horas": 598.9,
       "nivel": "futuro"
     },
     {
@@ -162,7 +146,7 @@
       "rodada": 0,
       "jogo": "Atlético-MG x Boca Juniors",
       "data_iso": "2026-11-21T17:00:00-03:00",
-      "faltam_horas": 671.8,
+      "faltam_horas": 670.9,
       "nivel": "futuro"
     },
     {
@@ -170,7 +154,7 @@
       "rodada": 0,
       "jogo": "Palmeiras x Estudiantes de La Plata",
       "data_iso": "2026-11-28T17:00:00-03:00",
-      "faltam_horas": 839.8,
+      "faltam_horas": 838.9,
       "nivel": "futuro"
     }
   ],
@@ -353,5 +337,5 @@
     "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
   "artigos_ge_descobertos": [],
-  "atualizado_em": "2026-10-24T17:09:19-03:00"
+  "atualizado_em": "2026-10-24T18:04:11-03:00"
 }

@@ -17,7 +17,7 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 9,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 43,
+    "candidatos_oficiais_encontrados": 41,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
@@ -83,18 +83,6 @@
       "descoberta_antecipada": true
     },
     {
-      "event_id": "401841283",
-      "rodada": 32,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Palmeiras x Bragantino",
-      "data_iso": "2026-10-24T18:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
       "event_id": "401841281",
       "rodada": 32,
       "competicao_chave": "brasileirao",
@@ -107,6 +95,18 @@
       ],
       "manual": false,
       "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401841278",
+      "rodada": 32,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Chapecoense x Fluminense",
+      "data_iso": "2026-10-24T19:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841282",
@@ -402,7 +402,7 @@
       "fonte": "getv",
       "canal": "ge tv",
       "titulo": "AO VIVO: PALMEIRAS X RED BULL BRAGANTINO | PRÉ-JOGO | BRASILEIRÃO 2026 | Premiere",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-10-24T17:30:00-03:00",
       "motivo": "conteúdo rejeitado: pre jogo"
     },
@@ -557,16 +557,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "RKCJAcj2xOU",
-      "url": "https://www.youtube.com/watch?v=RKCJAcj2xOU",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: LENS X PARIS FC | LIGUE 1 26/27 | 8ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-10-24T15:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "UEV1NElLuMA",
       "url": "https://www.youtube.com/watch?v=UEV1NElLuMA",
       "fonte": "cazetv",
@@ -604,16 +594,6 @@
       "titulo": "AO VIVO (SOM AMBIENTE): RENNES X STRASBOURG | LIGUE 1 26/27 | 8ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-10-25T12:50:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "iwiaWUguZg8",
-      "url": "https://www.youtube.com/watch?v=iwiaWUguZg8",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ATLÉTICO DE MADRID X A CORUÑA | LALIGA 26/27 | 10ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-10-24T13:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -700,12 +680,12 @@
   "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401841283",
+      "event_id": "401841278",
       "rodada": 32,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Palmeiras x Bragantino",
-      "data_iso": "2026-10-24T18:30:00-03:00",
+      "jogo": "Chapecoense x Fluminense",
+      "data_iso": "2026-10-24T19:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -719,5 +699,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-10-24T17:07:08-03:00"
+  "atualizado_em": "2026-10-24T18:01:50-03:00"
 }
