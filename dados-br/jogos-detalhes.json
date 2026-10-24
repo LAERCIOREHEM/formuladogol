@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-23T22:06:17.116574-03:00",
+  "gerado_em": "2026-10-23T23:16:39.593368-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 310,
   "total_com_estatisticas": 310,
-  "total_com_publico": 309,
+  "total_com_publico": 310,
   "total_com_eventos": 310,
   "total_com_jogadores": 310,
   "total_eventos_validados": 310,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Estadio Mineirão",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 29516,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.otempo.com.br/sports/cruzeiro/2026/10/23/analise-cruzeiro-faz-dever-de-casa-vence-o-remo-e-vira-3-colocado-do-brasileirao",
       "arbitro": "",
       "stats": [
         {
@@ -546,7 +546,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-23T22:06:17.031455-03:00"
+      "atualizado_em": "2026-10-23T22:06:17.031455-03:00",
+      "renda": 1220408
     },
     "401841272": {
       "event_id": "401841272",
@@ -175153,5 +175154,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 274,
+  "total_com_renda": 310
 }
