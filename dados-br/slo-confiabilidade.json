@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "atualizado_em": "2026-10-23T22:04:02-03:00",
+  "atualizado_em": "2026-10-24T18:43:29-03:00",
   "targets_minutos": {
     "final_to_detection": 5,
     "final_to_results": 7,
@@ -8,20 +8,20 @@
     "commit_to_site": 5
   },
   "ultima_observacao": {
-    "trace_id": "fdg-401841287",
-    "event_id": "401841287",
-    "finalizado_em": "2026-10-23T22:01:52-03:00",
-    "af_calculado_em": "2026-10-23T22:03:59-03:00",
-    "final_para_af_minutos": 2.117,
+    "trace_id": "fdg-401841285",
+    "event_id": "401841285",
+    "finalizado_em": "2026-10-24T18:24:00-03:00",
+    "af_calculado_em": "2026-10-24T18:43:26-03:00",
+    "final_para_af_minutos": 19.433,
     "alvo_minutos": 10,
-    "dentro_slo": true,
-    "registrado_em": "2026-10-23T22:04:02-03:00",
-    "run_id": "40047820672"
+    "dentro_slo": false,
+    "registrado_em": "2026-10-24T18:43:29-03:00",
+    "run_id": "40135301657"
   },
   "resumo": {
-    "amostra_final_para_af": 19,
-    "media_final_para_af_minutos": 20.402,
-    "violacoes_final_para_af": 16
+    "amostra_final_para_af": 20,
+    "media_final_para_af_minutos": 20.353,
+    "violacoes_final_para_af": 17
   },
   "observacoes": [
     {
@@ -232,6 +232,17 @@
       "dentro_slo": true,
       "registrado_em": "2026-10-23T22:04:02-03:00",
       "run_id": "40047820672"
+    },
+    {
+      "trace_id": "fdg-401841285",
+      "event_id": "401841285",
+      "finalizado_em": "2026-10-24T18:24:00-03:00",
+      "af_calculado_em": "2026-10-24T18:43:26-03:00",
+      "final_para_af_minutos": 19.433,
+      "alvo_minutos": 10,
+      "dentro_slo": false,
+      "registrado_em": "2026-10-24T18:43:29-03:00",
+      "run_id": "40135301657"
     }
   ]
 }
