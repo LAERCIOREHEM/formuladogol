@@ -2,46 +2,33 @@
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
   "jogos_finalizados": 313,
-  "jogos_com_publico": 311,
-  "jogos_sem_publico": 2,
-  "publico_total": 7738022,
-  "jogos_com_renda": 311,
-  "aguardando_fonte": [
-    {
-      "event_id": "401841285",
-      "mandante": "Internacional",
-      "visitante": "Botafogo",
-      "estado": "AGUARDANDO_FONTE"
-    },
-    {
-      "event_id": "401841284",
-      "mandante": "Mirassol",
-      "visitante": "São Paulo",
-      "estado": "AGUARDANDO_FONTE"
-    }
-  ],
+  "jogos_com_publico": 313,
+  "jogos_sem_publico": 0,
+  "publico_total": 7779492,
+  "jogos_com_renda": 313,
+  "aguardando_fonte": [],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
     {
       "event_id": "401841285",
-      "tipo_publico": "",
-      "publico_presente": null,
+      "tipo_publico": "presente",
+      "publico_presente": 25770,
       "publico_pagante": null,
-      "renda": null,
-      "fonte_publico": "",
-      "origem": "",
-      "estado": "AGUARDANDO_FONTE"
+      "renda": 149435.0,
+      "fonte_publico": "https://www.lance.com.br/lancepedia/internacional-3-x-0-botafogo-brasileirao-2018.html",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
     },
     {
       "event_id": "401841284",
-      "tipo_publico": "",
-      "publico_presente": null,
+      "tipo_publico": "presente",
+      "publico_presente": 15700,
       "publico_pagante": null,
-      "renda": null,
-      "fonte_publico": "",
-      "origem": "",
-      "estado": "AGUARDANDO_FONTE"
+      "renda": 1087398.0,
+      "fonte_publico": "https://www.terra.com.br/amp/esportes/sao-paulo/sao-paulo-bate-mirassol-com-brilho-de-luciano-reage-no-brasileirao-e-alivia-pressao-em-roger%2C647c44d4e84641743965a7746dec9661vzc1o7u7.html",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
     },
     {
       "event_id": "401841280",
@@ -3154,5 +3141,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-10-24T18:56:46.757910-03:00"
+  "gerado_em": "2026-10-24T19:02:23.178263-03:00"
 }
