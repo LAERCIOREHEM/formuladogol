@@ -1,15 +1,58 @@
 {
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
-  "jogos_finalizados": 310,
-  "jogos_com_publico": 310,
-  "jogos_sem_publico": 0,
-  "publico_total": 7696885,
-  "jogos_com_renda": 310,
-  "aguardando_fonte": [],
+  "jogos_finalizados": 313,
+  "jogos_com_publico": 311,
+  "jogos_sem_publico": 2,
+  "publico_total": 7738022,
+  "jogos_com_renda": 311,
+  "aguardando_fonte": [
+    {
+      "event_id": "401841285",
+      "mandante": "Internacional",
+      "visitante": "Botafogo",
+      "estado": "AGUARDANDO_FONTE"
+    },
+    {
+      "event_id": "401841284",
+      "mandante": "Mirassol",
+      "visitante": "São Paulo",
+      "estado": "AGUARDANDO_FONTE"
+    }
+  ],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
+    {
+      "event_id": "401841285",
+      "tipo_publico": "",
+      "publico_presente": null,
+      "publico_pagante": null,
+      "renda": null,
+      "fonte_publico": "",
+      "origem": "",
+      "estado": "AGUARDANDO_FONTE"
+    },
+    {
+      "event_id": "401841284",
+      "tipo_publico": "",
+      "publico_presente": null,
+      "publico_pagante": null,
+      "renda": null,
+      "fonte_publico": "",
+      "origem": "",
+      "estado": "AGUARDANDO_FONTE"
+    },
+    {
+      "event_id": "401841280",
+      "tipo_publico": "presente",
+      "publico_presente": 41137,
+      "publico_pagante": null,
+      "renda": 2602813.86,
+      "fonte_publico": "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/corinthians-tem-mais-volume-pouco-cria-fica-no-empate-com-o-vitoria-e-segue-colado-no-z-4-cmvg04v0l00fq014wlipffos0.html",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
+    },
     {
       "event_id": "401841287",
       "tipo_publico": "presente",
@@ -3111,5 +3154,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-10-23T23:16:40.566095-03:00"
+  "gerado_em": "2026-10-24T18:56:46.757910-03:00"
 }

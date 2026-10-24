@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-24T18:46:07.924252-03:00",
+  "gerado_em": "2026-10-24T18:56:45.745889-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 313,
   "total_com_estatisticas": 313,
-  "total_com_publico": 310,
+  "total_com_publico": 311,
   "total_com_eventos": 313,
   "total_com_jogadores": 313,
   "total_eventos_validados": 313,
@@ -1147,9 +1147,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Estadio Manoel Barradas",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 41137,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/corinthians-tem-mais-volume-pouco-cria-fica-no-empate-com-o-vitoria-e-segue-colado-no-z-4-cmvg04v0l00fq014wlipffos0.html",
       "arbitro": "",
       "stats": [
         {
@@ -1716,7 +1716,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-24T18:46:04.964871-03:00"
+      "atualizado_em": "2026-10-24T18:46:04.964871-03:00",
+      "renda": 2602813.86
     },
     "401841287": {
       "event_id": "401841287",
@@ -176862,5 +176863,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 274,
+  "total_com_renda": 311
 }
