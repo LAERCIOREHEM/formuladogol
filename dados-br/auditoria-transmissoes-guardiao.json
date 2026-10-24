@@ -6027,49 +6027,111 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado: Chapecoense x Fluminense, Brasileirão Série A, 32ª rodada, hoje (24/10/2026), às 19h30 (horário de Brasília), na Arena Condá. A transmissão integral no Brasil é exclusiva do Prime Video. GE oferece apenas acompanhamento em tempo real, não transmissão do jogo."
+    },
+    {
+      "event_id": "401841282",
+      "jogo": "Santos x Bahia",
+      "data_iso": "2026-10-24T21:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-10-24T19:43:18-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "GE TV"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/09/27/brasileirao-2026-veja-a-tabela-detalhada-de-bahia-e-vitoria-entre-as-rodadas-31-e-34.ghtml",
+        "https://ge.globo.com/google/amp/ba/futebol/times/bahia/noticia/2026/10/24/bahia-faz-confronto-direto-com-o-santos-para-voltar-a-zona-de-classificacao-da-libertadores.ghtml",
+        "https://ge.globo.com/google/amp/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/10/24/santos-x-bahia-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/google/amp/sp/santos-e-regiao/futebol/times/santos/noticia/2026/10/20/santos-volta-aos-treinos-e-inicia-preparacao-para-enfrentar-o-bahia.ghtml",
+        "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/jogo/24-10-2026/santos-bahia.ghtml",
+        "https://ge.globo.com/sp/santos-e-regiao/futebol/times/santos/noticia/2026/10/21/santos-x-bahia-em-reforma-vila-belmiro-tera-capacidade-reduzida.ghtml",
+        "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/10/22/santos-x-bahia-ao-vivo-onde-assistir-horario-e-escalacoes-pelo-brasileirao.html",
+        "https://placar.uol.com.br/esporte/futebol/brasileirao/2026/10/24/santos-x-bahia.htm",
+        "https://www.bol.uol.com.br/esporte/2026/10/24/mirassol-x-sao-paulo-como-foi-o-jogo-pelo-brasileirao-2026.ghtm",
+        "https://www.bol.uol.com.br/esporte/2026/10/24/santos-busca-aproveitar-ma-fase-do-bahia-para-encostar-na-briga-por-vaga-na-libertadores.amp.htm",
+        "https://www.uol.com.br/esporte/colunas/bruno-lima/2026/09/22/santos-estuda-mais-de-um-jogo-em-sao-paulo-na-reta-final-do-brasileirao.htm",
+        "https://www.uol.com.br/esporte/ultimas-noticias/2026/10/24/santos-x-bahia-horario-e-onde-assistir-ao-jogo-do-brasileirao.ghtm",
+        "https://www.youtube.com/watch?v=U5x-Pza-v40",
+        "https://www.youtube.com/watch?v=cUv-dPy9O7M"
+      ],
+      "canais_depois": [
+        "Premiere",
+        "SporTV"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/google/amp/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/10/24/santos-x-bahia-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=WAasakiYhbY",
+          "scope": "pre_game",
+          "valid_for_match": false,
+          "reason": "O título do vídeo informa “SANTOS X BAHIA | AQUECIMENTO AO VIVO”; trata-se de cobertura de aquecimento/pré-jogo, sem evidência de exibição integral da partida."
+        }
+      ],
+      "youtube_removidos": [
+        "https://www.youtube.com/watch?v=WAasakiYhbY"
+      ],
+      "overlay_alterado": true,
+      "resumo": "Confirmado: Santos x Bahia, Campeonato Brasileiro (32ª rodada), sábado, 24/10/2026, às 21h (horário de Brasília), na Vila Belmiro. A transmissão integral para o Brasil é de SporTV e Premiere. GE TV não integra a grade da partida: o vídeo informado é de aquecimento/pré-jogo, não da transmissão completa."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841278",
-    "jogo": "Chapecoense x Fluminense",
-    "data_iso": "2026-10-24T19:30:00-03:00",
+    "event_id": "401841282",
+    "jogo": "Santos x Bahia",
+    "data_iso": "2026-10-24T21:00:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-10-24T18:04:02-03:00",
+    "executado_em": "2026-10-24T19:43:18-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
-    "canais_antes": [],
+    "canais_antes": [
+      "GE TV"
+    ],
     "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR-1.pdf",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
-      "https://ge.globo.com/futebol/times/fluminense/noticia/2026/10/23/escalacao-do-fluminense-time-tera-tres-desfalques-contra-a-chapecoense.ghtml",
-      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/jogo/24-10-2026/chapecoense-fluminense.ghtml",
-      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/10/24/chapecoense-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/10/23/chapecoense-x-fluminense-onde-assistir-ao-vivo-horario-e-provaveis-escalacoes-pela-32-rodada-da-serie-a.html",
-      "https://sbtnews.sbt.com.br/noticia/brasil/chapecoense-x-fluminense-onde-assistir-ao-vivo-e-horario",
-      "https://sports.sbt.com.br/noticia/brasileirao/cbf-divulga-tabela-atualizada-ate-a-34a-rodada-do-brasileirao-confira",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
-      "https://www.cnnbrasil.com.br/esportes/brasileirao/chapecoense-x-fluminense-horario-e-onde-assistir-ao-jogo-do-brasileirao",
-      "https://www.uol.com.br/esporte/futebol/times/chapecoense",
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/10/24/chapecoense-x-fluminense-horario-e-onde-assistir-ao-jogo-do-brasileirao.ghtm",
-      "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/24/apos-queda-na-libertadores-fluminense-visita-lanterna-chapecoense-para-defender-lugar-no-g-5.amp.htm",
-      "https://www.youtube.com/watch?v=n_OmbY1o5RU",
-      "https://www.youtube.com/watch?v=qMuUlXv79YE"
+      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/09/27/brasileirao-2026-veja-a-tabela-detalhada-de-bahia-e-vitoria-entre-as-rodadas-31-e-34.ghtml",
+      "https://ge.globo.com/google/amp/ba/futebol/times/bahia/noticia/2026/10/24/bahia-faz-confronto-direto-com-o-santos-para-voltar-a-zona-de-classificacao-da-libertadores.ghtml",
+      "https://ge.globo.com/google/amp/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/10/24/santos-x-bahia-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/google/amp/sp/santos-e-regiao/futebol/times/santos/noticia/2026/10/20/santos-volta-aos-treinos-e-inicia-preparacao-para-enfrentar-o-bahia.ghtml",
+      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/jogo/24-10-2026/santos-bahia.ghtml",
+      "https://ge.globo.com/sp/santos-e-regiao/futebol/times/santos/noticia/2026/10/21/santos-x-bahia-em-reforma-vila-belmiro-tera-capacidade-reduzida.ghtml",
+      "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/10/22/santos-x-bahia-ao-vivo-onde-assistir-horario-e-escalacoes-pelo-brasileirao.html",
+      "https://placar.uol.com.br/esporte/futebol/brasileirao/2026/10/24/santos-x-bahia.htm",
+      "https://www.bol.uol.com.br/esporte/2026/10/24/mirassol-x-sao-paulo-como-foi-o-jogo-pelo-brasileirao-2026.ghtm",
+      "https://www.bol.uol.com.br/esporte/2026/10/24/santos-busca-aproveitar-ma-fase-do-bahia-para-encostar-na-briga-por-vaga-na-libertadores.amp.htm",
+      "https://www.uol.com.br/esporte/colunas/bruno-lima/2026/09/22/santos-estuda-mais-de-um-jogo-em-sao-paulo-na-reta-final-do-brasileirao.htm",
+      "https://www.uol.com.br/esporte/ultimas-noticias/2026/10/24/santos-x-bahia-horario-e-onde-assistir-ao-jogo-do-brasileirao.ghtm",
+      "https://www.youtube.com/watch?v=U5x-Pza-v40",
+      "https://www.youtube.com/watch?v=cUv-dPy9O7M"
     ],
     "canais_depois": [
-      "Prime Video"
+      "Premiere",
+      "SporTV"
     ],
-    "exclusivo": true,
+    "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/10/24/chapecoense-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://www.cnnbrasil.com.br/esportes/brasileirao/chapecoense-x-fluminense-horario-e-onde-assistir-ao-jogo-do-brasileirao"
+      "https://ge.globo.com/google/amp/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/10/24/santos-x-bahia-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
     ],
-    "youtube": [],
-    "youtube_removidos": [],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=WAasakiYhbY",
+        "scope": "pre_game",
+        "valid_for_match": false,
+        "reason": "O título do vídeo informa “SANTOS X BAHIA | AQUECIMENTO AO VIVO”; trata-se de cobertura de aquecimento/pré-jogo, sem evidência de exibição integral da partida."
+      }
+    ],
+    "youtube_removidos": [
+      "https://www.youtube.com/watch?v=WAasakiYhbY"
+    ],
     "overlay_alterado": true,
-    "resumo": "Confirmado: Chapecoense x Fluminense, Brasileirão Série A, 32ª rodada, hoje (24/10/2026), às 19h30 (horário de Brasília), na Arena Condá. A transmissão integral no Brasil é exclusiva do Prime Video. GE oferece apenas acompanhamento em tempo real, não transmissão do jogo."
+    "resumo": "Confirmado: Santos x Bahia, Campeonato Brasileiro (32ª rodada), sábado, 24/10/2026, às 21h (horário de Brasília), na Vila Belmiro. A transmissão integral para o Brasil é de SporTV e Premiere. GE TV não integra a grade da partida: o vídeo informado é de aquecimento/pré-jogo, não da transmissão completa."
   },
-  "atualizado_em": "2026-10-24T18:04:02-03:00"
+  "atualizado_em": "2026-10-24T19:43:18-03:00"
 }
