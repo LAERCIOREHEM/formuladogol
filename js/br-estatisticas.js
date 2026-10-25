@@ -1208,7 +1208,12 @@
         const total = Number(state.competition?.resumo?.jogos_finalizados) || totalFinishedGames();
         const informed = Number(attendance.jogos_com_publico) || 0;
         const pending = Math.max(0, total - informed);
-        return `<div class="stats-data-status${pending ? " is-warning" : ""}">Cobertura: ${coverageLabel(informed, total)} jogos · ${integer(pending)} ${pending === 1 ? "pendente" : "pendentes"} · atualizado ${escapeHtml(dateTimeCompactBR(state.competition?.atualizado_em))}</div>`;
+        const missingGames = (Array.isArray(state.competition?.jogos) ? state.competition.jogos : [])
+          .filter((game) => !(Number(game?.publico) > 0));
+        const pendingDetail = missingGames.length
+          ? `<div class="stats-source-note">Pendente: ${missingGames.slice(0, 3).map((game) => `${escapeHtml(game.mandante)} × ${escapeHtml(game.visitante)}${Number(game.publico_pagante) > 0 ? ` — ${integer(game.publico_pagante)} pagantes informados; público presente ainda não confirmado` : ""}${Number(game.renda) > 0 ? ` · renda ${escapeHtml(moneyBR(game.renda))} confirmada` : ""}`).join("; ")}${missingGames.length > 3 ? ` e mais ${integer(missingGames.length - 3)}` : ""}.</div>`
+          : "";
+        return `<div class="stats-data-status${pending ? " is-warning" : ""}">Cobertura: ${coverageLabel(informed, total)} jogos · ${integer(pending)} ${pending === 1 ? "pendente" : "pendentes"} · renda documentada em ${integer(Number(attendance.jogos_com_renda) || 0)} jogos · atualizado ${escapeHtml(dateTimeCompactBR(state.competition?.atualizado_em))}</div>${pendingDetail}`;
       })()}
       ${attendanceControls(filteredAttendance, clubRanking)}
       <div class="stats-attendance-summary">
