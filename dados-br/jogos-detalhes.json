@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-24T19:02:22.412977-03:00",
+  "gerado_em": "2026-10-24T21:36:09.972850-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 313,
   "total_com_estatisticas": 313,
-  "total_com_publico": 313,
+  "total_com_publico": 315,
   "total_com_eventos": 313,
   "total_com_jogadores": 313,
   "total_eventos_validados": 313,
@@ -20,9 +20,9 @@
       "placar_mandante": 3,
       "placar_visitante": 0,
       "estadio": "Estadio Beira-Rio",
-      "publico": 25770,
+      "publico": 33406,
       "publico_tipo": "presente",
-      "publico_fonte": "https://www.lance.com.br/lancepedia/internacional-3-x-0-botafogo-brasileirao-2018.html",
+      "publico_fonte": "https://internacional.com.br/noticias/masculino/inter-goleia-o-botafogo-com-show-da-torcida",
       "arbitro": "",
       "stats": [
         {
@@ -569,7 +569,8 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-10-24T18:45:59.950538-03:00",
-      "renda": 149435
+      "renda": 1450464,
+      "publico_pagante": 30703
     },
     "401841284": {
       "event_id": "401841284",
@@ -176864,8 +176865,20 @@
       "publico_pagante": 19535,
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
+    },
+    "401841283": {
+      "publico": 26020,
+      "publico_fonte": "https://www.estadao.com.br/esportes/futebol/palmeiras-supera-penalti-perdido-vence-bragantino-e-assume-lideranca-do-brasileirao",
+      "publico_tipo": "presente",
+      "renda": 1549693.46
+    },
+    "401841281": {
+      "publico": 19048,
+      "publico_fonte": "https://esportes.r7.com/jogada-10/marino-desencanta-vasco-vira-e-vence-o-corinthians-em-sao-januario-24102026",
+      "publico_tipo": "presente",
+      "renda": 1042402.5
     }
   },
-  "total_com_publico_pagante": 274,
-  "total_com_renda": 313
+  "total_com_publico_pagante": 275,
+  "total_com_renda": 315
 }

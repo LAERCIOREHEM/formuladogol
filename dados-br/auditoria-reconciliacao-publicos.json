@@ -1,23 +1,43 @@
 {
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
-  "jogos_finalizados": 313,
-  "jogos_com_publico": 313,
+  "jogos_finalizados": 315,
+  "jogos_com_publico": 315,
   "jogos_sem_publico": 0,
-  "publico_total": 7779492,
-  "jogos_com_renda": 313,
+  "publico_total": 7832196,
+  "jogos_com_renda": 315,
   "aguardando_fonte": [],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
     {
+      "event_id": "401841283",
+      "tipo_publico": "presente",
+      "publico_presente": 26020,
+      "publico_pagante": null,
+      "renda": 1549693.46,
+      "fonte_publico": "https://www.estadao.com.br/esportes/futebol/palmeiras-supera-penalti-perdido-vence-bragantino-e-assume-lideranca-do-brasileirao",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
+    },
+    {
+      "event_id": "401841281",
+      "tipo_publico": "presente",
+      "publico_presente": 19048,
+      "publico_pagante": null,
+      "renda": 1042402.5,
+      "fonte_publico": "https://esportes.r7.com/jogada-10/marino-desencanta-vasco-vira-e-vence-o-corinthians-em-sao-januario-24102026",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
+    },
+    {
       "event_id": "401841285",
       "tipo_publico": "presente",
-      "publico_presente": 25770,
-      "publico_pagante": null,
-      "renda": 149435.0,
-      "fonte_publico": "https://www.lance.com.br/lancepedia/internacional-3-x-0-botafogo-brasileirao-2018.html",
-      "origem": "cloudflare-postgame-fastlane",
+      "publico_presente": 33406,
+      "publico_pagante": 30703,
+      "renda": 1450464.0,
+      "fonte_publico": "https://internacional.com.br/noticias/masculino/inter-goleia-o-botafogo-com-show-da-torcida",
+      "origem": "correção documental verificada",
       "estado": "CONFIRMADO"
     },
     {
@@ -3141,5 +3161,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-10-24T19:02:23.178263-03:00"
+  "gerado_em": "2026-10-24T21:36:10.597763-03:00"
 }

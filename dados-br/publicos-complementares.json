@@ -1,6 +1,6 @@
 {
   "_comentario": "Complemento documental de público presente, pagantes e renda. Correções verificadas por event_id são mescladas por campo antes da coleta; a busca automática prioriza ge/Gato Mestre. Público pagante nunca substitui público presente e fontes avulsas podem cobrir jogos remarcados.",
-  "atualizado_em": "2026-10-24T19:28:03.462159-03:00",
+  "atualizado_em": "2026-10-24T21:36:10.274954-03:00",
   "jogos": {
     "401840808": {
       "tipo": "presente",
@@ -3860,10 +3860,10 @@
     },
     "401841285": {
       "tipo": "presente",
-      "publico_status": "confirmado_fonte_clube",
-      "renda_status": "confirmado_fonte_clube",
-      "origem": "site_oficial_internacional_2026-10-24",
-      "pagantes_status": "confirmado_fonte_clube",
+      "publico_status": "divulgado",
+      "renda_status": "divulgado",
+      "origem": "correção documental verificada",
+      "pagantes_status": "divulgado",
       "nota_auditoria": "Inter 3x0 Botafogo 24/10/2026, rodada 32. Público presente 33.406, pagantes 30.703, não pagantes 2.703, renda R$ 1.450.464,00. Dados da ficha técnica publicada pelo clube.",
       "publico": 33406,
       "pagantes": 30703,
@@ -3873,7 +3873,8 @@
       "fonte": "https://internacional.com.br/noticias/masculino/inter-goleia-o-botafogo-com-show-da-torcida",
       "fonte_publico": "https://internacional.com.br/noticias/masculino/inter-goleia-o-botafogo-com-show-da-torcida",
       "fonte_pagantes": "https://internacional.com.br/noticias/masculino/inter-goleia-o-botafogo-com-show-da-torcida",
-      "fonte_renda": "https://internacional.com.br/noticias/masculino/inter-goleia-o-botafogo-com-show-da-torcida"
+      "fonte_renda": "https://internacional.com.br/noticias/masculino/inter-goleia-o-botafogo-com-show-da-torcida",
+      "verificado_em": "2026-10-18T22:55:58-03:00"
     },
     "401841287": {
       "tipo": "presente",
@@ -3916,6 +3917,30 @@
       "renda": 3882407.5,
       "renda_status": "divulgado",
       "fonte_renda": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/09/02/flamengo-bate-mirassol-em-jogo-atrasado-e-cola-no-lider-palmeiras.htm"
+    },
+    "401841283": {
+      "tipo": "presente",
+      "publico": 26020,
+      "publico_status": "divulgado",
+      "fonte": "https://www.estadao.com.br/esportes/futebol/palmeiras-supera-penalti-perdido-vence-bragantino-e-assume-lideranca-do-brasileirao",
+      "fonte_publico": "https://www.estadao.com.br/esportes/futebol/palmeiras-supera-penalti-perdido-vence-bragantino-e-assume-lideranca-do-brasileirao",
+      "renda": 1549693.46,
+      "renda_status": "divulgado",
+      "fonte_renda": "https://tnonline.uol.com.br/noticias/esportes/palmeiras-ganha-do-red-bull-bragantino-e-mantem-lideranca-geral-do-paulistao-732638",
+      "origem": "cloudflare-postgame-fastlane",
+      "verificado_em": "2026-10-24T21:36:09.876081-03:00"
+    },
+    "401841281": {
+      "tipo": "presente",
+      "publico": 19048,
+      "publico_status": "divulgado",
+      "fonte": "https://esportes.r7.com/jogada-10/marino-desencanta-vasco-vira-e-vence-o-corinthians-em-sao-januario-24102026",
+      "fonte_publico": "https://esportes.r7.com/jogada-10/marino-desencanta-vasco-vira-e-vence-o-corinthians-em-sao-januario-24102026",
+      "renda": 1042402.5,
+      "renda_status": "divulgado",
+      "fonte_renda": "https://esportes.r7.com/jogada-10/marino-desencanta-vasco-vira-e-vence-o-corinthians-em-sao-januario-24102026",
+      "origem": "cloudflare-postgame-fastlane",
+      "verificado_em": "2026-10-24T21:36:09.876081-03:00"
     }
   },
   "fontes_rodadas": {
