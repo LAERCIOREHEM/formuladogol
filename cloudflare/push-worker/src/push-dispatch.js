@@ -169,7 +169,7 @@ export async function enqueueSportsEvent(env, eventKey, options = {}) {
     VALUES (?, 'pending')
   `).bind(key).run();
   // Não reencaminhar para a Queue uma chave de evento já conhecida.
-  if (inserted?.meta && Object.prototype.hasOwnProperty.call(inserted.meta, 'changes') && num(inserted.meta.changes, 0) === 0) return false;
+  if (num(inserted?.meta?.changes, 0) === 0) return false;
   try {
     const message = { kind: 'event_dispatch', eventKey: key, afterSubscriptionId: '' };
     if (delaySeconds > 0) await env.PUSH_QUEUE.send(message, { delaySeconds });
