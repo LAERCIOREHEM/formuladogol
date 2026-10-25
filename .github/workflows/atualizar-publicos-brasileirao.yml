@@ -17,8 +17,9 @@ on:
       - 'scripts/gerar_estatisticas_competicao_brasileirao.py'
       - '.github/workflows/atualizar-publicos-brasileirao.yml'
   schedule:
-    # Backstop gratuito: o Orchestrator segue responsavel pela conciliacao rapida.
-    - cron: '13,43 * * * *'
+    # Backstop de 10 minutos para campos faltantes; a pesquisa IA so ocorre quando elegivel
+    # por jogo/campo e continua sujeita a backoff e guardas de orçamento.
+    - cron: '3,13,23,33,43,53 * * * *'
   workflow_dispatch:
     inputs:
       modo:
@@ -170,9 +171,9 @@ jobs:
               echo "::warning::Fastlane sem cobertura completa do event_id ${EVENT_ID}; pesquisa determinística direcionada."
               python scripts/atualizar_publicos_brasileirao.py --event-id "$EVENT_ID" --max-rodadas 1
               if publico_ou_renda_pendente; then
-                echo "::notice::Ainda falta público/renda; fallback IA por evento com grace de 30min e backoff persistente."
+                echo "::notice::Ainda falta público/renda; fallback IA por evento com grace de 9min e backoff persistente."
                 set +e
-                python scripts/completar_publicos_ia.py --grace-horas 0.5 --modo partida --event-id "$EVENT_ID" --max-jogos 1 2>&1 | tee /tmp/camada-ia.log
+                python scripts/completar_publicos_ia.py --grace-horas 0.15 --modo partida --event-id "$EVENT_ID" --max-jogos 1 2>&1 | tee /tmp/camada-ia.log
                 IA_RC=${PIPESTATUS[0]}
                 set -e
                 if [[ "$IA_RC" != "0" ]]; then
@@ -215,7 +216,7 @@ jobs:
           fi
           "${DET_CMD[@]}"
 
-          IA_CMD=(python scripts/completar_publicos_ia.py --grace-horas 0.5 --modo "${MODO:-automatico}")
+          IA_CMD=(python scripts/completar_publicos_ia.py --grace-horas 0.15 --modo "${MODO:-automatico}")
           case "${MODO:-automatico}" in
             partida) IA_CMD+=(--event-id "$EVENT_ID" --max-jogos 1) ;;
             automatico) IA_CMD+=(--max-jogos 1) ;;
