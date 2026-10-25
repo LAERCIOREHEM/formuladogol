@@ -20,12 +20,17 @@ class FakeStorage {
 }
 
 class FakeDB {
-  constructor() { this.events = new Map(); this.essentialEvents = new Map(); this.matchEvents = new Map(); this.preflight = new Map(); this.incidents = new Map(); }
+  constructor() { this.events = new Map(); this.essentialEvents = new Map(); this.matchEvents = new Map(); this.preflight = new Map(); this.incidents = new Map(); this.dispatches = new Map(); }
   prepare(sql) {
     return {
       bind: (...args) => ({
         run: async () => {
           let changes = 0;
+          // Modelar a tabela D1 de despacho: INSERT OR IGNORE é idempotente.
+          // Sem isso, o mock devolvia changes=0 e impedia o enqueue em testes.
+          if (/INSERT OR IGNORE INTO push_event_dispatch/.test(sql)) {
+            if (!this.dispatches.has(args[0])) { this.dispatches.set(args[0], { status: 'pending' }); changes = 1; }
+          }
           if (/INSERT OR IGNORE INTO sports_events/.test(sql)) {
             if (!this.events.has(args[0])) { this.events.set(args[0], args); changes = 1; }
           }
@@ -208,6 +213,7 @@ try {
   assert.equal(await monitor.emitPrematchReminders(reminderNow), 1);
   assert.equal(db.matchEvents.size, 1);
   assert.equal(queue.length, 1);
+  assert.equal(db.dispatches.size, 1, 'T-15 deve gravar despacho único');
   const premRow = [...db.matchEvents.values()][0];
   const premPayload = JSON.parse(premRow[4]);
   assert.equal(premPayload.type, 'prematch_15');
