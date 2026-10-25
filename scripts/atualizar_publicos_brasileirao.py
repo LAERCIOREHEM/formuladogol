@@ -1106,10 +1106,25 @@ def propagar_publicos_para_detalhes(
         mapa = {}
     alteracoes = 0
     conflitos: list[dict[str, Any]] = []
+    # Fastlane pode documentar público/renda antes de a ESPN criar a linha de
+    # detalhes. Materializar uma linha mínima SOMENTE para IDs finalizados e
+    # reconhecidos em resultados, sem inventar estatísticas ou participantes.
+    resultados = carregar_json(RESULTADOS, {})
+    finalizados = {
+        str(g.get("event_id"))
+        for g in (resultados.get("resultados") or [])
+        if isinstance(g, dict) and str(g.get("estado") or "").lower() == "post"
+    }
     for event_id, comp in mapa.items():
-        if not isinstance(comp, dict) or str(event_id) not in jogos:
+        if not isinstance(comp, dict):
             continue
-        row = jogos[str(event_id)]
+        event_id = str(event_id)
+        if event_id not in jogos:
+            if event_id not in finalizados or numero_publico(comp.get("publico")) is None:
+                continue
+            jogos[event_id] = {}
+            alteracoes += 1
+        row = jogos[event_id]
         publico = numero_publico(comp.get("publico"))
         fonte = str(comp.get("fonte") or comp.get("origem") or "complemento documental")
         tipo = str(comp.get("tipo") or "presente")
