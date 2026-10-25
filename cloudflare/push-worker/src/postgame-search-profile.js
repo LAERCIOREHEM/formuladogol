@@ -373,7 +373,7 @@ export function buildAttendanceSearchQueries(task) {
   if (round) add(`"${home}" "${away}" "rodada ${round}" público renda`);
 
   // Buscas direcionadas em portais que costumam publicar ficha técnica cedo.
-  for (const domain of ['uol.com.br', 'ge.globo.com', 'estadao.com.br', 'r7.com', 'itatiaia.com.br']) {
+  for (const domain of ['uol.com.br', 'ge.globo.com', 'estadao.com.br', 'itatiaia.com.br', 'gauchazh.clicrbs.com.br', 'metro1.com.br', 'r7.com']) {
     add(`site:${domain} "${home}" "${away}" público renda`);
   }
 
@@ -382,7 +382,7 @@ export function buildAttendanceSearchQueries(task) {
   for (const domain of officialClubDomainsForTask(task)) {
     add(`site:${domain} "${home}" "${away}" público renda`);
   }
-  return queries.slice(0, 18);
+  return queries.slice(0, 22);
 }
 
 export function attendanceSourcePolicyText(task) {
