@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-24T22:00:57.932243-03:00",
+  "gerado_em": "2026-10-24T22:32:31.827540-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 316,
   "total_com_estatisticas": 316,
-  "total_com_publico": 315,
+  "total_com_publico": 316,
   "total_com_eventos": 316,
   "total_com_jogadores": 316,
   "total_eventos_validados": 316,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Arena Condá",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 3664,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/fluminense-e-surpreendido-pela-chapecoense-e-ve-g-4-do-brasileirao-se-distanciar-cmvn4z9v102gk014wux7u9tp3.html",
       "arbitro": "",
       "stats": [
         {
@@ -572,7 +572,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-24T22:00:42.468061-03:00"
+      "atualizado_em": "2026-10-24T22:00:42.468061-03:00",
+      "renda": 154330
     },
     "401841283": {
       "event_id": "401841283",
@@ -178584,5 +178585,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 275,
+  "total_com_renda": 316
 }
