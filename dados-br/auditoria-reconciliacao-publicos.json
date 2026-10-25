@@ -2,30 +2,23 @@
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
   "jogos_finalizados": 317,
-  "jogos_com_publico": 316,
-  "jogos_sem_publico": 1,
-  "publico_total": 7835860,
+  "jogos_com_publico": 317,
+  "jogos_sem_publico": 0,
+  "publico_total": 7850516,
   "jogos_com_renda": 317,
-  "aguardando_fonte": [
-    {
-      "event_id": "401841282",
-      "mandante": "Santos",
-      "visitante": "Bahia",
-      "estado": "AGUARDANDO_FONTE"
-    }
-  ],
+  "aguardando_fonte": [],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
     {
       "event_id": "401841282",
-      "tipo_publico": "",
-      "publico_presente": null,
+      "tipo_publico": "presente",
+      "publico_presente": 14656,
       "publico_pagante": 14656,
       "renda": 500270.0,
-      "fonte_publico": "",
-      "origem": "ficha técnica jornalística verificada; somente pagantes comprovados",
-      "estado": "AGUARDANDO_FONTE"
+      "fonte_publico": "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/10/24/santos-x-bahia-vila-belmiro.amp.htm",
+      "origem": "UOL ficha técnica: público 14.656 torcedores; Itatiaia identifica 14.656 pagantes",
+      "estado": "CONFIRMADO"
     },
     {
       "event_id": "401841278",
@@ -3188,5 +3181,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-10-25T00:04:52.338443-03:00"
+  "gerado_em": "2026-10-25T00:10:14.934457-03:00"
 }
