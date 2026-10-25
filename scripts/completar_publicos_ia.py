@@ -505,6 +505,8 @@ def consultas_obrigatorias(partida: Mapping[str, Any]) -> list[str]:
         f'"{confronto}" ficha técnica público renda',
         f'site:uol.com.br "{mandante}" "{visitante}" "PÚBLICO" "RENDA" {ano}',
         f'site:bol.uol.com.br "{mandante}" "{visitante}" "PÚBLICO" "RENDA" {ano}',
+        f'site:itatiaia.com.br "{mandante}" "{visitante}" "público" "renda" {ano}',
+        f'site:metro1.com.br "{mandante}" "{visitante}" "público" "renda" {ano}',
         f'site:gauchazh.clicrbs.com.br "{mandante}" "{visitante}" "PÚBLICO" "RENDA" {ano}',
         f'site:estadao.com.br "{confronto}" público renda',
         f'site:ge.globo.com "{confronto}" público renda',
