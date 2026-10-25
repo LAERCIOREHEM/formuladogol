@@ -1,15 +1,32 @@
 {
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
-  "jogos_finalizados": 316,
+  "jogos_finalizados": 317,
   "jogos_com_publico": 316,
-  "jogos_sem_publico": 0,
+  "jogos_sem_publico": 1,
   "publico_total": 7835860,
-  "jogos_com_renda": 316,
-  "aguardando_fonte": [],
+  "jogos_com_renda": 317,
+  "aguardando_fonte": [
+    {
+      "event_id": "401841282",
+      "mandante": "Santos",
+      "visitante": "Bahia",
+      "estado": "AGUARDANDO_FONTE"
+    }
+  ],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
+    {
+      "event_id": "401841282",
+      "tipo_publico": "",
+      "publico_presente": null,
+      "publico_pagante": 14656,
+      "renda": 500270.0,
+      "fonte_publico": "",
+      "origem": "ficha técnica jornalística verificada; somente pagantes comprovados",
+      "estado": "AGUARDANDO_FONTE"
+    },
     {
       "event_id": "401841278",
       "tipo_publico": "presente",
@@ -3171,5 +3188,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-10-24T22:32:32.612193-03:00"
+  "gerado_em": "2026-10-25T00:04:52.338443-03:00"
 }
