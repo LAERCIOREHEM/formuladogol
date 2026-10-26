@@ -6079,59 +6079,93 @@
       ],
       "overlay_alterado": true,
       "resumo": "Confirmado: Santos x Bahia, Campeonato Brasileiro (32ª rodada), sábado, 24/10/2026, às 21h (horário de Brasília), na Vila Belmiro. A transmissão integral para o Brasil é de SporTV e Premiere. GE TV não integra a grade da partida: o vídeo informado é de aquecimento/pré-jogo, não da transmissão completa."
+    },
+    {
+      "event_id": "401841279",
+      "jogo": "Coritiba x Grêmio",
+      "data_iso": "2026-10-26T19:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-10-26T18:04:19-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Premiere"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/10/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-30a-rodada.ghtml",
+        "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+        "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/10/07/remo-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/jogo/26-10-2026/coritiba-gremio.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/16/coritiba-x-vitoria-pelo-brasileirao-tem-mudanca-de-data-e-horario-veja-detalhes.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/25/coritiba-x-gremio-pode-mudar-o-cenario-dos-times-na-disputa-contra-a-queda-assista.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/26/coritiba-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/pr/futebol/times/coritiba/noticia/2026/09/28/agenda-do-coritiba-confira-datas-e-horarios-dos-jogos-ate-a-34a-rodada-do-brasileirao.ghtml",
+        "https://ge.globo.com/pr/futebol/times/coritiba/noticia/2026/10/21/coritiba-tenta-encerrar-dois-jejuns-contra-o-gremio-no-couto-pereira.ghtml",
+        "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/04/26/gremio-x-coritiba-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/10/26/gremio-entra-em-campo-mais-afundado-no-z-4-entenda-motivos-para-decisao-contra-o-coritiba.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-gremio/832208",
+        "https://www.youtube.com/watch?v=-W_buf3jy1E",
+        "https://www.youtube.com/watch?v=wsFL5Uub1j4"
+      ],
+      "canais_depois": [
+        "Premiere"
+      ],
+      "exclusivo": true,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/26/coritiba-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-gremio/832208"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Coritiba x Grêmio, Brasileirão Série A 2026, fase única, 32ª rodada, nesta segunda-feira, 26/10/2026, às 19h30 (horário de Brasília), no Couto Pereira. A transmissão integral é exclusiva do Premiere. O ge fará apenas acompanhamento em Tempo Real, que não constitui transmissão do jogo."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841282",
-    "jogo": "Santos x Bahia",
-    "data_iso": "2026-10-24T21:00:00-03:00",
+    "event_id": "401841279",
+    "jogo": "Coritiba x Grêmio",
+    "data_iso": "2026-10-26T19:30:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-10-24T19:43:18-03:00",
+    "executado_em": "2026-10-26T18:04:19-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "GE TV"
+      "Premiere"
     ],
-    "status": "corrigido",
+    "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/09/27/brasileirao-2026-veja-a-tabela-detalhada-de-bahia-e-vitoria-entre-as-rodadas-31-e-34.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/times/bahia/noticia/2026/10/24/bahia-faz-confronto-direto-com-o-santos-para-voltar-a-zona-de-classificacao-da-libertadores.ghtml",
-      "https://ge.globo.com/google/amp/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/10/24/santos-x-bahia-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/sp/santos-e-regiao/futebol/times/santos/noticia/2026/10/20/santos-volta-aos-treinos-e-inicia-preparacao-para-enfrentar-o-bahia.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/jogo/24-10-2026/santos-bahia.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/times/santos/noticia/2026/10/21/santos-x-bahia-em-reforma-vila-belmiro-tera-capacidade-reduzida.ghtml",
-      "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/10/22/santos-x-bahia-ao-vivo-onde-assistir-horario-e-escalacoes-pelo-brasileirao.html",
-      "https://placar.uol.com.br/esporte/futebol/brasileirao/2026/10/24/santos-x-bahia.htm",
-      "https://www.bol.uol.com.br/esporte/2026/10/24/mirassol-x-sao-paulo-como-foi-o-jogo-pelo-brasileirao-2026.ghtm",
-      "https://www.bol.uol.com.br/esporte/2026/10/24/santos-busca-aproveitar-ma-fase-do-bahia-para-encostar-na-briga-por-vaga-na-libertadores.amp.htm",
-      "https://www.uol.com.br/esporte/colunas/bruno-lima/2026/09/22/santos-estuda-mais-de-um-jogo-em-sao-paulo-na-reta-final-do-brasileirao.htm",
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/10/24/santos-x-bahia-horario-e-onde-assistir-ao-jogo-do-brasileirao.ghtm",
-      "https://www.youtube.com/watch?v=U5x-Pza-v40",
-      "https://www.youtube.com/watch?v=cUv-dPy9O7M"
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/10/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-30a-rodada.ghtml",
+      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+      "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/10/07/remo-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/jogo/26-10-2026/coritiba-gremio.ghtml",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/16/coritiba-x-vitoria-pelo-brasileirao-tem-mudanca-de-data-e-horario-veja-detalhes.ghtml",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/25/coritiba-x-gremio-pode-mudar-o-cenario-dos-times-na-disputa-contra-a-queda-assista.ghtml",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/26/coritiba-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/pr/futebol/times/coritiba/noticia/2026/09/28/agenda-do-coritiba-confira-datas-e-horarios-dos-jogos-ate-a-34a-rodada-do-brasileirao.ghtml",
+      "https://ge.globo.com/pr/futebol/times/coritiba/noticia/2026/10/21/coritiba-tenta-encerrar-dois-jejuns-contra-o-gremio-no-couto-pereira.ghtml",
+      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/04/26/gremio-x-coritiba-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/10/26/gremio-entra-em-campo-mais-afundado-no-z-4-entenda-motivos-para-decisao-contra-o-coritiba.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-gremio/832208",
+      "https://www.youtube.com/watch?v=-W_buf3jy1E",
+      "https://www.youtube.com/watch?v=wsFL5Uub1j4"
     ],
     "canais_depois": [
-      "Premiere",
-      "SporTV"
+      "Premiere"
     ],
-    "exclusivo": false,
+    "exclusivo": true,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/google/amp/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/10/24/santos-x-bahia-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/26/coritiba-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-gremio/832208"
     ],
-    "youtube": [
-      {
-        "url": "https://www.youtube.com/watch?v=WAasakiYhbY",
-        "scope": "pre_game",
-        "valid_for_match": false,
-        "reason": "O título do vídeo informa “SANTOS X BAHIA | AQUECIMENTO AO VIVO”; trata-se de cobertura de aquecimento/pré-jogo, sem evidência de exibição integral da partida."
-      }
-    ],
-    "youtube_removidos": [
-      "https://www.youtube.com/watch?v=WAasakiYhbY"
-    ],
+    "youtube": [],
+    "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado: Santos x Bahia, Campeonato Brasileiro (32ª rodada), sábado, 24/10/2026, às 21h (horário de Brasília), na Vila Belmiro. A transmissão integral para o Brasil é de SporTV e Premiere. GE TV não integra a grade da partida: o vídeo informado é de aquecimento/pré-jogo, não da transmissão completa."
+    "resumo": "Confirmado para o Brasil: Coritiba x Grêmio, Brasileirão Série A 2026, fase única, 32ª rodada, nesta segunda-feira, 26/10/2026, às 19h30 (horário de Brasília), no Couto Pereira. A transmissão integral é exclusiva do Premiere. O ge fará apenas acompanhamento em Tempo Real, que não constitui transmissão do jogo."
   },
-  "atualizado_em": "2026-10-24T19:43:18-03:00"
+  "atualizado_em": "2026-10-26T18:04:19-03:00"
 }

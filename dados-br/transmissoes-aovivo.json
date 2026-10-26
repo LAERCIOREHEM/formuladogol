@@ -13,43 +13,6 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "jogos": {
-    "401841281": {
-      "event_id": "401841281",
-      "rodada": 32,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "espn_league": "bra.1",
-      "mandante": "Vasco da Gama",
-      "visitante": "Corinthians",
-      "data_iso": "2026-10-24T18:30:00-03:00",
-      "estadio": "Estádio São Januário",
-      "origem": "automático",
-      "principal": {
-        "fonte": "cazetv",
-        "nome": "CazéTV",
-        "video_id": "FDo01YVDsNE",
-        "url": "https://www.youtube.com/watch?v=FDo01YVDsNE",
-        "status": "live",
-        "inicio_programado": "2026-10-24T17:00:00-03:00",
-        "inicio_real": "2026-10-24T17:01:48-03:00",
-        "titulo": "AO VIVO: VASCO X CORINTHIANS | BRASILEIRÃO 2026 | 32ª RODADA",
-        "canal": "CazéTV",
-        "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
-        "thumbnail": "https://i.ytimg.com/vi/FDo01YVDsNE/maxresdefault.jpg?v=6adcd91a",
-        "confianca": 0.925,
-        "motivos": [
-          "os dois clubes aparecem no título",
-          "identifica Brasileirão/competição",
-          "identifica transmissão ao vivo",
-          "transmissão já está ao vivo",
-          "horário compatível (90 min de diferença)"
-        ],
-        "origem_busca": "streams-page",
-        "escopo": "partida",
-        "embeddable": false
-      },
-      "alternativas": []
-    },
     "401841286": {
       "event_id": "401841286",
       "rodada": 32,
@@ -66,18 +29,19 @@
         "nome": "GE TV",
         "video_id": "t02EdyZtW00",
         "url": "https://www.youtube.com/watch?v=t02EdyZtW00",
-        "status": "upcoming",
+        "status": "live",
         "inicio_programado": "2026-10-26T18:00:00-03:00",
-        "inicio_real": "",
+        "inicio_real": "2026-10-26T17:55:19-03:00",
         "titulo": "FLAMENGO X ATLÉTICO-MG | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
         "canal": "ge tv",
         "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
         "thumbnail": "https://i.ytimg.com/vi/t02EdyZtW00/maxresdefault.jpg?v=6ada3c2e",
-        "confianca": 0.85,
+        "confianca": 0.9,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
           "identifica transmissão ao vivo",
+          "transmissão já está ao vivo",
           "horário compatível (120 min de diferença)"
         ],
         "origem_busca": "uploads",
@@ -145,6 +109,78 @@
         "canal": "ge tv",
         "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
         "thumbnail": "https://i.ytimg.com/vi/yL7MzrhVAJk/maxresdefault.jpg?v=6acbffae",
+        "confianca": 0.875,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (90 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": true
+      },
+      "alternativas": []
+    },
+    "401841290": {
+      "event_id": "401841290",
+      "rodada": 33,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Grêmio",
+      "visitante": "Athletico-PR",
+      "data_iso": "2026-10-29T21:30:00-03:00",
+      "estadio": "Arena do Grêmio",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "xwhPKMVtapI",
+        "url": "https://www.youtube.com/watch?v=xwhPKMVtapI",
+        "status": "upcoming",
+        "inicio_programado": "2026-10-29T20:30:00-03:00",
+        "inicio_real": "",
+        "titulo": "GRÊMIO X ATHLETICO-PR | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/xwhPKMVtapI/maxresdefault.jpg?v=6adf77cb",
+        "confianca": 0.9,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (60 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": true
+      },
+      "alternativas": []
+    },
+    "401841295": {
+      "event_id": "401841295",
+      "rodada": 33,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Corinthians",
+      "visitante": "Mirassol",
+      "data_iso": "2026-10-30T20:00:00-03:00",
+      "estadio": "Neo Química Arena",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "FcqUaxsQHNQ",
+        "url": "https://www.youtube.com/watch?v=FcqUaxsQHNQ",
+        "status": "upcoming",
+        "inicio_programado": "2026-10-30T18:30:00-03:00",
+        "inicio_real": "",
+        "titulo": "CORINTHIANS X MIRASSOL | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/FcqUaxsQHNQ/maxresdefault.jpg?v=6adf78e1",
         "confianca": 0.875,
         "motivos": [
           "os dois clubes aparecem no título",
@@ -263,5 +299,5 @@
       "alternativas": []
     }
   },
-  "atualizado_em": "2026-10-24T19:31:47-03:00"
+  "atualizado_em": "2026-10-26T18:02:17-03:00"
 }
