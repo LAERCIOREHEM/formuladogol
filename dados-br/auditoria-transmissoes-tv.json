@@ -7,9 +7,9 @@
     "jogos_sem_transmissao_14d": 1,
     "jogos_sem_transmissao_fora_14d": 9,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 2,
+    "registros_preservados": 3,
     "jogos_guardiao_ia": 2,
-    "jogos_estaveis_sem_reconsulta_editorial": 2,
+    "jogos_estaveis_sem_reconsulta_editorial": 9,
     "fontes_com_falha": 2
   },
   "fontes": {
@@ -26,18 +26,18 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 10083
+      "duracao_ms": 10494
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 33,
-      "duracao_ms": 39070
+      "jogos_com_canal": 26,
+      "duracao_ms": 19577
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 2,
-      "jogos_com_canal": 2,
-      "duracao_ms": 33350
+      "jogos_com_canal": 0,
+      "duracao_ms": 18139
     },
     "espn": {
       "ok": false,
@@ -54,7 +54,7 @@
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-31T16:00:00-03:00",
-      "faltam_horas": 116.5,
+      "faltam_horas": 116.0,
       "nivel": "aviso"
     }
   ],
@@ -64,7 +64,7 @@
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-31T16:00:00-03:00",
-      "faltam_horas": 116.5,
+      "faltam_horas": 116.0,
       "nivel": "aviso"
     },
     {
@@ -72,7 +72,7 @@
       "rodada": 35,
       "jogo": "Mirassol x Atlético-MG",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 549.5,
+      "faltam_horas": 549.0,
       "nivel": "futuro"
     },
     {
@@ -80,7 +80,7 @@
       "rodada": 35,
       "jogo": "Grêmio x Bahia",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 549.5,
+      "faltam_horas": 549.0,
       "nivel": "futuro"
     },
     {
@@ -88,7 +88,7 @@
       "rodada": 35,
       "jogo": "Coritiba x Santos",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 549.5,
+      "faltam_horas": 549.0,
       "nivel": "futuro"
     },
     {
@@ -96,7 +96,7 @@
       "rodada": 36,
       "jogo": "Athletico-PR x Remo",
       "data_iso": "2026-11-21T17:00:00-03:00",
-      "faltam_horas": 621.5,
+      "faltam_horas": 621.0,
       "nivel": "futuro"
     },
     {
@@ -104,7 +104,7 @@
       "rodada": 36,
       "jogo": "Santos x Grêmio",
       "data_iso": "2026-11-21T17:00:00-03:00",
-      "faltam_horas": 621.5,
+      "faltam_horas": 621.0,
       "nivel": "futuro"
     },
     {
@@ -112,7 +112,7 @@
       "rodada": 36,
       "jogo": "Palmeiras x Flamengo",
       "data_iso": "2026-11-21T17:00:00-03:00",
-      "faltam_horas": 621.5,
+      "faltam_horas": 621.0,
       "nivel": "futuro"
     },
     {
@@ -120,7 +120,7 @@
       "rodada": 36,
       "jogo": "Bahia x Coritiba",
       "data_iso": "2026-11-21T17:00:00-03:00",
-      "faltam_horas": 621.5,
+      "faltam_horas": 621.0,
       "nivel": "futuro"
     },
     {
@@ -128,7 +128,7 @@
       "rodada": 0,
       "jogo": "Atlético-MG x Boca Juniors",
       "data_iso": "2026-11-21T17:00:00-03:00",
-      "faltam_horas": 621.5,
+      "faltam_horas": 621.0,
       "nivel": "futuro"
     },
     {
@@ -136,7 +136,7 @@
       "rodada": 0,
       "jogo": "Palmeiras x Estudiantes de La Plata",
       "data_iso": "2026-11-28T17:00:00-03:00",
-      "faltam_horas": 789.5,
+      "faltam_horas": 789.0,
       "nivel": "futuro"
     }
   ],
@@ -154,6 +154,18 @@
       "canais": [
         "SporTV"
       ]
+    },
+    {
+      "event_id": "401841324",
+      "jogo": "Fluminense x Mirassol",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video",
+        "Disney+ / ESPN"
+      ]
     }
   ],
   "erros": [
@@ -166,5 +178,5 @@
     "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/26/coritiba-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
     "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/10/26/flamengo-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
   ],
-  "atualizado_em": "2026-10-26T19:31:43-03:00"
+  "atualizado_em": "2026-10-26T20:01:35-03:00"
 }
