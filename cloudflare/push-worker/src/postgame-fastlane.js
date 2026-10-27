@@ -1154,9 +1154,6 @@ async function refreshCachedPublicSources(env,task,values,sources){
       extractor='no_numeric_evidence';
     }
 
-    await recordPublicSourceObservation(env,{eventId:task.event_id,url:row.url,provider:row.provider,
-      outcome:valid?'accepted':'no_data',reason:valid?`validated_${extractor}`:(lastError||'no_documental_data'),
-      fields:valid?Object.keys(valid.values||{}):[],publishedAt:source.publishedAt});
     await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=CASE WHEN ?='ok' THEN failures ELSE failures+1 END WHERE event_id=? AND url=?`)
       .bind(valid?`ok:${extractor}`:(lastError||'no_data'),valid?'ok':'fail',task.event_id,row.url).run();
     if(valid){
@@ -1170,6 +1167,15 @@ async function refreshCachedPublicSources(env,task,values,sources){
       Object.assign(sources,guarded.sources);
       if(guarded.verdict.critical.length) lastError=`factual_integrity:${guarded.verdict.critical.join('|')}`;
     }
+    // Uma fonte só conta como ACEITA se algum campo sobreviver ao guard factual
+    // e efetivamente entrar nos valores da partida. Evita falsas taxas de sucesso.
+    const retainedFields=valid?Object.keys(valid.values||{}).filter((key)=>
+      Number(valid.values[key])>0 && Number(values[key])===Number(valid.values[key]) &&
+      text(sources[key])===text(valid.sources[key])):[];
+    await recordPublicSourceObservation(env,{eventId:task.event_id,url:row.url,provider:row.provider,
+      outcome:retainedFields.length?'accepted':valid?'rejected':'no_data',
+      reason:retainedFields.length?`validated_${extractor}`:valid?'factual_guard_or_no_new_fields':extractor==='no_numeric_evidence'?'no_labeled_numeric_attendance_or_revenue':(lastError||'source_parser_rejected'),
+      fields:retainedFields,publishedAt:source.publishedAt});
     if(isPublicComplete(values))break;
   }
   return {checked,foundAny,lastError};
