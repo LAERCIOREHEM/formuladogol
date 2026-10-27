@@ -173,6 +173,48 @@ export function isMultiMatchRoundupSource(sourceUrl = '') {
 export const VERIFIED_STADIUM_CAPACITY = Object.freeze({
   'arena conda': 20089,
 });
+// Extração estruturada de matérias multijogo (GE/Gato Mestre), sem IA.
+// O gate genérico continua rejeitando roundups: somente este caminho pode
+// separar campos por placar, clubes, data, rodada e próximo cabeçalho.
+export function extractRoundupMatchBlock(task, sourceText, sourceUrl = '') {
+  const deny = (reason) => ({ accepted:false, reason, window:'' });
+  if (!isMultiMatchRoundupSource(sourceUrl)) return deny('not_roundup_source');
+  if (sourceCompetitionConflict(task, sourceUrl)) return deny('competition_mismatch');
+  const hs=Number(task?.home_score), as=Number(task?.away_score);
+  if (!Number.isInteger(hs)||!Number.isInteger(as)||hs<0||as<0||hs>20||as>20)
+    return deny('score_not_confirmed');
+  const gameDate=text(task?.kickoff||task?.data_iso).slice(0,10);
+  const sourceDate=urlDate(sourceUrl);
+  if(!gameDate||!sourceDate||daysBetweenIso(gameDate,sourceDate)>3)
+    return deny('roundup_date_mismatch');
+  let path='';
+  try { path=decodeURIComponent(new URL(text(sourceUrl)).pathname); } catch (_) { return deny('bad_url'); }
+  const roundSlug=path.match(/(?:^|[-/])(\d{1,2})[aoªº]?-rodada/i);
+  const expectedRound=Number(task?.round??task?.rodada);
+  if(roundSlug&&expectedRound>0&&Number(roundSlug[1])!==expectedRound)
+    return deny('roundup_round_mismatch');
+  const raw=text(sourceText).replace(/\s+/g,' ');
+  const escapePattern=(value)=>text(value).split('').map((c)=>'.*+?^$()|[]{}\\'.includes(c)?'\\'+c:c).join('').replace(/\s+/g,'\\s+');
+  const strongAliases=(value)=>teamSearchVariants(value,8).filter((a)=>!SEARCH_ONLY_WEAK_IDENTITY_ALIASES.has(normalizeText(a))&&a.length>=3);
+  const variants=(value)=>[...new Set(strongAliases(value))].sort((a,b)=>b.length-a.length).map(escapePattern).join('|');
+  const home=variants(task?.home), away=variants(task?.away);
+  if(!home||!away) return deny('missing_teams');
+  const target=new RegExp('(?:^|[^\\p{L}])((?:'+home+')\\s+'+hs+'\\s*[x×]\\s*'+as+'\\s+(?:'+away+'))(?=\\s|$|[,(])','giu');
+  const clubs=[...new Set(Object.keys(TEAM_SEARCH_PROFILES).flatMap(strongAliases))].sort((a,b)=>b.length-a.length).map(escapePattern).join('|');
+  const headers=new RegExp('(?:^|[^\\p{L}])(?:'+clubs+')\\s+\\d{1,2}\\s*[x×]\\s*\\d{1,2}\\s+(?:'+clubs+')(?=\\s|$|[,(])','giu');
+  const boundaries=[...raw.matchAll(headers)].map((m)=>m.index);
+  for(const match of raw.matchAll(target)){
+    const begin=match.index+match[0].indexOf(match[1]);
+    const after=begin+match[1].length;
+    const next=boundaries.find((index)=>index>=after);
+    const end=Math.min(next??raw.length,after+850);
+    const window=raw.slice(begin,end).trim();
+    if(/\b(?:p[úu]blico\s+(?:presente|total|pagante)|renda(?:\s+bruta)?)\s*:/i.test(window))
+      return {accepted:true,reason:'roundup_match_scoped',window};
+  }
+  return deny('roundup_match_or_labeled_data_not_found');
+}
+
 export function verifiedStadiumCapacity(task) {
   const name = normalizeText(task?.stadium || task?.estadio).replace(/^estadio\s+/, '');
   return VERIFIED_STADIUM_CAPACITY[name] || null;
