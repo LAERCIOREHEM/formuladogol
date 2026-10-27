@@ -450,7 +450,7 @@ export function publicSearchRequest(task, missing, env, phase = 'openai') {
       properties:{encontrado:{type:'boolean'},publico:{type:['integer','null']},publico_pagante:{type:['integer','null']},renda:{type:['number','null']},fonte_publico:{type:['string','null']},fonte_publico_pagante:{type:['string','null']},fonte_renda:{type:['string','null']},confianca:{type:'number'},observacao:{type:'string'}},
       required:['encontrado','publico','publico_pagante','renda','fonte_publico','fonte_publico_pagante','fonte_renda','confianca','observacao']
     } } },
-    tools:[{type:'web_search',search_context_size:'medium',filters:{allowed_domains:[...new Set([...PREFERRED_EDITORIAL_SOURCE_SUFFIXES,...officialClubDomainsForTask(task)])].slice(0,100)},user_location:{type:'approximate',country:'BR',timezone:'America/Sao_Paulo'}}],
+    tools:[{type:'web_search',search_context_size:'medium',user_location:{type:'approximate',country:'BR',timezone:'America/Sao_Paulo'}}],
     // OpenAI Responses documenta `required` quando a busca precisa realmente rodar.
     tool_choice:'required', max_tool_calls:PUBLIC_POLICY.openaiMaxToolCalls, max_output_tokens:3000,
     include:['web_search_call.action.sources'], reasoning:{effort:'low'}
