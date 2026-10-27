@@ -2,36 +2,29 @@
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
   "jogos_finalizados": 319,
-  "jogos_com_publico": 318,
-  "jogos_sem_publico": 1,
-  "publico_total": 7882062,
-  "jogos_com_renda": 318,
-  "aguardando_fonte": [
-    {
-      "event_id": "401841286",
-      "mandante": "Flamengo",
-      "visitante": "Atlético-MG",
-      "estado": "AGUARDANDO_FONTE"
-    }
-  ],
+  "jogos_com_publico": 319,
+  "jogos_sem_publico": 0,
+  "publico_total": 7942686,
+  "jogos_com_renda": 319,
+  "aguardando_fonte": [],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
     {
       "event_id": "401841286",
-      "tipo_publico": "",
-      "publico_presente": null,
-      "publico_pagante": null,
-      "renda": null,
-      "fonte_publico": "",
-      "origem": "",
-      "estado": "AGUARDANDO_FONTE"
+      "tipo_publico": "presente",
+      "publico_presente": 60624,
+      "publico_pagante": 57619,
+      "renda": 4578138.0,
+      "fonte_publico": "https://ge.globo.com/gato-mestre/noticia/2026/10/26/flamengo-x-atletico-mg-tem-o-maior-publico-da-32a-rodada-do-brasileiro-veja-a-lista.ghtml",
+      "origem": "ge/Gato Mestre",
+      "estado": "CONFIRMADO"
     },
     {
       "event_id": "401841279",
       "tipo_publico": "presente",
       "publico_presente": 31546,
-      "publico_pagante": null,
+      "publico_pagante": 30759,
       "renda": 1638336.99,
       "fonte_publico": "https://gauchazh.clicrbs.com.br/esportes/gremio/noticia/2026/10/gremio-erra-demais-leva-virada-do-cruzeiro-e-afunda-no-z-4-do-brasileirao-cmveb9shr011w01d4f6l87zln.html",
       "origem": "cloudflare-postgame-fastlane",
@@ -61,7 +54,7 @@
       "event_id": "401841283",
       "tipo_publico": "presente",
       "publico_presente": 26020,
-      "publico_pagante": null,
+      "publico_pagante": 25987,
       "renda": 1549693.46,
       "fonte_publico": "https://www.estadao.com.br/esportes/futebol/palmeiras-supera-penalti-perdido-vence-bragantino-e-assume-lideranca-do-brasileirao",
       "origem": "cloudflare-postgame-fastlane",
@@ -71,7 +64,7 @@
       "event_id": "401841281",
       "tipo_publico": "presente",
       "publico_presente": 19048,
-      "publico_pagante": null,
+      "publico_pagante": 18335,
       "renda": 1042402.5,
       "fonte_publico": "https://esportes.r7.com/jogada-10/marino-desencanta-vasco-vira-e-vence-o-corinthians-em-sao-januario-24102026",
       "origem": "cloudflare-postgame-fastlane",
@@ -91,7 +84,7 @@
       "event_id": "401841284",
       "tipo_publico": "presente",
       "publico_presente": 15700,
-      "publico_pagante": null,
+      "publico_pagante": 8371,
       "renda": 1087398.0,
       "fonte_publico": "https://www.terra.com.br/amp/esportes/sao-paulo/sao-paulo-bate-mirassol-com-brilho-de-luciano-reage-no-brasileirao-e-alivia-pressao-em-roger%2C647c44d4e84641743965a7746dec9661vzc1o7u7.html",
       "origem": "cloudflare-postgame-fastlane",
@@ -101,7 +94,7 @@
       "event_id": "401841280",
       "tipo_publico": "presente",
       "publico_presente": 41137,
-      "publico_pagante": null,
+      "publico_pagante": 16560,
       "renda": 2602813.86,
       "fonte_publico": "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/corinthians-tem-mais-volume-pouco-cria-fica-no-empate-com-o-vitoria-e-segue-colado-no-z-4-cmvg04v0l00fq014wlipffos0.html",
       "origem": "cloudflare-postgame-fastlane",
@@ -3208,5 +3201,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-10-26T22:16:40.640684-03:00"
+  "gerado_em": "2026-10-27T00:35:26.149752-03:00"
 }

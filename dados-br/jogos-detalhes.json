@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-26T22:16:39.892654-03:00",
+  "gerado_em": "2026-10-27T00:35:25.006496-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 319,
   "total_com_estatisticas": 319,
-  "total_com_publico": 318,
+  "total_com_publico": 319,
   "total_com_eventos": 319,
   "total_com_jogadores": 319,
   "total_eventos_validados": 319,
@@ -20,9 +20,9 @@
       "placar_mandante": 3,
       "placar_visitante": 2,
       "estadio": "Estadio do Maracana",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 60624,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/10/26/flamengo-x-atletico-mg-tem-o-maior-publico-da-32a-rodada-do-brasileiro-veja-a-lista.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -588,7 +588,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-26T22:11:03.117352-03:00"
+      "atualizado_em": "2026-10-26T22:11:03.117352-03:00",
+      "publico_pagante": 57619,
+      "renda": 4578138,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841279": {
       "event_id": "401841279",
@@ -1121,7 +1124,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-10-26T22:11:05.385644-03:00",
-      "renda": 1638336.99
+      "renda": 1638336.99,
+      "publico_pagante": 30759,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841282": {
       "event_id": "401841282",
@@ -2823,7 +2828,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-10-24T23:21:45.547728-03:00",
-      "renda": 1549693.46
+      "renda": 1549693.46,
+      "publico_pagante": 25987,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841281": {
       "event_id": "401841281",
@@ -3409,7 +3416,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-10-24T23:21:48.356307-03:00",
-      "renda": 1042402.5
+      "renda": 1042402.5,
+      "publico_pagante": 18335,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841285": {
       "event_id": "401841285",
@@ -4539,7 +4548,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-10-24T23:21:53.824040-03:00",
-      "renda": 1087398
+      "renda": 1087398,
+      "publico_pagante": 8371,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841280": {
       "event_id": "401841280",
@@ -5121,7 +5132,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-10-24T23:21:56.704019-03:00",
-      "renda": 2602813.86
+      "renda": 2602813.86,
+      "publico_pagante": 16560,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841287": {
       "event_id": "401841287",
@@ -5660,7 +5673,8 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-10-24T23:21:59.417457-03:00",
-      "renda": 1220408
+      "renda": 1220408,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841272": {
       "event_id": "401841272",
@@ -180305,6 +180319,6 @@
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
   },
-  "total_com_publico_pagante": 294,
-  "total_com_renda": 318
+  "total_com_publico_pagante": 300,
+  "total_com_renda": 319
 }
