@@ -150,7 +150,7 @@ assert.deepEqual([...extractOpenAISources(openAiSourceFixture)].sort(),[
       assert.equal(String(url),'https://api.openai.com/v1/responses');
       const body=JSON.parse(String(opts.body||'{}'));
       assert.equal(body.tool_choice,'required');
-      assert.ok(body.tools[0].filters.allowed_domains.includes('uol.com.br'));
+      assert.equal(Object.hasOwn(body.tools[0],'filters'),false,'busca web deve abranger todos os domínios');
       return new Response(JSON.stringify({
         id:'resp_attendance',
         output:[
@@ -238,10 +238,10 @@ assert.equal(nextPublicAttemptMs(task,'gemini',{phase:'deterministic'},at(181),{
 const terra=publicSearchRequest(task,['renda'],{},'openai');
 assert.equal(terra.model,'gpt-5.6-terra'); assert.equal(terra.max_tool_calls,6); assert.equal(terra.reasoning.effort,'low');
 assert.equal(terra.tool_choice,'required');
-assert.ok(terra.tools[0].filters.allowed_domains.includes('uol.com.br'));
-assert.ok(terra.tools[0].filters.allowed_domains.includes('saopaulofc.net'));
-assert.ok(terra.tools[0].filters.allowed_domains.includes('santosfc.com.br'));
-assert.ok(terra.tools[0].filters.allowed_domains.length <= 100);
+assert.equal(Object.hasOwn(terra.tools[0],'filters'),false,'não limitar veículos por domínio');
+assert.match(String(terra.input[0].content[0].text),/partida=/,'dossiê factual obrigatório');
+assert.match(String(terra.input[0].content[0].text),/público renda/,'consultas abertas devem conter público e renda');
+assert.doesNotMatch(String(terra.input[0].content[0].text),/site:uol\.com\.br/,'consultas base sem site: obrigatório');
 const sol=publicSearchRequest(task,['renda'],{POSTGAME_OPENAI_MODEL:'gpt-5.6-sol'},'openai');
 assert.equal(sol.model,'gpt-5.6-sol');
 assert.match(JSON.stringify(terra),/sites oficiais dos clubes participantes/);
@@ -290,8 +290,12 @@ console.log('postgame-fastlane v15 policy + eligibility guard + factual integrit
 
 // ============================ R10R15 Match Identity Gate ============================
 {
-  const { evaluateSourceMatchIdentity, extractRoundupMatchBlock, POSTGAME_SEARCH_PROFILE_VERSION } = await import('../src/postgame-search-profile.js');
+  const { evaluateSourceMatchIdentity, extractRoundupMatchBlock, buildAttendanceSearchQueries, POSTGAME_SEARCH_PROFILE_VERSION } = await import('../src/postgame-search-profile.js');
   assert.equal(POSTGAME_SEARCH_PROFILE_VERSION, 10);
+  const searchQueries=buildAttendanceSearchQueries({home:'Flamengo',away:'Atlético-MG',kickoff:'2026-10-26T20:00:00-03:00',home_score:3,away_score:2,round:32,stadium:'Maracanã'});
+  assert.equal(searchQueries[0],'Flamengo Atlético-MG público renda 26/10/2026');
+  assert.ok(searchQueries.slice(0,3).every((q)=>!q.includes('site:')),'começar com três buscas genéricas');
+  assert.ok(searchQueries.some((q)=>q.includes('3 x 2')),'usar placar como consulta alternativa');
 
   const grenal = {
     event_id:'401841267', league:'bra.1', home:'Grêmio', away:'Internacional',
