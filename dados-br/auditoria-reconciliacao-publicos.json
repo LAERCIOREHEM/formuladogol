@@ -1,15 +1,42 @@
 {
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
-  "jogos_finalizados": 317,
-  "jogos_com_publico": 317,
-  "jogos_sem_publico": 0,
-  "publico_total": 7850516,
-  "jogos_com_renda": 317,
-  "aguardando_fonte": [],
+  "jogos_finalizados": 319,
+  "jogos_com_publico": 318,
+  "jogos_sem_publico": 1,
+  "publico_total": 7882062,
+  "jogos_com_renda": 318,
+  "aguardando_fonte": [
+    {
+      "event_id": "401841286",
+      "mandante": "Flamengo",
+      "visitante": "Atlético-MG",
+      "estado": "AGUARDANDO_FONTE"
+    }
+  ],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
+    {
+      "event_id": "401841286",
+      "tipo_publico": "",
+      "publico_presente": null,
+      "publico_pagante": null,
+      "renda": null,
+      "fonte_publico": "",
+      "origem": "",
+      "estado": "AGUARDANDO_FONTE"
+    },
+    {
+      "event_id": "401841279",
+      "tipo_publico": "presente",
+      "publico_presente": 31546,
+      "publico_pagante": null,
+      "renda": 1638336.99,
+      "fonte_publico": "https://gauchazh.clicrbs.com.br/esportes/gremio/noticia/2026/10/gremio-erra-demais-leva-virada-do-cruzeiro-e-afunda-no-z-4-do-brasileirao-cmveb9shr011w01d4f6l87zln.html",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
+    },
     {
       "event_id": "401841282",
       "tipo_publico": "presente",
@@ -3181,5 +3208,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-10-25T10:15:02.975682-03:00"
+  "gerado_em": "2026-10-26T22:16:40.640684-03:00"
 }

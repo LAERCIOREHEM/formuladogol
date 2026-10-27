@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-26T22:11:05.470257-03:00",
+  "gerado_em": "2026-10-26T22:16:39.892654-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 319,
   "total_com_estatisticas": 319,
-  "total_com_publico": 317,
+  "total_com_publico": 318,
   "total_com_eventos": 319,
   "total_com_jogadores": 319,
   "total_eventos_validados": 319,
@@ -600,9 +600,9 @@
       "placar_mandante": 0,
       "placar_visitante": 1,
       "estadio": "Couto Pereira",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 31546,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://gauchazh.clicrbs.com.br/esportes/gremio/noticia/2026/10/gremio-erra-demais-leva-virada-do-cruzeiro-e-afunda-no-z-4-do-brasileirao-cmveb9shr011w01d4f6l87zln.html",
       "arbitro": "",
       "stats": [
         {
@@ -1120,7 +1120,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-26T22:11:05.385644-03:00"
+      "atualizado_em": "2026-10-26T22:11:05.385644-03:00",
+      "renda": 1638336.99
     },
     "401841282": {
       "event_id": "401841282",
@@ -180303,5 +180304,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 294,
+  "total_com_renda": 318
 }
