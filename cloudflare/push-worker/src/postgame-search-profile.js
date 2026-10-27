@@ -392,39 +392,28 @@ function pairVariants(home, away) {
 
 export function buildAttendanceSearchQueries(task) {
   const home = text(task?.home), away = text(task?.away);
-  const date = text(task?.kickoff).slice(0, 10);
+  const date = text(task?.kickoff || task?.data_iso).slice(0, 10);
+  const year = /^20\d{2}/.test(date) ? date.slice(0, 4) : '';
+  const dayBR = /^20\d{2}-\d{2}-\d{2}$/.test(date) ? `${date.slice(8,10)}/${date.slice(5,7)}/${year}` : '';
   const score = task?.home_score != null && task?.away_score != null ? `${task.home_score} x ${task.away_score}` : '';
   const stadium = text(task?.stadium || task?.estadio);
-  const round = text(task?.round || task?.rodada);
   const queries = [];
   const add = (q) => { q = text(q); if (q && !queries.includes(q)) queries.push(q); };
 
-  for (const [h, a] of pairVariants(home, away)) {
-    add(`"${h}" "${a}" público renda`);
-  }
-  const homeVariants = teamSearchVariants(home, 8);
-  const awayVariants = teamSearchVariants(away, 8);
-  const homeNickname = homeVariants.find((v) => v !== home && !v.includes(' ') && v.length >= 3);
-  const awayNickname = awayVariants.find((v) => v !== away && !v.includes(' ') && v.length >= 3);
-  if (homeNickname) add(`"${homeNickname}" "${away}" público renda`);
-  if (awayNickname) add(`"${home}" "${awayNickname}" público renda`);
-  add(`"${home}" "${away}" "ficha técnica" público renda`);
-  if (score) add(`"${home}" "${away}" "${score}" público renda`);
+  // Primeiro imitar as buscas simples que encontram a ficha técnica logo após o FINAL.
+  // NENHUMA consulta restringe o domínio: portais conhecidos são preferência, não cerca.
+  add(`${home} ${away} público renda ${dayBR || year}`);
+  add(`"${home}" "${away}" público presente renda ${year}`);
+  add(`"${home}" "${away}" público pagante renda ${year}`);
+  if (score) add(`${home} ${score} ${away} público renda ${year}`);
+  add(`"${home}" "${away}" ficha técnica renda ${year}`);
+
+  // Fallbacks sem amarrar a pesquisa a sites: título invertido, apelidos e estádio.
   if (stadium) add(`"${home}" "${away}" "${stadium}" público renda`);
-  if (date) add(`"${home}" "${away}" "${date}" público renda`);
-  if (round) add(`"${home}" "${away}" "rodada ${round}" público renda`);
-
-  // Buscas direcionadas em portais que costumam publicar ficha técnica cedo.
-  for (const domain of ['uol.com.br', 'ge.globo.com', 'estadao.com.br', 'itatiaia.com.br', 'gauchazh.clicrbs.com.br', 'metro1.com.br', 'r7.com']) {
-    add(`site:${domain} "${home}" "${away}" público renda`);
-  }
-
-  // Os sites oficiais dos DOIS participantes são aceitos somente para fatos
-  // documentais (público/renda/estádio/ficha técnica), jamais para opinião.
-  for (const domain of officialClubDomainsForTask(task)) {
-    add(`site:${domain} "${home}" "${away}" público renda`);
-  }
-  return queries.slice(0, 22);
+  const pairs = pairVariants(home, away);
+  for (const [h, a] of pairs.slice(1, 4)) add(`"${h}" "${a}" público renda ${year}`);
+  add(`"${away}" "${home}" público renda ${year}`);
+  return queries.slice(0, 10);
 }
 
 export function attendanceSourcePolicyText(task) {
