@@ -290,7 +290,7 @@ console.log('postgame-fastlane v15 policy + eligibility guard + factual integrit
 
 // ============================ R10R15 Match Identity Gate ============================
 {
-  const { evaluateSourceMatchIdentity, extractRoundupMatchBlock, buildAttendanceSearchQueries, POSTGAME_SEARCH_PROFILE_VERSION } = await import('../src/postgame-search-profile.js');
+  const { evaluateSourceMatchIdentity, extractRoundupMatchBlock, buildAttendanceSearchQueries, isCandidateEditorialAttendanceSource, POSTGAME_SEARCH_PROFILE_VERSION } = await import('../src/postgame-search-profile.js');
   assert.equal(POSTGAME_SEARCH_PROFILE_VERSION, 10);
   const searchQueries=buildAttendanceSearchQueries({home:'Flamengo',away:'Atlético-MG',kickoff:'2026-10-26T20:00:00-03:00',home_score:3,away_score:2,round:32,stadium:'Maracanã'});
   assert.equal(searchQueries[0],'Flamengo Atlético-MG público renda 26/10/2026');
@@ -366,6 +366,21 @@ console.log('postgame-fastlane v15 policy + eligibility guard + factual integrit
   const safe=validatePublicPayload(amounts,[geFlaUrl],flaGalo,{structuredRoundup:true});
   assert.equal(safe.accepted,true);
   assert.equal(safe.values.renda,4578137.5);
+  // Fonte regional ainda não cadastrada: valor explícito + URL segura + jogo exato.
+  const regionalUrl='https://jornalregional.com.br/esportes/2026/10/26/flamengo-atletico-mg-publico-renda';
+  const regionalText='Flamengo 3 x 2 Atlético-MG pela 32ª rodada do Brasileiro. Público presente: 60.624 torcedores. Público pagante: 57.619. Renda: R$ 4.578.137,50.';
+  assert.equal(isCandidateEditorialAttendanceSource(regionalUrl,flaGalo),true,'fonte regional nova não pode ser descartada por lista fixa');
+  assert.equal(isCandidateEditorialAttendanceSource('http://jornalregional.com.br/esportes/2026/10/26/fla-galo',flaGalo),false,'candidato deve usar HTTPS');
+  assert.equal(isCandidateEditorialAttendanceSource('https://corinthians.com.br/noticias/2026/10/26/flamengo-atletico-mg',flaGalo),false,'site de clube não participante não pode ser fonte nova');
+  assert.equal(isCandidateEditorialAttendanceSource('https://localhost/esportes/2026/10/26/fla-galo',flaGalo),false,'host local inseguro');
+  const regionalGate=evaluateSourceMatchIdentity(flaGalo,regionalText,regionalUrl);
+  assert.equal(regionalGate.accepted,true);
+  const regionalNumbers=extractPublicFromTextDeterministic(regionalGate.window,regionalUrl);
+  assert.equal(validatePublicPayload(regionalNumbers,[regionalUrl],flaGalo).accepted,false,'dado direto de modelo em domínio novo permanece bloqueado');
+  const regionalChecked=validatePublicPayload(regionalNumbers,[regionalUrl],flaGalo,{documentaryCandidate:true});
+  assert.equal(regionalChecked.accepted,true,'domínio novo deve funcionar após leitura documental escopada');
+  assert.equal(regionalChecked.values.renda,4578137.5);
+
   assert.equal(extractRoundupMatchBlock({...flaGalo,round:31},geRound32,geFlaUrl).accepted,false,'rodada conflitante bloqueada');
   assert.equal(extractRoundupMatchBlock({...flaGalo,home_score:2},geRound32,geFlaUrl).accepted,false,'placar divergente bloqueado');
   assert.equal(extractRoundupMatchBlock({...flaGalo,kickoff:'2026-09-16T20:00:00-03:00'},geRound32,geFlaUrl).accepted,false,'data divergente bloqueada');
