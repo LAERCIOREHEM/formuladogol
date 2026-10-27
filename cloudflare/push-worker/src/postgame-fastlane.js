@@ -1409,7 +1409,7 @@ export function publicAlertMessage(task, values, sources, ai, lastError, env = {
     `event_id: ${text(task.event_id)}`,
     `Diagnóstico documental: https://push.formuladogol.com.br/v1/postgame/diagnostics?event_id=${encodeURIComponent(text(task.event_id))}`,
     '',
-    'O que foi encontrado:'
+    'O que foi encontrado:',
     line('Público', values.publico, sources?.publico),
     line('Pagantes', values.publico_pagante, sources?.publico_pagante),
     line('Renda', values.renda, sources?.renda, true),
