@@ -8,6 +8,7 @@ import { probeEspnSources } from './espn-source.js';
 import { LIVE_API_CONSTANTS, resolveLiveScoreboard, resolveLiveSummary } from './live-api.js';
 import { createLiveStatsStore } from './live-stats-store.js';
 import { postgameSearchProbe, postgameStatus, readPostgameFastlane, runPostgameMaintenance, POSTGAME_POLICY_VERSION } from './postgame-fastlane.js';
+import { readPublicDiscoveryDiagnostics } from './postgame-public-observability.js';
 import { feedbackNotifierConfigured, runFeedbackNotifier } from './feedback-notifier.js';
 import { healthMonitorStatus, runHealthMonitor, HEALTH_POLICY_VERSION } from './health-monitor.js';
 import { HEALTH_ACTION_CENTER_VERSION } from './health-action-center.js';
@@ -777,6 +778,12 @@ export default {
         return json(request,payload,payload.ok?200:payload.error==='query_required'?400:503);
       }
 
+      if (url.pathname === '/v1/postgame/diagnostics' && request.method === 'GET') {
+        if (!(await allowStatusRead(request, env, 'postgame-diagnostics'))) return json(request, { ok:false, error:'rate_limited' }, 429);
+        const ids=String(url.searchParams.get('event_ids')||url.searchParams.get('event_id')||'')
+          .split(',').map((v)=>cleanId(v)).filter(Boolean);
+        return json(request, await readPublicDiscoveryDiagnostics(env,ids), 200, { 'Cache-Control':'no-store' });
+      }
       if (url.pathname === '/v1/postgame/status' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'postgame-status'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
         return json(request, await postgameStatus(env), 200, { 'Cache-Control': 'no-store' });
