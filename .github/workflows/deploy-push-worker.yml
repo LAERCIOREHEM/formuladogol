@@ -654,6 +654,25 @@ jobs:
             exit 1
           fi
 
+          # R10R27: comprovar o diagnóstico real no D1 sem criar buscas pagas.
+          # Fonte externa/horário podem estar ausentes até aparecer um jogo novo.
+          curl -fsS --max-time 12 'https://push.formuladogol.com.br/v1/postgame/diagnostics' >/tmp/fdg-public-diagnostics.json
+          node <<'NODE'
+          const fs=require('fs');
+          const d=JSON.parse(fs.readFileSync('/tmp/fdg-public-diagnostics.json','utf8'));
+          if(d.ok!==true || d.version!==1 || !Array.isArray(d.rows) ||
+             !d.summary || typeof d.summary.games!=='number'){
+            throw new Error('Hunter observability /v1/postgame/diagnostics inválido');
+          }
+          for(const row of d.rows.slice(0,3)){
+            if(!row.timeline||!row.sourceFunnel||!row.cost||!Array.isArray(row.sources)||
+               typeof row.cost.estimatedUsd!=='number'){
+              throw new Error('Hunter metrics por partida incompletas: '+row.event_id);
+            }
+          }
+          console.log('Hunter observability D1 LIVE: '+d.rows.length+' partidas, custo estimado USD='+(d.summary.estimatedUsd||0));
+          NODE
+
           # PROVA LIVE independente de pendências: executa (ou reutiliza por até 15 min)
           # uma pesquisa Gemini real e exige google_search observado + fonte citada.
           PROBE_HTTP="$(curl -sS --max-time 45 -o /tmp/fdg-gemini-probe.json -w '%{http_code}' 'https://push.formuladogol.com.br/v1/postgame/search-probe' || true)"
