@@ -290,7 +290,7 @@ console.log('postgame-fastlane v15 policy + eligibility guard + factual integrit
 
 // ============================ R10R15 Match Identity Gate ============================
 {
-  const { evaluateSourceMatchIdentity, POSTGAME_SEARCH_PROFILE_VERSION } = await import('../src/postgame-search-profile.js');
+  const { evaluateSourceMatchIdentity, extractRoundupMatchBlock, POSTGAME_SEARCH_PROFILE_VERSION } = await import('../src/postgame-search-profile.js');
   assert.equal(POSTGAME_SEARCH_PROFILE_VERSION, 10);
 
   const grenal = {
@@ -343,6 +343,29 @@ console.log('postgame-fastlane v15 policy + eligibility guard + factual integrit
   const gateRodadaAlvo = evaluateSourceMatchIdentity(botVasco, rodadaComAlvo, 'https://ge.globo.com/gato-mestre/noticia/2026/10/07/publicos-da-29a-rodada.ghtml');
   assert.equal(gateRodadaAlvo.accepted, false, 'matéria multijogo exige parser estruturado por confronto');
   assert.ok(gateRodadaAlvo.conflicts.includes('multi_match_roundup_requires_structured_parser'));
+  // R10R27: Fastlane também pode extrair roundups após provar cabeçalho
+  // exato (equipes, placar, rodada/data), sem herdar valores de outro jogo.
+  const geFlaUrl='https://ge.globo.com/gato-mestre/noticia/2026/10/26/flamengo-x-atletico-mg-tem-o-maior-publico-da-32a-rodada-do-brasileiro-veja-a-lista.ghtml';
+  const flaGalo={event_id:'401841286',league:'bra.1',home:'Flamengo',away:'Atlético-MG',kickoff:'2026-10-26T20:00:00-03:00',home_score:3,away_score:2,round:32,stadium:'Maracanã'};
+  const geRound32='Internacional 3 x 0 Botafogo (Beira-Rio) Público pagante: 34.287 Público presente: não divulgado Renda líquida: R$ 1.440.409 Flamengo 3 x 2 Atlético-MG (Maracanã) Público pagante: 57.619 Público presente: 60.624 Renda: R$ 4.578.137,50 Cruzeiro 1 x 0 Remo (Mineirão) Público presente: 29.516 Renda: R$ 1.220.408';
+  assert.equal(evaluateSourceMatchIdentity(flaGalo,geRound32,geFlaUrl).accepted,false,'roundup continua bloqueado no gate generico');
+  const scopedFla=extractRoundupMatchBlock(flaGalo,geRound32,geFlaUrl);
+  assert.equal(scopedFla.accepted,true,scopedFla.reason);
+  assert.ok(!scopedFla.window.includes('1.440.409')&&!scopedFla.window.includes('1.220.408'),'não herdar receita de outras partidas');
+  const amounts=extractPublicFromTextDeterministic(scopedFla.window,geFlaUrl);
+  assert.equal(amounts.publico,60624);
+  assert.equal(amounts.publico_pagante,57619);
+  assert.equal(amounts.renda,4578137.50,'centavos precisam ser preservados');
+  assert.equal(validatePublicPayload(amounts,[geFlaUrl],flaGalo).accepted,false,'modelo nao pode publicar roundup bruto');
+  const safe=validatePublicPayload(amounts,[geFlaUrl],flaGalo,{structuredRoundup:true});
+  assert.equal(safe.accepted,true);
+  assert.equal(safe.values.renda,4578137.5);
+  assert.equal(extractRoundupMatchBlock({...flaGalo,round:31},geRound32,geFlaUrl).accepted,false,'rodada conflitante bloqueada');
+  assert.equal(extractRoundupMatchBlock({...flaGalo,home_score:2},geRound32,geFlaUrl).accepted,false,'placar divergente bloqueado');
+  assert.equal(extractRoundupMatchBlock({...flaGalo,kickoff:'2026-09-16T20:00:00-03:00'},geRound32,geFlaUrl).accepted,false,'data divergente bloqueada');
+  const partialGe='Flamengo 1 x 0 Fluminense Público presente: 63.300 Público pagante: 58.246 Renda: R$ 7.006.350,00 Chapecoense 1 x 4 Athletico-PR. A partida será na Arena Condá.';
+  assert.equal(extractRoundupMatchBlock(chape,partialGe,geUrl).accepted,false,'sem dados no bloco de Chape nao pode copiar Flamengo');
+
   // O parser Python continua responsável pelas matérias agregadas de rodada.
 
   const chape = {event_id:'401841265',league:'bra.1',home:'Chapecoense',away:'Athletico-PR',kickoff:'2026-10-12T19:30:00-03:00',home_score:1,away_score:4,round:30,stadium:'Arena Condá'};
