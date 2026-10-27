@@ -364,7 +364,7 @@ console.log('postgame-fastlane v15 policy + eligibility guard + factual integrit
   assert.equal(extractRoundupMatchBlock({...flaGalo,home_score:2},geRound32,geFlaUrl).accepted,false,'placar divergente bloqueado');
   assert.equal(extractRoundupMatchBlock({...flaGalo,kickoff:'2026-09-16T20:00:00-03:00'},geRound32,geFlaUrl).accepted,false,'data divergente bloqueada');
   const partialGe='Flamengo 1 x 0 Fluminense Público presente: 63.300 Público pagante: 58.246 Renda: R$ 7.006.350,00 Chapecoense 1 x 4 Athletico-PR. A partida será na Arena Condá.';
-  assert.equal(extractRoundupMatchBlock(chape,partialGe,geUrl).accepted,false,'sem dados no bloco de Chape nao pode copiar Flamengo');
+  assert.equal(extractRoundupMatchBlock({event_id:'401841265',home:'Chapecoense',away:'Athletico-PR',kickoff:'2026-10-12T19:30:00-03:00',home_score:1,away_score:4,round:30},partialGe,'https://ge.globo.com/gato-mestre/noticia/2026/10/11/flamengo-1-x-0-fluminense-tem-o-maior-publico-da-30a-rodada-do-brasileiro-veja-a-lista.ghtml').accepted,false,'sem dados no bloco de Chape nao pode copiar Flamengo');
 
   // O parser Python continua responsável pelas matérias agregadas de rodada.
 
