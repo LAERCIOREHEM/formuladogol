@@ -967,6 +967,60 @@ async function processHighlight(env, now = Date.now()) {
 }
 
 
+// Primeiro buscar GRÁTIS no sitemap do GE, antes de Gemini/OpenAI.
+// As URLs retornadas continuam sem autoridade factual até a extração por
+// confronto exato (extractRoundupMatchBlock) e validação por campo.
+export function geRoundupSitemapUrls(xml, round) {
+  const target=Number(round);
+  if(!Number.isInteger(target)||target<1||target>40) return [];
+  const urls=[];
+  const source=String(xml||'').slice(0,6000000);
+  for(const match of source.matchAll(/<loc\b[^>]*>\s*(https?:\/\/[^<\s]+)\s*<\/loc>/gi)){
+    const raw=match[1].replace(/&amp;/gi,'&');
+    let url;
+    try { url=new URL(raw); } catch (_) { continue; }
+    if(url.hostname.toLowerCase()!=='ge.globo.com') continue;
+    const path=decodeURIComponent(url.pathname).toLowerCase();
+    if(!/^\/(?:google\/amp\/)?gato-mestre\/noticia\/20\d\d\/\d\d\/\d\d\//.test(path)) continue;
+    if(!/publicos?/.test(path)) continue;
+    const m=path.match(/(?:^|[-/])(\d{1,2})[aoªº]?-rodada/);
+    if(!m||Number(m[1])!==target) continue;
+    const canonical=normalizeUrl(url.toString());
+    if(canonical&&!urls.includes(canonical)) urls.push(canonical);
+    if(urls.length>=10) break;
+  }
+  return urls;
+}
+async function discoverGeRoundupSources(env,task,now=Date.now()){
+  const day=text(task?.kickoff).slice(0,10),round=Number(task?.round??task?.rodada);
+  if(!/^20\d{2}-\d{2}-\d{2}$/.test(day)||!Number.isInteger(round)||round<1||round>40) return [];
+  // A ficha da rodada só é relevante até 72h após o FINAL.
+  const endMs=taskEndMs(task,now);
+  if(now-endMs>72*3600000) return [];
+  const key='ge_roundup_sitemap_v1_'+day.replace(/-/g,'')+'_'+round;
+  const prev=safeJson(await metaGet(env,key),null);
+  const checked=Date.parse(text(prev?.checkedAt));
+  if(Number.isFinite(checked)&&now-checked>=0&&now-checked<5*60000) return prev?.urls||[];
+  const dayAfter=new Date(Date.parse(day+'T12:00:00Z')+86400000).toISOString().slice(0,10);
+  const dates=[day,dayAfter],urls=new Set();
+  const fetchXml=async(date,part)=>{
+    const [year,month,d]=date.split('-');
+    const endpoint='https://ge.globo.com/sitemap/ge/'+year+'/'+month+'/'+d+'_'+part+'.xml';
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),4500);
+    try {
+      const response=await fetch(endpoint,{signal:controller.signal,headers:{accept:'application/xml,text/xml,*/*'}});
+      if(!response.ok)return [];
+      return geRoundupSitemapUrls(await response.text(),round);
+    }catch(_){return [];}finally{clearTimeout(timeout);}
+  };
+  const found=await Promise.all(dates.flatMap((date)=>[1,2].map((part)=>fetchXml(date,part))));
+  for(const group of found)for(const url of group)urls.add(url);
+  const list=[...urls].slice(0,10);
+  await metaPut(env,key,JSON.stringify({checkedAt:nowIso(now),urls:list}));
+  return list;
+}
+
 async function cacheDiscoveredSources(env, eventId, urls, provider='gemini') {
   for (const raw of urls || []) {
     const url = normalizeUrl(raw); if (!url) continue;
@@ -978,7 +1032,7 @@ async function cachedSources(env,eventId){
   // Primeiro a ficha do próprio confronto, depois fontes descobertas via IA.
   // Mantém o teto de oito fontes e o histórico de consultas.
   const r=await env.DB.prepare(`SELECT * FROM postgame_source_cache WHERE event_id=?
-    ORDER BY CASE WHEN provider='ge-matchday' THEN 0 ELSE 1 END,
+    ORDER BY CASE WHEN provider='ge-matchday' THEN 0 WHEN provider='ge-roundup-sitemap' OR url LIKE '%/gato-mestre/%' THEN 1 ELSE 2 END,
       COALESCE(last_checked_at,'') ASC,discovered_at DESC LIMIT 8`).bind(text(eventId)).all();
   return r?.results||[];
 }
@@ -1418,6 +1472,8 @@ async function processPublicTask(env, task, now = Date.now()) {
   // Somente Match Identity Gate + dados explícitos autorizam gravar D1.
   if(!isPublicComplete(values)){
     await cacheDiscoveredSources(env,eventId,matchDayEditorialSources(task),'ge-matchday');
+    const freeRoundups=await discoverGeRoundupSources(env,task,now);
+    if(freeRoundups.length)await cacheDiscoveredSources(env,eventId,freeRoundups,'ge-roundup-sitemap');
     const cached=await refreshCachedPublicSources(env,task,values,sources);
     if(cached.lastError)lastError=cached.lastError;
   }
