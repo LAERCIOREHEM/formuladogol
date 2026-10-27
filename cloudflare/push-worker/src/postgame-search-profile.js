@@ -150,6 +150,26 @@ export function isAcceptedAttendanceSource(value, task = null) {
   return quality === 'robust' || quality === 'club_official';
 }
 
+// Fontes não cadastradas podem ser candidatas DOCUMENTAIS; a descoberta é
+// aberta, mas não equivale a autorização para publicar valores do modelo.
+// Requer HTTPS, domínio público, página jornalística, Match Identity Gate,
+// placar exato e extração determinística. Clubes de terceiros são excluídos.
+export function isCandidateEditorialAttendanceSource(value, task = null) {
+  if (attendanceSourceQuality(value, task) !== 'unverified') return false;
+  let url;
+  try { url=new URL(text(value)); } catch (_) { return false; }
+  if (url.protocol !== 'https:' || url.username || url.password || url.port) return false;
+  const host=url.hostname.toLowerCase().replace(/^www\./,'');
+  if (!host.includes('.') || host.length>180 || host.includes('..')) return false;
+  if (/^\d+(?:\.\d+){3}$/.test(host) || host.includes(':')) return false;
+  if (/(?:^|\.)(?:localhost|local|internal|invalid|test)$/.test(host)) return false;
+  if (/(?:^|\.)(?:example\.com|bit\.ly|tinyurl\.com|t\.co|pastebin\.com|wikipedia\.org|google\.com|bing\.com)$/.test(host)) return false;
+  if (Object.values(TEAM_SEARCH_PROFILES).some((profile)=>(profile.officialDomains||[]).some((domain)=>host===domain||host.endsWith('.'+domain)))) return false;
+  const path=decodeURIComponent(url.pathname).toLowerCase();
+  if (path.length<15 || !/(?:\/20\d{2}\/\d{1,2}\/\d{1,2}\/|\/(?:noticias?|esportes?|futebol|sports|news|brasileirao|jogos?|partida|materia)(?:\/|-))/i.test(path)) return false;
+  return true;
+}
+
 export const AMBIGUOUS_IDENTITY_ALIASES = Object.freeze(new Set(['vitoria', 'internacional', 'santos', 'bahia', 'remo']));
 // Apelidos curtos continuam excelentes para DESCOBERTA, mas não são prova de
 // identidade por si só. A etapa de validação privilegia nomes canônicos/fortes.
