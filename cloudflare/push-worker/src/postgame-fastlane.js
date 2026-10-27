@@ -3,6 +3,7 @@ import { sendMail, probeMail, mailConfig, maskAddress } from './mailer.js';
 import { countWebSearchCalls, recordAiUsage, recordProviderUsage, postgamePublicCostSummary } from './ai-usage.js';
 import { searchPublicWithGemini, fetchSourceText, extractPublicWithWorkersAI, resolveWorkersAiExtractModel, fetchOpenAiResponses, openAiUsage } from './ai-router.js';
 import { extractSourceWithCache } from './source-extraction-cache.js';
+import { recordPublicSourceObservation, recordPublicResolution } from './postgame-public-observability.js';
 import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, isCandidateEditorialAttendanceSource, evaluateSourceMatchIdentity, buildAttendanceSearchQueries, attendanceSourcePolicyText, officialClubDomainsForTask, matchDayEditorialSources, PREFERRED_EDITORIAL_SOURCE_SUFFIXES, isMultiMatchRoundupSource, extractRoundupMatchBlock, verifiedStadiumCapacity } from './postgame-search-profile.js';
 import { FACTUAL_INTEGRITY_POLICY_VERSION, FACTUAL_INCIDENTS, inspectPostgameFactualIntegrity, quarantinePostgameFactualIntegrity } from './postgame-factual-integrity.js';
 import { attendanceEligibility, POSTGAME_ELIGIBILITY_VERSION, ATTENDANCE_REQUIRED_LEAGUE } from './postgame-competition-eligibility.js';
@@ -807,6 +808,19 @@ async function upsertTask(env, row, staticData = {}) {
         updated_at=CURRENT_TIMESTAMP`)
       .bind(eventId, round, stadium, text(row.atualizado_em || row.updated_at) || null).run();
   }
+  // Captura a primeira resolução OBSERVADA em partidas recentes. Histórico
+  // anterior à instalação não ganha timestamp fictício. O upsert estático pode
+  // resolver a partida antes do Hunter, então ambos precisam instrumentar.
+  const kickoffMs=Date.parse(text(row.kickoff||row.data_iso));
+  if(league.required && Number.isFinite(kickoffMs) && Date.now()-kickoffMs>=-4*3600000 &&
+     Date.now()-kickoffMs<=72*3600000 && (publicComplete||staticData.verified===true)){
+    const latest=await env.DB.prepare('SELECT public_status,public_sources_json FROM postgame_fastlane WHERE event_id=?').bind(eventId).first();
+    if(latest?.public_status==='resolved'){
+      const src=safeJson(latest.public_sources_json,{})||{};
+      await recordPublicResolution(env,eventId,{channel:staticData.verified===true?'verified_static':'pages_snapshot',
+        sourceUrl:text(src.publico||src.renda)});
+    }
+  }
   return true;
 }
 
@@ -1066,16 +1080,25 @@ async function refreshCachedPublicSources(env,task,values,sources){
   for(const row of rows.slice(0,6)){
     // Busca ampla não significa fetch arbitrário (SSRF/UGC/clubes estranhos).
     // Fontes novas só poderão publicar via gate e extrator deterministicamente rotulado.
-    if(!isAcceptedAttendanceSource(row.url,task) && !isCandidateEditorialAttendanceSource(row.url,task)) continue;
+    if(!isAcceptedAttendanceSource(row.url,task) && !isCandidateEditorialAttendanceSource(row.url,task)) {
+      await recordPublicSourceObservation(env,{eventId:task.event_id,url:row.url,provider:row.provider,outcome:'rejected',reason:'source_not_eligible'});
+      continue;
+    }
     // Evita repetir requisição de fonte recém-checada no mesmo ciclo.
     const lastChecked=Date.parse(text(row.last_checked_at));
     if(Number.isFinite(lastChecked)&&Date.now()-lastChecked>=0&&Date.now()-lastChecked<90_000)continue;
     const source=await fetchSourceText(row.url); checked++;
-    if(!source.ok){lastError=source.reason;await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=failures+1 WHERE event_id=? AND url=?`).bind(source.reason,task.event_id,row.url).run();continue;}
+    if(!source.ok){
+      lastError=source.reason;
+      await recordPublicSourceObservation(env,{eventId:task.event_id,url:row.url,provider:row.provider,outcome:'fetch_failed',reason:source.reason});
+      await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=failures+1 WHERE event_id=? AND url=?`).bind(source.reason,task.event_id,row.url).run();
+      continue;
+    }
     const isStructuredRoundup=isMultiMatchRoundupSource(source.url);
     const documentaryCandidate=isCandidateEditorialAttendanceSource(source.url,task);
     if(!isAcceptedAttendanceSource(source.url,task) && !documentaryCandidate){
       lastError='redirect_to_untrusted_source';
+      await recordPublicSourceObservation(env,{eventId:task.event_id,url:row.url,provider:row.provider,outcome:'rejected',reason:lastError,publishedAt:source.publishedAt});
       continue;
     }
     const identity=isStructuredRoundup
@@ -1083,6 +1106,7 @@ async function refreshCachedPublicSources(env,task,values,sources){
       : evaluateSourceMatchIdentity(task,source.text,source.url);
     if(!identity.accepted){
       lastError=`source_match_identity_rejected:${[...(identity.conflicts||[]),...(identity.reasons||[])].join('|')}`;
+      await recordPublicSourceObservation(env,{eventId:task.event_id,url:row.url,provider:row.provider,outcome:'rejected',reason:lastError,publishedAt:source.publishedAt});
       await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=failures+1 WHERE event_id=? AND url=?`).bind(lastError.slice(0,500),task.event_id,row.url).run();
       continue;
     }
@@ -1096,6 +1120,7 @@ async function refreshCachedPublicSources(env,task,values,sources){
         ? new RegExp('\\b'+homeScore+'\\s*[x×-]\\s*'+awayScore+'\\b','i') : null;
       if(!expected||!expected.test(identity.window)){
         lastError='candidate_source_missing_exact_score';
+        await recordPublicSourceObservation(env,{eventId:task.event_id,url:row.url,provider:row.provider,outcome:'rejected',reason:lastError,publishedAt:source.publishedAt});
         continue;
       }
     }
@@ -1129,6 +1154,9 @@ async function refreshCachedPublicSources(env,task,values,sources){
       extractor='no_numeric_evidence';
     }
 
+    await recordPublicSourceObservation(env,{eventId:task.event_id,url:row.url,provider:row.provider,
+      outcome:valid?'accepted':'no_data',reason:valid?`validated_${extractor}`:(lastError||'no_documental_data'),
+      fields:valid?Object.keys(valid.values||{}):[],publishedAt:source.publishedAt});
     await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=CASE WHEN ?='ok' THEN failures ELSE failures+1 END WHERE event_id=? AND url=?`)
       .bind(valid?`ok:${extractor}`:(lastError||'no_data'),valid?'ok':'fail',task.event_id,row.url).run();
     if(valid){
@@ -1623,6 +1651,7 @@ async function processPublicTask(env, task, now = Date.now()) {
     .bind(num(values.publico),num(values.publico_pagante),num(values.renda),JSON.stringify(sources),status,Number(task.public_attempts||0)+1,nowIso(now),nextAt,complete?'':text(lastError).slice(0,1000),eventId).run();
   if (Number(persisted?.meta?.changes || 0) < 1) return {eventId, attempted:false, status:'skipped_competition_reclassified'};
   await writePublicAiState(env,eventId,next);
+  if(complete) await recordPublicResolution(env,eventId,{at:now,channel:'hunter:'+text(plan.phase),sourceUrl:text(sources.publico||sources.renda)});
   return{eventId,phase:plan.phase,status,nextAt,model:next.last_model||'',alert:next.alert_status||'',reason:complete?'':lastError,budget:budget.reason||'',estimatedUsd:Number(costSummary?.event?.estimatedUsd||0)};
 }
 
