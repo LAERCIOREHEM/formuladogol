@@ -165,7 +165,8 @@ export function isCandidateEditorialAttendanceSource(value, task = null) {
   if (/(?:^|\.)(?:localhost|local|internal|invalid|test)$/.test(host)) return false;
   if (/(?:^|\.)(?:example\.com|bit\.ly|tinyurl\.com|t\.co|pastebin\.com|wikipedia\.org|google\.com|bing\.com)$/.test(host)) return false;
   if (Object.values(TEAM_SEARCH_PROFILES).some((profile)=>(profile.officialDomains||[]).some((domain)=>host===domain||host.endsWith('.'+domain)))) return false;
-  const path=decodeURIComponent(url.pathname).toLowerCase();
+  let path='';
+  try { path=decodeURIComponent(url.pathname).toLowerCase(); } catch (_) { return false; }
   if (path.length<15 || !/(?:\/20\d{2}\/\d{1,2}\/\d{1,2}\/|\/(?:noticias?|esportes?|futebol|sports|news|brasileirao|jogos?|partida|materia)(?:\/|-))/i.test(path)) return false;
   return true;
 }
