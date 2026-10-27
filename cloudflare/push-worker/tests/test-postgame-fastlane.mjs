@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { highlightTitleValid, highlightTaskValid, findOfficialHighlight, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI, geminiCircuitState, geminiStructuralFailure, staticSeedRefreshIntervalMs, hasLabeledFinancialEvidence } from '../src/postgame-fastlane.js';
+import { highlightTitleValid, highlightTaskValid, findOfficialHighlight, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI, geminiCircuitState, geminiStructuralFailure, staticSeedRefreshIntervalMs, hasLabeledFinancialEvidence, geRoundupSitemapUrls } from '../src/postgame-fastlane.js';
 
 assert.equal(highlightTitleValid('FLAMENGO 1 X 0 BRAGANTINO | MELHORES MOMENTOS | BRASILEIRÃO 2026', 'Flamengo', 'Bragantino'), true);
 assert.equal(highlightTitleValid('FLAMENGO X BRAGANTINO | AQUECIMENTO AO VIVO | BRASILEIRÃO', 'Flamengo', 'Bragantino'), false);
@@ -347,6 +347,8 @@ console.log('postgame-fastlane v15 policy + eligibility guard + factual integrit
   // exato (equipes, placar, rodada/data), sem herdar valores de outro jogo.
   const geFlaUrl='https://ge.globo.com/gato-mestre/noticia/2026/10/26/flamengo-x-atletico-mg-tem-o-maior-publico-da-32a-rodada-do-brasileiro-veja-a-lista.ghtml';
   const flaGalo={event_id:'401841286',league:'bra.1',home:'Flamengo',away:'Atlético-MG',kickoff:'2026-10-26T20:00:00-03:00',home_score:3,away_score:2,round:32,stadium:'Maracanã'};
+  const sitemapGe='<urlset><url><loc>https://ge.globo.com/gato-mestre/noticia/2026/10/26/flamengo-x-atletico-mg-tem-o-maior-publico-da-32a-rodada-do-brasileiro-veja-a-lista.ghtml</loc></url><url><loc>https://ge.globo.com/gato-mestre/noticia/2026/10/26/outra-lista-de-publicos-da-31a-rodada.ghtml</loc></url><url><loc>https://evil.example.com/gato-mestre/noticia/2026/10/26/publicos-da-32a-rodada.ghtml</loc></url></urlset>';
+  assert.deepEqual(geRoundupSitemapUrls(sitemapGe,32),[geFlaUrl],'sitemap não pode trazer domínio ou rodada errados');
   const geRound32='Internacional 3 x 0 Botafogo (Beira-Rio) Público pagante: 34.287 Público presente: não divulgado Renda líquida: R$ 1.440.409 Flamengo 3 x 2 Atlético-MG (Maracanã) Público pagante: 57.619 Público presente: 60.624 Renda: R$ 4.578.137,50 Cruzeiro 1 x 0 Remo (Mineirão) Público presente: 29.516 Renda: R$ 1.220.408';
   assert.equal(evaluateSourceMatchIdentity(flaGalo,geRound32,geFlaUrl).accepted,false,'roundup continua bloqueado no gate generico');
   const scopedFla=extractRoundupMatchBlock(flaGalo,geRound32,geFlaUrl);
