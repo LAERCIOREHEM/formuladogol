@@ -432,6 +432,8 @@ export function buildAttendanceSearchQueries(task) {
   if (stadium) add(`"${home}" "${away}" "${stadium}" público renda`);
   const pairs = pairVariants(home, away);
   for (const [h, a] of pairs.slice(1, 4)) add(`"${h}" "${a}" público renda ${year}`);
+  const informalHome = teamSearchVariants(home,8).find((alias)=>SEARCH_ONLY_WEAK_IDENTITY_ALIASES.has(normalizeText(alias)));
+  if (informalHome) add(`"${informalHome}" "${away}" público renda ${year}`);
   add(`"${away}" "${home}" público renda ${year}`);
   return queries.slice(0, 10);
 }
