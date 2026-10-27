@@ -1,31 +1,115 @@
 {
-  "atualizado_em": "2026-09-21T08:41:26-03:00",
+  "atualizado_em": "2026-10-26T22:30:34-03:00",
   "fonte": "GE TV / YouTube",
   "modo": "incremental",
   "rodadas_processadas": {
-    "inicio": 28,
-    "fim": 28
+    "inicio": 32,
+    "fim": 32
   },
   "youtube_requests": 12,
   "resumo": {
     "playlists_encontradas": 1,
-    "videos_lidos": 6,
-    "jogos_processados": 1,
-    "jogos_vinculados_nesta_execucao": 1,
-    "jogos_vinculados_total": 233,
-    "candidatos_duvidosos": 0,
-    "jogos_sem_video": 0
+    "videos_lidos": 8,
+    "jogos_processados": 10,
+    "jogos_vinculados_nesta_execucao": 7,
+    "jogos_vinculados_total": 275,
+    "candidatos_duvidosos": 3,
+    "jogos_sem_video": 3
   },
   "playlists": [
     {
-      "playlist_id": "PLBRo3jjDey6M",
-      "titulo": "28ª rodada do Brasileirão 2026",
-      "rodada": 28,
-      "published_at": "2026-08-17T01:21:14.673437449Z",
-      "item_count": 6,
-      "url": "https://www.youtube.com/playlist?list=PLBRo3jjDey6M"
+      "playlist_id": "PLIbmYrmHI_RM",
+      "titulo": "32ª rodada do Brasileirão 2026",
+      "rodada": 32,
+      "published_at": "2026-08-17T01:21:43.608381478Z",
+      "item_count": 8,
+      "url": "https://www.youtube.com/playlist?list=PLIbmYrmHI_RM"
     }
   ],
-  "candidatos_duvidosos": [],
-  "jogos_sem_video": []
+  "candidatos_duvidosos": [
+    {
+      "event_id": "401841284",
+      "chave": "401841284",
+      "rodada": 32,
+      "mandante": "Mirassol",
+      "visitante": "São Paulo",
+      "placar_mandante": 1,
+      "placar_visitante": 1,
+      "video_id": "JDhBWi--hco",
+      "titulo": "VITÓRIA 1 X 1 ATHLETICO-PR | MELHORES MOMENTOS | 32ª RODADA | BRASILEIRÃO 2026 | ge tv",
+      "url": "https://www.youtube.com/watch?v=JDhBWi--hco",
+      "thumbnail": "https://i.ytimg.com/vi/JDhBWi--hco/maxresdefault.jpg",
+      "playlist_id": "PLIbmYrmHI_RM",
+      "published_at": "2026-10-24T21:46:36Z",
+      "fonte": "GE TV / YouTube",
+      "confianca": 0.46,
+      "motivos": [
+        "rodada da playlist confere",
+        "título compatível com melhores momentos",
+        "placar confere"
+      ]
+    },
+    {
+      "event_id": "401841278",
+      "chave": "401841278",
+      "rodada": 32,
+      "mandante": "Chapecoense",
+      "visitante": "Fluminense",
+      "placar_mandante": 2,
+      "placar_visitante": 1,
+      "video_id": "KyZ1bX0jw8s",
+      "titulo": "Private video",
+      "url": "https://www.youtube.com/watch?v=KyZ1bX0jw8s",
+      "thumbnail": null,
+      "playlist_id": "PLIbmYrmHI_RM",
+      "published_at": "2026-10-27T01:05:56Z",
+      "fonte": "GE TV / YouTube",
+      "confianca": 0.32,
+      "motivos": [
+        "rodada da playlist confere"
+      ]
+    },
+    {
+      "event_id": "401841282",
+      "chave": "401841282",
+      "rodada": 32,
+      "mandante": "Santos",
+      "visitante": "Bahia",
+      "placar_mandante": 1,
+      "placar_visitante": 1,
+      "video_id": "JDhBWi--hco",
+      "titulo": "VITÓRIA 1 X 1 ATHLETICO-PR | MELHORES MOMENTOS | 32ª RODADA | BRASILEIRÃO 2026 | ge tv",
+      "url": "https://www.youtube.com/watch?v=JDhBWi--hco",
+      "thumbnail": "https://i.ytimg.com/vi/JDhBWi--hco/maxresdefault.jpg",
+      "playlist_id": "PLIbmYrmHI_RM",
+      "published_at": "2026-10-24T21:46:36Z",
+      "fonte": "GE TV / YouTube",
+      "confianca": 0.46,
+      "motivos": [
+        "rodada da playlist confere",
+        "título compatível com melhores momentos",
+        "placar confere"
+      ]
+    }
+  ],
+  "jogos_sem_video": [
+    {
+      "event_id": "401841284",
+      "rodada": 32,
+      "mandante": "Mirassol",
+      "visitante": "São Paulo"
+    },
+    {
+      "event_id": "401841278",
+      "rodada": 32,
+      "mandante": "Chapecoense",
+      "visitante": "Fluminense"
+    },
+    {
+      "event_id": "401841282",
+      "rodada": 32,
+      "mandante": "Santos",
+      "visitante": "Bahia"
+    }
+  ]
 }
