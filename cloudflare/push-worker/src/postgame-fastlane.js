@@ -3,7 +3,7 @@ import { sendMail, probeMail, mailConfig, maskAddress } from './mailer.js';
 import { countWebSearchCalls, recordAiUsage, recordProviderUsage, postgamePublicCostSummary } from './ai-usage.js';
 import { searchPublicWithGemini, fetchSourceText, extractPublicWithWorkersAI, resolveWorkersAiExtractModel, fetchOpenAiResponses, openAiUsage } from './ai-router.js';
 import { extractSourceWithCache } from './source-extraction-cache.js';
-import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, evaluateSourceMatchIdentity, buildAttendanceSearchQueries, attendanceSourcePolicyText, officialClubDomainsForTask, matchDayEditorialSources, PREFERRED_EDITORIAL_SOURCE_SUFFIXES, isMultiMatchRoundupSource, verifiedStadiumCapacity } from './postgame-search-profile.js';
+import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, evaluateSourceMatchIdentity, buildAttendanceSearchQueries, attendanceSourcePolicyText, officialClubDomainsForTask, matchDayEditorialSources, PREFERRED_EDITORIAL_SOURCE_SUFFIXES, isMultiMatchRoundupSource, extractRoundupMatchBlock, verifiedStadiumCapacity } from './postgame-search-profile.js';
 import { FACTUAL_INTEGRITY_POLICY_VERSION, FACTUAL_INCIDENTS, inspectPostgameFactualIntegrity, quarantinePostgameFactualIntegrity } from './postgame-factual-integrity.js';
 import { attendanceEligibility, POSTGAME_ELIGIBILITY_VERSION, ATTENDANCE_REQUIRED_LEAGUE } from './postgame-competition-eligibility.js';
 
@@ -240,7 +240,7 @@ export function extractOpenAISources(response) {
   return urls;
 }
 
-export function validatePublicPayload(payload, sourceUrls, task = null) {
+export function validatePublicPayload(payload, sourceUrls, task = null, { structuredRoundup = false } = {}) {
   const p = payload && typeof payload === 'object' ? payload : {};
   if (p.encontrado !== true) return { accepted: false, reason: 'not_found' };
   const confidence = Number(p.confianca || 0);
@@ -250,7 +250,7 @@ export function validatePublicPayload(payload, sourceUrls, task = null) {
   let revenueValue = clampMoney(p.renda);
   // A URL é uma lista de jogos, não uma ficha técnica de UM event_id.
   // Nem mesmo uma resposta de IA com confiança 1 pode contornar este bloqueio.
-  if ([p.fonte_publico, p.fonte_publico_pagante, p.fonte_renda].some((url) => url && isMultiMatchRoundupSource(url))) {
+  if (!structuredRoundup && [p.fonte_publico, p.fonte_publico_pagante, p.fonte_renda].some((url) => url && isMultiMatchRoundupSource(url))) {
     return { accepted: false, reason: 'multi_match_roundup_requires_structured_parser' };
   }
   const capacity = verifiedStadiumCapacity(task);
@@ -989,7 +989,7 @@ export function hasLabeledFinancialEvidence(value='') {
   const body=text(value).replace(/\s+/g,' ');
   return /\b(?:p[úu]blico|pagantes?|renda|bilheteria|arrecada[çc][ãa]o)\b.{0,110}(?:R\$\s*)?[0-9][0-9., ]{2,}/i.test(body);
 }
-function validateGroundedValues(parsed, sourceUrls='', task = null) {
+function validateGroundedValues(parsed, sourceUrls='', task = null, options = {}) {
   const urls = Array.isArray(sourceUrls) ? robustSources(sourceUrls, task) : robustSources([sourceUrls], task);
   if (!urls.length) return null;
   const p = parsed && typeof parsed === 'object' ? { ...parsed } : {};
@@ -998,7 +998,7 @@ function validateGroundedValues(parsed, sourceUrls='', task = null) {
   if (!p.fonte_publico && p.publico != null && urls.length === 1) p.fonte_publico = urls[0];
   if (!p.fonte_publico_pagante && p.publico_pagante != null && urls.length === 1) p.fonte_publico_pagante = urls[0];
   if (!p.fonte_renda && p.renda != null && urls.length === 1) p.fonte_renda = urls[0];
-  const verified = validatePublicPayload(p, urls, task);
+  const verified = validatePublicPayload(p, urls, task, options);
   return verified.accepted ? verified : null;
 }
 
@@ -1010,7 +1010,10 @@ async function refreshCachedPublicSources(env,task,values,sources){
     if(Number.isFinite(lastChecked)&&Date.now()-lastChecked>=0&&Date.now()-lastChecked<90_000)continue;
     const source=await fetchSourceText(row.url); checked++;
     if(!source.ok){lastError=source.reason;await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=failures+1 WHERE event_id=? AND url=?`).bind(source.reason,task.event_id,row.url).run();continue;}
-    const identity=evaluateSourceMatchIdentity(task,source.text,source.url);
+    const isStructuredRoundup=isMultiMatchRoundupSource(source.url);
+    const identity=isStructuredRoundup
+      ? extractRoundupMatchBlock(task,source.text,source.url)
+      : evaluateSourceMatchIdentity(task,source.text,source.url);
     if(!identity.accepted){
       lastError=`source_match_identity_rejected:${[...(identity.conflicts||[]),...(identity.reasons||[])].join('|')}`;
       await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=failures+1 WHERE event_id=? AND url=?`).bind(lastError.slice(0,500),task.event_id,row.url).run();
@@ -1022,21 +1025,22 @@ async function refreshCachedPublicSources(env,task,values,sources){
     // imediatamente anterior/seguinte no documento.
     const scopedSource={...source,text:identity.window};
     const deterministic=extractPublicFromTextDeterministic(scopedSource.text,source.url);
-    let valid=validateGroundedValues(deterministic,source.url,task);
+    const validationOptions={structuredRoundup:isStructuredRoundup&&identity.accepted};
+    let valid=validateGroundedValues(deterministic,source.url,task,validationOptions);
     let extractor='deterministic';
 
     // Só gasta Workers AI quando a página realmente fala da partida e o parser
     // de rótulos não conseguiu extrair nenhum campo confiável.
-    if(!valid&&hasLabeledFinancialEvidence(scopedSource.text)){
+    if(!valid&&!isStructuredRoundup&&hasLabeledFinancialEvidence(scopedSource.text)){
       // R10R19: cache persistente por evento, URL, modelo e SHA-256 do TEXTO
       // escopado. Revalida o payload armazenado pelo mesmo guard factual antes
       // de reutilizá-lo. Falhas expiram em 20 min; página alterada reabre a IA.
       const extracted=await extractSourceWithCache(env,task,scopedSource,{
         model:resolveWorkersAiExtractModel(env),
         extract:()=>extractPublicWithWorkersAI(env,task,scopedSource),
-        validate:(parsed)=>Boolean(validateGroundedValues(parsed,source.url,task)),
+        validate:(parsed)=>Boolean(validateGroundedValues(parsed,source.url,task,validationOptions)),
       });
-      valid=validateGroundedValues(extracted.parsed,source.url,task);
+      valid=validateGroundedValues(extracted.parsed,source.url,task,validationOptions);
       extractor=extracted.cacheState==='hit_positive'?'workers-ai-cache':'workers-ai';
       if(!valid&&extracted.reason)lastError=text(extracted.reason);
     }else if(!valid){
