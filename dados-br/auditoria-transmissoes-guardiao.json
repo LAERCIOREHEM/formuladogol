@@ -6293,51 +6293,111 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado: Santos x Palmeiras, Campeonato Brasileiro Série A 2026, fase única, 33ª rodada, nesta quarta-feira (28/10/2026), às 19h30 (horário de Brasília), na Vila Belmiro. A transmissão integral no Brasil é exclusiva do Premiere. O ge fará acompanhamento em tempo real, o que não equivale a transmissão da partida. A indicação anterior de Globo vinha de uma página sobre Bahia x São Paulo e não se aplica a este jogo."
+    },
+    {
+      "event_id": "401841289",
+      "jogo": "Fluminense x Internacional",
+      "data_iso": "2026-10-28T19:30:00-03:00",
+      "checkpoint": -15,
+      "executado_em": "2026-10-28T19:19:04-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+      "canais_antes": [
+        "CazéTV"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/10/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-30a-rodada.ghtml",
+        "https://ge.globo.com/futebol/times/fluminense",
+        "https://ge.globo.com/futebol/times/fluminense/noticia/2026/09/30/fluminense-aposta-em-mes-sem-viagens-para-chegar-bem-fisicamente-a-semifinal-da-libertadores.ghtml",
+        "https://ge.globo.com/futebol/times/fluminense/noticia/2026/10/27/escalacao-do-fluminense-thiago-silva-savarino-e-canobbio-voltam-ao-time.ghtml",
+        "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+        "https://ge.globo.com/google/amp/futebol/times/fluminense/noticia/2026/10/11/nonato-valoriza-classico-do-fluminense-com-o-flamengo-tem-que-ter-nocao-da-dimensao-dessa-partida.ghtml",
+        "https://ge.globo.com/google/amp/gato-mestre/dicas/noticia/2026/10/27/palpites-e-dicas-para-fluminense-x-internacional-pelo-brasileirao.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/10/08/fluminense-x-coritiba-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/rj/futebol/brasileirao-serie-a/jogo/28-10-2026/fluminense-internacional.ghtml",
+        "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/10/28/fluminense-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/05/03/internacional-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/10/24/chapecoense-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://www.youtube.com/watch?v=3oN4yRgbuuc",
+        "https://www.youtube.com/watch?v=vZHU7-dHDhU"
+      ],
+      "canais_depois": [
+        "CazéTV",
+        "Premiere",
+        "Record"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/10/28/fluminense-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=t4pf4qZ0c14",
+          "scope": "match",
+          "valid_for_match": true,
+          "reason": "O dossiê identifica a live oficial da CazéTV como “AO VIVO: FLUMINENSE X INTERNACIONAL | BRASILEIRÃO 2026 | 33ª RODADA”, em andamento, com escopo de partida. A confirmação editorial do ge lista CazéTV como uma das transmissões oficiais do jogo; não se trata apenas de pré-jogo, pós-jogo, watchalong ou melhores momentos."
+        }
+      ],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Fluminense x Internacional, Brasileirão 2026 — 33ª rodada, fase única — em 28/10/2026, às 19h30 (horário de Brasília), no Maracanã. A grade completa de transmissão é CazéTV, Premiere e Record. O link da CazéTV no dossiê é compatível com transmissão integral: o título identifica especificamente a partida ao vivo, e a relação de transmissões do ge confirma CazéTV entre os detentores que exibem o jogo."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841293",
-    "jogo": "Santos x Palmeiras",
+    "event_id": "401841289",
+    "jogo": "Fluminense x Internacional",
     "data_iso": "2026-10-28T19:30:00-03:00",
-    "checkpoint": -90,
-    "executado_em": "2026-10-28T18:05:13-03:00",
+    "checkpoint": -15,
+    "executado_em": "2026-10-28T19:19:04-03:00",
     "chamada_openai": true,
-    "motivo_chamada": "checkpoint de auditoria completa",
+    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
     "canais_antes": [
-      "Globo"
+      "CazéTV"
     ],
     "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/07/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-29a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/10/28/bragantino-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/10/11/atletico-mg-x-santos-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/09/12/palmeiras-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/futebol/copa-do-brasil/noticia/2026/08/26/palmeiras-x-santos-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/jogo/28-10-2026/santos-palmeiras.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/10/08/santos-x-flamengo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/10/28/santos-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/copa-do-brasil/noticia/2026/09/02/santos-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/santos-fc-x-palmeiras/832213",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/brasileirao-33-rodada-comeca-com-classico-da-saudade-e-duelo-tricolor",
-      "https://www.youtube.com/watch?v=28o178sfyX8",
-      "https://www.youtube.com/watch?v=cp3VbMPVItA"
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/10/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-30a-rodada.ghtml",
+      "https://ge.globo.com/futebol/times/fluminense",
+      "https://ge.globo.com/futebol/times/fluminense/noticia/2026/09/30/fluminense-aposta-em-mes-sem-viagens-para-chegar-bem-fisicamente-a-semifinal-da-libertadores.ghtml",
+      "https://ge.globo.com/futebol/times/fluminense/noticia/2026/10/27/escalacao-do-fluminense-thiago-silva-savarino-e-canobbio-voltam-ao-time.ghtml",
+      "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+      "https://ge.globo.com/google/amp/futebol/times/fluminense/noticia/2026/10/11/nonato-valoriza-classico-do-fluminense-com-o-flamengo-tem-que-ter-nocao-da-dimensao-dessa-partida.ghtml",
+      "https://ge.globo.com/google/amp/gato-mestre/dicas/noticia/2026/10/27/palpites-e-dicas-para-fluminense-x-internacional-pelo-brasileirao.ghtml",
+      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/10/08/fluminense-x-coritiba-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/jogo/28-10-2026/fluminense-internacional.ghtml",
+      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/10/28/fluminense-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/05/03/internacional-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/10/24/chapecoense-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://www.youtube.com/watch?v=3oN4yRgbuuc",
+      "https://www.youtube.com/watch?v=vZHU7-dHDhU"
     ],
     "canais_depois": [
-      "Premiere"
+      "CazéTV",
+      "Premiere",
+      "Record"
     ],
-    "exclusivo": true,
+    "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/10/28/santos-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/santos-fc-x-palmeiras/832213"
+      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/10/28/fluminense-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml"
     ],
-    "youtube": [],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=t4pf4qZ0c14",
+        "scope": "match",
+        "valid_for_match": true,
+        "reason": "O dossiê identifica a live oficial da CazéTV como “AO VIVO: FLUMINENSE X INTERNACIONAL | BRASILEIRÃO 2026 | 33ª RODADA”, em andamento, com escopo de partida. A confirmação editorial do ge lista CazéTV como uma das transmissões oficiais do jogo; não se trata apenas de pré-jogo, pós-jogo, watchalong ou melhores momentos."
+      }
+    ],
     "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado: Santos x Palmeiras, Campeonato Brasileiro Série A 2026, fase única, 33ª rodada, nesta quarta-feira (28/10/2026), às 19h30 (horário de Brasília), na Vila Belmiro. A transmissão integral no Brasil é exclusiva do Premiere. O ge fará acompanhamento em tempo real, o que não equivale a transmissão da partida. A indicação anterior de Globo vinha de uma página sobre Bahia x São Paulo e não se aplica a este jogo."
+    "resumo": "Confirmado para o Brasil: Fluminense x Internacional, Brasileirão 2026 — 33ª rodada, fase única — em 28/10/2026, às 19h30 (horário de Brasília), no Maracanã. A grade completa de transmissão é CazéTV, Premiere e Record. O link da CazéTV no dossiê é compatível com transmissão integral: o título identifica especificamente a partida ao vivo, e a relação de transmissões do ge confirma CazéTV entre os detentores que exibem o jogo."
   },
-  "atualizado_em": "2026-10-28T18:05:13-03:00"
+  "atualizado_em": "2026-10-28T19:19:04-03:00"
 }

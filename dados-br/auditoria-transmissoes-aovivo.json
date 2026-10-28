@@ -15,14 +15,14 @@
   "resumo": {
     "jogos_na_janela": 46,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 7,
+    "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 34,
+    "candidatos_oficiais_encontrados": 36,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 7,
-    "sem_transmissao": 1,
+    "sem_transmissao": 0,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -79,18 +79,6 @@
       "fontes_encontradas": [
         "CazéTV"
       ],
-      "manual": false,
-      "descoberta_antecipada": true
-    },
-    {
-      "event_id": "401841293",
-      "rodada": 33,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Santos x Palmeiras",
-      "data_iso": "2026-10-28T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
       "manual": false,
       "descoberta_antecipada": false
     },
@@ -181,6 +169,23 @@
   ],
   "aceitos": [
     {
+      "event_id": "401841289",
+      "jogo": "Fluminense x Internacional",
+      "fonte": "cazetv",
+      "video_id": "t4pf4qZ0c14",
+      "url": "https://www.youtube.com/watch?v=t4pf4qZ0c14",
+      "titulo": "AO VIVO: FLUMINENSE X INTERNACIONAL | BRASILEIRÃO 2026 | 33ª RODADA",
+      "status": "live",
+      "confianca": 0.925,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "transmissão já está ao vivo",
+        "horário compatível (90 min de diferença)"
+      ]
+    },
+    {
       "event_id": "401841295",
       "jogo": "Corinthians x Mirassol",
       "fonte": "getv",
@@ -261,23 +266,6 @@
       ]
     },
     {
-      "event_id": "401841289",
-      "jogo": "Fluminense x Internacional",
-      "fonte": "cazetv",
-      "video_id": "t4pf4qZ0c14",
-      "url": "https://www.youtube.com/watch?v=t4pf4qZ0c14",
-      "titulo": "AO VIVO: FLUMINENSE X INTERNACIONAL | BRASILEIRÃO 2026 | 33ª RODADA",
-      "status": "live",
-      "confianca": 0.925,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (90 min de diferença)"
-      ]
-    },
-    {
       "event_id": "401841306",
       "jogo": "Athletico-PR x Vasco da Gama",
       "fonte": "cazetv",
@@ -295,6 +283,16 @@
     }
   ],
   "rejeitados": [
+    {
+      "video_id": "S5eEvauBYGM",
+      "url": "https://www.youtube.com/watch?v=S5eEvauBYGM",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: SANTOS X PALMEIRAS | PRÉ-JOGO | BRASILEIRÃO 2026 | Premiere",
+      "status": "live",
+      "inicio_programado": "2026-10-28T18:30:00-03:00",
+      "motivo": "conteúdo rejeitado: pre jogo"
+    },
     {
       "video_id": "E5N8086Puug",
       "url": "https://www.youtube.com/watch?v=E5N8086Puug",
@@ -334,16 +332,6 @@
       "status": "upcoming",
       "inicio_programado": "2026-10-29T15:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "S5eEvauBYGM",
-      "url": "https://www.youtube.com/watch?v=S5eEvauBYGM",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: SANTOS X PALMEIRAS | PRÉ-JOGO | BRASILEIRÃO 2026 | Premiere",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-28T18:30:00-03:00",
-      "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
       "video_id": "hNog7bqOalc",
@@ -393,6 +381,16 @@
       "titulo": "AO VIVO: ATHLETIC BILBAO X REAL SOCIEDAD | LALIGA 26/27 | 11ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-11-01T16:20:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "5T8yFUlLRC4",
+      "url": "https://www.youtube.com/watch?v=5T8yFUlLRC4",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: JUDÔ | TIME BRASIL NO GRAND SLAM DE ABU DHABI | DIA 1",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-29T09:40:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -466,6 +464,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "On-9wkhVT9c",
+      "url": "https://www.youtube.com/watch?v=On-9wkhVT9c",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: JUDÔ | TIME BRASIL NO GRAND SLAM DE ABU DHABI | DIA 3",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-31T09:40:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "Sgm_6pjnOdc",
       "url": "https://www.youtube.com/watch?v=Sgm_6pjnOdc",
       "fonte": "cazetv",
@@ -483,16 +491,6 @@
       "titulo": "AO VIVO: ELCHE X VALENCIA | LALIGA 26/27 | 11ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-11-01T13:50:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "XK3UOBxPzqE",
-      "url": "https://www.youtube.com/watch?v=XK3UOBxPzqE",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: CORINTHIANS X INDEPENDIENTE SANTA FE | LIBERTADORES FEMININA 2026 | SEMIFINAL",
-      "status": "live",
-      "inicio_programado": "2026-10-28T16:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -564,29 +562,29 @@
       "status": "upcoming",
       "inicio_programado": "2026-10-29T08:50:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "y6HaugC83KA",
+      "url": "https://www.youtube.com/watch?v=y6HaugC83KA",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: JUDÔ | TIME BRASIL NO GRAND SLAM DE ABU DHABI | DIA 2",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-30T09:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
     }
   ],
   "search_api_pulados": [],
-  "sem_transmissao": [
-    {
-      "event_id": "401841293",
-      "rodada": 33,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Santos x Palmeiras",
-      "data_iso": "2026-10-28T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    }
-  ],
+  "sem_transmissao": [],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 87,
+    "unidades": 88,
     "requisicoes": {
       "channels": 4,
-      "videos": 43,
+      "videos": 44,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-10-28T18:02:41-03:00"
+  "atualizado_em": "2026-10-28T19:16:38-03:00"
 }
