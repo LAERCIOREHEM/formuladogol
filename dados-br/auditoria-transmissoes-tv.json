@@ -7,10 +7,10 @@
     "jogos_sem_transmissao_14d": 1,
     "jogos_sem_transmissao_fora_14d": 8,
     "jogos_criticos_sem_transmissao_72h": 1,
-    "registros_preservados": 28,
+    "registros_preservados": 22,
     "jogos_guardiao_ia": 3,
-    "jogos_estaveis_sem_reconsulta_editorial": 2,
-    "fontes_com_falha": 0
+    "jogos_estaveis_sem_reconsulta_editorial": 3,
+    "fontes_com_falha": 2
   },
   "fontes": {
     "guardiao_ia": {
@@ -18,24 +18,30 @@
       "jogos_com_canal": 3
     },
     "cbf": {
-      "ok": true,
-      "competicoes_ok": [
-        "brasileirao"
-      ],
+      "ok": false,
+      "competicoes_ok": [],
       "registros": 0,
       "erros": [
+        "Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 10614
+      "duracao_ms": 9876
+    },
+    "ge_agenda": {
+      "ok": true,
+      "jogos_com_canal": 0,
+      "duracao_ms": 6833
+    },
+    "ge_artigos": {
+      "ok": true,
+      "artigos_consultados": 6,
+      "jogos_com_canal": 8,
+      "duracao_ms": 79674
     },
     "espn": {
-      "ok": true,
-      "competicoes_consultadas": 4,
-      "eventos_na_janela": 0,
-      "scoreboard_com_canal": 0,
-      "summary_com_canal": 0,
-      "duracao_ms": 0
+      "ok": false,
+      "erro": "RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261026-20261229&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
     },
     "youtube_oficial": {
       "ok": true,
@@ -48,7 +54,7 @@
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-31T16:00:00-03:00",
-      "faltam_horas": 68.7,
+      "faltam_horas": 68.5,
       "nivel": "critico"
     }
   ],
@@ -58,7 +64,7 @@
       "rodada": 33,
       "jogo": "Coritiba x Vitória",
       "data_iso": "2026-10-31T16:00:00-03:00",
-      "faltam_horas": 68.7,
+      "faltam_horas": 68.5,
       "nivel": "critico"
     },
     {
@@ -66,7 +72,7 @@
       "rodada": 35,
       "jogo": "Mirassol x Atlético-MG",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 501.7,
+      "faltam_horas": 501.5,
       "nivel": "futuro"
     },
     {
@@ -74,7 +80,7 @@
       "rodada": 35,
       "jogo": "Grêmio x Bahia",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 501.7,
+      "faltam_horas": 501.5,
       "nivel": "futuro"
     },
     {
@@ -82,7 +88,7 @@
       "rodada": 35,
       "jogo": "Coritiba x Santos",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 501.7,
+      "faltam_horas": 501.5,
       "nivel": "futuro"
     },
     {
@@ -90,7 +96,7 @@
       "rodada": 36,
       "jogo": "Athletico-PR x Remo",
       "data_iso": "2026-11-21T17:00:00-03:00",
-      "faltam_horas": 573.7,
+      "faltam_horas": 573.5,
       "nivel": "futuro"
     },
     {
@@ -98,7 +104,7 @@
       "rodada": 36,
       "jogo": "Santos x Grêmio",
       "data_iso": "2026-11-21T17:00:00-03:00",
-      "faltam_horas": 573.7,
+      "faltam_horas": 573.5,
       "nivel": "futuro"
     },
     {
@@ -106,7 +112,7 @@
       "rodada": 36,
       "jogo": "Bahia x Coritiba",
       "data_iso": "2026-11-21T17:00:00-03:00",
-      "faltam_horas": 573.7,
+      "faltam_horas": 573.5,
       "nivel": "futuro"
     },
     {
@@ -114,7 +120,7 @@
       "rodada": 0,
       "jogo": "Atlético-MG x Boca Juniors",
       "data_iso": "2026-11-21T17:00:00-03:00",
-      "faltam_horas": 573.7,
+      "faltam_horas": 573.5,
       "nivel": "futuro"
     },
     {
@@ -122,7 +128,7 @@
       "rodada": 0,
       "jogo": "Palmeiras x Estudiantes de La Plata",
       "data_iso": "2026-11-28T17:00:00-03:00",
-      "faltam_horas": 741.7,
+      "faltam_horas": 741.5,
       "nivel": "futuro"
     }
   ],
@@ -132,20 +138,6 @@
       "jogo": "Remo x Botafogo",
       "canais": [
         "Premiere",
-        "Globo"
-      ]
-    },
-    {
-      "event_id": "401841288",
-      "jogo": "Atlético-MG x Cruzeiro",
-      "canais": [
-        "Globo"
-      ]
-    },
-    {
-      "event_id": "401841292",
-      "jogo": "Vasco da Gama x Flamengo",
-      "canais": [
         "Globo"
       ]
     },
@@ -246,13 +238,6 @@
       ]
     },
     {
-      "event_id": "401913107",
-      "jogo": "Vasco da Gama x Palmeiras",
-      "canais": [
-        "Globo"
-      ]
-    },
-    {
       "event_id": "401841316",
       "jogo": "Corinthians x Botafogo",
       "canais": [
@@ -261,20 +246,6 @@
         "SporTV",
         "Globo",
         "Disney+ / ESPN"
-      ]
-    },
-    {
-      "event_id": "401841314",
-      "jogo": "Cruzeiro x Palmeiras",
-      "canais": [
-        "Globo"
-      ]
-    },
-    {
-      "event_id": "401841313",
-      "jogo": "Flamengo x Athletico-PR",
-      "canais": [
-        "Globo"
       ]
     },
     {
@@ -381,19 +352,21 @@
         "Prime Video",
         "Disney+ / ESPN"
       ]
-    },
-    {
-      "event_id": "401841322",
-      "jogo": "Palmeiras x Flamengo",
-      "canais": [
-        "Globo"
-      ]
     }
   ],
   "erros": [
+    "CBF: Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
     "CBF: Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
-    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
+    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
+    "ESPN: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261026-20261229&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
   ],
-  "artigos_ge_descobertos": [],
-  "atualizado_em": "2026-10-28T19:19:16-03:00"
+  "artigos_ge_descobertos": [
+    "https://ge.globo.com/gato-mestre/noticia/2026/10/28/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-33a-rodada-do-brasileirao.ghtml",
+    "https://ge.globo.com/cartola/noticia/2026/10/28/cartola-2026-veja-suspensos-lesionados-e-escalacoes-provaveis-da-rodada-33-do-brasileirao.ghtml",
+    "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/bahia-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/10/28/fluminense-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/10/28/remo-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml"
+  ],
+  "atualizado_em": "2026-10-28T19:31:45-03:00"
 }

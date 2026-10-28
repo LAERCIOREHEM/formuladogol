@@ -170,7 +170,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=yL7MzrhVAJk",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -206,7 +206,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -239,20 +239,20 @@
       "canais": [
         "Globo"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "GE guia editorial",
+      "confianca": "confirmado",
       "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "GE guia editorial",
           "canais": [
             "Globo"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/bahia-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -273,20 +273,20 @@
       "canais": [
         "Globo"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "GE guia editorial",
+      "confianca": "confirmado",
       "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "GE guia editorial",
           "canais": [
             "Globo"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/bahia-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -318,7 +318,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=xwhPKMVtapI",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -352,7 +352,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=FcqUaxsQHNQ",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -373,9 +373,10 @@
       "data_iso": "2026-11-01T16:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "GE TV"
+        "GE TV",
+        "Globo"
       ],
-      "origem": "YouTube oficial validado",
+      "origem": "GE guia editorial + YouTube oficial validado",
       "confianca": "confirmado",
       "estavel": false,
       "exclusivo": false,
@@ -386,9 +387,19 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=baGfKQNcuc4",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/bahia-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -396,6 +407,11 @@
           "nome": "Assistir na GE TV",
           "url": "https://www.youtube.com/watch?v=baGfKQNcuc4",
           "tipo": "player_oficial"
+        },
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -422,7 +438,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -475,7 +491,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -534,7 +550,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -607,7 +623,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -648,9 +664,10 @@
       "data_iso": "2026-11-04T19:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "CazéTV"
+        "CazéTV",
+        "Globo"
       ],
-      "origem": "YouTube oficial validado",
+      "origem": "GE guia editorial + YouTube oficial validado",
       "confianca": "confirmado",
       "estavel": false,
       "exclusivo": false,
@@ -661,9 +678,19 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=cOjixSohLkY",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/bahia-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -671,6 +698,11 @@
           "nome": "Assistir na CazéTV",
           "url": "https://www.youtube.com/watch?v=cOjixSohLkY",
           "tipo": "player_oficial"
+        },
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -697,7 +729,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -746,7 +778,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -793,7 +825,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -861,7 +893,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -918,7 +950,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -992,7 +1024,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1061,7 +1093,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=89tPGaf7W4s",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -1084,20 +1116,20 @@
       "canais": [
         "Globo"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "GE guia editorial",
+      "confianca": "confirmado",
       "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "GE guia editorial",
           "canais": [
             "Globo"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/bahia-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -1137,7 +1169,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1190,20 +1222,20 @@
       "canais": [
         "Globo"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "GE guia editorial",
+      "confianca": "confirmado",
       "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "GE guia editorial",
           "canais": [
             "Globo"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/bahia-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -1224,20 +1256,20 @@
       "canais": [
         "Globo"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "GE guia editorial",
+      "confianca": "confirmado",
       "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "GE guia editorial",
           "canais": [
             "Globo"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/bahia-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -1273,7 +1305,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1326,7 +1358,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1385,7 +1417,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1464,7 +1496,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1533,7 +1565,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1576,7 +1608,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1635,7 +1667,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1712,7 +1744,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1786,7 +1818,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1865,7 +1897,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1923,20 +1955,20 @@
       "canais": [
         "Globo"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "GE guia editorial",
+      "confianca": "confirmado",
       "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "GE guia editorial",
           "canais": [
             "Globo"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-28T19:19:16-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/bahia-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-10-28T19:31:45-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -1948,5 +1980,5 @@
       ]
     }
   },
-  "atualizado_em": "2026-10-28T19:19:16-03:00"
+  "atualizado_em": "2026-10-28T19:31:45-03:00"
 }
