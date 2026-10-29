@@ -48,13 +48,13 @@ export const POSTGAME_POLICY_VERSION = 16;
  */
 export const PUBLIC_POLICY = Object.freeze({
   aiStartMinutes: 3,
-  geminiScheduleMinutes: [3, 9, 18, 30, 45, 60, 90, 120],
-  openaiScheduleMinutes: [20, 50, 100],
+  geminiScheduleMinutes: [3, 15, 45, 105],
+  openaiScheduleMinutes: [12, 50],
   deterministicEveryMinutes: 3,
   overdueMinutes: 120,
   migrationGraceMinutes: 15,
-  overdueGeminiEveryMinutes: 60,
-  overdueOpenaiEveryMinutes: 180,
+  overdueGeminiEveryMinutes: 120,
+  overdueOpenaiEveryMinutes: 240,
   geminiCircuitStructuralMinutes: 30,
   geminiCircuitSoftMinutes: 15,
   geminiProbeCacheMinutes: 15,
@@ -1359,12 +1359,12 @@ export function planPublicStep(task, ai, now = Date.now(), budget = { allowGemin
 }
 
 export function shouldImmediateOpenAiFallback({ageMinutes=0,forcedUpgrade=false,budget={allowOpenAI:true},complete=false}={}) {
-  // Se depois do Gemini ainda faltam público OU renda, a partir de T+20 a
+  // Se depois do Gemini ainda faltam público OU renda, a partir de T+12 a
   // contingência OpenAI entra no mesmo ciclo. Na primeira passada da v10,
   // `forcedUpgrade` antecipa essa regra para qualquer pendência elegível. Não usamos
   // `found`/`sources` como trava: um resultado parcial também precisa de fallback.
   if(complete || budget?.allowOpenAI===false) return false;
-  return Boolean(forcedUpgrade) || Number(ageMinutes||0)>=20;
+  return Boolean(forcedUpgrade) || Number(ageMinutes||0)>=12;
 }
 
 export function nextPublicAttemptMs(task, phaseDone, nextPlan, now=Date.now(), ai={}) {
