@@ -422,6 +422,43 @@ console.log('postgame-fastlane v15 policy + eligibility guard + factual integrit
   assert.equal(parsedBotVasco.renda, 801180);
 }
 console.log('R10R15 match identity gate tests: PASS');
+
+// R10R29: casos reais da rodada 33 — normalização sem perda de offsets,
+// notícia longa, placar ×, presentes ≠ pagantes e renda em formato combinado.
+{
+  const {evaluateSourceMatchIdentity} = await import('../src/postgame-search-profile.js');
+  const remo={event_id:'401841297',league:'bra.1',home:'Remo',away:'Botafogo',
+    kickoff:'2026-10-28T21:30:00-03:00',home_score:2,away_score:1,round:33,stadium:'Mangueirão'};
+  const remoUrl='https://www.oliberal.com/esportes/remo/xo-jejum-remo-vence-o-botafogo-e-segue-vivo-no-brasileirao-1.1188130';
+  const longStory='Remo 2 x 1 Botafogo no Mangueirão, 33ª rodada do Campeonato Brasileiro. '+
+    ('Vitória do clube em Belém; retrospectiva com acentos e pontuação. '.repeat(48))+
+    ' Ficha técnica: Renda e público: R$ 378.700,00 / 9.760 pagantes / 13.458 presentes.';
+  const longGate=evaluateSourceMatchIdentity(remo,longStory,remoUrl);
+  assert.equal(longGate.accepted,true,'a identificação do Remo deve sobreviver à normalização');
+  assert.ok(longGate.window.includes('13.458 presentes'),'não truncar ficha técnica após o título');
+  const remoFields=extractPublicFromTextDeterministic(longGate.window,remoUrl);
+  assert.deepEqual([remoFields.publico,remoFields.publico_pagante,remoFields.renda],[13458,9760,378700]);
+  const remoValidated=validatePublicPayload(remoFields,[remoUrl],remo);
+  assert.equal(remoValidated.accepted,true);
+  const bahia={event_id:'401841296',league:'bra.1',home:'Bahia',away:'São Paulo',
+    kickoff:'2026-10-28T21:30:00-03:00',home_score:3,away_score:2,round:33,stadium:'Arena Fonte Nova'};
+  const bahiaUrl='https://www.correiobraziliense.com.br/esportes/2026/10/7529972-bahia-vence-o-sao-paulo-em-salvador-e-cola-no-g6-do-brasileirao.html';
+  const bahiaText='Bahia 3×2 São Paulo, Arena Fonte Nova, 33ª rodada do Brasileirão. '+
+    'A partida teve arbitragem confirmada. Ficha técnica: Público: 21.492 presentes. Renda: 628.385,50.';
+  const bahiaGate=evaluateSourceMatchIdentity(bahia,bahiaText,bahiaUrl);
+  assert.equal(bahiaGate.accepted,true,'placar 3×2 deve ser reconhecido como resultado do confronto');
+  assert.ok(bahiaGate.window.includes('Público: 21.492'));
+  const bahiaFields=extractPublicFromTextDeterministic(bahiaGate.window,bahiaUrl);
+  assert.equal(bahiaFields.publico,21492);
+  assert.equal(bahiaFields.renda,628385.50);
+  assert.equal(validatePublicPayload(bahiaFields,[bahiaUrl],bahia).accepted,true);
+  // Não copiar dados de um confronto adjacente numa reportagem de rodada.
+  const other='Flamengo 1 x 0 Bahia. Público: 61.000. Renda: R$ 1.800.000,00.';
+  assert.equal(evaluateSourceMatchIdentity(remo,other,remoUrl).accepted,false);
+}
+console.log('R10R29 round 33 hunter regression fixtures: PASS');
+
+
 // ============================ R10R16.1 Factual Integrity Guard ============================
 {
   const { inspectPostgameFactualIntegrity, quarantinePostgameFactualIntegrity, FACTUAL_INCIDENTS } = await import('../src/postgame-factual-integrity.js');
