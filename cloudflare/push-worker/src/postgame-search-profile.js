@@ -2,7 +2,7 @@ export const POSTGAME_SEARCH_PROFILE_VERSION = 10;
 
 function text(value) { return String(value ?? '').trim(); }
 function normalizeText(value) {
-  return text(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return text(value).replace(/×/g, ' x ').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
 function sourceHostname(value) {
   try { return new URL(text(value)).hostname.toLowerCase().replace(/^www\./, ''); } catch (_) { return ''; }
@@ -194,7 +194,7 @@ function normalizeWithSourceOffsets(value) {
   let normalized = '';
   const offsets = [];
   for (let i = 0; i < raw.length; i++) {
-    const decomposed = raw[i].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const decomposed = (raw[i] === '×' ? ' x ' : raw[i]).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     for (const unit of decomposed) {
       const char = /[a-z0-9]/.test(unit) ? unit : ' ';
       if (char === ' ' && (!normalized || normalized.endsWith(' '))) continue;
