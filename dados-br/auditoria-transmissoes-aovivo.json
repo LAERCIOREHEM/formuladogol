@@ -17,10 +17,10 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 7,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 45,
+    "candidatos_oficiais_encontrados": 47,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
     "transmissoes_publicadas": 7,
     "sem_transmissao": 1,
     "erros": 0
@@ -69,12 +69,12 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841288",
+      "event_id": "401841292",
       "rodada": 33,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Cruzeiro",
-      "data_iso": "2026-10-29T19:30:00-03:00",
+      "jogo": "Vasco da Gama x Flamengo",
+      "data_iso": "2026-10-29T20:00:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -535,7 +535,7 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: BARCELONA X ALAVÉS | LALIGA 26/27 | 11ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-10-31T16:20:00-03:00",
+      "inicio_programado": "2026-10-31T16:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -615,7 +615,7 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: KANE ESTREIA COMO BOLA DE OURO E TEM CHELSEA X MANCHESTER UNITED | QUEM FEZ, FEZ",
       "status": "upcoming",
-      "inicio_programado": "2026-10-29T19:05:00-03:00",
+      "inicio_programado": "2026-10-30T19:05:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -659,6 +659,26 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "mXOil98FdlU",
+      "url": "https://www.youtube.com/watch?v=mXOil98FdlU",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): FC LORIENT X STADE BRESTOIS | LIGUE 1 26/27 | 9ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-02T16:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "s9unUJUeNig",
+      "url": "https://www.youtube.com/watch?v=s9unUJUeNig",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): ESTAC TROYES X LE MANS | LIGUE 1 26/27 | 9ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-10-31T16:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "y6HaugC83KA",
       "url": "https://www.youtube.com/watch?v=y6HaugC83KA",
       "fonte": "cazetv",
@@ -669,15 +689,21 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401841292",
+      "jogo": "Vasco da Gama x Flamengo",
+      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
+    }
+  ],
   "sem_transmissao": [
     {
-      "event_id": "401841288",
+      "event_id": "401841292",
       "rodada": 33,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Cruzeiro",
-      "data_iso": "2026-10-29T19:30:00-03:00",
+      "jogo": "Vasco da Gama x Flamengo",
+      "data_iso": "2026-10-29T20:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -691,5 +717,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-10-29T18:01:41-03:00"
+  "atualizado_em": "2026-10-29T18:31:42-03:00"
 }
