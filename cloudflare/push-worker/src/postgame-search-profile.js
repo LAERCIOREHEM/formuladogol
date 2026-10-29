@@ -307,16 +307,37 @@ function aliasOccurrences(normalized, alias) {
   }
   return out;
 }
-function bestPair(normalized, homeAliases, awayAliases) {
+function bestPair(normalized, homeAliases, awayAliases, raw = '', offsets = [], task = null) {
   const homes = homeAliases.flatMap((a) => aliasOccurrences(normalized, a));
   const aways = awayAliases.flatMap((a) => aliasOccurrences(normalized, a));
-  let best = null;
+  let nearest = null;
+  let documented = null;
+  const exactScore = task ? taskScoreRegex(task) : null;
+  // A dupla mais próxima pode estar no rodapé ("assuntos relacionados"), DEPOIS
+  // da ficha. Classificar todas as ocorrências próximas do confronto, priorizando
+  // o bloco cuja ficha documental venha DEPOIS de clubes/placar, nunca o rodapé.
   for (const h of homes) for (const a of aways) {
     const distance = Math.max(0, Math.max(h.start, a.start) - Math.min(h.end, a.end));
-    if (!best || distance < best.distance) best = { home: h, away: a, distance };
+    if (!nearest || distance < nearest.distance) nearest = { home:h, away:a, distance };
+    if (!raw || distance > IDENTITY_PAIR_MAX_CHARS) continue;
+    const startNorm = Math.min(h.start, a.start), endNorm = Math.max(h.end, a.end);
+    const first = offsets[Math.max(0, startNorm - 1)] ?? 0;
+    const last = (offsets[Math.max(0, endNorm - 2)] ?? first) + 1;
+    const context = raw.slice(Math.max(0,first-200),Math.min(raw.length,last+550));
+    if (!matchRelationEvidence(' '+normalizeText(context)+' ',h.alias,a.alias)) continue;
+    const after = raw.slice(last,Math.min(raw.length,last+IDENTITY_EXTRACTION_SUFFIX));
+    const marker = /\b(?:p[úu]blico(?:\s+(?:presente|total|geral|pagante))?|pagantes?|renda(?:\s+(?:bruta|total))?|bilheteria)\s*[:\-–—]\s*(?:R\$\s*)?[0-9]/i.exec(after);
+    const nearScore = exactScore ? exactScore.test(context) : false;
+    const rank = (marker ? 120-Math.min(65,marker.index/80) : 0) +
+      (nearScore ? 35 : 0) + (distance<=100 ? 10 : 0) - distance/1000;
+    if (!documented || rank > documented.rank ||
+       (rank===documented.rank && distance<documented.distance)) {
+      documented={home:h,away:a,distance,rank};
+    }
   }
-  return best;
+  return documented || nearest;
 }
+
 function taskScoreRegex(task) {
   const h = Number(task?.home_score), a = Number(task?.away_score);
   if (!Number.isFinite(h) || !Number.isFinite(a)) return null;
@@ -381,7 +402,7 @@ export function evaluateSourceMatchIdentity(task, sourceText, sourceUrl = '') {
     else { result.score += 4; dateProof = true; }
   }
 
-  const pair = bestPair(normalized, identityAliases(task?.home), identityAliases(task?.away));
+  const pair = bestPair(normalized, identityAliases(task?.home), identityAliases(task?.away), raw, offsetMap.offsets, task);
   if (!pair) { result.reasons.push('teams_not_both_found'); return result; }
   result.homeAlias = pair.home.alias; result.awayAlias = pair.away.alias; result.pairDistance = pair.distance;
   if (pair.distance > IDENTITY_PAIR_MAX_CHARS) { result.reasons.push(`teams_too_far:${pair.distance}`); return result; }

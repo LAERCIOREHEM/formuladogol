@@ -1,0 +1,103 @@
+name: Hunter Live Production Smoke
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/hunter-live-smoke.yml'
+      - 'cloudflare/push-worker/tests/test-hunter-live-sources.mjs'
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Deploy Push Worker']
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  live-readonly:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    env:
+      VERIFY_INTEGRATION_REV: ${{ github.event_name == 'workflow_run' && '1' || '0' }}
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Hunter unit regressions
+        working-directory: cloudflare/push-worker
+        run: node tests/test-postgame-fastlane.mjs
+      - name: Fetch and parse real editorial articles without modifying D1
+        if: github.event_name == 'pull_request'
+        working-directory: cloudflare/push-worker
+        run: node tests/test-hunter-live-sources.mjs
+      - name: Hot test — Worker, D1, site and Gemini Google Search
+        shell: bash
+        run: |
+          python -u - <<'PY'
+          import json, urllib.request, urllib.error, sys, time, os
+          BASE='https://push.formuladogol.com.br'
+          SITE='https://formuladogol.com.br'
+          outcomes=[]
+          def get(url,timeout=35):
+              req=urllib.request.Request(url,headers={'Accept':'application/json','Cache-Control':'no-cache','User-Agent':'FDG-Hunter-Live-Smoke/20261029'})
+              try:
+                  with urllib.request.urlopen(req,timeout=timeout) as res:
+                      return res.status,json.loads(res.read().decode('utf-8'))
+              except urllib.error.HTTPError as exc:
+                  try: body=json.loads(exc.read().decode('utf-8'))
+                  except Exception: body={'error':str(exc)}
+                  return exc.code,body
+              except Exception as exc:
+                  return 0,{'error':type(exc).__name__+': '+str(exc)[:180]}
+          def inspect(name,url,check,timeout=35):
+              status,data=get(url,timeout)
+              try: passed=bool(check(status,data))
+              except Exception as exc: passed=False;data={'validation_error':str(exc),'raw':data}
+              outcomes.append((name,passed))
+              print(('PASS' if passed else 'FAIL')+' '+name+' http='+str(status),flush=True)
+              return status,data
+          health_status,h=inspect('worker_health',BASE+'/health',lambda s,d:s==200 and d.get('ok') is True and d.get('postgameFastlane') is True)
+          print('production_worker_revision='+str(h.get('revision'))+' hunter_policy='+str(h.get('postgameFastlaneVersion')),flush=True)
+          st_status,st=inspect('hunter_status',BASE+'/v1/postgame/status',lambda s,d:s==200 and d.get('ok') is True)
+          print('hunter_summary='+json.dumps({k:st.get(k) for k in ('version','publicPending','publicOverdue','publicResolved','publicBudgetGuard','searchProfileVersion','geminiCircuit')},ensure_ascii=False),flush=True)
+          if os.getenv('VERIFY_INTEGRATION_REV')=='1':
+              integrated=(st_status==200 and st.get('hunterIntegrationRevision')=='R10R29.1')
+              outcomes.append(('hunter_integrated_revision',integrated))
+              print(('PASS' if integrated else 'FAIL')+' hunter_integrated_revision='+str(st.get('hunterIntegrationRevision')),flush=True)
+          events={'401841296':(21492,21379,628385.5),'401841297':(13458,9760,378700)}
+          rows_status,rows=inspect('D1_event_response',BASE+'/v1/postgame?event_ids=401841296,401841297',lambda s,d:s==200 and d.get('ok') is True and isinstance(d.get('rows'),list))
+          found={str(row.get('event_id')):row for row in rows.get('rows',[])}
+          for eid,(public,paid,revenue) in events.items():
+              row=found.get(eid,{})
+              actual=(row.get('publico'),row.get('publico_pagante'),row.get('renda'))
+              complete=row.get('public_status')=='resolved' and all(x is not None for x in actual)
+              passed=complete and all(abs(float(a)-v)<0.001 for a,v in zip(actual,(public,paid,revenue)))
+              outcomes.append(('event_'+eid,passed))
+              print(('PASS' if passed else 'FAIL')+' event_'+eid+' status='+str(row.get('public_status'))+' actual='+str(actual)+' expected='+str((public,paid,revenue)),flush=True)
+          _,pages=inspect('Pages_publicos_complementares',SITE+'/dados-br/publicos-complementares.json',lambda s,d:s==200 and isinstance(d.get('jogos'),dict))
+          for eid,expected in events.items():
+              row=pages.get('jogos',{}).get(eid,{})
+              actual=(row.get('publico'),row.get('pagantes'),row.get('renda'))
+              passed=all(a is not None and abs(float(a)-v)<.001 for a,v in zip(actual,expected))
+              outcomes.append(('pages_event_'+eid,passed))
+              print(('PASS' if passed else 'FAIL')+' pages_event_'+eid+' actual='+str(actual),flush=True)
+          # Uma chamada real de descoberta, sem modificar público/renda oficiais.
+          # O endpoint possui cache de 15 minutos e circuit breaker.
+          probe_status,probe=inspect('gemini_google_search_live',BASE+'/v1/postgame/search-probe',
+              lambda s,d:s==200 and d.get('ok') is True and d.get('searchObserved') is True and d.get('sourcesFound',0)>0,timeout=90)
+          print('gemini_probe='+json.dumps({k:probe.get(k) for k in ('ok','cached','searchObserved','searchCalls','sourcesFound','model','route','httpStatus','result','error')},ensure_ascii=False),flush=True)
+          diagnostics_status,diags=inspect('documentary_diagnostics',BASE+'/v1/postgame/diagnostics?event_ids=401841296,401841297',
+              lambda s,d:s==200 and d.get('ok') is True,timeout=35)
+          print('summary='+json.dumps([{'test':name,'passed':passed} for name,passed in outcomes],ensure_ascii=False),flush=True)
+          if not all(passed for _,passed in outcomes):sys.exit(1)
+          PY
+
+  deployed-unsuccessfully:
+    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail when the Worker deploy itself was unsuccessful
+        run: exit 1

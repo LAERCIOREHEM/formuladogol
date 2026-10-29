@@ -458,6 +458,28 @@ console.log('R10R15 match identity gate tests: PASS');
 }
 console.log('R10R29 round 33 hunter regression fixtures: PASS');
 
+{
+  // Regressão: links de assuntos relacionados no rodapé NUNCA podem vencer
+  // o bloco documental do jogo na escolha da dupla de clubes.
+  const {evaluateSourceMatchIdentity}=await import('../src/postgame-search-profile.js');
+  const task={event_id:'401841297',league:'bra.1',home:'Remo',away:'Botafogo',
+    kickoff:'2026-10-28T21:30:00-03:00',home_score:2,away_score:1,round:33,stadium:'Mangueirão'};
+  const sourceUrl='https://www.oliberal.com/esportes/remo/ficha-tecnica-remobotafogo';
+  const sourceText='Remo vence o Botafogo no Mangueirão pela 33ª rodada do Brasileirão. '+
+    'O placar terminou Remo 2 x 1 Botafogo. '+
+    ('A equipe teve um jogo intenso em Belém e criou oportunidades. '.repeat(38))+
+    'Ficha técnica. Remo 2 x 1 Botafogo. Público total: 13.458. Público pagante: 9.760. Renda: R$ 378.700,00. '+
+    'Assuntos relacionados: Remo x Botafogo em outro campeonato. '+
+    'Remo x Botafogo e notícias do Remo x Botafogo. ';
+  const identity=evaluateSourceMatchIdentity(task,sourceText,sourceUrl);
+  assert.equal(identity.accepted,true,'não confundir tags do rodapé com o bloco do jogo');
+  const parsed=extractPublicFromTextDeterministic(identity.window,sourceUrl);
+  assert.deepEqual([parsed.publico,parsed.publico_pagante,parsed.renda],[13458,9760,378700],
+    'a ficha deve prevalecer sobre o link repetido no rodapé');
+}
+console.log('R10R29.1 source footer identity regression: PASS');
+
+
 
 // ============================ R10R16.1 Factual Integrity Guard ============================
 {
