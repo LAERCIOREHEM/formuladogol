@@ -58,7 +58,7 @@ export const PUBLIC_POLICY = Object.freeze({
   geminiCircuitStructuralMinutes: 30,
   geminiCircuitSoftMinutes: 15,
   geminiProbeCacheMinutes: 15,
-  openaiMaxToolCalls: 6,
+  openaiMaxToolCalls: 3,
   batchPerRun: 6,
   eventBudgetUsd: 1.00,
   monthlyBudgetUsd: 50.00,
