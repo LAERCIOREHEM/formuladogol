@@ -1048,11 +1048,16 @@ async function cacheDiscoveredSources(env, eventId, urls, provider='gemini') {
   }
 }
 async function cachedSources(env,eventId){
-  // Primeiro a ficha do próprio confronto, depois fontes descobertas via IA.
-  // Mantém o teto de oito fontes e o histórico de consultas.
+  // R10R28: impedir STARVATION. O ORDER BY anterior mantinha páginas GE
+  // antigas à frente de uma ficha UOL/GZH recém-achada; as seis leituras por
+  // ciclo podiam NUNCA alcançar as URLs descobertas por Gemini/OpenAI.
+  // Novas URLs aparecem primeiro; após a primeira tentativa a fila é justa
+  // pelo timestamp de última checagem. Fonte rejeitada repetidamente não
+  // bloqueia outra fonte não consultada.
   const r=await env.DB.prepare(`SELECT * FROM postgame_source_cache WHERE event_id=?
-    ORDER BY CASE WHEN provider='ge-matchday' THEN 0 WHEN provider='ge-roundup-sitemap' OR url LIKE '%/gato-mestre/%' THEN 1 ELSE 2 END,
-      COALESCE(last_checked_at,'') ASC,discovered_at DESC LIMIT 8`).bind(text(eventId)).all();
+    ORDER BY CASE WHEN last_checked_at IS NULL THEN 0 ELSE 1 END,
+      CASE WHEN last_checked_at IS NULL AND provider IN ('gemini','openai','bing-rss') THEN 0 ELSE 1 END,
+      COALESCE(last_checked_at,'') ASC, discovered_at DESC LIMIT 24`).bind(text(eventId)).all();
   return r?.results||[];
 }
 
