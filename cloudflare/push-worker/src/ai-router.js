@@ -120,6 +120,27 @@ async function fetchGemini(env,url,body,{gateway=false}={}){
 // R10R19: erros de compatibilidade do endpoint Interactions não devem se
 // repetir a cada partida. Retentar Interactions depois de seis horas.
 const GEMINI_INTERACTIONS_META_KEY = 'gemini_interactions_compat_cooldown_r10r19';
+const GEMINI_GEO_META_KEY = 'gemini_grounding_geo_cooldown_r10r28';
+export const GEMINI_GEO_COOLDOWN_MS = 24*60*60_000;
+export function geminiGeoNotSupported(status,raw){
+  const message=text(raw?.error?.message||raw?.message||raw);
+  return Number(status)===400 && /user location is not supported|location is not supported for the api/i.test(message);
+}
+async function readGeminiGeoCooldown(env) {
+  if(!env?.DB)return false;
+  try{
+    const row=await env.DB.prepare('SELECT value FROM postgame_meta WHERE key=?').bind(GEMINI_GEO_META_KEY).first();
+    return Number(safeJson(row?.value,{})?.until||0)>Date.now();
+  }catch(_){return false;}
+}
+async function markGeminiGeoCooldown(env){
+  if(!env?.DB)return;
+  try{
+    await env.DB.prepare(`INSERT INTO postgame_meta(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP)
+      ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP`)
+      .bind(GEMINI_GEO_META_KEY,JSON.stringify({version:1,reason:'provider_grounding_location_unsupported',until:Date.now()+GEMINI_GEO_COOLDOWN_MS})).run();
+  }catch(_){}
+}
 export const GEMINI_INTERACTIONS_COOLDOWN_MS = 6 * 60 * 60_000;
 export function geminiInteractionsCompatibilityFailure(status) {
   return [400, 404, 405, 422].includes(Number(status));
@@ -175,6 +196,8 @@ async function runGeminiCall(env,{url,body,gateway,kind,route,model,task,started
 export async function searchPublicWithGemini(env,task,missing){
  const model=text(env?.GEMINI_SEARCH_MODEL)||'gemini-3.5-flash-lite';
  if(!geminiConfigured(env)) return {found:false,responded:false,reason:'gemini_not_configured',model,sources:[],searchCalls:0,apiCalls:0,searchObserved:false};
+ if(await readGeminiGeoCooldown(env)) return {found:false,responded:false,
+    reason:'gemini_location_unsupported_cooldown',model,sources:[],searchCalls:0,apiCalls:0,searchObserved:false};
  const directInteractionUrl='https://generativelanguage.googleapis.com/v1beta/interactions';
  const directLegacyUrl=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
  const interactionBody=geminiInteractionRequest(task,missing,model);
@@ -187,6 +210,7 @@ export async function searchPublicWithGemini(env,task,missing){
    const hit=await runGeminiCall(env,{...spec,model,task,started});
    attempts.push(hit); aggregateSources=uniqueUrls([...aggregateSources,...hit.sources]);
    if(hit.parsed) parsed=hit.parsed;
+    if(geminiGeoNotSupported(hit.status,hit.raw))await markGeminiGeoCooldown(env);
    return hit;
  };
 
@@ -204,7 +228,7 @@ export async function searchPublicWithGemini(env,task,missing){
    let totalSearches=attempts.reduce((sum,a)=>sum+Number(a.searches||0),0);
    // Se a Interactions API falhar, não pesquisar ou não expor nenhuma fonte,
    // tentamos UMA vez o generateContent direto com google_search. Sem sampling.
-   if(totalSearches<1||aggregateSources.length<1){
+   if(!(await readGeminiGeoCooldown(env)) && (totalSearches<1||aggregateSources.length<1)){
      const last=attempts.at(-1);
      if(Number(last?.status)!==429){
        await run({url:directLegacyUrl,body:legacyBody,gateway:false,kind:'legacy',route:'direct_generateContent_grounding_v10_discovery'});
