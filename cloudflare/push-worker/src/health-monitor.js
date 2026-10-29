@@ -438,7 +438,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     ),
     // OVERDUE é amarelo: o Hunter já envia um alerta específico em T+2h e
     // continua pesquisando. Vermelho fica reservado ao budget guard.
-    indicator('postgame','Pós-jogo',postBudget>0?'red':postOverdue>0||postUnclassified>0?'yellow':'green',`${postPending} pendência(s) Brasileirão · ${postOverdue} >2h · ${postBudget} budget guard · ${postExempt} dispensada(s) · ${postUnclassified} sem competição identificada`),
+    indicator('postgame','Pós-jogo',postBudget>0&&postOverdue>0?'red':postBudget>0||postOverdue>0||postUnclassified>0?'yellow':'green',`${postPending} pendência(s) Brasileirão · ${postOverdue} >2h · ${postBudget} budget guard · ${postExempt} dispensada(s) · ${postUnclassified} sem competição identificada`),
     ...reliabilityIndicators,
     indicator('highlights','Melhores Momentos',highlightOverdue>0?'yellow':'green',`${highlight} pendência(s) no total · ${highlightOverdue} com mais de 2h${highlightPendingRows[0]?` · mais antiga: ${highlightPendingRows[0].home} x ${highlightPendingRows[0].away}`:''}`),
     indicator('editorial','Editorial / Transmissões',Array.isArray(os.errors)&&os.errors.length?'yellow':'green',Array.isArray(os.errors)&&os.errors.length?`${os.errors.length} erro(s) no último ciclo`:'sem erro reportado pelo Orchestrator'),
