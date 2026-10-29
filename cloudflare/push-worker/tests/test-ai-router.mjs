@@ -55,7 +55,7 @@ assert.deepEqual(officialClubDomainsForTask(hunterTask),['atletico.com.br','redb
 assert.equal(attendanceSourceQuality('https://atletico.com.br/noticias/x',hunterTask),'club_official');
 assert.equal(attendanceSourceQuality('https://atletico.com.br/noticias/x',{home:'Flamengo',away:'Santos'}),'unverified');
 const prompt=publicSchemaInstruction(hunterTask,['público presente','renda']);
-assert.match(prompt,/Red Bull Bragantino/);
+assert.match(prompt,/red bull bragantino/i,'normalized aliases retain Red Bull Bragantino');
 assert.doesNotMatch(prompt,/site:uol\.com\.br/);
 assert.match(prompt,/atletico\.com\.br/);
 assert.doesNotMatch(prompt,/NÃO use sites oficiais de clubes/);
