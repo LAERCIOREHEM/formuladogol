@@ -27,9 +27,9 @@ export function publicSchemaInstruction(task,missing){
  const queries=buildAttendanceSearchQueries(task);
  const homeAliases=teamSearchAliasesNormalized(task.home).join(', ');
  const awayAliases=teamSearchAliasesNormalized(task.away).join(', ');
- const queryPack=queries.join(' ; ');
+ const queryPack=queries.slice(0, 2).join(' ; ');
  const sourcePolicy=attendanceSourcePolicyText(task);
- return `Você é um pesquisador factual de pós-jogo. É OBRIGATÓRIO executar Google Search nesta chamada antes de responder. Pesquise na web APENAS dados documentais da partida ${matchup}. DOSSIÊ: data real=${date}; placar=${score}; rodada=${round}; estádio=${stadium}; event_id=${text(task.event_id)}. Aliases do mandante=${homeAliases}; aliases do visitante=${awayAliases}. Preciso exclusivamente de: ${missing.join(', ')}. Use as combinações de busca a seguir como ponto de partida e REFORMULE se necessário: ${queryPack}. NÃO dependa da expressão literal "${matchup}"; nomes equivalentes dos clubes representam a mesma partida. NÃO estime, NÃO use memória e NÃO confunda com outro confronto/data/rodada. Público = público presente/total; pagantes é campo separado; renda em reais. ${sourcePolicy} Cada número precisa ter sua própria URL realmente encontrada na busca. IMPORTANTE: nesta etapa os números que você escrever NÃO são autoridade de gravação; o Worker abrirá a URL, provará a identidade da partida pelo Match Identity Gate e extrairá os valores somente do bloco textual daquele confronto. Se um campo não estiver publicado em fonte aceita, use null.`;
+ return `Você é um pesquisador factual de pós-jogo. É OBRIGATÓRIO executar Google Search nesta chamada antes de responder. Pesquise na web APENAS dados documentais da partida ${matchup}. DOSSIÊ: data real=${date}; placar=${score}; rodada=${round}; estádio=${stadium}; event_id=${text(task.event_id)}. Aliases do mandante=${homeAliases}; aliases do visitante=${awayAliases}. Preciso exclusivamente de: ${missing.join(', ')}. Execute NO MÁXIMO DUAS pesquisas web objetivas nesta chamada (uma delas obrigatória). Comece com: ${queryPack}. Não faça varreduras em dezenas de consultas: retorne até CINCO URLs de fichas técnicas recentes e deixe a validação numérica para o Worker. NÃO dependa da expressão literal "${matchup}"; nomes equivalentes dos clubes representam a mesma partida. NÃO estime, NÃO use memória e NÃO confunda com outro confronto/data/rodada. Público = público presente/total; pagantes é campo separado; renda em reais. ${sourcePolicy} Cada número precisa ter sua própria URL realmente encontrada na busca. IMPORTANTE: nesta etapa os números que você escrever NÃO são autoridade de gravação; o Worker abrirá a URL, provará a identidade da partida pelo Match Identity Gate e extrairá os valores somente do bloco textual daquele confronto. Se um campo não estiver publicado em fonte aceita, use null.`;
 }
 
 // ---------- Gemini generateContent legado (fallback de compatibilidade) ----------
@@ -96,7 +96,7 @@ export function geminiInteractionRequest(task,missing,model='gemini-3.5-flash-li
     model,
     input: publicSchemaInstruction(task,missing) + ' Sua função nesta etapa é PESQUISAR e citar as melhores URLs encontradas. Não é necessário devolver JSON.',
     tools:[{type:'google_search'}],
-    generation_config:{max_output_tokens:600,tool_choice:'any'},
+    generation_config:{max_output_tokens:400,tool_choice:'any'},
     store:false,
   };
 }
@@ -107,7 +107,7 @@ function geminiLegacyRequest(task,missing){
     tools:[{google_search:{}}],
     // Fallback legado também opera apenas como descoberta. Sem responseSchema,
     // sem responseMimeType e sem sampling: o parser local faz a extração depois.
-    generationConfig:{maxOutputTokens:600},
+    generationConfig:{maxOutputTokens:400},
   };
 }
 
