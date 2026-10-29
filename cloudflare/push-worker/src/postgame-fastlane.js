@@ -328,14 +328,18 @@ export function extractPublicFromTextDeterministic(sourceText, sourceUrl = '') {
   const publico = firstMatch(body, [
     /\bp[úu]blico(?!\s+pagante)(?:\s+(?:presente|total|geral))?\s*(?:[:\-–—]|(?:foi\s+)?de)\s*([0-9][0-9.\s]{2,8})\b/i,
     /\bp[úu]blico(?!\s+pagante)\s+([0-9]{1,3}(?:\.[0-9]{3})+|[0-9]{3,6})\s+(?:torcedores|pessoas|presentes)\b/i,
+    /\b([0-9]{1,3}(?:\.[0-9]{3})+|[0-9]{3,6})\s+(?:torcedores?\s+)?presentes?\b/i,
   ], parseBrIntToken);
   const publicoPagante = firstMatch(body, [
     /\bp[úu]blico\s+pagante\s*(?:[:\-–—]|(?:foi\s+)?de)\s*([0-9][0-9.\s]{1,8})\b/i,
     /\bpagantes?\s*(?:[:\-–—]|(?:foram\s+)?de?)\s*([0-9][0-9.\s]{1,8})\b/i,
+    /\b([0-9]{1,3}(?:\.[0-9]{3})+|[0-9]{3,6})\s+pagantes?\b/i,
   ], parseBrIntToken);
   const renda = firstMatch(body, [
     /\brenda(?:\s+(?:bruta|total))?\s*(?:[:\-–—]|(?:foi\s+)?de)\s*(?:R\$\s*)?([0-9][0-9.\s]*(?:,[0-9]{2})?)\b/i,
     /\bbilheteria\s*(?:[:\-–—]|(?:foi\s+)?de)\s*(?:R\$\s*)?([0-9][0-9.\s]*(?:,[0-9]{2})?)\b/i,
+    /\brenda\s+e\s+p[úu]blico\s*[:\-–—]\s*R\$\s*([0-9][0-9.\s]*(?:,[0-9]{2})?)\b/i,
+    /\bp[úu]blico(?:\s+(?:total|presente))?\s*[:\-–—]\s*[0-9][0-9.\s]{2,8}\s*\/\s*R\$\s*([0-9][0-9.\s]*(?:,[0-9]{2})?)\b/i,
   ], parseBrMoneyToken);
   const found = publico != null || publicoPagante != null || renda != null;
   return {
@@ -1083,11 +1087,15 @@ function validateGroundedValues(parsed, sourceUrls='', task = null, options = {}
 
 async function refreshCachedPublicSources(env,task,values,sources){
   const rows=await cachedSources(env,task.event_id); let checked=0; let foundAny=false; let lastError='';
-  for(const row of rows.slice(0,6)){
+  // Apenas consultas realmente realizadas consomem o limite do ciclo; itens
+  // em cooldown/rejeitados não podem bloquear fontes inéditas válidas.
+  for(const row of rows){
+    if(checked>=6)break;
     // Busca ampla não significa fetch arbitrário (SSRF/UGC/clubes estranhos).
     // Fontes novas só poderão publicar via gate e extrator deterministicamente rotulado.
     if(!isAcceptedAttendanceSource(row.url,task) && !isCandidateEditorialAttendanceSource(row.url,task)) {
       await recordPublicSourceObservation(env,{eventId:task.event_id,url:row.url,provider:row.provider,outcome:'rejected',reason:'source_not_eligible'});
+      await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=failures+1 WHERE event_id=? AND url=?`).bind('source_not_eligible',task.event_id,row.url).run();
       continue;
     }
     // Evita repetir requisição de fonte recém-checada no mesmo ciclo.
@@ -1105,6 +1113,7 @@ async function refreshCachedPublicSources(env,task,values,sources){
     if(!isAcceptedAttendanceSource(source.url,task) && !documentaryCandidate){
       lastError='redirect_to_untrusted_source';
       await recordPublicSourceObservation(env,{eventId:task.event_id,url:row.url,provider:row.provider,outcome:'rejected',reason:lastError,publishedAt:source.publishedAt});
+      await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=failures+1 WHERE event_id=? AND url=?`).bind(lastError,task.event_id,row.url).run();
       continue;
     }
     const identity=isStructuredRoundup
@@ -1121,12 +1130,15 @@ async function refreshCachedPublicSources(env,task,values,sources){
     // dois clubes, coerência temporal e URL de notícia. Nunca usa Workers AI
     // para inferir valores nesses veículos: apenas campos rotulados na página.
     if(documentaryCandidate){
-      const homeScore=Number(task?.home_score),awayScore=Number(task?.away_score);
-      const expected=Number.isInteger(homeScore)&&Number.isInteger(awayScore)&&homeScore>=0&&awayScore>=0
-        ? new RegExp('\\b'+homeScore+'\\s*[x×-]\\s*'+awayScore+'\\b','i') : null;
-      if(!expected||!expected.test(identity.window)){
-        lastError='candidate_source_missing_exact_score';
+      // Fontes editoriais novas não devem ser descartadas APENAS porque escreveram
+      // "venceu por dois a um" em vez de "2 x 1". O Match Identity Gate já exigiu
+      // ambos os clubes + relação da partida + evidência temporal/contextual.
+      // Exigir aqui contexto forte; placar exato permanece evidência positiva,
+      // não condição absoluta para acessar uma ficha explicitamente rotulada.
+      if(Number(identity.score||0)<7){
+        lastError='candidate_source_insufficient_match_context';
         await recordPublicSourceObservation(env,{eventId:task.event_id,url:row.url,provider:row.provider,outcome:'rejected',reason:lastError,publishedAt:source.publishedAt});
+        await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=failures+1 WHERE event_id=? AND url=?`).bind(lastError,task.event_id,row.url).run();
         continue;
       }
     }
