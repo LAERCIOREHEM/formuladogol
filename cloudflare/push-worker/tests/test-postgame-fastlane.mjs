@@ -183,24 +183,27 @@ const at=(min)=>END+min*60_000;
 const zero={mini_attempts:0,sol_attempts:0,sol_completed:0};
 const fullBudget={allowGemini:true,allowOpenAI:true};
 
+// R10R28: fontes grátis a cada 3 min e IA paga apenas em checkpoints
+// limitados. Primeira contingência OpenAI em T+12, não dezenas de buscas.
 assert.equal(planPublicStep(task,zero,at(1),fullBudget).phase,'deterministic');
 assert.equal(planPublicStep(task,zero,at(3),fullBudget).phase,'gemini');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(8),fullBudget).phase,'deterministic');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(9),fullBudget).phase,'gemini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:2},at(18),fullBudget).phase,'gemini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:3},at(20),fullBudget).phase,'openai');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(9),fullBudget).phase,'deterministic');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:1,sol_attempts:0},at(12),fullBudget).phase,'openai');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:2,sol_attempts:1},at(18),fullBudget).phase,'deterministic');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:3,sol_attempts:0},at(20),fullBudget).phase,'openai');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:3,sol_attempts:2},at(60),fullBudget).phase,'gemini');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:7,sol_attempts:1},at(90),fullBudget).phase,'openai');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:8,sol_attempts:2},at(120),fullBudget).phase,'openai');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:4,sol_attempts:3},at(120),fullBudget).phase,'gemini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:8,sol_attempts:3},at(180),fullBudget).phase,'gemini');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:9,sol_attempts:3},at(300),fullBudget).phase,'openai');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:8,sol_attempts:2},at(120),fullBudget).phase,'deterministic');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:4,sol_attempts:3},at(120),fullBudget).phase,'deterministic');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:8,sol_attempts:3},at(180),fullBudget).phase,'deterministic');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:4,sol_attempts:2},at(240),fullBudget).phase,'gemini');
 assert.notEqual(planPublicStep(task,{mini_attempts:99,sol_attempts:99,sol_completed:1},at(24*60),fullBudget).phase,'give_up');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:3},at(45),{allowGemini:true,allowOpenAI:false}).phase,'gemini');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:5},at(45),{allowGemini:false,allowOpenAI:false}).phase,'budget_guard');
 
-assert.deepEqual(PUBLIC_POLICY.geminiScheduleMinutes,[3,9,18,30,45,60,90,120]);
-assert.deepEqual(PUBLIC_POLICY.openaiScheduleMinutes,[20,50,100]);
+assert.deepEqual(PUBLIC_POLICY.geminiScheduleMinutes,[3,15,45,105]);
+assert.deepEqual(PUBLIC_POLICY.openaiScheduleMinutes,[12,50]);
 assert.equal(PUBLIC_POLICY.overdueMinutes,120);
 assert.equal(PUBLIC_POLICY.migrationGraceMinutes,15);
 const oldFinished={league:'bra.1',final_at:'2026-10-07T22:00:00.000Z'};
@@ -211,8 +214,8 @@ assert.equal(publicSlaAlertAllowed(oldFinished,reopenedNow,reopenedAt),false);
 assert.equal(publicSlaAlertAllowed(oldFinished,Date.parse('2026-10-08T16:59:00.000Z'),reopenedAt),false);
 assert.equal(publicSlaAlertAllowed(oldFinished,Date.parse('2026-10-08T17:00:00.000Z'),reopenedAt),true);
 assert.equal(publicSlaAlertAllowed(oldFinished,Date.parse('2026-10-08T17:00:00.000Z'),''),true);
-assert.equal(PUBLIC_POLICY.overdueGeminiEveryMinutes,60);
-assert.equal(PUBLIC_POLICY.overdueOpenaiEveryMinutes,180);
+assert.equal(PUBLIC_POLICY.overdueGeminiEveryMinutes,120);
+assert.equal(PUBLIC_POLICY.overdueOpenaiEveryMinutes,240);
 assert.equal(PUBLIC_POLICY.eventBudgetUsd,1);
 assert.equal(PUBLIC_POLICY.monthlyBudgetUsd,50);
 assert.equal(PUBLIC_POLICY.geminiCircuitStructuralMinutes,30);
@@ -236,7 +239,7 @@ assert.equal(nextPublicAttemptMs(task,'deterministic',{phase:'budget_guard'},at(
 assert.equal(nextPublicAttemptMs(task,'gemini',{phase:'deterministic'},at(181),{mini_attempts:9,sol_attempts:3}),at(186));
 
 const terra=publicSearchRequest(task,['renda'],{},'openai');
-assert.equal(terra.model,'gpt-5.6-terra'); assert.equal(terra.max_tool_calls,6); assert.equal(terra.reasoning.effort,'low');
+assert.equal(terra.model,'gpt-5.6-terra'); assert.equal(terra.max_tool_calls,3); assert.equal(terra.reasoning.effort,'low');
 assert.equal(terra.tool_choice,'required');
 assert.equal(Object.hasOwn(terra.tools[0],'filters'),false,'não limitar veículos por domínio');
 assert.match(String(terra.input[0].content[0].text),/partida=/,'dossiê factual obrigatório');
@@ -273,7 +276,7 @@ assert.doesNotMatch(msg.body,/Nenhuma nova busca automática será feita/);
 
 // R10R9: falha Gemini em jogo >=45min precisa acionar OpenAI NO MESMO CICLO.
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),true);
-assert.equal(shouldImmediateOpenAiFallback({ageMinutes:19,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),false);
+assert.equal(shouldImmediateOpenAiFallback({ageMinutes:11,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),false);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:20,budget:{allowOpenAI:true},complete:false}),true);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:20,forcedUpgrade:true,budget:{allowOpenAI:true},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),true);
 assert.equal(shouldImmediateOpenAiFallback({ageMinutes:120,budget:{allowOpenAI:false},geminiResult:{searchCalls:0,httpStatus:400,found:false},discoveredCount:0,refreshedFoundAny:false,complete:false}),false);
