@@ -43,6 +43,10 @@ for (const {task,urls,expected} of cases) {
     const expectedMatches=Object.entries(expected).every(([k,v])=>Math.abs(Number(verified.values?.[k]??0)-v)<0.01);
     const ok=verified.accepted&&expectedMatches;
     console.log(JSON.stringify({eventId:task.event_id,url,stage:'extracted',ok,reason:verified.reason||'',publico:verified.values?.publico??null,pagantes:verified.values?.publico_pagante??null,renda:verified.values?.renda??null,sourceLength:source.text.length,windowLength:identity.window.length,score:identity.score}));
+    if(!ok) {
+      const locations=[...source.text.matchAll(/p[úu]blico|pagantes?|renda|bilheteria/gi)].slice(0,15).map(m=>({at:m.index,withinWindow:identity.window.includes(source.text.slice(m.index,m.index+10)),snippet:source.text.slice(Math.max(0,m.index-36),m.index+105).replace(/\\s+/g,' ')}));
+      console.log('MISSING_LABELED_FIELDS '+JSON.stringify({eventId:task.event_id,url,sourceLength:source.text.length,windowLength:identity.window.length,examples:locations}));
+    }
     if(ok)successful++;
   }
   console.log('SOURCE_COVERAGE '+task.event_id+': '+successful+'/'+urls.length);
