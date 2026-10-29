@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { aiGatewayId, gatewayBase, aiGatewayAuthHeaders, aiGatewayAuthConfigured, geminiConfigured, geminiGroundingSources, geminiSearchCount, geminiInteractionSearchCount, geminiInteractionSources, geminiInteractionText, geminiInteractionRequest, searchPublicWithGemini, isAiGatewayPreProviderFailure, fetchOpenAiResponses, publicSchemaInstruction, resolveWorkersAiExtractModel, WORKERS_AI_EXTRACT_DEFAULT_MODEL, geminiInteractionsCompatibilityFailure, GEMINI_INTERACTIONS_COOLDOWN_MS } from '../src/ai-router.js';
+import { aiGatewayId, gatewayBase, aiGatewayAuthHeaders, aiGatewayAuthConfigured, geminiConfigured, geminiGroundingSources, geminiSearchCount, geminiInteractionSearchCount, geminiInteractionSources, geminiInteractionText, geminiInteractionRequest, searchPublicWithGemini, isAiGatewayPreProviderFailure, fetchOpenAiResponses, publicSchemaInstruction, resolveWorkersAiExtractModel, WORKERS_AI_EXTRACT_DEFAULT_MODEL, geminiInteractionsCompatibilityFailure, GEMINI_INTERACTIONS_COOLDOWN_MS, geminiGeoNotSupported, GEMINI_GEO_COOLDOWN_MS } from '../src/ai-router.js';
 import { POSTGAME_SEARCH_PROFILE_VERSION, TEAM_SEARCH_PROFILES, buildAttendanceSearchQueries, officialClubDomainsForTask, attendanceSourceQuality, matchDayEditorialSources } from '../src/postgame-search-profile.js';
 
 // R10R17.8: a configuração histórica/depreciada não deve chegar a env.AI.run().
@@ -92,7 +92,9 @@ assert.equal(interactionRequest.tools[0].type,'google_search');
 assert.equal(interactionRequest.response_format,undefined);
 assert.deepEqual(interactionRequest.tools,[{type:'google_search'}]);
 assert.equal(interactionRequest.generation_config.tool_choice,'any');
-assert.equal(interactionRequest.generation_config.max_output_tokens,600);
+assert.equal(interactionRequest.generation_config.max_output_tokens,400);
+assert.match(prompt,/NO MÁXIMO DUAS pesquisas/,'reduzir pesquisas excessivas do Gemini');
+assert.equal(GEMINI_GEO_COOLDOWN_MS,24*60*60_000);
 assert.equal('search_types' in interactionRequest.tools[0],false);
 
 // R10R8: Interactions vai DIRETO ao Google. Se não houver busca real/fontes,
@@ -170,6 +172,33 @@ assert.equal('search_types' in interactionRequest.tools[0],false);
     assert.equal(failed.attempts.length,2);
     assert.match(failed.attempts[1].error,/Invalid request payload/);
   } finally { globalThis.fetch=previousFetch; }
+}
+assert.equal(geminiGeoNotSupported(400,{error:{message:'FAILED_PRECONDITION:User location is not supported for the API use.'}}),true);
+assert.equal(geminiGeoNotSupported(400,{error:{message:'Modelgeneratedfunctioncalls:Model generated too many tool calls'}}),false);
+assert.equal(geminiGeoNotSupported(500,{error:{message:'User location is not supported'}}),false);
+// R10R28: após uma falha geográfica Google, outras partidas não devem pagar
+// novamente pelo mesmo erro; a compatibilidade Interactions tem cooldown separado.
+{
+  const prev=globalThis.fetch,meta=new Map(),calls=[];
+  const env={GEMINI_API_KEY:'test-key',DB:{prepare(sql){return{bind(...params){return{
+    async first(){return meta.has(params[0])?{value:meta.get(params[0])}:null;},
+    async run(){if(sql.includes('postgame_meta')&&sql.includes('INSERT'))meta.set(params[0],params[1]);return{meta:{changes:1}};},
+  }}}}}};
+  try{
+    globalThis.fetch=async(url)=>{
+      calls.push(String(url));
+      return new Response(JSON.stringify({error:{
+        code:400,message:calls.length===1?'Modelgeneratedfunctioncalls:Model generated too many tool calls.':'FAILED_PRECONDITION:User location is not supported for the API use.'
+      }}),{status:400});
+    };
+    const first=await searchPublicWithGemini(env,hunterTask,['público','renda']);
+    assert.equal(first.apiCalls,2);
+    assert.equal(calls.length,2);
+    const second=await searchPublicWithGemini(env,{...hunterTask,event_id:'401841291'},['público','renda']);
+    assert.equal(second.apiCalls,0,'cooldown global não pode cobrar outra partida');
+    assert.equal(second.reason,'gemini_location_unsupported_cooldown');
+    assert.equal(calls.length,2,'nenhuma terceira chamada Gemini depois de geo 400');
+  }finally{globalThis.fetch=prev;}
 }
 const originalFetch=globalThis.fetch;
 try {
