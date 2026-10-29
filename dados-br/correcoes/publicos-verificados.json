@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "_comentario": "Correções documentais verificadas manualmente. O coletor mescla somente os event_ids e campos explicitamente listados; não substitui o restante do snapshot.",
-  "verificado_em": "2026-10-18T22:55:58-03:00",
+  "verificado_em": "2026-10-28T22:10:00-03:00",
   "jogos": {
     "401841169": {
       "confronto": "São Paulo 1 x 2 Santos",
@@ -276,6 +276,54 @@
       "origem": "GE/Gato Mestre 26/10/2026 22:38 BRT; Itatiaia confirma cifras",
       "nota": "Flamengo 3x2 Atlético-MG 26/10/2026 Maracanã, rodada 32, event_id 401841286: presentes 60.624; pagantes 57.619; renda bruta R$ 4.578.137,50. Corrige renda arredondada indevidamente no complemento legado (4578138).",
       "verificado_em": "2026-10-27T08:00:00-03:00"
+    },
+    "401841289": {
+      "confronto": "Fluminense 2 x 1 Internacional",
+      "rodada": 33,
+      "data": "2026-10-28",
+      "tipo": "presente",
+      "publico": 12282,
+      "renda": 558839.5,
+      "fonte_publico": "https://esportes.r7.com/jogada-10/com-gol-nos-acrescimos-fluminense-vence-o-internacional-de-virada-29102026/",
+      "fonte_renda": "https://esportes.r7.com/jogada-10/com-gol-nos-acrescimos-fluminense-vence-o-internacional-de-virada-29102026/",
+      "fonte_data": "https://www.fferj.com.br/partidas/6390",
+      "publico_status": "confirmado_ficha_tecnica_com_ressalva_data",
+      "renda_status": "confirmado_ficha_tecnica_com_ressalva_data",
+      "pagantes_status": "nao_divulgado",
+      "origem": "Ficha técnica Jogada10/R7, confronto/rodada/placar/estádio/escalação conferidos; data documental conferida na FERJ",
+      "nota": "Rodada 33, Maracanã, 28/10/2026. R7/Jogada10 informa público 12.282 presentes e renda R$ 558.839,50, mas sua ficha contém provável erro de digitação na data (24/10). A FERJ e Fluminense confirmam data real 28/10; equipes, rodada, placar 2x1, gols, estádio coerentes. Pagantes não identificados."
+    },
+    "401841291": {
+      "confronto": "Red Bull Bragantino 3 x 0 Chapecoense",
+      "rodada": 33,
+      "data": "2026-10-28",
+      "tipo": "presente",
+      "publico": 2137,
+      "renda": 49340,
+      "fonte_publico": "https://www.futebolinterior.com.br/red-bull-bragantino-3-x-0-chapecoense-wallace-yan-da-show-e-garante-a-vitoria/",
+      "fonte_renda": "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/red-bull-bragantino-vence-a-chapecoense-por-3-a-0-e-se-afasta-da-zoina-de-rebaixamento-cmvsts92s0193016g307goo0y.html",
+      "fonte_independente": "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/10/red-bull-bragantino-vence-a-chapecoense-por-3-a-0-e-se-afasta-da-zoina-de-rebaixamento-cmvsts92s0193016g307goo0y.html",
+      "publico_status": "confirmado_2_fontes",
+      "renda_status": "confirmado_2_fontes",
+      "pagantes_status": "nao_divulgado",
+      "origem": "Ficha técnica Futebol Interior 28/10 + republicação GZH",
+      "nota": "Rodada 33, Cícero de Souza Marques, 28/10/2026. Público presente 2.137; renda bruta R$ 49.340,00. Pagantes não identificados."
+    },
+    "401841293": {
+      "confronto": "Santos 0 x 0 Palmeiras",
+      "rodada": 33,
+      "data": "2026-10-28",
+      "tipo": "presente",
+      "publico": 13655,
+      "renda": 446085,
+      "fonte_publico": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/28/palmeiras-empata-com-o-santos-e-da-oportunidade-para-flamengo-ampliar-vantagem.htm",
+      "fonte_renda": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/28/palmeiras-empata-com-o-santos-e-da-oportunidade-para-flamengo-ampliar-vantagem.htm",
+      "fonte_independente": "https://www.gazetaesportiva.com/campeonatos/brasileiro-serie-a/palmeiras-empata-santos-flamengo-lideranca-brasileirao/",
+      "publico_status": "confirmado_2_fontes",
+      "renda_status": "confirmado_2_fontes",
+      "pagantes_status": "nao_divulgado",
+      "origem": "Ficha técnica UOL 28/10 e Gazeta Esportiva",
+      "nota": "Rodada 33, Vila Belmiro, 28/10/2026, Santos mandante 0x0 Palmeiras. Público 13.655; renda R$ 446.085,00. Pagantes não identificados."
     }
   }
 }
