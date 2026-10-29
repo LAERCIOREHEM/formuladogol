@@ -19,7 +19,7 @@ jobs:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     env:
-      VERIFY_INTEGRATION_REV: ${{ github.event_name == 'workflow_run' && '1' || '0' }}
+      VERIFY_INTEGRATION_REV: '1'
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
