@@ -638,6 +638,15 @@ export async function syncIncidents(env,snapshot,now=Date.now(),{dailySentThisRu
   let alertsSent=0;
   let silentRecovery=0;
   for(const action of activeActions){
+    // Hunter automático não deve gerar e-mail de ação humana apenas por atraso.
+    // Falhas recuperadas de provedores permanecem no relatório diário, desde que
+    // o consumo esteja abaixo do alerta e nenhuma pendência esteja afetada.
+    const recoveredProvider = text(action.id)==='openai' &&
+      snapshot?.providerFailureSummary != null &&
+      Number(snapshot.providerFailureSummary.activeUnresolved||0)===0 &&
+      Number(snapshot.postgame?.cost?.last24h?.estimatedUsd||0)<5;
+    const nonActionablePostgame = text(action.id)==='postgame' && text(action.responsibility)==='AUTO';
+    if(recoveredProvider || nonActionablePostgame)continue;
     const key=`health:${text(action.id)}`;
     active.add(key);
     const row=await env.DB.prepare('SELECT * FROM health_incidents WHERE incident_key=?').bind(key).first();
