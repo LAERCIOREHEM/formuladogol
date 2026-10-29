@@ -185,7 +185,26 @@ export const AMBIGUOUS_IDENTITY_ALIASES = Object.freeze(new Set(['vitoria', 'int
 const SEARCH_ONLY_WEAK_IDENTITY_ALIASES = new Set(['galo','fla','flu','inter','timao','coxa','peixe','verdao','braga','chape']);
 const IDENTITY_PAIR_MAX_CHARS = 420;
 const IDENTITY_CONTEXT_RADIUS = 900;
-const IDENTITY_EXTRACTION_SUFFIX = 1800;
+const IDENTITY_EXTRACTION_SUFFIX = 5500;
+
+// Mantém a correspondência entre os índices do texto normalizado e o HTML limpo.
+// Índices de uma string sem acentos/pontuação não podem recortar diretamente a original.
+function normalizeWithSourceOffsets(value) {
+  const raw = text(value);
+  let normalized = '';
+  const offsets = [];
+  for (let i = 0; i < raw.length; i++) {
+    const decomposed = raw[i].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    for (const unit of decomposed) {
+      const char = /[a-z0-9]/.test(unit) ? unit : ' ';
+      if (char === ' ' && (!normalized || normalized.endsWith(' '))) continue;
+      normalized += char;
+      offsets.push(i);
+    }
+  }
+  if (normalized.endsWith(' ')) { normalized = normalized.slice(0, -1); offsets.pop(); }
+  return {normalized, offsets};
+}
 
 // R10R17-HF6: estes endereços publicam uma LISTA de partidas.
 // O parser Python de rodada separa cada bloco por confronto; o Worker NÃO
@@ -342,7 +361,8 @@ export function sourceCompetitionConflict(task, sourceUrl = '') {
 // contextual e rejeita conflitos objetivos, sobretudo data incompatível na URL.
 export function evaluateSourceMatchIdentity(task, sourceText, sourceUrl = '') {
   const raw = text(sourceText).replace(/\s+/g, ' ');
-  const normalized = ` ${normalizeText(raw)} `;
+  const offsetMap = normalizeWithSourceOffsets(raw);
+  const normalized = ` ${offsetMap.normalized} `;
   const result = { accepted:false, score:0, reasons:[], conflicts:[], homeAlias:'', awayAlias:'', pairDistance:null, window:'' };
   if (!normalized.trim()) { result.reasons.push('empty_source_text'); return result; }
   const competitionConflict = sourceCompetitionConflict(task, sourceUrl);
@@ -368,7 +388,11 @@ export function evaluateSourceMatchIdentity(task, sourceText, sourceUrl = '') {
 
   const pairStart = Math.min(pair.home.start,pair.away.start);
   const pairEnd = Math.max(pair.home.end,pair.away.end);
-  const center = Math.floor((pairStart + pairEnd) / 2);
+  // bestPair trabalha sobre texto normalizado; converter ambos os offsets
+  // antes de montar janelas no texto real (acentos, pontuação, placares etc.).
+  const realPairStart = offsetMap.offsets[Math.max(0, pairStart - 1)] ?? 0;
+  const realPairEnd = (offsetMap.offsets[Math.max(0, pairEnd - 2)] ?? realPairStart) + 1;
+  const center = Math.floor((realPairStart + realPairEnd) / 2);
   const contextStart = Math.max(0, center - IDENTITY_CONTEXT_RADIUS);
   const contextEnd = Math.min(raw.length, center + IDENTITY_CONTEXT_RADIUS);
   const contextWindow = raw.slice(contextStart, contextEnd).trim();
@@ -382,8 +406,8 @@ export function evaluateSourceMatchIdentity(task, sourceText, sourceUrl = '') {
   // Extração começa NO confronto identificado e segue adiante. Em páginas com
   // vários jogos isto impede que o primeiro "Público/Renda" do bloco anterior
   // seja capturado para a partida-alvo (incidente Botafogo x Vasco).
-  const extractionStart = Math.max(0, pairStart - 8);
-  const extractionEnd = Math.min(raw.length, pairEnd + IDENTITY_EXTRACTION_SUFFIX);
+  const extractionStart = Math.max(0, realPairStart - 8);
+  const extractionEnd = Math.min(raw.length, realPairEnd + IDENTITY_EXTRACTION_SUFFIX);
   result.window = raw.slice(extractionStart, extractionEnd).trim();
 
   const scoreRe = taskScoreRegex(task); if (scoreRe && scoreRe.test(normWindow)) result.score += 2;
