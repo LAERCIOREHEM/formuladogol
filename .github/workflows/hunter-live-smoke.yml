@@ -6,13 +6,20 @@ on:
       - '.github/workflows/hunter-live-smoke.yml'
       - 'cloudflare/push-worker/tests/test-hunter-live-sources.mjs'
   workflow_dispatch:
+  workflow_run:
+    workflows: ['Deploy Push Worker']
+    types: [completed]
+    branches: [main]
 
 permissions:
   contents: read
 
 jobs:
   live-readonly:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    env:
+      VERIFY_INTEGRATION_REV: ${{ github.event_name == 'workflow_run' && '1' || '0' }}
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
@@ -23,13 +30,14 @@ jobs:
         working-directory: cloudflare/push-worker
         run: node tests/test-postgame-fastlane.mjs
       - name: Fetch and parse real editorial articles without modifying D1
+        if: github.event_name == 'pull_request'
         working-directory: cloudflare/push-worker
         run: node tests/test-hunter-live-sources.mjs
       - name: Hot test — Worker, D1, site and Gemini Google Search
         shell: bash
         run: |
           python -u - <<'PY'
-          import json, urllib.request, urllib.error, sys, time
+          import json, urllib.request, urllib.error, sys, time, os
           BASE='https://push.formuladogol.com.br'
           SITE='https://formuladogol.com.br'
           outcomes=[]
@@ -55,6 +63,10 @@ jobs:
           print('production_worker_revision='+str(h.get('revision'))+' hunter_policy='+str(h.get('postgameFastlaneVersion')),flush=True)
           st_status,st=inspect('hunter_status',BASE+'/v1/postgame/status',lambda s,d:s==200 and d.get('ok') is True)
           print('hunter_summary='+json.dumps({k:st.get(k) for k in ('version','publicPending','publicOverdue','publicResolved','publicBudgetGuard','searchProfileVersion','geminiCircuit')},ensure_ascii=False),flush=True)
+          if os.getenv('VERIFY_INTEGRATION_REV')=='1':
+              integrated=(st_status==200 and st.get('hunterIntegrationRevision')=='R10R29.1')
+              outcomes.append(('hunter_integrated_revision',integrated))
+              print(('PASS' if integrated else 'FAIL')+' hunter_integrated_revision='+str(st.get('hunterIntegrationRevision')),flush=True)
           events={'401841296':(21492,21379,628385.5),'401841297':(13458,9760,378700)}
           rows_status,rows=inspect('D1_event_response',BASE+'/v1/postgame?event_ids=401841296,401841297',lambda s,d:s==200 and d.get('ok') is True and isinstance(d.get('rows'),list))
           found={str(row.get('event_id')):row for row in rows.get('rows',[])}
@@ -82,3 +94,10 @@ jobs:
           print('summary='+json.dumps([{'test':name,'passed':passed} for name,passed in outcomes],ensure_ascii=False),flush=True)
           if not all(passed for _,passed in outcomes):sys.exit(1)
           PY
+
+  deployed-unsuccessfully:
+    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail when the Worker deploy itself was unsuccessful
+        run: exit 1
