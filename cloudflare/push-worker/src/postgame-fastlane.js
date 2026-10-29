@@ -1673,7 +1673,9 @@ async function processPublicTask(env, task, now = Date.now()) {
       } else if(staticSeedError){
         next.alert_status='suppressed_static_seed_unavailable';
       }else{
-        next.alert_status=await sendPublicNotFoundEmail(env,publicAlertMessage(task,values,sources,next,lastError,env,costSummary,nextAt));
+        // SLA de pesquisa é diagnóstico automático, não solicitação ao usuário.
+        // Manter o relógio e o estado no D1 sem disparar e-mail informativo a cada partida.
+        next.alert_status='suppressed_automatic_sla_informational';
         next.alert_at=nowIso(now);
       }
     }
