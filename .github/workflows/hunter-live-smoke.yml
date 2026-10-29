@@ -19,6 +19,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Hunter unit regressions
+        working-directory: cloudflare/push-worker
+        run: node tests/test-postgame-fastlane.mjs
       - name: Fetch and parse real editorial articles without modifying D1
         working-directory: cloudflare/push-worker
         run: node tests/test-hunter-live-sources.mjs
