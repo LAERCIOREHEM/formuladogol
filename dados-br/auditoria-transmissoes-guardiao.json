@@ -6530,54 +6530,113 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado no Brasil: Vasco da Gama x Flamengo, Brasileirão Série A 2026, fase única/33ª rodada, quinta-feira, 29/10/2026, às 20h (BRT), no Nilton Santos. A transmissão integral é exclusiva do Prime Video. Não há indicação de Globo, SporTV, Premiere, GE TV, CazéTV, Disney+ / ESPN, Paramount+, Record ou SBT para este jogo. A página do Prime pode iniciar cobertura/pré-jogo às 18h30, mas a bola rola às 20h."
+    },
+    {
+      "event_id": "401841290",
+      "jogo": "Grêmio x Athletico-PR",
+      "data_iso": "2026-10-29T21:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-10-29T20:13:04-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "GE TV",
+        "Premiere",
+        "SporTV"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/ajuda",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml",
+        "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+        "https://ge.globo.com/google/amp/rs/futebol/times/gremio/noticia/2026/10/29/gremio-encara-o-athletico-com-chance-de-sair-do-z-4-e-se-inspira-em-virada-de-chave-de-2016.ghtml",
+        "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/10/07/remo-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/08/athletico-pr-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/pr/futebol/times/athletico-pr/noticia/2026/09/28/agenda-do-athletico-veja-datas-e-horarios-dos-jogos-ate-a-34a-rodada-do-brasileirao.ghtml",
+        "https://ge.globo.com/rs/futebol/brasileirao-serie-a/jogo/29-10-2026/gremio-atletico-pr.ghtml",
+        "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/10/29/gremio-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/gremio-x-atletico-go-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
+        "https://ge.globo.com/sportv"
+      ],
+      "canais_depois": [
+        "Premiere",
+        "SporTV"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/10/29/gremio-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=xwhPKMVtapI",
+          "scope": "pre_game",
+          "valid_for_match": false,
+          "reason": "O título do vídeo no dossiê informa “GRÊMIO X ATHLETICO-PR | AQUECIMENTO AO VIVO”; trata-se de aquecimento/pré-jogo e não há evidência de transmissão integral da partida."
+        }
+      ],
+      "youtube_removidos": [
+        "https://www.youtube.com/watch?v=xwhPKMVtapI"
+      ],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Grêmio x Athletico-PR, Brasileirão 2026, 33ª rodada, nesta quinta-feira, 29/10/2026, às 21h30 (de Brasília), na Arena do Grêmio, tem transmissão integral de SporTV e Premiere. GE TV não integra a grade da partida: o link do YouTube informado é identificado como “AQUECIMENTO AO VIVO”, isto é, conteúdo pré-jogo, não a transmissão completa."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841292",
-    "jogo": "Vasco da Gama x Flamengo",
-    "data_iso": "2026-10-29T20:00:00-03:00",
+    "event_id": "401841290",
+    "jogo": "Grêmio x Athletico-PR",
+    "data_iso": "2026-10-29T21:30:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-10-29T18:33:25-03:00",
+    "executado_em": "2026-10-29T20:13:04-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "Prime Video"
+      "GE TV",
+      "Premiere",
+      "SporTV"
     ],
-    "status": "confirmado",
+    "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://cdn.conmebol.com/wp-content/uploads/2024/08/GUIA-NRH-INT-SUB20-2024-POR_ING.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR.pdf",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
-      "https://ge.globo.com/google/amp/futebol/times/vasco/noticia/2026/10/29/leo-jardim-pega-virose-mas-sera-titular-em-vasco-x-flamengo.ghtml",
-      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/jogo/29-10-2026/vasco-flamengo.ghtml",
-      "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/10/27/vasco-x-flamengo-ao-vivo-onde-assistir-horario-e-escalacoes-pela-33-rodada-da-serie-a.html",
-      "https://sbtnews.sbt.com.br/noticia/brasil/vasco-x-flamengo-onde-assistir-ao-vivo-e-horario-1",
-      "https://sports.sbt.com.br/futebol/brasileirao/jogo/29-10-2026/vasco-x-flamengo",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/vasco-da-gama-saf-x-flamengo/832212",
-      "https://www.cnnbrasil.com.br/esportes/brasileirao/vasco-x-flamengo-horario-e-onde-assistir-ao-campeonato-brasileiro-serie-a",
-      "https://www.primevideo.com/-/hi/detail/0S9610HYJQSDWMV0ZSEKX83YDJ",
-      "https://www.primevideo.com/-/pt_BR/tournament/amzn1.dv.icid.5a28c628-0310-42c0-8966-2f1f748488d3",
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/10/29/vasco-x-flamengo-horario-e-onde-assistir-ao-jogo-do-brasileirao.ghtm",
-      "https://www.youtube.com/watch?v=6SfG4Q3bGRU",
-      "https://www.youtube.com/watch?v=oBe9IXxlVKc"
+      "https://ge.globo.com/ajuda",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml",
+      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+      "https://ge.globo.com/google/amp/rs/futebol/times/gremio/noticia/2026/10/29/gremio-encara-o-athletico-com-chance-de-sair-do-z-4-e-se-inspira-em-virada-de-chave-de-2016.ghtml",
+      "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/10/07/remo-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/08/athletico-pr-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/pr/futebol/times/athletico-pr/noticia/2026/09/28/agenda-do-athletico-veja-datas-e-horarios-dos-jogos-ate-a-34a-rodada-do-brasileirao.ghtml",
+      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/jogo/29-10-2026/gremio-atletico-pr.ghtml",
+      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/10/29/gremio-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/gremio-x-atletico-go-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
+      "https://ge.globo.com/sportv"
     ],
     "canais_depois": [
-      "Prime Video"
+      "Premiere",
+      "SporTV"
     ],
-    "exclusivo": true,
+    "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/vasco-da-gama-saf-x-flamengo/832212",
-      "https://www.primevideo.com/-/hi/detail/0S9610HYJQSDWMV0ZSEKX83YDJ",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml",
-      "https://www.cnnbrasil.com.br/esportes/brasileirao/vasco-x-flamengo-horario-e-onde-assistir-ao-campeonato-brasileiro-serie-a"
+      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/10/29/gremio-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml"
     ],
-    "youtube": [],
-    "youtube_removidos": [],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=xwhPKMVtapI",
+        "scope": "pre_game",
+        "valid_for_match": false,
+        "reason": "O título do vídeo no dossiê informa “GRÊMIO X ATHLETICO-PR | AQUECIMENTO AO VIVO”; trata-se de aquecimento/pré-jogo e não há evidência de transmissão integral da partida."
+      }
+    ],
+    "youtube_removidos": [
+      "https://www.youtube.com/watch?v=xwhPKMVtapI"
+    ],
     "overlay_alterado": true,
-    "resumo": "Confirmado no Brasil: Vasco da Gama x Flamengo, Brasileirão Série A 2026, fase única/33ª rodada, quinta-feira, 29/10/2026, às 20h (BRT), no Nilton Santos. A transmissão integral é exclusiva do Prime Video. Não há indicação de Globo, SporTV, Premiere, GE TV, CazéTV, Disney+ / ESPN, Paramount+, Record ou SBT para este jogo. A página do Prime pode iniciar cobertura/pré-jogo às 18h30, mas a bola rola às 20h."
+    "resumo": "Confirmado para o Brasil: Grêmio x Athletico-PR, Brasileirão 2026, 33ª rodada, nesta quinta-feira, 29/10/2026, às 21h30 (de Brasília), na Arena do Grêmio, tem transmissão integral de SporTV e Premiere. GE TV não integra a grade da partida: o link do YouTube informado é identificado como “AQUECIMENTO AO VIVO”, isto é, conteúdo pré-jogo, não a transmissão completa."
   },
-  "atualizado_em": "2026-10-29T18:33:25-03:00"
+  "atualizado_em": "2026-10-29T20:13:04-03:00"
 }
