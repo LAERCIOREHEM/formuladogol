@@ -1,0 +1,52 @@
+name: Hunter Attendance Regression CI
+
+on:
+  pull_request:
+    paths:
+      - 'cloudflare/push-worker/src/postgame-*.js'
+      - 'cloudflare/push-worker/src/postgame-fastlane.js'
+      - 'cloudflare/push-worker/src/health-monitor.js'
+      - 'cloudflare/push-worker/tests/test-postgame-fastlane.mjs'
+      - 'dados-br/correcoes/publicos-verificados.json'
+      - '.github/workflows/hunter-regression-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Worker test dependencies
+        working-directory: cloudflare/push-worker
+        run: npm install --no-audit --no-fund
+      - name: Syntax checks
+        working-directory: cloudflare/push-worker
+        run: npm run check
+      - name: Full sports and hunter regressions
+        working-directory: cloudflare/push-worker
+        run: npm run test:sports
+      - name: Validate verified attendance data
+        run: |
+          python -m json.tool dados-br/correcoes/publicos-verificados.json >/dev/null
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('dados-br/correcoes/publicos-verificados.json').read_text(encoding='utf-8'))['jogos']
+          expected={
+            '401841296':(21492,21379,628385.50),
+            '401841297':(13458,9760,378700)
+          }
+          for eid, triple in expected.items():
+            row=d[eid]
+            assert (row['publico'],row['pagantes'],row['renda'])==triple,(eid,row)
+            assert row['pagantes']<=row['publico']
+            assert all(row.get(k,'').startswith('https://') for k in ('fonte_publico','fonte_pagantes','fonte_renda'))
+          print('verified fixtures: 2/2')
+          PY
