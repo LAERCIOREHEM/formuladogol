@@ -199,7 +199,7 @@ assert.equal(planPublicStep(task,{...zero,mini_attempts:4,sol_attempts:3},at(120
 assert.equal(planPublicStep(task,{...zero,mini_attempts:8,sol_attempts:3},at(180),fullBudget).phase,'deterministic');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:4,sol_attempts:2},at(240),fullBudget).phase,'gemini');
 assert.notEqual(planPublicStep(task,{mini_attempts:99,sol_attempts:99,sol_completed:1},at(24*60),fullBudget).phase,'give_up');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:3},at(45),{allowGemini:true,allowOpenAI:false}).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:2},at(45),{allowGemini:true,allowOpenAI:false}).phase,'gemini');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:5},at(45),{allowGemini:false,allowOpenAI:false}).phase,'budget_guard');
 
 assert.deepEqual(PUBLIC_POLICY.geminiScheduleMinutes,[3,15,45,105]);
