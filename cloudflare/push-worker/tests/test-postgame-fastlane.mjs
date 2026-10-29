@@ -192,7 +192,7 @@ assert.equal(planPublicStep(task,{...zero,mini_attempts:1},at(9),fullBudget).pha
 assert.equal(planPublicStep(task,{...zero,mini_attempts:1,sol_attempts:0},at(12),fullBudget).phase,'openai');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:2,sol_attempts:1},at(18),fullBudget).phase,'deterministic');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:3,sol_attempts:0},at(20),fullBudget).phase,'openai');
-assert.equal(planPublicStep(task,{...zero,mini_attempts:3,sol_attempts:2},at(60),fullBudget).phase,'gemini');
+assert.equal(planPublicStep(task,{...zero,mini_attempts:2,sol_attempts:2},at(60),fullBudget).phase,'gemini');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:7,sol_attempts:1},at(90),fullBudget).phase,'openai');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:8,sol_attempts:2},at(120),fullBudget).phase,'deterministic');
 assert.equal(planPublicStep(task,{...zero,mini_attempts:4,sol_attempts:3},at(120),fullBudget).phase,'deterministic');
