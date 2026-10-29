@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-28T21:56:36.867465-03:00",
+  "gerado_em": "2026-10-28T22:14:46.462882-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 322,
   "total_com_estatisticas": 322,
-  "total_com_publico": 319,
+  "total_com_publico": 322,
   "total_com_eventos": 322,
   "total_com_jogadores": 322,
   "total_eventos_validados": 322,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Estadio do Maracana",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 12282,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://esportes.r7.com/jogada-10/com-gol-nos-acrescimos-fluminense-vence-o-internacional-de-virada-29102026/",
       "arbitro": "",
       "stats": [
         {
@@ -575,7 +575,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-28T21:56:31.442207-03:00"
+      "atualizado_em": "2026-10-28T21:56:31.442207-03:00",
+      "renda": 558839.5
     },
     "401841291": {
       "event_id": "401841291",
@@ -587,9 +588,9 @@
       "placar_mandante": 3,
       "placar_visitante": 0,
       "estadio": "Estádio Municipal Cicero de Souza Marques",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 2137,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.futebolinterior.com.br/red-bull-bragantino-3-x-0-chapecoense-wallace-yan-da-show-e-garante-a-vitoria/",
       "arbitro": "",
       "stats": [
         {
@@ -1115,7 +1116,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-28T21:56:34.032760-03:00"
+      "atualizado_em": "2026-10-28T21:56:34.032760-03:00",
+      "renda": 49340
     },
     "401841293": {
       "event_id": "401841293",
@@ -1127,9 +1129,9 @@
       "placar_mandante": 0,
       "placar_visitante": 0,
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 13655,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/28/palmeiras-empata-com-o-santos-e-da-oportunidade-para-flamengo-ampliar-vantagem.htm",
       "arbitro": "",
       "stats": [
         {
@@ -1679,7 +1681,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-28T21:56:36.783762-03:00"
+      "atualizado_em": "2026-10-28T21:56:36.783762-03:00",
+      "renda": 446085
     },
     "401841286": {
       "event_id": "401841286",
@@ -181990,5 +181993,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 301,
+  "total_com_renda": 322
 }
