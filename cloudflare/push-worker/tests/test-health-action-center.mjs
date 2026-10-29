@@ -42,6 +42,17 @@ const closedWithBreakdown=buildActionCenter({
 },now);
 assert.ok(closedWithBreakdown.informational.some(x=>x.includes('4 recuperada(s)')));
 
+const earlyBudgetGuard=buildActionCenter({...mock,
+  indicators:[{id:'postgame',label:'Pós-jogo',severity:'yellow',detail:'guard dentro do SLA'}],
+  postgame:{...mock.postgame,pending:1,overdue:0,budgetGuard:1,pendingRows:[{home:'Santos',away:'Palmeiras',status:'budget_guard',attempts:5}]}
+},now).requiresAttention.find((a)=>a.id==='postgame');
+assert.equal(earlyBudgetGuard.responsibility,'AUTO','guard dentro do SLA não exige intervenção humana');
+const lateBudgetGuard=buildActionCenter({...mock,
+  indicators:[{id:'postgame',label:'Pós-jogo',severity:'red',detail:'guard >2h'}],
+  postgame:{...mock.postgame,pending:1,overdue:1,budgetGuard:1}
+},now).requiresAttention.find((a)=>a.id==='postgame');
+assert.equal(lateBudgetGuard.responsibility,'MANUAL','somente guard persistente além do SLA exige revisão');
+
 const spike=buildActionCenter({...mock,postgame:{...mock.postgame,cost:{last24h:{estimatedUsd:5.1},budget:{monthlyBudgetUsd:50}}}},now);
 assert.ok(spike.requiresAttention.find(x=>x.id==='openai').recommendation.includes('US$ 5 em 24 horas'));
 
