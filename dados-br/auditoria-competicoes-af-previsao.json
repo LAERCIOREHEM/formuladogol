@@ -2,7 +2,7 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-10-26T22:11:17-03:00",
+  "gerado_em": "2026-10-28T21:56:47-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "af_snapshot_seguro": true,
@@ -16,15 +16,46 @@
   "competicoes": [
     {
       "competicao": "copa_do_brasil",
-      "status": "cache_valido",
+      "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-10-26T21:36:14-03:00",
+      "gerado_em": "2026-10-28T21:56:46-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 155,
+      "finalizados": 150,
+      "pendentes": 5,
+      "fase_atual": {
+        "status": "em_andamento",
+        "ordem": 800,
+        "nome": "Semifinal",
+        "eventos": 4,
+        "eventos_pendentes": 4
+      },
+      "summary_partidas_iniciadas": {
+        "consultados": 0,
+        "confirmados": 0,
+        "atualizados": 0,
+        "ao_vivo": [],
+        "finalizados": [],
+        "pendentes": [],
+        "pendentes_vencidos": [],
+        "erros": []
+      },
+      "api_football_resgate_resultados": {
+        "consultados": 0,
+        "finalizados": [],
+        "requisicoes": 0,
+        "erros": []
+      },
+      "api_football_auditoria_penaltis": {
+        "consultados": 0,
+        "corrigidos": [],
+        "requisicoes": 0,
+        "erros": []
+      },
       "coleta": {
         "modo": "incremental",
-        "janela_inicio": "2026-10-05T00:00:00-03:00",
-        "janela_fim": "2027-02-23T23:59:59-03:00",
+        "janela_inicio": "2026-10-07T00:00:00-03:00",
+        "janela_fim": "2027-02-25T23:59:59-03:00",
         "requisicoes": 3,
         "ultima_completa_em": "2026-10-23T22:06:30-03:00",
         "ajustes_editoriais_aplicados": 0
@@ -32,15 +63,51 @@
     },
     {
       "competicao": "libertadores",
-      "status": "cache_valido",
+      "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-10-26T21:36:14-03:00",
+      "gerado_em": "2026-10-28T21:56:47-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 155,
+      "finalizados": 154,
+      "pendentes": 1,
+      "fase_atual": {
+        "status": "em_andamento",
+        "ordem": 900,
+        "nome": "Final",
+        "eventos": 1,
+        "eventos_pendentes": 1
+      },
+      "summary_partidas_iniciadas": {
+        "consultados": 0,
+        "confirmados": 0,
+        "atualizados": 0,
+        "ao_vivo": [],
+        "finalizados": [],
+        "pendentes": [],
+        "pendentes_vencidos": [],
+        "erros": []
+      },
+      "api_football_resgate_resultados": {
+        "consultados": 0,
+        "finalizados": [],
+        "requisicoes": 0,
+        "erros": []
+      },
+      "api_football_auditoria_penaltis": {
+        "consultados": 1,
+        "corrigidos": [],
+        "datas_consultadas": [],
+        "requisicoes": 1,
+        "remaining": null,
+        "reserva": 12,
+        "erros": [
+          "401842648: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-10-28 to 2026-10-30.'}"
+        ]
+      },
       "coleta": {
         "modo": "incremental",
-        "janela_inicio": "2026-10-05T00:00:00-03:00",
-        "janela_fim": "2027-02-23T23:59:59-03:00",
+        "janela_inicio": "2026-10-07T00:00:00-03:00",
+        "janela_fim": "2027-02-25T23:59:59-03:00",
         "requisicoes": 3,
         "ultima_completa_em": "2026-10-23T22:06:31-03:00",
         "ajustes_editoriais_aplicados": 0
@@ -48,15 +115,46 @@
     },
     {
       "competicao": "sul_americana",
-      "status": "cache_valido",
+      "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-10-26T21:36:15-03:00",
+      "gerado_em": "2026-10-28T21:56:47-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 157,
+      "finalizados": 156,
+      "pendentes": 1,
+      "fase_atual": {
+        "status": "em_andamento",
+        "ordem": 900,
+        "nome": "Final",
+        "eventos": 1,
+        "eventos_pendentes": 1
+      },
+      "summary_partidas_iniciadas": {
+        "consultados": 0,
+        "confirmados": 0,
+        "atualizados": 0,
+        "ao_vivo": [],
+        "finalizados": [],
+        "pendentes": [],
+        "pendentes_vencidos": [],
+        "erros": []
+      },
+      "api_football_resgate_resultados": {
+        "consultados": 0,
+        "finalizados": [],
+        "requisicoes": 0,
+        "erros": []
+      },
+      "api_football_auditoria_penaltis": {
+        "consultados": 0,
+        "corrigidos": [],
+        "requisicoes": 0,
+        "erros": []
+      },
       "coleta": {
         "modo": "incremental",
-        "janela_inicio": "2026-10-05T00:00:00-03:00",
-        "janela_fim": "2027-02-23T23:59:59-03:00",
+        "janela_inicio": "2026-10-07T00:00:00-03:00",
+        "janela_fim": "2027-02-25T23:59:59-03:00",
         "requisicoes": 3,
         "ultima_completa_em": "2026-10-23T22:06:33-03:00",
         "ajustes_editoriais_aplicados": 0
