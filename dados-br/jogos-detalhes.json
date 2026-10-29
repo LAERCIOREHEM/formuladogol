@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-29T04:01:52.514892-03:00",
+  "gerado_em": "2026-10-29T09:51:46.430188-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 324,
   "total_com_estatisticas": 324,
-  "total_com_publico": 322,
+  "total_com_publico": 324,
   "total_com_eventos": 324,
   "total_com_jogadores": 324,
   "total_eventos_validados": 324,
@@ -20,9 +20,9 @@
       "placar_mandante": 3,
       "placar_visitante": 2,
       "estadio": "Arena Fonte Nova",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 21492,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.terra.com.br/esportes/sao-paulo/sao-paulo-fraqueja-fisicamente-apos-buscar-empate-ve-dominio-adversario-e-perde-para-o-bahia%2C7bfd2f9e4b0f5bc56d24c6050cc857ftr19bb.html",
       "arbitro": "",
       "stats": [
         {
@@ -602,7 +602,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-28T23:45:33.551073-03:00"
+      "atualizado_em": "2026-10-28T23:45:33.551073-03:00",
+      "publico_pagante": 21379,
+      "renda": 628385.5
     },
     "401841297": {
       "event_id": "401841297",
@@ -614,9 +616,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Mangueirão",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 13458,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.oliberal.com/esportes/remo/xo-jejum-remo-vence-o-botafogo-e-segue-vivo-no-brasileirao-1.1188130",
       "arbitro": "",
       "stats": [
         {
@@ -1147,7 +1149,8 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-10-28T23:45:35.686111-03:00",
-      "renda": 378700
+      "renda": 378700,
+      "publico_pagante": 9760
     },
     "401841289": {
       "event_id": "401841289",
@@ -183133,6 +183136,6 @@
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
   },
-  "total_com_publico_pagante": 301,
-  "total_com_renda": 323
+  "total_com_publico_pagante": 303,
+  "total_com_renda": 324
 }

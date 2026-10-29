@@ -2,46 +2,33 @@
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
   "jogos_finalizados": 324,
-  "jogos_com_publico": 322,
-  "jogos_sem_publico": 2,
-  "publico_total": 7970760,
-  "jogos_com_renda": 323,
-  "aguardando_fonte": [
-    {
-      "event_id": "401841296",
-      "mandante": "Bahia",
-      "visitante": "São Paulo",
-      "estado": "AGUARDANDO_FONTE"
-    },
-    {
-      "event_id": "401841297",
-      "mandante": "Remo",
-      "visitante": "Botafogo",
-      "estado": "AGUARDANDO_FONTE"
-    }
-  ],
+  "jogos_com_publico": 324,
+  "jogos_sem_publico": 0,
+  "publico_total": 8005710,
+  "jogos_com_renda": 324,
+  "aguardando_fonte": [],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
     {
       "event_id": "401841296",
-      "tipo_publico": "",
-      "publico_presente": null,
-      "publico_pagante": null,
-      "renda": null,
-      "fonte_publico": "",
-      "origem": "",
-      "estado": "AGUARDANDO_FONTE"
+      "tipo_publico": "presente",
+      "publico_presente": 21492,
+      "publico_pagante": 21379,
+      "renda": 628385.5,
+      "fonte_publico": "https://www.terra.com.br/esportes/sao-paulo/sao-paulo-fraqueja-fisicamente-apos-buscar-empate-ve-dominio-adversario-e-perde-para-o-bahia%2C7bfd2f9e4b0f5bc56d24c6050cc857ftr19bb.html",
+      "origem": "Público presente Terra/Correio Braziliense; pagantes Galáticos; renda ficha do EC Bahia",
+      "estado": "CONFIRMADO"
     },
     {
       "event_id": "401841297",
-      "tipo_publico": "",
-      "publico_presente": null,
-      "publico_pagante": null,
+      "tipo_publico": "presente",
+      "publico_presente": 13458,
+      "publico_pagante": 9760,
       "renda": 378700.0,
-      "fonte_publico": "",
-      "origem": "cloudflare-postgame-fastlane",
-      "estado": "AGUARDANDO_FONTE"
+      "fonte_publico": "https://www.oliberal.com/esportes/remo/xo-jejum-remo-vence-o-botafogo-e-segue-vivo-no-brasileirao-1.1188130",
+      "origem": "Ficha técnica O Liberal e confirmação independente Roma News",
+      "estado": "CONFIRMADO"
     },
     {
       "event_id": "401841289",
@@ -3264,5 +3251,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-10-29T04:01:54.491330-03:00"
+  "gerado_em": "2026-10-29T09:51:47.806773-03:00"
 }
