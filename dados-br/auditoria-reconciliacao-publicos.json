@@ -1,15 +1,48 @@
 {
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
-  "jogos_finalizados": 322,
+  "jogos_finalizados": 324,
   "jogos_com_publico": 322,
-  "jogos_sem_publico": 0,
+  "jogos_sem_publico": 2,
   "publico_total": 7970760,
   "jogos_com_renda": 322,
-  "aguardando_fonte": [],
+  "aguardando_fonte": [
+    {
+      "event_id": "401841296",
+      "mandante": "Bahia",
+      "visitante": "São Paulo",
+      "estado": "AGUARDANDO_FONTE"
+    },
+    {
+      "event_id": "401841297",
+      "mandante": "Remo",
+      "visitante": "Botafogo",
+      "estado": "AGUARDANDO_FONTE"
+    }
+  ],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
+    {
+      "event_id": "401841296",
+      "tipo_publico": "",
+      "publico_presente": null,
+      "publico_pagante": null,
+      "renda": null,
+      "fonte_publico": "",
+      "origem": "",
+      "estado": "AGUARDANDO_FONTE"
+    },
+    {
+      "event_id": "401841297",
+      "tipo_publico": "",
+      "publico_presente": null,
+      "publico_pagante": null,
+      "renda": null,
+      "fonte_publico": "",
+      "origem": "",
+      "estado": "AGUARDANDO_FONTE"
+    },
     {
       "event_id": "401841289",
       "tipo_publico": "presente",
@@ -3231,5 +3264,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-10-28T22:14:47.308390-03:00"
+  "gerado_em": "2026-10-29T03:01:15.757572-03:00"
 }
