@@ -6440,51 +6440,93 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: Remo x Botafogo, Brasileirão Série A (33ª rodada), hoje, 28/10/2026, às 21h30 (horário de Brasília), no Mangueirão, em Belém. A transmissão integral será de Globo (incluindo a afiliada TV Liberal no Pará) e Premiere. O ge terá apenas acompanhamento em tempo real, não transmissão de vídeo integral."
+    },
+    {
+      "event_id": "401841288",
+      "jogo": "Atlético-MG x Cruzeiro",
+      "data_iso": "2026-10-29T19:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-10-29T18:03:18-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Premiere",
+        "Globo"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/07/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-29a-rodada.ghtml",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml",
+        "https://ge.globo.com/google/amp/mg/futebol/brasileirao-serie-a/noticia/2026/10/29/atletico-mg-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/google/amp/mg/futebol/noticia/2026/10/29/quem-esta-pior-leva-a-melhor-atletico-mg-e-cruzeiro-chegam-a-classico-em-cenario-raro.ghtml",
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/jogo/29-10-2026/atletico-mg-cruzeiro.ghtml",
+        "https://ge.globo.com/mg/futebol/campeonato-mineiro/noticia/2026/01/25/atletico-mg-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/mg/futebol/copa-do-brasil/noticia/2026/09/01/atletico-mg-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/08/athletico-pr-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://globoplay.globo.com/globo-esporte-mg/t/tQC2wRGbKy/cenas",
+        "https://globoplay.globo.com/v/12050389",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/atletico-mineiro-x-cruzeiro/832216",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil/a/atletico-mg-bate-cruzeiro-de-virada-e-o-primeiro-semifinalista-da-copa-do-brasil"
+      ],
+      "canais_depois": [
+        "Premiere"
+      ],
+      "exclusivo": true,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/atletico-mineiro-x-cruzeiro/832216",
+        "https://ge.globo.com/google/amp/mg/futebol/brasileirao-serie-a/noticia/2026/10/29/atletico-mg-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Atlético-MG x Cruzeiro, Brasileirão Série A 2026, fase única/33ª rodada, hoje (quinta-feira, 29 de outubro de 2026), às 19h30 (horário de Brasília), na Arena MRV, terá transmissão integral exclusiva do Premiere. A Globo não integra a grade desta partida; o GE oferece acompanhamento em tempo real, que não equivale à transmissão ao vivo do jogo."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841297",
-    "jogo": "Remo x Botafogo",
-    "data_iso": "2026-10-28T21:30:00-03:00",
+    "event_id": "401841288",
+    "jogo": "Atlético-MG x Cruzeiro",
+    "data_iso": "2026-10-29T19:30:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-10-28T20:04:02-03:00",
+    "executado_em": "2026-10-29T18:03:18-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
       "Premiere",
       "Globo"
     ],
-    "status": "confirmado",
+    "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/23/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-32a-rodada.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
-      "https://ge.globo.com/futebol/times/botafogo",
-      "https://ge.globo.com/futebol/times/botafogo/noticia/2026/10/27/escalacao-do-botafogo-sem-danilo-e-montoro-tite-tera-que-fazer-mudancas-no-meio-campo-contra-o-remo.ghtml",
-      "https://ge.globo.com/google/amp/futebol/times/botafogo/noticia/2026/10/27/danilo-nao-viaja-e-vira-desfalque-do-botafogo-contra-o-remo.ghtml",
-      "https://ge.globo.com/google/amp/pa/futebol/times/remo/noticia/2026/09/29/pos-data-fifa-remo-tera-maratona-de-seis-jogos-na-serie-a-em-um-mes-veja-datas.ghtml",
-      "https://ge.globo.com/google/amp/pa/futebol/times/remo/noticia/2026/10/27/com-retorno-de-lesionados-remo-define-lista-de-atletas-para-encarar-o-botafogo.ghtml",
-      "https://ge.globo.com/pa/futebol/brasileirao-serie-a/jogo/28-10-2026/remo-botafogo.ghtml",
-      "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/10/28/remo-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/10/05/confira-retornos-e-ausencias-do-remo-na-serie-a-pos-super-data-fifa.ghtml",
-      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/10/22/remo-inicia-venda-de-ingressos-para-jogo-contra-o-botafogo-pela-serie-a.ghtml",
-      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/10/26/remo-tem-desfalque-na-defesa-mas-ganha-retorno-no-ataque-contra-o-botafogo.ghtml"
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/07/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-29a-rodada.ghtml",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml",
+      "https://ge.globo.com/google/amp/mg/futebol/brasileirao-serie-a/noticia/2026/10/29/atletico-mg-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/google/amp/mg/futebol/noticia/2026/10/29/quem-esta-pior-leva-a-melhor-atletico-mg-e-cruzeiro-chegam-a-classico-em-cenario-raro.ghtml",
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/jogo/29-10-2026/atletico-mg-cruzeiro.ghtml",
+      "https://ge.globo.com/mg/futebol/campeonato-mineiro/noticia/2026/01/25/atletico-mg-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/mg/futebol/copa-do-brasil/noticia/2026/09/01/atletico-mg-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/08/athletico-pr-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://globoplay.globo.com/globo-esporte-mg/t/tQC2wRGbKy/cenas",
+      "https://globoplay.globo.com/v/12050389",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/atletico-mineiro-x-cruzeiro/832216",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil/a/atletico-mg-bate-cruzeiro-de-virada-e-o-primeiro-semifinalista-da-copa-do-brasil"
     ],
     "canais_depois": [
-      "Globo",
       "Premiere"
     ],
-    "exclusivo": false,
+    "exclusivo": true,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/10/28/remo-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/pa/futebol/brasileirao-serie-a/jogo/28-10-2026/remo-botafogo.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml"
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/atletico-mineiro-x-cruzeiro/832216",
+      "https://ge.globo.com/google/amp/mg/futebol/brasileirao-serie-a/noticia/2026/10/29/atletico-mg-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml"
     ],
     "youtube": [],
     "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: Remo x Botafogo, Brasileirão Série A (33ª rodada), hoje, 28/10/2026, às 21h30 (horário de Brasília), no Mangueirão, em Belém. A transmissão integral será de Globo (incluindo a afiliada TV Liberal no Pará) e Premiere. O ge terá apenas acompanhamento em tempo real, não transmissão de vídeo integral."
+    "resumo": "Confirmado para o Brasil: Atlético-MG x Cruzeiro, Brasileirão Série A 2026, fase única/33ª rodada, hoje (quinta-feira, 29 de outubro de 2026), às 19h30 (horário de Brasília), na Arena MRV, terá transmissão integral exclusiva do Premiere. A Globo não integra a grade desta partida; o GE oferece acompanhamento em tempo real, que não equivale à transmissão ao vivo do jogo."
   },
-  "atualizado_em": "2026-10-28T20:04:02-03:00"
+  "atualizado_em": "2026-10-29T18:03:18-03:00"
 }

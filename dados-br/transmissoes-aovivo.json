@@ -13,80 +13,6 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "jogos": {
-    "401841289": {
-      "event_id": "401841289",
-      "rodada": 33,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "espn_league": "bra.1",
-      "mandante": "Fluminense",
-      "visitante": "Internacional",
-      "data_iso": "2026-10-28T19:30:00-03:00",
-      "estadio": "Estadio do Maracana",
-      "origem": "automático",
-      "principal": {
-        "fonte": "cazetv",
-        "nome": "CazéTV",
-        "video_id": "t4pf4qZ0c14",
-        "url": "https://www.youtube.com/watch?v=t4pf4qZ0c14",
-        "status": "live",
-        "inicio_programado": "2026-10-28T18:00:00-03:00",
-        "inicio_real": "2026-10-28T18:00:15-03:00",
-        "titulo": "AO VIVO: FLUMINENSE X INTERNACIONAL | BRASILEIRÃO 2026 | 33ª RODADA",
-        "canal": "CazéTV",
-        "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
-        "thumbnail": "https://i.ytimg.com/vi/t4pf4qZ0c14/maxresdefault.jpg?v=6abbd245",
-        "confianca": 0.925,
-        "motivos": [
-          "os dois clubes aparecem no título",
-          "identifica Brasileirão/competição",
-          "identifica transmissão ao vivo",
-          "transmissão já está ao vivo",
-          "horário compatível (90 min de diferença)"
-        ],
-        "origem_busca": "streams-page",
-        "escopo": "partida",
-        "embeddable": false
-      },
-      "alternativas": []
-    },
-    "401841296": {
-      "event_id": "401841296",
-      "rodada": 33,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "espn_league": "bra.1",
-      "mandante": "Bahia",
-      "visitante": "São Paulo",
-      "data_iso": "2026-10-28T21:30:00-03:00",
-      "estadio": "Arena Fonte Nova",
-      "origem": "automático",
-      "principal": {
-        "fonte": "getv",
-        "nome": "GE TV",
-        "video_id": "yL7MzrhVAJk",
-        "url": "https://www.youtube.com/watch?v=yL7MzrhVAJk",
-        "status": "live",
-        "inicio_programado": "2026-10-28T20:00:00-03:00",
-        "inicio_real": "2026-10-28T20:00:40-03:00",
-        "titulo": "BAHIA X SÃO PAULO | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
-        "canal": "ge tv",
-        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
-        "thumbnail": "https://i.ytimg.com/vi/yL7MzrhVAJk/maxresdefault.jpg?v=6acbffae",
-        "confianca": 0.925,
-        "motivos": [
-          "os dois clubes aparecem no título",
-          "identifica Brasileirão/competição",
-          "identifica transmissão ao vivo",
-          "transmissão já está ao vivo",
-          "horário compatível (90 min de diferença)"
-        ],
-        "origem_busca": "streams-page",
-        "escopo": "partida",
-        "embeddable": true
-      },
-      "alternativas": []
-    },
     "401841290": {
       "event_id": "401841290",
       "rodada": 33,
@@ -231,6 +157,42 @@
       },
       "alternativas": []
     },
+    "401841298": {
+      "event_id": "401841298",
+      "rodada": 34,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "São Paulo",
+      "visitante": "Corinthians",
+      "data_iso": "2026-11-04T21:30:00-03:00",
+      "estadio": "Estádio Cícero Pompeu de Toledo",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "TzBl51tTBmU",
+        "url": "https://www.youtube.com/watch?v=TzBl51tTBmU",
+        "status": "upcoming",
+        "inicio_programado": "2026-11-04T20:00:00-03:00",
+        "inicio_real": "",
+        "titulo": "SÃO PAULO X CORINTHIANS | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/TzBl51tTBmU/maxresdefault.jpg?v=6ae2a55a",
+        "confianca": 0.875,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (90 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": true
+      },
+      "alternativas": []
+    },
     "401913108": {
       "event_id": "401913108",
       "rodada": 0,
@@ -262,7 +224,43 @@
         "embeddable": true
       },
       "alternativas": []
+    },
+    "401913107": {
+      "event_id": "401913107",
+      "rodada": 0,
+      "competicao_chave": "copa_do_brasil",
+      "competicao_nome": "Copa do Brasil",
+      "espn_league": "bra.copa_do_brazil",
+      "mandante": "Vasco da Gama",
+      "visitante": "Palmeiras",
+      "data_iso": "2026-11-08T17:00:00-03:00",
+      "estadio": "Estádio São Januário",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "iI_CDCgFJ1Y",
+        "url": "https://www.youtube.com/watch?v=iI_CDCgFJ1Y",
+        "status": "upcoming",
+        "inicio_programado": "2026-11-08T15:30:00-03:00",
+        "inicio_real": "",
+        "titulo": "AO VIVO: VASCO X PALMEIRAS | COPA DO BRASIL | SEMIFINAL (VOLTA) | ge tv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/iI_CDCgFJ1Y/maxresdefault.jpg?v=6ae2af42",
+        "confianca": 0.875,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (90 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": true
+      },
+      "alternativas": []
     }
   },
-  "atualizado_em": "2026-10-28T20:01:30-03:00"
+  "atualizado_em": "2026-10-29T18:01:41-03:00"
 }
