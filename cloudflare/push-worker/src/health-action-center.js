@@ -94,9 +94,14 @@ export function buildActionCenter(snapshot = {}, now = Date.now()) {
       }
       case 'postgame':
         action.impact = 'Público e renda podem permanecer ausentes ou aguardando classificação.';
-        action.responsibility = 'AUTO';
-        action.responsibility = snapshot.postgame?.budgetGuard>0?'MANUAL':'AUTO';
-        action.recommendation = 'O Hunter mantém retentativas. Só considerar correção documental quando houver fonte oficial verificável; budget guard exige revisão de custos.';
+        // Budget guard dentro do SLA NÃO exige ação humana: pesquisa grátis
+        // continua e o teto da IA nunca é aumentado automaticamente.
+        const manual=Number(snapshot.postgame?.budgetGuard||0)>0 &&
+          Number(snapshot.postgame?.overdue||0)>0;
+        action.responsibility = manual?'MANUAL':'AUTO';
+        action.recommendation = manual
+          ? 'SLA excedido com IA limitada pelo orçamento: revisar fontes e custos antes de aprovar qualquer gasto. A busca gratuita continua.'
+          : 'O Hunter continua buscando fontes gratuitas e verificando a partida. Não aumentar orçamento nem corrigir manualmente enquanto estiver dentro do SLA.';
         action.evidence = (snapshot.postgame?.pendingRows || []).slice(0,3).map(x => clean(`${x.home} x ${x.away} · ${x.status} · ${x.attempts} tentativa(s) · ${x.lastError || 'sem erro'}`,280));
         action.link = 'https://push.formuladogol.com.br/v1/postgame/status';
         break;
