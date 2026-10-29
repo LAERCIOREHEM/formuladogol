@@ -3,11 +3,11 @@
   "projeto": "AF-Previsão",
   "versao_modelo": "AF-Previsão 1.3",
   "etapa": "Execução 5 — histórico encadeado e avaliação científica preparada",
-  "gerado_em": "2026-10-26T21:58:00-03:00",
-  "referencia_esportiva_em": "2026-10-26T21:58:00-03:00",
-  "calculado_em": "2026-10-26T22:08:19-03:00",
+  "gerado_em": "2026-10-28T21:28:00-03:00",
+  "referencia_esportiva_em": "2026-10-28T21:28:00-03:00",
+  "calculado_em": "2026-10-28T21:53:25-03:00",
   "status": "ok",
-  "hash_entrada": "77e3b27e9ada88cf0701fe0328a4b4fb364763ff6873a2319a3492a605c74e4f",
+  "hash_entrada": "a4da0493c7d23b4329193302cfbc08663c22fc905dc739fdd2fdb0e491d5105d",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -20,302 +20,302 @@
       2024,
       2025
     ],
-    "partidas_2026_concluidas": 319,
-    "partidas_2026_restantes": 61,
+    "partidas_2026_concluidas": 322,
+    "partidas_2026_restantes": 58,
     "partidas_calendario": 380,
-    "concluidos_reconhecidos_no_calendario": 319,
+    "concluidos_reconhecidos_no_calendario": 322,
     "comparacao_resultados_tabela": {
-      "partidas_concluidas": 319,
-      "soma_jogos_tabela": 638,
+      "partidas_concluidas": 322,
+      "soma_jogos_tabela": 644,
       "resultado": "íntegro"
     }
   },
   "modelo": {
     "selecionado_execucao_1": "poisson_map_bayesiano",
-    "data_ajuste": "2026-10-27",
+    "data_ajuste": "2026-10-29",
     "desvio_prior": 0.4,
     "meia_vida_dias": 365.0,
-    "intercepto_log": 0.04566,
-    "vantagem_mando_log": 0.33181388,
-    "multiplicador_mando": 1.39349346,
+    "intercepto_log": 0.04178021,
+    "vantagem_mando_log": 0.33594855,
+    "multiplicador_mando": 1.39926703,
     "forcas_clubes": [
       {
         "clube": "Flamengo",
-        "ataque_log": 0.42979627,
-        "defesa_log": 0.35376308,
-        "multiplicador_ataque": 1.53694437,
-        "multiplicador_protecao_defensiva": 1.42441768,
+        "ataque_log": 0.43151541,
+        "defesa_log": 0.35262458,
+        "multiplicador_ataque": 1.53958887,
+        "multiplicador_protecao_defensiva": 1.4227969,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": 0.6962,
-          "ajuste_defesa_pct": 1.3116,
-          "ajuste_forca_pct": 1.0035,
+          "ajuste_ataque_pct": 0.7028,
+          "ajuste_defesa_pct": 1.31,
+          "ajuste_forca_pct": 1.0059,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Palmeiras",
-        "ataque_log": 0.3199441,
-        "defesa_log": 0.45338906,
-        "multiplicador_ataque": 1.37705079,
-        "multiplicador_protecao_defensiva": 1.57363631,
+        "ataque_log": 0.30566652,
+        "defesa_log": 0.47336151,
+        "multiplicador_ataque": 1.35752952,
+        "multiplicador_protecao_defensiva": 1.60538163,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": -0.1461,
-          "ajuste_defesa_pct": 3.8188,
-          "ajuste_forca_pct": 1.8171,
-          "classificacao": "leve melhora"
+          "ajuste_ataque_pct": -1.4299,
+          "ajuste_defesa_pct": 4.2789,
+          "ajuste_forca_pct": 1.3843,
+          "classificacao": "estável"
         }
       },
       {
         "clube": "Cruzeiro",
-        "ataque_log": 0.15413496,
-        "defesa_log": 0.13890004,
-        "multiplicador_ataque": 1.16664833,
-        "multiplicador_protecao_defensiva": 1.14900924,
+        "ataque_log": 0.15581323,
+        "defesa_log": 0.13777727,
+        "multiplicador_ataque": 1.16860792,
+        "multiplicador_protecao_defensiva": 1.14771989,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": 1.7432,
-          "ajuste_defesa_pct": 0.5236,
-          "ajuste_forca_pct": 1.1316,
+          "ajuste_ataque_pct": 1.7524,
+          "ajuste_defesa_pct": 0.5205,
+          "ajuste_forca_pct": 1.1346,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Athletico-PR",
-        "ataque_log": 0.15486128,
-        "defesa_log": 0.0774801,
-        "multiplicador_ataque": 1.16749599,
-        "multiplicador_protecao_defensiva": 1.08056072,
+        "ataque_log": 0.15607042,
+        "defesa_log": 0.0755625,
+        "multiplicador_ataque": 1.16890851,
+        "multiplicador_protecao_defensiva": 1.07849063,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": 0.2454,
-          "ajuste_defesa_pct": -1.0453,
-          "ajuste_forca_pct": -0.402,
+          "ajuste_ataque_pct": 0.238,
+          "ajuste_defesa_pct": -1.0658,
+          "ajuste_forca_pct": -0.416,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Fluminense",
-        "ataque_log": 0.10432673,
-        "defesa_log": 0.14137631,
-        "multiplicador_ataque": 1.10996306,
-        "multiplicador_protecao_defensiva": 1.15185802,
+        "ataque_log": 0.11112257,
+        "defesa_log": 0.13791431,
+        "multiplicador_ataque": 1.11753187,
+        "multiplicador_protecao_defensiva": 1.14787718,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": -0.5909,
-          "ajuste_defesa_pct": -0.0482,
-          "ajuste_forca_pct": -0.3199,
+          "ajuste_ataque_pct": -0.1283,
+          "ajuste_defesa_pct": -0.2636,
+          "ajuste_forca_pct": -0.1959,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Atlético-MG",
-        "ataque_log": 0.05132498,
-        "defesa_log": 0.10819716,
-        "multiplicador_ataque": 1.05266493,
-        "multiplicador_protecao_defensiva": 1.11426741,
+        "ataque_log": 0.05280595,
+        "defesa_log": 0.10664936,
+        "multiplicador_ataque": 1.05422505,
+        "multiplicador_protecao_defensiva": 1.11254408,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": 0.4548,
-          "ajuste_defesa_pct": 1.1099,
-          "ajuste_forca_pct": 0.7818,
+          "ajuste_ataque_pct": 0.4601,
+          "ajuste_defesa_pct": 1.097,
+          "ajuste_forca_pct": 0.7781,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Bahia",
-        "ataque_log": 0.09549649,
-        "defesa_log": 0.04448537,
-        "multiplicador_ataque": 1.10020496,
-        "multiplicador_protecao_defensiva": 1.04548968,
+        "ataque_log": 0.09697034,
+        "defesa_log": 0.04285776,
+        "multiplicador_ataque": 1.10182769,
+        "multiplicador_protecao_defensiva": 1.04378941,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": -1.6031,
-          "ajuste_defesa_pct": 1.0082,
-          "ajuste_forca_pct": -0.306,
+          "ajuste_ataque_pct": -1.5764,
+          "ajuste_defesa_pct": 0.9879,
+          "ajuste_forca_pct": -0.3025,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Santos",
-        "ataque_log": 0.1251525,
-        "defesa_log": -0.04851401,
-        "multiplicador_ataque": 1.13332127,
-        "multiplicador_protecao_defensiva": 0.95264399,
+        "ataque_log": 0.11027761,
+        "defesa_log": -0.02832706,
+        "multiplicador_ataque": 1.116588,
+        "multiplicador_protecao_defensiva": 0.97207039,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": 1.1389,
-          "ajuste_defesa_pct": 1.0405,
-          "ajuste_forca_pct": 1.0897,
-          "classificacao": "estável"
-        }
-      },
-      {
-        "clube": "São Paulo",
-        "ataque_log": -0.04179341,
-        "defesa_log": 0.12401852,
-        "multiplicador_ataque": 0.95906789,
-        "multiplicador_protecao_defensiva": 1.13203683,
-        "tendencia_recente": {
-          "jogos_considerados": 12,
-          "ajuste_ataque_pct": -1.3692,
-          "ajuste_defesa_pct": 1.4866,
-          "ajuste_forca_pct": 0.0485,
+          "ajuste_ataque_pct": -0.164,
+          "ajuste_defesa_pct": 2.1096,
+          "ajuste_forca_pct": 0.9664,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Bragantino",
-        "ataque_log": 0.00646306,
-        "defesa_log": 0.04009592,
-        "multiplicador_ataque": 1.006484,
-        "multiplicador_protecao_defensiva": 1.04091061,
+        "ataque_log": 0.0190909,
+        "defesa_log": 0.04974599,
+        "multiplicador_ataque": 1.01927429,
+        "multiplicador_protecao_defensiva": 1.05100409,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": -1.0184,
-          "ajuste_defesa_pct": -0.0199,
-          "ajuste_forca_pct": -0.5204,
+          "ajuste_ataque_pct": -0.3486,
+          "ajuste_defesa_pct": 1.2179,
+          "ajuste_forca_pct": 0.4316,
+          "classificacao": "estável"
+        }
+      },
+      {
+        "clube": "São Paulo",
+        "ataque_log": -0.04023759,
+        "defesa_log": 0.12243914,
+        "multiplicador_ataque": 0.9605612,
+        "multiplicador_protecao_defensiva": 1.13025033,
+        "tendencia_recente": {
+          "jogos_considerados": 12,
+          "ajuste_ataque_pct": -1.3623,
+          "ajuste_defesa_pct": 1.4783,
+          "ajuste_forca_pct": 0.0479,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Botafogo",
-        "ataque_log": 0.14576885,
-        "defesa_log": 0.06412741,
-        "multiplicador_ataque": 1.15692874,
-        "multiplicador_protecao_defensiva": 1.06622823,
+        "ataque_log": 0.14694383,
+        "defesa_log": 0.06283155,
+        "multiplicador_ataque": 1.1582889,
+        "multiplicador_protecao_defensiva": 1.06484745,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": -3.7883,
-          "ajuste_defesa_pct": -0.4441,
-          "ajuste_forca_pct": -2.1305,
+          "ajuste_ataque_pct": -3.8049,
+          "ajuste_defesa_pct": -0.453,
+          "ajuste_forca_pct": -2.1433,
           "classificacao": "leve queda"
         }
       },
       {
         "clube": "Coritiba",
-        "ataque_log": -0.04625508,
-        "defesa_log": -0.19199081,
-        "multiplicador_ataque": 0.95479838,
-        "multiplicador_protecao_defensiva": 0.82531446,
+        "ataque_log": -0.04584717,
+        "defesa_log": -0.19311082,
+        "multiplicador_ataque": 0.95518793,
+        "multiplicador_protecao_defensiva": 0.82439061,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": -3.1397,
-          "ajuste_defesa_pct": -0.3612,
-          "ajuste_forca_pct": -1.7603,
+          "ajuste_ataque_pct": -3.1435,
+          "ajuste_defesa_pct": -0.3581,
+          "ajuste_forca_pct": -1.7607,
           "classificacao": "leve queda"
         }
       },
       {
         "clube": "Vasco da Gama",
-        "ataque_log": 0.06711667,
-        "defesa_log": -0.09897136,
-        "multiplicador_ataque": 1.06942024,
-        "multiplicador_protecao_defensiva": 0.90576865,
+        "ataque_log": 0.06882339,
+        "defesa_log": -0.10023181,
+        "multiplicador_ataque": 1.071247,
+        "multiplicador_protecao_defensiva": 0.90462769,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": -0.4704,
-          "ajuste_defesa_pct": 1.8484,
-          "ajuste_forca_pct": 0.6823,
+          "ajuste_ataque_pct": -0.4726,
+          "ajuste_defesa_pct": 1.8493,
+          "ajuste_forca_pct": 0.6817,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Vitória",
-        "ataque_log": -0.11776223,
-        "defesa_log": -0.02845006,
-        "multiplicador_ataque": 0.88890738,
-        "multiplicador_protecao_defensiva": 0.97195083,
+        "ataque_log": -0.11682444,
+        "defesa_log": -0.02991766,
+        "multiplicador_ataque": 0.88974138,
+        "multiplicador_protecao_defensiva": 0.97052544,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": 0.1961,
-          "ajuste_defesa_pct": 0.7581,
-          "ajuste_forca_pct": 0.4767,
+          "ajuste_ataque_pct": 0.1845,
+          "ajuste_defesa_pct": 0.7623,
+          "ajuste_forca_pct": 0.473,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Mirassol",
-        "ataque_log": 0.10031515,
-        "defesa_log": 0.06627222,
-        "multiplicador_ataque": 1.10551926,
-        "multiplicador_protecao_defensiva": 1.06851755,
+        "ataque_log": 0.10207879,
+        "defesa_log": 0.06474573,
+        "multiplicador_ataque": 1.10747073,
+        "multiplicador_protecao_defensiva": 1.06688772,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": -1.0235,
-          "ajuste_defesa_pct": 1.6637,
-          "ajuste_forca_pct": 0.3111,
+          "ajuste_ataque_pct": -1.025,
+          "ajuste_defesa_pct": 1.6694,
+          "ajuste_forca_pct": 0.3132,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Internacional",
-        "ataque_log": -0.00517475,
-        "defesa_log": 0.03606434,
-        "multiplicador_ataque": 0.99483861,
-        "multiplicador_protecao_defensiva": 1.03672255,
+        "ataque_log": -0.00212429,
+        "defesa_log": 0.02884231,
+        "multiplicador_ataque": 0.99787796,
+        "multiplicador_protecao_defensiva": 1.02926228,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": -0.6189,
-          "ajuste_defesa_pct": 1.4086,
-          "ajuste_forca_pct": 0.3897,
+          "ajuste_ataque_pct": -0.4253,
+          "ajuste_defesa_pct": 0.8616,
+          "ajuste_forca_pct": 0.2161,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Grêmio",
-        "ataque_log": -0.00738253,
-        "defesa_log": -0.02650807,
-        "multiplicador_ataque": 0.99264465,
-        "multiplicador_protecao_defensiva": 0.97384018,
+        "ataque_log": -0.0061284,
+        "defesa_log": -0.02776942,
+        "multiplicador_ataque": 0.99389034,
+        "multiplicador_protecao_defensiva": 0.97261261,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": -1.0977,
-          "ajuste_defesa_pct": 0.6005,
-          "ajuste_forca_pct": -0.2522,
+          "ajuste_ataque_pct": -1.1017,
+          "ajuste_defesa_pct": 0.6017,
+          "ajuste_forca_pct": -0.2536,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Corinthians",
-        "ataque_log": -0.03120916,
-        "defesa_log": 0.03330868,
-        "multiplicador_ataque": 0.96927282,
-        "multiplicador_protecao_defensiva": 1.03386963,
+        "ataque_log": -0.02970248,
+        "defesa_log": 0.03180113,
+        "multiplicador_ataque": 0.9707343,
+        "multiplicador_protecao_defensiva": 1.03231219,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": -0.0732,
-          "ajuste_defesa_pct": -2.2175,
-          "ajuste_forca_pct": -1.1512,
+          "ajuste_ataque_pct": -0.0734,
+          "ajuste_defesa_pct": -2.2292,
+          "ajuste_forca_pct": -1.1571,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Remo",
-        "ataque_log": -0.12192296,
-        "defesa_log": -0.10623667,
-        "multiplicador_ataque": 0.88521656,
-        "multiplicador_protecao_defensiva": 0.89921181,
+        "ataque_log": -0.12029411,
+        "defesa_log": -0.10727173,
+        "multiplicador_ataque": 0.88665962,
+        "multiplicador_protecao_defensiva": 0.89828155,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": -2.5538,
-          "ajuste_defesa_pct": 1.3321,
-          "ajuste_forca_pct": -0.6298,
+          "ajuste_ataque_pct": -2.5429,
+          "ajuste_defesa_pct": 1.3374,
+          "ajuste_forca_pct": -0.6217,
           "classificacao": "estável"
         }
       },
       {
         "clube": "Chapecoense",
-        "ataque_log": -0.11978605,
-        "defesa_log": -0.36655335,
-        "multiplicador_ataque": 0.88711021,
-        "multiplicador_protecao_defensiva": 0.69311915,
+        "ataque_log": -0.14563518,
+        "defesa_log": -0.38255487,
+        "multiplicador_ataque": 0.86447303,
+        "multiplicador_protecao_defensiva": 0.68211646,
         "tendencia_recente": {
           "jogos_considerados": 12,
-          "ajuste_ataque_pct": -0.7416,
-          "ajuste_defesa_pct": 0.6418,
-          "ajuste_forca_pct": -0.0523,
+          "ajuste_ataque_pct": -1.7907,
+          "ajuste_defesa_pct": 0.1887,
+          "ajuste_forca_pct": -0.8059,
           "classificacao": "estável"
         }
       }
@@ -328,12 +328,12 @@
     "convergencia": {
       "erro_padrao_maximo_pontos_percentuais": 0.035355,
       "margem_95_maxima_pontos_percentuais": 0.069296,
-      "maior_diferenca_entre_metades_pontos_percentuais": 0.1622
+      "maior_diferenca_entre_metades_pontos_percentuais": 0.1419
     },
     "desempate_residual": {
-      "simulacoes_com_empate_apos_pontos_vitorias_saldo_gols": 16579,
-      "percentual_simulacoes": 0.82895,
-      "pares_residuais": 16648
+      "simulacoes_com_empate_apos_pontos_vitorias_saldo_gols": 16178,
+      "percentual_simulacoes": 0.8089,
+      "pares_residuais": 16226
     }
   },
   "tendencia_recente": {
@@ -350,22 +350,22 @@
       "limite_ajuste_taxa_partida_pct": 10.0,
       "regra": "A forma recente é apenas um ajuste conservador sobre o modelo MAP; nunca substitui campanha acumulada, mando, força ofensiva/defensiva ou tabela restante."
     },
-    "maior_ajuste_absoluto_forca_pct": 2.1305,
-    "maior_ajuste_absoluto_taxa_partida_pct": 6.7026,
+    "maior_ajuste_absoluto_forca_pct": 2.1433,
+    "maior_ajuste_absoluto_taxa_partida_pct": 7.1178,
     "observacao": "Ajuste complementar sem sazonalidade, limitado e separado entre ataque e defesa."
   },
   "sensibilidade_dixon_coles": {
     "rho_testado": 0.08,
     "aplicado_na_producao": false,
     "motivo": "A Execução 1 mostrou melhora de calibração, mas piora nas três regras próprias de pontuação. A versão 1.0 mantém rho=0 e publica esta sensibilidade para reavaliação versionada.",
-    "diferenca_media_absoluta_1x2_pontos_percentuais": 1.245402,
-    "diferenca_maxima_1x2_pontos_percentuais": 2.127951,
+    "diferenca_media_absoluta_1x2_pontos_percentuais": 1.247225,
+    "diferenca_maxima_1x2_pontos_percentuais": 2.124521,
     "alteracao_media_massa_placares_baixos_pontos_percentuais": 0.0
   },
   "diagnostico_af_score": {
     "disponivel": true,
     "cobertura_clubes": 20,
-    "correlacao_pearson_com_forca_map": 0.894229,
+    "correlacao_pearson_com_forca_map": 0.897156,
     "aplicado_na_producao": false,
     "motivo": "O AF-Score não possui série histórica homogênea em 2023–2025. Incluí-lo agora impediria backtesting temporal equivalente e poderia introduzir vazamento."
   },
@@ -392,19 +392,19 @@
         "principais_chances_titulo": [
           {
             "clube": "Palmeiras",
-            "probabilidade_pct": 50.3415
+            "probabilidade_pct": 50.4492
           },
           {
             "clube": "Atlético-MG",
-            "probabilidade_pct": 18.845
+            "probabilidade_pct": 18.77855
           },
           {
             "clube": "Grêmio",
-            "probabilidade_pct": 18.5843
+            "probabilidade_pct": 18.54715
           },
           {
             "clube": "Vasco da Gama",
-            "probabilidade_pct": 12.2292
+            "probabilidade_pct": 12.2251
           }
         ]
       },
@@ -426,11 +426,11 @@
         "principais_chances_titulo": [
           {
             "clube": "Palmeiras",
-            "probabilidade_pct": 55.24925
+            "probabilidade_pct": 55.30215
           },
           {
             "clube": "Estudiantes de La Plata",
-            "probabilidade_pct": 44.75075
+            "probabilidade_pct": 44.69785
           }
         ]
       },
@@ -452,11 +452,11 @@
         "principais_chances_titulo": [
           {
             "clube": "Boca Juniors",
-            "probabilidade_pct": 62.59875
+            "probabilidade_pct": 62.6065
           },
           {
             "clube": "Atlético-MG",
-            "probabilidade_pct": 37.40125
+            "probabilidade_pct": 37.3935
           }
         ]
       }
@@ -464,14 +464,14 @@
     "alocacao_vagas": {
       "vagas_brasileirao_base": 5,
       "vagas_sul_americana": 6,
-      "media_clubes_serie_a_2026_na_libertadores": 7.926505,
+      "media_clubes_serie_a_2026_na_libertadores": 7.926957,
       "minimo_clubes_serie_a_2026_na_libertadores": 7,
       "maximo_clubes_serie_a_2026_na_libertadores": 9,
-      "media_total_clubes_brasileiros_na_libertadores": 7.926505,
+      "media_total_clubes_brasileiros_na_libertadores": 7.926957,
       "minimo_total_clubes_brasileiros_na_libertadores": 7,
       "maximo_total_clubes_brasileiros_na_libertadores": 9,
       "media_vagas_consumidas_por_clubes_brasileiros_fora_da_serie_a_2026": 0.0,
-      "soma_probabilidades_libertadores_pct": 792.6505,
+      "soma_probabilidades_libertadores_pct": 792.69565,
       "soma_probabilidades_sul_americana_pct": 600.0,
       "regra_decomposicao": "vias exclusivas: G5 do Brasileirão primeiro; títulos/copa apenas quando necessários; sobreposições descem como repasse",
       "regra_elegibilidade": "títulos da Copa do Brasil, Libertadores e Sul-Americana classificam mesmo que o clube seja rebaixado; a posição na liga limita apenas as vagas obtidas pelo Brasileirão"
@@ -479,9 +479,9 @@
   },
   "cobertura_dados": {
     "brasileirao": {
-      "referencia_esportiva_em": "2026-10-26T21:58:00-03:00",
-      "partidas_concluidas": 319,
-      "partidas_restantes": 61
+      "referencia_esportiva_em": "2026-10-28T21:28:00-03:00",
+      "partidas_concluidas": 322,
+      "partidas_restantes": 58
     },
     "copas": {
       "todas_consideradas": true,
@@ -542,7 +542,7 @@
     "soma_campeao_pct": 100.0,
     "soma_g4_pct": 400.0,
     "soma_g6_pct": 600.0,
-    "soma_libertadores_consolidada_pct": 792.6505,
+    "soma_libertadores_consolidada_pct": 792.69565,
     "soma_sul_americana_base_pct": 600.0,
     "soma_sul_americana_consolidada_pct": 600.0,
     "soma_rebaixamento_pct": 400.0,
