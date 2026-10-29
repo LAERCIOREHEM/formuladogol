@@ -4,6 +4,7 @@ import { countWebSearchCalls, recordAiUsage, recordProviderUsage, postgamePublic
 import { searchPublicWithGemini, fetchSourceText, extractPublicWithWorkersAI, resolveWorkersAiExtractModel, fetchOpenAiResponses, openAiUsage } from './ai-router.js';
 import { extractSourceWithCache } from './source-extraction-cache.js';
 import { recordPublicSourceObservation, recordPublicResolution } from './postgame-public-observability.js';
+import { discoverFreePublicNews } from './postgame-rss-discovery.js';
 import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, isCandidateEditorialAttendanceSource, evaluateSourceMatchIdentity, buildAttendanceSearchQueries, attendanceSourcePolicyText, officialClubDomainsForTask, matchDayEditorialSources, PREFERRED_EDITORIAL_SOURCE_SUFFIXES, isMultiMatchRoundupSource, extractRoundupMatchBlock, verifiedStadiumCapacity } from './postgame-search-profile.js';
 import { FACTUAL_INTEGRITY_POLICY_VERSION, FACTUAL_INCIDENTS, inspectPostgameFactualIntegrity, quarantinePostgameFactualIntegrity } from './postgame-factual-integrity.js';
 import { attendanceEligibility, POSTGAME_ELIGIBILITY_VERSION, ATTENDANCE_REQUIRED_LEAGUE } from './postgame-competition-eligibility.js';
@@ -1537,6 +1538,18 @@ async function processPublicTask(env, task, now = Date.now()) {
   // sem aguardar que Gemini/OpenAI descubram o endereço via Google Search.
   // Somente Match Identity Gate + dados explícitos autorizam gravar D1.
   if(!isPublicComplete(values)){
+    // Descoberta ABERTA gratuita: RSS genérico de duas buscas na web.
+    // Não usa Gemini/OpenAI, não é autoridade factual, é opcional se falhar.
+    // Throttle persistente por partida evita varredura em todo cron.
+    const rssKey='public_free_rss_v1:'+eventId;
+    const lastRss=Date.parse(text(await metaGet(env,rssKey)));
+    if(!Number.isFinite(lastRss)||now-lastRss>=8*60_000){
+      await metaPut(env,rssKey,nowIso(now));
+      try {
+        const free=await discoverFreePublicNews(task);
+        if(free.urls.length)await cacheDiscoveredSources(env,eventId,free.urls,'bing-rss');
+      }catch(e){console.warn('postgame_free_rss:',text(e?.message||e).slice(0,140));}
+    }
     await cacheDiscoveredSources(env,eventId,matchDayEditorialSources(task),'ge-matchday');
     const freeRoundups=await discoverGeRoundupSources(env,task,now);
     if(freeRoundups.length)await cacheDiscoveredSources(env,eventId,freeRoundups,'ge-roundup-sitemap');
