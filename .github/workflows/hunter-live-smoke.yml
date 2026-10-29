@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/hunter-live-smoke.yml'
+      - 'cloudflare/push-worker/tests/test-hunter-live-sources.mjs'
   workflow_dispatch:
 
 permissions:
@@ -14,6 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch and parse real editorial articles without modifying D1
+        working-directory: cloudflare/push-worker
+        run: node tests/test-hunter-live-sources.mjs
       - name: Hot test — Worker, D1, site and Gemini Google Search
         shell: bash
         run: |
