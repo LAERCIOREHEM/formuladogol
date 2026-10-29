@@ -167,7 +167,15 @@ export function isCandidateEditorialAttendanceSource(value, task = null) {
   if (Object.values(TEAM_SEARCH_PROFILES).some((profile)=>(profile.officialDomains||[]).some((domain)=>host===domain||host.endsWith('.'+domain)))) return false;
   let path='';
   try { path=decodeURIComponent(url.pathname).toLowerCase(); } catch (_) { return false; }
-  if (path.length<15 || !/(?:\/20\d{2}\/\d{1,2}\/\d{1,2}\/|\/(?:noticias?|esportes?|futebol|sports|news|brasileirao|jogos?|partida|materia)(?:\/|-))/i.test(path)) return false;
+  // Jornal local pode publicar ficha técnica num slug da raiz sem /noticias/.
+  // O slug do confronto, junto ao Match Identity Gate posterior, é evidência
+  // mais forte que impor caminhos ou uma lista fechada de domínios.
+  const slug=(name)=>teamSearchVariants(name,8)
+    .map((alias)=>normalizeText(alias).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''))
+    .filter((alias)=>alias.length>=4);
+  const hasTeams=(name)=>slug(name).some((alias)=>path.includes(alias));
+  const explicitNewsPath=/(?:\/20\d{2}\/\d{1,2}\/\d{1,2}\/|\/(?:noticias?|esportes?|futebol|sports|news|brasileirao|jogos?|partida|materia)(?:\/|-))/i.test(path);
+  if (path.length<15 || (!explicitNewsPath && !(hasTeams(task?.home)&&hasTeams(task?.away)))) return false;
   return true;
 }
 
