@@ -1989,6 +1989,7 @@ export async function postgameStatus(env) {
     ok: true,
     engine: 'cloudflare-postgame-fastlane',
     version: POSTGAME_POLICY_VERSION,
+    hunterIntegrationRevision: 'R10R29.1',
     storedPolicyVersion,
     publicPolicy: PUBLIC_POLICY,
     searchProfileVersion: POSTGAME_SEARCH_PROFILE_VERSION,
