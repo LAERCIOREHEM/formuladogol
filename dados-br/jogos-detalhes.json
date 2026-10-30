@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-29T23:55:49.288531-03:00",
+  "gerado_em": "2026-10-29T23:59:31.908553-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 327,
   "total_com_estatisticas": 327,
-  "total_com_publico": 325,
+  "total_com_publico": 327,
   "total_com_eventos": 327,
   "total_com_jogadores": 327,
   "total_eventos_validados": 327,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Arena do Grêmio",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 35025,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/29/gremio-vence-a-2seguida-supera-o-atheltico-pr-e-deixa-a-zona-de-rebaixamento-do-brasileirao.amp.htm",
       "arbitro": "",
       "stats": [
         {
@@ -587,7 +587,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T23:55:32.070347-03:00"
+      "atualizado_em": "2026-10-29T23:55:32.070347-03:00",
+      "renda": 1527422.6
     },
     "401841292": {
       "event_id": "401841292",
@@ -599,9 +600,9 @@
       "placar_mandante": 1,
       "placar_visitante": 4,
       "estadio": "Joao Havelange Stadium",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 28041,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.tribunadosertao.com.br/esportes/2026/10/29/1009629-pedro-e-samuel-lino-marcam-dois-cada-flamengo-goleia-vasco-e-abre-tres-pontos-na-lideranca",
       "arbitro": "",
       "stats": [
         {
@@ -1148,7 +1149,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T23:55:34.563469-03:00"
+      "atualizado_em": "2026-10-29T23:55:34.563469-03:00",
+      "renda": 1714434
     },
     "401841288": {
       "event_id": "401841288",
@@ -184850,5 +184852,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 303,
+  "total_com_renda": 327
 }

@@ -1,31 +1,34 @@
 {
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
-  "jogos_finalizados": 326,
-  "jogos_com_publico": 325,
-  "jogos_sem_publico": 1,
-  "publico_total": 8047768,
-  "jogos_com_renda": 325,
-  "aguardando_fonte": [
-    {
-      "event_id": "401841292",
-      "mandante": "Vasco da Gama",
-      "visitante": "Flamengo",
-      "estado": "AGUARDANDO_FONTE"
-    }
-  ],
+  "jogos_finalizados": 327,
+  "jogos_com_publico": 327,
+  "jogos_sem_publico": 0,
+  "publico_total": 8110834,
+  "jogos_com_renda": 327,
+  "aguardando_fonte": [],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
     {
-      "event_id": "401841292",
-      "tipo_publico": "",
-      "publico_presente": null,
+      "event_id": "401841290",
+      "tipo_publico": "presente",
+      "publico_presente": 35025,
       "publico_pagante": null,
-      "renda": null,
-      "fonte_publico": "",
-      "origem": "",
-      "estado": "AGUARDANDO_FONTE"
+      "renda": 1527422.6,
+      "fonte_publico": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/29/gremio-vence-a-2seguida-supera-o-atheltico-pr-e-deixa-a-zona-de-rebaixamento-do-brasileirao.amp.htm",
+      "origem": "Ficha técnica UOL/Agência Estado, 29/10/2026; conferida por leitura e parser reais em GitHub Actions 40994668159",
+      "estado": "CONFIRMADO"
+    },
+    {
+      "event_id": "401841292",
+      "tipo_publico": "presente",
+      "publico_presente": 28041,
+      "publico_pagante": null,
+      "renda": 1714434.0,
+      "fonte_publico": "https://www.tribunadosertao.com.br/esportes/2026/10/29/1009629-pedro-e-samuel-lino-marcam-dois-cada-flamengo-goleia-vasco-e-abre-tres-pontos-na-lideranca",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
     },
     {
       "event_id": "401841288",
@@ -3278,5 +3281,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-10-29T22:26:41.190673-03:00"
+  "gerado_em": "2026-10-29T23:59:32.988031-03:00"
 }
