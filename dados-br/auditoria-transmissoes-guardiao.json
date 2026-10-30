@@ -6583,14 +6583,69 @@
       ],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: Grêmio x Athletico-PR, Brasileirão 2026, 33ª rodada, nesta quinta-feira, 29/10/2026, às 21h30 (de Brasília), na Arena do Grêmio, tem transmissão integral de SporTV e Premiere. GE TV não integra a grade da partida: o link do YouTube informado é identificado como “AQUECIMENTO AO VIVO”, isto é, conteúdo pré-jogo, não a transmissão completa."
+    },
+    {
+      "event_id": "401841295",
+      "jogo": "Corinthians x Mirassol",
+      "data_iso": "2026-10-30T20:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-10-30T18:58:21-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "GE TV",
+        "Premiere",
+        "SporTV"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml",
+        "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+        "https://ge.globo.com/futebol/times/corinthians",
+        "https://ge.globo.com/futebol/times/sao-paulo/noticia/2026/10/13/sao-paulo-x-corinthians-cbf-confirma-classico-na-vila-belmiro.ghtml",
+        "https://ge.globo.com/google/amp/futebol/times/corinthians/noticia/2026/10/09/classicos-e-confrontos-diretos-como-sera-a-sequencia-decisiva-do-corinthians-no-brasileirao.ghtml",
+        "https://ge.globo.com/google/amp/futebol/times/corinthians/noticia/2026/10/30/cbf-define-datas-para-jogos-do-corinthians-contra-botafogo-e-atletico-mg-pelo-brasileirao.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://ge.globo.com/google/amp/sp/futebol/brasileirao-serie-a/noticia/2026/10/30/corinthians-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sp/futebol/brasileirao-serie-a/jogo/30-10-2026/corinthians-mirassol.ghtml",
+        "https://ge.globo.com/sp/tem-esporte/futebol/times/mirassol/noticia/2026/09/28/cbf-divulga-datas-e-horarios-da-31a-a-34a-rodada-da-serie-a-veja-os-jogos-do-mirassol.ghtml",
+        "https://ge.globo.com/sportv",
+        "https://www.youtube.com/watch?v=5WLKtG5wAUU",
+        "https://www.youtube.com/watch?v=clGHdlIhx9Q"
+      ],
+      "canais_depois": [
+        "Premiere",
+        "SporTV"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/google/amp/sp/futebol/brasileirao-serie-a/noticia/2026/10/30/corinthians-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=FcqUaxsQHNQ",
+          "scope": "pre_game",
+          "valid_for_match": false,
+          "reason": "O título informado identifica o conteúdo como “AQUECIMENTO AO VIVO”; trata-se de pré-jogo, não de evidência de transmissão integral. A confirmação editorial do ge aponta exclusivamente Premiere e SporTV para o jogo."
+        }
+      ],
+      "youtube_removidos": [
+        "https://www.youtube.com/watch?v=FcqUaxsQHNQ"
+      ],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Corinthians x Mirassol, Brasileirão Série A 2026, 33ª rodada, sexta-feira (30/10/2026), às 20h de Brasília, na Neo Química Arena. A transmissão integral é de Premiere e SporTV. GE TV não entra na grade: o URL do YouTube informado é de aquecimento/pré-jogo, não há evidência de transmissão completa da partida."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841290",
-    "jogo": "Grêmio x Athletico-PR",
-    "data_iso": "2026-10-29T21:30:00-03:00",
+    "event_id": "401841295",
+    "jogo": "Corinthians x Mirassol",
+    "data_iso": "2026-10-30T20:00:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-10-29T20:13:04-03:00",
+    "executado_em": "2026-10-30T18:58:21-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
@@ -6601,18 +6656,20 @@
     "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/ajuda",
+      "https://ge.globo.com/",
       "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml",
       "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
-      "https://ge.globo.com/google/amp/rs/futebol/times/gremio/noticia/2026/10/29/gremio-encara-o-athletico-com-chance-de-sair-do-z-4-e-se-inspira-em-virada-de-chave-de-2016.ghtml",
-      "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/10/07/remo-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/08/athletico-pr-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/pr/futebol/times/athletico-pr/noticia/2026/09/28/agenda-do-athletico-veja-datas-e-horarios-dos-jogos-ate-a-34a-rodada-do-brasileirao.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/jogo/29-10-2026/gremio-atletico-pr.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/10/29/gremio-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/gremio-x-atletico-go-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
-      "https://ge.globo.com/sportv"
+      "https://ge.globo.com/futebol/times/corinthians",
+      "https://ge.globo.com/futebol/times/sao-paulo/noticia/2026/10/13/sao-paulo-x-corinthians-cbf-confirma-classico-na-vila-belmiro.ghtml",
+      "https://ge.globo.com/google/amp/futebol/times/corinthians/noticia/2026/10/09/classicos-e-confrontos-diretos-como-sera-a-sequencia-decisiva-do-corinthians-no-brasileirao.ghtml",
+      "https://ge.globo.com/google/amp/futebol/times/corinthians/noticia/2026/10/30/cbf-define-datas-para-jogos-do-corinthians-contra-botafogo-e-atletico-mg-pelo-brasileirao.ghtml",
+      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+      "https://ge.globo.com/google/amp/sp/futebol/brasileirao-serie-a/noticia/2026/10/30/corinthians-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/jogo/30-10-2026/corinthians-mirassol.ghtml",
+      "https://ge.globo.com/sp/tem-esporte/futebol/times/mirassol/noticia/2026/09/28/cbf-divulga-datas-e-horarios-da-31a-a-34a-rodada-da-serie-a-veja-os-jogos-do-mirassol.ghtml",
+      "https://ge.globo.com/sportv",
+      "https://www.youtube.com/watch?v=5WLKtG5wAUU",
+      "https://www.youtube.com/watch?v=clGHdlIhx9Q"
     ],
     "canais_depois": [
       "Premiere",
@@ -6621,22 +6678,22 @@
     "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/10/29/gremio-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/google/amp/sp/futebol/brasileirao-serie-a/noticia/2026/10/30/corinthians-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
       "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml"
     ],
     "youtube": [
       {
-        "url": "https://www.youtube.com/watch?v=xwhPKMVtapI",
+        "url": "https://www.youtube.com/watch?v=FcqUaxsQHNQ",
         "scope": "pre_game",
         "valid_for_match": false,
-        "reason": "O título do vídeo no dossiê informa “GRÊMIO X ATHLETICO-PR | AQUECIMENTO AO VIVO”; trata-se de aquecimento/pré-jogo e não há evidência de transmissão integral da partida."
+        "reason": "O título informado identifica o conteúdo como “AQUECIMENTO AO VIVO”; trata-se de pré-jogo, não de evidência de transmissão integral. A confirmação editorial do ge aponta exclusivamente Premiere e SporTV para o jogo."
       }
     ],
     "youtube_removidos": [
-      "https://www.youtube.com/watch?v=xwhPKMVtapI"
+      "https://www.youtube.com/watch?v=FcqUaxsQHNQ"
     ],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: Grêmio x Athletico-PR, Brasileirão 2026, 33ª rodada, nesta quinta-feira, 29/10/2026, às 21h30 (de Brasília), na Arena do Grêmio, tem transmissão integral de SporTV e Premiere. GE TV não integra a grade da partida: o link do YouTube informado é identificado como “AQUECIMENTO AO VIVO”, isto é, conteúdo pré-jogo, não a transmissão completa."
+    "resumo": "Confirmado para o Brasil: Corinthians x Mirassol, Brasileirão Série A 2026, 33ª rodada, sexta-feira (30/10/2026), às 20h de Brasília, na Neo Química Arena. A transmissão integral é de Premiere e SporTV. GE TV não entra na grade: o URL do YouTube informado é de aquecimento/pré-jogo, não há evidência de transmissão completa da partida."
   },
-  "atualizado_em": "2026-10-29T20:13:04-03:00"
+  "atualizado_em": "2026-10-30T18:58:21-03:00"
 }

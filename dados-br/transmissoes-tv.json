@@ -25,29 +25,46 @@
       "data_iso": "2026-10-30T20:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "GE TV"
+        "Premiere",
+        "SporTV"
       ],
-      "origem": "YouTube oficial validado",
+      "origem": "Guardião IA verificado",
       "confianca": "confirmado",
-      "estavel": false,
+      "estavel": true,
       "exclusivo": false,
       "fontes": [
         {
-          "fonte": "YouTube oficial validado",
+          "fonte": "Guardião IA verificado",
           "canais": [
-            "GE TV"
+            "Premiere",
+            "SporTV"
           ],
-          "referencia": "https://www.youtube.com/watch?v=FcqUaxsQHNQ",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
-          "autoridade": 120,
-          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+          "referencia": "https://ge.globo.com/google/amp/sp/futebol/brasileirao-serie-a/noticia/2026/10/30/corinthians-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml | https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml",
+          "capturado_em": "2026-10-30T18:58:21-03:00",
+          "autoridade": 900,
+          "detalhe": "grade completa reconciliada por web_search; confiança=0.99; checkpoint=-90"
         }
       ],
       "acessos": [
         {
-          "nome": "Assistir na GE TV",
-          "url": "https://www.youtube.com/watch?v=FcqUaxsQHNQ",
-          "tipo": "player_oficial"
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "SporTV no Globoplay",
+          "url": "https://globoplay.globo.com/canais/sportv-us/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "SporTV na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -72,7 +89,7 @@
             "Premiere"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -111,7 +128,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=baGfKQNcuc4",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -149,7 +166,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -207,7 +224,7 @@
             "GE TV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -266,7 +283,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -341,7 +358,7 @@
             "GE TV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -400,7 +417,7 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=cOjixSohLkY",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -438,7 +455,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -492,7 +509,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -531,7 +548,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=TzBl51tTBmU",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -569,7 +586,7 @@
             "GE TV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -628,7 +645,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -707,7 +724,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -776,7 +793,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=89tPGaf7W4s",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -810,7 +827,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=iI_CDCgFJ1Y",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -848,7 +865,7 @@
             "GE TV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -907,7 +924,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -982,7 +999,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1047,7 +1064,7 @@
             "GE TV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1116,7 +1133,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1195,7 +1212,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1268,7 +1285,7 @@
             "GE TV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1317,7 +1334,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1360,7 +1377,7 @@
             "GE TV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1419,7 +1436,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1498,7 +1515,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1577,7 +1594,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1652,7 +1669,7 @@
             "GE TV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1711,7 +1728,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1749,7 +1766,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-10-30T18:31:55-03:00",
+          "capturado_em": "2026-10-30T18:58:32-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1783,5 +1800,5 @@
       ]
     }
   },
-  "atualizado_em": "2026-10-30T18:31:55-03:00"
+  "atualizado_em": "2026-10-30T18:58:32-03:00"
 }
