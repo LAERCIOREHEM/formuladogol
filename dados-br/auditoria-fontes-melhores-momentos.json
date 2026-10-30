@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-10-29T00:46:31-03:00",
+  "atualizado_em": "2026-10-29T22:21:42-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
     "regra": "GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video e CazéTV são prioritários. UOL Esporte é aceito como fallback após 48 horas ou por vínculo manual conferido.",
@@ -13,18 +13,27 @@
     "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais."
   },
   "resumo": {
-    "jogos_resultados": 324,
-    "jogos_com_video": 324,
-    "ge_globo": 309,
+    "jogos_resultados": 326,
+    "jogos_com_video": 325,
+    "ge_globo": 310,
     "amazon_prime_video": 4,
     "cazetv": 8,
     "uol_esporte": 3,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 1,
     "percentual_fontes_preferidas": 100.0
   },
   "outros_sites_ainda_em_uso": [],
-  "sem_video": [],
+  "sem_video": [
+    {
+      "event_id": "401841292",
+      "rodada": 33,
+      "mandante": "Vasco da Gama",
+      "visitante": "Flamengo",
+      "placar_mandante": 1,
+      "placar_visitante": 4
+    }
+  ],
   "detalhamento": {
     "ge_globo": [
       {
@@ -4905,6 +4914,22 @@
         "channel_title": "",
         "titulo": "VITÓRIA 1 X 1 ATHLETICO-PR | MELHORES MOMENTOS | 32ª RODADA | BRASILEIRÃO 2026 | ge tv",
         "url": "https://www.youtube.com/watch?v=JDhBWi--hco",
+        "confianca": 1.0
+      },
+      {
+        "event_id": "401841288",
+        "rodada": 33,
+        "mandante": "Atlético-MG",
+        "visitante": "Cruzeiro",
+        "placar_mandante": 0,
+        "placar_visitante": 1,
+        "categoria_fonte": "ge_globo",
+        "origem_vinculo": "automatico",
+        "fonte": "GE TV / YouTube",
+        "fonte_busca": "cloudflare-fastlane-youtube-uploads",
+        "channel_title": "GE TV",
+        "titulo": "ATLÉTICO-MG 0 X 1 CRUZEIRO | MELHORES MOMENTOS | 33ª RODADA | BRASILEIRÃO 2026 | ge.globo",
+        "url": "https://www.youtube.com/watch?v=NejcN3WcXLU",
         "confianca": 1.0
       },
       {
