@@ -1,0 +1,33 @@
+name: Inspect UOL Gremio Attendance 2026-10-29
+on:
+  pull_request:
+    paths: ['.github/workflows/inspect-uol-gremio-20261029.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read actual UOL article with Hunter fetcher
+        working-directory: cloudflare/push-worker
+        run: |
+          node --input-type=module <<'NODE'
+          import { fetchSourceText } from './src/ai-router.js';
+          import { evaluateSourceMatchIdentity } from './src/postgame-search-profile.js';
+          import {extractPublicFromTextDeterministic} from './src/postgame-fastlane.js';
+          const url='https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/29/gremio-vence-a-2seguida-supera-o-atheltico-pr-e-deixa-a-zona-de-rebaixamento-do-brasileirao.amp.htm';
+          const source=await fetchSourceText(url);
+          console.log('SOURCE',JSON.stringify({ok:source.ok,reason:source.reason,length:source.text?.length,url:source.url}));
+          if(!source.ok)process.exit(2);
+          const task={event_id:'401841290',league:'bra.1',home:'Grêmio',away:'Athletico-PR',kickoff:'2026-10-29T21:30:00-03:00',final_at:'2026-10-29T23:38:39-03:00',home_score:2,away_score:0,round:33,stadium:'Arena do Grêmio'};
+          const identity=evaluateSourceMatchIdentity(task,source.text,url);
+          console.log('IDENTITY',JSON.stringify({accepted:identity.accepted,score:identity.score,reasons:identity.reasons,conflicts:identity.conflicts,windowLength:identity.window?.length}));
+          console.log('PARSED',JSON.stringify(extractPublicFromTextDeterministic(identity.window,url)));
+          const matches=[...source.text.matchAll(/p[úu]blico|pagantes?|renda|bilheteria/gi)];
+          for(const m of matches.slice(-22))console.log('ARTICLE_MATCH',JSON.stringify(source.text.slice(Math.max(0,m.index-90),m.index+190).replace(/\\s+/g,' ')));
+          NODE
