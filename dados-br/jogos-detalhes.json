@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-29T22:07:10.613907-03:00",
+  "gerado_em": "2026-10-29T22:26:40.347053-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 326,
   "total_com_estatisticas": 326,
-  "total_com_publico": 324,
+  "total_com_publico": 325,
   "total_com_eventos": 326,
   "total_com_jogadores": 326,
   "total_eventos_validados": 326,
@@ -581,9 +581,9 @@
       "placar_mandante": 0,
       "placar_visitante": 1,
       "estadio": "Arena MRV",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 42058,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.cnnbrasil.com.br/esportes/futebol/atletico-mineiro/atletico-mg-lucra-quase-r18-milhao-em-classico-contra-o-cruzeiro",
       "arbitro": "",
       "stats": [
         {
@@ -1143,7 +1143,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T22:06:57.667253-03:00"
+      "atualizado_em": "2026-10-29T22:06:57.667253-03:00",
+      "renda": 3034566.5
     },
     "401841296": {
       "event_id": "401841296",
@@ -184270,5 +184271,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 303,
+  "total_com_renda": 325
 }

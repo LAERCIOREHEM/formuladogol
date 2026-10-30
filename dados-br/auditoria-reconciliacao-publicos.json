@@ -1,15 +1,42 @@
 {
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
-  "jogos_finalizados": 324,
-  "jogos_com_publico": 324,
-  "jogos_sem_publico": 0,
-  "publico_total": 8005710,
-  "jogos_com_renda": 324,
-  "aguardando_fonte": [],
+  "jogos_finalizados": 326,
+  "jogos_com_publico": 325,
+  "jogos_sem_publico": 1,
+  "publico_total": 8047768,
+  "jogos_com_renda": 325,
+  "aguardando_fonte": [
+    {
+      "event_id": "401841292",
+      "mandante": "Vasco da Gama",
+      "visitante": "Flamengo",
+      "estado": "AGUARDANDO_FONTE"
+    }
+  ],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
+    {
+      "event_id": "401841292",
+      "tipo_publico": "",
+      "publico_presente": null,
+      "publico_pagante": null,
+      "renda": null,
+      "fonte_publico": "",
+      "origem": "",
+      "estado": "AGUARDANDO_FONTE"
+    },
+    {
+      "event_id": "401841288",
+      "tipo_publico": "presente",
+      "publico_presente": 42058,
+      "publico_pagante": null,
+      "renda": 3034566.5,
+      "fonte_publico": "https://www.cnnbrasil.com.br/esportes/futebol/atletico-mineiro/atletico-mg-lucra-quase-r18-milhao-em-classico-contra-o-cruzeiro",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
+    },
     {
       "event_id": "401841296",
       "tipo_publico": "presente",
@@ -3251,5 +3278,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-10-29T09:51:47.806773-03:00"
+  "gerado_em": "2026-10-29T22:26:41.190673-03:00"
 }
