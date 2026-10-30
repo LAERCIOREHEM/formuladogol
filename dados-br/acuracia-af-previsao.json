@@ -2,7 +2,7 @@
   "schema_version": 1,
   "projeto": "AF-Previsão",
   "temporada": 2026,
-  "gerado_em": "2026-10-29T22:08:34-03:00",
+  "gerado_em": "2026-10-29T23:39:18-03:00",
   "status": "ok",
   "escopo_publico": {
     "inicio_historico_classificacao": "2026-07-17T22:05:00-03:00",
@@ -20,11 +20,11 @@
     "ultima_previsao_temporada": "2026-10-29T21:53:00-03:00"
   },
   "jogos": {
-    "jogos_avaliados": 186,
+    "jogos_avaliados": 188,
     "maior_probabilidade": {
-      "amostra": 186,
-      "confirmadas": 97,
-      "taxa_confirmacao_pct": 52.15
+      "amostra": 188,
+      "confirmadas": 99,
+      "taxa_confirmacao_pct": 52.66
     },
     "alta_confianca_80": {
       "amostra": 0,
@@ -58,20 +58,20 @@
           20,
           30
         ],
-        "amostra": 262,
-        "probabilidade_media_pct": 25.3998,
-        "frequencia_observada_pct": 24.4275,
-        "erro_absoluto_pp": 0.9723
+        "amostra": 264,
+        "probabilidade_media_pct": 25.4172,
+        "frequencia_observada_pct": 24.2424,
+        "erro_absoluto_pp": 1.1747
       },
       {
         "faixa_pct": [
           30,
           40
         ],
-        "amostra": 77,
-        "probabilidade_media_pct": 34.6351,
-        "frequencia_observada_pct": 40.2597,
-        "erro_absoluto_pp": 5.6246
+        "amostra": 81,
+        "probabilidade_media_pct": 34.71,
+        "frequencia_observada_pct": 40.7407,
+        "erro_absoluto_pp": 6.0308
       },
       {
         "faixa_pct": [
@@ -115,8 +115,8 @@
       }
     ],
     "metricas_tecnicas": {
-      "brier_multiclasse_medio": 0.19267539,
-      "log_loss_medio": 0.9729148
+      "brier_multiclasse_medio": 0.19268431,
+      "log_loss_medio": 0.97288413
     },
     "por_rodada": [
       {
@@ -251,12 +251,12 @@
       },
       {
         "rodada": 33,
-        "jogos_avaliados": 14,
-        "maior_probabilidade_avaliada": 14,
-        "maior_probabilidade_confirmada": 8,
+        "jogos_avaliados": 16,
+        "maior_probabilidade_avaliada": 16,
+        "maior_probabilidade_confirmada": 10,
         "previsoes_fortes_60_total": 2,
         "previsoes_fortes_60_confirmadas": 2,
-        "taxa_confirmacao_pct": 57.14,
+        "taxa_confirmacao_pct": 62.5,
         "taxa_fortes_60_pct": 100.0
       }
     ]

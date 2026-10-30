@@ -1,15 +1,594 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-29T22:26:40.347053-03:00",
+  "gerado_em": "2026-10-29T23:38:58.924895-03:00",
   "fonte": "ESPN summary + scoreboard",
-  "total_jogos": 326,
-  "total_com_estatisticas": 326,
+  "total_jogos": 327,
+  "total_com_estatisticas": 327,
   "total_com_publico": 325,
-  "total_com_eventos": 326,
-  "total_com_jogadores": 326,
-  "total_eventos_validados": 326,
+  "total_com_eventos": 327,
+  "total_com_jogadores": 327,
+  "total_eventos_validados": 327,
   "total_eventos_pendentes_detalhes": 0,
   "jogos": {
+    "401841290": {
+      "event_id": "401841290",
+      "event_id_fonte_detalhes": "401841290",
+      "rodada": 33,
+      "data_iso": "2026-10-29T21:30",
+      "mandante": "Grêmio",
+      "visitante": "Athletico-PR",
+      "placar_mandante": 2,
+      "placar_visitante": 0,
+      "estadio": "Arena do Grêmio",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "29.6%",
+          "away": "70.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "19",
+          "away": "16"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "7",
+          "away": "7"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "17"
+        },
+        {
+          "nome": "Defesas",
+          "home": "4",
+          "away": "3"
+        },
+        {
+          "nome": "Passes",
+          "home": "229",
+          "away": "542"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "168",
+          "away": "490"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "70%",
+          "away": "90%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "5",
+          "away": "18"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "10",
+          "away": "9"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "8",
+          "away": "33"
+        },
+        {
+          "nome": "Cortes",
+          "home": "37",
+          "away": "23"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "6",
+          "away": "8"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "4",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "0"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "29.6%",
+          "away": "70.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "19",
+          "away": "16"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "7",
+          "away": "7"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "17"
+        },
+        {
+          "nome": "Defesas",
+          "home": "4",
+          "away": "3"
+        },
+        {
+          "nome": "Passes",
+          "home": "229",
+          "away": "542"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "168",
+          "away": "490"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "70%",
+          "away": "90%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "5",
+          "away": "18"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "10",
+          "away": "9"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "8",
+          "away": "33"
+        },
+        {
+          "nome": "Cortes",
+          "home": "37",
+          "away": "23"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "6",
+          "away": "8"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "4",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "0"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "39'",
+          "jogador": "Marlon",
+          "time": "Grêmio",
+          "assistencias": [],
+          "descricao": "Goal - Free-kick 138 Goal! Grêmio 1, Athletico Paranaense 0. Marlon (Grêmio) from a free kick with a left footed shot to the top left corner. Marlon Goal - Free-kick"
+        },
+        {
+          "minuto": "52'",
+          "jogador": "Fabián Balbuena",
+          "time": "Grêmio",
+          "assistencias": [],
+          "descricao": "Goal 70 Goal! Grêmio 2, Athletico Paranaense 0. Fabián Balbuena (Grêmio) right footed shot from very close range to the bottom right corner following a corner. Fabián Balbuena Goal"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "23'",
+          "jogador": "Juan Portilla",
+          "time": "Athletico-PR",
+          "descricao": "Yellow Card 94 Juan Portilla (Athletico Paranaense) is shown the yellow card for a bad foul. Juan Portilla Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "29'",
+          "jogador": "José Enamorado",
+          "time": "Grêmio",
+          "descricao": "Yellow Card 94 José Enamorado (Grêmio) is shown the yellow card for a bad foul. José Enamorado Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "37'",
+          "jogador": "Leonardo Derik",
+          "time": "Athletico-PR",
+          "descricao": "Yellow Card 94 Léo Derik (Athletico Paranaense) is shown the yellow card for a bad foul. Leonardo Derik Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "66'",
+          "jogador": "Carlos Vinícius",
+          "time": "Grêmio",
+          "descricao": "Yellow Card 94 Carlos Vinícius (Grêmio) is shown the yellow card. Carlos Vinícius Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "69'",
+          "jogador": "Erick Noriega",
+          "time": "Grêmio",
+          "descricao": "Yellow Card 94 Erick Noriega (Grêmio) is shown the yellow card for a bad foul. Erick Noriega Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "88'",
+          "jogador": "Bruno Zapelli",
+          "time": "Athletico-PR",
+          "descricao": "Yellow Card 94 Bruno Zapelli (Athletico Paranaense) is shown the yellow card for a bad foul. Bruno Zapelli Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "90'+2'",
+          "jogador": "Weverton",
+          "time": "Grêmio",
+          "descricao": "Yellow Card 94 Weverton (Grêmio) is shown the yellow card. Weverton Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "381170",
+          "nome": "Arthur Dias",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "361359",
+          "nome": "João Cruz",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "270242",
+          "nome": "Juan Felipe Aguirre",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "94976",
+          "nome": "Juan Portilla",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "268476",
+          "nome": "Kevin Viveros",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "338881",
+          "nome": "Leonardo Derik",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "380327",
+          "nome": "Leozinho",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "309499",
+          "nome": "Lucas Esquivel",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "113352",
+          "nome": "Luiz Gustavo",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "322655",
+          "nome": "Mycael",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "197049",
+          "nome": "Stiven Mendoza",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "296574",
+          "nome": "Bruno Zapelli",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "361357",
+          "nome": "Eduardo",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "287688",
+          "nome": "Gastón Benavídez",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "378910",
+          "nome": "Jorge Rivaldo",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "340596",
+          "nome": "Kerwin Vargas",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "252576",
+          "nome": "Carlos Vinícius",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "303030",
+          "nome": "Erick Noriega",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "199101",
+          "nome": "Fabián Balbuena",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "269079",
+          "nome": "Francis Amuzu",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "314603",
+          "nome": "Gustavo Martins",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "213260",
+          "nome": "João Pedro",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "286714",
+          "nome": "José Enamorado",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "229121",
+          "nome": "Marlon",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "238449",
+          "nome": "Mathías Villasanti",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "383983",
+          "nome": "Wallace",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "198983",
+          "nome": "Weverton",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "95558",
+          "nome": "Caio Paulista",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "213879",
+          "nome": "Dodi",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "187100",
+          "nome": "Martin Braithwaite",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "287664",
+          "nome": "Mateus Tetê",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "286201",
+          "nome": "Wagner Leonardo",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Grêmio": 2,
+          "Athletico-PR": 0
+        },
+        "gols_extraidos": {
+          "Grêmio": 2,
+          "Athletico-PR": 0
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Grêmio": {
+            "amarelo": 4,
+            "vermelho": 0
+          },
+          "Athletico-PR": {
+            "amarelo": 3,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Grêmio": {
+            "amarelo": 4,
+            "vermelho": 0
+          },
+          "Athletico-PR": {
+            "amarelo": 3,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-10-29T23:38:42.525312-03:00"
+    },
     "401841292": {
       "event_id": "401841292",
       "event_id_fonte_detalhes": "401841292",
@@ -27,8 +606,8 @@
       "stats": [
         {
           "nome": "Posse",
-          "home": "55.5%",
-          "away": "44.5%"
+          "home": "55.7%",
+          "away": "44.3%"
         },
         {
           "nome": "Finalizações",
@@ -63,12 +642,12 @@
         },
         {
           "nome": "Passes",
-          "home": "587",
+          "home": "592",
           "away": "481"
         },
         {
           "nome": "Passes certos",
-          "home": "518",
+          "home": "521",
           "away": "404"
         },
         {
@@ -79,7 +658,7 @@
         {
           "nome": "Desarmes",
           "home": "12",
-          "away": "15"
+          "away": "13"
         },
         {
           "nome": "Interceptações",
@@ -94,7 +673,7 @@
         {
           "nome": "Cortes",
           "home": "10",
-          "away": "33"
+          "away": "34"
         },
         {
           "nome": "Escanteios",
@@ -120,8 +699,8 @@
       "estatisticas": [
         {
           "nome": "Posse",
-          "home": "55.5%",
-          "away": "44.5%"
+          "home": "55.7%",
+          "away": "44.3%"
         },
         {
           "nome": "Finalizações",
@@ -156,12 +735,12 @@
         },
         {
           "nome": "Passes",
-          "home": "587",
+          "home": "592",
           "away": "481"
         },
         {
           "nome": "Passes certos",
-          "home": "518",
+          "home": "521",
           "away": "404"
         },
         {
@@ -172,7 +751,7 @@
         {
           "nome": "Desarmes",
           "home": "12",
-          "away": "15"
+          "away": "13"
         },
         {
           "nome": "Interceptações",
@@ -187,7 +766,7 @@
         {
           "nome": "Cortes",
           "home": "10",
-          "away": "33"
+          "away": "34"
         },
         {
           "nome": "Escanteios",
@@ -569,7 +1148,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T22:06:54.883330-03:00"
+      "atualizado_em": "2026-10-29T23:38:45.167175-03:00"
     },
     "401841288": {
       "event_id": "401841288",
@@ -1143,7 +1722,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T22:06:57.667253-03:00",
+      "atualizado_em": "2026-10-29T23:38:47.539749-03:00",
       "renda": 3034566.5
     },
     "401841296": {
@@ -1738,7 +2317,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T22:07:00.363657-03:00",
+      "atualizado_em": "2026-10-29T23:38:49.783115-03:00",
       "publico_pagante": 21379,
       "renda": 628385.5
     },
@@ -2284,7 +2863,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T22:07:02.991170-03:00",
+      "atualizado_em": "2026-10-29T23:38:52.028626-03:00",
       "publico_pagante": 9760,
       "renda": 378700
     },
@@ -2853,7 +3432,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T22:07:05.509777-03:00",
+      "atualizado_em": "2026-10-29T23:38:54.278716-03:00",
       "renda": 558839.5
     },
     "401841291": {
@@ -3394,7 +3973,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T22:07:08.047316-03:00",
+      "atualizado_em": "2026-10-29T23:38:56.579578-03:00",
       "renda": 49340
     },
     "401841293": {
@@ -3959,7 +4538,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T22:07:10.529840-03:00",
+      "atualizado_em": "2026-10-29T23:38:58.840320-03:00",
       "renda": 446085
     },
     "401841286": {
@@ -184271,7 +184850,5 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  },
-  "total_com_publico_pagante": 303,
-  "total_com_renda": 325
+  }
 }
