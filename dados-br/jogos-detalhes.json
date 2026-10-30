@@ -1,15 +1,576 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-29T21:39:12.060029-03:00",
+  "gerado_em": "2026-10-29T22:07:10.613907-03:00",
   "fonte": "ESPN summary + scoreboard",
-  "total_jogos": 325,
-  "total_com_estatisticas": 325,
+  "total_jogos": 326,
+  "total_com_estatisticas": 326,
   "total_com_publico": 324,
-  "total_com_eventos": 325,
-  "total_com_jogadores": 325,
-  "total_eventos_validados": 325,
+  "total_com_eventos": 326,
+  "total_com_jogadores": 326,
+  "total_eventos_validados": 326,
   "total_eventos_pendentes_detalhes": 0,
   "jogos": {
+    "401841292": {
+      "event_id": "401841292",
+      "event_id_fonte_detalhes": "401841292",
+      "rodada": 33,
+      "data_iso": "2026-10-29T20:00",
+      "mandante": "Vasco da Gama",
+      "visitante": "Flamengo",
+      "placar_mandante": 1,
+      "placar_visitante": 4,
+      "estadio": "Joao Havelange Stadium",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "55.5%",
+          "away": "44.5%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "15",
+          "away": "14"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "6"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "10%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "14",
+          "away": "8"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Passes",
+          "home": "587",
+          "away": "481"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "518",
+          "away": "404"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "12",
+          "away": "15"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "18",
+          "away": "15"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "6",
+          "away": "11"
+        },
+        {
+          "nome": "Cortes",
+          "home": "10",
+          "away": "33"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "6",
+          "away": "4"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "1"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "55.5%",
+          "away": "44.5%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "15",
+          "away": "14"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "6"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "10%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "14",
+          "away": "8"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Passes",
+          "home": "587",
+          "away": "481"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "518",
+          "away": "404"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "12",
+          "away": "15"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "18",
+          "away": "15"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "6",
+          "away": "11"
+        },
+        {
+          "nome": "Cortes",
+          "home": "10",
+          "away": "33"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "6",
+          "away": "4"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "1"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "10'",
+          "jogador": "Pedro",
+          "time": "Flamengo",
+          "assistencias": [
+            "Guillermo Varela"
+          ],
+          "descricao": "Goal - Header 137 Goal! Vasco da Gama 0, Flamengo 1. Pedro (Flamengo) header from the centre of the box to the bottom right corner. Assisted by Guillermo Varela with a cross. Pedro Goal - Header"
+        },
+        {
+          "minuto": "15'",
+          "jogador": "Alan Lescano",
+          "time": "Vasco da Gama",
+          "assistencias": [
+            "Brenner"
+          ],
+          "descricao": "Goal 70 Goal! Vasco da Gama 1, Flamengo 1. Alan Lescano (Vasco da Gama) left footed shot from the centre of the box to the bottom right corner. Assisted by Brenner. Alan Lescano Goal"
+        },
+        {
+          "minuto": "41'",
+          "jogador": "Pedro",
+          "time": "Flamengo",
+          "assistencias": [],
+          "descricao": "Goal 70 Goal! Vasco da Gama 1, Flamengo 2. Pedro (Flamengo) right footed shot from very close range to the bottom right corner. Pedro Goal"
+        },
+        {
+          "minuto": "53'",
+          "jogador": "Samuel Lino",
+          "time": "Flamengo",
+          "assistencias": [],
+          "descricao": "Goal 70 Goal! Vasco da Gama 1, Flamengo 3. Samuel Lino (Flamengo) right footed shot from outside the box to the bottom right corner. Samuel Lino Goal"
+        },
+        {
+          "minuto": "85'",
+          "jogador": "Samuel Lino",
+          "time": "Flamengo",
+          "assistencias": [],
+          "descricao": "Goal 70 Goal! Vasco da Gama 1, Flamengo 4. Samuel Lino (Flamengo) right footed shot from the centre of the box to the top right corner. Samuel Lino Goal"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "45'+5'",
+          "jogador": "Gonzalo Plata",
+          "time": "Flamengo",
+          "descricao": "Yellow Card 94 Gonzalo Plata (Flamengo) is shown the yellow card for a bad foul. Gonzalo Plata Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "86'",
+          "jogador": "Samuel Lino",
+          "time": "Flamengo",
+          "descricao": "Yellow Card 94 Samuel Lino (Flamengo) is shown the yellow card for excessive celebration. Samuel Lino Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "215388",
+          "nome": "Agustín Rossi",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "246844",
+          "nome": "Emerson Royal",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "202533",
+          "nome": "Erick Pulgar",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "179767",
+          "nome": "Giorgian de Arrascaeta",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "277352",
+          "nome": "Gonzalo Plata",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "188368",
+          "nome": "Guillermo Varela",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "165778",
+          "nome": "Jorginho",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "252316",
+          "nome": "Léo Ortiz",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "145405",
+          "nome": "Léo Pereira",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "235017",
+          "nome": "Pedro",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "253937",
+          "nome": "Samuel Lino",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "201683",
+          "nome": "Bruno Henrique",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "414769",
+          "nome": "Joaquin Freitas",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "234715",
+          "nome": "Lucas Paquetá",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "234765",
+          "nome": "Luiz Araújo",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "336485",
+          "nome": "Alan Lescano",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "257744",
+          "nome": "Brenner",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "334756",
+          "nome": "Cuiabano",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "275941",
+          "nome": "Facundo Colidio",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "285142",
+          "nome": "Gabriel Pereira",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "196873",
+          "nome": "Jair",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "43711",
+          "nome": "José Luis Rodríguez",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "205464",
+          "nome": "Léo Jardim",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "312657",
+          "nome": "Lucas Freitas",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "285203",
+          "nome": "Marino Hinestroza",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "201717",
+          "nome": "Thiago Mendes",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "292259",
+          "nome": "Bruno Duarte",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "219005",
+          "nome": "David",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "287862",
+          "nome": "Lucas Piton",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "323815",
+          "nome": "Nuno Moreira",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "198302",
+          "nome": "Tchê Tchê",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Vasco da Gama": 1,
+          "Flamengo": 4
+        },
+        "gols_extraidos": {
+          "Vasco da Gama": 1,
+          "Flamengo": 4
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Vasco da Gama": {
+            "amarelo": 0,
+            "vermelho": 0
+          },
+          "Flamengo": {
+            "amarelo": 2,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Vasco da Gama": {
+            "amarelo": 0,
+            "vermelho": 0
+          },
+          "Flamengo": {
+            "amarelo": 2,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-10-29T22:06:54.883330-03:00"
+    },
     "401841288": {
       "event_id": "401841288",
       "event_id_fonte_detalhes": "401841288",
@@ -94,7 +655,7 @@
         {
           "nome": "Cortes",
           "home": "22",
-          "away": "30"
+          "away": "31"
         },
         {
           "nome": "Escanteios",
@@ -187,7 +748,7 @@
         {
           "nome": "Cortes",
           "home": "22",
-          "away": "30"
+          "away": "31"
         },
         {
           "nome": "Escanteios",
@@ -582,7 +1143,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T21:38:58.926724-03:00"
+      "atualizado_em": "2026-10-29T22:06:57.667253-03:00"
     },
     "401841296": {
       "event_id": "401841296",
@@ -1176,7 +1737,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T21:39:01.640152-03:00",
+      "atualizado_em": "2026-10-29T22:07:00.363657-03:00",
       "publico_pagante": 21379,
       "renda": 628385.5
     },
@@ -1722,7 +2283,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T21:39:04.198740-03:00",
+      "atualizado_em": "2026-10-29T22:07:02.991170-03:00",
       "publico_pagante": 9760,
       "renda": 378700
     },
@@ -2291,7 +2852,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T21:39:06.804121-03:00",
+      "atualizado_em": "2026-10-29T22:07:05.509777-03:00",
       "renda": 558839.5
     },
     "401841291": {
@@ -2832,7 +3393,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T21:39:09.380342-03:00",
+      "atualizado_em": "2026-10-29T22:07:08.047316-03:00",
       "renda": 49340
     },
     "401841293": {
@@ -3397,7 +3958,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-29T21:39:11.975627-03:00",
+      "atualizado_em": "2026-10-29T22:07:10.529840-03:00",
       "renda": 446085
     },
     "401841286": {
