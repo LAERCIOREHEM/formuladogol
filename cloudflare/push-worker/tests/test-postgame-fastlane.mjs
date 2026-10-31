@@ -294,7 +294,7 @@ console.log('postgame-fastlane v15 policy + eligibility guard + factual integrit
 // ============================ R10R15 Match Identity Gate ============================
 {
   const { evaluateSourceMatchIdentity, extractRoundupMatchBlock, buildAttendanceSearchQueries, isCandidateEditorialAttendanceSource, POSTGAME_SEARCH_PROFILE_VERSION } = await import('../src/postgame-search-profile.js');
-  assert.equal(POSTGAME_SEARCH_PROFILE_VERSION, 10);
+  assert.equal(POSTGAME_SEARCH_PROFILE_VERSION, 11);
   const searchQueries=buildAttendanceSearchQueries({home:'Flamengo',away:'Atlético-MG',kickoff:'2026-10-26T20:00:00-03:00',home_score:3,away_score:2,round:32,stadium:'Maracanã'});
   assert.equal(searchQueries[0],'Flamengo Atlético-MG público renda 26/10/2026');
   assert.ok(searchQueries.slice(0,3).every((q)=>!q.includes('site:')),'começar com três buscas genéricas');
@@ -516,3 +516,44 @@ console.log('R10R29.1 source footer identity regression: PASS');
 }
 console.log('R10R16.1 factual integrity guard tests: PASS');
 
+
+
+// R10R33: incidente real Coritiba x Vitória. URLs antigas sem data (ou com
+// metadata histórica) não podem gravar público/renda para 31/10/2026.
+{
+  const {evaluateAttendanceSourceChronology, evaluateSourceMatchIdentity} =
+    await import('../src/postgame-search-profile.js');
+  const task = {event_id:'401841294',league:'bra.1',home:'Coritiba',away:'Vitória',
+    kickoff:'2026-10-31T16:00:00-03:00',home_score:2,away_score:0,round:33,stadium:'Couto Pereira'};
+  const oldAttendanceUrl='https://www.dgabc.com.br/Noticia/807541/coritiba-bate-vitoria-e-se-recupera-mas-segue-na-degola';
+  const oldRevenueUrl='https://www.gazetadopovo.com.br/esportes/coritiba-sofre-eliminacao-na-medida-certa-bspa4gw51sits3fvwywn2kb4e';
+  const correct='https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/31/coritiba-bate-o-vitoria-encerra-jejum-de-dois-meses-e-abre-distancia-da-zona-de-rebaixamento.amp.htm';
+  const historical='Coritiba 2 x 0 Vitória no Couto Pereira pelo Campeonato Brasileiro. '+
+    'Público - 6.192 presentes. Renda - R$ 121.240,00.';
+  // A prova de identidade lexical pode aceitar uma partida histórica repetida:
+  // esta era a vulnerabilidade que permitiu a contaminação entre temporadas.
+  assert.equal(evaluateSourceMatchIdentity(task,historical,oldAttendanceUrl).accepted,true);
+  assert.equal(evaluateAttendanceSourceChronology(task,oldAttendanceUrl,'',historical).accepted,false,
+    'URL sem data e sem prova de publicação NÃO é aceita');
+  assert.equal(evaluateAttendanceSourceChronology(task,oldRevenueUrl,'',historical).accepted,false);
+  assert.match(evaluateAttendanceSourceChronology(task,oldAttendanceUrl,'',historical).reason,
+    /publication_date_unverified/);
+  assert.match(evaluateAttendanceSourceChronology(task,oldAttendanceUrl,'2011-10-31T18:00:00-03:00',historical).reason,
+    /published_at_date_mismatch/);
+  assert.equal(evaluateAttendanceSourceChronology(task,correct,null,'').accepted,true,
+    'URL UOL datada exatamente para o jogo tem identidade temporal');
+  const real='31/10/2026 Coritiba 2 x 0 Vitória. Público - 23.570 presentes. Renda - R$ 609.791,00.';
+  const correctValues=extractPublicFromTextDeterministic(real,correct);
+  assert.deepEqual([correctValues.publico,correctValues.renda],[23570,609791]);
+  assert.equal(evaluateAttendanceSourceChronology(task,oldAttendanceUrl,null,real).accepted,true,
+    'site regional com data explícita recente no cabeçalho continua acessível');
+  assert.match(evaluateAttendanceSourceChronology(task,oldAttendanceUrl,null,
+    '31 de outubro de 2010 — Coritiba 2 x 0 Vitória no Couto Pereira.').reason,
+    /article_date_mismatch/);
+  assert.equal(evaluateAttendanceSourceChronology(task,correct,'2025-10-31T20:00:00-03:00',real).accepted,false,
+    'metadado contraditório bloqueia mesmo URL aparentemente atual');
+  const valid=validatePublicPayload(correctValues,[correct],task);
+  assert.equal(valid.accepted,true);
+  assert.deepEqual([valid.values.publico,valid.values.renda],[23570,609791]);
+}
+console.log('R10R33 chronology safeguard Coritiba-Vitória: PASS');
