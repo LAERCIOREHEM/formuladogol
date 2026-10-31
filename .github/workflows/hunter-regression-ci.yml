@@ -41,12 +41,19 @@ jobs:
           d=json.loads(Path('dados-br/correcoes/publicos-verificados.json').read_text(encoding='utf-8'))['jogos']
           expected={
             '401841296':(21492,21379,628385.50),
-            '401841297':(13458,9760,378700)
+            '401841297':(13458,9760,378700),
+            '401841294':(23570,None,609791)
           }
           for eid, triple in expected.items():
             row=d[eid]
-            assert (row['publico'],row['pagantes'],row['renda'])==triple,(eid,row)
-            assert row['pagantes']<=row['publico']
-            assert all(row.get(k,'').startswith('https://') for k in ('fonte_publico','fonte_pagantes','fonte_renda'))
-          print('verified fixtures: 2/2')
+            actual=(row['publico'],row.get('pagantes'),row['renda'])
+            assert actual==triple,(eid,actual,triple)
+            if row.get('pagantes') is not None:
+              assert row['pagantes']<=row['publico']
+            assert all(row.get(k,'').startswith('https://') for k in ('fonte_publico','fonte_renda'))
+            if row.get('pagantes') is not None:
+              assert row.get('fonte_pagantes','').startswith('https://')
+          assert d['401841294']['pagantes_status']=='nao_divulgado'
+          assert '/2026/10/31/' in d['401841294']['fonte_publico']
+          print('verified fixtures: 3/3')
           PY

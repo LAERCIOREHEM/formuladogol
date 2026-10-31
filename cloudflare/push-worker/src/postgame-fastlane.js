@@ -5,7 +5,7 @@ import { searchPublicWithGemini, fetchSourceText, extractPublicWithWorkersAI, re
 import { extractSourceWithCache } from './source-extraction-cache.js';
 import { recordPublicSourceObservation, recordPublicResolution } from './postgame-public-observability.js';
 import { discoverFreePublicNews } from './postgame-rss-discovery.js';
-import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, isCandidateEditorialAttendanceSource, evaluateSourceMatchIdentity, buildAttendanceSearchQueries, attendanceSourcePolicyText, officialClubDomainsForTask, matchDayEditorialSources, PREFERRED_EDITORIAL_SOURCE_SUFFIXES, isMultiMatchRoundupSource, extractRoundupMatchBlock, verifiedStadiumCapacity } from './postgame-search-profile.js';
+import { POSTGAME_SEARCH_PROFILE_VERSION, teamSearchAliasesNormalized, attendanceSourceQuality, isAcceptedAttendanceSource, isCandidateEditorialAttendanceSource, evaluateSourceMatchIdentity, buildAttendanceSearchQueries, attendanceSourcePolicyText, officialClubDomainsForTask, matchDayEditorialSources, PREFERRED_EDITORIAL_SOURCE_SUFFIXES, isMultiMatchRoundupSource, extractRoundupMatchBlock, verifiedStadiumCapacity, evaluateAttendanceSourceChronology } from './postgame-search-profile.js';
 import { FACTUAL_INTEGRITY_POLICY_VERSION, FACTUAL_INCIDENTS, inspectPostgameFactualIntegrity, quarantinePostgameFactualIntegrity } from './postgame-factual-integrity.js';
 import { attendanceEligibility, POSTGAME_ELIGIBILITY_VERSION, ATTENDANCE_REQUIRED_LEAGUE } from './postgame-competition-eligibility.js';
 
@@ -1106,6 +1106,18 @@ async function refreshCachedPublicSources(env,task,values,sources){
       lastError=source.reason;
       await recordPublicSourceObservation(env,{eventId:task.event_id,url:row.url,provider:row.provider,outcome:'fetch_failed',reason:source.reason});
       await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=failures+1 WHERE event_id=? AND url=?`).bind(source.reason,task.event_id,row.url).run();
+      continue;
+    }
+    // Incident R33 Coritiba x Vitória: HTML antigo (sem data na URL) tinha
+    // a MESMA dupla, porém público/renda de outra temporada. A validação
+    // de identidade esportiva NÃO prova a data da publicação.
+    const chronology=evaluateAttendanceSourceChronology(task,source.url,source.publishedAt,source.text);
+    if(!chronology.accepted){
+      lastError='source_chronology_rejected:'+chronology.reason;
+      await recordPublicSourceObservation(env,{eventId:task.event_id,url:source.url,provider:row.provider,
+        outcome:'rejected',reason:lastError,publishedAt:source.publishedAt});
+      await env.DB.prepare('UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=failures+1 WHERE event_id=? AND url=?')
+        .bind(lastError.slice(0,500),task.event_id,row.url).run();
       continue;
     }
     const isStructuredRoundup=isMultiMatchRoundupSource(source.url);

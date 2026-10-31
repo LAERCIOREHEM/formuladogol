@@ -1,0 +1,45 @@
+name: Hunter Historical Source Guard CI
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/hunter-temporal-guard-ci.yml'
+      - 'cloudflare/push-worker/src/postgame-fastlane.js'
+      - 'cloudflare/push-worker/src/postgame-search-profile.js'
+      - 'cloudflare/push-worker/tests/test-postgame-fastlane.mjs'
+      - 'cloudflare/push-worker/tests/test-ai-router.mjs'
+      - 'dados-br/correcoes/publicos-verificados.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and source chronology gate
+        working-directory: cloudflare/push-worker
+        run: |
+          node --check src/postgame-search-profile.js
+          node --check src/postgame-fastlane.js
+          node tests/test-postgame-fastlane.mjs
+          node tests/test-ai-router.mjs
+      - name: Verify documented figures and sources
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          verified=json.loads(Path('dados-br/correcoes/publicos-verificados.json').read_text(encoding='utf-8'))['jogos']
+          event=verified['401841294']
+          assert event['publico']==23570 and event['renda']==609791,event
+          assert event['pagantes_status']=='nao_divulgado'
+          assert event['fonte_publico']==event['fonte_renda']
+          assert '/2026/10/31/' in event['fonte_publico']
+          print('Coritiba x Vitória authoritative correction: PASS')
+          PY
