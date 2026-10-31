@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-30T22:11:10.735987-03:00",
+  "gerado_em": "2026-10-30T22:21:51.072283-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 328,
   "total_com_estatisticas": 328,
-  "total_com_publico": 327,
+  "total_com_publico": 328,
   "total_com_eventos": 328,
   "total_com_jogadores": 328,
   "total_eventos_validados": 328,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Neo Química Arena",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 44151,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/10/30/corinthians-mirassol-como-foi-o-jogo-33-rodada-brasileirao.ghtm",
       "arbitro": "",
       "stats": [
         {
@@ -570,7 +570,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-30T22:11:02.713322-03:00"
+      "atualizado_em": "2026-10-30T22:11:02.713322-03:00",
+      "renda": 2841726.76
     },
     "401841290": {
       "event_id": "401841290",
@@ -185414,5 +185415,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 303,
+  "total_com_renda": 328
 }
