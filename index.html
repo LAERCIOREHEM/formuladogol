@@ -5899,6 +5899,18 @@ function setFiltroJogos(time) {
 }
 function setFiltroCompeticaoJogos(chave) {
   state.jogosFiltroCompeticao = BR_JOGOS_COMPETICOES[chave] ? chave : 'todos';
+  // O filtro temporal anterior ("Hoje"/"7 dias"/data) não deve esconder
+  // uma final futura ao selecionar a competição. Se não houver jogo naquele
+  // recorte, mostrar as partidas publicadas da competição automaticamente.
+  if (state.jogosFiltroCompeticao !== 'todos') {
+    const jogosCompeticao = jogosUnificadosBase().filter(j =>
+      String(j.competicao_chave || 'brasileirao') === state.jogosFiltroCompeticao);
+    const temJogoNoPeriodo = jogosCompeticao.some(j => jogoPassaPeriodo(j));
+    if (jogosCompeticao.length && !temJogoNoPeriodo) {
+      state.jogosFiltroData = '';
+      state.jogosFiltroPeriodo = 'todos';
+    }
+  }
   renderJogos();
 }
 function setFiltroPeriodoJogos(periodo) {
