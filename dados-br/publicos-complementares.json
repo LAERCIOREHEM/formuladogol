@@ -1,6 +1,6 @@
 {
   "_comentario": "Complemento documental de público presente, pagantes e renda. Correções verificadas por event_id são mescladas por campo antes da coleta; a busca automática prioriza ge/Gato Mestre. Público pagante nunca substitui público presente e fontes avulsas podem cobrir jogos remarcados.",
-  "atualizado_em": "2026-10-30T22:21:51.652566-03:00",
+  "atualizado_em": "2026-10-30T23:38:47.725516-03:00",
   "jogos": {
     "401840808": {
       "tipo": "presente",
@@ -4175,7 +4175,11 @@
       "renda_status": "divulgado",
       "fonte_renda": "https://www.cnnbrasil.com.br/esportes/futebol/atletico-mineiro/atletico-mg-lucra-quase-r18-milhao-em-classico-contra-o-cruzeiro",
       "origem": "cloudflare-postgame-fastlane",
-      "verificado_em": "2026-10-30T01:26:39.561054Z"
+      "verificado_em": "2026-10-30T01:26:39.561054Z",
+      "pagantes": 34763,
+      "pagantes_status": "divulgado",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/10/30/corinthians-2-x-0-mirassol-tem-o-maior-publico-da-33a-rodada-do-brasileiro-veja-a-lista.ghtml"
     },
     "401841290": {
       "publico": 35025,
@@ -4201,7 +4205,11 @@
       "renda_status": "divulgado",
       "fonte_renda": "https://www.tribunadosertao.com.br/esportes/2026/10/29/1009629-pedro-e-samuel-lino-marcam-dois-cada-flamengo-goleia-vasco-e-abre-tres-pontos-na-lideranca",
       "origem": "cloudflare-postgame-fastlane",
-      "verificado_em": "2026-10-29T23:59:31.741133-03:00"
+      "verificado_em": "2026-10-29T23:59:31.741133-03:00",
+      "pagantes": 28041,
+      "pagantes_status": "divulgado",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/10/30/corinthians-2-x-0-mirassol-tem-o-maior-publico-da-33a-rodada-do-brasileiro-veja-a-lista.ghtml"
     },
     "401841295": {
       "tipo": "presente",
@@ -4213,7 +4221,11 @@
       "renda_status": "divulgado",
       "fonte_renda": "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/10/30/corinthians-mirassol-como-foi-o-jogo-33-rodada-brasileirao.ghtm",
       "origem": "cloudflare-postgame-fastlane",
-      "verificado_em": "2026-10-31T01:21:50.672109Z"
+      "verificado_em": "2026-10-31T01:21:50.672109Z",
+      "pagantes": 43842,
+      "pagantes_status": "divulgado",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/10/30/corinthians-2-x-0-mirassol-tem-o-maior-publico-da-33a-rodada-do-brasileiro-veja-a-lista.ghtml"
     }
   },
   "fontes_rodadas": {
@@ -4343,6 +4355,10 @@
     },
     "32": {
       "url": "https://ge.globo.com/gato-mestre/noticia/2026/10/26/flamengo-x-atletico-mg-tem-o-maior-publico-da-32a-rodada-do-brasileiro-veja-a-lista.ghtml",
+      "fonte": "ge/Gato Mestre"
+    },
+    "33": {
+      "url": "https://ge.globo.com/gato-mestre/noticia/2026/10/30/corinthians-2-x-0-mirassol-tem-o-maior-publico-da-33a-rodada-do-brasileiro-veja-a-lista.ghtml",
       "fonte": "ge/Gato Mestre"
     }
   }
