@@ -92,7 +92,7 @@
     const channels = tv && Array.isArray(tv.canais) ? tv.canais.filter(Boolean) : [];
     const principal = yt && yt.principal;
     return {
-      label: channels.join(" / ") || (principal && (principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : (principal.fonte === "sbt" ? "SBT" : "GE TV")))) || "Transmissão a confirmar",
+      label: (tv && tv.exibicao_confirmada) || channels.join(" / ") || (principal && (principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : (principal.fonte === "sbt" ? "SBT" : "GE TV")))) || "Transmissão a confirmar",
       youtubeUrl: principal && principal.embeddable !== false ? safeYoutube(principal.url) : ""
     };
   }
@@ -256,6 +256,19 @@
     const button = event.target.closest("[data-competition]");
     if (!button) return;
     state.competition = button.getAttribute("data-competition") || "todos";
+    // Ao mudar de competição, o mês atual pode não ter partidas. Selecionar
+    // o próximo mês que tenha jogos evita ocultar uma final já anunciada.
+    if (state.competition !== "todos") {
+      const months = Array.from(new Set(state.games
+        .filter((game) => game.competicao_chave === state.competition)
+        .map((game) => parseDate(game.data_iso))
+        .filter(Boolean)
+        .map(monthKey))).sort();
+      if (months.length && !months.includes(state.month)) {
+        const current = monthKey(new Date());
+        state.month = months.find((value) => value >= current) || months[months.length - 1];
+      }
+    }
     render();
   });
 

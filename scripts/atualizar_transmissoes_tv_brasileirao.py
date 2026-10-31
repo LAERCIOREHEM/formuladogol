@@ -955,6 +955,7 @@ def manual_policy_for_game(manual: Mapping[str, Any], game: Mapping[str, Any]) -
                 "fonte": str(raw.get("fonte") or "transmissoes.json"),
                 "fonte_url": str(raw.get("fonte_url") or "").strip(),
                 "data_iso": str(raw.get("data_iso") or "").strip(),
+                "exibicao_confirmada": str(raw.get("exibicao_confirmada") or "").strip(),
             }
     return {}
 
@@ -1264,6 +1265,8 @@ def consolidate_game(
         "estavel": channels_are_stable(channels, selected, policy),
         "exclusivo": bool((manual and policy.get("exclusivo") is True) or (guardian and any(e.exclusive for e in guardian))),
         "fontes": [e.public() for e in sorted(selected, key=lambda e: e.authority, reverse=True)],
+        **({"exibicao_confirmada": policy["exibicao_confirmada"]}
+           if manual and policy.get("exibicao_confirmada") else {}),
     }
 
 

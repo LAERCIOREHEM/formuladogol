@@ -2,7 +2,7 @@
   "schema_version": 1,
   "temporada": 2026,
   "tipo": "agenda_continental_oficial",
-  "verificado_em": "2026-10-13T18:45:00-03:00",
+  "verificado_em": "2026-10-31T08:14:00-03:00",
   "regra": "Fallback documental somente para agenda operacional; placar/FINAL continuam exigindo fonte esportiva estruturada.",
   "jogos": [
     {
@@ -218,6 +218,33 @@
       },
       "fonte": "CONMEBOL oficial",
       "fonte_url": "https://gol.conmebol.com/libertadores/pt-br/news/datas-confirmadas-confira-como-serao-disputadas-semifinais-da-conmebol-libertadores",
+      "status": "Agendado",
+      "concluido": false
+    },
+    {
+      "competicao_chave": "sul_americana",
+      "espn_league": "conmebol.sudamericana",
+      "fase": "Final",
+      "fase_ordem": 900,
+      "perna": null,
+      "data_iso": "2026-11-21T20:00:00-03:00",
+      "estadio": "Metropolitano Roberto Meléndez",
+      "mandante": {
+        "espn_id": "7632",
+        "nome": "Atlético-MG",
+        "sigla": "CAM",
+        "pais": "BRA",
+        "serie_a_2026": true
+      },
+      "visitante": {
+        "espn_id": "5",
+        "nome": "Boca Juniors",
+        "sigla": "CABJ",
+        "pais": "ARG",
+        "serie_a_2026": false
+      },
+      "fonte": "CONMEBOL oficial — final confirmada",
+      "fonte_url": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/10/30/final-da-sul-americana-entre-atletico-mg-e-boca-juniors-tem-horario-definido.htm",
       "status": "Agendado",
       "concluido": false
     }
