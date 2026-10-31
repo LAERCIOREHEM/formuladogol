@@ -1,0 +1,65 @@
+name: Sul-Americana Final Production Smoke
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/sula-final-production-smoke.yml'
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Deploy site (GitHub Pages)']
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Verify final on real site, not only GitHub source
+        shell: bash
+        run: |
+          python -u - <<'PY'
+          import json,urllib.request,urllib.error,time,sys
+          ROOT='https://formuladogol.com.br'
+          EVENT='401913961'
+          KICKOFF='2026-11-21T20:00:00-03:00'
+          def read(path):
+              req=urllib.request.Request(ROOT+path+('?smoke=20261031' if '?' not in path else '&smoke=20261031'),
+                  headers={'User-Agent':'FDG-Sula-Final-Smoke/1.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=25) as response:
+                  return response.read().decode('utf-8')
+          def verify():
+              agenda=json.loads(read('/dados-br/agenda-clubes-br.json'))
+              matches=[x for x in agenda.get('jogos',[]) if str(x.get('event_id'))==EVENT]
+              assert len(matches)==1, ('agenda event count',len(matches))
+              game=matches[0]
+              assert game.get('data_iso')==KICKOFF,('agenda kickoff',game.get('data_iso'))
+              assert game.get('fase')=='Final',('phase',game.get('fase'))
+              assert game.get('mandante',{}).get('nome')=='Atlético-MG'
+              assert game.get('visitante',{}).get('nome')=='Boca Juniors'
+              tv=json.loads(read('/dados-br/transmissoes-tv.json'))
+              entry=tv.get('jogos',{}).get(EVENT,{})
+              assert entry.get('data_iso')==KICKOFF,('tv kickoff',entry.get('data_iso'))
+              assert entry.get('exibicao_confirmada')=='Disney+ Premium',('tv label',entry)
+              assert any('disneyplus.com' in x.get('url','') for x in entry.get('acessos',[])), 'missing official access'
+              continent=json.loads(read('/dados-br/competicoes-af-previsao/sul-americana.json'))
+              finals=[x for x in continent.get('eventos',[]) if x.get('event_id')==EVENT]
+              assert len(finals)==1 and finals[0].get('data_iso')==KICKOFF, 'continental snapshot kickoff'
+              main=read('/')
+              assert "jogosCompeticao.length && !temJogoNoPeriodo" in main, 'main games auto-widen filter not deployed'
+              standalone=read('/js/br-agenda.js')
+              assert 'months.find((value) => value >= current)' in standalone, 'standalone month auto-switch not deployed'
+              print('LIVE PRODUCTION PASS: Sula final 401913961 21/11 20h BRT, Disney+ Premium, both games filters',flush=True)
+          for attempt in range(1,9):
+              try:
+                  verify()
+                  sys.exit(0)
+              except Exception as exc:
+                  print('Attempt',attempt,'live site has not converged:',str(exc)[:300],flush=True)
+                  if attempt!=8:time.sleep(15)
+          sys.exit(1)
+          PY
