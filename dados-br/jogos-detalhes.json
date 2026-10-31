@@ -1,15 +1,561 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-31T08:28:14.758617-03:00",
+  "gerado_em": "2026-10-31T18:04:00.268668-03:00",
   "fonte": "ESPN summary + scoreboard",
-  "total_jogos": 328,
-  "total_com_estatisticas": 328,
+  "total_jogos": 329,
+  "total_com_estatisticas": 329,
   "total_com_publico": 328,
-  "total_com_eventos": 328,
-  "total_com_jogadores": 328,
-  "total_eventos_validados": 328,
+  "total_com_eventos": 329,
+  "total_com_jogadores": 329,
+  "total_eventos_validados": 329,
   "total_eventos_pendentes_detalhes": 0,
   "jogos": {
+    "401841294": {
+      "event_id": "401841294",
+      "event_id_fonte_detalhes": "401841294",
+      "rodada": 33,
+      "data_iso": "2026-10-31T16:00",
+      "mandante": "Coritiba",
+      "visitante": "Vitória",
+      "placar_mandante": 2,
+      "placar_visitante": 0,
+      "estadio": "Couto Pereira",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "48.8%",
+          "away": "51.2%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "20",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "7",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "10%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "20",
+          "away": "12"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "5"
+        },
+        {
+          "nome": "Passes",
+          "home": "403",
+          "away": "435"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "336",
+          "away": "360"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "11",
+          "away": "12"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "7",
+          "away": "12"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "9",
+          "away": "16"
+        },
+        {
+          "nome": "Cortes",
+          "home": "24",
+          "away": "33"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "7",
+          "away": "5"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "0"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "48.8%",
+          "away": "51.2%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "20",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "7",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "10%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "20",
+          "away": "12"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "5"
+        },
+        {
+          "nome": "Passes",
+          "home": "403",
+          "away": "435"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "336",
+          "away": "360"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "11",
+          "away": "12"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "7",
+          "away": "12"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "9",
+          "away": "16"
+        },
+        {
+          "nome": "Cortes",
+          "home": "24",
+          "away": "33"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "7",
+          "away": "5"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "0"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "58'",
+          "jogador": "Pedro Rocha",
+          "time": "Coritiba",
+          "assistencias": [],
+          "descricao": "Goal 70 Goal! Coritiba 1, Vitória 0. Pedro Rocha (Coritiba) right footed shot from very close range to the centre of the goal. Pedro Rocha Goal"
+        },
+        {
+          "minuto": "69'",
+          "jogador": "Tinga",
+          "time": "Coritiba",
+          "assistencias": [
+            "Tiago Cóser"
+          ],
+          "descricao": "Goal - Header 137 Goal! Coritiba 2, Vitória 0. Tinga (Coritiba) header from very close range to the high centre of the goal. Assisted by Tiago Cóser with a headed pass following a corner. Tinga Goal - Header"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "62'",
+          "jogador": "Emanuel Britez",
+          "time": "Vitória",
+          "descricao": "Yellow Card 94 Emanuel Brítez (Vitória) is shown the yellow card. Emanuel Britez Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "90'+4'",
+          "jogador": "Tissi",
+          "time": "Coritiba",
+          "descricao": "Yellow Card 94 Tissi (Coritiba) is shown the yellow card for a bad foul. Tissi Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "236324",
+          "nome": "Breno",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "243831",
+          "nome": "Bruno Melo",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "256018",
+          "nome": "Jacy Maranhão",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "150215",
+          "nome": "Josué Pesqueira",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "276240",
+          "nome": "Nicolás Fonseca",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "364880",
+          "nome": "Pedro Luccas",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "216846",
+          "nome": "Pedro Rocha",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "128368",
+          "nome": "Sebastián Gómez",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "188143",
+          "nome": "Thiago Santos",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "319507",
+          "nome": "Tiago",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "200826",
+          "nome": "Tinga",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "333306",
+          "nome": "Joaquín Lavega",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "358798",
+          "nome": "Rodrigo",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "155268",
+          "nome": "Rodrigo Moledo",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "402818",
+          "nome": "Tissi",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "316781",
+          "nome": "Vini Paulista",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "271773",
+          "nome": "Cacá",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "252315",
+          "nome": "Caique",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "379661",
+          "nome": "Diego Tarzia",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "402426",
+          "nome": "Edenilson",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "200206",
+          "nome": "Emanuel Britez",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "218649",
+          "nome": "Emmanuel Martínez",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "256044",
+          "nome": "Erick",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "402660",
+          "nome": "Gean",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "287941",
+          "nome": "Lucas Arcanjo",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "379359",
+          "nome": "Renê",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "383950",
+          "nome": "Zé Vitor",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "3098485",
+          "nome": "Alex Bruno Da Costa Lima",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "269852",
+          "nome": "Gabriel Baralhas",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "253009",
+          "nome": "Lucas",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "218972",
+          "nome": "Matheus",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "227314",
+          "nome": "Renato Kayzer",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Coritiba": 2,
+          "Vitória": 0
+        },
+        "gols_extraidos": {
+          "Coritiba": 2,
+          "Vitória": 0
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Coritiba": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Vitória": {
+            "amarelo": 1,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Coritiba": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Vitória": {
+            "amarelo": 1,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-10-31T18:03:51.254416-03:00"
+    },
     "401841295": {
       "event_id": "401841295",
       "event_id_fonte_detalhes": "401841295",
@@ -570,7 +1116,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-31T08:28:07.662853-03:00",
+      "atualizado_em": "2026-10-31T18:03:53.437692-03:00",
       "publico_pagante": 43842,
       "renda": 2841726.76,
       "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
@@ -1152,7 +1698,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-31T08:28:09.908135-03:00",
+      "atualizado_em": "2026-10-31T18:03:55.724573-03:00",
       "renda": 1527422.6
     },
     "401841292": {
@@ -1714,7 +2260,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-31T08:28:12.262385-03:00",
+      "atualizado_em": "2026-10-31T18:03:57.936199-03:00",
       "publico_pagante": 28041,
       "renda": 1714434,
       "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
@@ -2291,7 +2837,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-31T08:28:14.674596-03:00",
+      "atualizado_em": "2026-10-31T18:04:00.183316-03:00",
       "publico_pagante": 34763,
       "renda": 3034566.5,
       "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
@@ -185421,6 +185967,5 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  },
-  "total_com_publico_pagante": 306
+  }
 }
