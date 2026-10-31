@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-10-31T18:04:00.268668-03:00",
+  "gerado_em": "2026-10-31T18:31:40.342702-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 329,
   "total_com_estatisticas": 329,
-  "total_com_publico": 328,
+  "total_com_publico": 329,
   "total_com_eventos": 329,
   "total_com_jogadores": 329,
   "total_eventos_validados": 329,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Couto Pereira",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 6192,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.dgabc.com.br/Noticia/807541/coritiba-bate-vitoria-e-se-recupera-mas-segue-na-degola",
       "arbitro": "",
       "stats": [
         {
@@ -554,7 +554,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-10-31T18:03:51.254416-03:00"
+      "atualizado_em": "2026-10-31T18:03:51.254416-03:00",
+      "renda": 121240
     },
     "401841295": {
       "event_id": "401841295",
@@ -185967,5 +185968,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 306,
+  "total_com_renda": 329
 }
