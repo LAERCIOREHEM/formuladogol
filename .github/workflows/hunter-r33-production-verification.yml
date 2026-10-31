@@ -1,0 +1,67 @@
+name: Hunter R33 Post-Deployment Verification
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/hunter-r33-production-verification.yml'
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Deploy Push Worker']
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verify:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Verify Worker v11, D1 and published attendance/revenue
+        shell: bash
+        run: |
+          python -u - <<'PY'
+          import json,time,urllib.request,urllib.error,sys
+          ID='401841294'; PUBLIC=23570; REVENUE=609791
+          BASE='https://formuladogol.com.br'
+          WORKER='https://push.formuladogol.com.br'
+          def read(url):
+              req=urllib.request.Request(url,headers={'User-Agent':'FDG-R33-Integrity-Smoke/1.0','Cache-Control':'no-cache','Accept':'application/json'})
+              try:
+                  with urllib.request.urlopen(req,timeout=25) as response:
+                      return json.loads(response.read().decode('utf-8'))
+              except urllib.error.HTTPError as error:
+                  raise AssertionError(url+': HTTP '+str(error.code)) from error
+          def validate():
+              data=read(BASE+'/dados-br/publicos-complementares.json?t=20261031R33')
+              pub=data.get('jogos',{}).get(ID,{})
+              assert (pub.get('publico'),pub.get('renda'))==(PUBLIC,REVENUE),('Pages publicos',pub)
+              assert '/2026/10/31/' in str(pub.get('fonte_publico',''))
+              stats=read(BASE+'/dados-br/estatisticas-competicao.json?t=20261031R33')
+              games=[x for x in stats.get('jogos',[]) if str(x.get('event_id'))==ID]
+              assert len(games)==1 and (games[0].get('publico'),games[0].get('renda'))==(PUBLIC,REVENUE),('Pages stats',games)
+              status=read(WORKER+'/v1/postgame/status')
+              assert status.get('ok') is True,('Worker',status)
+              assert status.get('searchProfileVersion')==11,('Worker old profile',status.get('searchProfileVersion'))
+              record=read(WORKER+'/v1/postgame?event_ids='+ID)
+              rows=record.get('rows',[])
+              assert record.get('ok') is True and isinstance(rows,list),('D1 contract',record)
+              matches=[row for row in rows if str(row.get('event_id'))==ID]
+              assert len(matches)==1,('D1 no event',rows)
+              row=matches[0]
+              assert (row.get('publico'),row.get('renda'))==(PUBLIC,REVENUE),('D1 wrong attendance',row)
+              assert row.get('publico_pagante') is None,('D1 made-up paid attendance',row)
+              print('LIVE PASS: 401841294 23.570 presents R$609.791; Worker chronology profile 11; D1 and Pages consistent',flush=True)
+          for attempt in range(1,9):
+              try:
+                  validate()
+                  sys.exit(0)
+              except Exception as exc:
+                  print('Attempt',attempt,'not converged:',str(exc)[:400],flush=True)
+                  if attempt!=8:time.sleep(12)
+          sys.exit(1)
+          PY
+  deploy-failed:
+    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: exit 1
