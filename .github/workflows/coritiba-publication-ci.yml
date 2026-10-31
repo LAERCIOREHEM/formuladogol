@@ -1,0 +1,49 @@
+name: Coritiba Attendance Publication CI
+
+on:
+  pull_request:
+    paths:
+      - 'dados-br/publicos-complementares.json'
+      - 'dados-br/estatisticas-competicao.json'
+      - 'dados-br/auditoria-reconciliacao-publicos.json'
+      - '.github/workflows/coritiba-publication-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate reconciled published figures
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          def load(path):
+              return json.loads(Path(path).read_text(encoding='utf-8'))
+          ev='401841294'
+          complement=load('dados-br/publicos-complementares.json')['jogos'][ev]
+          stats=load('dados-br/estatisticas-competicao.json')
+          game=next(g for g in stats['jogos'] if str(g.get('event_id'))==ev)
+          audit=load('dados-br/auditoria-reconciliacao-publicos.json')
+          track=next(g for g in audit['por_partida'] if str(g.get('event_id'))==ev)
+          verified=load('dados-br/correcoes/publicos-verificados.json')['jogos'][ev]
+          for row, pkey in [(complement,'publico'),(game,'publico'),(track,'publico_presente'),(verified,'publico')]:
+              assert row[pkey]==23570 and row['renda']==609791,row
+          assert complement['pagantes_status']=='nao_divulgado'
+          assert game.get('publico_pagante') is None and track.get('publico_pagante') is None
+          assert all('/2026/10/31/' in row['fonte_publico'] for row in (complement,track,verified))
+          stats_public=stats['publico']
+          games=[x for x in stats['jogos'] if x.get('publico') is not None]
+          assert len(games)==stats_public['jogos_com_publico']==329
+          assert sum(g['publico'] for g in games)==stats_public['total_publico']==audit['publico_total']==8178555
+          assert stats_public['media_publico']==round(stats_public['total_publico']/len(games))
+          assert abs(sum(g['renda'] for g in stats['jogos'] if g.get('renda') is not None)-stats_public['renda_total'])<0.01
+          assert len(stats_public['ranking'])==len(games)
+          assert all(a['publico']>=b['publico'] for a,b in zip(stats_public['ranking'],stats_public['ranking'][1:]))
+          print('PUBLICATION PASS: Coritiba 23.570 presentes, renda R$ 609.791; all JSONs and rankings consistent')
+          PY
