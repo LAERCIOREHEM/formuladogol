@@ -448,11 +448,19 @@ def official_continental_games(root: Path) -> Iterable[dict[str, Any]]:
 
 def fixture_signature(item: Mapping[str, Any]) -> tuple[str, str, str, str]:
     date = parse_dt(item.get("data_iso"))
+    comp = str(item.get("competicao_chave") or "")
+    # ESPN pode manter 17h enquanto a CONMEBOL já confirmou 20h.
+    # A identidade do MESMO confronto continental deve sobreviver à troca
+    # de horário; no Brasileirão mantemos a granularidade original.
+    date_key = (
+        date.strftime("%Y-%m-%d") if comp in {"libertadores", "sul_americana"}
+        else date.strftime("%Y-%m-%dT%H:%M")
+    ) if date else ""
     return (
-        str(item.get("competicao_chave") or ""),
+        comp,
         norm((item.get("mandante") or {}).get("nome") if isinstance(item.get("mandante"), Mapping) else item.get("mandante")),
         norm((item.get("visitante") or {}).get("nome") if isinstance(item.get("visitante"), Mapping) else item.get("visitante")),
-        date.strftime("%Y-%m-%dT%H:%M") if date else "",
+        date_key,
     )
 
 
@@ -477,6 +485,16 @@ def merge_schedule_candidates(candidates: Iterable[dict[str, Any]]) -> list[dict
             preferred, secondary = dict(item), previous
         else:
             preferred, secondary = previous, item
+        # Na final em partida única, a data/hora oficialmente confirmada
+        # prevalece sobre o kickoff provisório da ESPN sem perder o event_id.
+        # Nunca modifica placar/status nem se aplica a jogos já concluídos.
+        official = next((candidate for candidate in (previous, item)
+            if candidate.get("fallback_agenda_oficial") is True
+            and candidate.get("fase") == "Final"
+            and str(candidate.get("fonte_calendario") or "").startswith("CONMEBOL oficial")), None)
+        if official and not preferred.get("concluido"):
+            preferred["data_iso"] = str(official.get("data_iso") or preferred.get("data_iso"))
+            preferred["estadio"] = str(official.get("estadio") or preferred.get("estadio") or "")
         # Conserva a evidência oficial de calendário mesmo quando o snapshot ESPN
         # é a linha principal do jogo.
         if secondary.get("fonte_calendario") and not preferred.get("fonte_calendario"):
@@ -692,6 +710,22 @@ def selftest() -> None:
     assert merge_schedule_candidates([doc, espn_row])[0]["event_id"] == "401999999"
     assert merge_schedule_candidates([espn_row, doc])[0]["event_id"] == "401999999"
     assert merged[0]["fonte_calendario"] == "CONMEBOL oficial"
+    final_official = {
+        **official_row, "fase": "Final", "data_iso": "2026-11-21T20:00:00-03:00",
+        "mandante": {"nome": "Atlético-MG"}, "visitante": {"nome": "Boca Juniors"},
+        "estadio": "Metropolitano Roberto Meléndez",
+        "fonte_calendario": "CONMEBOL oficial — final confirmada",
+    }
+    final_espn = {
+        **final_official, "event_id": "401913961",
+        "data_iso": "2026-11-21T17:00:00-03:00",
+        "fallback_agenda_oficial": False, "fonte_calendario": "",
+    }
+    for sequence in ([final_official, final_espn], [final_espn, final_official]):
+        deduplicated = merge_schedule_candidates(sequence)
+        assert len(deduplicated) == 1, "horário provisório não duplica final"
+        assert deduplicated[0]["event_id"] == "401913961"
+        assert deduplicated[0]["data_iso"] == "2026-11-21T20:00:00-03:00"
     print("self-test OK")
 
 
