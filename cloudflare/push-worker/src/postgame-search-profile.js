@@ -1,4 +1,4 @@
-export const POSTGAME_SEARCH_PROFILE_VERSION = 10;
+export const POSTGAME_SEARCH_PROFILE_VERSION = 11;
 
 function text(value) { return String(value ?? '').trim(); }
 function normalizeText(value) {
@@ -282,6 +282,47 @@ function daysBetweenIso(a, b) {
   const x = Date.parse(`${a}T12:00:00Z`), y = Date.parse(`${b}T12:00:00Z`);
   return Number.isFinite(x) && Number.isFinite(y) ? Math.abs(x - y) / 86400000 : null;
 }
+
+// R10R33: nomes, placar, rodada e estadio podem coincidir com um jogo antigo.
+// Qualquer fonte SEM data em URL exige dataPublished ou data de publicacao
+// explicitamente comprovada no cabecalho da reportagem. Rejeicao fail-closed.
+export function evaluateAttendanceSourceChronology(task, sourceUrl = '', publishedAt = '', sourceText = '') {
+  const gameDate = text(task?.kickoff || task?.data_iso).slice(0,10);
+  const reject = (reason, sourceDate = '') => ({ accepted:false, reason, sourceDate, gameDate });
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(gameDate)) return reject('game_date_missing');
+
+  const byUrl = urlDate(sourceUrl);
+  const byMetadata = text(publishedAt).match(/^(20\d{2}-\d{2}-\d{2})(?=$|[T\s])/i)?.[1] || '';
+  // Fonte datada ou metadado antigo bloqueia, ainda que os clubes sejam iguais.
+  for (const [kind, date] of [['url',byUrl],['published_at',byMetadata]]) {
+    if (!date) continue;
+    const delta = daysBetweenIso(gameDate,date);
+    if (delta == null || delta > 3) return reject(kind+'_date_mismatch:'+date+':'+gameDate,date);
+  }
+  if (byUrl || byMetadata) return { accepted:true, reason:'dated_source', sourceDate:byMetadata||byUrl, gameDate };
+
+  // Fontes regionais com URL opaca e sem metatags: somente data visivel no
+  // inicio da noticia. Datas de jogos futuros ou links do rodape nao contam.
+  const lead = text(sourceText).slice(0,1000);
+  const dates = [];
+  for (const match of lead.matchAll(/\b(20\d{2})[-/](0?[1-9]|1[0-2])[-/](0?[1-9]|[12]\d|3[01])\b/g))
+    dates.push(match[1]+'-'+match[2].padStart(2,'0')+'-'+match[3].padStart(2,'0'));
+  for (const match of lead.matchAll(/\b(0?[1-9]|[12]\d|3[01])[./](0?[1-9]|1[0-2])[./](20\d{2})\b/g))
+    dates.push(match[3]+'-'+match[2].padStart(2,'0')+'-'+match[1].padStart(2,'0'));
+  for (const match of lead.matchAll(/\b(0?[1-9]|[12]\d|3[01])\s+de\s+(janeiro|fevereiro|mar[çc]o|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\s+de\s+(20\d{2})\b/gi)) {
+    const months=['janeiro','fevereiro','marco','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+    const month=match[2].toLowerCase().replace('ç','c');
+    dates.push(match[3]+'-'+String(months.indexOf(month)+1).padStart(2,'0')+'-'+match[1].padStart(2,'0'));
+  }
+  if (dates.length) {
+    const first = dates[0], delta = daysBetweenIso(gameDate,first);
+    return delta!=null && delta<=3
+      ? { accepted:true, reason:'visible_publication_date', sourceDate:first, gameDate }
+      : reject('article_date_mismatch:'+first+':'+gameDate,first);
+  }
+  return reject('publication_date_unverified');
+}
+
 function identityAliases(team) {
   const aliases = teamSearchAliasesNormalized(team).filter(Boolean);
   const strong = aliases.filter((alias) => !SEARCH_ONLY_WEAK_IDENTITY_ALIASES.has(alias));
