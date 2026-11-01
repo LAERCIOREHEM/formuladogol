@@ -482,13 +482,14 @@ jobs:
           if (Number(h.opsRagRuntimeVersion) !== 1) problems.push(`opsRagRuntimeVersion=${h.opsRagRuntimeVersion}`);
           if (Number(h.opsMcpGatewayVersion) !== 1) problems.push(`opsMcpGatewayVersion=${h.opsMcpGatewayVersion}`);
           if (h.healthFineTuning !== 'not_used_by_design') problems.push(`healthFineTuning=${h.healthFineTuning}`);
-          if (h.readinessAlertPolicyVersion !== 'R10.1') problems.push(`readinessAlertPolicyVersion=${h.readinessAlertPolicyVersion}`);
-          if (h.readinessLifecyclePolicyVersion !== '6-R10.2') problems.push(`readinessLifecyclePolicyVersion=${h.readinessLifecyclePolicyVersion}`);
+          if (h.readinessAlertPolicyVersion !== 'R10.3') problems.push(`readinessAlertPolicyVersion=${h.readinessAlertPolicyVersion}`);
+          if (h.readinessLifecyclePolicyVersion !== '6-R10.3') problems.push(`readinessLifecyclePolicyVersion=${h.readinessLifecyclePolicyVersion}`);
           if (h.readinessOperationalWindowOnly !== true) problems.push('readinessOperationalWindowOnly!=true');
           if (h.readinessStalePreflightPruning !== true) problems.push('readinessStalePreflightPruning!=true');
           if (h.readinessIncidentDedup !== true) problems.push('readinessIncidentDedup!=true');
           if (h.readinessExactEventIdAuthority !== true) problems.push('readinessExactEventIdAuthority!=true');
           if (h.readinessHealthDuplicateSuppression !== true) problems.push('readinessHealthDuplicateSuppression!=true');
+          if (h.readinessSourceLagEmailSuppression !== true) problems.push('readinessSourceLagEmailSuppression!=true');
           if (h.feedbackNotifier !== true) problems.push('feedbackNotifier!=true');
           if (process.env.FEEDBACK_EXPECTED === '1' && h.feedbackNotifierConfigured !== true) problems.push('feedbackNotifierConfigured!=true');
           if (h.liveStatePrimary !== 'worker-espn') problems.push(`liveStatePrimary=${h.liveStatePrimary}`);
