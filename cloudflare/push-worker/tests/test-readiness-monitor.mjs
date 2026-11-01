@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { SportsMonitor, countReadinessPending, pruneReadinessPreflight } from '../src/sports-monitor.js';
+import { readinessSnapshot, resolveScoreboardEvent } from '../src/readiness-guardian.js';
 
 class FakeStorage {
   constructor(){ this.map=new Map(); this.alarm=null; }
@@ -72,6 +73,52 @@ class FakeDB {
   const postMatches={live:{state:'post',kickoff:upcomingKickoff}};
   assert.equal(countReadinessPending(activePreflight,activeWatchlist,postMatches,currentNow),0,'partida finalizada não pode manter readiness pendente');
 }
+
+// R10R33: teste de integração do canal de e-mail, não apenas do helper.
+// Os dois incidentes reais da Copa do Brasil NÃO são falhas operacionais.
+{
+  const db=new FakeDB();
+  const monitor=new SportsMonitor({storage:new FakeStorage()},{DB:db});
+  const sent=[];
+  monitor.notifyReadinessIncident=async (game, checkpoint, readiness, severity)=>{
+    sent.push({id:game.eventId,checkpoint,severity,reasons:readiness.reasons});
+    return 'sent';
+  };
+  const watchlist={},preflight={};
+  for(const fixture of [
+    {id:'401913105',kickoff:'2026-11-01T16:00:00-03:00',home:'Palmeiras',away:'Vasco da Gama'},
+    {id:'401913109',kickoff:'2026-11-01T18:30:00-03:00',home:'Grêmio',away:'Atlético-MG'}
+  ]){
+    const game={eventId:fixture.id,sourceEventId:fixture.id,league:'bra.copa_do_brazil',
+      kickoff:fixture.kickoff,home:{id:'h',name:fixture.home},away:{id:'a',name:fixture.away}};
+    const raw={id:fixture.id,date:fixture.kickoff,status:{type:{state:'pre'}},
+      competitions:[{competitors:[
+        {homeAway:'home',team:{id:'h',displayName:fixture.home}},
+        {homeAway:'away',team:{id:'a',displayName:fixture.away}}
+      ]}]};
+    const resolved=resolveScoreboardEvent([raw],game);
+    const kickoffMs=Date.parse(fixture.kickoff);
+    const t3=readinessSnapshot(game,resolved,{initialized:true,state:'pre'}, {},'tplus3',kickoffMs+3*60_000);
+    await monitor.persistPreflight(game,'tplus3',t3,false,false,true);
+    const t10=readinessSnapshot(game,resolved,{initialized:true,state:'pre'}, {},'tplus3',kickoffMs+10*60_000);
+    await monitor.persistPreflight(game,'tplus3',t10,false,false,true);
+    watchlist[fixture.id]=game;
+    preflight[fixture.id]={tplus3:{completedAt:kickoffMs+3*60_000,...t10}};
+    assert.equal(db.incidents.get('push_readiness:'+fixture.id).severity,'observing',
+      'ESPN PRE-only only observed in monitor_incidents');
+  }
+  assert.equal(sent.length,0,'never send user T+3/T+10 mail for ESPN PRE-only');
+  assert.equal(countReadinessPending(preflight,watchlist,{},Date.parse('2026-11-01T18:41:00-03:00')),0,
+    'source lag only must not mark operational Health as actionable');
+  const problemGame=watchlist['401913109'];
+  const bad=readinessSnapshot(problemGame,null,{initialized:true,state:'pre'}, {},'tplus3',
+    Date.parse('2026-11-01T18:41:00-03:00'));
+  await monitor.persistPreflight(problemGame,'tplus3',bad,false,false,true);
+  assert.equal(sent.length,1,'missing ESPN event must still generate a true actionable alert');
+  assert.equal(sent[0].id,'401913109');
+  assert.equal(db.incidents.get('push_readiness:401913109').severity,'critical');
+}
+console.log('R10R33 Copa do Brasil no-actionable-email integration: PASS');
 
 const realNow=Date.now, realFetch=globalThis.fetch;
 const kickoff='2026-09-08T23:30:00.000Z';
