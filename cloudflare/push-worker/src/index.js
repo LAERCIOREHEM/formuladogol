@@ -724,8 +724,8 @@ export default {
         opsMcpGatewayVersion: OPS_INTELLIGENCE_CONSTANTS.mcpGatewayVersion,
         healthFineTuning: 'not_used_by_design',
         sportsMonitorReady: Boolean(monitor?.ok),
-        readinessAlertPolicyVersion: 'R10.1',
-        readinessLifecyclePolicyVersion: '6-R10.2',
+        readinessAlertPolicyVersion: 'R10.3',
+        readinessLifecyclePolicyVersion: '6-R10.3',
         redCardEventPolicyVersion: RED_CARD_EVENT_POLICY_VERSION,
         redCardAggregateStatsIgnored: true,
         redCardEventContextRequired: true,
@@ -734,6 +734,7 @@ export default {
         readinessIncidentDedup: true,
         readinessExactEventIdAuthority: true,
         readinessHealthDuplicateSuppression: true,
+        readinessSourceLagEmailSuppression: true,
         operationalState: operational?.state || 'unknown',
         sports: {
           watchCount: Number(monitor?.watchCount || 0),

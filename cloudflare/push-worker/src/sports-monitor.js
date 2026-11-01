@@ -62,7 +62,7 @@ export function shouldRetryMissingScorers(previous, observation, missing, now = 
 }
 const LIVE_POLL_LATE_START_MS = 45 * 60_000;
 const LIVE_POLICY_VERSION = '6-R10';
-const READINESS_LIFECYCLE_POLICY_VERSION = '6-R10.2';
+const READINESS_LIFECYCLE_POLICY_VERSION = '6-R10.3';
 const ESSENTIAL_EVENT_TYPES = new Set(['prematch_15', 'goal', 'goal_overturned', 'red_card', 'lineup_confirmed', 'match_start', 'final_whistle']);
 
 function text(value) { return String(value == null ? '' : value).trim(); }
@@ -101,9 +101,12 @@ export function pruneReadinessPreflight(preflight = {}, watchlist = {}, matches 
 export function countReadinessPending(preflight = {}, watchlist = {}, matches = {}, nowMs = Date.now()) {
   const relevant = pruneReadinessPreflight(preflight, watchlist, matches, nowMs);
   let count = 0;
-  for (const state of Object.values(relevant)) {
+  for (const [eventId,state] of Object.entries(relevant)) {
     const latest = latestReadinessState(state || {});
-    if (latest && latest.readiness === 'red') count += 1;
+    // ESPN "pre" isolado não é falha operacional do push. O RED continua
+    // auditável no D1; o Health não deve exigir intervenção do usuário.
+    if (latest?.readiness === 'red'
+        && !continentalReadinessPreOnly(watchlist?.[eventId],latest)) count += 1;
   }
   return count;
 }
@@ -791,8 +794,9 @@ export class SportsMonitor {
       return;
     }
 
-    // ESPN 'pre' isolado em T+3 é observação transitória, não incidente crítico.
-    // Em T+10, se persistir, o recheck promoverá o incidente e enviará o alerta.
+    // ESPN 'pre' isolado com ID e monitor válidos é degradação de fonte,
+    // não falha do push nem ação do mantenedor. Nunca enviar T+3/T+10
+    // apenas por essa causa; manter diagnóstico e rechecks gratuitos.
     const transientPreGrace = shouldDeferReadinessPreAlert(game, readiness, checkpoint);
     const severity = transientPreGrace ? 'observing' : checkpoint === 'tplus3' ? 'critical' : checkpoint === 't10' ? 'warning' : 'observing';
     if (!current) {
@@ -1227,9 +1231,9 @@ export class SportsMonitor {
             };
           }
         } else {
-          // T+10: se a ESPN ainda estiver em PRE e não houver evidência de
-          // partida iniciada, o atraso deixa de ser transitório. Notificar uma
-          // vez pelo mecanismo existente de incidentes, sem mascarar RED.
+          // Recheck pós-T+10: se a ESPN continuar em PRE, registrar a
+          // degradação silenciosamente. O guard impede e-mail enquanto
+          // for a ÚNICA causa; falhas reais ainda notificam.
           const kickoff = Date.parse(game?.kickoff || '');
           if (Number.isFinite(kickoff) && startedAt >= kickoff + CONTINENTAL_READINESS_GRACE_MS
               && continentalReadinessPreOnly(game, follow)) {
