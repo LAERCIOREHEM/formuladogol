@@ -1,0 +1,44 @@
+name: FDG Readiness Copa do Brasil No-False-Email CI
+
+on:
+  pull_request:
+    paths:
+      - 'cloudflare/push-worker/src/readiness-guardian.js'
+      - 'cloudflare/push-worker/src/sports-monitor.js'
+      - 'cloudflare/push-worker/src/index.js'
+      - 'cloudflare/push-worker/tests/test-readiness-guardian.mjs'
+      - 'cloudflare/push-worker/tests/test-readiness-monitor.mjs'
+      - 'cloudflare/push-worker/tests/test-continental-readiness-guard.mjs'
+      - 'cloudflare/push-worker/tests/verify-monitor-deploy.mjs'
+      - '.github/workflows/deploy-push-worker.yml'
+      - '.github/workflows/readiness-copa-no-false-email-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  readiness-sports-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        working-directory: cloudflare/push-worker
+        run: npm install --no-audit --no-fund
+      - name: Check syntax
+        working-directory: cloudflare/push-worker
+        run: npm run check
+      - name: Regression all sports and notifications
+        working-directory: cloudflare/push-worker
+        run: npm run test:sports
+      - name: Copa do Brasil 401913105 + 401913109 user-email false alarms
+        working-directory: cloudflare/push-worker
+        run: |
+          node tests/test-readiness-guardian.mjs
+          node tests/test-readiness-monitor.mjs
+          node tests/test-continental-readiness-guard.mjs
+          node tests/verify-monitor-deploy.mjs --self-test
