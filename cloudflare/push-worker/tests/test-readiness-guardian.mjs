@@ -9,6 +9,7 @@ import {
   continentalReadinessPreOnly,
   shouldDeferReadinessPreAlert,
   CONTINENTAL_READINESS_GRACE_MS,
+  READINESS_SOURCE_LAG_WINDOW_MS,
   extractRedCards,
   applyRedCardObservations,
   extractLineupSnapshot,
@@ -37,7 +38,7 @@ function raw(id='401912542', state='pre') {
   };
 }
 
-assert.equal(READINESS_VERSION, '6-R10.1');
+assert.equal(READINESS_VERSION, '6-R10.3');
 assert.equal(RED_CARD_EVENT_POLICY_VERSION, '6-R10R6');
 assert.deepEqual(CHECKPOINTS.map((x) => x.key), ['t30','t10','tplus3']);
 assert.deepEqual(deriveScheduleEvents({}, {}, Date.now(), true), [], 'alertas legados de agenda precisam permanecer desativados');
@@ -71,12 +72,13 @@ assert.ok(readiness.reasons.includes('espn_still_pre_after_tplus3'));
 readiness = readinessSnapshot(game, resolveScoreboardEvent([raw('401912542','in')], game), initialized, {}, 'tplus3', Date.parse(kickoff)+3*60_000);
 assert.equal(readiness.ready, true);
 
-// R10R17.8: Brasileirão e continental não devem disparar alerta crítico
-// por um único status 'pre' da ESPN em T+3; em T+10 a falha passa a ser real.
+// R10R33: fonte ESPN em PRE isolado não é ação necessária, mesmo em T+10.
+// A Copa do Brasil deve seguir o mesmo contrato do Brasileirão/CONMEBOL.
 const brGame = { ...game, league:'bra.1', eventId:'401841268' };
 const brRaw = raw('401841268','pre');
 const at = (minutes) => Date.parse(kickoff) + minutes * 60_000;
 assert.equal(CONTINENTAL_READINESS_GRACE_MS, 10 * 60_000);
+assert.equal(READINESS_SOURCE_LAG_WINDOW_MS, 45 * 60_000);
 for (const leagueGame of [game, brGame]) {
   const source = leagueGame === game ? raw('401912542','pre') : brRaw;
   const resolvedPre = resolveScoreboardEvent([source], leagueGame);
@@ -85,12 +87,50 @@ for (const leagueGame of [game, brGame]) {
   assert.equal(continentalReadinessPreOnly(leagueGame, t3), true);
   assert.equal(shouldDeferReadinessPreAlert(leagueGame, t3, 'tplus3'), true, 'T+3: sem e-mail');
   assert.equal(shouldDeferReadinessPreAlert(leagueGame, { ...t3, checkedAt:new Date(at(9)).toISOString() }, 'tplus3'), true, 'T+9: sem e-mail');
-  assert.equal(shouldDeferReadinessPreAlert(leagueGame, { ...t3, checkedAt:new Date(at(10)).toISOString() }, 'tplus3'), false, 'T+10: escalada permitida');
+  assert.equal(shouldDeferReadinessPreAlert(leagueGame, { ...t3, checkedAt:new Date(at(10)).toISOString() }, 'tplus3'), true, 'T+10: ESPN pre isolado não gera e-mail');
+  assert.equal(shouldDeferReadinessPreAlert(leagueGame, { ...t3, checkedAt:new Date(at(30)).toISOString() }, 'tplus3'), true, 'T+30: não reabrir incidente não acionável');
+  assert.equal(shouldDeferReadinessPreAlert(leagueGame, { ...t3, checkedAt:new Date(at(46)).toISOString() }, 'tplus3'), false, 'fora da janela operacional: nunca haverá novo checkpoint');
   assert.equal(shouldDeferReadinessPreAlert(leagueGame, t3, 't10'), false, 'sem suprimir falhas no T-10');
   assert.equal(shouldDeferReadinessPreAlert(leagueGame, { ...t3, identityOk:false, reasons:['team_identity_mismatch','espn_still_pre_after_tplus3'] }, 'tplus3'), false, 'identidade errada permanece crítica');
   assert.equal(shouldDeferReadinessPreAlert(leagueGame, { ...t3, monitorInitialized:false, reasons:['monitor_not_initialized','espn_still_pre_after_tplus3'] }, 'tplus3'), false, 'monitor ausente permanece crítico');
   assert.equal(shouldDeferReadinessPreAlert(leagueGame, { ...t3, checkedAt:'invalid' }, 'tplus3'), false, 'horário inválido não pode mascarar falha');
 }
+// Reprodução EXATA dos dois e-mails de 01/11/2026: mesmos IDs ESPN
+// e horários oficiais em BRT. A fonte pode estar PRE, mas ID e monitor OK.
+for (const fixture of [
+  { id:'401913105', kickoff:'2026-11-01T16:00:00-03:00', home:'Palmeiras', away:'Vasco da Gama' },
+  { id:'401913109', kickoff:'2026-11-01T18:30:00-03:00', home:'Grêmio', away:'Atlético-MG' }
+]) {
+  const copaGame = {
+    eventId:fixture.id, sourceEventId:fixture.id, league:'bra.copa_do_brazil',
+    kickoff:fixture.kickoff, home:{id:'h-'+fixture.id,name:fixture.home},
+    away:{id:'a-'+fixture.id,name:fixture.away}
+  };
+  const copaRaw = {
+    id:fixture.id,date:fixture.kickoff,status:{type:{state:'pre'}},
+    competitions:[{competitors:[
+      {homeAway:'home',team:{id:copaGame.home.id,displayName:fixture.home}},
+      {homeAway:'away',team:{id:copaGame.away.id,displayName:fixture.away}}
+    ]}]
+  };
+  const kickoffTime = Date.parse(fixture.kickoff);
+  const t3 = readinessSnapshot(copaGame,resolveScoreboardEvent([copaRaw],copaGame),
+    {initialized:true,state:'pre'}, {},'tplus3',kickoffTime+3*60_000);
+  assert.deepEqual(t3.reasons,['espn_still_pre_after_tplus3']);
+  assert.equal(continentalReadinessPreOnly(copaGame,t3),true,fixture.id+' pre-only source lag');
+  for (const delta of [3,10,15,30,45]) {
+    assert.equal(shouldDeferReadinessPreAlert(copaGame,
+      {...t3,checkedAt:new Date(kickoffTime+delta*60_000).toISOString()},'tplus3'),
+      true,fixture.id+' at T+'+delta+' must NOT mail');
+  }
+  const unavailable=readinessSnapshot(copaGame,null,{initialized:true,state:'pre'},
+    {},'tplus3',kickoffTime+3*60_000);
+  assert.equal(shouldDeferReadinessPreAlert(copaGame,unavailable,'tplus3'),false,'ESPN event missing = actionable');
+  const uninitialized=readinessSnapshot(copaGame,resolveScoreboardEvent([copaRaw],copaGame),
+    {initialized:false,state:'pre'}, {},'tplus3',kickoffTime+3*60_000);
+  assert.equal(shouldDeferReadinessPreAlert(copaGame,uninitialized,'tplus3'),false,'monitor missing = actionable');
+}
+
 assert.equal(continentalReadinessPreOnly({ ...brGame, league:'bra.2' }, { ready:false, identityOk:true, monitorInitialized:true, reasons:['espn_still_pre_after_tplus3'] }), false, 'não estender guarda a ligas não monitoradas');
 
 // Regressão R10.1: event_id ESPN exato é autoridade de identidade. Diferença
