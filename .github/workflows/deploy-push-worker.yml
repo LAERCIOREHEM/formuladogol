@@ -181,14 +181,9 @@ jobs:
           FDG_D1_DATABASE_ID: ${{ steps.d1.outputs.database_id }}
         run: npm run render-config
 
-      - name: Aplicar schema D1
+      - name: Aplicar schema D1 com backoff para sobrecarga transitoria
         shell: bash
-        run: |
-          set -euo pipefail
-          for migration in migrations/*.sql; do
-            echo "Aplicando $migration"
-            npx wrangler d1 execute DB --remote --file="$migration" --config wrangler.generated.jsonc
-          done
+        run: bash scripts/apply-d1-migrations.sh
 
       - name: Deploy Worker + Durable Object + custom domain
         run: npx wrangler deploy --config wrangler.generated.jsonc
