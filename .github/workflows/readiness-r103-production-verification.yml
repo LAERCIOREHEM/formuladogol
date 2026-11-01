@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   verify:
@@ -51,6 +52,13 @@ jobs:
                   if attempt!=10:time.sleep(15)
           sys.exit(1)
           PY
+      - name: Show last production deploy runs and failed steps
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh api "repos/$GH_REPO/actions/workflows/deploy-push-worker.yml/runs?per_page=8" --jq '.workflow_runs[] | [.id,.event,.head_sha[0:10],.status,.conclusion,.created_at,.html_url] | @tsv'
   deploy-failed:
     if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success' }}
     runs-on: ubuntu-latest
