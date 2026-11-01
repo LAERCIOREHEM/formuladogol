@@ -1,0 +1,28 @@
+name: Push Worker D1 Deploy Backoff CI
+
+on:
+  pull_request:
+    paths:
+      - 'cloudflare/push-worker/scripts/apply-d1-migrations.sh'
+      - 'cloudflare/push-worker/tests/test-d1-migration-retry.sh'
+      - '.github/workflows/deploy-push-worker.yml'
+      - '.github/workflows/push-d1-deploy-backoff-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check bash syntax
+        working-directory: cloudflare/push-worker
+        run: |
+          bash -n scripts/apply-d1-migrations.sh
+          bash -n tests/test-d1-migration-retry.sh
+      - name: Test bounded retry, SQL fail-fast and persistent D1 overload
+        working-directory: cloudflare/push-worker
+        run: bash tests/test-d1-migration-retry.sh
