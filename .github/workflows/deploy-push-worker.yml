@@ -341,9 +341,12 @@ jobs:
           NODE
           )"
 
-          # R10R17-HF2: recusar deploy sem a regressão de competição do Match Identity Gate.
-          if [[ "${EXPECTED_SEARCH_PROFILE}" != "10" ]]; then
-            echo "::error::Match Identity Search Profile v10 obrigatório para bloquear fontes de outra competição."
+          # A versão 10 introduziu o Match Identity Gate. Versões superiores
+          # preservam o contrato e adicionam proteções (v11: cronologia).
+          # Nunca fixar igualdade de versão aqui: isso bloqueava deploys
+          # legítimos e deixava o Worker em versão antiga.
+          if ! [[ "${EXPECTED_SEARCH_PROFILE}" =~ ^[0-9]+$ ]] || (( EXPECTED_SEARCH_PROFILE < 10 )); then
+            echo "::error::Match Identity Search Profile mínimo v10 necessário; encontrado: ${EXPECTED_SEARCH_PROFILE}"
             exit 1
           fi
           echo "Esperado pelo código local: revision=${EXPECTED_REVISION}; gateway=${EXPECTED_GATEWAY}; stateContract=${EXPECTED_STATE_CONTRACT}; factsContract=${EXPECTED_FACTS_CONTRACT}; monitorFacts=${EXPECTED_MONITOR_FACTS}; scorerPolicy=${EXPECTED_SCORER_POLICY}; redCardPolicy=${EXPECTED_RED_CARD_POLICY}; statsFallback=${EXPECTED_STATS_FALLBACK}; postgame=${EXPECTED_POSTGAME}; searchProfile=${EXPECTED_SEARCH_PROFILE}"
