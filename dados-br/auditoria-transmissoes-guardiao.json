@@ -6682,51 +6682,125 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado: Coritiba x Vitória, 33ª rodada do Campeonato Brasileiro Série A, em 31/10/2026, às 16h (horário de Brasília), no Couto Pereira. A grade oficial consultada indica transmissão integral exclusiva pelo Premiere. O ge fará acompanhamento em Tempo Real, que não é transmissão de vídeo da partida."
+    },
+    {
+      "event_id": "401913105",
+      "jogo": "Palmeiras x Vasco da Gama",
+      "data_iso": "2026-11-01T16:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-11-01T14:34:18-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "GE TV"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cdn.conmebol.com/wp-content/uploads/2022/01/Manual-de-clubes-2022-CL-PORT-actualizado-VO1.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2024/02/Manual-de-Clubes-CL-2024-ESP-Digital.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR-Fev26.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/CS-2026-Manual-de-Clubes-POR-1.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/CS-2026-Manual-de-Clubes-POR.pdf",
+        "https://ge.globo.com/google/amp/futebol/copa-do-brasil/noticia/2026/09/10/semifinais-da-copa-do-brasil-2026-veja-os-mandos-de-campo.ghtml",
+        "https://ge.globo.com/google/amp/rs/futebol/copa-do-brasil/noticia/2026/09/27/cbf-define-datas-e-horarios-dos-jogos-das-semifinais-da-copa-do-brasil.ghtml",
+        "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/09/10/sorteio-dos-mandos-da-semifinal-da-copa-do-brasil-2026-veja-onde-assistir-ao-vivo.ghtml",
+        "https://ge.globo.com/sp/futebol/copa-do-brasil/noticia/2026/11/01/palmeiras-x-vasco-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://sbtnews.sbt.com.br/noticia/brasil/palmeiras-x-vasco-onde-assistir-ao-vivo-e-horario",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/semifinais-da-copa-do-brasil-comecam-neste-domingo",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/semis-da-copa-do-brasil-galo-e-vasco-decidem-em-casa-gremio-e-palmeiras-sao-mandantes-do-jogo-de-ida",
+        "https://www.cnnbrasil.com.br/esportes/futebol/copa-do-brasil/copa-do-brasil-cbf-define-datas-das-semifinais-de-2026",
+        "https://www.cnnbrasil.com.br/esportes/futebol/copa-do-brasil/palmeiras-x-vasco-horario-e-onde-assistir-ao-jogo-da-copa-do-brasil",
+        "https://www.primevideo.com/detail/0L0B455L4VHAJ2QUQ5G5EGQDSY",
+        "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/09/27/cbf-divulga-datas-e-horarios-das-semifinais-da-copa-do-brasil.amp.htm",
+        "https://www.uol.com.br/esporte/ultimas-noticias/2026/11/01/onde-vai-passar-palmeiras-x-vasco-pela-copa-do-brasil-como-assistir-ao-vivo.amp.htm",
+        "https://www.youtube.com/watch?v=ZyAVcPSttjA"
+      ],
+      "canais_depois": [
+        "Globo",
+        "GE TV",
+        "Premiere",
+        "Prime Video",
+        "SporTV"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/sp/futebol/copa-do-brasil/noticia/2026/11/01/palmeiras-x-vasco-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/semifinais-da-copa-do-brasil-comecam-neste-domingo"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=baGfKQNcuc4",
+          "scope": "match",
+          "valid_for_match": true,
+          "reason": "O dossiê identifica o vídeo oficial da ge tv como ao vivo e intitulado “PALMEIRAS X VASCO | COPA DO BRASIL | SEMIFINAL (IDA)”. A página do ge também relaciona explicitamente a ge tv entre as transmissões ao vivo da partida."
+        }
+      ],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado: Palmeiras x Vasco da Gama, Copa do Brasil 2026, semifinal — jogo de ida, em 1º de novembro de 2026 às 16h (horário de Brasília), no Nubank Parque. A transmissão integral no Brasil é de Globo, GE TV, Premiere, SporTV e Prime Video. A disponibilidade da Globo pode variar conforme a praça. GE TV não é apenas pré-jogo ou tempo real: há indicação de transmissão ao vivo do confronto."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841294",
-    "jogo": "Coritiba x Vitória",
-    "data_iso": "2026-10-31T16:00:00-03:00",
+    "event_id": "401913105",
+    "jogo": "Palmeiras x Vasco da Gama",
+    "data_iso": "2026-11-01T16:00:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-10-31T14:33:13-03:00",
+    "executado_em": "2026-11-01T14:34:18-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "Premiere"
+      "GE TV"
     ],
-    "status": "confirmado",
+    "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/27/brasileirao-2026-veja-a-tabela-detalhada-de-bahia-e-vitoria-entre-as-rodadas-31-e-34.ghtml",
-      "https://ge.globo.com/ba/futebol/times/vitoria/noticia/2026/10/31/vitoria-pega-o-coritiba-para-encerrar-jejum-e-evitar-menor-distancia-para-o-z-4-no-returno.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
-      "https://ge.globo.com/google/amp/pr/futebol/times/coritiba/noticia/2026/09/28/agenda-do-coritiba-confira-datas-e-horarios-dos-jogos-ate-a-34a-rodada-do-brasileirao.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/jogo/31-10-2026/coritiba-vitoria.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/16/coritiba-x-vitoria-pelo-brasileirao-tem-mudanca-de-data-e-horario-veja-detalhes.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/31/coritiba-x-vitoria-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/pr/futebol/times/coritiba/noticia/2026/10/30/coritiba-chega-aos-500-jogos-no-couto-pereira-pela-serie-a-em-meio-a-pressao-contra-o-rebaixamento.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/10/19/corinthians-x-vitoria-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-b/a/cbf-detalha-rodadas-31-a-34-da-serie-b",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-serie-a/empate-entre-corinthians-e-vitoria-encerra-31-rodada-do-brasileirao",
-      "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
-      "https://www.youtube.com/watch?v=FuPTa3y86-E",
-      "https://www.youtube.com/watch?v=dOdqhX4TuWI"
+      "https://cdn.conmebol.com/wp-content/uploads/2022/01/Manual-de-clubes-2022-CL-PORT-actualizado-VO1.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2024/02/Manual-de-Clubes-CL-2024-ESP-Digital.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR-Fev26.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CS-2026-Manual-de-Clubes-POR-1.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CS-2026-Manual-de-Clubes-POR.pdf",
+      "https://ge.globo.com/google/amp/futebol/copa-do-brasil/noticia/2026/09/10/semifinais-da-copa-do-brasil-2026-veja-os-mandos-de-campo.ghtml",
+      "https://ge.globo.com/google/amp/rs/futebol/copa-do-brasil/noticia/2026/09/27/cbf-define-datas-e-horarios-dos-jogos-das-semifinais-da-copa-do-brasil.ghtml",
+      "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/09/10/sorteio-dos-mandos-da-semifinal-da-copa-do-brasil-2026-veja-onde-assistir-ao-vivo.ghtml",
+      "https://ge.globo.com/sp/futebol/copa-do-brasil/noticia/2026/11/01/palmeiras-x-vasco-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://sbtnews.sbt.com.br/noticia/brasil/palmeiras-x-vasco-onde-assistir-ao-vivo-e-horario",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/semifinais-da-copa-do-brasil-comecam-neste-domingo",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/semis-da-copa-do-brasil-galo-e-vasco-decidem-em-casa-gremio-e-palmeiras-sao-mandantes-do-jogo-de-ida",
+      "https://www.cnnbrasil.com.br/esportes/futebol/copa-do-brasil/copa-do-brasil-cbf-define-datas-das-semifinais-de-2026",
+      "https://www.cnnbrasil.com.br/esportes/futebol/copa-do-brasil/palmeiras-x-vasco-horario-e-onde-assistir-ao-jogo-da-copa-do-brasil",
+      "https://www.primevideo.com/detail/0L0B455L4VHAJ2QUQ5G5EGQDSY",
+      "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/09/27/cbf-divulga-datas-e-horarios-das-semifinais-da-copa-do-brasil.amp.htm",
+      "https://www.uol.com.br/esporte/ultimas-noticias/2026/11/01/onde-vai-passar-palmeiras-x-vasco-pela-copa-do-brasil-como-assistir-ao-vivo.amp.htm",
+      "https://www.youtube.com/watch?v=ZyAVcPSttjA"
     ],
     "canais_depois": [
-      "Premiere"
+      "Globo",
+      "GE TV",
+      "Premiere",
+      "Prime Video",
+      "SporTV"
     ],
-    "exclusivo": true,
+    "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/31/coritiba-x-vitoria-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/jogo/31-10-2026/coritiba-vitoria.ghtml"
+      "https://ge.globo.com/sp/futebol/copa-do-brasil/noticia/2026/11/01/palmeiras-x-vasco-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/semifinais-da-copa-do-brasil-comecam-neste-domingo"
     ],
-    "youtube": [],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=baGfKQNcuc4",
+        "scope": "match",
+        "valid_for_match": true,
+        "reason": "O dossiê identifica o vídeo oficial da ge tv como ao vivo e intitulado “PALMEIRAS X VASCO | COPA DO BRASIL | SEMIFINAL (IDA)”. A página do ge também relaciona explicitamente a ge tv entre as transmissões ao vivo da partida."
+      }
+    ],
     "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado: Coritiba x Vitória, 33ª rodada do Campeonato Brasileiro Série A, em 31/10/2026, às 16h (horário de Brasília), no Couto Pereira. A grade oficial consultada indica transmissão integral exclusiva pelo Premiere. O ge fará acompanhamento em Tempo Real, que não é transmissão de vídeo da partida."
+    "resumo": "Confirmado: Palmeiras x Vasco da Gama, Copa do Brasil 2026, semifinal — jogo de ida, em 1º de novembro de 2026 às 16h (horário de Brasília), no Nubank Parque. A transmissão integral no Brasil é de Globo, GE TV, Premiere, SporTV e Prime Video. A disponibilidade da Globo pode variar conforme a praça. GE TV não é apenas pré-jogo ou tempo real: há indicação de transmissão ao vivo do confronto."
   },
-  "atualizado_em": "2026-10-31T14:33:13-03:00"
+  "atualizado_em": "2026-11-01T14:34:18-03:00"
 }
