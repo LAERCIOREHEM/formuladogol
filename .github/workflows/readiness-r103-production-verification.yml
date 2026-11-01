@@ -43,13 +43,13 @@ jobs:
               assert monitor.get('readinessVersion')=='6-R10.3',('monitor still old',monitor.get('readinessVersion'))
               assert monitor.get('readinessLifecyclePolicyVersion')=='6-R10.3',('monitor lifecycle still old',monitor.get('readinessLifecyclePolicyVersion'))
               print('PRODUCTION PASS: readiness R10.3, Copa do Brasil ESPN pre-only cannot trigger T+3/T+10 mail',flush=True)
-          for attempt in range(1,11):
+          for attempt in range(1,3):
               try:
                   check()
                   sys.exit(0)
               except Exception as exc:
                   print('Attempt',attempt,'not yet deployed:',str(exc)[:350],flush=True)
-                  if attempt!=10:time.sleep(15)
+                  if attempt!=2:time.sleep(10)
           sys.exit(1)
           PY
       - name: Show last production deploy runs and failed steps
