@@ -1,0 +1,26 @@
+name: Push Deploy Profile Version Gate CI
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/deploy-push-worker.yml'
+      - '.github/workflows/push-deploy-profile-gate-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require compatible minimum version and exact deployed verification
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          w=Path('.github/workflows/deploy-push-worker.yml').read_text()
+          assert '(( EXPECTED_SEARCH_PROFILE < 10 ))' in w
+          assert 'EXPECTED_SEARCH_PROFILE}" != "10"' not in w
+          assert "Number(s.searchProfileVersion) !== expectedSearch" in w
+          assert "readinessAlertPolicyVersion !== 'R10.3'" in w
+          assert "readinessSourceLagEmailSuppression !== true" in w
+          print('Deploy profile gate: v10 minimum, v11 allowed, deployed identity exact: PASS')
+          PY
