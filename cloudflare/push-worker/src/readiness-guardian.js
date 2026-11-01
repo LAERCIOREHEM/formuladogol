@@ -1,5 +1,5 @@
 const MINUTE = 60_000;
-export const READINESS_VERSION = '6-R10.1';
+export const READINESS_VERSION = '6-R10.3';
 export const RED_CARD_EVENT_POLICY_VERSION = '6-R10R6';
 export const PRECHECK_FROM_MS = 35 * MINUTE;
 export const PRECHECK_POLL_MS = 60_000;
@@ -350,25 +350,33 @@ export function dueReadinessCheckpoints(game, preflightState = {}, nowMs = Date.
 }
 
 
-// R10R17.8: a ESPN pode manter 'pre' por alguns minutos após o início
-// tanto no Brasileirão quanto nas competições continentais. Somente o
-// status PRE isolado recebe tolerância até T+10; falha de identidade, evento
-// ausente ou monitor não inicializado continuam gerando alertas imediatos.
-export const CONTINENTAL_READINESS_GRACE_MS = 10 * 60_000; // nome legado, agora compartilhado
+// R10R33: atraso isolado do status ESPN é degradação do provedor, NÃO uma
+// ação operacional do administrador. Isso vale também para a Copa do Brasil:
+// Palmeiras×Vasco (401913105) e Grêmio×Atlético-MG (401913109) ficaram em
+// "pre" após o início e dispararam e-mails T+3 sem falha comprovada do push.
+// Reter o RED para auditoria, mas não enviar e-mail nem contaminar o Health.
+// Event ID ausente/errado, identidade incompatível e monitor não inicializado
+// NÃO são tolerados e continuam com alerta crítico.
+export const CONTINENTAL_READINESS_GRACE_MS = 10 * 60_000; // legado: duração original
+export const READINESS_SOURCE_LAG_WINDOW_MS = 45 * 60_000;
 export function continentalReadinessPreOnly(game, readiness) {
   const league = String(game?.league || '').toLowerCase();
-  const eligible = league === 'bra.1' || league.startsWith('conmebol.') || league.startsWith('uefa.');
+  const eligible = league === 'bra.1' || league === 'bra.copa_do_brazil'
+    || league.startsWith('conmebol.') || league.startsWith('uefa.');
   const reasons = Array.isArray(readiness?.reasons) ? readiness.reasons : [];
   return eligible && readiness?.ready === false
     && readiness?.identityOk === true && readiness?.monitorInitialized === true
     && reasons.length === 1 && reasons[0] === 'espn_still_pre_after_tplus3';
 }
 
+// Mantém o nome legado para compatibilidade com o monitor, mas a política
+// não é mais "adiar e alarmar em T+10": nunca se manda e-mail por atraso
+// ESPNs isolado durante a janela operacional da partida.
 export function shouldDeferReadinessPreAlert(game, readiness, checkpoint) {
   const kickoffMs = Date.parse(game?.kickoff || '');
   const checkedMs = Date.parse(readiness?.checkedAt || '');
   return checkpoint === 'tplus3' && Number.isFinite(kickoffMs) && Number.isFinite(checkedMs)
-    && checkedMs >= kickoffMs && checkedMs < kickoffMs + CONTINENTAL_READINESS_GRACE_MS
+    && checkedMs >= kickoffMs && checkedMs <= kickoffMs + READINESS_SOURCE_LAG_WINDOW_MS
     && continentalReadinessPreOnly(game, readiness);
 }
 
