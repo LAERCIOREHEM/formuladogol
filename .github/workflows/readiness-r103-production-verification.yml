@@ -1,0 +1,60 @@
+name: Readiness R10.3 Production Verification
+
+on:
+  pull_request:
+    paths: ['.github/workflows/readiness-r103-production-verification.yml']
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Deploy Push Worker']
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Check deployed health contracts, no emails sent
+        shell: bash
+        run: |
+          python -u - <<'PY'
+          import json,time,urllib.request,urllib.error,sys
+          base='https://push.formuladogol.com.br'
+          def get(path):
+              req=urllib.request.Request(base+path,headers={
+                  'User-Agent':'FDG-Readiness-R103-Live-Smoke/1.0',
+                  'Accept':'application/json',
+                  'Cache-Control':'no-cache'
+              })
+              with urllib.request.urlopen(req,timeout=25) as response:
+                  return json.loads(response.read().decode('utf-8'))
+          def check():
+              health=get('/health')
+              assert health.get('service')=='formula-do-gol-push',('unexpected worker',health.get('service'))
+              assert health.get('readinessAlertPolicyVersion')=='R10.3',('old alert policy',health.get('readinessAlertPolicyVersion'))
+              assert health.get('readinessLifecyclePolicyVersion')=='6-R10.3',('old lifecycle',health.get('readinessLifecyclePolicyVersion'))
+              assert health.get('readinessSourceLagEmailSuppression') is True,'source lag suppression not deployed'
+              monitor=get('/v1/monitor/status')
+              assert monitor.get('readinessVersion')=='6-R10.3',('monitor still old',monitor.get('readinessVersion'))
+              assert monitor.get('readinessLifecyclePolicyVersion')=='6-R10.3',('monitor lifecycle still old',monitor.get('readinessLifecyclePolicyVersion'))
+              print('PRODUCTION PASS: readiness R10.3, Copa do Brasil ESPN pre-only cannot trigger T+3/T+10 mail',flush=True)
+          for attempt in range(1,11):
+              try:
+                  check()
+                  sys.exit(0)
+              except Exception as exc:
+                  print('Attempt',attempt,'not yet deployed:',str(exc)[:350],flush=True)
+                  if attempt!=10:time.sleep(15)
+          sys.exit(1)
+          PY
+  deploy-failed:
+    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo 'Push Worker deploy failed; readiness R10.3 not verified.'
+          exit 1
