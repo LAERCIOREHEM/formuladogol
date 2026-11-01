@@ -3,13 +3,13 @@
 # SQL files are designed to be idempotent on this repository.
 set -euo pipefail
 shopt -s nullglob
-migrations_dir="\${FDG_D1_MIGRATIONS_DIR:-migrations}"
-max_attempts="\${FDG_D1_MAX_ATTEMPTS:-6}"
-retry_base="\${FDG_D1_RETRY_WAIT_SECS:-6}"
-pause="\${FDG_D1_INTER_MIGRATION_PAUSE_SECS:-3}"
-config="\${FDG_D1_WRANGLER_CONFIG:-wrangler.generated.jsonc}"
+migrations_dir="${FDG_D1_MIGRATIONS_DIR:-migrations}"
+max_attempts="${FDG_D1_MAX_ATTEMPTS:-6}"
+retry_base="${FDG_D1_RETRY_WAIT_SECS:-6}"
+pause="${FDG_D1_INTER_MIGRATION_PAUSE_SECS:-3}"
+config="${FDG_D1_WRANGLER_CONFIG:-wrangler.generated.jsonc}"
 migrations=("$migrations_dir"/*.sql)
-if ((\${#migrations[@]} == 0)); then
+if ((${#migrations[@]} == 0)); then
   echo "ERRO: nenhuma migracao D1 em $migrations_dir" >&2
   exit 1
 fi
@@ -17,7 +17,7 @@ if ! [[ "$max_attempts" =~ ^[1-9][0-9]*$ && "$retry_base" =~ ^[0-9]+$ && "$pause
   echo "ERRO: configuracao de retry D1 invalida" >&2
   exit 2
 fi
-for migration in "\${migrations[@]}"; do
+for migration in "${migrations[@]}"; do
   attempt=1
   while true; do
     output="$(mktemp)"
@@ -45,10 +45,10 @@ for migration in "\${migrations[@]}"; do
     fi
     delay=$((retry_base * (2 ** (attempt - 1))))
     if ((delay > 60)); then delay=60; fi
-    echo "D1 temporariamente sobrecarregado; nova tentativa apos \${delay}s." >&2
+    echo "D1 temporariamente sobrecarregado; nova tentativa apos ${delay}s." >&2
     sleep "$delay"
     attempt=$((attempt+1))
   done
   if ((pause > 0)); then sleep "$pause"; fi
 done
-echo "D1 schema OK: \${#migrations[@]} arquivos verificados."
+echo "D1 schema OK: ${#migrations[@]} arquivos verificados."
