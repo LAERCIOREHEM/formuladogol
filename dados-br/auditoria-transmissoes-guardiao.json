@@ -6799,65 +6799,113 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para Grêmio x Atlético-MG, jogo de ida da semifinal da Copa do Brasil, em 01/11/2026 às 18h30 (Brasília), na Arena do Grêmio, em Porto Alegre: SporTV, Premiere e Amazon Prime (Prime Video) transmitem integralmente. Globo e GE TV não entram na grade desta partida; a fonte do dossiê referia-se a Palmeiras x Vasco, outro jogo da semifinal."
+    },
+    {
+      "event_id": "401841299",
+      "jogo": "Bragantino x Santos",
+      "data_iso": "2026-11-02T20:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-11-02T18:33:29-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "CazéTV",
+        "Premiere",
+        "SporTV"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/cartola/noticia/2026/10/30/rodada-34-do-cartola-tera-nove-jogos-validos-saiba-o-horario-do-fechamento-do-mercado.ghtml",
+        "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+        "https://ge.globo.com/sp/vale-do-paraiba-regiao",
+        "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/jogo/02-11-2026/bragantino-santos.ghtml",
+        "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/11/02/bragantino-x-santos-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/times/bragantino/noticia/2026/10/30/bragantino-tem-a-volta-de-dois-jogadores-para-enfrentar-o-santos.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/red-bull-bragantino-x-santos-fc/832225",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/brasileirao-30-rodada-termina-com-vitoria-do-red-bull-bragantino-sobre-o-cruzeiro",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/brasileirao-33-rodada-comeca-com-classico-da-saudade-e-duelo-tricolor",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/duelo-entre-red-bull-bragantino-e-santos-abre-34-rodada-nesta-segunda-feira",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/serie-a/serie-a-sao-paulo-x-santos-e-atletico-mg-x-bragantino-se-enfrentam-em-jogos-adiados-da-21-rodada",
+        "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a"
+      ],
+      "canais_depois": [
+        "Premiere",
+        "SporTV"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/red-bull-bragantino-x-santos-fc/832225",
+        "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/11/02/bragantino-x-santos-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=ftynqYKwkg0",
+          "scope": "post_game",
+          "valid_for_match": false,
+          "reason": "O título informado no dossiê diz 'LOGO APÓS O JOGO ... | GERAL CAZÉTV' e o início programado é 22h, duas horas após o pontapé inicial das 20h. Isso caracteriza programação pós-jogo, sem evidência de transmissão integral da partida."
+        }
+      ],
+      "youtube_removidos": [
+        "https://www.youtube.com/watch?v=ftynqYKwkg0"
+      ],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Red Bull Bragantino x Santos, Brasileirão Série A 2026, fase única, rodada 34, nesta segunda-feira, 2 de novembro de 2026, às 20h (BRT), no Cícero de Souza Marques, em Bragança Paulista. A transmissão integral é de Premiere e SporTV. A CBF lista ambos no registro oficial do jogo, e o ge confirma as duas emissoras. CazéTV não entra na grade: o URL do dossiê é programado para 'logo após o jogo', portanto é conteúdo pós-jogo, não a partida integral."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401913109",
-    "jogo": "Grêmio x Atlético-MG",
-    "data_iso": "2026-11-01T18:30:00-03:00",
+    "event_id": "401841299",
+    "jogo": "Bragantino x Santos",
+    "data_iso": "2026-11-02T20:00:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-11-01T17:29:31-03:00",
+    "executado_em": "2026-11-02T18:33:29-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "GE TV",
+      "CazéTV",
       "Premiere",
-      "SporTV",
-      "Globo",
-      "Prime Video"
+      "SporTV"
     ],
     "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/futebol/copa-do-brasil/noticia/2026/06/22/oitavas-de-final-da-copa-do-brasil-2026-veja-datas-e-horarios.ghtml",
-      "https://ge.globo.com/futebol/times/atletico-mg/index/feed/pagina-6.ghtml",
-      "https://ge.globo.com/google/amp/rs/futebol/copa-do-brasil/noticia/2026/11/01/gremio-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/08/16/atletico-mg-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/10/08/athletico-pr-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/pr/futebol/copa-do-brasil/noticia/2026/08/04/copa-do-brasil-onde-assistir-ao-vivo-aos-jogos-de-volta-das-oitavas-de-final.ghtml",
-      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/10/26/flamengo-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rs",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/02/25/gremio-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/gremio-x-atletico-mg-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
-      "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/08/11/quartas-da-copa-do-brasil-2026-veja-datas-e-horarios-dos-jogos.ghtml",
-      "https://ge.globo.com/rs/futebol/times/gremio",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/brasilia-recebe-final-da-copa-do-brasil-2026",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/gremio-iguala-recorde-do-flamengo-de-semifinais-de-copa-do-brasil",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/palmeiras-e-vasco-avancam-as-semifinais-da-copa-do-brasil",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/semifinais-da-copa-do-brasil-comecam-neste-domingo",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/semis-da-copa-do-brasil-galo-e-vasco-decidem-em-casa-gremio-e-palmeiras-sao-mandantes-do-jogo-de-ida",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil/a/cbf-realiza-sorteio-dos-mandos-das-semifinais-da-copa-do-brasil-na-quinta-feira",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil/a/com-classicos-estaduais-copa-betano-do-brasil-conhece-confrontos-das-quartas-de-final",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil/a/gremio-bate-inter-por-3-a-1-e-avanca-a-semifinal-da-copa-do-brasil",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil/copa-brasil-masculino/cbf-define-detalhes-das-quartas-de-final-da-copa-betano-do-brasil-2026",
-      "https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/2002",
-      "https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/profissional/2026"
+      "https://ge.globo.com/cartola/noticia/2026/10/30/rodada-34-do-cartola-tera-nove-jogos-validos-saiba-o-horario-do-fechamento-do-mercado.ghtml",
+      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+      "https://ge.globo.com/sp/vale-do-paraiba-regiao",
+      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/jogo/02-11-2026/bragantino-santos.ghtml",
+      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/11/02/bragantino-x-santos-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/times/bragantino/noticia/2026/10/30/bragantino-tem-a-volta-de-dois-jogadores-para-enfrentar-o-santos.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/red-bull-bragantino-x-santos-fc/832225",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/brasileirao-30-rodada-termina-com-vitoria-do-red-bull-bragantino-sobre-o-cruzeiro",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/brasileirao-33-rodada-comeca-com-classico-da-saudade-e-duelo-tricolor",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/duelo-entre-red-bull-bragantino-e-santos-abre-34-rodada-nesta-segunda-feira",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/serie-a/serie-a-sao-paulo-x-santos-e-atletico-mg-x-bragantino-se-enfrentam-em-jogos-adiados-da-21-rodada",
+      "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a"
     ],
     "canais_depois": [
-      "SporTV",
       "Premiere",
-      "Prime Video"
+      "SporTV"
     ],
     "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/google/amp/rs/futebol/copa-do-brasil/noticia/2026/11/01/gremio-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/2002"
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/red-bull-bragantino-x-santos-fc/832225",
+      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/11/02/bragantino-x-santos-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
     ],
-    "youtube": [],
-    "youtube_removidos": [],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=ftynqYKwkg0",
+        "scope": "post_game",
+        "valid_for_match": false,
+        "reason": "O título informado no dossiê diz 'LOGO APÓS O JOGO ... | GERAL CAZÉTV' e o início programado é 22h, duas horas após o pontapé inicial das 20h. Isso caracteriza programação pós-jogo, sem evidência de transmissão integral da partida."
+      }
+    ],
+    "youtube_removidos": [
+      "https://www.youtube.com/watch?v=ftynqYKwkg0"
+    ],
     "overlay_alterado": true,
-    "resumo": "Confirmado para Grêmio x Atlético-MG, jogo de ida da semifinal da Copa do Brasil, em 01/11/2026 às 18h30 (Brasília), na Arena do Grêmio, em Porto Alegre: SporTV, Premiere e Amazon Prime (Prime Video) transmitem integralmente. Globo e GE TV não entram na grade desta partida; a fonte do dossiê referia-se a Palmeiras x Vasco, outro jogo da semifinal."
+    "resumo": "Confirmado para o Brasil: Red Bull Bragantino x Santos, Brasileirão Série A 2026, fase única, rodada 34, nesta segunda-feira, 2 de novembro de 2026, às 20h (BRT), no Cícero de Souza Marques, em Bragança Paulista. A transmissão integral é de Premiere e SporTV. A CBF lista ambos no registro oficial do jogo, e o ge confirma as duas emissoras. CazéTV não entra na grade: o URL do dossiê é programado para 'logo após o jogo', portanto é conteúdo pós-jogo, não a partida integral."
   },
-  "atualizado_em": "2026-11-01T17:29:31-03:00"
+  "atualizado_em": "2026-11-02T18:33:29-03:00"
 }
