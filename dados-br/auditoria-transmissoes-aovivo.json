@@ -17,7 +17,7 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 4,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 31,
+    "candidatos_oficiais_encontrados": 37,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
@@ -69,12 +69,12 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841304",
+      "event_id": "401841301",
       "rodada": 34,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Chapecoense x Mirassol",
-      "data_iso": "2026-11-03T19:30:00-03:00",
+      "jogo": "Internacional x Coritiba",
+      "data_iso": "2026-11-03T21:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -189,6 +189,26 @@
   ],
   "rejeitados": [
     {
+      "video_id": "uLqXRKXOB8E",
+      "url": "https://www.youtube.com/watch?v=uLqXRKXOB8E",
+      "fonte": "sbt",
+      "canal": "SBT",
+      "titulo": "SBT  Ao Vivo",
+      "status": "live",
+      "inicio_programado": "2026-11-03T17:10:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "3QGqzvp8-SI",
+      "url": "https://www.youtube.com/watch?v=3QGqzvp8-SI",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "JORGE IGGOR LISTA OS 10 MELHORES JOGADORES DO BRASIL NO MÊS DE OUTUBRO! | Gabariggor | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-03T23:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "50fYjfnzpvY",
       "url": "https://www.youtube.com/watch?v=50fYjfnzpvY",
       "fonte": "getv",
@@ -239,16 +259,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "PjxpTrtP05Q",
-      "url": "https://www.youtube.com/watch?v=PjxpTrtP05Q",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO! NA PONTA DOS DEDOS ANALISA CAMPEONATO DE KIMI ANTONELLI! #podcast | ge.globo",
-      "status": "live",
-      "inicio_programado": "2026-11-03T17:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "TEx8KlYjDAk",
       "url": "https://www.youtube.com/watch?v=TEx8KlYjDAk",
       "fonte": "getv",
@@ -284,7 +294,7 @@
       "fonte": "getv",
       "canal": "ge tv",
       "titulo": "AO VIVO! SÃO PAULO X CORINTHIANS, FLAMENGO X GRÊMIO e PALMEIRAS X REMO! | Denilson show | ge tv",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-11-03T19:00:00-03:00",
       "motivo": "conteúdo reúne mais de uma partida"
     },
@@ -307,16 +317,6 @@
       "status": "upcoming",
       "inicio_programado": "2026-11-08T11:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "ZEyw45Np6ls",
-      "url": "https://www.youtube.com/watch?v=ZEyw45Np6ls",
-      "fonte": "sbt_sports",
-      "canal": "SBT Sports",
-      "titulo": "PÓS-JOGO - BARCELONA X ASTON VILLA | FUTLIVE",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-03T19:00:00-03:00",
-      "motivo": "conteúdo rejeitado: pos jogo"
     },
     {
       "video_id": "0OZIxRZobq4",
@@ -349,16 +349,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "d3_HizrJ00s",
-      "url": "https://www.youtube.com/watch?v=d3_HizrJ00s",
-      "fonte": "sbt",
-      "canal": "SBT",
-      "titulo": "🔴Maria Rita e Thayná Bitencourt ao vivo no MISSÃO TELETON | (03/11/26)",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-03T18:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "17dRF5GXRCI",
       "url": "https://www.youtube.com/watch?v=17dRF5GXRCI",
       "fonte": "cazetv",
@@ -379,6 +369,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "2WEUufnlntw",
+      "url": "https://www.youtube.com/watch?v=2WEUufnlntw",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: LE MANS X MÔNACO | LIGUE 1 26/27 | 10ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-08T12:35:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "BvzKAxrzksU",
       "url": "https://www.youtube.com/watch?v=BvzKAxrzksU",
       "fonte": "cazetv",
@@ -386,6 +386,16 @@
       "titulo": "AO VIVO (SOM AMBIENTE): CELTIC X BEŞIKTAŞ | EUROPA LEAGUE 26/27 | RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-11-05T16:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "FOT1VnqNsCA",
+      "url": "https://www.youtube.com/watch?v=FOT1VnqNsCA",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: BRASIL X NIGÉRIA | COPA DO MUNDO FEMININA SUB-17 2026 | SEMIFINAL",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-04T14:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -399,6 +409,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "M6zzug9n3B0",
+      "url": "https://www.youtube.com/watch?v=M6zzug9n3B0",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: LENS X OLYMPIQUE MARSEILLE | LIGUE 1 26/27 | 10ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-08T16:05:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "RIrZqYcq48Y",
       "url": "https://www.youtube.com/watch?v=RIrZqYcq48Y",
       "fonte": "cazetv",
@@ -406,6 +426,16 @@
       "titulo": "AO VIVO: RENNES X OLYMPIAKOS | EUROPA LEAGUE  26/27 | 4ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-11-04T12:15:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "THv-sDWRuiA",
+      "url": "https://www.youtube.com/watch?v=THv-sDWRuiA",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ANA JÚLIA AMARAL E LUIZ DANIEL NA NATAÇÃO | JOGOS OLÍMPICOS DA JUVENTUDE DAKAR 2026",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-04T06:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -426,6 +456,26 @@
       "titulo": "AO VIVO (SOM AMBIENTE): SUNDERLAND X DINAMO ZAGREB | EUROPA LEAGUE 26/27 | RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-11-05T16:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "Yqe-YA61QrA",
+      "url": "https://www.youtube.com/watch?v=Yqe-YA61QrA",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: AUXERRE X PARIS FC | LIGUE 1 26/27 | 10ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-07T12:35:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "fWLkEXEq4rA",
+      "url": "https://www.youtube.com/watch?v=fWLkEXEq4rA",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: JAPÃO X COREIA DO NORTE | COPA DO MUNDO FEMININA SUB-17 2026 | SEMIFINAL",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-04T11:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -467,17 +517,27 @@
       "status": "upcoming",
       "inicio_programado": "2026-11-05T14:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "zXANPBOgg6E",
+      "url": "https://www.youtube.com/watch?v=zXANPBOgg6E",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: TOULOUSE X STRASBOURG | LIGUE 1 26/27 | 10ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-06T16:05:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
     }
   ],
   "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401841304",
+      "event_id": "401841301",
       "rodada": 34,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Chapecoense x Mirassol",
-      "data_iso": "2026-11-03T19:30:00-03:00",
+      "jogo": "Internacional x Coritiba",
+      "data_iso": "2026-11-03T21:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -491,5 +551,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-11-03T18:04:24-03:00"
+  "atualizado_em": "2026-11-03T20:02:02-03:00"
 }
