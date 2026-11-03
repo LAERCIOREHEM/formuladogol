@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "sorteio",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-10-31T18:04:16-03:00",
+  "gerado_em": "2026-11-02T22:11:11-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,19 +17,19 @@
     "ordem": 800,
     "nome": "Semifinal",
     "eventos": 4,
-    "eventos_pendentes": 4
+    "eventos_pendentes": 2
   },
   "resumo": {
     "eventos": 155,
-    "finalizados": 150,
-    "pendentes": 5,
+    "finalizados": 152,
+    "pendentes": 3,
     "equipes": 128,
     "equipes_serie_a_2026": 21
   },
   "coleta": {
     "modo": "incremental",
-    "janela_inicio": "2026-10-10T00:00:00-03:00",
-    "janela_fim": "2027-02-28T23:59:59-03:00",
+    "janela_inicio": "2026-10-12T00:00:00-03:00",
+    "janela_fim": "2027-03-02T23:59:59-03:00",
     "requisicoes": 3,
     "ultima_completa_em": "2026-10-30T22:11:25-03:00",
     "ajustes_editoriais_aplicados": 0
@@ -6841,9 +6841,9 @@
     {
       "event_id": "401913105",
       "data_iso": "2026-11-01T16:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "P.A.",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Semifinal",
       "fase_ordem": 800,
       "semana": null,
@@ -6857,8 +6857,8 @@
         "pais": "BRA",
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 1
       },
       "visitante": {
         "espn_id": "3454",
@@ -6871,16 +6871,16 @@
         "vencedor": false,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Palmeiras",
       "penaltis": false,
       "vencedor_penaltis": null
     },
     {
       "event_id": "401913109",
       "data_iso": "2026-11-01T18:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "P.A.",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Semifinal",
       "fase_ordem": 800,
       "semana": null,
@@ -6894,8 +6894,8 @@
         "pais": "BRA",
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 2
       },
       "visitante": {
         "espn_id": "7632",
@@ -6908,7 +6908,7 @@
         "vencedor": false,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Grêmio",
       "penaltis": false,
       "vencedor_penaltis": null
     },
