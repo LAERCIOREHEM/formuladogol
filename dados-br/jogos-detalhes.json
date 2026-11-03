@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-02T22:11:01.371925-03:00",
+  "gerado_em": "2026-11-03T00:26:35.668751-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 330,
   "total_com_estatisticas": 330,
-  "total_com_publico": 329,
+  "total_com_publico": 330,
   "total_com_eventos": 330,
   "total_com_jogadores": 330,
   "total_eventos_validados": 330,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Estádio Municipal Cicero de Souza Marques",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 7780,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://sports.sbt.com.br/noticia/sbt-sports/bragantino-vence-o-santos-e-pula-para-8o-no-brasileiro",
       "arbitro": "",
       "stats": [
         {
@@ -577,7 +577,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-02T22:11:01.287859-03:00"
+      "atualizado_em": "2026-11-02T22:11:01.287859-03:00",
+      "renda": 364490
     },
     "401841294": {
       "event_id": "401841294",
@@ -186538,5 +186539,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 306,
+  "total_com_renda": 330
 }
