@@ -13,16 +13,16 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 45,
+    "jogos_na_janela": 44,
     "jogos_foco": 1,
     "descobertas_antecipadas": 4,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 28,
+    "candidatos_oficiais_encontrados": 31,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
-    "transmissoes_publicadas": 5,
-    "sem_transmissao": 0,
+    "transmissoes_publicadas": 4,
+    "sem_transmissao": 1,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -69,16 +69,14 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841299",
+      "event_id": "401841304",
       "rodada": 34,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Bragantino x Santos",
-      "data_iso": "2026-11-02T20:00:00-03:00",
-      "principal": "CazéTV",
-      "fontes_encontradas": [
-        "CazéTV"
-      ],
+      "jogo": "Chapecoense x Mirassol",
+      "data_iso": "2026-11-03T19:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
       "manual": false,
       "descoberta_antecipada": false
     },
@@ -173,22 +171,6 @@
       ]
     },
     {
-      "event_id": "401841299",
-      "jogo": "Bragantino x Santos",
-      "fonte": "cazetv",
-      "video_id": "ftynqYKwkg0",
-      "url": "https://www.youtube.com/watch?v=ftynqYKwkg0",
-      "titulo": "AO VIVO: LOGO APÓS O JOGO ENTRE RB BRAGANTINO X SANTOS NO BRASILEIRÃO | GERAL CAZÉTV",
-      "status": "upcoming",
-      "confianca": 0.85,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "horário compatível (120 min de diferença)"
-      ]
-    },
-    {
       "event_id": "401841306",
       "jogo": "Athletico-PR x Vasco da Gama",
       "fonte": "cazetv",
@@ -196,36 +178,16 @@
       "url": "https://www.youtube.com/watch?v=cOjixSohLkY",
       "titulo": "AO VIVO: ATHLETICO X VASCO | BRASILEIRÃO 2026 | 34ª RODADA",
       "status": "upcoming",
-      "confianca": 0.95,
+      "confianca": 0.875,
       "motivos": [
         "os dois clubes aparecem no título",
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
-        "horário compatível (0 min de diferença)"
+        "horário compatível (90 min de diferença)"
       ]
     }
   ],
   "rejeitados": [
-    {
-      "video_id": "HMCxHb_8nYc",
-      "url": "https://www.youtube.com/watch?v=HMCxHb_8nYc",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: SESI BAURU X PRAIA CLUBE | SUPERLIGA MASCULINA DE VÔLEI 2026/27 | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-11-02T18:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "3TeqzK12sI8",
-      "url": "https://www.youtube.com/watch?v=3TeqzK12sI8",
-      "fonte": "sbt",
-      "canal": "SBT",
-      "titulo": "🔴 MISSÃO TELETON | Pepita e Beto Marden (02/11/26)",
-      "status": "live",
-      "inicio_programado": "2026-11-02T18:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
     {
       "video_id": "50fYjfnzpvY",
       "url": "https://www.youtube.com/watch?v=50fYjfnzpvY",
@@ -262,7 +224,7 @@
       "fonte": "getv",
       "canal": "ge tv",
       "titulo": "AO VIVO: PAULISTANO BAURERI X SESI BAURU | SUPERLIGA FEMININA DE VÔLEI 2026/27 | ge tv",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-11-03T18:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -282,18 +244,8 @@
       "fonte": "getv",
       "canal": "ge tv",
       "titulo": "AO VIVO! NA PONTA DOS DEDOS ANALISA CAMPEONATO DE KIMI ANTONELLI! #podcast | ge.globo",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-11-03T17:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "S3O5pmcAP0U",
-      "url": "https://www.youtube.com/watch?v=S3O5pmcAP0U",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO! PRIMEIRA DESCIDA ANALISA JOGOS DA SEMANA 8 DA NFL #podcast | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-03T16:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -317,6 +269,26 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "bl8_mndeosk",
+      "url": "https://www.youtube.com/watch?v=bl8_mndeosk",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: FLAMENGO X GRÊMIO | PRÉ-JOGO | BRASILEIRÃO 2026 | Premiere",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-04T18:30:00-03:00",
+      "motivo": "conteúdo rejeitado: pre jogo"
+    },
+    {
+      "video_id": "gQjn6aRI8zA",
+      "url": "https://www.youtube.com/watch?v=gQjn6aRI8zA",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! SÃO PAULO X CORINTHIANS, FLAMENGO X GRÊMIO e PALMEIRAS X REMO! | Denilson show | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-03T19:00:00-03:00",
+      "motivo": "conteúdo reúne mais de uma partida"
+    },
+    {
       "video_id": "j80QKov4xqw",
       "url": "https://www.youtube.com/watch?v=j80QKov4xqw",
       "fonte": "getv",
@@ -337,33 +309,23 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "sy-lswpVI7U",
-      "url": "https://www.youtube.com/watch?v=sy-lswpVI7U",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO! COPA DO BRASIL, SÃO PAULO X CORINTHIANS, CRUZEIRO CAMPEÃO DA LIBERTA FEM.! | Panela Sportv",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-02T20:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "tFdDFe14q-o",
-      "url": "https://www.youtube.com/watch?v=tFdDFe14q-o",
+      "video_id": "ZEyw45Np6ls",
+      "url": "https://www.youtube.com/watch?v=ZEyw45Np6ls",
       "fonte": "sbt_sports",
       "canal": "SBT Sports",
-      "titulo": "AO VIVO | GALVÃO FC - 02/11/26",
+      "titulo": "PÓS-JOGO - BARCELONA X ASTON VILLA | FUTLIVE",
       "status": "upcoming",
-      "inicio_programado": "2026-11-02T23:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
+      "inicio_programado": "2026-11-03T19:00:00-03:00",
+      "motivo": "conteúdo rejeitado: pos jogo"
     },
     {
-      "video_id": "E5N8086Puug",
-      "url": "https://www.youtube.com/watch?v=E5N8086Puug",
+      "video_id": "0OZIxRZobq4",
+      "url": "https://www.youtube.com/watch?v=0OZIxRZobq4",
       "fonte": "sbt",
       "canal": "SBT",
-      "titulo": "SBT Ao Vivo",
-      "status": "live",
-      "inicio_programado": "2026-10-20T17:35:00-03:00",
+      "titulo": "MINI ACIDENTE: funileira é TROLADA no Eita Lucas antes de TRANSFORMAÇÃO",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-04T12:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -377,87 +339,157 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "KbG6W1CzGtI",
+      "url": "https://www.youtube.com/watch?v=KbG6W1CzGtI",
+      "fonte": "sbt",
+      "canal": "SBT",
+      "titulo": "SOM DE FACULDADE e JÚNIOR CAVANNE AGITAM o PALCO do EITA LUCAS!",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-07T12:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "d3_HizrJ00s",
       "url": "https://www.youtube.com/watch?v=d3_HizrJ00s",
       "fonte": "sbt",
       "canal": "SBT",
-      "titulo": "🔴 MISSÃO TELETON | Maria Rita e Thayná Bitencourt (03/11/26)",
+      "titulo": "🔴Maria Rita e Thayná Bitencourt ao vivo no MISSÃO TELETON | (03/11/26)",
       "status": "upcoming",
       "inicio_programado": "2026-11-03T18:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "nDdZIniwsfY",
-      "url": "https://www.youtube.com/watch?v=nDdZIniwsfY",
-      "fonte": "sbt",
-      "canal": "SBT",
-      "titulo": "🔴 MISSÃO TELETON | Cela Lopes e Duda Rubert (04/11/26)",
+      "video_id": "17dRF5GXRCI",
+      "url": "https://www.youtube.com/watch?v=17dRF5GXRCI",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): ANDERLECHT X FC SALZBURG | EUROPA LEAGUE 26/27 | RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-11-04T18:00:00-03:00",
+      "inicio_programado": "2026-11-05T14:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "yl-AseBJuvo",
-      "url": "https://www.youtube.com/watch?v=yl-AseBJuvo",
-      "fonte": "sbt",
-      "canal": "SBT",
-      "titulo": "Programa do João com Lucas Guimarães, Tio Paulo, Luara e Matheus Albino | (31/10/26)",
+      "video_id": "2AWoK6lGZsc",
+      "url": "https://www.youtube.com/watch?v=2AWoK6lGZsc",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): GETAFE X BRIGHTON | CONFERENCE LEAGUE 26/27 | RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-11-02T19:00:00-03:00",
+      "inicio_programado": "2026-11-05T16:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "0EqZef2S9ws",
-      "url": "https://www.youtube.com/watch?v=0EqZef2S9ws",
+      "video_id": "BvzKAxrzksU",
+      "url": "https://www.youtube.com/watch?v=BvzKAxrzksU",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: LOUD SC X FURIA FC | KINGS LEAGUE BRAZIL | 3ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-02T16:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "CpwOi6XUGrw",
-      "url": "https://www.youtube.com/watch?v=CpwOi6XUGrw",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: TÊNIS DE MESA | BRUNA TAKAHASHI NO WTT CHAMPIONS DE FRANKFURT",
+      "titulo": "AO VIVO (SOM AMBIENTE): CELTIC X BEŞIKTAŞ | EUROPA LEAGUE 26/27 | RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-11-03T09:45:00-03:00",
+      "inicio_programado": "2026-11-05T16:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "mXOil98FdlU",
-      "url": "https://www.youtube.com/watch?v=mXOil98FdlU",
+      "video_id": "GqdycOiqL7U",
+      "url": "https://www.youtube.com/watch?v=GqdycOiqL7U",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): FC LORIENT X STADE BRESTOIS | LIGUE 1 26/27 | 9ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-02T16:30:00-03:00",
+      "titulo": "AO VIVO (SOM AMBIENTE): ATALANTA X KAIRAT | CONFERENCE LEAGUE 26/27 | 3ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-05T14:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "u3vq7cKfPRo",
-      "url": "https://www.youtube.com/watch?v=u3vq7cKfPRo",
+      "video_id": "RIrZqYcq48Y",
+      "url": "https://www.youtube.com/watch?v=RIrZqYcq48Y",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: A CORUÑA X OSASUNA | LALIGA 26/27 | 11ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-02T16:45:00-03:00",
+      "titulo": "AO VIVO: RENNES X OLYMPIAKOS | EUROPA LEAGUE  26/27 | 4ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-04T12:15:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "U5xo3pSswp4",
+      "url": "https://www.youtube.com/watch?v=U5xo3pSswp4",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): AGF FODBOLD X BRAGA | CONFERENCE LEAGUE 26/27 | RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-05T14:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "Um6L1X6_6-4",
+      "url": "https://www.youtube.com/watch?v=Um6L1X6_6-4",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): SUNDERLAND X DINAMO ZAGREB | EUROPA LEAGUE 26/27 | RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-05T16:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "jDtB-bds6Oo",
+      "url": "https://www.youtube.com/watch?v=jDtB-bds6Oo",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): COPENHAGEN X IBERIA | CONFERENCE LEAGUE 26/27 | RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-05T16:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "qtYa-Zr8ncI",
+      "url": "https://www.youtube.com/watch?v=qtYa-Zr8ncI",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): PANATHINAIKOS X CSKA SOFIA | CONFERENCE LEAGUE 26/27 | RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-05T16:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "uV1_2DTfePw",
+      "url": "https://www.youtube.com/watch?v=uV1_2DTfePw",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): TRABZONSPOR X FREIBURG | CONFERENCE LEAGUE 26/27 | RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-05T14:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "xg_ji_foRDU",
+      "url": "https://www.youtube.com/watch?v=xg_ji_foRDU",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): MIDTJYLLAND X AJAX | CONFERENCE LEAGUE 26/27 | RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-05T14:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
   "search_api_pulados": [],
-  "sem_transmissao": [],
+  "sem_transmissao": [
+    {
+      "event_id": "401841304",
+      "rodada": 34,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Chapecoense x Mirassol",
+      "data_iso": "2026-11-03T19:30:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
+    }
+  ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 87,
+    "unidades": 86,
     "requisicoes": {
       "channels": 4,
-      "videos": 43,
+      "videos": 42,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-11-02T18:31:34-03:00"
+  "atualizado_em": "2026-11-03T18:04:24-03:00"
 }
