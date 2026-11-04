@@ -33,7 +33,7 @@ jobs:
               status,headers,body=read('https://push.formuladogol.com.br/health')
               health=json.loads(body)
               assert status==200 and health.get('service')=='formula-do-gol-push'
-              assert health.get('healthPolicyVersion')==14,('healthPolicyVersion not deployed',health.get('healthPolicyVersion'))
+              assert health.get('healthMonitorPolicyVersion')==14,('healthMonitorPolicyVersion not deployed',health.get('healthMonitorPolicyVersion'))
               status,headers,body=read('https://push.formuladogol.com.br/v1/health-monitor/status')
               report=json.loads(body)
               assert report.get('ok') is True
