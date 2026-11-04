@@ -1,0 +1,51 @@
+name: AF Mathematical Relegation CI
+on:
+  pull_request:
+    paths:
+      - 'scripts/gerar_probabilidades_brasileirao.py'
+      - 'scripts/af_previsao_continental.py'
+      - 'js/br-estatisticas.js'
+      - 'dados-br/probabilidades-brasileirao.json'
+      - '.github/workflows/af-mathematical-relegation-ci.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Python and JS syntax
+        run: |
+          python -m py_compile scripts/gerar_probabilidades_brasileirao.py scripts/af_previsao_continental.py
+          node --check js/br-estatisticas.js
+      - name: Validate proof and zero / hundred percent outputs
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('dados-br/probabilidades-brasileirao.json').read_text())
+          c=next(x for x in p['clubes'] if x['clube']=='Chapecoense')
+          d=c['probabilidades_detalhes']['rebaixamento']
+          assert (c['pontos_atuais'],c['jogos_atuais'])==(21,33)
+          assert d['certeza_estrutural'] is True and d['exibicao']=='100%'
+          assert '36 pontos' in d['motivo_certeza']
+          assert c['probabilidades_pct']['rebaixamento']==100
+          assert c['probabilidades_pct']['campeao']==0
+          assert c['probabilidades_pct']['libertadores']==0
+          assert c['probabilidades_pct']['sul_americana']==0
+          assert c['probabilidades_pct']['sem_competicao_continental']==100
+          from sys import path
+          path.insert(0,'scripts')
+          from af_previsao_continental import display_probability
+          certain=display_probability(2000000,2000000,0.001,structurally_certain=True,certainty_reason='prova aritmetica')
+          assert certain['exibicao']=='100%' and certain['motivo_certeza']=='prova aritmetica'
+          impossible=display_probability(0,2000000,0.001,structurally_possible=False)
+          assert impossible['exibicao']=='0%'
+          empirical=display_probability(2000000,2000000,0.001)
+          assert empirical['exibicao']!='100%',empirical
+          print('AF MATHEMATICAL RELEGATION PASS: proof, deterministic 0/100, empirical remains approximate')
+          PY
