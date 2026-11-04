@@ -1,16 +1,16 @@
 {
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
-    "jogos_na_janela": 45,
-    "jogos_com_transmissao": 33,
-    "jogos_sem_transmissao_na_janela": 12,
-    "jogos_sem_transmissao_14d": 2,
-    "jogos_sem_transmissao_fora_14d": 10,
+    "jogos_na_janela": 43,
+    "jogos_com_transmissao": 32,
+    "jogos_sem_transmissao_na_janela": 11,
+    "jogos_sem_transmissao_14d": 3,
+    "jogos_sem_transmissao_fora_14d": 8,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 11,
+    "registros_preservados": 23,
     "jogos_guardiao_ia": 2,
-    "jogos_estaveis_sem_reconsulta_editorial": 9,
-    "fontes_com_falha": 2
+    "jogos_estaveis_sem_reconsulta_editorial": 3,
+    "fontes_com_falha": 0
   },
   "fontes": {
     "guardiao_ia": {
@@ -18,34 +18,28 @@
       "jogos_com_canal": 2
     },
     "cbf": {
-      "ok": false,
-      "competicoes_ok": [],
+      "ok": true,
+      "competicoes_ok": [
+        "brasileirao"
+      ],
       "registros": 0,
       "erros": [
-        "Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 9909
-    },
-    "ge_agenda": {
-      "ok": true,
-      "jogos_com_canal": 14,
-      "duracao_ms": 13171
-    },
-    "ge_artigos": {
-      "ok": true,
-      "artigos_consultados": 4,
-      "jogos_com_canal": 0,
-      "duracao_ms": 57551
+      "duracao_ms": 3035
     },
     "espn": {
-      "ok": false,
-      "erro": "RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261101-20270104&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
+      "ok": true,
+      "competicoes_consultadas": 3,
+      "eventos_na_janela": 0,
+      "scoreboard_com_canal": 0,
+      "summary_com_canal": 0,
+      "duracao_ms": 0
     },
     "youtube_oficial": {
       "ok": true,
-      "jogos_com_canal": 4
+      "jogos_com_canal": 6
     }
   },
   "sem_transmissao": [
@@ -54,7 +48,7 @@
       "rodada": 35,
       "jogo": "Mirassol x Atlético-MG",
       "data_iso": "2026-11-14T18:30:00-03:00",
-      "faltam_horas": 261.6,
+      "faltam_horas": 240.4,
       "nivel": "aviso"
     },
     {
@@ -62,7 +56,15 @@
       "rodada": 21,
       "jogo": "Chapecoense x Vasco da Gama",
       "data_iso": "2026-11-14T20:30:00-03:00",
-      "faltam_horas": 263.6,
+      "faltam_horas": 242.4,
+      "nivel": "aviso"
+    },
+    {
+      "event_id": "401841312",
+      "rodada": 35,
+      "jogo": "Grêmio x Bahia",
+      "data_iso": "2026-11-18T17:00:00-03:00",
+      "faltam_horas": 334.9,
       "nivel": "aviso"
     }
   ],
@@ -72,7 +74,7 @@
       "rodada": 35,
       "jogo": "Mirassol x Atlético-MG",
       "data_iso": "2026-11-14T18:30:00-03:00",
-      "faltam_horas": 261.6,
+      "faltam_horas": 240.4,
       "nivel": "aviso"
     },
     {
@@ -80,7 +82,7 @@
       "rodada": 21,
       "jogo": "Chapecoense x Vasco da Gama",
       "data_iso": "2026-11-14T20:30:00-03:00",
-      "faltam_horas": 263.6,
+      "faltam_horas": 242.4,
       "nivel": "aviso"
     },
     {
@@ -88,23 +90,15 @@
       "rodada": 35,
       "jogo": "Grêmio x Bahia",
       "data_iso": "2026-11-18T17:00:00-03:00",
-      "faltam_horas": 356.1,
-      "nivel": "futuro"
-    },
-    {
-      "event_id": "401841315",
-      "rodada": 35,
-      "jogo": "Coritiba x Santos",
-      "data_iso": "2026-11-18T19:30:00-03:00",
-      "faltam_horas": 358.6,
-      "nivel": "futuro"
+      "faltam_horas": 334.9,
+      "nivel": "aviso"
     },
     {
       "event_id": "401841318",
       "rodada": 36,
       "jogo": "Athletico-PR x Remo",
       "data_iso": "2026-11-22T16:00:00-03:00",
-      "faltam_horas": 451.1,
+      "faltam_horas": 429.9,
       "nivel": "futuro"
     },
     {
@@ -112,7 +106,7 @@
       "rodada": 37,
       "jogo": "São Paulo x Remo",
       "data_iso": "2026-11-28T17:00:00-03:00",
-      "faltam_horas": 596.1,
+      "faltam_horas": 574.9,
       "nivel": "futuro"
     },
     {
@@ -120,7 +114,7 @@
       "rodada": 37,
       "jogo": "Mirassol x Athletico-PR",
       "data_iso": "2026-11-28T17:00:00-03:00",
-      "faltam_horas": 596.1,
+      "faltam_horas": 574.9,
       "nivel": "futuro"
     },
     {
@@ -128,7 +122,7 @@
       "rodada": 37,
       "jogo": "Vitória x Santos",
       "data_iso": "2026-11-28T17:00:00-03:00",
-      "faltam_horas": 596.1,
+      "faltam_horas": 574.9,
       "nivel": "futuro"
     },
     {
@@ -136,7 +130,7 @@
       "rodada": 37,
       "jogo": "Coritiba x Flamengo",
       "data_iso": "2026-11-28T17:00:00-03:00",
-      "faltam_horas": 596.1,
+      "faltam_horas": 574.9,
       "nivel": "futuro"
     },
     {
@@ -144,7 +138,7 @@
       "rodada": 37,
       "jogo": "Chapecoense x Palmeiras",
       "data_iso": "2026-11-28T17:00:00-03:00",
-      "faltam_horas": 596.1,
+      "faltam_horas": 574.9,
       "nivel": "futuro"
     },
     {
@@ -152,7 +146,7 @@
       "rodada": 37,
       "jogo": "Fluminense x Cruzeiro",
       "data_iso": "2026-11-28T17:00:00-03:00",
-      "faltam_horas": 596.1,
+      "faltam_horas": 574.9,
       "nivel": "futuro"
     },
     {
@@ -160,11 +154,26 @@
       "rodada": 0,
       "jogo": "Palmeiras x Estudiantes de La Plata",
       "data_iso": "2026-11-28T17:00:00-03:00",
-      "faltam_horas": 596.1,
+      "faltam_horas": 574.9,
       "nivel": "futuro"
     }
   ],
   "preservados": [
+    {
+      "event_id": "401841305",
+      "jogo": "Botafogo x Atlético-MG",
+      "canais": [
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841300",
+      "jogo": "Palmeiras x Remo",
+      "canais": [
+        "Premiere"
+      ]
+    },
     {
       "event_id": "401841303",
       "jogo": "Cruzeiro x Bahia",
@@ -191,6 +200,44 @@
         "GE TV",
         "Premiere",
         "Globo"
+      ]
+    },
+    {
+      "event_id": "401841314",
+      "jogo": "Cruzeiro x Palmeiras",
+      "canais": [
+        "Premiere",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841313",
+      "jogo": "Flamengo x Athletico-PR",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841316",
+      "jogo": "Corinthians x Botafogo",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841308",
+      "jogo": "Vasco da Gama x Internacional",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video",
+        "Disney+ / ESPN"
       ]
     },
     {
@@ -222,6 +269,15 @@
       ]
     },
     {
+      "event_id": "401841326",
+      "jogo": "Botafogo x São Paulo",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
       "event_id": "401841327",
       "jogo": "Bahia x Coritiba",
       "canais": [
@@ -239,13 +295,6 @@
         "Globo",
         "Prime Video",
         "Disney+ / ESPN"
-      ]
-    },
-    {
-      "event_id": "401841324",
-      "jogo": "Fluminense x Mirassol",
-      "canais": [
-        "Premiere"
       ]
     },
     {
@@ -271,19 +320,67 @@
         "Prime Video",
         "Disney+ / ESPN"
       ]
+    },
+    {
+      "event_id": "401841320",
+      "jogo": "Santos x Grêmio",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841319",
+      "jogo": "Atlético-MG x Corinthians",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841328",
+      "jogo": "Atlético-MG x Vasco da Gama",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841336",
+      "jogo": "Botafogo x Bahia",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Prime Video",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841334",
+      "jogo": "Corinthians x Grêmio",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841331",
+      "jogo": "Internacional x Bragantino",
+      "canais": [
+        "SporTV"
+      ]
     }
   ],
   "erros": [
-    "CBF: Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
     "CBF: Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
-    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
-    "ESPN: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261101-20270104&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
+    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
-  "artigos_ge_descobertos": [
-    "https://ge.globo.com/cartola/noticia/2026/11/03/cartola-2026-veja-suspensos-lesionados-e-escalacoes-provaveis-da-rodada-34-do-brasileirao.ghtml",
-    "https://ge.globo.com/pr/futebol/noticia/2026/11/03/athletico-x-paranavai-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-    "https://ge.globo.com/gato-mestre/dicas/noticia/2026/11/02/veja-a-expectativa-de-gols-xg-e-as-dicas-de-sg-para-a-rodada-34-do-cartola-2026.ghtml",
-    "https://ge.globo.com/gato-mestre/noticia/2026/11/02/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-34a-rodada-do-brasileirao.ghtml"
-  ],
-  "atualizado_em": "2026-11-03T20:51:46-03:00"
+  "artigos_ge_descobertos": [],
+  "atualizado_em": "2026-11-04T18:04:16-03:00"
 }
