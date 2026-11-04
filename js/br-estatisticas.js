@@ -1279,8 +1279,8 @@
     if (detail.impossivel_estruturalmente && detail.motivo_impossibilidade) {
       return `Impossível matematicamente — ${detail.motivo_impossibilidade}`;
     }
-    if (detail.certo_estruturalmente && detail.motivo_certeza) {
-      return `Garantido matematicamente — ${detail.motivo_certeza}`;
+    if (detail.certeza_estrutural === true) {
+      return `Garantido matematicamente — ${detail.motivo_certeza || "resultado comprovado pela pontuação máxima e pelos clubes inalcançáveis"}`;
     }
     const ocorrencias = Number(detail.ocorrencias);
     const simulacoes = Number(detail.simulacoes);
@@ -1301,10 +1301,11 @@
     const explicit = String(detail?.exibicao || "").replace(/\s/g, "");
     // O back-end conhece a aritmética da eliminação; o front-end só tem o
     // número. Quando ele já decidiu o rótulo, a decisão dele prevalece.
+    // Prova matemática precede inclusive a string 'exibicao' do snapshot.
+    if (detail?.impossivel_estruturalmente === true || detail?.possivel_estruturalmente === false) return "0%";
+    if (detail?.certeza_estrutural === true) return "100%";
     if (/^(0%|100%|~0%|~100%)$/.test(explicit)) return explicit;
     if (!Number.isFinite(n)) return "—";
-    if (detail?.impossivel_estruturalmente === true || detail?.possivel_estruturalmente === false) return "0%";
-    if (detail?.certeza_estrutural === true && n >= 100) return "100%";
     // O til marca resultado empírico: nunca observado é diferente de
     // observado e raro, e ambos são diferentes de impossível.
     if (detail?.zero_observado === true || n === 0) return "~0%";
@@ -1338,6 +1339,16 @@
   // exatamente 100%, sem impor três casas a linhas que só precisam de uma.
   function continentalDisplayTriplet(club) {
     const fields = ["libertadores", "sul_americana", "sem_competicao_continental"];
+    // Quando as três probabilidades estão exatamente em 0/0/100 e não há
+    // ocorrência continental, a tríade é inequívoca: não usar "~100%".
+    // Rebaixamento, isoladamente, NÃO proíbe vaga por copas.
+    const values = fields.map((field) => Number(probabilityFieldValue(club, field)));
+    const details = fields.map((field) => probabilityFieldDetail(club, field));
+    if (values[0] === 0 && values[1] === 0 && values[2] === 100
+        && details[0]?.ocorrencias === 0 && details[1]?.ocorrencias === 0
+        && details[2]?.certeza_estrutural === true) {
+      return { libertadores: "0%", sul_americana: "0%", sem_competicao_continental: "100%" };
+    }
     const raw = fields.map((field) => Math.max(0, Number(probabilityFieldValue(club, field)) || 0));
     const rawTotal = raw.reduce((sum, value) => sum + value, 0);
     const normalized = rawTotal > 0 ? raw.map((value) => 100 * value / rawTotal) : [0, 0, 100];
