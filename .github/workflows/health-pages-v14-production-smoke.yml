@@ -38,19 +38,19 @@ jobs:
               report=json.loads(body)
               assert report.get('ok') is True
               snapshot=report.get('snapshot') or {}
-              assert snapshot.get('policyVersion')==14,('snapshot not v14',snapshot.get('policyVersion'))
+              assert snapshot.get('policyVersion')==14,('snapshot not v14',snapshot.get('policyVersion'), report.get('scheduler'), report.get('lastRun'))
               site=next((r for r in snapshot.get('indicators',[]) if r.get('id')=='site'),None)
               assert site and site.get('severity')=='green',('Site/Pages',site)
               details=snapshot.get('pagesAvailability') or {}
               assert details.get('failedCycles')==0 and details.get('severity')=='green',details
               print('LIVE PASS: Site HTML 200; Worker Health v14; Pages GREEN; no false CRITICAL',flush=True)
-          for attempt in range(1,12):
+          for attempt in range(1,3):
               try:
                   check()
                   sys.exit(0)
               except Exception as exc:
                   print('NOT YET CONVERGED',attempt,str(exc)[:430],flush=True)
-                  if attempt<11: time.sleep(15)
+                  if attempt<2: time.sleep(10)
           sys.exit(1)
           PY
   deploy-failed:
