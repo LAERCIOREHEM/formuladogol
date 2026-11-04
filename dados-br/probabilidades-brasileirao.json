@@ -22,14 +22,14 @@
       "metodo": "EWMA de resíduos de gols sem componente sazonal",
       "janela_jogos": 12,
       "peso_no_modelo": 0.08,
-      "limite_ajuste_taxa_partida_pct": 10.0,
+      "limite_ajuste_taxa_partida_pct": 10,
       "regra": "ajuste marginal e limitado; não substitui a força acumulada nem a simulação da tabela restante"
     },
-    "decaimento_temporal_meia_vida_dias": 365.0,
+    "decaimento_temporal_meia_vida_dias": 365,
     "desvio_prior": 0.4,
     "dixon_coles": {
       "implementado": true,
-      "rho_producao": 0.0,
+      "rho_producao": 0,
       "regra": "ativação condicionada a ganho fora da amostra; atualmente mantido como sensibilidade"
     },
     "monte_carlo": 2000000,
@@ -269,7 +269,7 @@
     },
     "maior_chance_libertadores": {
       "clube": "Flamengo",
-      "probabilidade_pct": 100.0
+      "probabilidade_pct": 100
     },
     "maior_chance_sul_americana": {
       "clube": "São Paulo",
@@ -277,7 +277,7 @@
     },
     "maior_risco_rebaixamento": {
       "clube": "Chapecoense",
-      "probabilidade_pct": 100.0
+      "probabilidade_pct": 100
     }
   },
   "clubes": [
@@ -288,14 +288,14 @@
       "jogos_atuais": 33,
       "probabilidades_pct": {
         "campeao": 83.6332,
-        "g4": 100.0,
-        "g6": 100.0,
-        "libertadores_base": 100.0,
-        "sul_americana_base": 0.0,
-        "rebaixamento": 0.0,
-        "libertadores": 100.0,
-        "sul_americana": 0.0,
-        "sem_competicao_continental": 0.0
+        "g4": 100,
+        "g6": 100,
+        "libertadores_base": 100,
+        "sul_americana_base": 0,
+        "rebaixamento": 0,
+        "libertadores": 100,
+        "sul_americana": 0,
+        "sem_competicao_continental": 0
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -313,7 +313,7 @@
         "g4": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100.0,
+          "percentual_estimado": 100,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -325,7 +325,7 @@
         "g6": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100.0,
+          "percentual_estimado": 100,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -337,7 +337,7 @@
         "libertadores_base": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100.0,
+          "percentual_estimado": 100,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -349,7 +349,7 @@
         "sul_americana_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -361,7 +361,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -373,7 +373,7 @@
         "libertadores": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100.0,
+          "percentual_estimado": 100,
           "exibicao": ">99,999%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -385,7 +385,7 @@
         "sul_americana": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -397,7 +397,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -436,24 +436,24 @@
       "distribuicao_posicoes_pct": [
         83.6332,
         16.3668,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -469,7 +469,7 @@
           "total": {
             "ocorrencias": 2000000,
             "simulacoes": 2000000,
-            "percentual_estimado": 100.0,
+            "percentual_estimado": 100,
             "exibicao": ">99,999%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -482,7 +482,7 @@
             "via_brasileirao": {
               "ocorrencias": 2000000,
               "simulacoes": 2000000,
-              "percentual_estimado": 100.0,
+              "percentual_estimado": 100,
               "exibicao": ">99,999%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -494,7 +494,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -506,7 +506,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -518,7 +518,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -530,7 +530,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -544,7 +544,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -556,7 +556,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -568,7 +568,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -578,13 +578,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 100.0
+          "soma_vias_pct": 100
         },
         "sul_americana": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0,
+            "percentual_estimado": 0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -597,7 +597,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -609,7 +609,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -619,13 +619,13 @@
               "limite_superior_95_regra_dos_tres_pct": 0.00015
             }
           },
-          "soma_vias_pct": 0.0
+          "soma_vias_pct": 0
         },
         "sem_competicao_continental": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0,
+            "percentual_estimado": 0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -645,14 +645,14 @@
       "jogos_atuais": 33,
       "probabilidades_pct": {
         "campeao": 16.3668,
-        "g4": 100.0,
-        "g6": 100.0,
-        "libertadores_base": 100.0,
-        "sul_americana_base": 0.0,
-        "rebaixamento": 0.0,
-        "libertadores": 100.0,
-        "sul_americana": 0.0,
-        "sem_competicao_continental": 0.0
+        "g4": 100,
+        "g6": 100,
+        "libertadores_base": 100,
+        "sul_americana_base": 0,
+        "rebaixamento": 0,
+        "libertadores": 100,
+        "sul_americana": 0,
+        "sem_competicao_continental": 0
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -670,7 +670,7 @@
         "g4": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100.0,
+          "percentual_estimado": 100,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -682,7 +682,7 @@
         "g6": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100.0,
+          "percentual_estimado": 100,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -694,7 +694,7 @@
         "libertadores_base": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100.0,
+          "percentual_estimado": 100,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -706,7 +706,7 @@
         "sul_americana_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -718,7 +718,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -730,7 +730,7 @@
         "libertadores": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100.0,
+          "percentual_estimado": 100,
           "exibicao": ">99,999%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -742,7 +742,7 @@
         "sul_americana": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -754,7 +754,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -794,23 +794,23 @@
         16.3668,
         83.6223,
         0.0109,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -826,7 +826,7 @@
           "total": {
             "ocorrencias": 2000000,
             "simulacoes": 2000000,
-            "percentual_estimado": 100.0,
+            "percentual_estimado": 100,
             "exibicao": ">99,999%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -839,7 +839,7 @@
             "via_brasileirao": {
               "ocorrencias": 2000000,
               "simulacoes": 2000000,
-              "percentual_estimado": 100.0,
+              "percentual_estimado": 100,
               "exibicao": ">99,999%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -851,7 +851,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -863,7 +863,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -875,7 +875,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -887,7 +887,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -901,7 +901,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -913,7 +913,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -925,7 +925,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -935,13 +935,13 @@
               "limite_superior_95_regra_dos_tres_pct": 0.00015
             }
           },
-          "soma_vias_pct": 100.0
+          "soma_vias_pct": 100
         },
         "sul_americana": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0,
+            "percentual_estimado": 0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -954,7 +954,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -966,7 +966,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -976,13 +976,13 @@
               "limite_superior_95_regra_dos_tres_pct": 0.00015
             }
           },
-          "soma_vias_pct": 0.0
+          "soma_vias_pct": 0
         },
         "sem_competicao_continental": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0,
+            "percentual_estimado": 0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -1001,21 +1001,21 @@
       "pontos_atuais": 57,
       "jogos_atuais": 33,
       "probabilidades_pct": {
-        "campeao": 0.0,
+        "campeao": 0,
         "g4": 89.0192,
         "g6": 99.54095,
         "libertadores_base": 96.4945,
         "sul_americana_base": 3.5055,
-        "rebaixamento": 0.0,
+        "rebaixamento": 0,
         "libertadores": 99.6265,
         "sul_americana": 0.3735,
-        "sem_competicao_continental": 0.0
+        "sem_competicao_continental": 0
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1075,7 +1075,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1111,7 +1111,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -1148,7 +1148,7 @@
         "maximo_simulado": 72
       },
       "distribuicao_posicoes_pct": [
-        0.0,
+        0,
         0.0109,
         71.4526,
         17.5557,
@@ -1157,17 +1157,17 @@
         0.44705,
         0.0119,
         0.0001,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -1208,7 +1208,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1220,7 +1220,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1232,7 +1232,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1258,7 +1258,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1270,7 +1270,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1282,7 +1282,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1323,7 +1323,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -1339,7 +1339,7 @@
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0,
+            "percentual_estimado": 0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -1358,21 +1358,21 @@
       "pontos_atuais": 54,
       "jogos_atuais": 33,
       "probabilidades_pct": {
-        "campeao": 0.0,
+        "campeao": 0,
         "g4": 44.24565,
         "g6": 92.57095,
         "libertadores_base": 73.449,
         "sul_americana_base": 26.551,
-        "rebaixamento": 0.0,
+        "rebaixamento": 0,
         "libertadores": 95.4247,
         "sul_americana": 4.5753,
-        "sem_competicao_continental": 0.0
+        "sem_competicao_continental": 0
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1432,7 +1432,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1468,7 +1468,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -1505,8 +1505,8 @@
         "maximo_simulado": 69
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
+        0,
+        0,
         10.3017,
         33.94395,
         29.20335,
@@ -1515,16 +1515,16 @@
         1.1154,
         0.1709,
         0.0151,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -1565,7 +1565,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1577,7 +1577,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1589,7 +1589,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1615,7 +1615,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1627,7 +1627,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1639,7 +1639,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1680,7 +1680,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -1696,7 +1696,7 @@
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0,
+            "percentual_estimado": 0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -1715,21 +1715,21 @@
       "pontos_atuais": 54,
       "jogos_atuais": 33,
       "probabilidades_pct": {
-        "campeao": 0.0,
+        "campeao": 0,
         "g4": 41.7605,
         "g6": 90.71895,
         "libertadores_base": 70.18445,
         "sul_americana_base": 29.81555,
-        "rebaixamento": 0.0,
+        "rebaixamento": 0,
         "libertadores": 94.27795,
         "sul_americana": 5.72205,
-        "sem_competicao_continental": 0.0
+        "sem_competicao_continental": 0
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1789,7 +1789,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1825,7 +1825,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -1862,8 +1862,8 @@
         "maximo_simulado": 69
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
+        0,
+        0,
         12.38485,
         29.37565,
         28.42395,
@@ -1872,16 +1872,16 @@
         1.68775,
         0.28425,
         0.0222,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -1922,7 +1922,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1934,7 +1934,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1946,7 +1946,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1972,7 +1972,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1984,7 +1984,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1996,7 +1996,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2037,7 +2037,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -2053,7 +2053,7 @@
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0,
+            "percentual_estimado": 0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -2072,21 +2072,21 @@
       "pontos_atuais": 53,
       "jogos_atuais": 33,
       "probabilidades_pct": {
-        "campeao": 0.0,
+        "campeao": 0,
         "g4": 19.6229,
         "g6": 74.15025,
         "libertadores_base": 42.8688,
         "sul_americana_base": 57.1312,
-        "rebaixamento": 0.0,
+        "rebaixamento": 0,
         "libertadores": 85.76945,
         "sul_americana": 14.23055,
-        "sem_competicao_continental": 0.0
+        "sem_competicao_continental": 0
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -2146,7 +2146,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -2182,7 +2182,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -2219,8 +2219,8 @@
         "maximo_simulado": 68
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
+        0,
+        0,
         5.16465,
         14.45825,
         23.2459,
@@ -2230,15 +2230,15 @@
         1.0569,
         0.0979,
         0.00205,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -2279,7 +2279,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2291,7 +2291,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2303,7 +2303,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2329,7 +2329,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2341,7 +2341,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2353,7 +2353,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2394,7 +2394,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -2410,7 +2410,7 @@
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0,
+            "percentual_estimado": 0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -2429,12 +2429,12 @@
       "pontos_atuais": 50,
       "jogos_atuais": 33,
       "probabilidades_pct": {
-        "campeao": 0.0,
+        "campeao": 0,
         "g4": 5.19985,
         "g6": 35.9164,
         "libertadores_base": 15.60655,
         "sul_americana_base": 84.37525,
-        "rebaixamento": 0.0,
+        "rebaixamento": 0,
         "libertadores": 73.0616,
         "sul_americana": 26.9379,
         "sem_competicao_continental": 0.0005
@@ -2443,7 +2443,7 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -2503,7 +2503,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -2576,8 +2576,8 @@
         "maximo_simulado": 65
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
+        0,
+        0,
         0.68495,
         4.5149,
         10.4067,
@@ -2589,13 +2589,13 @@
         0.1968,
         0.01755,
         0.00065,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -2648,7 +2648,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2786,12 +2786,12 @@
       "pontos_atuais": 47,
       "jogos_atuais": 34,
       "probabilidades_pct": {
-        "campeao": 0.0,
+        "campeao": 0,
         "g4": 0.0899,
         "g6": 3.6353,
         "libertadores_base": 0.7624,
         "sul_americana_base": 97.51895,
-        "rebaixamento": 0.0,
+        "rebaixamento": 0,
         "libertadores": 16.9863,
         "sul_americana": 82.87135,
         "sem_competicao_continental": 0.14235
@@ -2800,7 +2800,7 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -2860,7 +2860,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -2933,8 +2933,8 @@
         "maximo_simulado": 59
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
+        0,
+        0,
         0.00035,
         0.08955,
         0.6725,
@@ -2948,11 +2948,11 @@
         0.3277,
         0.05165,
         0.0042,
-        5e-05,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        0.00005,
+        0,
+        0,
+        0,
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -2993,7 +2993,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3005,7 +3005,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3017,7 +3017,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3043,7 +3043,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3055,7 +3055,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3067,7 +3067,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3143,12 +3143,12 @@
       "pontos_atuais": 47,
       "jogos_atuais": 34,
       "probabilidades_pct": {
-        "campeao": 0.0,
+        "campeao": 0,
         "g4": 0.04655,
         "g6": 2.79075,
         "libertadores_base": 0.4984,
         "sul_americana_base": 95.82675,
-        "rebaixamento": 0.0,
+        "rebaixamento": 0,
         "libertadores": 14.79275,
         "sul_americana": 84.74005,
         "sem_competicao_continental": 0.4672
@@ -3157,7 +3157,7 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -3217,7 +3217,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -3290,9 +3290,9 @@
         "maximo_simulado": 59
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
-        0.0,
+        0,
+        0,
+        0,
         0.04655,
         0.45185,
         2.29235,
@@ -3306,10 +3306,10 @@
         0.23085,
         0.0324,
         0.00205,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        0,
+        0,
+        0,
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -3350,7 +3350,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3362,7 +3362,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3374,7 +3374,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3400,7 +3400,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3412,7 +3412,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3424,7 +3424,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3500,7 +3500,7 @@
       "pontos_atuais": 43,
       "jogos_atuais": 33,
       "probabilidades_pct": {
-        "campeao": 0.0,
+        "campeao": 0,
         "g4": 0.01545,
         "g6": 0.6525,
         "libertadores_base": 0.1345,
@@ -3514,7 +3514,7 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -3647,9 +3647,9 @@
         "maximo_simulado": 58
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
-        0.0,
+        0,
+        0,
+        0,
         0.01545,
         0.11905,
         0.518,
@@ -3665,8 +3665,8 @@
         0.3353,
         0.06165,
         0.00445,
-        0.0,
-        0.0
+        0,
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -3707,7 +3707,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3719,7 +3719,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3731,7 +3731,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3757,7 +3757,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3769,7 +3769,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3781,7 +3781,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3857,10 +3857,10 @@
       "pontos_atuais": 39,
       "jogos_atuais": 33,
       "probabilidades_pct": {
-        "campeao": 0.0,
-        "g4": 0.0,
+        "campeao": 0,
+        "g4": 0,
         "g6": 0.0031,
-        "libertadores_base": 5e-05,
+        "libertadores_base": 0.00005,
         "sul_americana_base": 33.206,
         "rebaixamento": 6.8316,
         "libertadores": 0.4315,
@@ -3871,7 +3871,7 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -3883,7 +3883,7 @@
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -3907,7 +3907,7 @@
         "libertadores_base": {
           "ocorrencias": 1,
           "simulacoes": 2000000,
-          "percentual_estimado": 5e-05,
+          "percentual_estimado": 0.00005,
           "exibicao": "<0,001%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -4004,11 +4004,11 @@
         "maximo_simulado": 54
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        5e-05,
+        0,
+        0,
+        0,
+        0,
+        0.00005,
         0.00305,
         0.18725,
         1.37725,
@@ -4023,7 +4023,7 @@
         4.6015,
         2.20285,
         0.02725,
-        0.0
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -4052,7 +4052,7 @@
             "via_brasileirao": {
               "ocorrencias": 1,
               "simulacoes": 2000000,
-              "percentual_estimado": 5e-05,
+              "percentual_estimado": 0.00005,
               "exibicao": "<0,001%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -4064,7 +4064,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4076,7 +4076,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4088,7 +4088,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4114,7 +4114,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4126,7 +4126,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4138,7 +4138,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4214,8 +4214,8 @@
       "pontos_atuais": 42,
       "jogos_atuais": 33,
       "probabilidades_pct": {
-        "campeao": 0.0,
-        "g4": 0.0,
+        "campeao": 0,
+        "g4": 0,
         "g6": 0.0061,
         "libertadores_base": 0.0006,
         "sul_americana_base": 22.65865,
@@ -4228,7 +4228,7 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -4240,7 +4240,7 @@
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -4361,10 +4361,10 @@
         "maximo_simulado": 57
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        0,
+        0,
+        0,
+        0,
         0.0006,
         0.0055,
         0.09445,
@@ -4380,7 +4380,7 @@
         4.26545,
         0.79955,
         0.0005,
-        0.0
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -4421,7 +4421,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4433,7 +4433,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4445,7 +4445,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4471,7 +4471,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4483,7 +4483,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4495,7 +4495,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4571,8 +4571,8 @@
       "pontos_atuais": 38,
       "jogos_atuais": 32,
       "probabilidades_pct": {
-        "campeao": 0.0,
-        "g4": 0.0,
+        "campeao": 0,
+        "g4": 0,
         "g6": 0.01475,
         "libertadores_base": 0.00075,
         "sul_americana_base": 25.39515,
@@ -4585,7 +4585,7 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -4597,7 +4597,7 @@
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -4718,10 +4718,10 @@
         "maximo_simulado": 56
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        0,
+        0,
+        0,
+        0,
         0.00075,
         0.014,
         0.2063,
@@ -4737,7 +4737,7 @@
         7.2952,
         4.6198,
         0.07035,
-        0.0
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -4790,7 +4790,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4802,7 +4802,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4928,10 +4928,10 @@
       "pontos_atuais": 40,
       "jogos_atuais": 34,
       "probabilidades_pct": {
-        "campeao": 0.0,
-        "g4": 0.0,
-        "g6": 0.0,
-        "libertadores_base": 0.0,
+        "campeao": 0,
+        "g4": 0,
+        "g6": 0,
+        "libertadores_base": 0,
         "sul_americana_base": 17.08605,
         "rebaixamento": 11.4531,
         "libertadores": 0.0525,
@@ -4942,7 +4942,7 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -4954,7 +4954,7 @@
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -4966,7 +4966,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -4978,7 +4978,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5075,12 +5075,12 @@
         "maximo_simulado": 52
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0.0069,
         0.1798,
         0.97405,
@@ -5094,7 +5094,7 @@
         7.7276,
         3.689,
         0.0365,
-        0.0
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -5123,7 +5123,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -5135,7 +5135,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5147,7 +5147,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5159,7 +5159,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5185,7 +5185,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5197,7 +5197,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5209,7 +5209,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5285,10 +5285,10 @@
       "pontos_atuais": 38,
       "jogos_atuais": 33,
       "probabilidades_pct": {
-        "campeao": 0.0,
-        "g4": 0.0,
-        "g6": 0.0,
-        "libertadores_base": 0.0,
+        "campeao": 0,
+        "g4": 0,
+        "g6": 0,
+        "libertadores_base": 0,
         "sul_americana_base": 10.2383,
         "rebaixamento": 25.01195,
         "libertadores": 0.0616,
@@ -5299,7 +5299,7 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5311,7 +5311,7 @@
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5323,7 +5323,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -5335,7 +5335,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5432,12 +5432,12 @@
         "maximo_simulado": 53
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0.0088,
         0.20035,
         0.777,
@@ -5451,7 +5451,7 @@
         14.30245,
         10.5164,
         0.1931,
-        0.0
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -5480,7 +5480,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -5492,7 +5492,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5504,7 +5504,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5516,7 +5516,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5542,7 +5542,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5554,7 +5554,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5566,7 +5566,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5642,10 +5642,10 @@
       "pontos_atuais": 36,
       "jogos_atuais": 33,
       "probabilidades_pct": {
-        "campeao": 0.0,
-        "g4": 0.0,
-        "g6": 0.0,
-        "libertadores_base": 0.0,
+        "campeao": 0,
+        "g4": 0,
+        "g6": 0,
+        "libertadores_base": 0,
         "sul_americana_base": 5.3361,
         "rebaixamento": 42.551,
         "libertadores": 0.00915,
@@ -5656,7 +5656,7 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5668,7 +5668,7 @@
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5680,7 +5680,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5692,7 +5692,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5789,12 +5789,12 @@
         "maximo_simulado": 51
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0.0015,
         0.0322,
         0.2268,
@@ -5808,7 +5808,7 @@
         18.90025,
         21.97365,
         1.6771,
-        0.0
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -5837,7 +5837,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -5849,7 +5849,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5861,7 +5861,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5873,7 +5873,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5899,7 +5899,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5911,7 +5911,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5923,7 +5923,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5999,10 +5999,10 @@
       "pontos_atuais": 37,
       "jogos_atuais": 33,
       "probabilidades_pct": {
-        "campeao": 0.0,
-        "g4": 0.0,
-        "g6": 0.0,
-        "libertadores_base": 0.0,
+        "campeao": 0,
+        "g4": 0,
+        "g6": 0,
+        "libertadores_base": 0,
         "sul_americana_base": 3.94095,
         "rebaixamento": 46.42315,
         "libertadores": 89.3922,
@@ -6013,7 +6013,7 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6025,7 +6025,7 @@
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6037,7 +6037,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6049,7 +6049,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6146,12 +6146,12 @@
         "maximo_simulado": 52
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0.00075,
         0.02345,
         0.1695,
@@ -6165,7 +6165,7 @@
         20.2979,
         25.0191,
         1.10615,
-        0.0
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -6194,7 +6194,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -6218,7 +6218,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6230,7 +6230,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6356,10 +6356,10 @@
       "pontos_atuais": 35,
       "jogos_atuais": 33,
       "probabilidades_pct": {
-        "campeao": 0.0,
-        "g4": 0.0,
-        "g6": 0.0,
-        "libertadores_base": 0.0,
+        "campeao": 0,
+        "g4": 0,
+        "g6": 0,
+        "libertadores_base": 0,
         "sul_americana_base": 3.3611,
         "rebaixamento": 50.90365,
         "libertadores": 0.00355,
@@ -6370,7 +6370,7 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6382,7 +6382,7 @@
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6394,7 +6394,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6406,7 +6406,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6503,13 +6503,13 @@
         "maximo_simulado": 50
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0.0068,
         0.08685,
         0.5865,
@@ -6522,7 +6522,7 @@
         21.7564,
         27.6664,
         1.48085,
-        0.0
+        0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -6551,7 +6551,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -6563,7 +6563,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6575,7 +6575,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6587,7 +6587,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6613,7 +6613,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6625,7 +6625,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6637,7 +6637,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6713,13 +6713,13 @@
       "pontos_atuais": 29,
       "jogos_atuais": 33,
       "probabilidades_pct": {
-        "campeao": 0.0,
-        "g4": 0.0,
-        "g6": 0.0,
-        "libertadores_base": 0.0,
+        "campeao": 0,
+        "g4": 0,
+        "g6": 0,
+        "libertadores_base": 0,
         "sul_americana_base": 0.00025,
         "rebaixamento": 99.7086,
-        "libertadores": 0.0,
+        "libertadores": 0,
         "sul_americana": 0.0133,
         "sem_competicao_continental": 99.9867
       },
@@ -6727,7 +6727,7 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6739,7 +6739,7 @@
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6751,7 +6751,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6763,7 +6763,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6799,7 +6799,7 @@
         "libertadores": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -6860,16 +6860,16 @@
         "maximo_simulado": 44
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0.00025,
         0.00065,
         0.00505,
@@ -6895,7 +6895,7 @@
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0,
+            "percentual_estimado": 0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -6908,7 +6908,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -6920,7 +6920,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6932,7 +6932,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6944,7 +6944,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6956,7 +6956,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -6970,7 +6970,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6982,7 +6982,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6994,7 +6994,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7004,7 +7004,7 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0.0
+          "soma_vias_pct": 0
         },
         "sul_americana": {
           "total": {
@@ -7070,21 +7070,21 @@
       "pontos_atuais": 21,
       "jogos_atuais": 33,
       "probabilidades_pct": {
-        "campeao": 0.0,
-        "g4": 0.0,
-        "g6": 0.0,
-        "libertadores_base": 0.0,
-        "sul_americana_base": 0.0,
-        "rebaixamento": 100.0,
-        "libertadores": 0.0,
-        "sul_americana": 0.0,
-        "sem_competicao_continental": 100.0
+        "campeao": 0,
+        "g4": 0,
+        "g6": 0,
+        "libertadores_base": 0,
+        "sul_americana_base": 0,
+        "rebaixamento": 100,
+        "libertadores": 0,
+        "sul_americana": 0,
+        "sem_competicao_continental": 100
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -7096,7 +7096,7 @@
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -7108,7 +7108,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -7120,7 +7120,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -7132,7 +7132,7 @@
         "sul_americana_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -7144,19 +7144,20 @@
         "rebaixamento": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100.0,
+          "percentual_estimado": 100,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
           "certeza_estrutural": true,
           "motivo_impossibilidade": null,
-          "limite_superior_95_regra_dos_tres_pct": null
+          "limite_superior_95_regra_dos_tres_pct": null,
+          "motivo_certeza": "16 clubes já possuem mais pontos do que os 36 pontos máximos alcançáveis pela Chapecoense; restam 5 jogos"
         },
         "libertadores": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -7168,7 +7169,7 @@
         "sul_americana": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0,
+          "percentual_estimado": 0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -7180,7 +7181,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100.0,
+          "percentual_estimado": 100,
           "exibicao": ">99,999%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -7217,23 +7218,23 @@
         "maximo_simulado": 36
       },
       "distribuicao_posicoes_pct": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0.0001,
         0.8276,
         99.1723
@@ -7252,7 +7253,7 @@
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0,
+            "percentual_estimado": 0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -7265,7 +7266,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -7277,7 +7278,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7289,7 +7290,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7301,7 +7302,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7313,7 +7314,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -7327,7 +7328,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7339,7 +7340,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7351,7 +7352,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7361,13 +7362,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0.0
+          "soma_vias_pct": 0
         },
         "sul_americana": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0,
+            "percentual_estimado": 0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -7380,7 +7381,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -7392,7 +7393,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0,
+              "percentual_estimado": 0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -7402,13 +7403,13 @@
               "limite_superior_95_regra_dos_tres_pct": 0.00015
             }
           },
-          "soma_vias_pct": 0.0
+          "soma_vias_pct": 0
         },
         "sem_competicao_continental": {
           "total": {
             "ocorrencias": 2000000,
             "simulacoes": 2000000,
-            "percentual_estimado": 100.0,
+            "percentual_estimado": 100,
             "exibicao": ">99,999%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -7419,6 +7420,10 @@
           },
           "regra": "complemento exclusivo após Libertadores e Sul-Americana"
         }
+      },
+      "situacao_matematica": {
+        "rebaixamento": "confirmado",
+        "fundamento": "16 clubes já possuem mais pontos do que os 36 pontos máximos alcançáveis pela Chapecoense; restam 5 jogos"
       }
     }
   ],

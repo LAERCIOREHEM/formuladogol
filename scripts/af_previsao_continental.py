@@ -964,11 +964,14 @@ def display_probability(
     structurally_possible: bool = True,
     structurally_certain: bool = False,
     impossibility_reason: str | None = None,
+    certainty_reason: str | None = None,
 ) -> dict[str, Any]:
     pct = 100.0 * count / simulations
     zero_observed = count == 0
     if not structurally_possible:
         display = "0%"
+    elif structurally_certain:
+        display = "100%"
     elif pct < threshold_pct:
         display = f"<{threshold_pct:.3f}%".replace(".", ",")
     elif count == simulations and structurally_certain:
@@ -995,6 +998,7 @@ def display_probability(
         "possivel_estruturalmente": bool(structurally_possible),
         "impossivel_estruturalmente": not bool(structurally_possible),
         "certeza_estrutural": bool(structurally_certain),
+        "motivo_certeza": certainty_reason if structurally_certain else None,
         "motivo_impossibilidade": impossibility_reason if not structurally_possible else None,
         "limite_superior_95_regra_dos_tres_pct": round(upper_95, 8) if upper_95 is not None else None,
     }

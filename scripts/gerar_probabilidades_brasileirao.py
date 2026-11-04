@@ -969,13 +969,18 @@ def structural_status(
             }
 
         impossivel_cair = podem_acima < ACIMA_PARA_CAIR
+        rebaixado = certos_acima >= ACIMA_PARA_CAIR and not impossivel_cair
         criterios["rebaixamento"] = {
             "possivel": not impossivel_cair,
-            "certo": bool(certos_acima >= ACIMA_PARA_CAIR and not impossivel_cair),
+            "certo": bool(rebaixado),
             "motivo": (
                 f"apenas {podem_acima} clube(s) ainda podem terminar acima; "
                 f"o rebaixamento exigiria {ACIMA_PARA_CAIR}"
             ) if impossivel_cair else None,
+            "motivo_certeza": (
+                f"{certos_acima} clubes já têm mais pontos que o máximo "
+                f"alcançável de {maximo[i]} pontos; restam {remaining[i]} jogos"
+            ) if rebaixado else None,
         }
 
         # A faixa 6º-11º não tem teste de fronteira simples e confiável:
@@ -1121,6 +1126,7 @@ def run_monte_carlo(
                         structurally_possible=structural[team].get(key, {}).get("possivel", True),
                         structurally_certain=structural[team].get(key, {}).get("certo", False),
                         impossibility_reason=structural[team].get(key, {}).get("motivo"),
+                        certainty_reason=structural[team].get(key, {}).get("motivo_certeza"),
                     )
                     for key, count in criterion_counts.items()
                 },
