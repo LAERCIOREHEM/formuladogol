@@ -1,0 +1,62 @@
+name: Health Pages v14 Live Verification
+
+on:
+  pull_request:
+    paths: ['.github/workflows/health-pages-v14-production-smoke.yml']
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Deploy Push Worker']
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Assert Pages is reachable and Health v14 deployed
+        shell: bash
+        run: |
+          python -u - <<'PY'
+          import json,time,urllib.request,sys
+          def read(url):
+              req=urllib.request.Request(url,headers={'User-Agent':'FDG-Health-v14-Smoke','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=20) as response:
+                  return response.status,response.headers, response.read()
+          def check():
+              status,headers,body=read('https://formuladogol.com.br/?health_v14='+str(int(time.time())))
+              assert status==200 and 'text/html' in headers.get('Content-Type',''),('Pages',status,headers.get('Content-Type'))
+              status,headers,body=read('https://push.formuladogol.com.br/health')
+              health=json.loads(body)
+              assert status==200 and health.get('service')=='formula-do-gol-push'
+              assert health.get('healthPolicyVersion')==14,('healthPolicyVersion not deployed',health.get('healthPolicyVersion'))
+              status,headers,body=read('https://push.formuladogol.com.br/v1/health-monitor/status')
+              report=json.loads(body)
+              assert report.get('ok') is True
+              snapshot=report.get('snapshot') or {}
+              assert snapshot.get('policyVersion')==14,('snapshot not v14',snapshot.get('policyVersion'))
+              site=next((r for r in snapshot.get('indicators',[]) if r.get('id')=='site'),None)
+              assert site and site.get('severity')=='green',('Site/Pages',site)
+              details=snapshot.get('pagesAvailability') or {}
+              assert details.get('failedCycles')==0 and details.get('severity')=='green',details
+              print('LIVE PASS: Site HTML 200; Worker Health v14; Pages GREEN; no false CRITICAL',flush=True)
+          for attempt in range(1,12):
+              try:
+                  check()
+                  sys.exit(0)
+              except Exception as exc:
+                  print('NOT YET CONVERGED',attempt,str(exc)[:430],flush=True)
+                  if attempt<11: time.sleep(15)
+          sys.exit(1)
+          PY
+  deploy-failed:
+    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo 'The deployment failed; not declaring Health v14 active.'
+          exit 1
