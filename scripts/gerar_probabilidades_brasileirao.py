@@ -973,6 +973,9 @@ def structural_status(
         criterios["rebaixamento"] = {
             "possivel": not impossivel_cair,
             "certo": bool(rebaixado),
+            "clubes_certos_acima": certos_acima,
+            "melhor_posicao_possivel": certos_acima + 1,
+            "maximo_pontos": maximo[i],
             "motivo": (
                 f"apenas {podem_acima} clube(s) ainda podem terminar acima; "
                 f"o rebaixamento exigiria {ACIMA_PARA_CAIR}"
@@ -989,6 +992,82 @@ def structural_status(
 
         resultado[team] = criterios
     return resultado
+
+
+def apply_continental_mathematical_certainty(
+    teams: Sequence[dict[str, Any]],
+    structural: Mapping[str, Mapping[str, Mapping[str, Any]]],
+    continental_config: Mapping[str, Any],
+) -> None:
+    """Prova 0/0/100 nas vagas continentais, sem confundir rebaixamento com inelegibilidade.
+
+    A alocação deste modelo usa G5 + no máximo quatro vagas de campeões/vice
+    (Libertadores, Sul-Americana e os dois finalistas da Copa do Brasil) +
+    seis vagas da Sul-Americana. Sobreposições/repasses não aumentam o TOTAL
+    de clubes da Série A contemplados. Um clube abaixo desta fronteira e
+    eliminado de todas as copas NÃO pode classificar-se por qualquer via.
+    O critério é suficiente (conservador), não pretende detectar todos os casos.
+    """
+    base = int(continental_config.get("brasileirao_vagas_diretas", 4)) + int(
+        continental_config.get("brasileirao_vagas_preliminares", 1)
+    )
+    sula = int(continental_config.get("sul_americana_vagas", 6))
+    max_qualificados = base + sula + 4
+    for item in teams:
+        name = item["clube"]
+        relegation = structural[name]["rebaixamento"]
+        best_rank = int(relegation["melhor_posicao_possivel"])
+        if best_rank <= max_qualificados:
+            continue
+        breakdown = item["decomposicao_chances"]
+        lib_routes = breakdown["libertadores"]["vias"]
+        cups = ("via_copa_do_brasil", "via_titulo_libertadores", "via_titulo_sul_americana")
+        if not all(lib_routes[route]["impossivel_estruturalmente"] is True for route in cups):
+            continue  # Rebaixado ainda pode obter vaga diretamente por título de copa.
+
+        reason = (
+            f"Mesmo no melhor cenário, o clube termina a partir do {best_rank}º lugar "
+            f"({relegation['clubes_certos_acima']} adversários matematicamente acima). "
+            f"No máximo {max_qualificados} clubes da Série A podem obter vagas "
+            "continentais pelo Brasileirão e repasses; o clube não disputa mais "
+            "nenhuma das copas que oferecem vaga direta."
+        )
+        p = item["probabilidades_pct"]
+        details = item["probabilidades_detalhes"]
+        if any(float(p[key]) != target for key, target in (
+            ("libertadores", 0), ("sul_americana", 0),
+            ("sem_competicao_continental", 100)
+        )):
+            raise ValueError(f"Contradição entre prova e Monte Carlo continental: {name}")
+
+        def certify(detail: dict[str, Any], certain: bool) -> None:
+            detail["exibicao"] = "100%" if certain else "0%"
+            detail["possivel_estruturalmente"] = certain
+            detail["impossivel_estruturalmente"] = not certain
+            detail["certeza_estrutural"] = certain
+            detail["motivo_certeza"] = reason if certain else None
+            detail["motivo_impossibilidade"] = None if certain else reason
+            detail["limite_superior_95_regra_dos_tres_pct"] = None
+
+        for destination in ("libertadores", "sul_americana", "sem_competicao_continental"):
+            certainty = destination == "sem_competicao_continental"
+            certify(details[destination], certainty)
+            certify(breakdown[destination]["total"], certainty)
+        for destination in ("libertadores", "sul_americana"):
+            for detail in breakdown[destination]["vias"].values():
+                certify(detail, False)
+        for detail in breakdown["libertadores"]["subvias_copa_do_brasil"].values():
+            certify(detail, False)
+        # É impossível ingressar na faixa-base 6º–11º quando a melhor
+        # classificação já ultrapassa o total máximo de vagas continentais.
+        certify(details["sul_americana_base"], False)
+        item["situacao_matematica"] = {
+            **item.get("situacao_matematica", {}),
+            "destino_continental": "sem_competicao_confirmado",
+            "limite_posicao_melhor": best_rank,
+            "limite_total_classificados": max_qualificados,
+            "fundamento_continental": reason,
+        }
 
 
 def run_monte_carlo(
@@ -2486,6 +2565,9 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
             "sul_americana": integrated["sul_americana"],
             "sem_competicao_continental": integrated["sem_competicao_continental"],
         }
+    apply_continental_mathematical_certainty(
+        teams, structural_status(state, forecasts), execution_25
+    )
     total_sul_integrada = sum(item["probabilidades_pct"]["sul_americana"] for item in teams)
     if abs(total_sul_integrada - 600.0) > 0.02:
         raise ValueError(f"soma integrada da Sul-Americana inválida: {total_sul_integrada:.6f}")
