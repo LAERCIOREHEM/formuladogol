@@ -1,0 +1,54 @@
+name: AF R24 Exact Mathematical Continental Production Smoke
+
+on:
+  pull_request:
+    paths: ['.github/workflows/af-r24-exact-continental-production.yml']
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'dados-br/probabilidades-brasileirao.json'
+      - 'js/br-estatisticas.js'
+      - '.github/workflows/af-r24-exact-continental-production.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Check deployed JSON fields including decompositions
+        run: |
+          python -u - <<'PY'
+          import json,time,urllib.request,sys
+          url='https://formuladogol.com.br/dados-br/probabilidades-brasileirao.json'
+          def check():
+              request=urllib.request.Request(url+'?r24='+str(int(time.time())),headers={'Cache-Control':'no-cache','Accept':'application/json','User-Agent':'AF-R24-Production-Proof/1.0'})
+              with urllib.request.urlopen(request,timeout=20) as response:
+                  data=json.load(response)
+              team=next(x for x in data['clubes'] if x['clube']=='Chapecoense')
+              probs=team['probabilidades_pct']
+              expected={'libertadores':(0,'0%'),'sul_americana':(0,'0%'),'sem_competicao_continental':(100,'100%'),'rebaixamento':(100,'100%'),'campeao':(0,'0%')}
+              for field,(value,label) in expected.items():
+                  actual=probs[field],team['probabilidades_detalhes'][field]['exibicao']
+                  assert actual==(value,label),(field,actual)
+              for field in ('libertadores','sul_americana','sem_competicao_continental'):
+                  detail=team['decomposicao_chances'][field]['total']
+                  assert detail['exibicao']==expected[field][1],(field,detail)
+                  d=team['probabilidades_detalhes'][field]
+                  if field=='sem_competicao_continental':
+                      assert d['certeza_estrutural'] is True and d['motivo_certeza']
+                  else:
+                      assert d['impossivel_estruturalmente'] is True and d['motivo_impossibilidade']
+              assert team['situacao_matematica']['destino_continental']=='sem_competicao_confirmado'
+              print('LIVE PASS: Chapecoense Libertadores 0%, Sula 0%, no continental 100%, relegation 100%, title 0%, proofs consistent')
+          for attempt in range(1,13):
+              try:
+                  check();sys.exit(0)
+              except Exception as exc:
+                  print('LIVE not converged',attempt,repr(exc)[:400],flush=True)
+                  if attempt!=12:time.sleep(12)
+          sys.exit(1)
+          PY
