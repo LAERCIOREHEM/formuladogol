@@ -18,6 +18,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install AF numeric dependency
+        run: python -m pip install 'numpy>=1.26,<3'
       - name: Check Python and JS syntax
         run: |
           python -m py_compile scripts/gerar_probabilidades_brasileirao.py scripts/af_previsao_continental.py
