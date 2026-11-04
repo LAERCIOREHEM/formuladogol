@@ -14,7 +14,7 @@ const CF_WORKERS_CPU_INCLUDED_MS = 30_000_000;
 const CF_WORKERS_REQUESTS_INCLUDED = 10_000_000;
 const CF_CPU_OVERAGE_PER_MILLION_USD = 0.02;
 const CF_REQUEST_OVERAGE_PER_MILLION_USD = 0.30;
-export const HEALTH_POLICY_VERSION = 13;
+export const HEALTH_POLICY_VERSION = 14;
 export const HUNTER_DAILY_WARNING_USD = 5;
 export const HUNTER_DAILY_CRITICAL_USD = 10;
 const ONE_SHOT_REPORT_DATE = "2026-10-17";
@@ -59,6 +59,53 @@ async function fetchJson(url, timeout=10000) {
   const c=new AbortController(); const t=setTimeout(()=>c.abort(),timeout);
   try { const r=await fetch(url,{cache:'no-store',signal:c.signal}); const body=await r.json().catch(()=>null); return {ok:r.ok,status:r.status,body}; }
   catch(e){ return {ok:false,status:0,error:text(e?.message||e)}; } finally { clearTimeout(t); }
+}
+
+// Pages: falha isolada do fetch feito de dentro do Worker não equivale a
+// queda confirmada no navegador público. Duas URLs HTML alternativas e dois
+// ciclos independentes são exigidos antes de pedir ação manual.
+// Não seguir redirects indiscriminados: valida HTTP 200 e content-type HTML.
+export async function probePagesAvailability(base, request=fetch) {
+  const origin=String(base||SITE).replace(/\/+$/,'');
+  const checks=[];
+  for(const path of ['/', '/index.html']) {
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),7000);
+    try {
+      const response=await request(origin+path,{
+        method:'GET', cache:'no-store', redirect:'follow',
+        headers:{Accept:'text/html'},
+        signal:controller.signal
+      });
+      const contentType=String(response?.headers?.get?.('content-type')||'');
+      const success=response?.status===200 && /text\/html/i.test(contentType);
+      checks.push({path,status:Number(response?.status)||0,ok:success,
+        reason:success?'ok':!contentType?'content_type_missing':'http_or_content_type'});
+      if(success) return {ok:true,status:200,checks};
+    } catch(error) {
+      checks.push({path,status:0,ok:false,reason:String(error?.name||error?.message||'network_error').slice(0,100)});
+    } finally {clearTimeout(timer);}
+  }
+  return {ok:false,status:checks.at(-1)?.status||0,checks};
+}
+
+export function classifyPagesAvailability(probe, previous=null, now=Date.now()) {
+  if(probe?.ok===true) return {severity:'green',detail:'HTTP 200 · Pages acessível',failedCycles:0,firstFailureAt:null,checks:probe.checks||[]};
+  const last=previous?.pagesAvailability||null;
+  const lastAt=Date.parse(String(previous?.at||''));
+  const firstAt=Date.parse(String(last?.firstFailureAt||''));
+  const validPrevious=Number(last?.failedCycles)>0 &&
+    Number.isFinite(lastAt) && now-lastAt>=4*60_000 && now-lastAt<=15*60_000 &&
+    Number.isFinite(firstAt) && now-firstAt<=20*60_000;
+  const failedCycles=validPrevious?Number(last.failedCycles)+1:1;
+  const firstFailureAt=validPrevious?last.firstFailureAt:new Date(now).toISOString();
+  const reasons=(probe?.checks||[]).map(c=>c.path+': '+(c.status?('HTTP '+c.status):c.reason)).join(' | ');
+  return {
+    severity:failedCycles>=2?'red':'yellow',
+    detail:(failedCycles>=2?'indisponibilidade confirmada':'instabilidade em observação, sem intervenção manual')
+      +' · '+reasons,
+    failedCycles,firstFailureAt,checks:probe?.checks||[]
+  };
 }
 
 function workersMetricKind(row={}){
@@ -271,7 +318,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   const previous = safeJson(await metaGet(env,'snapshot'),null);
   if (!force && previous && Number(previous.policyVersion) === HEALTH_POLICY_VERSION && now-(Date.parse(previous.at)||0)<SNAPSHOT_TTL_MS) return previous;
   const [site, publicAudit, factualAuditResponse, ragManifestResponse, reliabilitySnapshotResponse, continentalAgendaResponse, orchHealth, orchStatus, ai, providers, post, postRowsRaw, postCost, cfBilling, opsIntelligence] = await Promise.all([
-    fetchJson(`${text(env.SITE_BASE)||SITE}/`),
+    probePagesAvailability(text(env.SITE_BASE)||SITE),
     fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/auditoria-publicos.json`),
     fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/auditoria-publicos-identidade.json`),
     fetchJson(`${text(env.SITE_BASE)||SITE}/dados-br/rag-manifest.json`),
@@ -418,8 +465,9 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
       :'historical_without_later_success';
   }
   const activeSearchAnomaly=(providers.byEvent||[]).some(r=>activePublicIds.has(text(r.eventId||r.event_id)) && n(r.searches)>8);
+  const pagesAvailability=classifyPagesAvailability(site,previous,now);
   const indicators=[
-    indicator('site','Site / Pages',site.ok?'green':'red',site.ok?`HTTP ${site.status}`:`indisponível (HTTP ${site.status||'erro'})`),
+    indicator('site','Site / Pages',pagesAvailability.severity,pagesAvailability.detail),
     indicator('orchestrator','Orchestrator',orchHealth.ok&&orchStatus.ok?'green':'red',orchHealth.ok?`${text(os.workloadMode)||'modo desconhecido'} · próximo: ${fmtDate(os.nextRelevantMatchAt)}`:'health/status indisponível'),
     indicator('github','GitHub Actions',githubSeverity.severity,githubSeverity.detail),
     indicator('brasileirao','Brasileirão / ESPN',m.ok===false?'red':'green',m.ok===false?'Sports Monitor reportou falha':'monitor esportivo operacional'),
@@ -446,7 +494,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
     indicator('openai','IA / Custos',aiCostHealthSeverity({dayUsd:hunterDayUsd,activePending:postPending,providerFailures,unrecovered:activeProviderFailure?1:0,providersReady:geminiReady&&workersAiReady&&gatewayAuthReady,perEventAnomaly:activeSearchAnomaly}),`${providers.calls} chamada(s) multi-provider · ${providers.searches} busca(s) web · Hunter 24h ${fmtUsd(hunterDayUsd)} (alerta ${fmtUsd(HUNTER_DAILY_WARNING_USD)}) · mês ${fmtUsd(hunterMonthUsd)}/${fmtUsd(monthlyBudgetUsd)} · ${providerFailures} falha(s) históricas/24h${providerFailureSummary?` (${providerFailureSummary.recovered} recuperada(s), ${providerFailureSummary.unresolved} sem sucesso posterior, ${providerFailureSummary.activeUnresolved} em partidas pendentes)`:``}`),
     indicator('cloudflare','Cloudflare / CPU & Requests',cloudflareSeverity(cfBilling),cloudflareDetail(cfBilling)),
   ];
-  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY)),fineTuning:'not_used_by_design'},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches,errors:Array.isArray(os.errors)?os.errors.slice(0,6).map(x=>text(x).slice(0,300)):[]},reliabilityIntelligence:{sportingState:text(os.reliabilityState)||text(reliabilitySnapshot.state),factualAuditSchema:n(factualAudit.schema_version),factualCritical:n(factualAudit.total_criticos),factualWarnings:n(factualAudit.total_avisos),ragKnowledgeBaseReady:Number(ragManifest.schema_version||0)>=2&&Array.isArray(ragManifest.collections)&&ragManifest.collections.length>0,ragRuntimeEnabled:opsIntelligence?.rag?.ready===true,ragRuntimeVersion:n(opsIntelligence?.rag?.version),ragSourceCount:n(opsIntelligence?.rag?.sourceCount),ragChunkCount:n(opsIntelligence?.rag?.chunkCount),ragSourceSha256:text(opsIntelligence?.rag?.sourceSha256),mcpOpsEnabled:opsIntelligence?.mcp?.enabled===true,mcpOpsReadOnly:opsIntelligence?.mcp?.readOnly===true,mcpProtocolVersion:text(opsIntelligence?.mcp?.protocolVersion),mcpTools:n(opsIntelligence?.mcp?.tools),mcpResources:n(opsIntelligence?.mcp?.resources),fineTuning:'not_used_by_design'},postgame:{pending:postPending,searching:postSearching,overdue:postOverdue,budgetGuard:postBudget,resolved:postResolved,notApplicable:postExempt,eligibilityPending:postUnclassified,requiredLeague:'bra.1',seasonCoverage,highlightPending:highlight,persistentUntilResolved:true,pendingRows,cost:{...postCost,budget:{monthlyBudgetUsd,eventBudgetUsd,warningPct,monthPct:hunterBudgetPct}}},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
+  const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,pagesAvailability,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY)),fineTuning:'not_used_by_design'},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches,errors:Array.isArray(os.errors)?os.errors.slice(0,6).map(x=>text(x).slice(0,300)):[]},reliabilityIntelligence:{sportingState:text(os.reliabilityState)||text(reliabilitySnapshot.state),factualAuditSchema:n(factualAudit.schema_version),factualCritical:n(factualAudit.total_criticos),factualWarnings:n(factualAudit.total_avisos),ragKnowledgeBaseReady:Number(ragManifest.schema_version||0)>=2&&Array.isArray(ragManifest.collections)&&ragManifest.collections.length>0,ragRuntimeEnabled:opsIntelligence?.rag?.ready===true,ragRuntimeVersion:n(opsIntelligence?.rag?.version),ragSourceCount:n(opsIntelligence?.rag?.sourceCount),ragChunkCount:n(opsIntelligence?.rag?.chunkCount),ragSourceSha256:text(opsIntelligence?.rag?.sourceSha256),mcpOpsEnabled:opsIntelligence?.mcp?.enabled===true,mcpOpsReadOnly:opsIntelligence?.mcp?.readOnly===true,mcpProtocolVersion:text(opsIntelligence?.mcp?.protocolVersion),mcpTools:n(opsIntelligence?.mcp?.tools),mcpResources:n(opsIntelligence?.mcp?.resources),fineTuning:'not_used_by_design'},postgame:{pending:postPending,searching:postSearching,overdue:postOverdue,budgetGuard:postBudget,resolved:postResolved,notApplicable:postExempt,eligibilityPending:postUnclassified,requiredLeague:'bra.1',seasonCoverage,highlightPending:highlight,persistentUntilResolved:true,pendingRows,cost:{...postCost,budget:{monthlyBudgetUsd,eventBudgetUsd,warningPct,monthPct:hunterBudgetPct}}},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
   snapshot.continentalAgenda={integrityOk:text(continentalAgenda?.integridade_continental?.status)==='ok' && !(continentalAgenda?.integridade_continental?.faltantes||[]).length,
     fallbacks:n(continentalAgenda?.integridade_continental?.fallbacks_documentais_ativos)};
   snapshot.postgame.highlightOverdue=highlightOverdue;
