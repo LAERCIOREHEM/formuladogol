@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-03T23:50:38.784991-03:00",
+  "gerado_em": "2026-11-04T00:51:42.057471-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 332,
   "total_com_estatisticas": 332,
-  "total_com_publico": 331,
+  "total_com_publico": 332,
   "total_com_eventos": 332,
   "total_com_jogadores": 332,
   "total_eventos_validados": 332,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Estadio Beira-Rio",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 36412,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.estadao.com.br/esportes/futebol/internacional-faz-de-penalti-no-fim-bate-coritiba-e-complica-vida-do-corinthians-no-brasileirao",
       "arbitro": "",
       "stats": [
         {
@@ -587,7 +587,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-03T23:50:32.725980-03:00"
+      "atualizado_em": "2026-11-03T23:50:32.725980-03:00",
+      "renda": 1514667
     },
     "401841304": {
       "event_id": "401841304",
@@ -187687,5 +187688,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 306,
+  "total_com_renda": 332
 }
