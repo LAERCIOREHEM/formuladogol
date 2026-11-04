@@ -23,7 +23,7 @@ jobs:
           node-version: '22'
       - name: Install Worker dependencies
         working-directory: cloudflare/push-worker
-        run: npm ci --no-audit --no-fund
+        run: npm install --no-audit --no-fund
       - name: Validate Worker syntax and Pages false RED regression
         working-directory: cloudflare/push-worker
         run: |
