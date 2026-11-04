@@ -37,7 +37,11 @@ jobs:
               for field in ('libertadores','sul_americana','sem_competicao_continental'):
                   detail=team['decomposicao_chances'][field]['total']
                   assert detail['exibicao']==expected[field][1],(field,detail)
-                  assert 'matematicamente' in str(team['probabilidades_detalhes'][field].get('motivo_certeza') or 'matematicamente' if team['probabilidades_detalhes'][field]['certeza_estrutural'] else team['probabilidades_detalhes'][field]['motivo_impossibilidade'])
+                  d=team['probabilidades_detalhes'][field]
+                  if field=='sem_competicao_continental':
+                      assert d['certeza_estrutural'] is True and d['motivo_certeza']
+                  else:
+                      assert d['impossivel_estruturalmente'] is True and d['motivo_impossibilidade']
               assert team['situacao_matematica']['destino_continental']=='sem_competicao_confirmado'
               print('LIVE PASS: Chapecoense Libertadores 0%, Sula 0%, no continental 100%, relegation 100%, title 0%, proofs consistent')
           for attempt in range(1,13):
