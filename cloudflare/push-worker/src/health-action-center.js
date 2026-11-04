@@ -117,9 +117,13 @@ export function buildActionCenter(snapshot = {}, now = Date.now()) {
         action.recommendation = 'Verificar binding Cloudflare Email, endereço destinatário e fallback; não enviar senhas por e-mail.';
         break;
       case 'site':
-        action.impact = 'O site público pode estar indisponível.';
-        action.responsibility = 'MANUAL';
-        action.recommendation = 'Abrir o site e conferir GitHub Pages e DNS; observar HTTP e horário da última implantação.';
+        action.impact = severity === 'red'
+          ? 'Indisponibilidade pública confirmada em dois ciclos consecutivos.'
+          : 'Uma falha de rede/HTTP não comprova queda do site; rechecagem automática em andamento.';
+        action.responsibility = severity === 'red' ? 'MANUAL' : 'AUTO';
+        action.recommendation = severity === 'red'
+          ? 'Abrir o site e conferir GitHub Pages e DNS; observar HTTP e horário da última implantação.'
+          : 'Não agir ainda: a segunda verificação automática determinará se há indisponibilidade.';
         action.link = 'https://formuladogol.com.br/';
         break;
       case 'live':
