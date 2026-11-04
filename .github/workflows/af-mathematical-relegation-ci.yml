@@ -7,6 +7,7 @@ on:
       - 'js/br-estatisticas.js'
       - 'dados-br/probabilidades-brasileirao.json'
       - 'tests/test_af_continental_math_certainty.py'
+      - 'tests/test-af-continental-math-ui.mjs'
       - '.github/workflows/af-mathematical-relegation-ci.yml'
 permissions:
   contents: read
@@ -57,3 +58,5 @@ jobs:
           PY
       - name: Regression of all three continental columns and automatic recalculation
         run: python tests/test_af_continental_math_certainty.py
+      - name: Actual browser formatting for the Chapecoense row
+        run: node tests/test-af-continental-math-ui.mjs
