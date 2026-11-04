@@ -39,7 +39,6 @@ sqlite.prepare(`INSERT INTO ai_provider_ledger(provider,purpose,event_id,phase,o
 const previousFetch=globalThis.fetch;
 const json=(body)=>new Response(JSON.stringify(body),{status:200,headers:{'content-type':'application/json'}});
 const responses={
-  '/':{},
   '/dados-br/auditoria-publicos.json':{total_jogos_finalizados:30,total_com_publico_ou_complemento:25,total_sem_publico:5,total_com_renda:25,total_sem_renda:5},
   '/dados-br/auditoria-publicos-identidade.json':{schema_version:2,total_criticos:0,total_avisos:0},
   '/dados-br/rag-manifest.json':{schema_version:2,production_rag_enabled:true,collections:['a']},
@@ -54,12 +53,15 @@ globalThis.fetch=async function(url){
   if(s==='https://orchestrator.formuladogol.com.br/health') return json(orchHealth);
   if(s==='https://orchestrator.formuladogol.com.br/status') return json(orchStatus);
   const path=new URL(s).pathname;
+  if(path==='/' || path==='/index.html') return new Response('<!doctype html><html><title>Fórmula do Gol</title></html>',{status:200,headers:{'content-type':'text/html; charset=utf-8'}});
   if(path in responses) return json(responses[path]);
   return new Response('{}',{status:404});
 };
 try{
   const shot=await collectHealthSnapshot(env,{ok:true,activeGames:0,lastPollAt:now,readinessRed:0},now,true);
-  assert.equal(shot.policyVersion,13);
+  assert.equal(shot.policyVersion,14);
+  assert.equal(shot.indicators.find(i=>i.id==='site')?.severity,'green');
+  assert.equal(shot.pagesAvailability.failedCycles,0);
   assert.equal(shot.healthActionCenterVersion,1);
   assert.equal(shot.indicators.length,17);
   assert.equal(shot.indicators.find(i=>i.id==='github')?.severity,'green');
