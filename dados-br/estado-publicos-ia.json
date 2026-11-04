@@ -1,15 +1,40 @@
 {
   "schema_version": 2,
   "_comentario": "Estado por campo da camada IA de público/renda. Não há esgotamento definitivo: lacunas permanecem em backoff até serem resolvidas documentalmente.",
-  "gerado_em": "2026-11-03T12:31:16-03:00",
-  "jogos": {},
+  "gerado_em": "2026-11-03T22:20:28-03:00",
+  "jogos": {
+    "401841304": {
+      "schema_version": 2,
+      "rodada": 34,
+      "partida": "Chapecoense x Mirassol",
+      "campos": {
+        "publico": {
+          "status": "resolved",
+          "tentativas": 1,
+          "ultima_tentativa": "2026-11-03T22:20:28-03:00",
+          "resolvido_em": "2026-11-03T22:20:28-03:00",
+          "proxima_tentativa": ""
+        },
+        "renda": {
+          "status": "resolved",
+          "tentativas": 1,
+          "ultima_tentativa": "2026-11-03T22:20:28-03:00",
+          "resolvido_em": "2026-11-03T22:20:28-03:00",
+          "proxima_tentativa": ""
+        }
+      },
+      "esgotado": false,
+      "proxima_tentativa": ""
+    }
+  },
   "esgotados": [],
   "ultima_execucao": {
-    "pendentes_avaliados": 0,
-    "aceitos": 0,
+    "pendentes_avaliados": 1,
+    "aceitos": 1,
     "rejeitados": 0,
     "nao_encontrados": 0,
-    "erro": "Nenhuma lacuna elegível agora: público/renda já resolvidos ou aguardando o próximo backoff."
+    "erro": "",
+    "rejeicoes_detalhadas": []
   },
   "migracao_schema_2": "Estados legados esgotados foram reabertos; registros já resolvidos foram descartados.",
   "search_policy_version": 4

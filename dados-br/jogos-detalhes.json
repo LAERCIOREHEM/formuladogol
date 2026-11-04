@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-03T21:38:44.721362-03:00",
+  "gerado_em": "2026-11-03T22:20:29.080026-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 331,
   "total_com_estatisticas": 331,
-  "total_com_publico": 330,
+  "total_com_publico": 331,
   "total_com_eventos": 331,
   "total_com_jogadores": 331,
   "total_eventos_validados": 331,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 2,
       "estadio": "Arena Condá",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 5706,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/11/03/mirassol-vira-respira-contra-o-z-4-e-decreta-o-rebaixamento-da-chapecoense-no-brasileirao.htm",
       "arbitro": "",
       "stats": [
         {
@@ -575,7 +575,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-03T21:38:42.038333-03:00"
+      "atualizado_em": "2026-11-03T21:38:42.038333-03:00",
+      "renda": 223020,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841299": {
       "event_id": "401841299",
@@ -187106,5 +187108,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 306,
+  "total_com_renda": 331
 }
