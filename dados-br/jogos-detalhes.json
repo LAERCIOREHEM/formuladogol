@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-04T23:40:51.045861-03:00",
+  "gerado_em": "2026-11-04T23:51:37.857990-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 336,
   "total_com_estatisticas": 336,
-  "total_com_publico": 333,
+  "total_com_publico": 334,
   "total_com_eventos": 336,
   "total_com_jogadores": 336,
   "total_eventos_validados": 336,
@@ -1728,9 +1728,9 @@
       "placar_mandante": 3,
       "placar_visitante": 1,
       "estadio": "Estadio do Maracana",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 67164,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://centraldosgramados.com.br/flamengo-vence-gremio-3-a-1-lideranca-brasileirao",
       "arbitro": "",
       "stats": [
         {
@@ -2276,7 +2276,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-04T23:40:46.421181-03:00"
+      "atualizado_em": "2026-11-04T23:40:46.421181-03:00",
+      "renda": 5766015
     },
     "401841301": {
       "event_id": "401841301",
@@ -189956,5 +189957,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 306,
+  "total_com_renda": 334
 }

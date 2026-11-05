@@ -1,22 +1,48 @@
 {
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
-  "jogos_finalizados": 334,
-  "jogos_com_publico": 333,
-  "jogos_sem_publico": 1,
-  "publico_total": 8249325,
-  "jogos_com_renda": 333,
+  "jogos_finalizados": 336,
+  "jogos_com_publico": 334,
+  "jogos_sem_publico": 2,
+  "publico_total": 8316489,
+  "jogos_com_renda": 334,
   "aguardando_fonte": [
     {
-      "event_id": "401841307",
-      "mandante": "Flamengo",
-      "visitante": "Grêmio",
+      "event_id": "401841305",
+      "mandante": "Botafogo",
+      "visitante": "Atlético-MG",
+      "estado": "AGUARDANDO_FONTE"
+    },
+    {
+      "event_id": "401841298",
+      "mandante": "São Paulo",
+      "visitante": "Corinthians",
       "estado": "AGUARDANDO_FONTE"
     }
   ],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
+    {
+      "event_id": "401841305",
+      "tipo_publico": "",
+      "publico_presente": null,
+      "publico_pagante": null,
+      "renda": null,
+      "fonte_publico": "",
+      "origem": "",
+      "estado": "AGUARDANDO_FONTE"
+    },
+    {
+      "event_id": "401841298",
+      "tipo_publico": "",
+      "publico_presente": null,
+      "publico_pagante": null,
+      "renda": null,
+      "fonte_publico": "",
+      "origem": "",
+      "estado": "AGUARDANDO_FONTE"
+    },
     {
       "event_id": "401841306",
       "tipo_publico": "presente",
@@ -29,13 +55,13 @@
     },
     {
       "event_id": "401841307",
-      "tipo_publico": "",
-      "publico_presente": null,
+      "tipo_publico": "presente",
+      "publico_presente": 67164,
       "publico_pagante": null,
-      "renda": null,
-      "fonte_publico": "",
-      "origem": "",
-      "estado": "AGUARDANDO_FONTE"
+      "renda": 5766015.0,
+      "fonte_publico": "https://centraldosgramados.com.br/flamengo-vence-gremio-3-a-1-lideranca-brasileirao",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
     },
     {
       "event_id": "401841301",
@@ -3358,5 +3384,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-11-04T23:16:33.742102-03:00"
+  "gerado_em": "2026-11-04T23:51:38.536293-03:00"
 }
