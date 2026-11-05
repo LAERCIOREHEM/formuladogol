@@ -26,13 +26,18 @@
   function probabilidadeDo(nome){ return state.probabilidades[slug(nome)] || {}; }
   function probDisplay(prob, key){
     const detail = prob?.probabilidades_detalhes?.[key];
-    if (detail?.exibicao) return detail.exibicao;
     const n = Number(prob?.probabilidades_pct?.[key]);
     if (!Number.isFinite(n)) return "—";
-    if (n === 0) return "0%";
-    if (n > 0 && n < 0.001) return "<0,001%";
-    if (n > 99.999) return ">99,999%";
-    const digits = n < 0.1 ? 3 : n < 1 ? 2 : 1;
+    // Somente uma prova estrutural autoriza 0% ou 100% sem aproximação.
+    if (detail?.impossivel_estruturalmente === true || detail?.possivel_estruturalmente === false) return "0%";
+    if (detail?.certeza_estrutural === true) return "100%";
+    const label = String(detail?.exibicao || "").trim();
+    if (label && label !== "0%" && label !== "100%") return label;
+    if (n === 0) return "~0%";
+    if (n < 0.001) return "<0,001%";
+    if (n >= 99.999) return "~100%";
+    let digits = n < 0.1 ? 3 : n < 1 ? 2 : 1;
+    while (digits < 4 && Number(n.toFixed(digits)) >= 100) digits += 1;
     return n.toLocaleString("pt-BR", { minimumFractionDigits: digits, maximumFractionDigits: digits }) + "%";
   }
   function paginaClubeUrl(clube){ return `/clube/${slug(clube?.nome || "")}/`; }
