@@ -2,18 +2,11 @@
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
   "jogos_finalizados": 336,
-  "jogos_com_publico": 335,
-  "jogos_sem_publico": 1,
-  "publico_total": 8338497,
+  "jogos_com_publico": 336,
+  "jogos_sem_publico": 0,
+  "publico_total": 8351283,
   "jogos_com_renda": 336,
-  "aguardando_fonte": [
-    {
-      "event_id": "401841298",
-      "mandante": "São Paulo",
-      "visitante": "Corinthians",
-      "estado": "AGUARDANDO_FONTE"
-    }
-  ],
+  "aguardando_fonte": [],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
@@ -29,13 +22,13 @@
     },
     {
       "event_id": "401841298",
-      "tipo_publico": "",
-      "publico_presente": null,
-      "publico_pagante": 107142,
-      "renda": 12786.0,
-      "fonte_publico": "",
-      "origem": "cloudflare-postgame-fastlane",
-      "estado": "AGUARDANDO_FONTE"
+      "tipo_publico": "presente",
+      "publico_presente": 12786,
+      "publico_pagante": 12773,
+      "renda": 936644.5,
+      "fonte_publico": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/11/04/majestoso-na-vila-termina-empatado-e-deixa-corinthians-no-z-4-e-sao-paulo-longe-da-libertadores.htm",
+      "origem": "Correção documental verificada — UOL/Agência Estado e Gazeta Esportiva",
+      "estado": "CONFIRMADO"
     },
     {
       "event_id": "401841306",
@@ -3378,5 +3371,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-11-05T01:41:59.480313-03:00"
+  "gerado_em": "2026-11-05T02:56:42.339768-03:00"
 }
