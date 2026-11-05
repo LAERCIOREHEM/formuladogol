@@ -1,8 +1,7 @@
 {
-  "atualizado_em": "2026-11-04T23:32:40.366819-03:00",
+  "atualizado_em": "2026-11-04T23:36:53.842220-03:00",
   "fonte": "ESPN",
   "fontes_complementares": [
-    "ESPN summary",
     "override manual"
   ],
   "fallbacks_resultado": [
@@ -23,15 +22,6 @@
       "fonte": "override manual",
       "origem": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial."
-    },
-    {
-      "event_id": "401841305",
-      "rodada": 34,
-      "jogo": "Botafogo x Atlético-MG",
-      "placar": "1 x 0",
-      "fonte": "ESPN summary",
-      "origem": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841305",
-      "motivo": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN."
     }
   ],
   "total": 370,
@@ -9730,7 +9720,7 @@
       "visitante": "Atlético-MG",
       "estadio": "Joao Havelange Stadium",
       "transmissao": "",
-      "status": "FT",
+      "status": "90'+4'",
       "estado": "post",
       "concluido": true,
       "placar_mandante": 1,
@@ -9746,9 +9736,9 @@
       "motivo_ajuste": "",
       "resultado_manual": false,
       "resultado_fallback": false,
-      "fonte_resultado": "ESPN summary",
-      "origem_resultado": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841305",
-      "motivo_fallback": "Scoreboard geral divergente; resultado confirmado no summary individual da ESPN.",
+      "fonte_resultado": "ESPN",
+      "origem_resultado": "",
+      "motivo_fallback": "",
       "motivo_resultado_manual": ""
     },
     {
@@ -9759,9 +9749,9 @@
       "visitante": "Corinthians",
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "transmissao": "",
-      "status": "87'",
-      "estado": "in",
-      "concluido": false,
+      "status": "90'+5'",
+      "estado": "post",
+      "concluido": true,
       "placar_mandante": 0,
       "placar_visitante": 0,
       "adiado": false,
@@ -9770,7 +9760,7 @@
       "fonte_calendario": "ESPN",
       "origem_calendario": "",
       "data_espn_original": "",
-      "finalizado_em": "",
+      "finalizado_em": "2026-11-04T23:32:40-03:00",
       "rodada_corrigida_de": null,
       "motivo_ajuste": "",
       "resultado_manual": false,
