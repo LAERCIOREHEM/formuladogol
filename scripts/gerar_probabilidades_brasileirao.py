@@ -975,6 +975,7 @@ def structural_status(
             "certo": bool(rebaixado),
             "clubes_certos_acima": certos_acima,
             "melhor_posicao_possivel": certos_acima + 1,
+            "pior_posicao_possivel": podem_acima + 1,
             "maximo_pontos": maximo[i],
             "motivo": (
                 f"apenas {podem_acima} clube(s) ainda podem terminar acima; "
@@ -986,9 +987,25 @@ def structural_status(
             ) if rebaixado else None,
         }
 
-        # A faixa 6º-11º não tem teste de fronteira simples e confiável:
-        # permanece empírica de propósito, sem afirmar nada.
-        criterios["sul_americana_base"] = {"possivel": True, "certo": False, "motivo": None}
+        # A faixa-base da Sul-Americana equivale às posições 6º–11º.
+        # Limites conservadores permitem provar exclusão ou garantia, sem
+        # transformar ausência em Monte Carlo em uma impossibilidade.
+        melhor_posicao = certos_acima + 1
+        pior_posicao = podem_acima + 1
+        sula_impossivel = melhor_posicao > 11 or pior_posicao < 6
+        sula_certa = melhor_posicao >= 6 and pior_posicao <= 11
+        criterios["sul_americana_base"] = {
+            "possivel": not sula_impossivel,
+            "certo": sula_certa,
+            "motivo": (
+                f"o clube só pode terminar entre {melhor_posicao}º e {pior_posicao}º "
+                "pelos limites de pontuação, fora da faixa-base 6º–11º"
+            ) if sula_impossivel else None,
+            "motivo_certeza": (
+                f"posição garantida entre {melhor_posicao}º e {pior_posicao}º, "
+                "integralmente dentro da faixa-base 6º–11º"
+            ) if sula_certa else None,
+        }
 
         resultado[team] = criterios
     return resultado
