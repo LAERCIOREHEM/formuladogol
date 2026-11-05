@@ -4817,13 +4817,40 @@ function legendaProbabilidadeHtml() {
   return `<p class="legenda-probabilidade"><strong>0%</strong> e <strong>100%</strong> indicam impossibilidade ou certeza matemática, já provadas pela pontuação. <strong>~0%</strong> e <strong>~100%</strong> indicam o resultado de 2 milhões de simulações, sem prova matemática.</p>`;
 }
 
-function metasObjetivosFormatarChance(valor) {
+function metasObjetivosProva(prob, tipo) {
+  const details = prob?.probabilidades_detalhes || {};
+  const proof = (detail) => {
+    if (detail?.certeza_estrutural === true) return '100%';
+    if (detail?.impossivel_estruturalmente === true || detail?.possivel_estruturalmente === false) return '0%';
+    return '';
+  };
+  if (tipo === 'titulo') return proof(details.campeao);
+  if (tipo === 'libertadores') return proof(details.libertadores);
+  if (tipo === 'sul_americana_ou_melhor') {
+    // Os três destinos continentais são exclusivos e exaustivos.
+    const semVaga = details.sem_competicao_continental;
+    if (semVaga?.impossivel_estruturalmente === true) return '100%';
+    if (semVaga?.certeza_estrutural === true) return '0%';
+    return '';
+  }
+  if (tipo === 'permanencia') {
+    const queda = details.rebaixamento;
+    if (queda?.impossivel_estruturalmente === true) return '100%';
+    if (queda?.certeza_estrutural === true) return '0%';
+  }
+  return '';
+}
+
+function metasObjetivosFormatarChance(valor, prova = '') {
   const n = Number(valor);
   if (!Number.isFinite(n)) return '—';
-  if (n <= 0) return '~0%';        // era '0%'
-  if (n < .001) return '~0%';      // era '<0,001%'
-  if (n > 99.999) return '~100%';  // era '>99,999%'
-  const casas = n < .1 ? 3 : n < 1 ? 2 : 1;
+  if (prova === '0%' && n === 0) return '0%';
+  if (prova === '100%' && n === 100) return '100%';
+  if (n <= 0) return '~0%';
+  if (n < .001) return '<0,001%';
+  if (n >= 99.999) return '~100%';
+  let casas = n < .1 ? 3 : n < 1 ? 2 : 1;
+  while (casas < 4 && Number(n.toFixed(casas)) >= 100) casas += 1;
   return n.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas }) + '%';
 }
 
@@ -4882,7 +4909,7 @@ function metasObjetivosCard(def, nivel, clubeTabela, clubeProb) {
     if (combo) detalhe += ` · uma combinação possível: ${combo.texto}${combo.obtidos > falta ? ` (${combo.obtidos} pts)` : ''}`;
   }
   return `<article class="team-needs-objective${classe}">
-    <div class="team-needs-objective-head"><span class="team-needs-objective-title">${def.icon} ${brEscapeHtml(def.label)}</span><span class="team-needs-current">AF atual<br><strong>${brEscapeHtml(metasObjetivosFormatarChance(chance))}</strong></span></div>
+    <div class="team-needs-objective-head"><span class="team-needs-objective-title">${def.icon} ${brEscapeHtml(def.label)}</span><span class="team-needs-current">AF atual<br><strong>${brEscapeHtml(metasObjetivosFormatarChance(chance, metasObjetivosProva(clubeProb, def.key)))}</strong></span></div>
     <div class="team-needs-target"><strong>${Number.isFinite(meta) ? meta : '—'}</strong><span>pts para ${brEscapeHtml(nivelRotulo)}</span></div>
     <div class="team-needs-gap">${gap}</div>
     ${detalhe ? `<div class="team-needs-detail">${brEscapeHtml(detalhe)}</div>` : ''}
