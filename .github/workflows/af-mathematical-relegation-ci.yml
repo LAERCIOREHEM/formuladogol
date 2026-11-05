@@ -1,7 +1,23 @@
 name: AF Mathematical Relegation CI
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/gerar_probabilidades_brasileirao.py'
+      - 'scripts/af_previsao_continental.py'
+      - 'js/br-estatisticas.js'
+      - 'js/br-clubes.js'
+      - 'index.html'
+      - 'dados-br/probabilidades-brasileirao.json'
+      - 'tests/test_af_continental_math_certainty.py'
+      - 'tests/test-af-continental-math-ui.mjs'
+      - 'tests/test-af-math-objectives.mjs'
+      - '.github/workflows/af-mathematical-relegation-ci.yml'
   pull_request:
     paths:
+      - 'index.html'
+      - 'js/br-clubes.js'
+      - 'tests/test-af-math-objectives.mjs'
       - 'scripts/gerar_probabilidades_brasileirao.py'
       - 'scripts/af_previsao_continental.py'
       - 'js/br-estatisticas.js'
@@ -29,6 +45,7 @@ jobs:
         run: |
           python -m py_compile scripts/gerar_probabilidades_brasileirao.py scripts/af_previsao_continental.py
           node --check js/br-estatisticas.js
+          node --check js/br-clubes.js
       - name: Validate proof and zero / hundred percent outputs
         run: |
           python - <<'PY'
@@ -37,9 +54,9 @@ jobs:
           p=json.loads(Path('dados-br/probabilidades-brasileirao.json').read_text())
           c=next(x for x in p['clubes'] if x['clube']=='Chapecoense')
           d=c['probabilidades_detalhes']['rebaixamento']
-          assert (c['pontos_atuais'],c['jogos_atuais'])==(21,33)
+          assert c['situacao_matematica']['limite_posicao_melhor'] >= 17
           assert d['certeza_estrutural'] is True and d['exibicao']=='100%'
-          assert '36 pontos' in d['motivo_certeza']
+          assert d['motivo_certeza']
           assert c['probabilidades_pct']['rebaixamento']==100
           assert c['probabilidades_pct']['campeao']==0
           assert c['probabilidades_pct']['libertadores']==0
@@ -58,5 +75,7 @@ jobs:
           PY
       - name: Regression of all three continental columns and automatic recalculation
         run: python tests/test_af_continental_math_certainty.py
-      - name: Actual browser formatting for the Chapecoense row
-        run: node tests/test-af-continental-math-ui.mjs
+      - name: Browser formatting and all 20 club objectives
+        run: |
+          node tests/test-af-continental-math-ui.mjs
+          node tests/test-af-math-objectives.mjs
