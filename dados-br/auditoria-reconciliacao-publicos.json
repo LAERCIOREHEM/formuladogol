@@ -2,17 +2,11 @@
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
   "jogos_finalizados": 334,
-  "jogos_com_publico": 332,
-  "jogos_sem_publico": 2,
-  "publico_total": 8228453,
-  "jogos_com_renda": 332,
+  "jogos_com_publico": 333,
+  "jogos_sem_publico": 1,
+  "publico_total": 8249325,
+  "jogos_com_renda": 333,
   "aguardando_fonte": [
-    {
-      "event_id": "401841306",
-      "mandante": "Athletico-PR",
-      "visitante": "Vasco da Gama",
-      "estado": "AGUARDANDO_FONTE"
-    },
     {
       "event_id": "401841307",
       "mandante": "Flamengo",
@@ -25,13 +19,13 @@
   "por_partida": [
     {
       "event_id": "401841306",
-      "tipo_publico": "",
-      "publico_presente": null,
+      "tipo_publico": "presente",
+      "publico_presente": 20872,
       "publico_pagante": null,
-      "renda": null,
-      "fonte_publico": "",
-      "origem": "",
-      "estado": "AGUARDANDO_FONTE"
+      "renda": 994380.0,
+      "fonte_publico": "https://www.itatiaia.com.br/esportes/futebol/futebol-nacional/brasileirao-serie-a/vasco-faz-tres-gols-em-cinco-minutos-e-vira-contra-o-athletico-pr-pelo-brasileiro",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
     },
     {
       "event_id": "401841307",
@@ -3364,5 +3358,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-11-04T22:45:00.493074-03:00"
+  "gerado_em": "2026-11-04T23:16:33.742102-03:00"
 }

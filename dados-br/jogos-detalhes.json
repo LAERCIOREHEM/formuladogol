@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-04T21:56:33.518331-03:00",
+  "gerado_em": "2026-11-04T23:16:33.073100-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 334,
   "total_com_estatisticas": 334,
-  "total_com_publico": 332,
+  "total_com_publico": 333,
   "total_com_eventos": 334,
   "total_com_jogadores": 334,
   "total_eventos_validados": 334,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 3,
       "estadio": "Arena da Baixada",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 20872,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.itatiaia.com.br/esportes/futebol/futebol-nacional/brasileirao-serie-a/vasco-faz-tres-gols-em-cinco-minutos-e-vira-contra-o-athletico-pr-pelo-brasileiro",
       "arbitro": "",
       "stats": [
         {
@@ -593,7 +593,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-04T21:56:26.560791-03:00"
+      "atualizado_em": "2026-11-04T21:56:26.560791-03:00",
+      "renda": 994380
     },
     "401841307": {
       "event_id": "401841307",
@@ -188834,5 +188835,6 @@
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
   },
-  "total_com_publico_pagante": 306
+  "total_com_publico_pagante": 306,
+  "total_com_renda": 333
 }
