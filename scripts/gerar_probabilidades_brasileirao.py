@@ -1008,6 +1008,16 @@ def apply_continental_mathematical_certainty(
     eliminado de todas as copas NÃO pode classificar-se por qualquer via.
     O critério é suficiente (conservador), não pretende detectar todos os casos.
     """
+    def certify_base_destination(detail: dict[str, Any], certain: bool, reason: str) -> None:
+        """Registra prova matemática sem alterar os percentuais Monte Carlo."""
+        detail["exibicao"] = "100%" if certain else "0%"
+        detail["possivel_estruturalmente"] = certain
+        detail["impossivel_estruturalmente"] = not certain
+        detail["certeza_estrutural"] = certain
+        detail["motivo_certeza"] = reason if certain else None
+        detail["motivo_impossibilidade"] = None if certain else reason
+        detail["limite_superior_95_regra_dos_tres_pct"] = None
+
     base = int(continental_config.get("brasileirao_vagas_diretas", 4)) + int(
         continental_config.get("brasileirao_vagas_preliminares", 1)
     )
@@ -1066,6 +1076,51 @@ def apply_continental_mathematical_certainty(
             "destino_continental": "sem_competicao_confirmado",
             "limite_posicao_melhor": best_rank,
             "limite_total_classificados": max_qualificados,
+            "fundamento_continental": reason,
+        }
+
+
+    # A classificação matemática no G5 é uma prova de vaga na Libertadores,
+    # não uma estimativa de Monte Carlo. Propaga a prova ao destino continental
+    # integrado e aos dois destinos mutuamente exclusivos, para todos os clubes.
+    for item in teams:
+        name = item["clube"]
+        base_detail = item["probabilidades_detalhes"].get("libertadores_base") or {}
+        base_proof = (structural.get(name) or {}).get("libertadores_base") or {}
+        if base_detail.get("certeza_estrutural") is not True:
+            continue
+        if base_proof.get("certo") is not True:
+            raise ValueError(f"Certeza de G5 sem prova de pontuação: {name}")
+        expected = {
+            "libertadores": 100.0,
+            "sul_americana": 0.0,
+            "sem_competicao_continental": 0.0,
+        }
+        probabilities = item["probabilidades_pct"]
+        if any(float(probabilities[field]) != value for field, value in expected.items()):
+            raise ValueError(
+                f"Destinos continentais contradizem vaga-base matematicamente garantida: {name}"
+            )
+        reason = (
+            base_proof.get("motivo_certeza")
+            or "A posição entre os cinco primeiros é garantida pelos limites "
+               "de pontos que os adversários ainda podem alcançar."
+        )
+        details = item["probabilidades_detalhes"]
+        breakdown = item["decomposicao_chances"]
+        for field, value in expected.items():
+            certain = value == 100.0
+            certify_base_destination(details[field], certain, reason)
+            certify_base_destination(breakdown[field]["total"], certain, reason)
+        for route, detail in breakdown["libertadores"]["vias"].items():
+            certify_base_destination(detail, route == "via_brasileirao", reason)
+        for detail in breakdown["libertadores"]["subvias_copa_do_brasil"].values():
+            certify_base_destination(detail, False, reason)
+        for detail in breakdown["sul_americana"]["vias"].values():
+            certify_base_destination(detail, False, reason)
+        item["situacao_matematica"] = {
+            **item.get("situacao_matematica", {}),
+            "destino_continental": "libertadores_confirmado",
             "fundamento_continental": reason,
         }
 
