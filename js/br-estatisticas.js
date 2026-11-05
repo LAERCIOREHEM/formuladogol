@@ -1304,7 +1304,11 @@
     // Prova matemática precede inclusive a string 'exibicao' do snapshot.
     if (detail?.impossivel_estruturalmente === true || detail?.possivel_estruturalmente === false) return "0%";
     if (detail?.certeza_estrutural === true) return "100%";
-    if (/^(0%|100%|~0%|~100%)$/.test(explicit)) return explicit;
+    // Rótulos 0% e 100% só são absolutos com prova estrutural explícita.
+    // Snapshots legados podem trazer "0%" como mera contagem Monte Carlo.
+    if (/^(~0%|~100%)$/.test(explicit)) return explicit;
+    if (explicit === "0%" && n === 0) return "~0%";
+    if (explicit === "100%" && n === 100) return "~100%";
     if (!Number.isFinite(n)) return "—";
     // O til marca resultado empírico: nunca observado é diferente de
     // observado e raro, e ambos são diferentes de impossível.
