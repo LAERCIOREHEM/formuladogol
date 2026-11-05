@@ -111,6 +111,37 @@ for name in ("Flamengo", "Palmeiras"):
     assert stale["probabilidades_detalhes"]["sul_americana"]["exibicao"] == "0%"
     assert stale["probabilidades_detalhes"]["sem_competicao_continental"]["exibicao"] == "0%"
 
+# O terceiro colocado tem no máximo a 9ª posição pelo limite de pontos.
+# Portanto, ter vaga continental é certeza, mas Libertadores vs Sul-Americana
+# ainda não está decidido: preservar as probabilidades integradas.
+cruz = next(row for row in data["clubes"] if row["clube"] == "Cruzeiro")
+assert cruz["situacao_matematica"]["vaga_continental_garantida"] is True
+assert cruz["situacao_matematica"]["limite_posicao_pior"] <= 11
+assert cruz["probabilidades_pct"]["sem_competicao_continental"] == 0
+assert cruz["probabilidades_detalhes"]["sem_competicao_continental"]["exibicao"] == "0%"
+assert cruz["probabilidades_detalhes"]["sem_competicao_continental"]["impossivel_estruturalmente"] is True
+assert 0 < cruz["probabilidades_pct"]["libertadores"] < 100
+assert 0 < cruz["probabilidades_pct"]["sul_americana"] < 100
+cruz_replay = copy.deepcopy(cruz)
+cruz_replay["probabilidades_detalhes"]["sem_competicao_continental"].update({
+    "exibicao": "<0,001%", "impossivel_estruturalmente": False,
+    "possivel_estruturalmente": True,
+})
+proof_g11 = {"Cruzeiro": {
+    "rebaixamento": {
+        "clubes_certos_acima": 1, "melhor_posicao_possivel": 2,
+        "pior_posicao_possivel": 9,
+    },
+}}
+apply_continental_mathematical_certainty([cruz_replay], proof_g11, config)
+assert cruz_replay["probabilidades_detalhes"]["sem_competicao_continental"]["exibicao"] == "0%"
+assert cruz_replay["probabilidades_pct"] == cruz["probabilidades_pct"]
+
+# Sem prova de G11, zero em 2M simulações continua empírico.
+flu = next(row for row in data["clubes"] if row["clube"] == "Fluminense")
+assert flu["probabilidades_pct"]["sem_competicao_continental"] == 0
+assert flu["probabilidades_detalhes"]["sem_competicao_continental"]["impossivel_estruturalmente"] is False
+
 # Nunca declarar certeza matemática a partir de arredondamento ou 2M/2M.
 for team in data["clubes"]:
     p = team["probabilidades_pct"]
