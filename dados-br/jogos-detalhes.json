@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-05T00:21:43.444629-03:00",
+  "gerado_em": "2026-11-05T01:41:58.437788-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 336,
   "total_com_estatisticas": 336,
-  "total_com_publico": 334,
+  "total_com_publico": 335,
   "total_com_eventos": 336,
   "total_com_jogadores": 336,
   "total_eventos_validados": 336,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Joao Havelange Stadium",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 22008,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.futebolinterior.com.br/botafogo-1-x-0-atletico-mg-fogao-bate-os-reservas-do-galo-e-se-reabilita-no-brasileirao",
       "arbitro": "",
       "stats": [
         {
@@ -545,7 +545,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-04T23:40:39.661147-03:00"
+      "atualizado_em": "2026-11-04T23:40:39.661147-03:00",
+      "renda": 438170
     },
     "401841298": {
       "event_id": "401841298",
@@ -1131,7 +1132,8 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-11-04T23:40:41.845415-03:00",
-      "publico_pagante": 107142
+      "publico_pagante": 107142,
+      "renda": 12786
     },
     "401841306": {
       "event_id": "401841306",
@@ -189960,5 +189962,5 @@
     }
   },
   "total_com_publico_pagante": 307,
-  "total_com_renda": 334
+  "total_com_renda": 336
 }

@@ -2,17 +2,11 @@
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
   "jogos_finalizados": 336,
-  "jogos_com_publico": 334,
-  "jogos_sem_publico": 2,
-  "publico_total": 8316489,
-  "jogos_com_renda": 334,
+  "jogos_com_publico": 335,
+  "jogos_sem_publico": 1,
+  "publico_total": 8338497,
+  "jogos_com_renda": 336,
   "aguardando_fonte": [
-    {
-      "event_id": "401841305",
-      "mandante": "Botafogo",
-      "visitante": "Atlético-MG",
-      "estado": "AGUARDANDO_FONTE"
-    },
     {
       "event_id": "401841298",
       "mandante": "São Paulo",
@@ -25,20 +19,20 @@
   "por_partida": [
     {
       "event_id": "401841305",
-      "tipo_publico": "",
-      "publico_presente": null,
+      "tipo_publico": "presente",
+      "publico_presente": 22008,
       "publico_pagante": null,
-      "renda": null,
-      "fonte_publico": "",
-      "origem": "",
-      "estado": "AGUARDANDO_FONTE"
+      "renda": 438170.0,
+      "fonte_publico": "https://www.futebolinterior.com.br/botafogo-1-x-0-atletico-mg-fogao-bate-os-reservas-do-galo-e-se-reabilita-no-brasileirao",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
     },
     {
       "event_id": "401841298",
       "tipo_publico": "",
       "publico_presente": null,
       "publico_pagante": 107142,
-      "renda": null,
+      "renda": 12786.0,
       "fonte_publico": "",
       "origem": "cloudflare-postgame-fastlane",
       "estado": "AGUARDANDO_FONTE"
@@ -3384,5 +3378,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-11-05T00:21:44.413149-03:00"
+  "gerado_em": "2026-11-05T01:41:59.480313-03:00"
 }
