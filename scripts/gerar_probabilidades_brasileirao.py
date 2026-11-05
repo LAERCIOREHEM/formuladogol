@@ -1141,6 +1141,48 @@ def apply_continental_mathematical_certainty(
             "fundamento_continental": reason,
         }
 
+    # Propagação conservadora para TODAS as faixas: 6º–11º e ao menos uma
+    # vaga continental. Os 5 primeiros recebem Libertadores; entre os demais,
+    # as 6 vagas da Sul-Americana seguem a classificação. Logo qualquer clube
+    # comprovadamente no G11 terá uma vaga continental (mas não necessariamente
+    # a Libertadores).
+    for item in teams:
+        name = item["clube"]
+        proof = structural.get(name) or {}
+        details = item["probabilidades_detalhes"]
+        base_sula = proof.get("sul_americana_base") or {}
+        if base_sula.get("certo") is True or base_sula.get("possivel") is False:
+            certain = base_sula.get("certo") is True
+            expected_base = 100.0 if certain else 0.0
+            if float(item["probabilidades_pct"]["sul_americana_base"]) != expected_base:
+                raise ValueError(f"Faixa-base 6º–11º contradiz limite matemático: {name}")
+            reason = (
+                base_sula.get("motivo_certeza") if certain else base_sula.get("motivo")
+            ) or "Limite matemático da faixa-base 6º–11º pela pontuação restante."
+            certify_base_destination(details["sul_americana_base"], certain, reason)
+
+        league_proof = proof.get("rebaixamento") or {}
+        worst_rank = league_proof.get("pior_posicao_possivel")
+        if worst_rank is None or int(worst_rank) > base + sula:
+            continue
+        if float(item["probabilidades_pct"]["sem_competicao_continental"]) != 0.0:
+            raise ValueError(f"G{base + sula} garantido contradiz chance sem continental: {name}")
+        reason = (
+            f"No máximo {int(worst_rank)}º lugar pelos limites de pontuação. "
+            f"O modelo assegura vaga continental aos {base + sula} primeiros "
+            f"({base} Libertadores-base e {sula} Sul-Americana)."
+        )
+        certify_base_destination(details["sem_competicao_continental"], False, reason)
+        certify_base_destination(
+            item["decomposicao_chances"]["sem_competicao_continental"]["total"], False, reason
+        )
+        item["situacao_matematica"] = {
+            **item.get("situacao_matematica", {}),
+            "vaga_continental_garantida": True,
+            "limite_posicao_pior": int(worst_rank),
+            "fundamento_vaga_continental": reason,
+        }
+
 
 def run_monte_carlo(
     state: CurrentState,
