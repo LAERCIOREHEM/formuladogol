@@ -2,7 +2,7 @@
   "schema_version": 1,
   "projeto": "AF-Previsão",
   "temporada": 2026,
-  "gerado_em": "2026-11-03T23:51:05-03:00",
+  "gerado_em": "2026-11-04T21:37:04-03:00",
   "status": "ok",
   "escopo_publico": {
     "inicio_historico_classificacao": "2026-07-17T22:05:00-03:00",
@@ -20,11 +20,11 @@
     "ultima_previsao_temporada": "2026-11-03T23:32:00-03:00"
   },
   "jogos": {
-    "jogos_avaliados": 198,
+    "jogos_avaliados": 202,
     "maior_probabilidade": {
-      "amostra": 198,
-      "confirmadas": 109,
-      "taxa_confirmacao_pct": 55.05
+      "amostra": 202,
+      "confirmadas": 111,
+      "taxa_confirmacao_pct": 54.95
     },
     "alta_confianca_80": {
       "amostra": 0,
@@ -38,30 +38,30 @@
           0,
           10
         ],
-        "amostra": 3,
-        "probabilidade_media_pct": 8.9961,
+        "amostra": 4,
+        "probabilidade_media_pct": 9.218,
         "frequencia_observada_pct": 0.0,
-        "erro_absoluto_pp": 8.9961
+        "erro_absoluto_pp": 9.218
       },
       {
         "faixa_pct": [
           10,
           20
         ],
-        "amostra": 56,
-        "probabilidade_media_pct": 16.1581,
-        "frequencia_observada_pct": 10.7143,
-        "erro_absoluto_pp": 5.4438
+        "amostra": 60,
+        "probabilidade_media_pct": 16.0966,
+        "frequencia_observada_pct": 11.6667,
+        "erro_absoluto_pp": 4.43
       },
       {
         "faixa_pct": [
           20,
           30
         ],
-        "amostra": 282,
-        "probabilidade_media_pct": 25.4362,
-        "frequencia_observada_pct": 22.695,
-        "erro_absoluto_pp": 2.7412
+        "amostra": 285,
+        "probabilidade_media_pct": 25.4047,
+        "frequencia_observada_pct": 22.807,
+        "erro_absoluto_pp": 2.5977
       },
       {
         "faixa_pct": [
@@ -88,10 +88,10 @@
           50,
           60
         ],
-        "amostra": 48,
-        "probabilidade_media_pct": 54.0354,
-        "frequencia_observada_pct": 54.1667,
-        "erro_absoluto_pp": 0.1312
+        "amostra": 50,
+        "probabilidade_media_pct": 54.1938,
+        "frequencia_observada_pct": 52.0,
+        "erro_absoluto_pp": 2.1938
       },
       {
         "faixa_pct": [
@@ -108,15 +108,15 @@
           70,
           80
         ],
-        "amostra": 4,
-        "probabilidade_media_pct": 74.7694,
+        "amostra": 6,
+        "probabilidade_media_pct": 74.153,
         "frequencia_observada_pct": 100.0,
-        "erro_absoluto_pp": 25.2306
+        "erro_absoluto_pp": 25.847
       }
     ],
     "metricas_tecnicas": {
-      "brier_multiclasse_medio": 0.18998202,
-      "log_loss_medio": 0.96160431
+      "brier_multiclasse_medio": 0.19005104,
+      "log_loss_medio": 0.96225889
     },
     "por_rodada": [
       {
@@ -261,13 +261,13 @@
       },
       {
         "rodada": 34,
-        "jogos_avaliados": 6,
-        "maior_probabilidade_avaliada": 6,
-        "maior_probabilidade_confirmada": 6,
-        "previsoes_fortes_60_total": 0,
-        "previsoes_fortes_60_confirmadas": 0,
-        "taxa_confirmacao_pct": 100.0,
-        "taxa_fortes_60_pct": null
+        "jogos_avaliados": 10,
+        "maior_probabilidade_avaliada": 10,
+        "maior_probabilidade_confirmada": 8,
+        "previsoes_fortes_60_total": 2,
+        "previsoes_fortes_60_confirmadas": 2,
+        "taxa_confirmacao_pct": 80.0,
+        "taxa_fortes_60_pct": 100.0
       }
     ]
   },

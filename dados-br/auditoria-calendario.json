@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-11-03T23:50:29.571345-03:00",
+  "gerado_em": "2026-11-04T21:36:31.627246-03:00",
   "fonte": "auditoria local sobre JSONs normalizados da ESPN",
   "escopo": "módulo Brasileirão; nenhum arquivo da Copa",
   "resumo": {
@@ -11,7 +11,7 @@
     "confrontos_com_ida_e_volta": 190,
     "partidas_com_data_confirmada": 370,
     "partidas_com_data_a_definir": 10,
-    "resultados_publicados": 332,
+    "resultados_publicados": 334,
     "proximos_publicados": 38,
     "eventos_espn_na_janela": 370,
     "ajustes_calendario_configurados": 3,
@@ -19,25 +19,36 @@
     "jogos_com_data_a_definir": 0,
     "rodadas_espn_com_clube_repetido": 0,
     "rodadas_preservadas_do_calendario_anterior": 0,
-    "kickoffs_confirmados_cbf": 26,
+    "kickoffs_confirmados_cbf": 22,
     "kickoffs_preservados_sem_confirmacao_atual": 0,
     "kickoffs_espn_provisorios_suprimidos_da_agenda": 0,
     "kickoffs_herdados_provisorios_suprimidos": 0,
-    "falhas_graves": 0
+    "falhas_graves": 1
   },
   "avisos": [],
   "distribuicao_jogos_disputados": {
-    "34": 5,
-    "33": 14,
-    "32": 1
+    "34": 8,
+    "33": 12
   },
   "jogos_disputados_por_clube": [
+    {
+      "time": "Athletico-PR",
+      "jogos_disputados": 34
+    },
     {
       "time": "Bragantino",
       "jogos_disputados": 34
     },
     {
       "time": "Coritiba",
+      "jogos_disputados": 34
+    },
+    {
+      "time": "Flamengo",
+      "jogos_disputados": 34
+    },
+    {
+      "time": "Grêmio",
       "jogos_disputados": 34
     },
     {
@@ -51,10 +62,6 @@
     {
       "time": "Santos",
       "jogos_disputados": 34
-    },
-    {
-      "time": "Athletico-PR",
-      "jogos_disputados": 33
     },
     {
       "time": "Atlético-MG",
@@ -81,15 +88,7 @@
       "jogos_disputados": 33
     },
     {
-      "time": "Flamengo",
-      "jogos_disputados": 33
-    },
-    {
       "time": "Fluminense",
-      "jogos_disputados": 33
-    },
-    {
-      "time": "Grêmio",
       "jogos_disputados": 33
     },
     {
@@ -105,12 +104,12 @@
       "jogos_disputados": 33
     },
     {
-      "time": "Vitória",
+      "time": "Vasco da Gama",
       "jogos_disputados": 33
     },
     {
-      "time": "Vasco da Gama",
-      "jogos_disputados": 32
+      "time": "Vitória",
+      "jogos_disputados": 33
     }
   ],
   "jogos_adiados_sem_data": [],
@@ -643,7 +642,23 @@
       "integra": true
     }
   ],
-  "duplicados_entre_resultados_e_proximos": [],
-  "falhas": [],
+  "duplicados_entre_resultados_e_proximos": [
+    {
+      "rodada": 34,
+      "mandante": "Athletico-PR",
+      "visitante": "Vasco da Gama"
+    },
+    {
+      "rodada": 34,
+      "mandante": "Flamengo",
+      "visitante": "Grêmio"
+    }
+  ],
+  "falhas": [
+    {
+      "tipo": "jogo_em_resultados_e_proximos",
+      "total": 2
+    }
+  ],
   "observacao": "O calendário só é substituído depois de validar 380 partidas, 38 rodadas íntegras, 20 clubes com 38 jogos e 190 confrontos de ida e volta."
 }
