@@ -1,15 +1,1137 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-04T23:16:33.073100-03:00",
+  "gerado_em": "2026-11-04T23:32:54.504344-03:00",
   "fonte": "ESPN summary + scoreboard",
-  "total_jogos": 334,
-  "total_com_estatisticas": 334,
+  "total_jogos": 336,
+  "total_com_estatisticas": 336,
   "total_com_publico": 333,
-  "total_com_eventos": 334,
-  "total_com_jogadores": 334,
-  "total_eventos_validados": 334,
+  "total_com_eventos": 336,
+  "total_com_jogadores": 336,
+  "total_eventos_validados": 336,
   "total_eventos_pendentes_detalhes": 0,
   "jogos": {
+    "401841305": {
+      "event_id": "401841305",
+      "event_id_fonte_detalhes": "401841305",
+      "rodada": 34,
+      "data_iso": "2026-11-04T21:30",
+      "mandante": "Botafogo",
+      "visitante": "Atlético-MG",
+      "placar_mandante": 1,
+      "placar_visitante": 0,
+      "estadio": "Joao Havelange Stadium",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "31.9%",
+          "away": "68.1%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "13",
+          "away": "13"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "17",
+          "away": "9"
+        },
+        {
+          "nome": "Defesas",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Passes",
+          "home": "299",
+          "away": "646"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "238",
+          "away": "590"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "8",
+          "away": "22"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "8",
+          "away": "15"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "3",
+          "away": "21"
+        },
+        {
+          "nome": "Cortes",
+          "home": "27",
+          "away": "18"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "4"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "2"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "31.9%",
+          "away": "68.1%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "13",
+          "away": "13"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "17",
+          "away": "9"
+        },
+        {
+          "nome": "Defesas",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Passes",
+          "home": "299",
+          "away": "646"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "238",
+          "away": "590"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "8",
+          "away": "22"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "8",
+          "away": "15"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "3",
+          "away": "21"
+        },
+        {
+          "nome": "Cortes",
+          "home": "27",
+          "away": "18"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "4"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "2"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "19'",
+          "jogador": "Edenilson",
+          "time": "Botafogo",
+          "assistencias": [
+            "Vitinho"
+          ],
+          "descricao": "Goal 70 Goal! Botafogo 1, Atlético Mineiro 0. Edenílson (Botafogo) right footed shot from the right side of the box to the bottom left corner. Assisted by Vitinho. Edenilson Goal"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "14'",
+          "jogador": "Cristian Medina",
+          "time": "Botafogo",
+          "descricao": "Yellow Card 94 Cristian Medina (Botafogo) is shown the yellow card for a bad foul. Cristian Medina Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "47'",
+          "jogador": "Tomás Pérez",
+          "time": "Atlético-MG",
+          "descricao": "Yellow Card 94 Tomás Pérez (Atlético Mineiro) is shown the yellow card for a bad foul. Tomás Pérez Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "75'",
+          "jogador": "Fernando Marçal",
+          "time": "Botafogo",
+          "descricao": "Yellow Card 94 Marçal (Botafogo) is shown the yellow card for a bad foul. Fernando Marçal Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "77'",
+          "jogador": "Kauã Pascini",
+          "time": "Atlético-MG",
+          "descricao": "Yellow Card 94 Kauã Pascini (Atlético Mineiro) is shown the yellow card for a bad foul. Kauã Pascini Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "336386",
+          "nome": "Alexsander",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "256560",
+          "nome": "Ángelo Preciado",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "417568",
+          "nome": "Cauã Soares",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "178349",
+          "nome": "Dudu",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "223953",
+          "nome": "Éverson",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "205074",
+          "nome": "Gustavo Scarpa",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "417569",
+          "nome": "Kauã Pascini",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "234015",
+          "nome": "Léo Duarte",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "417570",
+          "nome": "Mamady Cissé",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "361299",
+          "nome": "Tomás Pérez",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "398934",
+          "nome": "Vitão",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "410939",
+          "nome": "Gabriel Veneno",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "3103553",
+          "nome": "Gutte",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "191995",
+          "nome": "Vitor Hugo",
+          "time": "Atlético-MG",
+          "team_id": "7632",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "297056",
+          "nome": "Cristian Medina",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "272224",
+          "nome": "Danilo",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "196849",
+          "nome": "Edenilson",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "170362",
+          "nome": "Fernando Marçal",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "228401",
+          "nome": "Gabriel Batista",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "411648",
+          "nome": "Gabriel Justino",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "245291",
+          "nome": "Nahuel Ferraresi",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "252544",
+          "nome": "Paulo Victor",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "202374",
+          "nome": "Tiquinho Soares",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "398719",
+          "nome": "Victor Hugo",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "268700",
+          "nome": "Vitinho",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "199734",
+          "nome": "Alex Telles",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "224103",
+          "nome": "Arthur Cabral",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "297039",
+          "nome": "Domingos",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "400067",
+          "nome": "Kauan Toledo",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "314841",
+          "nome": "Matheus Martins",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Botafogo": 1,
+          "Atlético-MG": 0
+        },
+        "gols_extraidos": {
+          "Botafogo": 1,
+          "Atlético-MG": 0
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Botafogo": {
+            "amarelo": 2,
+            "vermelho": 0
+          },
+          "Atlético-MG": {
+            "amarelo": 2,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Botafogo": {
+            "amarelo": 2,
+            "vermelho": 0
+          },
+          "Atlético-MG": {
+            "amarelo": 2,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-11-04T23:32:42.889876-03:00"
+    },
+    "401841298": {
+      "event_id": "401841298",
+      "event_id_fonte_detalhes": "401841298",
+      "rodada": 34,
+      "data_iso": "2026-11-04T21:30",
+      "mandante": "São Paulo",
+      "visitante": "Corinthians",
+      "placar_mandante": 0,
+      "placar_visitante": 0,
+      "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "55.2%",
+          "away": "44.8%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "19",
+          "away": "18"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "4",
+          "away": "8"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "16"
+        },
+        {
+          "nome": "Defesas",
+          "home": "4",
+          "away": "4"
+        },
+        {
+          "nome": "Passes",
+          "home": "418",
+          "away": "349"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "346",
+          "away": "269"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "11",
+          "away": "17"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "12",
+          "away": "9"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "12",
+          "away": "13"
+        },
+        {
+          "nome": "Cortes",
+          "home": "15",
+          "away": "34"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "6",
+          "away": "8"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "5",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "1"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "55.2%",
+          "away": "44.8%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "19",
+          "away": "18"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "4",
+          "away": "8"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "16"
+        },
+        {
+          "nome": "Defesas",
+          "home": "4",
+          "away": "4"
+        },
+        {
+          "nome": "Passes",
+          "home": "418",
+          "away": "349"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "346",
+          "away": "269"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "11",
+          "away": "17"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "12",
+          "away": "9"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "12",
+          "away": "13"
+        },
+        {
+          "nome": "Cortes",
+          "home": "15",
+          "away": "34"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "6",
+          "away": "8"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "5",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "1"
+        }
+      ],
+      "gols": [],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "31'",
+          "jogador": "Djhordney Ferreira",
+          "time": "São Paulo",
+          "descricao": "Yellow Card 94 Djhordney (São Paulo) is shown the yellow card for a bad foul. Djhordney Ferreira Yellow Card"
+        },
+        {
+          "tipo": "vermelho",
+          "minuto": "31'",
+          "jogador": "Matheus Pereira",
+          "time": "Corinthians",
+          "descricao": "Red Card 93 Matheus Pereira (Corinthians) is shown the red card. Matheus Pereira Red Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "45'+1'",
+          "jogador": "André Ramalho",
+          "time": "Corinthians",
+          "descricao": "Yellow Card 94 André Ramalho (Corinthians) is shown the yellow card. André Ramalho Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "52'",
+          "jogador": "Pedro Milans",
+          "time": "Corinthians",
+          "descricao": "Yellow Card 94 Pedro Milans (Corinthians) is shown the yellow card for a bad foul. Pedro Milans Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "60'",
+          "jogador": "Pedro Lima",
+          "time": "São Paulo",
+          "descricao": "Yellow Card 94 Pedro Lima (São Paulo) is shown the yellow card for a bad foul. Pedro Lima Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "61'",
+          "jogador": "Newton",
+          "time": "São Paulo",
+          "descricao": "Yellow Card 94 Newton (São Paulo) is shown the yellow card for a bad foul. Newton Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "67'",
+          "jogador": "Luciano",
+          "time": "São Paulo",
+          "descricao": "Yellow Card 94 Luciano (São Paulo) is shown the yellow card. Luciano Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "67'",
+          "jogador": "Memphis Depay",
+          "time": "Corinthians",
+          "descricao": "Yellow Card 94 Memphis Depay (Corinthians) is shown the yellow card. Memphis Depay Yellow Card"
+        },
+        {
+          "tipo": "vermelho",
+          "minuto": "82'",
+          "jogador": "Yuri Alberto",
+          "time": "Corinthians",
+          "descricao": "Red Card 93 Yuri Alberto (Corinthians) is shown the red card for violent conduct. Yuri Alberto Red Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "89'",
+          "jogador": "Ferreira",
+          "time": "São Paulo",
+          "descricao": "Yellow Card 94 Ferreira (São Paulo) is shown the yellow card for a bad foul. Ferreira Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "409662",
+          "nome": "André",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "194090",
+          "nome": "André Ramalho",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "338898",
+          "nome": "Breno Bidon",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "195756",
+          "nome": "Fabrizio Angileri",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "168981",
+          "nome": "Gustavo Henrique",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "257051",
+          "nome": "Hugo Souza",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "347456",
+          "nome": "Kaio",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "287774",
+          "nome": "Matheus Bidu",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "359849",
+          "nome": "Pedro Milans",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "270562",
+          "nome": "Rodrigo Garro",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "266666",
+          "nome": "Yuri Alberto",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "148189",
+          "nome": "André Carrillo",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "240557",
+          "nome": "Charles",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "361471",
+          "nome": "João Pedro",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "159255",
+          "nome": "Memphis Depay",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "171652",
+          "nome": "Vitinho",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "236596",
+          "nome": "Artur",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "301516",
+          "nome": "Damián Bobadilla",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "402686",
+          "nome": "Djhordney Ferreira",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "252800",
+          "nome": "Iago",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "130711",
+          "nome": "Lucas Moura",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "190483",
+          "nome": "Luciano",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "357362",
+          "nome": "Newton",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "376489",
+          "nome": "Pedro Lima",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "199013",
+          "nome": "Rafael",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "196855",
+          "nome": "Rafael Tolói",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "201531",
+          "nome": "Robert Arboleda",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "296573",
+          "nome": "Ferreira",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "402683",
+          "nome": "Gustavo Santana",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "162558",
+          "nome": "Jonathan Calleri",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "319168",
+          "nome": "Pablo Maia",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "399075",
+          "nome": "Pedro Ferreira",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "São Paulo": 0,
+          "Corinthians": 0
+        },
+        "gols_extraidos": {
+          "São Paulo": 0,
+          "Corinthians": 0
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "São Paulo": {
+            "amarelo": 5,
+            "vermelho": 0
+          },
+          "Corinthians": {
+            "amarelo": 3,
+            "vermelho": 2
+          }
+        },
+        "cartoes_extraidos": {
+          "São Paulo": {
+            "amarelo": 5,
+            "vermelho": 0
+          },
+          "Corinthians": {
+            "amarelo": 3,
+            "vermelho": 2
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-11-04T23:32:45.039040-03:00"
+    },
     "401841306": {
       "event_id": "401841306",
       "event_id_fonte_detalhes": "401841306",
@@ -593,7 +1715,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-04T21:56:26.560791-03:00",
+      "atualizado_em": "2026-11-04T23:32:47.292869-03:00",
       "renda": 994380
     },
     "401841307": {
@@ -1154,7 +2276,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-04T21:56:28.767197-03:00"
+      "atualizado_em": "2026-11-04T23:32:49.603728-03:00"
     },
     "401841301": {
       "event_id": "401841301",
@@ -1733,7 +2855,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-04T21:56:31.032359-03:00",
+      "atualizado_em": "2026-11-04T23:32:51.907722-03:00",
       "renda": 1514667
     },
     "401841304": {
@@ -2301,7 +3423,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-04T21:56:33.433935-03:00",
+      "atualizado_em": "2026-11-04T23:32:54.419074-03:00",
       "renda": 223020,
       "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
@@ -188834,7 +189956,5 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  },
-  "total_com_publico_pagante": 306,
-  "total_com_renda": 333
+  }
 }
