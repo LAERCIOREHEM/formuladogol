@@ -15,13 +15,13 @@
   "resumo": {
     "jogos_na_janela": 38,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 5,
+    "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 54,
+    "candidatos_oficiais_encontrados": 47,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
-    "transmissoes_publicadas": 5,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
+    "transmissoes_publicadas": 6,
     "sem_transmissao": 1,
     "erros": 0
   },
@@ -69,12 +69,12 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841300",
+      "event_id": "401841303",
       "rodada": 34,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Palmeiras x Remo",
-      "data_iso": "2026-11-05T19:30:00-03:00",
+      "jogo": "Cruzeiro x Bahia",
+      "data_iso": "2026-11-05T21:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -118,6 +118,20 @@
       "principal": "CazéTV",
       "fontes_encontradas": [
         "CazéTV"
+      ],
+      "manual": false,
+      "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401841309",
+      "rodada": 35,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "São Paulo x Fluminense",
+      "data_iso": "2026-11-19T21:30:00-03:00",
+      "principal": "GE TV",
+      "fontes_encontradas": [
+        "GE TV"
       ],
       "manual": false,
       "descoberta_antecipada": true
@@ -185,6 +199,22 @@
       ]
     },
     {
+      "event_id": "401841309",
+      "jogo": "São Paulo x Fluminense",
+      "fonte": "getv",
+      "video_id": "Z3ow-IHNjg0",
+      "url": "https://www.youtube.com/watch?v=Z3ow-IHNjg0",
+      "titulo": "SÃO PAULO X FLUMINENSE | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
+      "status": "upcoming",
+      "confianca": 0.875,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "horário compatível (90 min de diferença)"
+      ]
+    },
+    {
       "event_id": "401913107",
       "jogo": "Vasco da Gama x Palmeiras",
       "fonte": "getv",
@@ -242,6 +272,16 @@
       "titulo": "SBT  Ao Vivo",
       "status": "live",
       "inicio_programado": "2026-11-03T17:10:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "g4kwhQFCqrg",
+      "url": "https://www.youtube.com/watch?v=g4kwhQFCqrg",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: PALMEIRAS ENTRA EM CAMPO PARA SEGUIR NA LUTA PELO TÍTULO DO BRASILEIRO | GERAL CAZÉTV",
+      "status": "live",
+      "inicio_programado": "2026-11-05T14:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -375,16 +415,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "FRX8DEo6lF0",
-      "url": "https://www.youtube.com/watch?v=FRX8DEo6lF0",
-      "fonte": "sbt",
-      "canal": "SBT",
-      "titulo": "🔴 MISSÃO TELETON | Nicholas Torres e Cinthia Cruz (05/11/26)",
-      "status": "live",
-      "inicio_programado": "2026-11-05T18:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "KbG6W1CzGtI",
       "url": "https://www.youtube.com/watch?v=KbG6W1CzGtI",
       "fonte": "sbt",
@@ -392,16 +422,6 @@
       "titulo": "SOM DE FACULDADE e JÚNIOR CAVANNE AGITAM o PALCO do EITA LUCAS!",
       "status": "upcoming",
       "inicio_programado": "2026-11-07T12:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "2AWoK6lGZsc",
-      "url": "https://www.youtube.com/watch?v=2AWoK6lGZsc",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): GETAFE X BRIGHTON | CONFERENCE LEAGUE 26/27 | RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-05T16:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -455,6 +475,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "7NZCDHtdSqo",
+      "url": "https://www.youtube.com/watch?v=7NZCDHtdSqo",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: BRASIL NA NATAÇÃO | JOGOS OLÍMPICOS DA JUVENTUDE DAKAR 2026",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-06T06:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "8KPCjExYQNo",
       "url": "https://www.youtube.com/watch?v=8KPCjExYQNo",
       "fonte": "cazetv",
@@ -472,26 +502,6 @@
       "titulo": "AO VIVO: HAMBURGO X BORUSSIA MÖNCHENGLADBACH | BUNDESLIGA 26/27 | 9ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-11-06T16:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "BvzKAxrzksU",
-      "url": "https://www.youtube.com/watch?v=BvzKAxrzksU",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): CELTIC X BEŞIKTAŞ | EUROPA LEAGUE 26/27 | RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-05T16:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "H3xdEZCWG68",
-      "url": "https://www.youtube.com/watch?v=H3xdEZCWG68",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: MÔNACO X NORDSJAELLAND | CONFERENCE LEAGUE 26/27 | 3ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-05T14:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -525,16 +535,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "N5pm4-yv6pA",
-      "url": "https://www.youtube.com/watch?v=N5pm4-yv6pA",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): CELTA X UNION SAINT-GILLOISE | EUROPA LEAGUE 26/27 | RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-05T16:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "NFA_3Pn_U6U",
       "url": "https://www.youtube.com/watch?v=NFA_3Pn_U6U",
       "fonte": "cazetv",
@@ -565,16 +565,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "RJN-QfmiKnc",
-      "url": "https://www.youtube.com/watch?v=RJN-QfmiKnc",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: BENFICA X LECH POZNAŃ | EUROPA LEAGUE 26/27 | 4ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-05T16:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "Tzthj2C5crc",
       "url": "https://www.youtube.com/watch?v=Tzthj2C5crc",
       "fonte": "cazetv",
@@ -585,16 +575,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "Um6L1X6_6-4",
-      "url": "https://www.youtube.com/watch?v=Um6L1X6_6-4",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): SUNDERLAND X DINAMO ZAGREB | EUROPA LEAGUE 26/27 | RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-05T16:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "Y2Qu7-tee0A",
       "url": "https://www.youtube.com/watch?v=Y2Qu7-tee0A",
       "fonte": "cazetv",
@@ -602,6 +582,16 @@
       "titulo": "AO VIVO: INTERNAZIONALE X COMO | SÉRIE A ITALIANA 26/27 | 11ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-11-08T13:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "YooRWaOWFk4",
+      "url": "https://www.youtube.com/watch?v=YooRWaOWFk4",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: BRASIL NA FINAL DA NATAÇÃO | JOGOS OLÍMPICOS DA JUVENTUDE DAKAR 2026",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-06T12:20:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -625,16 +615,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "Zosth8rp0GQ",
-      "url": "https://www.youtube.com/watch?v=Zosth8rp0GQ",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: PALMEIRAS ENTRA EM CAMPO PARA SEGUIR NA LUTA PELO TÍTULO DO BRASILEIRO | GERAL CAZÉTV",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-05T18:50:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "d2mZDPi18N4",
       "url": "https://www.youtube.com/watch?v=d2mZDPi18N4",
       "fonte": "cazetv",
@@ -642,16 +622,6 @@
       "titulo": "AO VIVO: REAL SOCIEDAD X RAYO VALLECANO | LALIGA 26/27 | 12ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-11-08T11:35:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "g4kwhQFCqrg",
-      "url": "https://www.youtube.com/watch?v=g4kwhQFCqrg",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: AZ - ALKMAAR ZAANSTREEK X JUVENTUS | EUROPA LEAGUE 26/27 | 4ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-05T14:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -665,16 +635,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "jDtB-bds6Oo",
-      "url": "https://www.youtube.com/watch?v=jDtB-bds6Oo",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): COPENHAGEN X IBERIA | CONFERENCE LEAGUE 26/27 | RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-05T16:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "mW8ByBGepuQ",
       "url": "https://www.youtube.com/watch?v=mW8ByBGepuQ",
       "fonte": "cazetv",
@@ -682,16 +642,6 @@
       "titulo": "AO VIVO: MÁLAGA X RACING CLUB | LALIGA 26/27 | 12ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-11-07T09:20:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "qtYa-Zr8ncI",
-      "url": "https://www.youtube.com/watch?v=qtYa-Zr8ncI",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): PANATHINAIKOS X CSKA SOFIA | CONFERENCE LEAGUE 26/27 | RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-05T16:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -725,27 +675,33 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401841303",
+      "jogo": "Cruzeiro x Bahia",
+      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
+    }
+  ],
   "sem_transmissao": [
     {
-      "event_id": "401841300",
+      "event_id": "401841303",
       "rodada": 34,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Palmeiras x Remo",
-      "data_iso": "2026-11-05T19:30:00-03:00",
+      "jogo": "Cruzeiro x Bahia",
+      "data_iso": "2026-11-05T21:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 86,
+    "unidades": 87,
     "requisicoes": {
       "channels": 4,
-      "videos": 42,
+      "videos": 43,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-11-05T18:01:48-03:00"
+  "atualizado_em": "2026-11-05T20:01:48-03:00"
 }
