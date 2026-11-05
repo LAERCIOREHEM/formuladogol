@@ -19,7 +19,7 @@ for field, display in expected.items():
     assert chap["probabilidades_detalhes"][field]["impossivel_estruturalmente"] == (display == "0%")
     assert chap["probabilidades_detalhes"][field]["limite_superior_95_regra_dos_tres_pct"] is None
 assert chap["situacao_matematica"]["destino_continental"] == "sem_competicao_confirmado"
-assert chap["situacao_matematica"]["limite_posicao_melhor"] == 17
+assert chap["situacao_matematica"]["limite_posicao_melhor"] > chap["situacao_matematica"]["limite_total_classificados"]
 assert chap["situacao_matematica"]["limite_total_classificados"] == 15
 assert chap["probabilidades_detalhes"]["rebaixamento"]["certeza_estrutural"] is True
 assert chap["probabilidades_detalhes"]["rebaixamento"]["exibicao"] == "100%"
@@ -76,6 +76,53 @@ proof15 = {"Chapecoense": {"rebaixamento": {
 }}}
 apply_continental_mathematical_certainty([not_proven], proof15, config)
 assert not_proven["probabilidades_detalhes"]["libertadores"]["exibicao"] == "<0,001%"
+
+# Regressão integral: vaga-base confirmada implica Libertadores garantida e
+# impossibilidade estrutural dos dois demais destinos (não basta 2M/2M).
+for name in ("Flamengo", "Palmeiras"):
+    team = next(row for row in data["clubes"] if row["clube"] == name)
+    assert team["probabilidades_detalhes"]["libertadores_base"]["certeza_estrutural"] is True
+    expected_destinations = {"libertadores": (100, "100%"), "sul_americana": (0, "0%"), "sem_competicao_continental": (0, "0%")}
+    for field, (value, label) in expected_destinations.items():
+        detail = team["probabilidades_detalhes"][field]
+        assert (team["probabilidades_pct"][field], detail["exibicao"]) == (value, label), (name, field)
+        assert detail["certeza_estrutural"] is (value == 100), (name, field)
+        assert detail["impossivel_estruturalmente"] is (value == 0), (name, field)
+        assert detail["motivo_certeza"] or detail["motivo_impossibilidade"], (name, field)
+        assert team["decomposicao_chances"][field]["total"]["exibicao"] == label
+    via = team["decomposicao_chances"]["libertadores"]["vias"]["via_brasileirao"]
+    assert via["certeza_estrutural"] is True and via["exibicao"] == "100%"
+    # Reproduz a origem do defeito num snapshot cru, preservando as chances.
+    stale = copy.deepcopy(team)
+    for field in expected_destinations:
+        d = stale["probabilidades_detalhes"][field]
+        d["exibicao"] = ">99,999%" if field == "libertadores" else "<0,001%"
+        d["certeza_estrutural"] = False
+        d["impossivel_estruturalmente"] = False
+        d["possivel_estruturalmente"] = True
+    prior_probabilities = copy.deepcopy(stale["probabilidades_pct"])
+    proof_base = {name: {
+        "rebaixamento": {"clubes_certos_acima": 0, "melhor_posicao_possivel": 1},
+        "libertadores_base": {"certo": True, "motivo_certeza": "G5 garantido por limites de pontos"},
+    }}
+    apply_continental_mathematical_certainty([stale], proof_base, config)
+    assert stale["probabilidades_pct"] == prior_probabilities
+    assert stale["probabilidades_detalhes"]["libertadores"]["exibicao"] == "100%"
+    assert stale["probabilidades_detalhes"]["sul_americana"]["exibicao"] == "0%"
+    assert stale["probabilidades_detalhes"]["sem_competicao_continental"]["exibicao"] == "0%"
+
+# Nunca declarar certeza matemática a partir de arredondamento ou 2M/2M.
+for team in data["clubes"]:
+    p = team["probabilidades_pct"]
+    d = team["probabilidades_detalhes"]
+    destinations = ("libertadores", "sul_americana", "sem_competicao_continental")
+    assert abs(sum(p[key] for key in destinations) - 100) < 1e-5, team["clube"]
+    for field in destinations + ("campeao", "g4", "g6", "rebaixamento"):
+        detail = d[field]
+        if detail.get("certeza_estrutural") is True:
+            assert p[field] == 100 and detail["exibicao"] == "100%", (team["clube"], field)
+        if detail.get("impossivel_estruturalmente") is True:
+            assert p[field] == 0 and detail["exibicao"] == "0%", (team["clube"], field)
 
 # A implementação só pode alterar os metadados estruturais e não os percentuais.
 assert before["probabilidades_pct"] == chap["probabilidades_pct"]
