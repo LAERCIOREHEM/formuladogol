@@ -36,4 +36,30 @@ for(const f of ['libertadores','sul_americana','sem_competicao_continental']){
 const approximated=continentalDisplayTriplet(empirical);
 assert.notEqual(approximated.sem_competicao_continental,'100%',
   'simulation-only 2 million/2 million must NOT be shown as mathematical certainty');
+for (const name of ['Flamengo','Palmeiras']) {
+  const club=data.clubes.find(x=>x.clube===name);
+  const labels=JSON.parse(JSON.stringify(continentalDisplayTriplet(club)));
+  assert.deepEqual(labels,{
+    libertadores:'100%',sul_americana:'0%',sem_competicao_continental:'0%'
+  },name+' must show mathematical 100/0/0');
+  for(const field of ['libertadores','sul_americana','sem_competicao_continental']){
+    const detail=club.probabilidades_detalhes[field];
+    assert.equal(probabilityDisplayText(detail,club.probabilidades_pct[field]),labels[field]);
+    assert.match(probabilityTooltip(detail),/matematicamente/i);
+  }
+}
+assert.equal(probabilityDisplayText({exibicao:'100%',certeza_estrutural:false},100),'~100%',
+ 'Monte Carlo 2M/2M cannot be presented as mathematical certainty');
+assert.equal(probabilityDisplayText({exibicao:'0%',possivel_estruturalmente:true},0),'~0%',
+ 'Monte Carlo 0/2M cannot be presented as impossible');
+for(const club of data.clubes){
+  const tri=continentalDisplayTriplet(club);
+  for(const field of ['libertadores','sul_americana','sem_competicao_continental']){
+    const meta=club.probabilidades_detalhes[field];
+    if(meta.certeza_estrutural===true)assert.equal(tri[field],'100%',club.clube+':'+field);
+    if(meta.impossivel_estruturalmente===true)assert.equal(tri[field],'0%',club.clube+':'+field);
+    if(meta.certeza_estrutural!==true)assert.notEqual(tri[field],'100%',club.clube+':'+field+' false guarantee');
+  }
+}
+console.log('PASS: All 20 teams preserve proof-based zero/one, Flamengo and Palmeiras 100/0/0');
 console.log('PASS: Actual statistics UI renders Chapecoense 0% / 0% / 100% and proof tooltips');
