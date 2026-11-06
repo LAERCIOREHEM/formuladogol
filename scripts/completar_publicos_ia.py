@@ -500,6 +500,7 @@ def consultas_obrigatorias(partida: Mapping[str, Any]) -> list[str]:
     ano = data_iso[:4] if len(data_iso) >= 4 else "2026"
     confronto = f"{mandante} x {visitante}".strip()
     return [
+        f'{mandante} {visitante} público renda',
         f'"{confronto}" público renda {ano}',
         f'"{confronto}" "PÚBLICO" "RENDA"',
         f'"{confronto}" ficha técnica público renda',
