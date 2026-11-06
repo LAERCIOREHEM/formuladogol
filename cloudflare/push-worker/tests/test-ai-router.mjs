@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { aiGatewayId, gatewayBase, aiGatewayAuthHeaders, aiGatewayAuthConfigured, geminiConfigured, geminiGroundingSources, geminiSearchCount, geminiInteractionSearchCount, geminiInteractionSources, geminiInteractionText, geminiInteractionRequest, searchPublicWithGemini, isAiGatewayPreProviderFailure, fetchOpenAiResponses, publicSchemaInstruction, resolveWorkersAiExtractModel, WORKERS_AI_EXTRACT_DEFAULT_MODEL, geminiInteractionsCompatibilityFailure, GEMINI_INTERACTIONS_COOLDOWN_MS, geminiGeoNotSupported, GEMINI_GEO_COOLDOWN_MS } from '../src/ai-router.js';
+import { aiGatewayId, gatewayBase, aiGatewayAuthHeaders, aiGatewayAuthConfigured, geminiConfigured, geminiGroundingSources, geminiSearchCount, geminiInteractionSearchCount, geminiInteractionSources, geminiInteractionText, geminiInteractionRequest, searchPublicWithGemini, isAiGatewayPreProviderFailure, fetchOpenAiResponses, publicSchemaInstruction, resolveWorkersAiExtractModel, WORKERS_AI_EXTRACT_DEFAULT_MODEL, geminiInteractionsCompatibilityFailure, GEMINI_INTERACTIONS_COOLDOWN_MS, geminiGeoNotSupported, GEMINI_GEO_COOLDOWN_MS, uolArticleAlternate, fetchSourceText } from '../src/ai-router.js';
 import { POSTGAME_SEARCH_PROFILE_VERSION, TEAM_SEARCH_PROFILES, buildAttendanceSearchQueries, officialClubDomainsForTask, attendanceSourceQuality, matchDayEditorialSources } from '../src/postgame-search-profile.js';
 
 // R10R17.8: a configuração histórica/depreciada não deve chegar a env.AI.run().
@@ -311,6 +311,33 @@ assert.equal(GEMINI_INTERACTIONS_COOLDOWN_MS,6*60*60_000);
     assert.equal(urls.filter(u=>u.endsWith('/interactions')).length,1);
     assert.equal(urls.filter(u=>u.includes(':generateContent')).length,2);
   } finally {globalThis.fetch=oldFetch;}
+}
+
+// R10R30: notícia com ficha técnica existe, mas .htm pode devolver 403.
+// O motor deve tentar .amp.htm somente no UOL e PRESERVAR a URL documental.
+{
+ const canonical='https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/11/05/palmeiras-passeia-em-casa-faz-6-no-remo-e-se-mantem-na-cola-do-flamengo.htm';
+ const amp=canonical.replace(/\.htm$/,'.amp.htm');
+ assert.equal(uolArticleAlternate(canonical),amp);
+ assert.equal(uolArticleAlternate(amp),canonical);
+ assert.equal(uolArticleAlternate('https://www.futebolinterior.com.br/partida.htm'),'');
+ const visited=[];
+ const html='<html><article><h1>Palmeiras 6 x 1 Remo</h1><p>Campeonato Brasileiro, 34ª rodada, 05/11/2026, Nubank Parque.</p>'+
+   '<p>Ficha técnica PALMEIRAS 6 X 1 REMO. PÚBLICO - 36.520 torcedores. RENDA - R$ 2.428.351,43.</p>'+
+   '<p>Rodada 34 do Brasileirão. Jhon Arias e Flaco López comemoraram os gols do jogo.</p></article></html>';
+ const mock=async (url)=>{
+   visited.push(String(url));
+   if(String(url)===canonical)return new Response('blocked',{status:403});
+   if(String(url)===amp)return new Response(html,{status:200,headers:{'content-type':'text/html'}});
+   throw Error('No other source should be called');
+ };
+ const downloaded=await fetchSourceText(canonical,mock);
+ assert.equal(downloaded.ok,true);
+ assert.equal(downloaded.url,amp);
+ assert.equal(downloaded.sourceAlternateOf,canonical);
+ assert.match(downloaded.text,/36\.520/);
+ assert.match(downloaded.text,/2\.428\.351,43/);
+ assert.deepEqual(visited,[canonical,amp]);
 }
 
 console.log('ai-router tests: PASS');
