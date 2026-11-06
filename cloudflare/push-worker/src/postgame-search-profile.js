@@ -517,6 +517,7 @@ export function buildAttendanceSearchQueries(task) {
 
   // Primeiro imitar as buscas simples que encontram a ficha técnica logo após o FINAL.
   // NENHUMA consulta restringe o domínio: portais conhecidos são preferência, não cerca.
+  add(`${home} ${away} público renda`);
   add(`${home} ${away} público renda ${dayBR || year}`);
   add(`"${home}" "${away}" público presente renda ${year}`);
   add(`"${home}" "${away}" público pagante renda ${year}`);
