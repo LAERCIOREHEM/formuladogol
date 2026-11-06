@@ -1,6 +1,6 @@
 {
   "_comentario": "Complemento documental de público presente, pagantes e renda. Correções verificadas por event_id são mescladas por campo antes da coleta; a busca automática prioriza ge/Gato Mestre. Público pagante nunca substitui público presente e fontes avulsas podem cobrir jogos remarcados.",
-  "atualizado_em": "2026-11-05T23:37:02.407937-03:00",
+  "atualizado_em": "2026-11-06T06:50:56.733780-03:00",
   "jogos": {
     "401840808": {
       "tipo": "presente",
@@ -4252,11 +4252,13 @@
       "renda_status": "divulgado",
       "fonte_renda": "https://sports.sbt.com.br/noticia/sbt-sports/bragantino-vence-o-santos-e-pula-para-8o-no-brasileiro",
       "origem": "cloudflare-postgame-fastlane",
-      "verificado_em": "2026-11-03T03:26:35.347733Z"
+      "verificado_em": "2026-11-03T03:26:35.347733Z",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/11/05/flamengo-3-x-1-gremio-tem-o-maior-publico-da-34a-rodada-do-brasileiro-veja-a-lista.ghtml"
     },
     "401841304": {
       "origem": "openai:web_search",
-      "fonte_adicional": "Camada de IA sobre reportagem do jogo",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
       "confianca": 0.95,
       "tipo": "presente",
       "fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/11/03/mirassol-vira-respira-contra-o-z-4-e-decreta-o-rebaixamento-da-chapecoense-no-brasileirao.htm",
@@ -4265,7 +4267,10 @@
       "renda": 223020,
       "renda_status": "divulgado",
       "fonte_renda": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/11/03/mirassol-vira-respira-contra-o-z-4-e-decreta-o-rebaixamento-da-chapecoense-no-brasileirao.htm",
-      "fonte_preferida": true
+      "fonte_preferida": true,
+      "pagantes": 5296,
+      "pagantes_status": "divulgado",
+      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/11/05/flamengo-3-x-1-gremio-tem-o-maior-publico-da-34a-rodada-do-brasileiro-veja-a-lista.ghtml"
     },
     "401841301": {
       "tipo": "presente",
@@ -4277,7 +4282,9 @@
       "renda_status": "divulgado",
       "fonte_renda": "https://www.estadao.com.br/esportes/futebol/internacional-faz-de-penalti-no-fim-bate-coritiba-e-complica-vida-do-corinthians-no-brasileirao",
       "origem": "cloudflare-postgame-fastlane",
-      "verificado_em": "2026-11-04T03:51:41.650080Z"
+      "verificado_em": "2026-11-04T03:51:41.650080Z",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/11/05/flamengo-3-x-1-gremio-tem-o-maior-publico-da-34a-rodada-do-brasileiro-veja-a-lista.ghtml"
     },
     "401841306": {
       "tipo": "presente",
@@ -4301,7 +4308,11 @@
       "renda_status": "divulgado",
       "fonte_renda": "https://centraldosgramados.com.br/flamengo-vence-gremio-3-a-1-lideranca-brasileirao",
       "origem": "cloudflare-postgame-fastlane",
-      "verificado_em": "2026-11-05T02:51:37.325653Z"
+      "verificado_em": "2026-11-05T02:51:37.325653Z",
+      "pagantes": 62818,
+      "pagantes_status": "divulgado",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/11/05/flamengo-3-x-1-gremio-tem-o-maior-publico-da-34a-rodada-do-brasileiro-veja-a-lista.ghtml"
     },
     "401841298": {
       "tipo": "presente",
@@ -4328,7 +4339,11 @@
       "renda_status": "divulgado",
       "fonte_renda": "https://www.futebolinterior.com.br/botafogo-1-x-0-atletico-mg-fogao-bate-os-reservas-do-galo-e-se-reabilita-no-brasileirao",
       "origem": "cloudflare-postgame-fastlane",
-      "verificado_em": "2026-11-05T01:41:58.271429-03:00"
+      "verificado_em": "2026-11-05T01:41:58.271429-03:00",
+      "pagantes": 20462,
+      "pagantes_status": "divulgado",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/11/05/flamengo-3-x-1-gremio-tem-o-maior-publico-da-34a-rodada-do-brasileiro-veja-a-lista.ghtml"
     },
     "401841300": {
       "publico": 36520,
@@ -4343,6 +4358,18 @@
       "fonte_renda": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/11/05/palmeiras-passeia-em-casa-faz-6-no-remo-e-se-mantem-na-cola-do-flamengo.htm",
       "origem": "Ficha técnica UOL / Agência Estado, com divergência editorial identificada",
       "verificado_em": "2026-11-05"
+    },
+    "401841303": {
+      "publico": 19166,
+      "tipo": "presente",
+      "fonte": "https://ge.globo.com/gato-mestre/noticia/2026/11/05/flamengo-3-x-1-gremio-tem-o-maior-publico-da-34a-rodada-do-brasileiro-veja-a-lista.ghtml",
+      "origem": "ge/Gato Mestre",
+      "renda": 808473,
+      "renda_status": "divulgado",
+      "publico_status": "divulgado",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "fonte_publico": "https://ge.globo.com/gato-mestre/noticia/2026/11/05/flamengo-3-x-1-gremio-tem-o-maior-publico-da-34a-rodada-do-brasileiro-veja-a-lista.ghtml",
+      "fonte_renda": "https://ge.globo.com/gato-mestre/noticia/2026/11/05/flamengo-3-x-1-gremio-tem-o-maior-publico-da-34a-rodada-do-brasileiro-veja-a-lista.ghtml"
     }
   },
   "fontes_rodadas": {
@@ -4476,6 +4503,10 @@
     },
     "33": {
       "url": "https://ge.globo.com/gato-mestre/noticia/2026/10/30/corinthians-2-x-0-mirassol-tem-o-maior-publico-da-33a-rodada-do-brasileiro-veja-a-lista.ghtml",
+      "fonte": "ge/Gato Mestre"
+    },
+    "34": {
+      "url": "https://ge.globo.com/gato-mestre/noticia/2026/11/05/flamengo-3-x-1-gremio-tem-o-maior-publico-da-34a-rodada-do-brasileiro-veja-a-lista.ghtml",
       "fonte": "ge/Gato Mestre"
     }
   }

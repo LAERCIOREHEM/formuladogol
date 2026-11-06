@@ -1,15 +1,25 @@
 {
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
-  "jogos_finalizados": 337,
-  "jogos_com_publico": 337,
+  "jogos_finalizados": 338,
+  "jogos_com_publico": 338,
   "jogos_sem_publico": 0,
-  "publico_total": 8387803,
-  "jogos_com_renda": 337,
+  "publico_total": 8406969,
+  "jogos_com_renda": 338,
   "aguardando_fonte": [],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
+    {
+      "event_id": "401841303",
+      "tipo_publico": "presente",
+      "publico_presente": 19166,
+      "publico_pagante": null,
+      "renda": 808473.0,
+      "fonte_publico": "https://ge.globo.com/gato-mestre/noticia/2026/11/05/flamengo-3-x-1-gremio-tem-o-maior-publico-da-34a-rodada-do-brasileiro-veja-a-lista.ghtml",
+      "origem": "ge/Gato Mestre",
+      "estado": "CONFIRMADO"
+    },
     {
       "event_id": "401841300",
       "tipo_publico": "presente",
@@ -24,7 +34,7 @@
       "event_id": "401841305",
       "tipo_publico": "presente",
       "publico_presente": 22008,
-      "publico_pagante": null,
+      "publico_pagante": 20462,
       "renda": 438170.0,
       "fonte_publico": "https://www.futebolinterior.com.br/botafogo-1-x-0-atletico-mg-fogao-bate-os-reservas-do-galo-e-se-reabilita-no-brasileirao",
       "origem": "cloudflare-postgame-fastlane",
@@ -54,7 +64,7 @@
       "event_id": "401841307",
       "tipo_publico": "presente",
       "publico_presente": 67164,
-      "publico_pagante": null,
+      "publico_pagante": 62818,
       "renda": 5766015.0,
       "fonte_publico": "https://centraldosgramados.com.br/flamengo-vence-gremio-3-a-1-lideranca-brasileirao",
       "origem": "cloudflare-postgame-fastlane",
@@ -74,7 +84,7 @@
       "event_id": "401841304",
       "tipo_publico": "presente",
       "publico_presente": 5706,
-      "publico_pagante": null,
+      "publico_pagante": 5296,
       "renda": 223020.0,
       "fonte_publico": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/11/03/mirassol-vira-respira-contra-o-z-4-e-decreta-o-rebaixamento-da-chapecoense-no-brasileirao.htm",
       "origem": "openai:web_search",
@@ -3381,5 +3391,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-11-05T23:23:27.574312-03:00"
+  "gerado_em": "2026-11-06T06:50:57.073577-03:00"
 }

@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-06T00:01:00.668153-03:00",
+  "gerado_em": "2026-11-06T06:50:56.001461-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 338,
   "total_com_estatisticas": 338,
-  "total_com_publico": 337,
+  "total_com_publico": 338,
   "total_com_eventos": 338,
   "total_com_jogadores": 338,
   "total_eventos_validados": 338,
@@ -20,9 +20,9 @@
       "placar_mandante": 3,
       "placar_visitante": 2,
       "estadio": "Estadio Mineirão",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 19166,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/11/05/flamengo-3-x-1-gremio-tem-o-maior-publico-da-34a-rodada-do-brasileiro-veja-a-lista.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -604,7 +604,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-06T00:00:49.146826-03:00"
+      "atualizado_em": "2026-11-06T00:00:49.146826-03:00",
+      "renda": 808473,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841300": {
       "event_id": "401841300",
@@ -1746,7 +1748,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-11-06T00:00:53.859283-03:00",
-      "renda": 438170
+      "renda": 438170,
+      "publico_pagante": 20462,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841298": {
       "event_id": "401841298",
@@ -3480,7 +3484,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-11-06T00:01:00.583158-03:00",
-      "renda": 5766015
+      "renda": 5766015,
+      "publico_pagante": 62818,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841301": {
       "event_id": "401841301",
@@ -4060,7 +4066,8 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-11-04T23:40:48.757526-03:00",
-      "renda": 1514667
+      "renda": 1514667,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841304": {
       "event_id": "401841304",
@@ -4629,7 +4636,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-11-04T23:40:50.961873-03:00",
       "renda": 223020,
-      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 5296
     },
     "401841299": {
       "event_id": "401841299",
@@ -5199,7 +5207,8 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-11-03T23:50:38.698189-03:00",
-      "renda": 364490
+      "renda": 364490,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841294": {
       "event_id": "401841294",
@@ -191160,5 +191169,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 310,
+  "total_com_renda": 338
 }
