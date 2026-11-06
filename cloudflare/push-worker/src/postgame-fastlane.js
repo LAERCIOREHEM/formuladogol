@@ -1186,6 +1186,18 @@ async function refreshCachedPublicSources(env,task,values,sources){
 
     await env.DB.prepare(`UPDATE postgame_source_cache SET last_checked_at=CURRENT_TIMESTAMP,last_status=?,failures=CASE WHEN ?='ok' THEN failures ELSE failures+1 END WHERE event_id=? AND url=?`)
       .bind(valid?`ok:${extractor}`:(lastError||'no_data'),valid?'ok':'fail',task.event_id,row.url).run();
+    // R10R30: duas fontes realmente consultadas podem contradizer-se.
+    // Não sobrescreve o primeiro documento automaticamente: registra a
+    // divergência por campo para auditoria/manual ou borderô CBF.
+    const crossSourceConflicts=valid?['publico','publico_pagante','renda'].filter((key)=>{
+      const before=Number(values[key]),candidate=Number(valid.values?.[key]);
+      const oldUrl=sourceUrlKey(sources[key]),newUrl=sourceUrlKey(valid.sources?.[key]);
+      return before>0&&candidate>0&&oldUrl&&newUrl&&oldUrl!==newUrl
+        &&Math.abs(before-candidate)>(key==='renda'?0.009:0);
+    }):[];
+    if(crossSourceConflicts.length){
+      lastError='documentary_source_conflict:'+crossSourceConflicts.join(',');
+    }
     if(valid){
       foundAny=true;
       for(const key of ['publico','publico_pagante','renda']){
@@ -1204,9 +1216,11 @@ async function refreshCachedPublicSources(env,task,values,sources){
       text(sources[key])===text(valid.sources[key])):[];
     await recordPublicSourceObservation(env,{eventId:task.event_id,url:row.url,provider:row.provider,
       outcome:retainedFields.length?'accepted':valid?'rejected':'no_data',
-      reason:retainedFields.length?`validated_${extractor}`:valid?'factual_guard_or_no_new_fields':extractor==='no_numeric_evidence'?'no_labeled_numeric_attendance_or_revenue':(lastError||'source_parser_rejected'),
+      reason:crossSourceConflicts.length?lastError:retainedFields.length?`validated_${extractor}`:valid?'factual_guard_or_no_new_fields':extractor==='no_numeric_evidence'?'no_labeled_numeric_attendance_or_revenue':(lastError||'source_parser_rejected'),
       fields:retainedFields,publishedAt:source.publishedAt});
-    if(isPublicComplete(values))break;
+    // Uma segunda fonte independente ajuda a identificar números conflitantes.
+    // Limite em duas consultas efetivas após completar, sem reprocessar indefinidamente.
+    if(isPublicComplete(values)&&checked>=2)break;
   }
   return {checked,foundAny,lastError};
 }
