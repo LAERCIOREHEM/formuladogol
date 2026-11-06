@@ -296,7 +296,8 @@ console.log('postgame-fastlane v15 policy + eligibility guard + factual integrit
   const { evaluateSourceMatchIdentity, extractRoundupMatchBlock, buildAttendanceSearchQueries, isCandidateEditorialAttendanceSource, POSTGAME_SEARCH_PROFILE_VERSION } = await import('../src/postgame-search-profile.js');
   assert.equal(POSTGAME_SEARCH_PROFILE_VERSION, 11);
   const searchQueries=buildAttendanceSearchQueries({home:'Flamengo',away:'Atlético-MG',kickoff:'2026-10-26T20:00:00-03:00',home_score:3,away_score:2,round:32,stadium:'Maracanã'});
-  assert.equal(searchQueries[0],'Flamengo Atlético-MG público renda 26/10/2026');
+  assert.equal(searchQueries[0],'Flamengo Atlético-MG público renda');
+  assert.equal(searchQueries[1],'Flamengo Atlético-MG público renda 26/10/2026');
   assert.ok(searchQueries.slice(0,3).every((q)=>!q.includes('site:')),'começar com três buscas genéricas');
   assert.ok(searchQueries.some((q)=>q.includes('3 x 2')),'usar placar como consulta alternativa');
 
