@@ -556,4 +556,30 @@ console.log('R10R16.1 factual integrity guard tests: PASS');
   assert.equal(valid.accepted,true);
   assert.deepEqual([valid.values.publico,valid.values.renda],[23570,609791]);
 }
+
+// R10R30: reportagem UOL é longa; valores aparecem só na FICHA TÉCNICA.
+// A seleção da janela deve preferir a dupla junto aos rótulos fiscais,
+// sem transformar público em renda nem misturar com o jogo de ida.
+{
+ const {evaluateSourceMatchIdentity}=await import('../src/postgame-search-profile.js');
+ const task={event_id:'401841300',league:'bra.1',home:'Palmeiras',away:'Remo',
+   kickoff:'2026-11-05T19:30:00-03:00',home_score:6,away_score:1,
+   round:34,stadium:'Allianz Parque'};
+ const url='https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/11/05/palmeiras-passeia-em-casa-faz-6-no-remo-e-se-mantem-na-cola-do-flamengo.amp.htm';
+ const source='Palmeiras passeia em casa e faz 6 no Remo pelo Brasileirão. '+
+   ('O time dominou o jogo e terminou o primeiro tempo com vantagem. '.repeat(110))+
+   'FICHA TÉCNICA PALMEIRAS 6 X 1 REMO. 34ª rodada. '+
+   'PÚBLICO - 36.520 torcedores. RENDA - R$ 2.428.351,43. LOCAL - Nubank Parque.';
+ const identity=evaluateSourceMatchIdentity(task,source,url);
+ assert.equal(identity.accepted,true,JSON.stringify(identity));
+ assert.ok(identity.window.includes('PÚBLICO - 36.520'));
+ assert.ok(identity.window.includes('RENDA - R$ 2.428.351,43'));
+ const parsed=extractPublicFromTextDeterministic(identity.window,url);
+ assert.deepEqual([parsed.publico,parsed.publico_pagante,parsed.renda],
+   [36520,null,2428351.43],'UOL postgame fiscal fields');
+ const validation=validatePublicPayload(parsed,[url],task);
+ assert.equal(validation.accepted,true,JSON.stringify(validation));
+}
+console.log('R10R30: Palmeiras x Remo UOL fiche fiscal long article: PASS');
+
 console.log('R10R33 chronology safeguard Coritiba-Vitória: PASS');
