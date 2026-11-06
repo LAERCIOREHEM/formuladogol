@@ -266,10 +266,49 @@ export async function searchPublicWithGemini(env,task,missing){
 
 function htmlToText(html){ return text(html).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/&#39;/g,"'").replace(/&quot;/gi,'"').replace(/\s+/g,' ').slice(0,50000); }
 
-export async function fetchSourceText(url){
- const u=normalizeUrl(url); if(!u) return {ok:false,url:'',text:'',reason:'invalid_url'};
- try{ const r=await fetch(u,{redirect:'follow',headers:{'user-agent':'Mozilla/5.0 (compatible; FormulaDoGol/1.0; +https://formuladogol.com.br)','accept':'text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.5','accept-language':'pt-BR,pt;q=0.9,en;q=0.5'}}); if(!r.ok)return{ok:false,url:r.url||u,text:'',reason:`http_${r.status}`}; const type=text(r.headers.get('content-type')); const raw=await r.text(); return {ok:true,url:normalizeUrl(r.url)||u,text:type.includes('html')?htmlToText(raw):text(raw).slice(0,50000),publishedAt:type.includes('html')?extractArticlePublishedAt(raw):null}; }catch(e){return{ok:false,url:u,text:'',reason:`fetch_error:${text(e?.message||e).slice(0,160)}`};}
+// R10R30: páginas UOL/Agência Estado às vezes recusam o HTML canônico,
+// mas oferecem a mesma reportagem na variante AMP. Fallback direcionado,
+// sem ampliar a política de fontes nem abandonar o Match Identity Gate.
+export function uolArticleAlternate(url){
+  const raw=normalizeUrl(url);
+  if(!raw)return '';
+  try{
+    const u=new URL(raw),host=u.hostname.toLowerCase();
+    if(!(host==='uol.com.br'||host.endsWith('.uol.com.br')))return '';
+    if(!u.pathname.includes('/esporte/')||!u.pathname.endsWith('.htm'))return '';
+    const amp=u.pathname.endsWith('.amp.htm');
+    u.pathname=amp?u.pathname.replace(/\.amp\.htm$/,'.htm'):
+      u.pathname.replace(/\.htm$/,'.amp.htm');
+    return normalizeUrl(u.toString());
+  }catch(_){return '';}
 }
+
+export async function fetchSourceText(url,fetcher=fetch){
+ const u=normalizeUrl(url);if(!u)return{ok:false,url:'',text:'',reason:'invalid_url'};
+ const request=async(candidate)=>{
+   try{
+     const r=await fetcher(candidate,{redirect:'follow',
+       headers:{'user-agent':'Mozilla/5.0 (compatible; FormulaDoGol/1.0; +https://formuladogol.com.br)',
+       'accept':'text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.5',
+       'accept-language':'pt-BR,pt;q=0.9,en;q=0.5'}});
+     if(!r.ok)return{ok:false,url:r.url||candidate,text:'',reason:'http_'+r.status};
+     const type=text(r.headers.get('content-type')),raw=await r.text();
+     return{ok:true,url:normalizeUrl(r.url)||candidate,
+       text:type.includes('html')?htmlToText(raw):text(raw).slice(0,50000),
+       publishedAt:type.includes('html')?extractArticlePublishedAt(raw):null};
+   }catch(e){return{ok:false,url:candidate,text:'',reason:'fetch_error:'+text(e?.message||e).slice(0,160)};}
+ };
+ const primary=await request(u);
+ const alternative=uolArticleAlternate(u);
+ const challenged=primary.ok&&(
+   primary.text.length<250||/^(?:access denied|forbidden|enable javascript|just a moment)/i.test(primary.text)
+ );
+ if(!alternative||(primary.ok&&!challenged))return primary;
+ const fallback=await request(alternative);
+ if(fallback.ok&&fallback.text.length>=200)return{...fallback,sourceAlternateOf:u};
+ return primary.ok?primary:{...primary,reason:primary.reason+';amp_fallback='+text(fallback.reason||'insufficient_text')};
+}
+
 
 // R10R17.8: somente IDs de modelos Workers AI ativos e documentados podem
 // ser usados na extração factual; overrides legados/depreciados caem no modelo seguro.
