@@ -52,14 +52,33 @@ export function parsePublicSearchRss(xml,task={},limit=10){
   }
   return out;
 }
+// R10R30: múltiplas consultas gratuitas; a primeira reproduz o Google do torcedor.
+// Descoberta nunca autoriza valores sem Match Identity Gate + extração.
+export function buildPostgameRssQueries(task) {
+  const home=text(task?.home), away=text(task?.away);
+  const iso=text(task?.kickoff || task?.data_iso).slice(0,10);
+  if(!home||!away||!/^20\d{2}-\d{2}-\d{2}$/.test(iso))return [];
+  const year=iso.slice(0,4),day=iso.slice(8,10)+'/'+iso.slice(5,7)+'/'+year;
+  const hasScore=task?.home_score!=null&&task?.away_score!=null
+    &&Number.isInteger(Number(task.home_score))&&Number.isInteger(Number(task.away_score));
+  const score=hasScore?home+' '+Number(task.home_score)+' x '+Number(task.away_score)+' '+away:home+' '+away;
+  return [
+    home+' '+away+' público renda',
+    score+' público renda '+year,
+    '"'+home+'" "'+away+'" ficha técnica '+day,
+    'site:uol.com.br/esporte '+home+' '+away+' público renda '+day,
+  ];
+}
+
 export async function discoverFreePublicNews(task,fetcher=fetch){
-  const year=text(task.kickoff).slice(0,4);
-  const home=text(task.home),away=text(task.away);
-  if(!home||!away||!/^20\d{2}$/.test(year))return{urls:[],feedsOk:0};
-  const query='"'+home+'" "'+away+'" publico renda '+year;
+  const queries=buildPostgameRssQueries(task);
+  if(!queries.length)return{urls:[],feedsOk:0};
   const endpoints=[
-    'https://www.bing.com/search?'+new URLSearchParams({q:query,format:'rss',setlang:'pt-BR'}),
-    'https://www.bing.com/news/search?'+new URLSearchParams({q:query,format:'rss',setmkt:'pt-BR'})
+    'https://www.bing.com/search?'+new URLSearchParams({q:queries[0],format:'rss',setlang:'pt-BR'}),
+    'https://www.bing.com/news/search?'+new URLSearchParams({q:queries[0],format:'rss',setmkt:'pt-BR'}),
+    'https://www.bing.com/search?'+new URLSearchParams({q:queries[1],format:'rss',setlang:'pt-BR'}),
+    'https://www.bing.com/search?'+new URLSearchParams({q:queries[2],format:'rss',setlang:'pt-BR'}),
+    'https://www.bing.com/search?'+new URLSearchParams({q:queries[3],format:'rss',setlang:'pt-BR'}),
   ];
   const results=await Promise.all(endpoints.map(async(url)=>{
     const controller=new AbortController();
@@ -71,6 +90,6 @@ export async function discoverFreePublicNews(task,fetcher=fetch){
       return{ok:/<rss\b|<channel\b/i.test(body),urls:parsePublicSearchRss(body,task,8)};
     }catch(_){return{ok:false,urls:[]};}finally{clearTimeout(timer);}
   }));
-  return{urls:[...new Set(results.flatMap(x=>x.urls))].slice(0,12),
+  return{urls:[...new Set(results.flatMap(x=>x.urls))].slice(0,16),
     feedsOk:results.filter(x=>x.ok).length};
 }
