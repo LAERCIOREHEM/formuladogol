@@ -1,6 +1,6 @@
 {
-  "gerado_em": "2026-11-07T08:53:47.625-03:00",
-  "fonte": "auditoria local sobre ESPN e tabela detalhada CBF 06/11/2026",
+  "gerado_em": "2026-11-07T20:25:31.949067-03:00",
+  "fonte": "auditoria local sobre JSONs normalizados da ESPN",
   "escopo": "módulo Brasileirão; nenhum arquivo da Copa",
   "resumo": {
     "clubes": 20,
@@ -13,25 +13,22 @@
     "partidas_com_data_a_definir": 0,
     "resultados_publicados": 339,
     "proximos_publicados": 41,
-    "eventos_espn_na_janela": 370,
+    "eventos_espn_na_janela": 380,
     "ajustes_calendario_configurados": 23,
     "jogos_adiados_sem_data": 0,
     "jogos_com_data_a_definir": 0,
     "rodadas_espn_com_clube_repetido": 0,
     "rodadas_preservadas_do_calendario_anterior": 0,
-    "kickoffs_confirmados_cbf": 19,
+    "kickoffs_confirmados_cbf": 39,
     "kickoffs_preservados_sem_confirmacao_atual": 0,
     "kickoffs_espn_provisorios_suprimidos_da_agenda": 0,
     "kickoffs_herdados_provisorios_suprimidos": 0,
-    "falhas_graves": 0,
-    "eventos_operacionais": 380,
-    "ids_cbf_provisorios": 10,
-    "kickoffs_tabela_detalhada_cbf": 20
+    "falhas_graves": 0
   },
   "avisos": [],
   "distribuicao_jogos_disputados": {
-    "33": 2,
-    "34": 18
+    "34": 18,
+    "33": 2
   },
   "jogos_disputados_por_clube": [
     {
@@ -643,9 +640,16 @@
       "clubes_repetidos": [],
       "clubes_ausentes": [],
       "integra": true
+    },
+    {
+      "rodada": 38,
+      "jogos_mapeados": 10,
+      "clubes_repetidos": [],
+      "clubes_ausentes": [],
+      "integra": true
     }
   ],
   "duplicados_entre_resultados_e_proximos": [],
   "falhas": [],
-  "observacao": "Matriz 380 jogos. R37 (10) e R38 (10) confirmadas pela CBF 06/11/2026, com 10 IDs locais provisórios até disponibilidade ESPN; resultados FINAL não alterados. Kickoffs operacionais sob fonte CBF detalhada, preferencial à agenda de credenciamento."
+  "observacao": "O calendário só é substituído depois de validar 380 partidas, 38 rodadas íntegras, 20 clubes com 38 jogos e 190 confrontos de ida e volta."
 }

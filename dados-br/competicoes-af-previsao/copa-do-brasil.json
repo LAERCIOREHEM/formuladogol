@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "sorteio",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-11-06T22:09:05-03:00",
+  "gerado_em": "2026-11-07T20:25:52-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,21 +17,20 @@
     "ordem": 800,
     "nome": "Semifinal",
     "eventos": 4,
-    "eventos_pendentes": 2
+    "eventos_pendentes": 1
   },
   "resumo": {
     "eventos": 155,
-    "finalizados": 152,
-    "pendentes": 3,
+    "finalizados": 153,
+    "pendentes": 2,
     "equipes": 128,
     "equipes_serie_a_2026": 21
   },
   "coleta": {
-    "modo": "incremental",
-    "janela_inicio": "2026-10-16T00:00:00-03:00",
-    "janela_fim": "2027-03-06T23:59:59-03:00",
-    "requisicoes": 3,
-    "ultima_completa_em": "2026-10-30T22:11:25-03:00",
+    "modo": "completa",
+    "requisicoes": 12,
+    "ultima_completa_em": "2026-11-07T20:25:52-03:00",
+    "fases_preservadas_por_event_id": 29,
     "ajustes_editoriais_aplicados": 0
   },
   "equipes": [
@@ -146,7 +145,7 @@
     {
       "espn_id": "3458",
       "nome": "Athletico-PR",
-      "nome_espn": "Athletico Paranaense",
+      "nome_espn": "Athletico-PR",
       "sigla": "CAP",
       "pais": "BRA",
       "serie_a_2026": true,
@@ -5292,7 +5291,7 @@
       "mandante": {
         "espn_id": "3458",
         "nome": "Athletico-PR",
-        "nome_espn": "Athletico Paranaense",
+        "nome_espn": "Athletico-PR",
         "sigla": "CAP",
         "pais": "BRA",
         "serie_a_2026": true,
@@ -5787,7 +5786,7 @@
       "visitante": {
         "espn_id": "3458",
         "nome": "Athletico-PR",
-        "nome_espn": "Athletico Paranaense",
+        "nome_espn": "Athletico-PR",
         "sigla": "CAP",
         "pais": "BRA",
         "serie_a_2026": true,
@@ -6223,7 +6222,7 @@
       "mandante": {
         "espn_id": "3458",
         "nome": "Athletico-PR",
-        "nome_espn": "Athletico Paranaense",
+        "nome_espn": "Athletico-PR",
         "sigla": "CAP",
         "pais": "BRA",
         "serie_a_2026": true,
@@ -6530,7 +6529,7 @@
       "visitante": {
         "espn_id": "3458",
         "nome": "Athletico-PR",
-        "nome_espn": "Athletico Paranaense",
+        "nome_espn": "Athletico-PR",
         "sigla": "CAP",
         "pais": "BRA",
         "serie_a_2026": true,
@@ -6915,9 +6914,9 @@
     {
       "event_id": "401913108",
       "data_iso": "2026-11-07T18:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "P.A.",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Semifinal",
       "fase_ordem": 800,
       "semana": null,
@@ -6932,7 +6931,7 @@
         "serie_a_2026": true,
         "mandante": true,
         "vencedor": false,
-        "placar": 0
+        "placar": 1
       },
       "visitante": {
         "espn_id": "6273",
@@ -6943,7 +6942,7 @@
         "serie_a_2026": true,
         "mandante": false,
         "vencedor": false,
-        "placar": 0
+        "placar": 1
       },
       "vencedor": null,
       "penaltis": false,
@@ -7029,6 +7028,6 @@
     "fase": "Semifinal",
     "fase_ordem": 800,
     "chaves": 2,
-    "equipes_ativas": 4
+    "equipes_ativas": 3
   }
 }

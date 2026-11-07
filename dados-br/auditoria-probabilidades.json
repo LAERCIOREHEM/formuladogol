@@ -5,9 +5,9 @@
   "etapa": "Execução 5 — histórico encadeado e avaliação científica preparada",
   "gerado_em": "2026-11-06T21:53:00-03:00",
   "referencia_esportiva_em": "2026-11-06T21:53:00-03:00",
-  "calculado_em": "2026-11-07T20:23:12-03:00",
+  "calculado_em": "2026-11-07T20:27:04-03:00",
   "status": "ok",
-  "hash_entrada": "1b2a863eaef3241e3d9cf5f1f1db6862fe30db4f3071b87a2193ecb8a198c1ce",
+  "hash_entrada": "b6f16939b68725e7327434bf681b5b02ffd515920d99b4ccc2240baaf2f0b5ae",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -360,7 +360,7 @@
     "motivo": "A Execução 1 mostrou melhora de calibração, mas piora nas três regras próprias de pontuação. A versão 1.0 mantém rho=0 e publica esta sensibilidade para reavaliação versionada.",
     "diferenca_media_absoluta_1x2_pontos_percentuais": 1.23542,
     "diferenca_maxima_1x2_pontos_percentuais": 2.136321,
-    "alteracao_media_massa_placares_baixos_pontos_percentuais": -0.0
+    "alteracao_media_massa_placares_baixos_pontos_percentuais": 0.0
   },
   "diagnostico_af_score": {
     "disponivel": true,
@@ -376,9 +376,8 @@
         "fase_atual": "Semifinal",
         "fase_ordem": 800,
         "chaves_atuais": 2,
-        "equipes_ativas": 4,
+        "equipes_ativas": 3,
         "clubes_ativos": [
-          "Atlético-MG",
           "Grêmio",
           "Palmeiras",
           "Vasco da Gama"
@@ -388,23 +387,19 @@
           1
         ],
         "pareamento_futuro": "sorteio",
-        "partidas_concluidas_no_ajuste": 152,
+        "partidas_concluidas_no_ajuste": 153,
         "principais_chances_titulo": [
           {
             "clube": "Palmeiras",
-            "probabilidade_pct": 54.41205
+            "probabilidade_pct": 54.30205
           },
           {
             "clube": "Grêmio",
-            "probabilidade_pct": 33.484
+            "probabilidade_pct": 37.17255
           },
           {
             "clube": "Vasco da Gama",
-            "probabilidade_pct": 8.54055
-          },
-          {
-            "clube": "Atlético-MG",
-            "probabilidade_pct": 3.5634
+            "probabilidade_pct": 8.5254
           }
         ]
       },
@@ -489,22 +484,22 @@
         {
           "chave": "copa_do_brasil",
           "nome": "Copa do Brasil",
-          "gerado_em": "2026-11-06T22:09:05-03:00",
+          "gerado_em": "2026-11-07T20:25:52-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 800,
             "nome": "Semifinal",
             "eventos": 4,
-            "eventos_pendentes": 2
+            "eventos_pendentes": 1
           },
-          "eventos_finalizados": 152,
-          "eventos_pendentes": 3,
-          "modo_coleta": "incremental"
+          "eventos_finalizados": 153,
+          "eventos_pendentes": 2,
+          "modo_coleta": "completa"
         },
         {
           "chave": "libertadores",
           "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-11-06T22:09:06-03:00",
+          "gerado_em": "2026-11-07T20:25:54-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -514,12 +509,12 @@
           },
           "eventos_finalizados": 154,
           "eventos_pendentes": 1,
-          "modo_coleta": "incremental"
+          "modo_coleta": "completa"
         },
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-11-06T22:09:07-03:00",
+          "gerado_em": "2026-11-07T20:25:58-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -529,12 +524,12 @@
           },
           "eventos_finalizados": 156,
           "eventos_pendentes": 1,
-          "modo_coleta": "incremental"
+          "modo_coleta": "completa"
         }
       ],
-      "referencia_mais_antiga_em": "2026-11-06T22:09:05-03:00",
-      "referencia_mais_recente_em": "2026-11-06T22:09:07-03:00",
-      "snapshots_atualizados_em": "2026-11-06T22:09:07-03:00"
+      "referencia_mais_antiga_em": "2026-11-07T20:25:52-03:00",
+      "referencia_mais_recente_em": "2026-11-07T20:25:58-03:00",
+      "snapshots_atualizados_em": "2026-11-07T20:25:58-03:00"
     }
   },
   "validacoes": {
