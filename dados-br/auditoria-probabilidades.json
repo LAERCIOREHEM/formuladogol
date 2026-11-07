@@ -5,9 +5,9 @@
   "etapa": "Execução 5 — histórico encadeado e avaliação científica preparada",
   "gerado_em": "2026-11-06T21:53:00-03:00",
   "referencia_esportiva_em": "2026-11-06T21:53:00-03:00",
-  "calculado_em": "2026-11-06T22:03:33-03:00",
+  "calculado_em": "2026-11-07T20:23:12-03:00",
   "status": "ok",
-  "hash_entrada": "11552e4ab53bef464fb9034a98f0c33037b9df4525d3bc64519725d0a9dc4780",
+  "hash_entrada": "1b2a863eaef3241e3d9cf5f1f1db6862fe30db4f3071b87a2193ecb8a198c1ce",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -328,12 +328,12 @@
     "convergencia": {
       "erro_padrao_maximo_pontos_percentuais": 0.035355,
       "margem_95_maxima_pontos_percentuais": 0.069296,
-      "maior_diferenca_entre_metades_pontos_percentuais": 0.1369
+      "maior_diferenca_entre_metades_pontos_percentuais": 0.0857
     },
     "desempate_residual": {
-      "simulacoes_com_empate_apos_pontos_vitorias_saldo_gols": 20968,
-      "percentual_simulacoes": 1.0484,
-      "pares_residuais": 21049
+      "simulacoes_com_empate_apos_pontos_vitorias_saldo_gols": 21075,
+      "percentual_simulacoes": 1.05375,
+      "pares_residuais": 21173
     }
   },
   "tendencia_recente": {
@@ -360,12 +360,12 @@
     "motivo": "A Execução 1 mostrou melhora de calibração, mas piora nas três regras próprias de pontuação. A versão 1.0 mantém rho=0 e publica esta sensibilidade para reavaliação versionada.",
     "diferenca_media_absoluta_1x2_pontos_percentuais": 1.23542,
     "diferenca_maxima_1x2_pontos_percentuais": 2.136321,
-    "alteracao_media_massa_placares_baixos_pontos_percentuais": 0.0
+    "alteracao_media_massa_placares_baixos_pontos_percentuais": -0.0
   },
   "diagnostico_af_score": {
     "disponivel": true,
     "cobertura_clubes": 20,
-    "correlacao_pearson_com_forca_map": 0.916554,
+    "correlacao_pearson_com_forca_map": 0.9149,
     "aplicado_na_producao": false,
     "motivo": "O AF-Score não possui série histórica homogênea em 2023–2025. Incluí-lo agora impediria backtesting temporal equivalente e poderia introduzir vazamento."
   },
@@ -489,7 +489,7 @@
         {
           "chave": "copa_do_brasil",
           "nome": "Copa do Brasil",
-          "gerado_em": "2026-11-06T00:01:13-03:00",
+          "gerado_em": "2026-11-06T22:09:05-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 800,
@@ -504,7 +504,7 @@
         {
           "chave": "libertadores",
           "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-11-06T00:01:14-03:00",
+          "gerado_em": "2026-11-06T22:09:06-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -519,7 +519,7 @@
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-11-06T00:01:15-03:00",
+          "gerado_em": "2026-11-06T22:09:07-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -532,9 +532,9 @@
           "modo_coleta": "incremental"
         }
       ],
-      "referencia_mais_antiga_em": "2026-11-06T00:01:13-03:00",
-      "referencia_mais_recente_em": "2026-11-06T00:01:15-03:00",
-      "snapshots_atualizados_em": "2026-11-06T00:01:15-03:00"
+      "referencia_mais_antiga_em": "2026-11-06T22:09:05-03:00",
+      "referencia_mais_recente_em": "2026-11-06T22:09:07-03:00",
+      "snapshots_atualizados_em": "2026-11-06T22:09:07-03:00"
     }
   },
   "validacoes": {
