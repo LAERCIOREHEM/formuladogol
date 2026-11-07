@@ -7267,51 +7267,117 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: Vitória x Fluminense, Campeonato Brasileiro Série A 2026, fase única, 34ª rodada, nesta sexta-feira, 6 de novembro de 2026, às 20h (horário de Brasília), no Barradão, em Salvador. A transmissão integral é de Premiere e SporTV. O ge também oferece cobertura em tempo real, mas isso não configura transmissão pela GE TV."
+    },
+    {
+      "event_id": "401913108",
+      "jogo": "Atlético-MG x Grêmio",
+      "data_iso": "2026-11-07T18:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-11-07T16:33:10-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "GE TV"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/Ranking-de-Clubes-CONMEBOL-2026.pdf",
+        "https://ge.globo.com/google/amp/rs/futebol/copa-do-brasil/noticia/2026/09/27/cbf-define-datas-e-horarios-dos-jogos-das-semifinais-da-copa-do-brasil.ghtml",
+        "https://ge.globo.com/mg/futebol/copa-do-brasil/noticia/2026/11/07/atletico-mg-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/11/01/gremio-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/11/04/atletico-mg-x-gremio-onde-assistir-ao-vivo-horario-e-provaveis-escalacoes-pela-semifinal-da-copa-do-brasil.html",
+        "https://sbtnews.sbt.com.br/noticia/brasil/atletico-mg-x-gremio-onde-assistir-ao-vivo-e-horario-1",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/profissional/2026/gremio-x-atletico-mineiro/835308",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/semis-da-copa-do-brasil-galo-e-vasco-decidem-em-casa-gremio-e-palmeiras-sao-mandantes-do-jogo-de-ida",
+        "https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/2002",
+        "https://www.cnnbrasil.com.br/esportes/futebol/copa-do-brasil/gremio-x-atletico-mg-horario-e-onde-assistir-ao-jogo-da-copa-do-brasil",
+        "https://www.cnnbrasil.com.br/noticias/atletico-mg-x-gremio-horario-e-onde-assistir-a-semifinal-da-copa-do-brasil",
+        "https://www.primevideo.com/-/pt/detail/0T5HU7GT4J72A0LL2GQUZEMZ9C",
+        "https://www.primevideo.com/detail/0HIV8IL9EZOCD29C498I31XV5K",
+        "https://www.youtube.com/myfamily/static/pdfs/parentguide_uk.pdf",
+        "https://www.youtube.com/watch?v=ygYoh4dY8Bc"
+      ],
+      "canais_depois": [
+        "Premiere",
+        "Prime Video",
+        "SporTV"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/2002",
+        "https://ge.globo.com/mg/futebol/copa-do-brasil/noticia/2026/11/07/atletico-mg-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=89tPGaf7W4s",
+          "scope": "unknown",
+          "valid_for_match": false,
+          "reason": "O URL não pôde ser verificado diretamente nesta consulta. Além disso, o título informado no dossiê identifica o conteúdo como 'Brasileirão 2026', mas o evento confirmado é Copa do Brasil; portanto, não há evidência suficiente de transmissão integral desta partida específica."
+        }
+      ],
+      "youtube_removidos": [
+        "https://www.youtube.com/watch?v=89tPGaf7W4s"
+      ],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Atlético-MG x Grêmio, jogo de volta da semifinal da Copa do Brasil 2026, em 07/11/2026 às 18h (horário de Brasília), na Arena MRV, em Belo Horizonte. A grade completa da partida é SporTV, Premiere e Prime Video. GE TV não integra a transmissão integral: o ge informa acompanhamento em tempo real, enquanto o vídeo do dossiê traz título de Brasileirão, divergente da competição desta partida."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841302",
-    "jogo": "Vitória x Fluminense",
-    "data_iso": "2026-11-06T20:00:00-03:00",
+    "event_id": "401913108",
+    "jogo": "Atlético-MG x Grêmio",
+    "data_iso": "2026-11-07T18:00:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-11-06T18:33:14-03:00",
+    "executado_em": "2026-11-07T16:33:10-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "Premiere",
-      "SporTV"
+      "GE TV"
     ],
-    "status": "confirmado",
+    "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/jogo/06-11-2026/vitoria-fluminense.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/28/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-33a-rodada.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/06/vitoria-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/ce/pv-70-anos/noticia/plantao.html",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/02/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-34a-rodada.ghtml",
-      "https://ge.globo.com/olimpiadas/noticia/plantao.html",
-      "https://ge.globo.com/sportv",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/vitoria-x-fluminense/832229",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/duelo-entre-red-bull-bragantino-e-santos-abre-34-rodada-nesta-segunda-feira",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/trio-carioca-vence-pela-34-rodada-do-brasileirao",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-serie-a/brasileirao-rodada-de-classicos-movimenta-fim-de-semana"
+      "https://cdn.conmebol.com/wp-content/uploads/2025/12/Ranking-de-Clubes-CONMEBOL-2026.pdf",
+      "https://ge.globo.com/google/amp/rs/futebol/copa-do-brasil/noticia/2026/09/27/cbf-define-datas-e-horarios-dos-jogos-das-semifinais-da-copa-do-brasil.ghtml",
+      "https://ge.globo.com/mg/futebol/copa-do-brasil/noticia/2026/11/07/atletico-mg-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/11/01/gremio-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/11/04/atletico-mg-x-gremio-onde-assistir-ao-vivo-horario-e-provaveis-escalacoes-pela-semifinal-da-copa-do-brasil.html",
+      "https://sbtnews.sbt.com.br/noticia/brasil/atletico-mg-x-gremio-onde-assistir-ao-vivo-e-horario-1",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/profissional/2026/gremio-x-atletico-mineiro/835308",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/semis-da-copa-do-brasil-galo-e-vasco-decidem-em-casa-gremio-e-palmeiras-sao-mandantes-do-jogo-de-ida",
+      "https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/2002",
+      "https://www.cnnbrasil.com.br/esportes/futebol/copa-do-brasil/gremio-x-atletico-mg-horario-e-onde-assistir-ao-jogo-da-copa-do-brasil",
+      "https://www.cnnbrasil.com.br/noticias/atletico-mg-x-gremio-horario-e-onde-assistir-a-semifinal-da-copa-do-brasil",
+      "https://www.primevideo.com/-/pt/detail/0T5HU7GT4J72A0LL2GQUZEMZ9C",
+      "https://www.primevideo.com/detail/0HIV8IL9EZOCD29C498I31XV5K",
+      "https://www.youtube.com/myfamily/static/pdfs/parentguide_uk.pdf",
+      "https://www.youtube.com/watch?v=ygYoh4dY8Bc"
     ],
     "canais_depois": [
       "Premiere",
+      "Prime Video",
       "SporTV"
     ],
     "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/vitoria-x-fluminense/832229",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/06/vitoria-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/02/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-34a-rodada.ghtml"
+      "https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/2002",
+      "https://ge.globo.com/mg/futebol/copa-do-brasil/noticia/2026/11/07/atletico-mg-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
     ],
-    "youtube": [],
-    "youtube_removidos": [],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=89tPGaf7W4s",
+        "scope": "unknown",
+        "valid_for_match": false,
+        "reason": "O URL não pôde ser verificado diretamente nesta consulta. Além disso, o título informado no dossiê identifica o conteúdo como 'Brasileirão 2026', mas o evento confirmado é Copa do Brasil; portanto, não há evidência suficiente de transmissão integral desta partida específica."
+      }
+    ],
+    "youtube_removidos": [
+      "https://www.youtube.com/watch?v=89tPGaf7W4s"
+    ],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: Vitória x Fluminense, Campeonato Brasileiro Série A 2026, fase única, 34ª rodada, nesta sexta-feira, 6 de novembro de 2026, às 20h (horário de Brasília), no Barradão, em Salvador. A transmissão integral é de Premiere e SporTV. O ge também oferece cobertura em tempo real, mas isso não configura transmissão pela GE TV."
+    "resumo": "Confirmado para o Brasil: Atlético-MG x Grêmio, jogo de volta da semifinal da Copa do Brasil 2026, em 07/11/2026 às 18h (horário de Brasília), na Arena MRV, em Belo Horizonte. A grade completa da partida é SporTV, Premiere e Prime Video. GE TV não integra a transmissão integral: o ge informa acompanhamento em tempo real, enquanto o vídeo do dossiê traz título de Brasileirão, divergente da competição desta partida."
   },
-  "atualizado_em": "2026-11-06T18:33:14-03:00"
+  "atualizado_em": "2026-11-07T16:33:10-03:00"
 }
