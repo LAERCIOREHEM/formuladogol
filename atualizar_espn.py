@@ -895,17 +895,52 @@ def aplicar_ajustes_calendario(eventos: list[dict[str, Any]]) -> None:
         event_id = str(ajuste.get("event_id") or "").strip()
         mand = para_canonico(ajuste.get("mandante"))
         vis = para_canonico(ajuste.get("visitante"))
-        alvo = None
-        for e in eventos:
-            bate_id = bool(event_id and str(e.get("event_id") or "") == event_id)
-            bate_jogo = bool(mand and vis and e.get("mandante_nome") == mand and e.get("visitante_nome") == vis)
-            if bate_id or bate_jogo:
-                alvo = e
-                break
+        oficial_final = str(ajuste.get("fonte_calendario") or "").startswith("CBF oficial — tabela detalhada")
+        if oficial_final and mand and vis:
+            iguais = [e for e in eventos if e.get("mandante_nome") == mand and e.get("visitante_nome") == vis]
+            reais = [e for e in iguais if not str(e.get("event_id") or "").startswith("cbf-2026-")]
+            if reais:
+                for antigo in iguais:
+                    if antigo not in reais:
+                        eventos.remove(antigo)
+        alvo = next((
+            e for e in eventos
+            if (event_id and str(e.get("event_id") or "") == event_id)
+            or (mand and vis and e.get("mandante_nome") == mand and e.get("visitante_nome") == vis)
+        ), None)
+        if alvo is None and oficial_final:
+            # Sem ID ESPN, aceita somente um confronto presente na matriz canônica.
+            base = carregar_calendario_canonico_por_mando().get((mand, vis))
+            dt = _parse_data_manual_brt(ajuste.get("data_iso"))
+            if (
+                base and int(base.get("rodada") or 0) == int(ajuste.get("rodada") or 0)
+                and dt and dt >= agora_brt() - timedelta(hours=6)
+                and str(ajuste.get("referencia_cbf") or "").isdigit()
+            ):
+                fixture_id = str(base.get("event_id") or event_id).strip()
+                if not fixture_id:
+                    raise RuntimeError(f"CBF sem ID local: {mand} x {vis}")
+                alvo = {
+                    "event_id": fixture_id, "rodada": int(ajuste["rodada"]),
+                    "data_dt": dt, "data_iso": dt.strftime("%Y-%m-%dT%H:%M"),
+                    "mandante_nome": mand, "visitante_nome": vis,
+                    "mandante": info_time(mand), "visitante": info_time(vis),
+                    "estadio": str(ajuste.get("estadio") or base.get("estadio") or ""),
+                    "transmissao": "", "status": "Pré-jogo", "estado": "pre",
+                    "concluido": False, "adiado": False, "data_definir": False,
+                    "placar_mandante": None, "placar_visitante": None,
+                    "_sort": dt.timestamp(),
+                    "fonte_evento": "CBF oficial — fixture sem ID ESPN",
+                    "fonte_calendario": str(ajuste["fonte_calendario"]),
+                    "origem_calendario": str(ajuste.get("origem_calendario") or ""),
+                }
+                eventos.append(alvo)
         if alvo is None:
             print(f"Aviso: ajuste de calendário não encontrou evento: {event_id or (mand + ' x ' + vis if mand and vis else '?')}")
             continue
-
+        # O placar/status FINAL ESPN é soberano; nunca reabrir partida disputada.
+        if oficial_final and (alvo.get("concluido") is True or str(alvo.get("estado") or "").lower() == "post"):
+            continue
         fonte_finalizada = bool(alvo.get("concluido") is True)
         rodada = ajuste.get("rodada")
         if rodada not in (None, ""):
@@ -919,6 +954,12 @@ def aplicar_ajustes_calendario(eventos: list[dict[str, Any]]) -> None:
             alvo["adiado"] = bool(ajuste.get("data_definir") is True)
         alvo["ajuste_calendario"] = True
         alvo["motivo_ajuste"] = str(ajuste.get("motivo") or "").strip()
+        if oficial_final:
+            anterior = str(alvo.get("data_iso") or "").strip()
+            if anterior and anterior != str(ajuste.get("data_iso") or "") and not alvo.get("data_espn_original"):
+                alvo["data_espn_original"] = anterior
+            alvo["fonte_calendario"] = str(ajuste["fonte_calendario"])
+            alvo["origem_calendario"] = str(ajuste.get("origem_calendario") or "")
 
         if ajuste.get("data_definir") is True:
             alvo["data_definir"] = True
@@ -2903,6 +2944,9 @@ def main() -> None:
                 corrigidos = aplicar_agenda_oficial_cbf(eventos_normalizados, agenda_cbf)
                 aplicar_rodadas_canonicas(eventos_normalizados)
                 provisorios = marcar_kickoffs_provisorios_espn(eventos_normalizados)
+                # A tabela detalhada prevalece sobre credenciamento e ESPN.
+                aplicar_ajustes_calendario(eventos_normalizados)
+                eventos_normalizados.sort(key=lambda e: float(e.get("_sort") or 0))
                 eventos_normalizados = sanear_eventos_por_rodada(eventos_normalizados)
                 if adicionados:
                     print(f"Partidas futuras restauradas por CBF + calendário canônico: {adicionados}")
@@ -2910,6 +2954,10 @@ def main() -> None:
                     print(f"Kickoffs futuros reconciliados pela CBF: {corrigidos}")
                 if provisorios:
                     print(f"Kickoffs ESPN provisórios mantidos fora da agenda pública: {provisorios}")
+            if not agenda_cbf:
+                aplicar_ajustes_calendario(eventos_normalizados)
+                eventos_normalizados.sort(key=lambda e: float(e.get("_sort") or 0))
+                eventos_normalizados = sanear_eventos_por_rodada(eventos_normalizados)
             aplicar_transmissoes_manuais(eventos_normalizados)
             if not eventos_normalizados:
                 raise RuntimeError("Nenhum evento ESPN foi normalizado; mantendo snapshot anterior.")
