@@ -235,11 +235,14 @@ def brasileirao_games(
         canonical_round = canonical_round_by_matchup.get(matchup, int(raw.get("rodada") or 0))
         official = official_by_matchup.get(matchup)
         raw_date = str(raw.get("data_iso") or "")
-        official_date = str(official.data_iso if official else "")
-        chosen_date = official_date or raw_date
-        provisional = canonical_round in provisional_rounds and not official_date
+        detailed_cbf = str(raw.get("fonte_calendario") or "").startswith("CBF oficial — tabela detalhada")
+        # Tabela detalhada de 06/11 é mais recente e específica do que
+        # credenciamento CBF. O scraper auxiliar nunca desfaz esta correção.
+        official_date = str(official.data_iso if official and not detailed_cbf else "")
+        chosen_date = raw_date if detailed_cbf else (official_date or raw_date)
+        provisional = canonical_round in provisional_rounds and not (official_date or detailed_cbf)
         raw_status = str(raw.get("status") or "")
-        official_resolved = bool(official_date)
+        official_resolved = bool(official_date or detailed_cbf)
         public_status = raw_status
         if official_resolved and ("data a definir" in raw_status.lower() or "adiad" in raw_status.lower()):
             public_status = "Agendado"
@@ -268,8 +271,8 @@ def brasileirao_games(
             "possui_clube_serie_a_2026": True,
             "probabilidades_disponiveis": bool(event_id and event_id in probability_ids),
             "fonte": "jogos.json",
-            "fonte_calendario": "CBF oficial — agenda de credenciamento" if official else str(raw.get("fonte_calendario") or "ESPN"),
-            "origem_calendario": official.origem if official else str(raw.get("origem_calendario") or ""),
+            "fonte_calendario": str(raw.get("fonte_calendario")) if detailed_cbf else ("CBF oficial — agenda de credenciamento" if official else str(raw.get("fonte_calendario") or "ESPN")),
+            "origem_calendario": str(raw.get("origem_calendario")) if detailed_cbf else (official.origem if official else str(raw.get("origem_calendario") or "")),
             "data_fonte_anterior": raw_date if official_date and raw_date and raw_date != official_date else "",
         }
 
@@ -290,16 +293,17 @@ def brasileirao_games(
             continue
         round_no = int(raw.get("rodada") or 0)
         official = official_by_matchup.get(matchup)
-        official_date = str(official.data_iso if official else "")
+        detailed_cbf = str(raw.get("fonte_calendario") or "").startswith("CBF oficial — tabela detalhada")
+        official_date = str(official.data_iso if official and not detailed_cbf else "")
         raw_date = str(raw.get("data_iso") or "").strip()
         # Sem confirmação oficial, o fallback continua conservador e só repara
         # buraco em rodada já amplamente detalhada pelo feed. Quando a própria
         # CBF publicou o kickoff, ela autoriza a entrada mesmo que a ESPN ainda
         # tenha menos de oito jogos ou data placeholder/a definir.
-        if round_counts.get(round_no, 0) < 8 and not official:
+        if round_counts.get(round_no, 0) < 8 and not (official or detailed_cbf):
             continue
-        chosen_date = official_date or raw_date
-        if (raw.get("data_definir") is True and not official) or not chosen_date:
+        chosen_date = raw_date if detailed_cbf else (official_date or raw_date)
+        if (raw.get("data_definir") is True and not (official or detailed_cbf)) or not chosen_date:
             continue
         yield {
             "event_id": event_id,
@@ -324,8 +328,8 @@ def brasileirao_games(
             "possui_clube_serie_a_2026": True,
             "probabilidades_disponiveis": bool(event_id and event_id in probability_ids),
             "fonte": "dados-br/calendario-completo.json (fallback canônico)",
-            "fonte_calendario": "CBF oficial — agenda de credenciamento" if official else str(raw.get("fonte_calendario") or "calendário canônico"),
-            "origem_calendario": official.origem if official else str(raw.get("origem_calendario") or ""),
+            "fonte_calendario": str(raw.get("fonte_calendario")) if detailed_cbf else ("CBF oficial — agenda de credenciamento" if official else str(raw.get("fonte_calendario") or "calendário canônico")),
+            "origem_calendario": str(raw.get("origem_calendario")) if detailed_cbf else (official.origem if official else str(raw.get("origem_calendario") or "")),
             "data_fonte_anterior": raw_date if official_date and raw_date and raw_date != official_date else "",
         }
 
