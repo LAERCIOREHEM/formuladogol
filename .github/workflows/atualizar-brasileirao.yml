@@ -115,6 +115,7 @@ jobs:
           python scripts/validar_python_embutido_workflow.py --self-test
           python scripts/validar_python_embutido_workflow.py .github/workflows/atualizar-brasileirao.yml
           python atualizar_espn.py --selftest
+          python tests/test_calendario_finais_cbf_2026.py
           python fontes_brasileirao.py --selftest
           python scripts/atualizar_transmissoes_tv_brasileirao.py --selftest
           python scripts/gerar_agenda_clubes_brasileirao.py --self-test
