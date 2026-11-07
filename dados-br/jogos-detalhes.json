@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-06T22:08:51.399609-03:00",
+  "gerado_em": "2026-11-06T22:46:05.339928-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 339,
   "total_com_estatisticas": 339,
-  "total_com_publico": 338,
+  "total_com_publico": 339,
   "total_com_eventos": 339,
   "total_com_jogadores": 339,
   "total_eventos_validados": 339,
@@ -20,9 +20,9 @@
       "placar_mandante": 0,
       "placar_visitante": 3,
       "estadio": "Estadio Manoel Barradas",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 20142,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/11/05/flamengo-3-x-1-gremio-tem-o-maior-publico-da-34a-rodada-do-brasileiro-veja-a-lista.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -565,7 +565,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-06T22:08:46.153547-03:00"
+      "atualizado_em": "2026-11-06T22:08:46.153547-03:00",
+      "publico_pagante": 19939,
+      "renda": 506013,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841303": {
       "event_id": "401841303",
@@ -191728,5 +191731,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 312,
+  "total_com_renda": 339
 }
