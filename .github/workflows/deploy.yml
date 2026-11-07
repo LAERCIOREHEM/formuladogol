@@ -153,6 +153,11 @@ jobs:
           node --check js/br-pwa.js
           node scripts/validar_pwa_instalacao.mjs
 
+      - name: Conferir 20 jogos oficiais das rodadas finais (CBF)
+        run: |
+          python -m py_compile atualizar_espn.py scripts/gerar_agenda_clubes_brasileirao.py
+          python tests/test_calendario_finais_cbf_2026.py
+
       - name: Montar site público
         shell: bash
         run: |
