@@ -276,6 +276,32 @@ def validate_phase_probabilities(probabilities: dict[str, Any], phase: dict[str,
                 errors.append(f"{name}: classificado não está ativo estruturalmente na Copa do Brasil")
         else:
             errors.append(f"{name}: situação indefinida no fechamento de {current_phase_config()['fase']}")
+    if PHASE_RANK == 800:
+        # REC 2026: nenhum finalista com risco positivo de rebaixamento
+        # pode aparecer como Libertadores 100% se o título da Copa é a
+        # única via disponível no cenário esportivo.
+        for name in classified:
+            club = by_name.get(name) or {}
+            vals = club.get("probabilidades_pct") or {}
+            if (
+                float(vals.get("rebaixamento") or 0) > 0
+                and float(vals.get("libertadores") or 0) >= 100
+            ):
+                errors.append(
+                    f"{name}: Libertadores 100% apesar de risco de rebaixamento; "
+                    "Art. 4º REC 2026 exige elegibilidade para Série A 2027"
+                )
+        palmeiras = by_name.get("Palmeiras") or {}
+        pal_math = (palmeiras.get("probabilidades_detalhes") or {}).get("libertadores_base") or {}
+        if "Palmeiras" in classified and pal_math.get("certeza_estrutural") is True:
+            # Finalista já matematicamente G5: repasse mínimo de uma vaga.
+            for club in probabilities.get("clubes") or []:
+                vals = club.get("probabilidades_pct") or {}
+                if float(vals.get("libertadores") or 0) + 1e-9 < float(vals.get("g6") or 0):
+                    errors.append(
+                        f"{club.get('clube')}: G6 matematicamente aberto pela Copa, "
+                        "mas chance de Libertadores inferior à de terminar no G6"
+                    )
     if errors:
         raise EditorialCopaError("AF-Previsão ainda não fechou a fase: " + "; ".join(errors))
 
