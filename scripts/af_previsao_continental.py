@@ -1162,7 +1162,23 @@ def allocate_integrated_qualification(
             if runner_name != champion_name and runner_eligible and not runner_already:
                 runner_index = qualify(runner_name, "via_copa_do_brasil")
                 if runner_index >= 0:
-                    copa_subroute_counts["vice_herda_vaga_direta"][runner_index] += 1
+                    winner_index = current_index(champion_name)
+                    champion_has_direct = bool(
+                        champion_already and (
+                            (winner_index >= 0 and int(position[winner_index]) <= top_direct)
+                            or champion_name in (str(lib_champion_names[row]), str(sula_champion_names[row]))
+                        )
+                    )
+                    # Se o campeão já tiver apenas vaga preliminar pelo 5º
+                    # lugar, a Copa lhe fornece vaga de grupos e o vice
+                    # continua preliminar. Só herda grupos se o campeão
+                    # já tiver grupos por outra via ou for inelegível.
+                    subroute = (
+                        "vice_herda_vaga_direta"
+                        if not champion_eligible or champion_has_direct
+                        else "vice"
+                    )
+                    copa_subroute_counts[subroute][runner_index] += 1
             else:
                 # Vice já classificado ou rebaixado: segunda vaga retorna à
                 # classificação do Brasileirão, com repasse ao próximo clube.
@@ -1833,6 +1849,19 @@ def self_test() -> None:
     assert winner_out["clubes"][teams[18]]["libertadores"]["total"]["ocorrencias"] == 0
     assert winner_out["clubes"][teams[6]]["libertadores"]["subvias_copa_do_brasil"]["vice_herda_vaga_direta"]["ocorrencias"] == 1
     assert winner_out["clubes"][teams[5]]["libertadores"]["vias"]["via_repasse"]["ocorrencias"] == 1
+
+    # Campeão em 5º (pré-Libertadores pelo Brasileirão): usa vaga direta
+    # da Copa, vice mantém preliminar, e o G6 recebe o repasse da base.
+    fifth_champion = allocate_integrated_qualification(
+        one_order, teams,
+        fixed_cup("copa_do_brasil", [teams[4]], [teams[6]], teams),
+        fixed_cup("libertadores", ["Estudiantes"], ["Vice L"], []),
+        fixed_cup("sul_americana", ["Boca Juniors"], ["Vice S"], []),
+        1, config
+    )
+    assert fifth_champion["clubes"][teams[6]]["libertadores"]["subvias_copa_do_brasil"]["vice"]["ocorrencias"] == 1
+    assert fifth_champion["clubes"][teams[6]]["libertadores"]["subvias_copa_do_brasil"]["vice_herda_vaga_direta"]["ocorrencias"] == 0
+    assert fifth_champion["clubes"][teams[5]]["libertadores"]["vias"]["via_repasse"]["ocorrencias"] == 1
 
     # Regressão 2026-09-18: Semifinal/Final pré-criadas como TBD não podem
     # virar a fase atual nem bloquear o AF após o fechamento das Quartas.
