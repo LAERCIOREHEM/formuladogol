@@ -8,6 +8,8 @@ on:
     branches: [main]
     paths:
       - 'dados-br/competicoes-af-previsao/sul-americana.json'
+      - 'dados-br/competicoes-af-previsao/copa-do-brasil.json'
+      - 'ops/af-recalculo-request.json'
       - 'dados-br/competicoes-af-previsao/libertadores.json'
       - 'dados-br/correcoes/agenda-continentais-oficial.json'
   workflow_dispatch:
@@ -259,9 +261,9 @@ jobs:
       - name: Atualizar competições que alteram as vagas continentais
         id: continental
         env:
-          FORCAR_AF: ${{ inputs.forcar_af }}
+          FORCAR_AF: ${{ inputs.forcar_af || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'ops(af):')) }}
           RECONSTRUIR_FONTES: ${{ inputs.reconstruir_fontes }}
-          FORCAR_FONTES_CONTINENTAIS: ${{ inputs.forcar_fontes_continentais }}
+          FORCAR_FONTES_CONTINENTAIS: ${{ inputs.forcar_fontes_continentais || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'ops(af):')) }}
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
           API_FOOTBALL_CONTINENTAL_RESERVE: '12'
         shell: bash
@@ -328,7 +330,7 @@ jobs:
         if: ${{ always() && steps.continental.outcome == 'success' }}
         id: af_gate
         env:
-          FORCAR_AF: ${{ inputs.forcar_af }}
+          FORCAR_AF: ${{ inputs.forcar_af || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'ops(af):')) }}
           BR_SINCRONIZADO: ${{ steps.espn.outputs.sincronizado }}
           CONTINENTAL_READY: ${{ steps.continental.outputs.continental_ready }}
           CONTINENTAL_CHANGED: ${{ steps.continental.outputs.continental_changed }}
@@ -444,7 +446,7 @@ jobs:
         if: steps.af_gate.outputs.run_af == 'true'
         id: af_generate
         env:
-          FORCAR_AF: ${{ inputs.forcar_af }}
+          FORCAR_AF: ${{ inputs.forcar_af || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'ops(af):')) }}
         shell: bash
         run: |
           set -euo pipefail
