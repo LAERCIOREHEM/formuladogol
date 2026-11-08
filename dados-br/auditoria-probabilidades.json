@@ -5,9 +5,9 @@
   "etapa": "Execução 5 — histórico encadeado e avaliação científica preparada",
   "gerado_em": "2026-11-06T21:53:00-03:00",
   "referencia_esportiva_em": "2026-11-06T21:53:00-03:00",
-  "calculado_em": "2026-11-07T20:27:04-03:00",
+  "calculado_em": "2026-11-08T20:57:12-03:00",
   "status": "ok",
-  "hash_entrada": "b6f16939b68725e7327434bf681b5b02ffd515920d99b4ccc2240baaf2f0b5ae",
+  "hash_entrada": "5801adca838e8b0d58b906a9d440f9907a1da6e5e26efe7878d9f365ba3858ea",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -373,33 +373,27 @@
     "competicoes": {
       "copa_do_brasil": {
         "status": "simulado",
-        "fase_atual": "Semifinal",
-        "fase_ordem": 800,
-        "chaves_atuais": 2,
-        "equipes_ativas": 3,
+        "fase_atual": "Final",
+        "fase_ordem": 900,
+        "chaves_atuais": 1,
+        "equipes_ativas": 2,
         "clubes_ativos": [
           "Grêmio",
-          "Palmeiras",
-          "Vasco da Gama"
+          "Palmeiras"
         ],
         "rodadas_simuladas_tamanhos": [
-          2,
           1
         ],
-        "pareamento_futuro": "sorteio",
-        "partidas_concluidas_no_ajuste": 153,
+        "pareamento_futuro": "não aplicável",
+        "partidas_concluidas_no_ajuste": 154,
         "principais_chances_titulo": [
           {
             "clube": "Palmeiras",
-            "probabilidade_pct": 54.30205
+            "probabilidade_pct": 55.2501
           },
           {
             "clube": "Grêmio",
-            "probabilidade_pct": 37.17255
-          },
-          {
-            "clube": "Vasco da Gama",
-            "probabilidade_pct": 8.5254
+            "probabilidade_pct": 44.7499
           }
         ]
       },
@@ -469,7 +463,7 @@
       "soma_probabilidades_libertadores_pct": 792.89265,
       "soma_probabilidades_sul_americana_pct": 600.0,
       "regra_decomposicao": "vias exclusivas: G5 do Brasileirão primeiro; títulos/copa apenas quando necessários; sobreposições descem como repasse",
-      "regra_elegibilidade": "títulos da Copa do Brasil, Libertadores e Sul-Americana classificam mesmo que o clube seja rebaixado; a posição na liga limita apenas as vagas obtidas pelo Brasileirão"
+      "regra_elegibilidade": "Art. 4º, §§ 6º-9º REC Copa do Brasil 2026: finalistas rebaixados não podem exercer vaga na Libertadores 2027; essa vaga retorna à classificação do Brasileirão. Elegibilidade de títulos continentais deve ser tratada também conforme Manual de Clubes CONMEBOL."
     }
   },
   "cobertura_dados": {
@@ -484,22 +478,7 @@
         {
           "chave": "copa_do_brasil",
           "nome": "Copa do Brasil",
-          "gerado_em": "2026-11-07T20:25:52-03:00",
-          "fase_atual": {
-            "status": "em_andamento",
-            "ordem": 800,
-            "nome": "Semifinal",
-            "eventos": 4,
-            "eventos_pendentes": 1
-          },
-          "eventos_finalizados": 153,
-          "eventos_pendentes": 2,
-          "modo_coleta": "completa"
-        },
-        {
-          "chave": "libertadores",
-          "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-11-07T20:25:54-03:00",
+          "gerado_em": "2026-11-08T20:55:47-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -509,12 +488,27 @@
           },
           "eventos_finalizados": 154,
           "eventos_pendentes": 1,
-          "modo_coleta": "completa"
+          "modo_coleta": "incremental"
+        },
+        {
+          "chave": "libertadores",
+          "nome": "CONMEBOL Libertadores",
+          "gerado_em": "2026-11-08T20:55:48-03:00",
+          "fase_atual": {
+            "status": "em_andamento",
+            "ordem": 900,
+            "nome": "Final",
+            "eventos": 1,
+            "eventos_pendentes": 1
+          },
+          "eventos_finalizados": 154,
+          "eventos_pendentes": 1,
+          "modo_coleta": "incremental"
         },
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-11-07T20:25:58-03:00",
+          "gerado_em": "2026-11-08T20:55:49-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -524,12 +518,12 @@
           },
           "eventos_finalizados": 156,
           "eventos_pendentes": 1,
-          "modo_coleta": "completa"
+          "modo_coleta": "incremental"
         }
       ],
-      "referencia_mais_antiga_em": "2026-11-07T20:25:52-03:00",
-      "referencia_mais_recente_em": "2026-11-07T20:25:58-03:00",
-      "snapshots_atualizados_em": "2026-11-07T20:25:58-03:00"
+      "referencia_mais_antiga_em": "2026-11-08T20:55:47-03:00",
+      "referencia_mais_recente_em": "2026-11-08T20:55:49-03:00",
+      "snapshots_atualizados_em": "2026-11-08T20:55:49-03:00"
     }
   },
   "validacoes": {

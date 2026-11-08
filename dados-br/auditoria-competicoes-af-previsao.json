@@ -2,15 +2,15 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-11-07T20:25:58-03:00",
+  "gerado_em": "2026-11-08T20:55:49-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "af_snapshot_seguro": true,
   "agenda_operacional_fresca": true,
   "snapshots_preservados": 0,
   "mudanca_esportiva": true,
-  "hash_estado_antes": "e2b01ac777e05e3bdddad47d9e0959c3ea96f8a0d332c9e1d41f0a797af7f0bd",
-  "hash_estado_depois": "b3ada0a38e6861c22d864c80abd53fe900e419c9781f0ecd366b6e6c39b5a948",
+  "hash_estado_antes": "b3ada0a38e6861c22d864c80abd53fe900e419c9781f0ecd366b6e6c39b5a948",
+  "hash_estado_depois": "29789716ddcf5e605b004e914db48153ca3062fe0d78d6ed0e20d18bdff769ae",
   "fonte": "ESPN + API-Football contingencial",
   "temporada": 2026,
   "competicoes": [
@@ -18,16 +18,16 @@
       "competicao": "copa_do_brasil",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-11-07T20:25:52-03:00",
-      "cache_efetivo_minutos": 5,
+      "gerado_em": "2026-11-08T20:55:47-03:00",
+      "cache_efetivo_minutos": 0,
       "eventos": 155,
-      "finalizados": 153,
-      "pendentes": 2,
+      "finalizados": 154,
+      "pendentes": 1,
       "fase_atual": {
         "status": "em_andamento",
-        "ordem": 800,
-        "nome": "Semifinal",
-        "eventos": 4,
+        "ordem": 900,
+        "nome": "Final",
+        "eventos": 1,
         "eventos_pendentes": 1
       },
       "summary_partidas_iniciadas": {
@@ -53,10 +53,11 @@
         "erros": []
       },
       "coleta": {
-        "modo": "completa",
-        "requisicoes": 12,
+        "modo": "incremental",
+        "janela_inicio": "2026-10-18T00:00:00-03:00",
+        "janela_fim": "2027-03-08T23:59:59-03:00",
+        "requisicoes": 3,
         "ultima_completa_em": "2026-11-07T20:25:52-03:00",
-        "fases_preservadas_por_event_id": 29,
         "ajustes_editoriais_aplicados": 0
       }
     },
@@ -64,8 +65,8 @@
       "competicao": "libertadores",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-11-07T20:25:54-03:00",
-      "cache_efetivo_minutos": 45,
+      "gerado_em": "2026-11-08T20:55:48-03:00",
+      "cache_efetivo_minutos": 0,
       "eventos": 155,
       "finalizados": 154,
       "pendentes": 1,
@@ -100,23 +101,24 @@
         "remaining": null,
         "reserva": 12,
         "erros": [
-          "401842648: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-11-06 to 2026-11-08.'}"
+          "401842648: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-11-07 to 2026-11-09.'}"
         ]
       },
       "coleta": {
-        "modo": "completa",
-        "requisicoes": 12,
+        "modo": "incremental",
+        "janela_inicio": "2026-10-18T00:00:00-03:00",
+        "janela_fim": "2027-03-08T23:59:59-03:00",
+        "requisicoes": 3,
         "ultima_completa_em": "2026-11-07T20:25:54-03:00",
-        "fases_preservadas_por_event_id": 29,
-        "ajustes_editoriais_aplicados": 7
+        "ajustes_editoriais_aplicados": 0
       }
     },
     {
       "competicao": "sul_americana",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-11-07T20:25:58-03:00",
-      "cache_efetivo_minutos": 45,
+      "gerado_em": "2026-11-08T20:55:49-03:00",
+      "cache_efetivo_minutos": 0,
       "eventos": 157,
       "finalizados": 156,
       "pendentes": 1,
@@ -150,10 +152,11 @@
         "erros": []
       },
       "coleta": {
-        "modo": "completa",
-        "requisicoes": 12,
+        "modo": "incremental",
+        "janela_inicio": "2026-10-18T00:00:00-03:00",
+        "janela_fim": "2027-03-08T23:59:59-03:00",
+        "requisicoes": 3,
         "ultima_completa_em": "2026-11-07T20:25:58-03:00",
-        "fases_preservadas_por_event_id": 29,
         "ajustes_editoriais_aplicados": 1
       }
     }
@@ -167,14 +170,14 @@
   "fontes_totalmente_atualizadas": true,
   "snapshots_prontos_para_af": true,
   "regras_operacionais": {
-    "cache_padrao_minutos": 45,
+    "cache_padrao_minutos": 0,
     "cache_janela_de_jogo_minutos": 5,
     "janela_de_jogo_horas_apos_inicio": 4,
     "janela_incremental_dias_passado": 21,
     "janela_incremental_dias_futuro": 120,
     "janela_scoreboard_dias": 1,
     "fallback_janela_scoreboard": "subdivisão progressiva até 1 dia em erro HTTP/transporte",
-    "reconstrucao_completa_horas": 168,
+    "reconstrucao_completa_horas": 0,
     "falha_de_rede": "preserva o último snapshot íntegro; --strict transforma a falha em erro",
     "nenhum_json_vazio": true
   }
