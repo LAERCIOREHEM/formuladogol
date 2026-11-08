@@ -7322,14 +7322,70 @@
       ],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: Atlético-MG x Grêmio, jogo de volta da semifinal da Copa do Brasil 2026, em 07/11/2026 às 18h (horário de Brasília), na Arena MRV, em Belo Horizonte. A grade completa da partida é SporTV, Premiere e Prime Video. GE TV não integra a transmissão integral: o ge informa acompanhamento em tempo real, enquanto o vídeo do dossiê traz título de Brasileirão, divergente da competição desta partida."
+    },
+    {
+      "event_id": "401913107",
+      "jogo": "Vasco da Gama x Palmeiras",
+      "data_iso": "2026-11-08T17:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-11-08T15:34:11-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "GE TV"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cdn.conmebol.com/wp-content/uploads/2019/01/manual-broadcasting-2019-por.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/CS-2026-Manual-de-Clubes-POR-1.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/CS-2026-Manual-de-Clubes-POR-Fev26.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/CS-2026-Manual-de-Clubes-POR.pdf",
+        "https://ge.globo.com/google/amp/rj/futebol/copa-do-brasil/noticia/2026/11/08/vasco-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/google/amp/rs/futebol/copa-do-brasil/noticia/2026/09/27/cbf-define-datas-e-horarios-dos-jogos-das-semifinais-da-copa-do-brasil.ghtml",
+        "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/09/10/sorteio-dos-mandos-da-semifinal-da-copa-do-brasil-2026-veja-onde-assistir-ao-vivo.ghtml",
+        "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/11/06/vasco-x-palmeiras-ao-vivo-onde-assistir-horario-e-detalhes-da-semifinal-da-copa-do-brasil.html",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/masculino/2026/vasco-da-gama-x-palmeiras/835311",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/gremio-e-palmeiras-abrem-vantagem-pela-semifinal-da-copa-do-brasil",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/palmeiras-e-vasco-avancam-as-semifinais-da-copa-do-brasil",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/semis-da-copa-do-brasil-galo-e-vasco-decidem-em-casa-gremio-e-palmeiras-sao-mandantes-do-jogo-de-ida",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil/copa-brasil-masculino/semifinais-da-copa-do-brasil-comecam-neste-domingo",
+        "https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/2002",
+        "https://www.cnnbrasil.com.br/esportes/futebol/copa-do-brasil/vasco-x-palmeiras-horario-e-onde-assistir-a-semifinal-da-copa-do-brasil",
+        "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/09/27/cbf-divulga-datas-e-horarios-das-semifinais-da-copa-do-brasil.amp.htm"
+      ],
+      "canais_depois": [
+        "GE TV",
+        "Globo",
+        "Premiere",
+        "Prime Video",
+        "SporTV"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/masculino/2026/vasco-da-gama-x-palmeiras/835311",
+        "https://ge.globo.com/google/amp/rj/futebol/copa-do-brasil/noticia/2026/11/08/vasco-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=iI_CDCgFJ1Y",
+          "scope": "match",
+          "valid_for_match": true,
+          "reason": "O título informado no dossiê identifica explicitamente a transmissão ao vivo de “VASCO X PALMEIRAS | COPA DO BRASIL | SEMIFINAL | ge tv”. A CBF e o ge confirmam GE TV/ge tv entre os canais que transmitem a partida ao vivo."
+        }
+      ],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Vasco da Gama x Palmeiras, Copa do Brasil 2026, semifinal (jogo de volta), hoje, domingo, 08/11/2026, às 17h (horário de Brasília), em São Januário. A grade completa é GE TV, Globo, Premiere, SporTV e Prime Video; portanto, não é exclusivo da GE TV."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401913108",
-    "jogo": "Atlético-MG x Grêmio",
-    "data_iso": "2026-11-07T18:00:00-03:00",
+    "event_id": "401913107",
+    "jogo": "Vasco da Gama x Palmeiras",
+    "data_iso": "2026-11-08T17:00:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-11-07T16:33:10-03:00",
+    "executado_em": "2026-11-08T15:34:11-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
@@ -7338,23 +7394,26 @@
     "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://cdn.conmebol.com/wp-content/uploads/2025/12/Ranking-de-Clubes-CONMEBOL-2026.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2019/01/manual-broadcasting-2019-por.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CS-2026-Manual-de-Clubes-POR-1.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CS-2026-Manual-de-Clubes-POR-Fev26.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CS-2026-Manual-de-Clubes-POR.pdf",
+      "https://ge.globo.com/google/amp/rj/futebol/copa-do-brasil/noticia/2026/11/08/vasco-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
       "https://ge.globo.com/google/amp/rs/futebol/copa-do-brasil/noticia/2026/09/27/cbf-define-datas-e-horarios-dos-jogos-das-semifinais-da-copa-do-brasil.ghtml",
-      "https://ge.globo.com/mg/futebol/copa-do-brasil/noticia/2026/11/07/atletico-mg-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/11/01/gremio-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/11/04/atletico-mg-x-gremio-onde-assistir-ao-vivo-horario-e-provaveis-escalacoes-pela-semifinal-da-copa-do-brasil.html",
-      "https://sbtnews.sbt.com.br/noticia/brasil/atletico-mg-x-gremio-onde-assistir-ao-vivo-e-horario-1",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/profissional/2026/gremio-x-atletico-mineiro/835308",
+      "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/09/10/sorteio-dos-mandos-da-semifinal-da-copa-do-brasil-2026-veja-onde-assistir-ao-vivo.ghtml",
+      "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/11/06/vasco-x-palmeiras-ao-vivo-onde-assistir-horario-e-detalhes-da-semifinal-da-copa-do-brasil.html",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/masculino/2026/vasco-da-gama-x-palmeiras/835311",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/gremio-e-palmeiras-abrem-vantagem-pela-semifinal-da-copa-do-brasil",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/palmeiras-e-vasco-avancam-as-semifinais-da-copa-do-brasil",
       "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/semis-da-copa-do-brasil-galo-e-vasco-decidem-em-casa-gremio-e-palmeiras-sao-mandantes-do-jogo-de-ida",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil/copa-brasil-masculino/semifinais-da-copa-do-brasil-comecam-neste-domingo",
       "https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/2002",
-      "https://www.cnnbrasil.com.br/esportes/futebol/copa-do-brasil/gremio-x-atletico-mg-horario-e-onde-assistir-ao-jogo-da-copa-do-brasil",
-      "https://www.cnnbrasil.com.br/noticias/atletico-mg-x-gremio-horario-e-onde-assistir-a-semifinal-da-copa-do-brasil",
-      "https://www.primevideo.com/-/pt/detail/0T5HU7GT4J72A0LL2GQUZEMZ9C",
-      "https://www.primevideo.com/detail/0HIV8IL9EZOCD29C498I31XV5K",
-      "https://www.youtube.com/myfamily/static/pdfs/parentguide_uk.pdf",
-      "https://www.youtube.com/watch?v=ygYoh4dY8Bc"
+      "https://www.cnnbrasil.com.br/esportes/futebol/copa-do-brasil/vasco-x-palmeiras-horario-e-onde-assistir-a-semifinal-da-copa-do-brasil",
+      "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/09/27/cbf-divulga-datas-e-horarios-das-semifinais-da-copa-do-brasil.amp.htm"
     ],
     "canais_depois": [
+      "GE TV",
+      "Globo",
       "Premiere",
       "Prime Video",
       "SporTV"
@@ -7362,22 +7421,20 @@
     "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/2002",
-      "https://ge.globo.com/mg/futebol/copa-do-brasil/noticia/2026/11/07/atletico-mg-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/masculino/2026/vasco-da-gama-x-palmeiras/835311",
+      "https://ge.globo.com/google/amp/rj/futebol/copa-do-brasil/noticia/2026/11/08/vasco-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
     ],
     "youtube": [
       {
-        "url": "https://www.youtube.com/watch?v=89tPGaf7W4s",
-        "scope": "unknown",
-        "valid_for_match": false,
-        "reason": "O URL não pôde ser verificado diretamente nesta consulta. Além disso, o título informado no dossiê identifica o conteúdo como 'Brasileirão 2026', mas o evento confirmado é Copa do Brasil; portanto, não há evidência suficiente de transmissão integral desta partida específica."
+        "url": "https://www.youtube.com/watch?v=iI_CDCgFJ1Y",
+        "scope": "match",
+        "valid_for_match": true,
+        "reason": "O título informado no dossiê identifica explicitamente a transmissão ao vivo de “VASCO X PALMEIRAS | COPA DO BRASIL | SEMIFINAL | ge tv”. A CBF e o ge confirmam GE TV/ge tv entre os canais que transmitem a partida ao vivo."
       }
     ],
-    "youtube_removidos": [
-      "https://www.youtube.com/watch?v=89tPGaf7W4s"
-    ],
+    "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: Atlético-MG x Grêmio, jogo de volta da semifinal da Copa do Brasil 2026, em 07/11/2026 às 18h (horário de Brasília), na Arena MRV, em Belo Horizonte. A grade completa da partida é SporTV, Premiere e Prime Video. GE TV não integra a transmissão integral: o ge informa acompanhamento em tempo real, enquanto o vídeo do dossiê traz título de Brasileirão, divergente da competição desta partida."
+    "resumo": "Confirmado para o Brasil: Vasco da Gama x Palmeiras, Copa do Brasil 2026, semifinal (jogo de volta), hoje, domingo, 08/11/2026, às 17h (horário de Brasília), em São Januário. A grade completa é GE TV, Globo, Premiere, SporTV e Prime Video; portanto, não é exclusivo da GE TV."
   },
-  "atualizado_em": "2026-11-07T16:33:10-03:00"
+  "atualizado_em": "2026-11-08T15:34:11-03:00"
 }

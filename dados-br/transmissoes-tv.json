@@ -17,16 +17,18 @@
     "acessos": "canais de direitos e plataformas de acesso são campos distintos; Claro tv+/Globoplay são opções para canais contratados, não novos detentores de direitos"
   },
   "jogos": {
-    "401913108": {
-      "event_id": "401913108",
+    "401913107": {
+      "event_id": "401913107",
       "rodada": 0,
-      "mandante": "Atlético-MG",
-      "visitante": "Grêmio",
-      "data_iso": "2026-11-07T18:00:00-03:00",
+      "mandante": "Vasco da Gama",
+      "visitante": "Palmeiras",
+      "data_iso": "2026-11-08T17:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
+        "GE TV",
         "Premiere",
         "SporTV",
+        "Globo",
         "Prime Video"
       ],
       "origem": "Guardião IA verificado",
@@ -37,17 +39,24 @@
         {
           "fonte": "Guardião IA verificado",
           "canais": [
+            "GE TV",
+            "Globo",
             "Premiere",
             "Prime Video",
             "SporTV"
           ],
-          "referencia": "https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/2002 | https://ge.globo.com/mg/futebol/copa-do-brasil/noticia/2026/11/07/atletico-mg-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-11-07T16:33:10-03:00",
+          "referencia": "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/masculino/2026/vasco-da-gama-x-palmeiras/835311 | https://ge.globo.com/google/amp/rj/futebol/copa-do-brasil/noticia/2026/11/08/vasco-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-11-08T15:34:11-03:00",
           "autoridade": 900,
           "detalhe": "grade completa reconciliada por web_search; confiança=0.99; checkpoint=-90"
         }
       ],
       "acessos": [
+        {
+          "nome": "Assistir na GE TV",
+          "url": "https://www.youtube.com/watch?v=iI_CDCgFJ1Y",
+          "tipo": "player_oficial"
+        },
         {
           "nome": "Premiere no Globoplay",
           "url": "https://globoplay.globo.com/canais/premiere/",
@@ -69,43 +78,14 @@
           "tipo": "acesso_oficial"
         },
         {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
+        },
+        {
           "nome": "Prime Video",
           "url": "https://www.primevideo.com/",
           "tipo": "acesso_oficial"
-        }
-      ]
-    },
-    "401913107": {
-      "event_id": "401913107",
-      "rodada": 0,
-      "mandante": "Vasco da Gama",
-      "visitante": "Palmeiras",
-      "data_iso": "2026-11-08T17:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "GE TV"
-      ],
-      "origem": "YouTube oficial validado",
-      "confianca": "confirmado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "YouTube oficial validado",
-          "canais": [
-            "GE TV"
-          ],
-          "referencia": "https://www.youtube.com/watch?v=iI_CDCgFJ1Y",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
-          "autoridade": 120,
-          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "Assistir na GE TV",
-          "url": "https://www.youtube.com/watch?v=iI_CDCgFJ1Y",
-          "tipo": "player_oficial"
         }
       ]
     },
@@ -138,7 +118,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -202,7 +182,7 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=9B48Zrg5s18",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -240,7 +220,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -291,7 +271,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -339,7 +319,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -392,7 +372,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -451,7 +431,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -530,7 +510,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -599,7 +579,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=Z3ow-IHNjg0",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -633,7 +613,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=Jb8_tiAM5Rk",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -671,7 +651,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -722,7 +702,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -771,7 +751,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "https://www.disneyplus.com/pt-br/explore/articles/semifinais-libertadores-2026",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -816,7 +796,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -885,7 +865,7 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=n2KWc_xbPAA",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -929,7 +909,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1002,7 +982,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1060,7 +1040,7 @@
             "CazéTV"
           ],
           "referencia": "ge — guia da 19ª rodada, 16/07/2026",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1113,7 +1093,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1166,7 +1146,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1221,7 +1201,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1280,7 +1260,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1314,7 +1294,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1353,7 +1333,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-07T16:33:21-03:00",
+          "capturado_em": "2026-11-08T15:34:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1367,5 +1347,5 @@
       ]
     }
   },
-  "atualizado_em": "2026-11-07T16:33:21-03:00"
+  "atualizado_em": "2026-11-08T15:34:23-03:00"
 }
