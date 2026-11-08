@@ -123,7 +123,7 @@ def _specific_instruction(kind: str) -> str:
         return (
             "Para Copa do Brasil: trate o último confronto encerrado como gancho quando ele completar a fase; apresente todos os classificados logo no início; "
             "use os placares agregados relevantes; conecte explicitamente a classificação às probabilidades de Libertadores. Se o material trouxer uma regra "
-            "de qualificação continental, explique-a com precisão. Em semifinal, diga 'avançar à final' ou 'vencer o confronto da semifinal', nunca 'vencer o próximo jogo' "
+            "de qualificação continental, explique-a com precisão. Jamais afirme vaga incondicional na Libertadores para finalista rebaixado: o REC 2026 da CBF (Art. 4º, §§ 6º-9º) exige presença na Série A de 2027 e repasse da vaga se houver queda. Explique G6 garantido pelo Palmeiras já classificado e G7 apenas condicional a outros repasses. Em semifinal, diga 'avançar à final' ou 'vencer o confronto da semifinal', nunca 'vencer o próximo jogo' "
             "quando a fase for de ida e volta. Dê destaque aos maiores saltos e quedas de probabilidade sem confundir chance total de Libertadores com a via Copa do Brasil."
         )
     if kind == "brasileirao":
