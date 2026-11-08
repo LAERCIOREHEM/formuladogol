@@ -137,10 +137,14 @@ apply_continental_mathematical_certainty([cruz_replay], proof_g11, config)
 assert cruz_replay["probabilidades_detalhes"]["sem_competicao_continental"]["exibicao"] == "0%"
 assert cruz_replay["probabilidades_pct"] == cruz["probabilidades_pct"]
 
-# Sem prova de G11, zero em 2M simulações continua empírico.
+# A certeza do Fluminense depende do limite de pontos do snapshot atual.
+# Testes não podem congelar uma hipótese antiga quando um G11 se torna provado.
 flu = next(row for row in data["clubes"] if row["clube"] == "Fluminense")
 assert flu["probabilidades_pct"]["sem_competicao_continental"] == 0
-assert flu["probabilidades_detalhes"]["sem_competicao_continental"]["impossivel_estruturalmente"] is False
+flu_math = flu.get("situacao_matematica") or {}
+flu_detail = flu["probabilidades_detalhes"]["sem_competicao_continental"]
+assert flu_detail["impossivel_estruturalmente"] is (flu_math.get("vaga_continental_garantida") is True)
+assert flu_detail["exibicao"] == ("0%" if flu_math.get("vaga_continental_garantida") else "<0,001%")
 
 # Nunca declarar certeza matemática a partir de arredondamento ou 2M/2M.
 for team in data["clubes"]:
