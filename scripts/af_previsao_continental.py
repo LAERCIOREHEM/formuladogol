@@ -1125,31 +1125,47 @@ def allocate_integrated_qualification(
             else:
                 qualify(champion_name, route)
 
-        # 3) Copa do Brasil. Se o campeão já estiver classificado, o vice
-        # herda a vaga direta e a vaga preliminar original do vice retorna ao
-        # Brasileirão. Se ambos já estiverem classificados, as duas retornam.
+        # 3) Copa do Brasil: Art. 4º, §§ 1º-9º do REC 2026.
+        # Só pode exercer vaga da Libertadores 2027 quem disputar a Série A
+        # 2027. Cada realização Monte Carlo usa a sua classificação FINAL,
+        # impedindo que o finalista rebaixado retenha a vaga da Copa.
+        # O direito esportivo de participar da final não garante elegibilidade.
         champion_name = str(copa_champion_names[row])
         runner_name = str(copa_runner_names[row])
-        champion_already = already_qualified(champion_name)
-        runner_already = already_qualified(runner_name)
+        first_relegated = int(config.get("rebaixamento_a_partir_da_posicao", 17))
 
-        if not champion_already:
+        def eligible_cup_finalist(team_name: str) -> bool:
+            index = current_index(team_name)
+            # Não inferir acesso/queda de equipe fora da Série A 2026; a
+            # elegibilidade externa depende de dados adicionais.
+            return index < 0 or int(position[index]) < first_relegated
+
+        champion_eligible = eligible_cup_finalist(champion_name)
+        runner_eligible = eligible_cup_finalist(runner_name)
+        champion_already = champion_eligible and already_qualified(champion_name)
+        runner_already = runner_eligible and already_qualified(runner_name)
+
+        if champion_eligible and not champion_already:
             champion_index = qualify(champion_name, "via_copa_do_brasil")
             if champion_index >= 0:
                 copa_subroute_counts["campeao"][champion_index] += 1
-            if runner_name != champion_name and not runner_already:
+            if runner_name != champion_name and runner_eligible and not runner_already:
                 runner_index = qualify(runner_name, "via_copa_do_brasil")
                 if runner_index >= 0:
                     copa_subroute_counts["vice"][runner_index] += 1
             else:
                 returned_slots += 1
         else:
+            # Campeão já classificado ou impedido de usar a vaga pela queda.
+            # Neste caso, a vaga direta passa ao vice, se for elegível.
             returned_slots += 1
-            if runner_name != champion_name and not runner_already:
+            if runner_name != champion_name and runner_eligible and not runner_already:
                 runner_index = qualify(runner_name, "via_copa_do_brasil")
                 if runner_index >= 0:
                     copa_subroute_counts["vice_herda_vaga_direta"][runner_index] += 1
             else:
+                # Vice já classificado ou rebaixado: segunda vaga retorna à
+                # classificação do Brasileirão, com repasse ao próximo clube.
                 returned_slots += 1
 
         # 4) Repasses: cada vaga devolvida desce uma posição, pulando clubes
@@ -1319,8 +1335,10 @@ def allocate_integrated_qualification(
                 "sobreposições descem como repasse"
             ),
             "regra_elegibilidade": (
-                "títulos da Copa do Brasil, Libertadores e Sul-Americana classificam mesmo que o clube "
-                "seja rebaixado; a posição na liga limita apenas as vagas obtidas pelo Brasileirão"
+                "Art. 4º, §§ 6º-9º REC Copa do Brasil 2026: finalistas rebaixados "
+                "não podem exercer vaga na Libertadores 2027; essa vaga retorna à "
+                "classificação do Brasileirão. Elegibilidade de títulos continentais "
+                "deve ser tratada também conforme Manual de Clubes CONMEBOL."
             ),
         },
     }
