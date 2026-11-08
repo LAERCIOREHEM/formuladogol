@@ -545,6 +545,33 @@ def continental_consequence() -> str:
         return "Campeão e vice têm direito a vagas de fases distintas da Libertadores, sujeito à elegibilidade para 2027. " + rule
     return rule
 
+def brasileiro_impacto_finalistas(probabilities: dict[str, Any], classificados: Sequence[str]) -> dict[str, Any]:
+    """Contextualiza o efeito no G6/G7 sem fabricar delta histórico do Bahia."""
+    clubs = {
+        str(row.get("clube") or ""): row
+        for row in (probabilities.get("clubes") or [])
+    }
+    pal = clubs.get("Palmeiras") or {}
+    pal_g5 = ((pal.get("probabilidades_detalhes") or {}).get("libertadores_base") or {})
+    if "Palmeiras" not in classificados or pal_g5.get("certeza_estrutural") is not True:
+        return {}
+    sixth = next(
+        (club for club in clubs.values() if int(club.get("posicao_atual") or 0) == 6),
+        None,
+    )
+    gremio = clubs.get("Grêmio") or {}
+    risk_gremio = ((gremio.get("probabilidades_pct") or {}).get("rebaixamento"))
+    sixth_pct = (sixth.get("probabilidades_pct") or {}).get("libertadores") if sixth else None
+    return {
+        "g6_matematicamente_aberto": True,
+        "fundamento": "Palmeiras finalista da Copa do Brasil e matematicamente classificado no G5 do Brasileirão.",
+        "sexto_colocado_atual": str(sixth.get("clube") or "") if sixth else "",
+        "chance_libertadores_sexto_pct": float(sixth_pct) if sixth_pct is not None else None,
+        "chance_rebaixamento_gremio_pct": float(risk_gremio) if risk_gremio is not None else None,
+        "g7_adicional_se_gremio_rebaixado": "Grêmio" in classificados,
+        "nota": "As chances são pós-fase; não são variações em pontos percentuais sem referência histórica do sexto colocado.",
+    }
+
 def dossier(before: dict[str, Any], after: dict[str, Any]) -> dict[str, Any]:
     before_rows = {row["clube"]: row for row in before.get("clubes") or []}
     after_rows = {row["clube"]: row for row in after.get("clubes") or []}
@@ -705,6 +732,26 @@ def narrative_fallback(data: dict[str, Any]) -> dict[str, Any]:
             ],
         },
     ]
+    impacto = data.get("impacto_brasileirao") or {}
+    if PHASE_RANK == 800 and impacto.get("g6_matematicamente_aberto"):
+        sixth = str(impacto.get("sexto_colocado_atual") or "o sexto colocado")
+        sixth_pct = impacto.get("chance_libertadores_sexto_pct")
+        pct_sexto = (f"{float(sixth_pct):.2f}%".replace(".", ",") if sixth_pct is not None else "não calculada")
+        texto = (
+            f"O Palmeiras já está matematicamente no G5 do Brasileirão e, como finalista da Copa, "
+            f"abriu o G6. O atual sexto colocado é {sixth}, com chance total de "
+            f"Libertadores de {pct_sexto} no AF-Previsão após as semifinais. "
+            "A posição do clube ainda pode mudar até o fim do campeonato."
+        )
+        if impacto.get("g7_adicional_se_gremio_rebaixado"):
+            risco = impacto.get("chance_rebaixamento_gremio_pct")
+            risco_txt = f"{float(risco):.2f}%".replace(".", ",") if risco is not None else "não calculado"
+            texto += (
+                f" O Grêmio tem risco de rebaixamento de {risco_txt} no mesmo cálculo: "
+                "se terminar na Série B, não poderá exercer a vaga da Copa, "
+                "que será repassada pelo Brasileirão, podendo abrir mais uma posição."
+            )
+        sections[1]["paragrafos"].append(texto)
     return {"titulo": title, "linha_fina": deck, "secoes": sections}
 
 
@@ -758,6 +805,7 @@ def editorial_summary(data: dict[str, Any]) -> dict[str, Any]:
             for row in data["comparacoes"]
         ],
         "destaques_calculados": data.get("destaques_calculados"),
+        "impacto_brasileirao": data.get("impacto_brasileirao"),
         "regra_libertadores_2027": data.get("regra_libertadores_2027"),
         "consequencia_continental": data.get("consequencia_continental"),
         "simulacoes": data.get("simulacoes"),
@@ -792,6 +840,17 @@ def validate_editorial(editorial: dict[str, Any], data: dict[str, Any]) -> None:
             raise EditorialCopaError("editorial não cita o último classificado que fechou as quartas")
         if "libertadores" not in folded or "final" not in folded:
             raise EditorialCopaError("editorial das quartas não comunica a consequência da semifinal para a Libertadores")
+    impacto = data.get("impacto_brasileirao") or {}
+    if PHASE_RANK == 800 and impacto.get("g6_matematicamente_aberto"):
+        sexto = str(impacto.get("sexto_colocado_atual") or "").casefold()
+        if "g6" not in folded or (sexto and sexto not in folded):
+            raise EditorialCopaError(
+                "Editorial da final não explicou G6 matemático e o sexto colocado atual"
+            )
+        if "rebaixamento" not in folded and "rebaixad" not in folded:
+            raise EditorialCopaError(
+                "Editorial omitiu a inelegibilidade de finalista rebaixado"
+            )
     word_count = len(re.findall(r"\b[\wÀ-ÿ-]+\b", " ".join(p for sec in sections for p in sec["paragrafos"])))
     if not 180 <= word_count <= 900:
         raise EditorialCopaError(f"editorial fora do tamanho esperado: {word_count} palavras")
@@ -1094,6 +1153,10 @@ def execute(args: argparse.Namespace) -> int:
         update_history(history, after)
         history_changed = True
     data = dossier(before, after)
+    if PHASE_RANK == 800:
+        data["impacto_brasileirao"] = brasileiro_impacto_finalistas(
+            probabilities, phase["classificados"]
+        )
     data["jogos_concluidos"] = int(phase.get("jogos") or 0)
     manifest = carregar_manifesto()
     articles = manifest.get("artigos") or []
