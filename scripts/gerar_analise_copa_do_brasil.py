@@ -502,14 +502,22 @@ def compact_metric(detail: Mapping[str, Any] | None) -> dict[str, Any]:
 
 
 def continental_consequence() -> str:
+    """REC Copa do Brasil 2026, Art. 4º: vaga esportiva é condicional."""
+    rule = (
+        "A Copa do Brasil destina uma vaga de grupos ao campeão e uma "
+        "preliminar ao vice, sujeitas à participação na Série A de 2027. "
+        "Se um finalista terminar rebaixado, não poderá exercer a vaga, "
+        "que será redirecionada nos termos do Art. 4º do regulamento da CBF. "
+        "Quando a vaga coincidir com a do Brasileirão, aplica-se o repasse "
+        "ao clube mais bem colocado ainda não classificado."
+    )
     if PHASE_RANK == 700:
-        return "Quem avançar à final da Copa do Brasil garante vaga na Libertadores 2027; o campeão vai à fase de grupos e o vice-campeão à fase preliminar."
+        return "Quem avançar à final adquire o direito condicional à Libertadores 2027. " + rule
     if PHASE_RANK == 800:
-        return "Os dois finalistas da Copa do Brasil já estão garantidos na Libertadores 2027; o campeão irá à fase de grupos e o vice-campeão à fase preliminar."
+        return "Os dois finalistas conquistaram o direito esportivo às vagas, mas a participação não está garantida em caso de rebaixamento. " + rule
     if PHASE_RANK == 900:
-        return "Campeão e vice da Copa do Brasil têm vaga na Libertadores 2027; o campeão vai à fase de grupos e o vice-campeão à fase preliminar."
-    return "A Copa do Brasil oferece ao campeão vaga na fase de grupos e ao vice-campeão vaga na fase preliminar da Libertadores 2027."
-
+        return "Campeão e vice têm direito a vagas de fases distintas da Libertadores, sujeito à elegibilidade para 2027. " + rule
+    return rule
 
 def dossier(before: dict[str, Any], after: dict[str, Any]) -> dict[str, Any]:
     before_rows = {row["clube"]: row for row in before.get("clubes") or []}
@@ -639,11 +647,11 @@ def narrative_fallback(data: dict[str, Any]) -> dict[str, Any]:
         deck = f"{last_winner} eliminou {last_loser} por {last_score} no agregado e se juntou a {_join_names([x for x in qualified if x != last_winner])}; quem avançar à final garante vaga na Libertadores 2027."
     elif PHASE_RANK == 800:
         title = f"Copa do Brasil define os finalistas: {_join_names(qualified)} vão decidir o título"
-        deck = "Os dois classificados à final também asseguram presença na Libertadores 2027, com campeão na fase de grupos e vice na fase preliminar."
+        deck = "Os finalistas conquistaram vagas condicionadas à permanência na Série A de 2027; a classificação do Brasileirão recebe eventuais repasses."
     elif PHASE_RANK == 900:
         champion = qualified[0] if qualified else "Campeão"
         title = f"{champion} é campeão da Copa do Brasil e garante vaga direta na Libertadores"
-        deck = "A decisão encerra o mata-mata nacional e consolida as vagas continentais de campeão e vice-campeão para 2027."
+        deck = "A decisão encerra a Copa e define as vagas esportivas, condicionadas à elegibilidade para a Série A de 2027."
     else:
         title = f"Copa do Brasil define classificados para {str(cfg['seguinte']).casefold()}: {_join_names(qualified[:4])} puxam a lista"
         deck = f"O fechamento de {cfg['fase']} confirmou quem segue vivo no mata-mata e redesenhou as probabilidades de Libertadores dos clubes da Série A."
@@ -657,7 +665,7 @@ def narrative_fallback(data: dict[str, Any]) -> dict[str, Any]:
             ],
         },
         {
-            "titulo": ("A semifinal vale também uma vaga continental" if PHASE_RANK == 700 else "Os finalistas já têm passaporte continental" if PHASE_RANK == 800 else "Título e vaga continental definidos" if PHASE_RANK == 900 else "A rota continental segue em jogo"),
+            "titulo": ("A semifinal vale também uma vaga continental" if PHASE_RANK == 700 else "Finalistas têm vagas continentais condicionadas" if PHASE_RANK == 800 else "Título e vaga continental definidos" if PHASE_RANK == 900 else "A rota continental segue em jogo"),
             "paragrafos": [
                 rule_text or "A rota continental segue aberta aos classificados conforme as vagas previstas para a Copa do Brasil.",
                 (f"No AF-Previsão após o fechamento, as chances totais de Libertadores dos classificados ficaram assim: {stats_text}. Esses percentuais combinam todas as vias possíveis, não apenas a Copa do Brasil." if stats_text else "As probabilidades totais de Libertadores continuam sendo calculadas considerando todas as vias disponíveis no modelo."),
@@ -1264,6 +1272,8 @@ def self_test() -> int:
     assert sample_spotlight.count('class="analysis-qualified-card"') == 4
     assert "Rota Libertadores" in sample_spotlight and "Libertadores 2027" in sample_spotlight
     activate_phase(800); assert ARTICLE_ID == "copa-do-brasil-2026-finalistas" and EXPECTED_TIES == 2
+    assert "rebaixamento" in continental_consequence().lower()
+    assert "Série A de 2027" in continental_consequence()
     activate_phase(900); assert ARTICLE_ID == "copa-do-brasil-2026-campeao" and EXPECTED_TIES == 1
     activate_phase(600)
     print("OK self-test: histórico, fase dinâmica, comparativo, HTML e navegação continental.")
