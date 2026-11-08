@@ -8,6 +8,7 @@ históricos imutáveis e entrega à camada editorial dedicada apenas fatos audit
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import os
@@ -272,8 +273,23 @@ def validate_phase_probabilities(probabilities: dict[str, Any], phase: dict[str,
                 ):
                     errors.append(f"{name}: subvia {key} não foi zerada após a eliminação")
         elif name in classified:
-            if not possible or impossible:
-                errors.append(f"{name}: classificado não está ativo estruturalmente na Copa do Brasil")
+            # A classificação esportiva à final vem do snapshot factual da
+            # Copa, NÃO da decomposição de probabilidades por rota exclusiva.
+            # Palmeiras pode ter 0% na rota "via Copa" porque já assegurou
+            # 100% da Libertadores pelo Brasileirão (via_brasileirao).
+            # Isso não significa eliminação na Copa.
+            by_league = (libertadores.get("vias") or {}).get("via_brasileirao") or {}
+            base_detail = (club.get("probabilidades_detalhes") or {}).get("libertadores_base") or {}
+            guaranteed_by_league = (
+                base_detail.get("certeza_estrutural") is True
+                and by_league.get("certeza_estrutural") is True
+                and float((club.get("probabilidades_pct") or {}).get("libertadores") or 0) == 100.0
+            )
+            if (not possible or impossible) and not guaranteed_by_league:
+                errors.append(
+                    f"{name}: finalista sem via Copa elegível e sem prova matemática "
+                    "de Libertadores garantida pelo Brasileirão"
+                )
         else:
             errors.append(f"{name}: situação indefinida no fechamento de {current_phase_config()['fase']}")
     if PHASE_RANK == 800:
@@ -1361,6 +1377,36 @@ def self_test() -> int:
     assert sample_spotlight.count('class="analysis-qualified-card"') == 4
     assert "Rota Libertadores" in sample_spotlight and "Libertadores 2027" in sample_spotlight
     activate_phase(800); assert ARTICLE_ID == "copa-do-brasil-2026-finalistas" and EXPECTED_TIES == 2
+    # Regressão R34: classificado à final pode ter via_Copa=0% justamente
+    # porque a vaga na Libertadores já está matematicamente garantida pela liga.
+    palmeiras_qualified_by_league = {
+        "clube": "Palmeiras",
+        "probabilidades_pct": {"libertadores": 100.0, "rebaixamento": 0.0, "g6": 100.0},
+        "probabilidades_detalhes": {"libertadores_base": {"certeza_estrutural": True}},
+        "decomposicao_chances": {
+            "libertadores": {"vias": {
+                "via_copa_do_brasil": {
+                    "percentual_estimado": 0.0,
+                    "possivel_estruturalmente": False,
+                    "impossivel_estruturalmente": True,
+                },
+                "via_brasileirao": {"certeza_estrutural": True},
+            }},
+        },
+    }
+    phase_finalista = {
+        "classificados": ["Palmeiras"], "eliminados": [],
+        "clubes_serie_a_na_fase": ["Palmeiras"],
+    }
+    validate_phase_probabilities({"clubes": [palmeiras_qualified_by_league]}, phase_finalista)
+    without_proof = copy.deepcopy(palmeiras_qualified_by_league)
+    without_proof["probabilidades_detalhes"]["libertadores_base"]["certeza_estrutural"] = False
+    try:
+        validate_phase_probabilities({"clubes": [without_proof]}, phase_finalista)
+    except EditorialCopaError:
+        pass
+    else:
+        raise AssertionError("finalista sem rota nem prova de liga não foi bloqueado")
     assert "rebaixamento" in continental_consequence().lower()
     assert "Série A de 2027" in continental_consequence()
     activate_phase(900); assert ARTICLE_ID == "copa-do-brasil-2026-campeao" and EXPECTED_TIES == 1
