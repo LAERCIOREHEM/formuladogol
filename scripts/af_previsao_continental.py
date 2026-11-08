@@ -1771,6 +1771,69 @@ def self_test() -> None:
     assert sum(fixed["pontuacao_objetivos"]["libertadores"]) == sum(fixed["auditoria"]["media_clubes_serie_a_2026_na_libertadores"] for _ in range(deterministic_sims))
     assert sum(fixed["pontuacao_objetivos"]["sul_americana_ou_melhor"]) == sum(fixed["pontuacao_objetivos"]["libertadores"]) + deterministic_sims * int(config["sul_americana_vagas"])
 
+    # Regressão do Art. 4º REC Copa do Brasil 2026: Palmeiras em G5 abre
+    # G6, e Grêmio só exerce a vaga da final se permanecer na Série A.
+    eligibility_order = np.broadcast_to(
+        np.arange(20, dtype=np.int16), (2, 20)
+    ).copy()
+    eligibility_order[1, 15], eligibility_order[1, 18] = (
+        eligibility_order[1, 18], eligibility_order[1, 15]
+    )
+    copa_final = fixed_cup(
+        "copa_do_brasil", [teams[1], teams[1]], [teams[18], teams[18]], teams
+    )
+    foreign_lib = fixed_cup(
+        "libertadores", ["Estudiantes", "Estudiantes"],
+        ["Vice L", "Vice L"], []
+    )
+    foreign_sula = fixed_cup(
+        "sul_americana", ["Boca Juniors", "Boca Juniors"],
+        ["Vice S", "Vice S"], []
+    )
+    final_allocation = allocate_integrated_qualification(
+        eligibility_order, teams, copa_final, foreign_lib, foreign_sula,
+        2, config
+    )
+    final_results = final_allocation["clubes"]
+    assert final_results[teams[1]]["libertadores"]["total"]["ocorrencias"] == 2
+    # Linha 0: Grêmio termina em 19º e não obtém Libertadores; uma
+    # segunda vaga vai à tabela (G7). Linha 1: termina em 16º e recebe
+    # a vaga da Copa; apenas uma vaga retorna à tabela (G6).
+    assert final_results[teams[18]]["libertadores"]["total"]["ocorrencias"] == 1
+    assert final_results[teams[18]]["libertadores"]["vias"]["via_copa_do_brasil"]["ocorrencias"] == 1
+    assert final_results[teams[5]]["libertadores"]["vias"]["via_repasse"]["ocorrencias"] == 2
+    assert final_results[teams[6]]["libertadores"]["vias"]["via_repasse"]["ocorrencias"] == 1
+
+    # Ambas as equipes da final rebaixadas: as duas vagas retornam ao
+    # Brasileirão sem fabricar classificação continental para rebaixados.
+    relegated_final = fixed_cup(
+        "copa_do_brasil", [teams[17]], [teams[18]], teams
+    )
+    one_order = np.arange(20, dtype=np.int16).reshape(1, 20)
+    both_out = allocate_integrated_qualification(
+        one_order, teams, relegated_final,
+        fixed_cup("libertadores", ["Estudiantes"], ["Vice L"], []),
+        fixed_cup("sul_americana", ["Boca Juniors"], ["Vice S"], []),
+        1, config
+    )
+    assert both_out["clubes"][teams[17]]["libertadores"]["total"]["ocorrencias"] == 0
+    assert both_out["clubes"][teams[18]]["libertadores"]["total"]["ocorrencias"] == 0
+    assert both_out["clubes"][teams[5]]["libertadores"]["total"]["ocorrencias"] == 1
+    assert both_out["clubes"][teams[6]]["libertadores"]["total"]["ocorrencias"] == 1
+
+    # Campeão rebaixado, vice elegível: vaga direta vai ao vice e a
+    # preliminar é repassada pela classificação da Série A.
+    winner_out = allocate_integrated_qualification(
+        one_order, teams,
+        fixed_cup("copa_do_brasil", [teams[18]], [teams[6]], teams),
+        fixed_cup("libertadores", ["Estudiantes"], ["Vice L"], []),
+        fixed_cup("sul_americana", ["Boca Juniors"], ["Vice S"], []),
+        1, config
+    )
+    assert winner_out["clubes"][teams[18]]["libertadores"]["total"]["ocorrencias"] == 0
+    assert winner_out["clubes"][teams[6]]["libertadores"]["subvias_copa_do_brasil"]["vice_herda_vaga_direta"]["ocorrencias"] == 1
+    assert winner_out["clubes"][teams[5]]["libertadores"]["vias"]["via_repasse"]["ocorrencias"] == 1
+
     # Regressão 2026-09-18: Semifinal/Final pré-criadas como TBD não podem
     # virar a fase atual nem bloquear o AF após o fechamento das Quartas.
     qf_events = [
