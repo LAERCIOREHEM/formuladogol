@@ -885,6 +885,17 @@ def validate_editorial(editorial: dict[str, Any], data: dict[str, Any]) -> None:
             raise EditorialCopaError(
                 "Editorial omitiu a inelegibilidade de finalista rebaixado"
             )
+    # Contrato de publicação: IA com parágrafo inacabado ou sem
+    # pontuação não pode chegar ao manifesto. Rejeitar aqui permite ao
+    # gerador tentar seu fallback determinístico já auditado, em vez de
+    # falhar somente depois de produzir todos os artefatos.
+    for section in sections:
+        for paragraph in section.get("paragrafos") or []:
+            clean = paragraph.rstrip()
+            if not clean or clean[-1] not in (".", "!", "?", "…", '"', "'"):
+                raise EditorialCopaError(
+                    "texto editorial potencialmente truncado/sem pontuação final"
+                )
     word_count = len(re.findall(r"\b[\wÀ-ÿ-]+\b", " ".join(p for sec in sections for p in sec["paragrafos"])))
     if not 180 <= word_count <= 900:
         raise EditorialCopaError(f"editorial fora do tamanho esperado: {word_count} palavras")
@@ -1326,6 +1337,16 @@ def self_test() -> int:
     data = synthetic_data()
     editorial = narrative_fallback(data)
     validate_editorial(editorial, data)
+    bad_punctuation = copy.deepcopy(editorial)
+    bad_punctuation["secoes"][0]["paragrafos"][0] = (
+        bad_punctuation["secoes"][0]["paragrafos"][0].rstrip(".!?…") + " truncado"
+    )
+    try:
+        validate_editorial(bad_punctuation, data)
+    except EditorialCopaError:
+        pass
+    else:
+        raise AssertionError("copy desk aceitou parágrafo sem pontuação terminal")
     page, metadata = render_article(
         data,
         editorial,
