@@ -133,6 +133,24 @@ def phase_rank_from_snapshot(snapshot: Mapping[str, Any]) -> int:
         rank = int(current.get("ordem") or 0)
     except (TypeError, ValueError):
         rank = 0
+    if rank == 900:
+        # A ESPN publica a fase FINAL assim que a semifinal termina.
+        # Não perder o editorial "finalistas": último fechamento elegível
+        # prevalece enquanto a final ainda não foi disputada.
+        events = snapshot.get("eventos") or []
+        final_games = [
+            e for e in events if int(e.get("fase_ordem") or 0) == 900
+        ]
+        semifinals = [
+            e for e in events if int(e.get("fase_ordem") or 0) == 800
+        ]
+        final_closed = bool(final_games) and all(e.get("concluido") is True for e in final_games)
+        semifinals_closed = (
+            len(semifinals) == int(PHASE_CONFIGS[800]["expected_games"])
+            and all(e.get("concluido") is True for e in semifinals)
+        )
+        if not final_closed and semifinals_closed:
+            return 800
     if rank in PHASE_CONFIGS:
         return rank
     available = sorted({
@@ -1377,6 +1395,21 @@ def self_test() -> int:
     assert sample_spotlight.count('class="analysis-qualified-card"') == 4
     assert "Rota Libertadores" in sample_spotlight and "Libertadores 2027" in sample_spotlight
     activate_phase(800); assert ARTICLE_ID == "copa-do-brasil-2026-finalistas" and EXPECTED_TIES == 2
+    # A CBF pode abrir a fase Final antes da publicação do editorial
+    # que encerrou as semifinais. Não pular o artigo dos finalistas.
+    phase_transition = {
+        "fase_atual": {"ordem": 900, "status": "em_andamento"},
+        "eventos": [
+            {"fase_ordem": 800, "concluido": True}
+            for _ in range(PHASE_CONFIGS[800]["expected_games"])
+        ] + [{"fase_ordem": 900, "concluido": False}],
+    }
+    assert phase_rank_from_snapshot(phase_transition) == 800
+    phase_transition["eventos"][-1]["concluido"] = True
+    assert phase_rank_from_snapshot(phase_transition) == 900
+    phase_transition["eventos"][-1]["concluido"] = False
+    phase_transition["eventos"][0]["concluido"] = False
+    assert phase_rank_from_snapshot(phase_transition) == 900
     # Regressão R34: classificado à final pode ter via_Copa=0% justamente
     # porque a vaga na Libertadores já está matematicamente garantida pela liga.
     palmeiras_qualified_by_league = {
