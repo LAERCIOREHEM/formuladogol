@@ -30,6 +30,7 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+from af_accuracy_insights import build_insights, deduplicate_selected_games  # noqa: E402
 from avaliar_af_previsao import (  # noqa: E402
     COMPETITION_PATHS,
     CONFIG_PATH,
@@ -647,8 +648,15 @@ def generate_accuracy(history_games: Mapping[str, Any]) -> dict[str, Any]:
     results = load_json(RESULTS_PATH, {}) or {}
     history_season = load_json(HISTORY_SEASON_PATH, {}) or {}
     table = load_json(TABLE_PATH, {}) or {}
-    selected = selected_pregame_records(history_games)
+    selected_raw = selected_pregame_records(history_games)
+    selected, duplicados = deduplicate_selected_games(selected_raw)
     games = game_accuracy(selected)
+    games["insights"] = build_insights(selected, calibration_bins)
+    games["controle_qualidade"] = {
+        "ids_com_resultado_e_previsao_valida": len(selected_raw),
+        "partidas_unicas": len(selected),
+        "ids_alternativos_conciliados": duplicados,
+    }
     timelines = build_timelines(history_season)
     league_finished, table_rows, table_message = final_table_state(table)
     range_coverage = final_range_coverage(timelines, table_rows) if league_finished else current_tracking()
@@ -690,7 +698,7 @@ def generate_accuracy(history_games: Mapping[str, Any]) -> dict[str, Any]:
             "inicio_historico_jogos": history_games.get("primeiro_registro"),
             "observacao": "Histórico auditável disponível a partir da segunda metade do Brasileirão 2026.",
             "avaliacao_alvo": "resultado_v_e_d",
-            "avaliacao_jogo_individual_publica": False,
+            "avaliacao_jogo_individual_publica": "somente exemplos ilustrativos de jogos reais; sem ranking individual",
         },
         "integridade": {
             "historico_temporada_schema": history_season.get("schema_version"),
@@ -738,6 +746,13 @@ def validate_accuracy(payload: Mapping[str, Any]) -> None:
     for row in games.get("calibracao") or []:
         if not 0 <= float(row.get("frequencia_observada_pct") or 0) <= 100:
             raise ValueError("calibração fora da faixa")
+    insights = games.get("insights") or {}
+    segments = insights.get("faixas_confianca") or []
+    if sum(int(row.get("amostra") or 0) for row in segments) != int(games.get("jogos_avaliados") or 0):
+        raise ValueError("segmentos de confiança não conciliam com partidas únicas")
+    quality = games.get("controle_qualidade") or {}
+    if int(quality.get("partidas_unicas") or 0) != int(games.get("jogos_avaliados") or 0):
+        raise ValueError("total de partidas únicas divergente")
 
 
 def update_files(capture: bool, update: bool) -> dict[str, Any]:
@@ -834,6 +849,18 @@ def self_test() -> None:
         raise AssertionError("acurácia sintética deveria ser 100%")
     if not metrics["calibracao"]:
         raise AssertionError("calibração sintética ausente")
+    duplicated_id = dict(chosen[0], event_id="ID_ESPN_ALTERNATIVO")
+    unique, duplicates = deduplicate_selected_games([chosen[0], duplicated_id])
+    if len(unique) != 1 or duplicates != 1:
+        raise AssertionError("IDs alternativos contados como partidas diferentes")
+    insights = build_insights(unique, calibration_bins)
+    if insights["faixas_confianca"][2]["amostra"] != 1:
+        raise AssertionError("segmento favorito claro deveria conter o exemplo de 70%")
+    if len(insights["calibracao_por_resultado"]["empate"]) < 1:
+        raise AssertionError("ausente aferição separada dos empates")
+    tied = dict(chosen[0], probabilidades_pct={"mandante": 35, "empate": 33, "visitante": 32})
+    if build_insights([tied], calibration_bins)["faixas_confianca"][0]["amostra"] != 1:
+        raise AssertionError("jogo 35/33/32 deve ser classificado como aberto")
 
     late = deepcopy(document)
     late["gerado_em"] = "2026-08-07T20:00:00-03:00"
