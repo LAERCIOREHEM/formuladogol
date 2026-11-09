@@ -1,0 +1,214 @@
+/* Aferição pública AF-Previsão · UX explicativa · 09/11/2026.
+   Complementa o tema original, sem substituir CSS global ou gráficos da timeline. */
+.af-insight-overview h2 { margin-bottom: 6px; }
+.af-insight-overview .accuracy-section-copy { max-width: 780px; }
+
+.af-insights-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0 12px;
+}
+.af-insight-kpi {
+  min-width: 0;
+  padding: 17px 16px 15px;
+  border: 1px solid rgba(148,163,184,.19);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(14,34,41,.92), rgba(4,14,22,.90));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+}
+.af-insight-kpi span {
+  display: block;
+  color: #c2d1dd;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .02em;
+}
+.af-insight-kpi strong {
+  display: block;
+  margin-top: 7px;
+  font-size: clamp(23px, 3vw, 33px);
+  line-height: 1.05;
+  letter-spacing: -.035em;
+  font-variant-numeric: tabular-nums;
+  color: #edf7ff;
+}
+.af-insight-kpi small {
+  display: block;
+  margin-top: 9px;
+  color: #a6b8c7;
+  line-height: 1.4;
+  font-size: 10.5px;
+}
+.af-kpi-green { border-top: 3px solid #a3e635; }
+.af-kpi-blue { border-top: 3px solid #60a5fa; }
+.af-kpi-amber { border-top: 3px solid #fbbf24; }
+.af-kpi-green strong { color: #d9ff76; }
+.af-kpi-blue strong { color: #b7dcff; }
+.af-kpi-amber strong { color: #ffde85; }
+.af-insight-reading {
+  margin: 12px 0 4px;
+  padding: 13px 15px;
+  border-left: 3px solid #a3e635;
+  border-radius: 0 12px 12px 0;
+  color: #d5e4ee;
+  background: rgba(163,230,53,.045);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+.af-insight-warning {
+  margin: 10px 0;
+  padding: 11px 13px;
+  border-radius: 10px;
+  border: 1px solid rgba(251,191,36,.42);
+  background: rgba(251,191,36,.075);
+  color: #ffe1a0;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.af-insight-section {
+  margin: 18px 0 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(148,163,184,.14);
+}
+.af-insight-section h3 {
+  margin: 0 0 5px;
+  color: #eef7ff;
+  font-size: clamp(15px, 2.2vw, 19px);
+  line-height: 1.3;
+}
+.af-insight-section > p {
+  margin: 5px 0 12px;
+  color: #a6b8c7;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.af-confidence-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.af-confidence-card {
+  min-width: 0;
+  padding: 13px 13px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(148,163,184,.18);
+  background: rgba(7,19,29,.72);
+}
+.af-confidence-aberto { border-top: 2px solid #94a3b8; }
+.af-confidence-favoritismo_moderado { border-top: 2px solid #60a5fa; }
+.af-confidence-favorito_claro { border-top: 2px solid #a3e635; }
+.af-confidence-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 9px; justify-content: space-between; }
+.af-confidence-head h4 { margin: 0; font-size: 13px; color: #f1f8ff; }
+.af-confidence-head > span { font-size: 10.5px; color: #b0c0ce; font-weight: 800; }
+.af-confidence-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 13px 0 11px; }
+.af-confidence-stats > div { min-width: 0; }
+.af-confidence-stats span { display: block; font-size: 10px; color: #9eb2c4; line-height: 1.3; min-height: 27px; }
+.af-confidence-stats b { display: block; font-size: clamp(17px, 2vw, 22px); color: #f0f8ff; font-variant-numeric: tabular-nums; }
+.af-confidence-stats small { color: #8fa4b5; font-size: 10px; }
+.af-confidence-card p { margin: 0; color: #adbdcc; line-height: 1.48; font-size: 11.3px; }
+.af-insight-footnote { color: #9badba !important; font-size: 11px !important; }
+.af-calibration-title { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.af-calibration-title label { color: #dae8f0; font-size: 13px; }
+.af-calibration-title select {
+  min-height: 42px;
+  min-width: min(100%, 240px);
+  border-radius: 11px;
+  background: #091923;
+  color: #edf7ff;
+  border: 1px solid rgba(163,230,53,.30);
+  padding: 8px 11px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+#af-accuracy-placeholder { color: #a6b8c7; }
+#accuracy-calibration {
+  min-height: 0;
+  margin-top: 9px;
+  padding: 0;
+}
+.af-insight-calibration-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 13px;
+}
+.af-insight-calibration-card {
+  min-width: 0;
+  border: 1px solid rgba(148,163,184,.17);
+  border-radius: 13px;
+  padding: 13px 14px;
+  background: rgba(5,14,23,.80);
+}
+.af-insight-calibration-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.af-insight-calibration-head strong { color: #f0f7fc; font-size: 12.5px; }
+.af-insight-calibration-head > span { color: #9eb1c0; font-size: 10px; white-space: nowrap; }
+.af-insight-bar-row {
+  display: grid;
+  grid-template-columns: minmax(88px, 124px) minmax(45px, 1fr) 49px;
+  gap: 7px;
+  align-items: center;
+  margin: 8px 0;
+}
+.af-insight-bar-row > span { color: #a5b6c4; font-size: 10px; line-height: 1.25; }
+.af-insight-track { height: 10px; overflow: hidden; border-radius: 99px; background: rgba(148,163,184,.12); }
+.af-insight-track > i { height: 100%; display: block; border-radius: inherit; }
+.af-bar-estimated { background: #fbbf24; }
+.af-bar-observed { background: #a3e635; }
+.af-insight-bar-row b { text-align: right; color: #eef7ff; font-size: 11px; font-variant-numeric: tabular-nums; }
+.af-insight-calibration-card p {
+  margin: 10px 0 0;
+  padding-top: 9px;
+  border-top: 1px solid rgba(148,163,184,.11);
+  color: #b9c9d4;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.af-insight-calibration-card strong { color: #f4f9ff; }
+.af-insight-calibration-card em { display: block; color: #f1cf90; font-style: normal; margin-top: 4px; }
+.af-insight-empty { margin: 12px !important; padding: 12px; color: #a5b7c7; }
+.af-example-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.af-insight-example { min-width: 0; border: 1px solid rgba(148,163,184,.16); background: rgba(8,21,30,.68); border-radius: 13px; padding: 12px; }
+.af-insight-example-top { display: flex; justify-content: space-between; gap: 8px; }
+.af-insight-example-top span { color: #d9ff76; font-size: 10px; letter-spacing: .04em; font-weight: 900; text-transform: uppercase; }
+.af-insight-example-top small { color: #a8bac8; font-size: 10px; }
+.af-insight-example h4 { margin: 9px 0; font-size: 14px; color: #eff8ff; }
+.af-insight-outcomes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.af-insight-outcomes span { text-align: center; min-width: 0; border: 1px solid rgba(148,163,184,.10); border-radius: 7px; padding: 6px 2px; color: #9db0be; font-size: 9px; }
+.af-insight-outcomes b { display: block; color: #d9ff76; margin-top: 3px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.af-insight-example p { margin: 9px 0; color: #b8cad4; font-size: 11px; line-height: 1.48; }
+.af-insight-example p strong { color: #eef7ff; }
+.af-insight-example > small { display: block; margin-top: 9px; color: #8da3b3; font-size: 9px; overflow-wrap: anywhere; }
+.af-benchmark { margin-top: 13px; }
+.af-benchmark h4 { margin: 0 0 8px; font-size: 14px; color: #edf7ff; }
+.af-benchmark p { font-size: 11.5px; line-height: 1.55; color: #b0c2ce; }
+.af-benchmark-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 7px; margin: 10px 0; }
+.af-benchmark-stats > div { background: rgba(255,255,255,.03); border: 1px solid rgba(148,163,184,.12); border-radius: 8px; padding: 9px; }
+.af-benchmark-stats span { display: block; color: #a3b6c4; font-size: 10px; }
+.af-benchmark-stats b { display: block; margin-top: 4px; color: #eff8ff; font-size: 15px; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 940px) {
+  .af-confidence-grid, .af-example-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .af-insights-kpis { grid-template-columns: 1fr; gap: 8px; }
+  .af-insight-kpi { padding: 13px 14px; }
+  .af-insight-kpi strong { font-size: 28px; }
+  .af-insight-calibration-grid { grid-template-columns: 1fr; padding: 9px; gap: 8px; }
+  .af-benchmark-stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .af-calibration-title { align-items: stretch; flex-direction: column; }
+  .af-calibration-title select { width: 100%; }
+}
+@media (max-width: 390px) {
+  .af-insight-bar-row { grid-template-columns: 87px minmax(30px,1fr) 45px; gap: 5px; }
+  .af-insight-bar-row span { font-size: 9px; }
+  .af-insight-calibration-card { padding: 10px; }
+  .af-insight-calibration-head { flex-wrap: wrap; }
+}

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Acurácia do AF-Previsão — Fórmula do Gol</title>
-  <meta name="description" content="Acompanhe a acurácia do AF-Previsão: calibração das probabilidades, evolução da classificação projetada, faixas de 80% e timeline por clube no Brasileirão 2026.">
+  <meta name="description" content="Entenda a qualidade das probabilidades do AF-Previsão: partidas auditadas, favoritos claros, jogos abertos, calibração, Brier Score e evolução dos clubes.">
   <link rel="canonical" href="https://formuladogol.com.br/acuracia.html">
   <meta property="og:title" content="Acurácia do AF-Previsão — Fórmula do Gol">
   <meta property="og:description" content="O histórico auditável das projeções do AF-Previsão e sua evolução no Brasileirão 2026.">
@@ -37,6 +37,7 @@
   <link rel="stylesheet" href="css/br-estatisticas.css?v=20260807-acuracia-v1">
   <link rel="stylesheet" href="css/br-global.css?v=20260807-acuracia-v1">
   <link rel="stylesheet" href="css/br-acuracia.css?v=20260816-cobertura-v1">
+  <link rel="stylesheet" href="css/br-acuracia-insights.css?v=20261109-ux-v1">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -84,10 +85,69 @@
       <header class="accuracy-heading">
         <h1>ACURÁCIA DO AF-PREVISÃO</h1>
         <div class="accuracy-heading-meta">
-          <p>O histórico auditável das projeções do modelo e sua evolução ao longo do Brasileirão 2026.</p>
+          <p>Não basta indicar o resultado mais provável: aferimos se as chances publicadas correspondem ao que aconteceu em campo.</p>
           <small id="accuracy-update-status" class="accuracy-update-status">Carregando data da última aferição…</small>
         </div>
       </header>
+
+      <section class="panel accuracy-section af-insight-overview" aria-labelledby="accuracy-overview-title">
+        <div class="panel-inner">
+          <div class="kicker">Inteligência estatística · Brasileirão 2026</div>
+          <h2 id="accuracy-overview-title">O AF-Previsão é confiável?</h2>
+          <p class="accuracy-section-copy">O modelo não promete adivinhar o futuro. Ele estima chances e compara suas previsões com os resultados reais. Veja o que já pode ser aferido.</p>
+          <div id="accuracy-insights-summary" class="af-insights-kpis" aria-live="polite"><p>Carregando indicadores auditáveis…</p></div>
+          <p id="accuracy-insights-reading" class="af-insight-reading"></p>
+          <div id="accuracy-insights-warning" class="af-insight-warning" hidden></div>
+        </div>
+      </section>
+
+      <section class="panel accuracy-section" aria-labelledby="accuracy-games-title">
+        <div class="panel-inner">
+          <div class="section-head accuracy-section-head">
+            <div>
+              <div class="kicker">Probabilidades dos jogos</div>
+              <h2 id="accuracy-games-title">Calibração do AF-Previsão</h2>
+              <p>Cada faixa compara a probabilidade que o modelo indicou com a frequência em que o resultado realmente aconteceu. Quanto mais parecidas as duas barras, melhor calibrado o modelo.</p>
+            </div>
+            <span id="accuracy-games-badge" class="badge live-soft">Coleta em andamento</span>
+          </div>
+          <div id="accuracy-games-chips" class="accuracy-current"></div>
+          <div class="af-insight-section">
+            <h3>Jogos abertos ou favoritos claros: o que muda?</h3>
+            <p>Compare os acertos Top-1 com a probabilidade média do resultado favorito em cada tipo de confronto. Uma previsão de 35% não equivale a uma de 72%.</p>
+            <div id="accuracy-confidence-cards" class="af-confidence-grid" aria-live="polite"></div>
+            <p class="af-insight-footnote">Faixas descritivas: jogo aberto quando a diferença entre os dois resultados mais prováveis é inferior a 10 pontos percentuais; favorito claro quando a vantagem é de pelo menos 10 pontos e a chance principal alcança 60%. Não são certificados de precisão.</p>
+          </div>
+          <div id="accuracy-scope"></div>
+          <div class="af-insight-section af-calibration-title">
+            <label for="accuracy-outcome-filter"><strong>Qual resultado você deseja avaliar?</strong></label>
+            <select id="accuracy-outcome-filter" aria-label="Filtrar calibração por resultado">
+              <option value="todos">Todos os resultados</option>
+              <option value="mandante">Vitória mandante</option>
+              <option value="empate">Empate</option>
+              <option value="visitante">Vitória visitante</option>
+            </select>
+          </div>
+          <div id="accuracy-calibration" class="accuracy-chart" aria-label="Comparação entre chance média estimada e frequência real por faixa"></div>
+          <div id="accuracy-calibration-explanation" class="af-insight-reading" aria-live="polite"></div>
+          <div id="accuracy-calibration-note" class="accuracy-note"></div>
+          <section class="af-insight-section" aria-labelledby="accuracy-examples-title">
+            <h3 id="accuracy-examples-title">Como interpretar partidas reais</h3>
+            <p>Exemplos escolhidos automaticamente entre jogos com previsão pré-jogo comprovada; não representam o desempenho completo da temporada.</p>
+            <div id="accuracy-example-cards" class="af-example-grid"></div>
+          </section>
+          <details class="accuracy-details">
+            <summary>Detalhes técnicos</summary>
+            <div id="accuracy-technical"></div>
+            <div id="accuracy-benchmark" class="af-benchmark"></div>
+          </details>
+        </div>
+      </section>
+
+
+      
+
+      
 
       <section class="panel accuracy-section" aria-labelledby="accuracy-timeline-title">
         <div class="panel-inner">
@@ -114,32 +174,6 @@
           <div id="accuracy-timeline-legend" class="accuracy-legend"></div>
         </div>
       </section>
-
-      <section class="panel accuracy-section" aria-labelledby="accuracy-games-title">
-        <div class="panel-inner">
-          <div class="section-head accuracy-section-head">
-            <div>
-              <div class="kicker">Probabilidades dos jogos</div>
-              <h2 id="accuracy-games-title">Calibração do AF-Previsão</h2>
-              <p>Cada faixa compara a probabilidade que o modelo indicou com a frequência em que o resultado realmente aconteceu. Quanto mais parecidas as duas barras, melhor calibrado o modelo.</p>
-            </div>
-            <span id="accuracy-games-badge" class="badge live-soft">Coleta em andamento</span>
-          </div>
-          <div id="accuracy-games-chips" class="accuracy-current"></div>
-          <div id="accuracy-scope"></div>
-          <div id="accuracy-calibration" class="accuracy-chart" aria-label="Comparação entre probabilidade indicada e frequência observada"></div>
-          <div id="accuracy-calibration-note" class="accuracy-note"></div>
-          <details class="accuracy-details">
-            <summary>Detalhes técnicos</summary>
-            <div id="accuracy-technical"></div>
-          </details>
-        </div>
-      </section>
-
-
-      
-
-      
 
       <section class="accuracy-grid-two">
         <article class="panel accuracy-section" aria-labelledby="accuracy-range-title">
@@ -168,7 +202,7 @@
             <div>
               <div class="kicker">Integridade do histórico</div>
               <h2 id="accuracy-seal-title">Previsões travadas por SHA-256</h2>
-              <p>Cada previsão é registrada antes da partida e encadeada ao hash anterior. Alterar uma previsão passada quebraria toda a cadeia, e isso é verificável.</p>
+              <p>As previsões pré-jogo possuem hashes SHA-256 individuais e um hash do conjunto. O painel usa registros anteriores ao início real de cada jogo, sem reconstruções posteriores.</p>
             </div>
           </div>
           <div id="accuracy-seal-body"></div>
@@ -180,7 +214,10 @@
           <details>
             <summary id="accuracy-method-title">Como medimos a acurácia?</summary>
             <div class="accuracy-method-copy">
-              <p><strong>Jogos:</strong> cada partida usa a última probabilidade V/E/D registrada antes do início factual do jogo. Previsões posteriores ao kickoff são automaticamente excluídas da avaliação.</p>
+              <p><strong>Jogos:</strong> usamos a última probabilidade V/E/D válida antes do início factual. IDs alternativos do mesmo confronto são conciliados para contar uma única partida; previsões posteriores ao início são excluídas.</p>
+              <p><strong>Palpite Top-1:</strong> o resultado com maior probabilidade só conta como acerto quando de fato ocorre. Empates de probabilidade máxima entre dois resultados não são classificados como um palpite único.</p>
+              <p><strong>Calibração:</strong> comparamos a probabilidade média com a frequência real, separadamente para mandante, empate e visitante. A visão geral reúne três resultados mutuamente exclusivos por jogo: sua quantidade de previsões é três vezes a de partidas.</p>
+              <p><strong>Referência neutra:</strong> Brier e Log Loss são comparados com 33,3% para cada desfecho; isso não é prova de superioridade sobre outros modelos.</p>
               <p><strong>Faixa de 80%:</strong> posição e pontuação usam a faixa central entre os percentis 10 e 90 das simulações. A cobertura só é fechada quando o Brasileirão termina.</p>
               <p><strong>Campeão, Libertadores e Sul-Americana:</strong> a confirmação só é calculada quando os desfechos esportivos estão definidos.</p>
             </div>
@@ -206,7 +243,8 @@
 
   <script src="js/br-config.js?v=20260723-copa-publica-v1"></script>
   <script src="js/br-menu.js?v=20260901-alertas-v1"></script>
-  <script src="js/br-acuracia.js?v=20260816-cobertura-v1"></script>
+  <script src="js/br-acuracia.js?v=20261109-ux-event-v1"></script>
+  <script src="js/br-acuracia-insights.js?v=20261109-ux-v1"></script>
   <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
   <script src="/js/br-social-footer.js?v=20260811-social-v2-tiktok" defer></script>
   <script src="/js/br-pwa.js?v=20260923-pwa-home-install-v4" defer></script>

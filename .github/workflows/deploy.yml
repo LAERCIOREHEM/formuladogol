@@ -42,6 +42,7 @@ on:
       - 'css/br-agenda.css'
       - 'css/br-estatisticas.css'
       - 'css/br-acuracia.css'
+      - 'css/br-acuracia-insights.css'
       - 'css/br-institucional.css'
       - 'css/br-sobre.css'
       - 'css/br-analises.css'
@@ -63,6 +64,7 @@ on:
       - 'cloudflare/push-worker/tests/test-resultados-freshness.mjs'
       - 'tests/test-br-classificacao-live.mjs'
       - 'js/br-acuracia.js'
+      - 'js/br-acuracia-insights.js'
       - 'js/br-feedback.js'
       - 'js/br-menu.js'
       - 'js/br-museu.js'
@@ -158,6 +160,25 @@ jobs:
           python -m py_compile atualizar_espn.py scripts/gerar_agenda_clubes_brasileirao.py
           python tests/test_calendario_finais_cbf_2026.py
 
+      - name: Verificar e regenerar aferição probabilística
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/af_accuracy_insights.py scripts/gerar_acuracia_af_previsao.py
+          python scripts/gerar_acuracia_af_previsao.py --self-test
+          node --check js/br-acuracia.js
+          node --check js/br-acuracia-insights.js
+          python scripts/gerar_acuracia_af_previsao.py --atualizar
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path("dados-br/acuracia-af-previsao.json").read_text(encoding="utf-8"))
+          games = data["jogos"]
+          assert sum(x["amostra"] for x in games["insights"]["faixas_confianca"]) == games["jogos_avaliados"]
+          assert games["controle_qualidade"]["partidas_unicas"] == games["jogos_avaliados"]
+          print("AF acurácia regenerada e validada:", games["jogos_avaliados"], "partidas únicas")
+          PY
+
       - name: Montar site público
         shell: bash
         run: |
@@ -209,6 +230,7 @@ jobs:
             css/br-agenda.css
             css/br-estatisticas.css
             css/br-acuracia.css
+            css/br-acuracia-insights.css
             css/br-institucional.css
             css/br-sobre.css
             css/br-analises.css
@@ -234,6 +256,7 @@ jobs:
             js/br-classificacao-live.js
             js/br-resultados-freshness.js
             js/br-acuracia.js
+            js/br-acuracia-insights.js
             js/br-feedback.js
             js/br-menu.js
             js/br-museu.js
