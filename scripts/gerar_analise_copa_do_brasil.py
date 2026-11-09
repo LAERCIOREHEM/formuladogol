@@ -564,8 +564,8 @@ def compact_metric(detail: Mapping[str, Any] | None) -> dict[str, Any]:
 def continental_consequence() -> str:
     """REC Copa do Brasil 2026, Art. 4º: vaga esportiva é condicional."""
     rule = (
-        "A Copa do Brasil destina uma vaga de grupos ao campeão e uma "
-        "preliminar ao vice, sujeitas à participação na Série A de 2027. "
+        "A Copa do Brasil destina na Libertadores 2027 uma vaga de grupos "
+        "ao campeão e uma preliminar ao vice, sujeitas à participação na Série A de 2027. "
         "Se um finalista terminar rebaixado, não poderá exercer a vaga, "
         "que será redirecionada nos termos do Art. 4º do regulamento da CBF. "
         "Quando a vaga coincidir com a do Brasileirão, aplica-se o repasse "
@@ -1463,6 +1463,7 @@ def self_test() -> int:
         raise AssertionError("finalista sem rota nem prova de liga não foi bloqueado")
     assert "rebaixamento" in continental_consequence().lower()
     assert "Série A de 2027" in continental_consequence()
+    assert "Libertadores 2027" in continental_consequence()
     activate_phase(900); assert ARTICLE_ID == "copa-do-brasil-2026-campeao" and EXPECTED_TIES == 1
     activate_phase(600)
     print("OK self-test: histórico, fase dinâmica, comparativo, HTML e navegação continental.")
