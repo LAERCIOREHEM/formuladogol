@@ -545,6 +545,7 @@
   function renderAll() {
     renderUpdateStatus(); renderGameChips(); renderScope(); renderSeal(); renderCalibration();
     setClubOptions(); wireTabs(); renderTimeline(); renderRange(); renderSeasonEvents();
+    document.dispatchEvent(new window.CustomEvent("af:acuracia-ready", { detail: state.data }));
   }
 
   var resizeTimer = null, lastMobile = null;
