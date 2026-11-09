@@ -688,6 +688,8 @@ def _pct_text(detail: Mapping[str, Any] | None) -> str:
         return "<0,001%" if possible and detail.get("possivel_estruturalmente") is True else "0%"
     if value < 0.001:
         return "<0,001%"
+    if value == 100 and str(detail.get("exibicao") or "") == "100%":
+        return "100%"
     if value >= 99.95:
         return ">99,9%"
     decimals = 3 if value < 0.1 else 2 if value < 1 else 1
@@ -762,7 +764,7 @@ def narrative_fallback(data: dict[str, Any]) -> dict[str, Any]:
             "titulo": "Quem mais ganhou força com o mata-mata",
             "paragrafos": [
                 (f"{top_up.get('clube')} registrou o maior salto na chance total de Libertadores entre os clubes desta fase: {_pp_text(float(top_up.get('libertadores_delta') or 0))}, chegando a {_pct_text(top_up.get('libertadores_depois'))}." if top_up else "O fechamento mudou de maneira desigual as chances continentais dos clubes envolvidos."),
-                (f"Pela via específica da Copa do Brasil, o maior avanço foi de {top_cup.get('clube')}, com {_pp_text(float(top_cup.get('via_copa_delta') or 0))} Para os eliminados, essa via caiu a 0%, embora alguns ainda possam chegar à Libertadores por outros caminhos." if top_cup else "Para os eliminados, a via específica da Copa do Brasil se encerrou; outras rotas continuam dependendo da situação de cada clube."),
+                (f"Pela via específica da Copa do Brasil, o maior avanço foi de {top_cup.get('clube')}, com {_pp_text(float(top_cup.get('via_copa_delta') or 0))} Para os eliminados, essa via caiu a 0%, embora alguns ainda possam chegar à Libertadores por outros caminhos." if top_cup and float(top_cup.get("via_copa_delta") or 0) > 0 else "Na via específica da Copa do Brasil, nenhuma equipe desta fase registrou aumento de probabilidade de classificação. As vagas já garantidas pelo Brasileirão são contabilizadas separadamente, e os eliminados ficaram com 0% por esta rota."),
             ],
         },
     ]
@@ -1464,6 +1466,8 @@ def self_test() -> int:
     assert "rebaixamento" in continental_consequence().lower()
     assert "Série A de 2027" in continental_consequence()
     assert "Libertadores 2027" in continental_consequence()
+    assert _pct_text({"percentual_estimado": 100, "exibicao": "100%"}) == "100%"
+    assert _pct_text({"percentual_estimado": 100, "exibicao": ">99,999%"}) != "100%"
     activate_phase(900); assert ARTICLE_ID == "copa-do-brasil-2026-campeao" and EXPECTED_TIES == 1
     activate_phase(600)
     print("OK self-test: histórico, fase dinâmica, comparativo, HTML e navegação continental.")
