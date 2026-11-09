@@ -1,6 +1,10 @@
 name: Publicar análise editorial da Copa do Brasil
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/gerar_analise_copa_do_brasil.py'
   workflow_run:
     workflows: ['Atualizar Brasileirao (ESPN)']
     types: [completed]
