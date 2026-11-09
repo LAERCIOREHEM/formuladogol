@@ -164,6 +164,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
           python -m py_compile scripts/af_accuracy_insights.py scripts/gerar_acuracia_af_previsao.py
           python scripts/gerar_acuracia_af_previsao.py --self-test
           node --check js/br-acuracia.js
