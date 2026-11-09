@@ -1,0 +1,82 @@
+name: AF Acurácia UX - auditoria determinística
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/af_accuracy_insights.py'
+      - 'scripts/gerar_acuracia_af_previsao.py'
+      - 'js/br-acuracia-insights.js'
+      - 'js/br-acuracia.js'
+      - 'css/br-acuracia-insights.css'
+      - 'acuracia.html'
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/af-acuracia-ux-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: af-acuracia-ux-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validar:
+    name: Dados auditáveis e UX
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar sintaxe, integridade e regressões
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements-af-previsao.txt
+          python -m py_compile scripts/af_accuracy_insights.py scripts/gerar_acuracia_af_previsao.py
+          python scripts/gerar_acuracia_af_previsao.py --self-test
+          node --check js/br-acuracia.js
+          node --check js/br-acuracia-insights.js
+          python scripts/gerar_acuracia_af_previsao.py --atualizar
+          python - <<'PY'
+          import json
+          from html.parser import HTMLParser
+          from pathlib import Path
+
+          class Parser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = set()
+                  self.duplicates = []
+              def handle_starttag(self, tag, attrs):
+                  for key, value in attrs:
+                      if key == 'id':
+                          if value in self.ids:
+                              self.duplicates.append(value)
+                          self.ids.add(value)
+
+          html = Path('acuracia.html').read_text(encoding='utf-8')
+          parser = Parser()
+          parser.feed(html)
+          assert not parser.duplicates, parser.duplicates
+          for name in ('accuracy-insights-summary', 'accuracy-confidence-cards',
+                       'accuracy-outcome-filter', 'accuracy-calibration-explanation',
+                       'accuracy-example-cards', 'accuracy-benchmark'):
+              assert name in parser.ids, name
+          for asset in ('js/br-acuracia-insights.js', 'css/br-acuracia-insights.css'):
+              assert asset in html and Path(asset).is_file(), asset
+
+          data = json.loads(Path('dados-br/acuracia-af-previsao.json').read_text(encoding='utf-8'))
+          assert data['status'] == 'ok'
+          games = data['jogos']
+          insight = games['insights']
+          assert sum(x['amostra'] for x in insight['faixas_confianca']) == games['jogos_avaliados']
+          assert games['controle_qualidade']['partidas_unicas'] == games['jogos_avaliados']
+          assert set(insight['calibracao_por_resultado']) == {'mandante','empate','visitante'}
+          assert all(x['amostra'] <= games['jogos_avaliados'] for x in insight['faixas_confianca'])
+          print('Amostra única e UX validadas:', games['jogos_avaliados'], 'jogos')
+          PY
