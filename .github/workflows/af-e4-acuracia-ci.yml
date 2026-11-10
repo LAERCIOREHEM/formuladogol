@@ -1,0 +1,112 @@
+name: AF-Previsão E4 - Acurácia de Placares e Certificação
+
+on:
+  push:
+    branches:
+      - feat/af-e4-acuracia-placares-certificada-20261110
+    paths:
+      - '.github/workflows/af-e4-acuracia-ci.yml'
+      - 'scripts/gerar_acuracia_placares_e4.py'
+      - 'js/br-acuracia-placares-e4.js'
+      - 'css/br-acuracia-placares-e4.css'
+      - 'acuracia.html'
+      - 'tests/test-af-e4-acuracia.mjs'
+      - 'tests/test-af-e4-viewports.mjs'
+      - '.github/workflows/deploy.yml'
+  pull_request:
+    paths:
+      - '.github/workflows/af-e4-acuracia-ci.yml'
+      - 'scripts/gerar_acuracia_placares_e4.py'
+      - 'js/br-acuracia-placares-e4.js'
+      - 'css/br-acuracia-placares-e4.css'
+      - 'acuracia.html'
+      - 'tests/test-af-e4-acuracia.mjs'
+      - 'tests/test-af-e4-viewports.mjs'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: af-e4-acuracia-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  certificar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Construir E4 somente com provas E1/E3
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/gerar_acuracia_placares_e4.py
+          python scripts/gerar_acuracia_placares_e4.py --self-test
+          python scripts/gerar_acuracia_placares_e4.py
+          python - <<'PY'
+          import json,hashlib,sys
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from gerar_acuracia_placares_e4 import build
+          artifact=Path('dados-br/acuracia-placares-af-2026.json')
+          source=json.loads(artifact.read_text(encoding='utf-8'))
+          assert source == build(), 'Não reproduz métricas certificadas E1/E3'
+          assert source['metricas']['jogos'] == 157
+          assert source['escopo']['sem_prova_historica'] == 182
+          assert source['metricas']['placares_exatos'] <= source['metricas']['top3_confirmados']
+          assert source['integridade']['hash_metricas']
+          print('AF E4 MÉTRICAS REPRODUZÍVEIS:',source['metricas']['jogos'])
+          PY
+
+      - name: Certificar JS e consistência da apresentação
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check js/br-acuracia-placares-e4.js
+          node --check tests/test-af-e4-acuracia.mjs
+          node tests/test-af-e4-acuracia.mjs
+          node --check js/br-acuracia.js
+          node --check js/br-acuracia-insights.js
+      - name: Preparar QA de desktop Android e iPhone
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --ignore-scripts playwright@1.56.1
+          npx playwright install --with-deps chromium webkit
+      - name: Testar filtros, calibração e responsividade
+        run: |
+          set -euo pipefail
+          node tests/test-af-e4-viewports.mjs
+      - name: Preservar capturas para revisão
+        uses: actions/upload-artifact@v4
+        with:
+          name: af-e4-acuracia-desktop-android-iphone
+          path: test-results/af-e4/*.png
+          if-no-files-found: error
+          retention-days: 14
+      - name: Publicar apenas relatório derivado certificado na branch
+        if: ${{ github.event_name == 'push' && github.ref_name == 'feat/af-e4-acuracia-placares-certificada-20261110' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dados-br/acuracia-placares-af-2026.json
+          if git diff --cached --quiet; then
+            echo "Relatório E4 idêntico ao já versionado"
+          else
+            git commit -m "data(AF E4): acurácia histórica de placares certificada"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
