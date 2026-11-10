@@ -40,7 +40,7 @@ assert.equal(api.render({ ...row, placar_modal: { mandante: 1, visitante: 2 } })
 assert.equal(api.render({ ...row, gols_esperados: { mandante: 0, visitante: 1 } }), '');
 assert.equal(api.render({ ...row, placares_mais_provaveis: [
   row.placares_mais_provaveis[0], row.placares_mais_provaveis[0], row.placares_mais_provaveis[2]
-] }).match(/af-e2-unavailable/g)?.length, 1);
+] }), '');
 
 const legacy = api.render({ ...row, placares_mais_provaveis: undefined });
 assert.match(legacy, /Chance individual indisponível/);
