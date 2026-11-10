@@ -150,6 +150,19 @@
     return '<span class="af-e3-chip af-e3-' + name + '">' +
       (value === null ? "◦ " : value ? "✓ " : "× ") + safe(text) + '</span>';
   }
+  function highlight(decision) {
+    // Um destaque interpretativo. Os três indicadores científicos permanecem
+    // independentes e disponíveis no detalhamento (sem alterar E4).
+    if (decision.exact) return { label: "Acertou o placar exato", kind: "success" };
+    if (decision.top1 && decision.top3)
+      return { label: "Acertou V/E/D e Top-3", kind: "success" };
+    if (decision.top1) {
+      const label = decision.outcome === "empate" ? "Acertou o empate" : "Acertou o vencedor";
+      return { label: label, kind: "success" };
+    }
+    if (decision.top3) return { label: "Placar no Top-3", kind: "success" };
+    return { label: "Sem acerto principal", kind: "neutral" };
+  }
   function missing(label, detail) {
     return '<div class="af-e3-outcome af-e3-outcome-missing" aria-label="' + safe(detail) + '">' +
       '<span class="af-e3-prefix">AF-Previsão</span><span class="af-e3-muted">' +
@@ -177,7 +190,8 @@
     const source = e.prova;
     const top1Label = decision.top1 === null ? "Sem palpite V/E/D único" :
       decision.top1 ? "Resultado V/E/D" : "V/E/D não confirmado";
-    const exactLabel = decision.exact ? "Placar exato" : "Placar diferente";
+    const exactLabel = decision.exact ? "Placar exato" : "Placar exato não confirmado";
+    const featured = highlight(decision);
     const top3Text = decision.top3 ? "O placar final estava entre os três principais." :
       "O placar final não estava entre os três principais.";
     const triple = e.top3_placares.map((x, i) => {
@@ -190,26 +204,30 @@
       pct(e.probabilidades_ved_pct[k]) + '</strong></span>').join("");
     const sourceUrl = 'https://github.com/LAERCIOREHEM/formuladogol/commit/' + source.commit;
     return '<details class="af-e3-result" data-af-e3="certificado">' +
-      '<summary class="af-e3-summary" aria-label="Expandir avaliação histórica do AF-Previsão: placar previsto ' +
-        predicted + ', resultado ' + (decision.top1 === null ? 'não definido' : decision.top1 ? 'correto' : 'incorreto') +
-        ', placar exato ' + (decision.exact ? 'correto' : 'não confirmado') + '">' +
+      '<summary class="af-e3-summary" aria-label="Expandir avaliação do AF-Previsão: ' +
+        safe(featured.label) + ', previsão principal ' + predicted + '">' +
         '<span class="af-e3-line"><span class="af-e3-prefix">AF-Previsão</span>' +
-          '<span class="af-e3-summary-label">Placar previsto</span>' +
+          '<span class="af-e3-summary-label">Previsão principal</span>' +
           '<strong class="af-e3-score">' + predicted + '</strong>' +
           '<span class="af-e3-pct">' + pct(bestPct) + ' desse placar</span></span>' +
-        '<span class="af-e3-statuses">' + chip(decision.top1, top1Label) +
-          chip(decision.exact, exactLabel) + '</span>' +
+        '<span class="af-e3-featured af-e3-featured-' + featured.kind + '">' +
+          (featured.kind === "success" ? "✓ " : "◦ ") + safe(featured.label) +
+        '</span>' +
       '</summary>' +
       '<div class="af-e3-details">' +
         '<p><strong>Placar real:</strong> ' + actual +
           ' · <strong>Palpite V/E/D:</strong> ' +
           (e.palpite_resultado_top1 ? safe(labels[e.palpite_resultado_top1]) : 'indefinido por empate de probabilidades') +
           '. Acertar o vencedor/empate não é o mesmo que acertar o placar exato.</p>' +
+        '<div class="af-e3-breakdown" aria-label="Indicadores independentes de acerto">' +
+          chip(decision.top1, top1Label) +
+          chip(decision.exact, exactLabel) +
+          chip(decision.top3, decision.top3 ? "Placar no Top-3" : "Fora do Top-3") +
+        '</div>' +
         '<div class="af-e3-probabilities" aria-label="Probabilidades pré-jogo de resultado">' + fields + '</div>' +
         '<p class="af-e3-heading">Três placares previstos antes do início:</p>' +
         '<div class="af-e3-score-list">' + triple + '</div>' +
-        '<p>' + chip(decision.top3, decision.top3 ? "Placar no Top-3" : "Fora do Top-3") +
-          ' ' + safe(top3Text) + '</p>' +
+        '<p class="af-e3-top3-explanation">' + safe(top3Text) + '</p>' +
         '<p class="af-e3-source">Previsão documental AF-Previsão · ' +
           safe(source.versao_modelo || "") + ' · gerada em ' + safe(formatSourceTime(source.gerado_em)) +
           ' · <a href="' + sourceUrl + '" rel="noopener noreferrer" target="_blank" ' +
@@ -221,7 +239,7 @@
   }
 
   root.FDGResultadosAF = Object.freeze({
-    load: load, render: render, decide: decide,
+    load: load, render: render, decide: decide, highlight: highlight,
     validateDocument: validDocument
   });
 })(typeof window !== "undefined" ? window : globalThis);
