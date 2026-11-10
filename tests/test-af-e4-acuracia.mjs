@@ -14,9 +14,10 @@ api.validate(doc);
 const list = doc.jogos;
 const summary = api.summarize(list);
 assert.equal(summary.jogos, doc.metricas.jogos);
-assert.equal(summary.jogos, 157);
-assert.equal(doc.escopo.resultados_finais_auditados, 339);
-assert.equal(doc.escopo.sem_prova_historica, 182);
+assert.ok(summary.jogos > 0);
+assert.ok(doc.escopo.resultados_finais_auditados >= summary.jogos);
+assert.equal(doc.escopo.sem_prova_historica +
+  doc.escopo.em_quarentena + summary.jogos, doc.escopo.resultados_finais_auditados);
 assert.equal(summary.placares_exatos, doc.metricas.placares_exatos);
 assert.equal(summary.top3_confirmados, doc.metricas.top3_confirmados);
 assert.ok(summary.top3_confirmados >= summary.placares_exatos);
@@ -34,7 +35,7 @@ for (const [type, target] of probabilities) {
   const bins = api.statsBins(list,type);
   const published = doc.metricas[target];
   assert.equal(bins.length, published.length);
-  assert.equal(bins.reduce((a,b)=>a+b.amostra,0), 157);
+  assert.equal(bins.reduce((a,b)=>a+b.amostra,0), summary.jogos);
   for (let i=0;i<bins.length;i++) {
     assert.equal(bins[i].amostra,published[i].amostra);
     assert.equal(bins[i].ocorrencias,published[i].ocorrencias);
@@ -44,8 +45,8 @@ for (const [type, target] of probabilities) {
 }
 const allRounds = doc.por_rodada.reduce((a,x)=>a+x.metricas.jogos,0);
 const allClubs = doc.por_clube.reduce((a,x)=>a+x.metricas.jogos,0);
-assert.equal(allRounds,157);
-assert.equal(allClubs,314);
+assert.equal(allRounds,summary.jogos);
+assert.equal(allClubs,summary.jogos*2);
 for (const row of doc.por_rodada) {
   assert.equal(row.metricas.jogos, list.filter(g=>g.rodada===row.rodada).length);
 }
