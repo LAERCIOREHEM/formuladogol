@@ -71,5 +71,5 @@ assert.match(liveJs, /probabilityMobile \+\s*placaresPreJogo \+/);
 const css = readFileSync('css/br-af-scorecards.css', 'utf8');
 assert.match(css, /max-width:\s*480px/);
 assert.match(css, /max-width:\s*350px/);
-assert.match(css, /minmax\(0, 1fr\)/);
+assert.match(css, /minmax\(0,\s*1fr\)/);
 console.log('E2 SCORECARDS: PASS — modal, Top-3, percentuais, legado, desktop/mobile e não exibição em FINAL');
