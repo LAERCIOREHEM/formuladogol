@@ -2905,6 +2905,7 @@ body > .container > section.hero > img {
   <link rel="stylesheet" href="/css/br-social-footer.css?v=20260811-social-v2-tiktok">
   <link rel="stylesheet" href="/css/br-pwa.css?v=20260923-pwa-home-install-v5">
   <link rel="stylesheet" href="/css/br-alertas.css?v=20260901-alertas-v1">
+  <link rel="stylesheet" href="/css/br-af-scorecards.css?v=20261110-e2">
 </head>
 <body>
 <div class="container">
@@ -2956,6 +2957,7 @@ body > .container > section.hero > img {
 <script src="js/br-estatisticas-ordem.js?v=20260816-ordem-canonica-v1"></script>
 <script src="js/br-classificacao-live.js?v=20260920-monitor-facts-v7"></script>
 <script src="js/br-resultados-freshness.js?v=20261004-r10r9"></script>
+<script src="js/br-af-scorecards.js?v=20261110-e2"></script>
 <script>
 const BR_PUBLIC_ONLY = true;
 
@@ -5879,8 +5881,12 @@ function renderJogos() {
       const acessosTx = acessosOndeAssistir(j);
       const compKey = String(j.competicao_chave || 'brasileirao');
       const comp = competicaoDoJogo(j);
-      const probabilidadesDesktop = jogoUnificadoEhBrasileirao(j) ? htmlProbabilidadesPreJogo(j, 'desktop') : '';
-      const probabilidadesMobile = jogoUnificadoEhBrasileirao(j) ? htmlProbabilidadesPreJogo(j, 'mobile') : '';
+      const previsaoElegivel = estado.estado === 'pre' && jogoUnificadoEhBrasileirao(j);
+      const probabilidadesDesktop = previsaoElegivel ? htmlProbabilidadesPreJogo(j, 'desktop') : '';
+      const probabilidadesMobile = previsaoElegivel ? htmlProbabilidadesPreJogo(j, 'mobile') : '';
+      const fontePlacarE2 = previsaoElegivel ? probabilidadesPreJogoDoJogo(j) : null;
+      const placaresPreJogo = fontePlacarE2 && window.FDGScoreCards
+        ? window.FDGScoreCards.render(fontePlacarE2.item, { context: 'jogos' }) : '';
       const probMandante = probabilidadesDesktop && probabilidadesDesktop.mandante ? probabilidadesDesktop.mandante : '';
       const probEmpate = probabilidadesDesktop && probabilidadesDesktop.empate ? probabilidadesDesktop.empate : '';
       const probVisitante = probabilidadesDesktop && probabilidadesDesktop.visitante ? probabilidadesDesktop.visitante : '';
@@ -5904,7 +5910,8 @@ function renderJogos() {
             <div class="jogo-center-stack">${probEmpate}${placarCentro}</div>
             ${htmlTimeJogoUnificado(v, conteudoV, 'jogo-time jogo-team-side br-club-link')}
           </div>
-          ${probabilidadesMobile || ''}`;
+          ${probabilidadesMobile || ''}
+          ${placaresPreJogo}`;
       const detalhes = [`<span class="jogo-detalhe">${statusHtml}</span>`];
       detalhes.push(j.estadio ? `<span class="jogo-detalhe">📍 ${brEscapeHtml(j.estadio)}</span>` : '<span class="jogo-detalhe">📍 Local a confirmar</span>');
       detalhes.push(`<span class="jogo-detalhe">📺 ${brEscapeHtml(tx || 'Transmissão a confirmar')}</span>`);
