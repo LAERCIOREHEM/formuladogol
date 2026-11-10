@@ -55,6 +55,11 @@ assert.match(html, /Placar previsto/);
 assert.match(html, /1 × 1/);
 assert.match(html, /13,2% desse placar/);
 assert.match(html, /V\/E\/D não confirmado/);
+assert.match(html, /Placar no Top-3/);
+assert.equal((html.match(/class="af-e3-featured /g) || []).length, 1);
+assert.match(html, /✓ Placar no Top-3/);
+assert.ok(html.indexOf('af-e3-featured') < html.indexOf('af-e3-details'));
+assert.match(html, /af-e3-breakdown/);
 assert.match(html, /Placar exato/);
 assert.match(html, /Placar no Top-3/);
 assert.match(html, /Conferir commit/);
@@ -68,7 +73,8 @@ assessment = api.decide({ ...game, placar_mandante: 2, placar_visitante: 1 }, do
 assert.equal(assessment.top1, true);
 assert.equal(assessment.exact, false);
 assert.equal(assessment.top3, false);
-assert.match(api.render({ ...game, placar_mandante: 2, placar_visitante: 1 }, docs), /Placar diferente/);
+assert.match(api.render({ ...game, placar_mandante: 2, placar_visitante: 1 }, docs), /Acertou o vencedor/);
+assert.match(api.render({ ...game, placar_mandante: 2, placar_visitante: 1 }, docs), /Placar exato não confirmado/);
 
 const wrongFinal = api.render({ ...game, placar_mandante: 3 }, report);
 assert.match(wrongFinal, /Aferição suspensa/);
@@ -81,13 +87,41 @@ assert.match(api.render({ ...game, event_id:'999', mandante: {nome:'X'}, visitan
 // IDs ESPN alternativos podem ser aceitos por mandante/visitante, sem cruzar partidas.
 assert.equal(api.decide({ ...game, event_id: 'novo-id' }, report).status, 'comprovado');
 
+// Dois casos REAIS auditados no snapshot E1/E3 (sem estimativas inventadas).
+const historical = JSON.parse(readFileSync('dados-br/resultados-af-placares-2026.json','utf8'));
+function lookup(home,away){return historical.jogos.find(x=>x.mandante===home&&x.visitante===away&&x.situacao==='comprovado');}
+function toResult(r){return {
+  event_id:r.event_ids[0],data_iso:r.inicio_factual,
+  mandante:{nome:r.mandante},visitante:{nome:r.visitante},
+  placar_mandante:r.placar_final_auditado.mandante,
+  placar_visitante:r.placar_final_auditado.visitante
+};}
+const vitoriaFlu=lookup('Vitória','Fluminense');
+const saoPauloCor=lookup('São Paulo','Corinthians');
+assert.ok(vitoriaFlu&&saoPauloCor,'Exemplos históricos ausentes');
+const vitoriaDecision=api.decide(toResult(vitoriaFlu),historical);
+const saoPauloDecision=api.decide(toResult(saoPauloCor),historical);
+assert.equal(vitoriaDecision.top1,true);
+assert.equal(vitoriaDecision.exact,false);
+assert.equal(api.highlight(vitoriaDecision).label,'Acertou o vencedor');
+assert.match(api.render(toResult(vitoriaFlu),historical),/✓ Acertou o vencedor/);
+assert.equal(saoPauloDecision.top1,false);
+assert.equal(saoPauloDecision.exact,false);
+assert.equal(saoPauloDecision.top3,true);
+assert.equal(api.highlight(saoPauloDecision).label,'Placar no Top-3');
+assert.match(api.render(toResult(saoPauloCor),historical),/✓ Placar no Top-3/);
+assert.match(api.render(toResult(saoPauloCor),historical),/V\/E\/D não confirmado/);
+assert.match(api.render(toResult(saoPauloCor),historical),/Placar exato não confirmado/);
+const allBad={...saoPauloDecision,top3:false};
+assert.equal(api.highlight(allBad).label,'Sem acerto principal');
+
 const src = readFileSync('index.html', 'utf8');
-assert.match(src, /js\/br-af-resultados\.js\?v=20261110-e3/);
-assert.match(src, /css\/br-af-resultados\.css\?v=20261110-e3/);
+assert.match(src, /js\/br-af-resultados\.js\?v=20261110-ux-r1/);
+assert.match(src, /css\/br-af-resultados\.css\?v=20261110-ux-r1/);
 assert.match(src, /FDGResultadosAF\.render\(r, state\.afE3Resultados\)/);
 assert.match(src, /\$\{afericaoHistorica\}\s*\$\{paginaResultado/);
 assert.match(src, /if \(state\.afE3Resultados\)/);
-assert.ok(src.indexOf('br-af-resultados.js?v=20261110-e3') < src.indexOf('function renderResultados()'));
+assert.ok(src.indexOf('br-af-resultados.js?v=20261110-ux-r1') < src.indexOf('function renderResultados()'));
 const css = readFileSync('css/br-af-resultados.css', 'utf8');
 assert.match(css, /min-height: 44px/);
 assert.match(css, /max-width:480px/);
