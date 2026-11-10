@@ -44,6 +44,14 @@
     const v = Date.parse(str);
     return Number.isFinite(v) ? v : null;
   }
+  function formatSourceTime(value) {
+    const time = when(value);
+    if (time === null) return "horário indisponível";
+    return new Date(time).toLocaleString("pt-BR", {
+      timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit",
+      year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false
+    }) + " (Brasília)";
+  }
   function validDocument(json) {
     if (!json || json.schema_version !== 1 || json.temporada !== 2026 ||
         json.status !== "ok" || json.tipo !== "comparativo_resultados_af_previsao" ||
@@ -203,7 +211,7 @@
         '<p>' + chip(decision.top3, decision.top3 ? "Placar no Top-3" : "Fora do Top-3") +
           ' ' + safe(top3Text) + '</p>' +
         '<p class="af-e3-source">Previsão documental AF-Previsão · ' +
-          safe(source.versao_modelo || "") + ' · gerada em ' + safe(source.gerado_em || "") +
+          safe(source.versao_modelo || "") + ' · gerada em ' + safe(formatSourceTime(source.gerado_em)) +
           ' · <a href="' + sourceUrl + '" rel="noopener noreferrer" target="_blank" ' +
           'aria-label="Abrir commit de origem da previsão no GitHub">Conferir commit ' +
           safe(source.commit.slice(0, 8)) + '</a>.</p>' +
