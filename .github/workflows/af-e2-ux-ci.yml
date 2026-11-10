@@ -13,6 +13,7 @@ on:
       - 'index.html'
       - 'aovivo.html'
       - 'js/br-aovivo.js'
+      - '.github/workflows/deploy.yml'
       - 'tests/test-af-e2-scorecards.mjs'
       - 'tests/test-af-e2-viewports.mjs'
   pull_request:
@@ -34,12 +35,12 @@ permissions:
 
 concurrency:
   group: af-e2-ux-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   certificar:
     name: Validar dados nativos e responsividade
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
