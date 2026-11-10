@@ -2906,6 +2906,7 @@ body > .container > section.hero > img {
   <link rel="stylesheet" href="/css/br-pwa.css?v=20260923-pwa-home-install-v5">
   <link rel="stylesheet" href="/css/br-alertas.css?v=20260901-alertas-v1">
   <link rel="stylesheet" href="/css/br-af-scorecards.css?v=20261110-e2">
+<link rel="stylesheet" href="/css/br-af-resultados.css?v=20261110-e3">
 </head>
 <body>
 <div class="container">
@@ -2958,6 +2959,7 @@ body > .container > section.hero > img {
 <script src="js/br-classificacao-live.js?v=20260920-monitor-facts-v7"></script>
 <script src="js/br-resultados-freshness.js?v=20261004-r10r9"></script>
 <script src="js/br-af-scorecards.js?v=20261110-e2"></script>
+<script src="js/br-af-resultados.js?v=20261110-e3"></script>
 <script>
 const BR_PUBLIC_ONLY = true;
 
@@ -6196,6 +6198,20 @@ function resultadosComFinaisRecentesESPN(listaBase) {
 
 function renderResultados() {
   const container = document.getElementById('view-resultados');
+  // E3 é acessório e não bloqueia o primeiro paint dos resultados reais.
+  // Após a leitura da prova E1, redesenha só a aba ativa.
+  if (window.FDGResultadosAF && !state.afE3Resultados && !state.afE3Carregando) {
+    state.afE3Carregando = true;
+    window.FDGResultadosAF.load().then(documento => {
+      state.afE3Resultados = documento;
+      state.afE3Carregando = false;
+      if (state.view === 'resultados') renderResultados();
+    }).catch(error => {
+      state.afE3Carregando = false;
+      state.afE3Erro = String(error && error.message || error);
+      // Sem arquivo E3, nenhuma previsão histórica deve ser exibida.
+    });
+  }
 
   if (!state.resultadosCarregados) {
     container.innerHTML = '<div class="card empty">Carregando resultados...</div>';
@@ -6257,6 +6273,13 @@ function renderResultados() {
   html += '</div>';
   html += '</div>';
   html += '<div class="br-games-archive-strip br-results-archive-strip"><span>Todos os jogos e rodadas do Brasileirão</span><a class="br-game-action" href="/brasileirao-jogos.html">🗂️ Abrir arquivo completo</a></div>';
+  if (state.afE3Resultados) {
+    const resumoE3 = state.afE3Resultados.resumo;
+    html += '<p class="af-e3-coverage" role="note">🎯 AF-Previsão · ' +
+      Number(resumoE3.previsoes_certificadas) + ' previsões pré-jogo comprovadas entre ' +
+      Number(resumoE3.resultados_auditados) +
+      ' resultados auditados. Jogos sem prova histórica não recebem palpites reconstruídos.</p>';
+  }
 
   // Estatística rápida quando filtra por time
   if (filtroTime && resultadosFiltrados.length > 0) {
@@ -6309,6 +6332,9 @@ function renderResultados() {
       const dataFmt = formatarDataResultado(r.data_iso);
       const extrasResultado = [htmlMelhoresMomentos(r, 'resultado'), htmlEstatisticasJogo(r)].filter(Boolean).join('');
       const paginaResultado = urlPaginaJogoBrasileirao(r);
+      const afericaoHistorica = window.FDGResultadosAF && state.afE3Resultados
+        ? window.FDGResultadosAF.render(r, state.afE3Resultados)
+        : '';
 
       html += `<div class="resultado-card ${classeJogo}">
         <div class="resultado-meta">
@@ -6320,6 +6346,7 @@ function renderResultados() {
           <div class="resultado-placar">${pm} <span class="placar-x">×</span> ${pv}</div>
           ${linkClubeBrasileirao(v.nome, `<span class="resultado-escudo">${escudoVisitante}</span><span class="resultado-team-text"><span class="resultado-nome">${v.nome || '?'}</span></span>`, 'resultado-time visitante br-club-link')}
         </div>
+        ${afericaoHistorica}
         ${paginaResultado ? `<div class="resultado-page-row"><a class="br-game-action br-game-action-detail" href="${brEscapeAttr(paginaResultado)}">📄 Ver partida</a></div>` : ''}
         ${htmlResumoResultadoDetalhes(r)}
         ${extrasResultado ? `<div class="resultado-extra">${extrasResultado}</div>` : ''}

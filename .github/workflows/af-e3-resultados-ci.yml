@@ -1,0 +1,118 @@
+name: AF-Previsão E3 - Resultados Certificados e UX
+
+on:
+  push:
+    branches:
+      - feat/af-e3-resultados-historicos-20261110
+    paths:
+      - '.github/workflows/af-e3-resultados-ci.yml'
+      - 'scripts/gerar_resultados_af_e3.py'
+      - 'js/br-af-resultados.js'
+      - 'css/br-af-resultados.css'
+      - 'index.html'
+      - 'tests/test-af-e3-resultados.mjs'
+      - 'tests/test-af-e3-viewports.mjs'
+      - '.github/workflows/deploy.yml'
+  pull_request:
+    paths:
+      - '.github/workflows/af-e3-resultados-ci.yml'
+      - 'scripts/gerar_resultados_af_e3.py'
+      - 'js/br-af-resultados.js'
+      - 'css/br-af-resultados.css'
+      - 'index.html'
+      - 'tests/test-af-e3-resultados.mjs'
+      - 'tests/test-af-e3-viewports.mjs'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: af-e3-resultados-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validar:
+    name: Dados E1 e interface Resultados em navegadores
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Certificar e projetar arquivo E3, sem recriar previsões
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/gerar_resultados_af_e3.py
+          python scripts/gerar_resultados_af_e3.py --self-test
+          python scripts/gerar_resultados_af_e3.py
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          from sys import path
+          path.insert(0, 'scripts')
+          from gerar_resultados_af_e3 import validate_audit, digest, project
+          src = Path('dados-br/auditoria-historica-placares-af-2026.json').read_bytes()
+          evidence = json.loads(src)
+          view = json.loads(Path('dados-br/resultados-af-placares-2026.json').read_bytes())
+          validate_audit(evidence)
+          again = project(evidence, src)
+          assert view == again, 'E3 não reproduz a prova histórica E1'
+          assert view['origem']['sha256_arquivo'] == hashlib.sha256(src).hexdigest()
+          assert view['integridade']['hash_jogos'] == digest(view['jogos'])
+          assert view['resumo']['resultados_auditados'] == 339
+          assert view['resumo']['previsoes_certificadas'] == 157
+          assert view['resumo']['sem_snapshot_certificado'] == 182
+          print('E3 CERTIFICADO: 157/339 documentados; sem retroprevisões')
+          PY
+
+      - name: Verificar código e semântica dos acertos
+        run: |
+          set -euo pipefail
+          node --check js/br-af-resultados.js
+          node --check tests/test-af-e3-resultados.mjs
+          node tests/test-af-e3-resultados.mjs
+          node --check js/br-af-scorecards.js
+          node --check js/br-aovivo.js
+
+      - name: Preparar navegadores QA
+        run: |
+          set -euo pipefail
+          npm install --no-save --ignore-scripts playwright@1.56.1
+          npx playwright install --with-deps chromium webkit
+
+      - name: Certificar layout desktop Android iPhone
+        run: |
+          set -euo pipefail
+          node tests/test-af-e3-viewports.mjs
+
+      - name: Guardar capturas para auditoria visual
+        uses: actions/upload-artifact@v4
+        with:
+          name: af-e3-qa-resultados-desktop-android-iphone
+          path: test-results/af-e3/*.png
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Persistir APENAS o comparativo derivado na branch
+        if: ${{ github.event_name == 'push' && github.ref_name == 'feat/af-e3-resultados-historicos-20261110' }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dados-br/resultados-af-placares-2026.json
+          if git diff --cached --quiet; then
+            echo "Artefato E3 idêntico; nenhum commit."
+          else
+            git commit -m "data(AF E3): previsões e resultados certificados pela E1"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
