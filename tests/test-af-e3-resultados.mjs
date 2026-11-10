@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import vm from 'node:vm';
 
 const code = readFileSync('js/br-af-resultados.js', 'utf8');
@@ -105,4 +106,26 @@ assert.equal(api.decide({
   placar_mandante: real.placar_final_auditado.mandante,
   placar_visitante: real.placar_final_auditado.visitante
 }, persisted).status, 'comprovado');
-console.log('AF E3 TESTS PASS: Top-1 independente de placar, Top-3, ausência de prova e proteção contra divergência de jogo.');
+// Regressão ponta a ponta usando os 339 resultados reais, não só exemplos sintéticos.
+const actualResults = readFileSync('resultados.json');
+const actualDocument = JSON.parse(actualResults.toString('utf8'));
+const sourceDigest = createHash('sha256').update(actualResults).digest('hex');
+const matches = { comprovado: 0, sem_prova: 0, inconsistente: 0, nao_auditado: 0, other: 0 };
+for (const game of actualDocument.resultados || []) {
+  const classification = api.decide(game, persisted);
+  if (classification.status === 'comprovado') matches.comprovado++;
+  else if (classification.status === 'sem_prova') matches.sem_prova++;
+  else if (classification.status === 'inconsistente') matches.inconsistente++;
+  else if (classification.status === 'nao_auditado') matches.nao_auditado++;
+  else matches.other++;
+}
+assert.ok(matches.comprovado > 0, 'Nenhuma previsão E1 é exibível nos resultados reais');
+if (sourceDigest === JSON.parse(readFileSync('dados-br/auditoria-historica-placares-af-2026.json', 'utf8'))
+    .fontes_resultados.arquivo_sha256) {
+  assert.equal(matches.comprovado, 157, 'Snapshot de resultados idêntico à E1 precisa exibir 157 provas');
+  assert.equal(matches.sem_prova, 182, 'Snapshot idêntico precisa preservar 182 lacunas');
+  assert.equal(matches.inconsistente, 0);
+  assert.equal(matches.nao_auditado, 0);
+}
+console.log('E3 MATCHING REAL:', matches, 'fonte de resultados idêntica à E1:', sourceDigest === persisted.origem.sha256_arquivo);
+console.log('AF E3 TESTS PASS: Top-1 independente de placar, Top-3, lacunas, correspondência real e bloqueio por divergência de jogo.');
