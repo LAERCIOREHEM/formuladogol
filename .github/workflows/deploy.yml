@@ -39,6 +39,7 @@ on:
       - 'css/br-global.css'
       - 'css/br-jogos.css'
       - 'css/br-aovivo.css'
+      - 'css/br-af-scorecards.css'
       - 'css/br-agenda.css'
       - 'css/br-estatisticas.css'
       - 'css/br-acuracia.css'
@@ -50,6 +51,8 @@ on:
       - 'css/br-pwa.css'
       - 'css/br-alertas.css'
       - 'js/br-aovivo.js'
+      - 'js/br-af-scorecards.js'
+      - 'tests/test-af-e2-scorecards.mjs'
       - 'js/br-live-goal-sync.js'
       - 'tests/test-br-live-goal-sync.mjs'
       - 'js/br-agenda.js'
@@ -135,6 +138,8 @@ jobs:
           node --check js/br-classificacao-live.js
           node --check js/br-estatisticas.js
           node --check js/br-aovivo.js
+          node --check js/br-af-scorecards.js
+          node tests/test-af-e2-scorecards.mjs
           node --check js/br-live-goal-sync.js
           node tests/test-br-live-goal-sync.mjs
           node --check js/br-resultados-freshness.js
@@ -228,6 +233,7 @@ jobs:
             css/br-global.css
             css/br-jogos.css
             css/br-aovivo.css
+            css/br-af-scorecards.css
             css/br-agenda.css
             css/br-estatisticas.css
             css/br-acuracia.css
@@ -247,6 +253,7 @@ jobs:
           PUBLIC_JS=(
             js/br-live-goal-sync.js
             js/br-aovivo.js
+            js/br-af-scorecards.js
             js/br-agenda.js
             js/br-analises.js
             js/br-clube-retorno.js

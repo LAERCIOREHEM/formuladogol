@@ -1,0 +1,118 @@
+name: AF-Previsão E2 - Placar pré-jogo UX
+
+on:
+  push:
+    branches:
+      - feat/af-e2-placares-jogos-aovivo-20261110
+    paths:
+      - '.github/workflows/af-e2-ux-ci.yml'
+      - 'scripts/af_e2_sync_top3.py'
+      - 'scripts/gerar_probabilidades_jogos.py'
+      - 'js/br-af-scorecards.js'
+      - 'css/br-af-scorecards.css'
+      - 'index.html'
+      - 'aovivo.html'
+      - 'js/br-aovivo.js'
+      - '.github/workflows/deploy.yml'
+      - 'tests/test-af-e2-scorecards.mjs'
+      - 'tests/test-af-e2-viewports.mjs'
+  pull_request:
+    paths:
+      - '.github/workflows/af-e2-ux-ci.yml'
+      - 'scripts/af_e2_sync_top3.py'
+      - 'scripts/gerar_probabilidades_jogos.py'
+      - 'js/br-af-scorecards.js'
+      - 'css/br-af-scorecards.css'
+      - 'index.html'
+      - 'aovivo.html'
+      - 'js/br-aovivo.js'
+      - 'tests/test-af-e2-scorecards.mjs'
+      - 'tests/test-af-e2-viewports.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: af-e2-ux-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  certificar:
+    name: Validar dados nativos e responsividade
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Certificar origem dos placares e atualizar snapshot em ambiente de teste
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
+          python scripts/af_e2_sync_top3.py
+          python -m py_compile scripts/gerar_probabilidades_jogos.py scripts/af_e2_sync_top3.py
+          python scripts/gerar_probabilidades_jogos.py --self-test
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          import json
+          sys.path.insert(0, str(Path('scripts').resolve()))
+          from gerar_probabilidades_jogos import validate_document, canonical_hash
+          pre = json.loads(Path('dados-br/probabilidades-jogos.json').read_text())
+          audit = json.loads(Path('dados-br/auditoria-probabilidades-jogos.json').read_text())
+          checks = validate_document(pre)
+          assert audit['hash_saida'] == canonical_hash(pre)
+          assert checks['jogos'] == len(pre['jogos'])
+          assert all(len(x['placares_mais_provaveis']) == 3 for x in pre['jogos'])
+          print('E2: %d jogos com Top-3 original certificado e auditoria íntegra' % len(pre['jogos']))
+          PY
+
+      - name: Validar integração e comportamento
+        run: |
+          set -euo pipefail
+          node --check js/br-af-scorecards.js
+          node --check js/br-aovivo.js
+          node --check tests/test-af-e2-scorecards.mjs
+          node tests/test-af-e2-scorecards.mjs
+
+      - name: Instalar motores de navegador para QA de interface
+        run: |
+          set -euo pipefail
+          npm install --no-save --ignore-scripts playwright@1.56.1
+          npx playwright install --with-deps chromium webkit
+
+      - name: Testar web, Android, iPhone, tablet e larguras reduzidas
+        run: |
+          set -euo pipefail
+          node tests/test-af-e2-viewports.mjs
+
+      - name: Arquivar capturas de layout para revisão visual
+        uses: actions/upload-artifact@v4
+        with:
+          name: af-e2-layout-desktop-android-iphone
+          path: test-results/af-e2/*.png
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Persistir o snapshot nativo certificado na branch de implementação
+        if: ${{ github.event_name == 'push' && github.ref_name == 'feat/af-e2-placares-jogos-aovivo-20261110' }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dados-br/probabilidades-jogos.json dados-br/auditoria-probabilidades-jogos.json
+          if git diff --cached --quiet; then
+            echo "Fonte atual já contém Top-3 validado; nenhuma mudança."
+          else
+            git commit -m "data(AF E2): Top-3 nativo comprovado e hash de publicação sincronizado"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
