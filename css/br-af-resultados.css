@@ -198,3 +198,10 @@
   font-size: 11px;
   line-height: 1.5;
 }
+
+@media(min-width:721px) {
+  .af-e3-summary { font-size: 12px; }
+  .af-e3-prefix, .af-e3-summary-label { font-size: 11px; }
+  .af-e3-details { font-size: 12px; }
+  .af-e3-probabilities > span { font-size: 11px; }
+}
