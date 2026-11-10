@@ -205,3 +205,48 @@
   .af-e3-details { font-size: 12px; }
   .af-e3-probabilities > span { font-size: 11px; }
 }
+
+/* HOTFIX UX-R1 · um único destaque compreensível no cartão fechado.
+   Avaliações Top-1 / placar exato / Top-3 continuam separadas no detalhe. */
+.af-e3-featured {
+  flex: 0 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 30px;
+  padding: 5px 10px;
+  border: 1px solid rgba(148,163,184,.23);
+  border-radius: 999px;
+  background: rgba(148,163,184,.09);
+  color: #d0dae2;
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.35;
+  text-align: center;
+}
+.af-e3-featured-success {
+  color: #d8ff98;
+  background: rgba(163,230,53,.10);
+  border-color: rgba(163,230,53,.30);
+}
+.af-e3-featured-neutral {
+  color: #cad6df;
+  background: rgba(148,163,184,.09);
+  border-color: rgba(148,163,184,.25);
+}
+.af-e3-breakdown {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px 7px;
+  margin: 10px 0;
+}
+.af-e3-top3-explanation { margin-top: 9px; }
+@media (max-width: 720px) {
+  .af-e3-featured { max-width: 100%; font-size: 11px; }
+}
+@media (max-width: 480px) {
+  .af-e3-featured { align-self: flex-start; min-height: 30px; font-size: 10.5px; }
+  .af-e3-breakdown { gap: 5px; }
+}
