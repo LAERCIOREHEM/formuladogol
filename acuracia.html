@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="css/br-global.css?v=20260807-acuracia-v1">
   <link rel="stylesheet" href="css/br-acuracia.css?v=20260816-cobertura-v1">
   <link rel="stylesheet" href="css/br-acuracia-insights.css?v=20261109-ux-v1">
+  <link rel="stylesheet" href="css/br-acuracia-placares-e4.css?v=20261110-e4">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -149,6 +150,70 @@
 
       
 
+      <section class="panel accuracy-section af-e4-section" aria-labelledby="af-e4-title">
+        <div class="panel-inner">
+          <div class="section-head accuracy-section-head">
+            <div>
+              <div class="kicker">Aferição de placares · Brasileirão 2026</div>
+              <h2 id="af-e4-title">Precisão dos placares</h2>
+              <p class="af-e4-subtitle">Quando o AF-Previsão indica um placar exato, com que frequência ele acontece? E quando consideramos os três placares mais prováveis? Confira as previsões realmente registradas antes dos jogos.</p>
+            </div>
+          </div>
+          <p id="af-e4-status" class="af-e4-status" role="status">Carregando aferição histórica…</p>
+          <div class="af-e4-controls">
+            <label for="af-e4-club">Clube
+              <select id="af-e4-club" aria-label="Filtrar acurácia dos placares por clube">
+                <option value="">Todos os clubes</option>
+              </select>
+            </label>
+            <label for="af-e4-round">Rodada
+              <select id="af-e4-round" aria-label="Filtrar acurácia dos placares por rodada">
+                <option value="">Todas as rodadas</option>
+              </select>
+            </label>
+          </div>
+          <div id="af-e4-summary" class="af-e4-kpis" aria-live="polite">
+            <p>Carregando métricas certificadas…</p>
+          </div>
+          <div id="af-e4-interpretation" class="af-e4-takeaway" aria-live="polite"></div>
+          <p id="af-e4-coverage" class="af-e4-coverage"></p>
+          <div class="af-e4-subhead">
+            <h3>As probabilidades dos placares se confirmam?</h3>
+            <p>Em cada faixa, comparamos quantas ocorrências o modelo esperava com quantas aconteceram. O Top-3 reúne três placares mutuamente exclusivos e soma suas chances.</p>
+          </div>
+          <div class="af-e4-calibration-select">
+            <label for="af-e4-calibration-type">Analisar:</label>
+            <select id="af-e4-calibration-type" aria-label="Selecionar evento avaliado na calibração">
+              <option value="modal">Placar exato mais provável</option>
+              <option value="top3">Placar entre os três principais</option>
+            </select>
+          </div>
+          <div id="af-e4-calibration-reading" class="af-e4-takeaway" aria-live="polite"></div>
+          <div id="af-e4-calibration" aria-label="Faixas de calibração dos placares"></div>
+          <div class="af-e4-subhead">
+            <h3>Como evoluiu o Top-3 por rodada?</h3>
+            <p>Visão histórica de todas as rodadas com previsão documentada, independentemente dos filtros acima. Taxas de rodadas com poucos jogos oscilam mais.</p>
+          </div>
+          <div id="af-e4-rounds" class="af-e4-rounds"></div>
+          <div class="af-e4-subhead">
+            <h3>Certificação da amostra</h3>
+            <p>A análise utiliza somente a base E1/E3 com evidência de previsão anterior à partida. Nenhum resultado anterior foi reconstruído retrospectivamente.</p>
+          </div>
+          <div id="af-e4-integrity" class="af-e4-integrity"></div>
+          <details class="accuracy-details">
+            <summary>Metodologia dos placares e limitações</summary>
+            <div class="accuracy-method-copy">
+              <p><strong>Placar exato:</strong> o placar modal mais provável precisa coincidir exatamente com os gols reais dos dois times. Esse acerto é independente do palpite V/E/D, pois o desfecho com maior chance agregada pode diferir do placar modal.</p>
+              <p><strong>Top-3:</strong> o placar real deve constar entre os três placares individuais documentados no snapshot original do AF-Previsão. A chance esperada de estar no Top-3 é a soma das três probabilidades.</p>
+              <p><strong>Erro médio de gols:</strong> calculamos o erro absoluto médio entre gols projetados e realizados, dividindo a soma das diferenças de mandante e visitante por duas vezes o número de jogos.</p>
+              <p><strong>Calibração:</strong> confrontamos a probabilidade média com a frequência observada. Faixas com menos de 20 partidas são marcadas como amostra reduzida. Um desvio não comprova sozinho que o modelo é inadequado.</p>
+              <p><strong>Incerteza:</strong> o conjunto certificado é uma amostra histórica parcial e não uma seleção aleatória de todos os jogos. A confiança estatística depende do tamanho e da composição da amostra; não é possível afirmar superioridade sobre outros modelos sem comparação equivalente.</p>
+              <p><strong>Integridade:</strong> as previsões existem em commits Git anteriores ao começo factual das partidas e passam por conferência SHA-256 na E1, E3 e E4. O histórico original permanece inalterado.</p>
+            </div>
+          </details>
+        </div>
+      </section>
+
       <section class="panel accuracy-section" aria-labelledby="accuracy-timeline-title">
         <div class="panel-inner">
           <div class="section-head accuracy-section-head">
@@ -245,6 +310,7 @@
   <script src="js/br-menu.js?v=20260901-alertas-v1"></script>
   <script src="js/br-acuracia.js?v=20261109-ux-event-v1"></script>
   <script src="js/br-acuracia-insights.js?v=20261109-ux-v1"></script>
+  <script src="js/br-acuracia-placares-e4.js?v=20261110-e4"></script>
   <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
   <script src="/js/br-social-footer.js?v=20260811-social-v2-tiktok" defer></script>
   <script src="/js/br-pwa.js?v=20260923-pwa-home-install-v4" defer></script>

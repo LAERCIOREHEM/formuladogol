@@ -45,6 +45,7 @@ on:
       - 'css/br-estatisticas.css'
       - 'css/br-acuracia.css'
       - 'css/br-acuracia-insights.css'
+      - 'css/br-acuracia-placares-e4.css'
       - 'css/br-institucional.css'
       - 'css/br-sobre.css'
       - 'css/br-analises.css'
@@ -72,6 +73,9 @@ on:
       - 'tests/test-br-classificacao-live.mjs'
       - 'js/br-acuracia.js'
       - 'js/br-acuracia-insights.js'
+      - 'js/br-acuracia-placares-e4.js'
+      - 'scripts/gerar_acuracia_placares_e4.py'
+      - 'tests/test-af-e4-acuracia.mjs'
       - 'js/br-feedback.js'
       - 'js/br-menu.js'
       - 'js/br-museu.js'
@@ -210,6 +214,29 @@ jobs:
           print('AF E3: dados públicos rastreáveis à auditoria E1')
           PY
 
+      - name: E4 — certificar métricas de placares históricos antes de publicar
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/gerar_acuracia_placares_e4.py
+          python scripts/gerar_acuracia_placares_e4.py --self-test
+          python scripts/gerar_acuracia_placares_e4.py
+          node --check js/br-acuracia-placares-e4.js
+          node tests/test-af-e4-acuracia.mjs
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          src=Path('dados-br/resultados-af-placares-2026.json').read_bytes()
+          report=json.loads(Path('dados-br/acuracia-placares-af-2026.json').read_text(encoding='utf-8'))
+          assert report['origem']['e3_sha256'] == hashlib.sha256(src).hexdigest()
+          assert report['metricas']['jogos'] == report['escopo']['jogos_com_previsao_certificada']
+          assert report['metricas']['placares_exatos'] <= report['metricas']['top3_confirmados']
+          assert (report['escopo']['sem_prova_historica'] +
+                  report['escopo']['em_quarentena'] + report['metricas']['jogos'] ==
+                  report['escopo']['resultados_finais_auditados'])
+          print('AF E4: painel historicamente certificado e consistente com E3')
+          PY
+
       - name: Montar site público
         shell: bash
         run: |
@@ -264,6 +291,7 @@ jobs:
             css/br-estatisticas.css
             css/br-acuracia.css
             css/br-acuracia-insights.css
+            css/br-acuracia-placares-e4.css
             css/br-institucional.css
             css/br-sobre.css
             css/br-analises.css
@@ -292,6 +320,7 @@ jobs:
             js/br-resultados-freshness.js
             js/br-acuracia.js
             js/br-acuracia-insights.js
+            js/br-acuracia-placares-e4.js
             js/br-feedback.js
             js/br-menu.js
             js/br-museu.js
@@ -311,6 +340,7 @@ jobs:
             dados-br/auditoria-probabilidades.json
             dados-br/avaliacao-af-previsao.json
             dados-br/acuracia-af-previsao.json
+            dados-br/acuracia-placares-af-2026.json
             dados-br/clubes.json
             dados-br/calendario-completo.json
             dados-br/elencos.json
