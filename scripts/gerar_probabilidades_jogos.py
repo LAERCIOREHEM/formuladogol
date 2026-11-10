@@ -122,6 +122,17 @@ def build_document(
         display = percentage_partition(values, 1)
         rates = row.get("gols_esperados") or {}
         modal = row.get("placar_modal") or {}
+        top_scores = row.get("placares_mais_provaveis") or []
+        if top_scores and len(top_scores) < 3:
+            raise ValueError(f"Top-3 incompleto para {event_id}")
+        top3 = [
+            {
+                "mandante": int(item["mandante"]),
+                "visitante": int(item["visitante"]),
+                "probabilidade_pct": round(float(item["probabilidade_pct"]), 4),
+            }
+            for item in top_scores[:3]
+        ]
 
         games.append(
             {
@@ -156,6 +167,7 @@ def build_document(
                     "mandante": int(modal.get("mandante") or 0),
                     "visitante": int(modal.get("visitante") or 0),
                 },
+                "placares_mais_provaveis": top3,
             }
         )
 
@@ -245,6 +257,29 @@ def validate_document(
             for field in ("mandante", "visitante")
         ):
             raise ValueError(f"taxa de gols inválida em {event_id}")
+        # O Top-3 é transportado da matriz original do AF, jamais simulado no frontend.
+        # A publicação legada sem Top-3 continua válida durante failover.
+        top3 = game.get("placares_mais_provaveis") or []
+        if top3:
+            if not isinstance(top3, list) or len(top3) != 3:
+                raise ValueError(f"Top-3 precisa conter 3 placares: {event_id}")
+            seen = set()
+            last = 101.0
+            for item in top3:
+                if not isinstance(item, dict):
+                    raise ValueError(f"Top-3 inválido: {event_id}")
+                h, a, chance = item.get("mandante"), item.get("visitante"), item.get("probabilidade_pct")
+                if not (type(h) is int and type(a) is int and 0 <= h <= 12 and 0 <= a <= 12):
+                    raise ValueError(f"Gols do Top-3 inválidos: {event_id}")
+                if (h, a) in seen:
+                    raise ValueError(f"Top-3 duplicado: {event_id}")
+                seen.add((h, a))
+                if chance is None or not math.isfinite(float(chance)) or not (0 <= float(chance) <= last + 0.00011):
+                    raise ValueError(f"Chance do Top-3 inválida/desordenada: {event_id}")
+                last = float(chance)
+            modal = game.get("placar_modal") or {}
+            if (top3[0]["mandante"], top3[0]["visitante"]) != (modal.get("mandante"), modal.get("visitante")):
+                raise ValueError(f"Modal diverge do Top-3: {event_id}")
 
     if expected_rows is not None:
         expected = {
@@ -471,6 +506,11 @@ def self_test() -> None:
             "gols_esperados": {"mandante": 1.5, "visitante": 1.0},
             "probabilidades_pct": {"mandante": 45.0, "empate": 28.0, "visitante": 27.0},
             "placar_modal": {"mandante": 1, "visitante": 0},
+            "placares_mais_provaveis": [
+                {"mandante": 1, "visitante": 0, "probabilidade_pct": 19.1},
+                {"mandante": 1, "visitante": 1, "probabilidade_pct": 12.3},
+                {"mandante": 2, "visitante": 0, "probabilidade_pct": 11.2},
+            ],
         },
         {
             "event_id": "teste-2",
@@ -496,6 +536,10 @@ def self_test() -> None:
     audit = build_audit(document, rows)
     if document["total_jogos"] != 2 or audit["status"] != "ok":
         raise AssertionError("documento pré-jogo incompleto")
+    if len(document["jogos"][0]["placares_mais_provaveis"]) != 3:
+        raise AssertionError("Top-3 original não foi preservado")
+    if document["jogos"][1]["placares_mais_provaveis"]:
+        raise AssertionError("não deve criar Top-3 quando não há dados na fonte")
 
     tampered = json.loads(json.dumps(document))
     tampered["jogos"][0]["probabilidades_exibicao_pct"]["empate"] += 0.1
@@ -505,6 +549,15 @@ def self_test() -> None:
         pass
     else:
         raise AssertionError("auditoria não bloqueou soma diferente de 100%")
+
+    corrupt_top = json.loads(json.dumps(document))
+    corrupt_top["jogos"][0]["placares_mais_provaveis"][0]["mandante"] = 9
+    try:
+        validate_document(corrupt_top)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Top-3 desconectado do modal foi aceito")
 
     duplicated = json.loads(json.dumps(document))
     duplicated["jogos"][1]["event_id"] = duplicated["jogos"][0]["event_id"]
