@@ -42,9 +42,12 @@
       }
       if (subset[0].mandante !== modal.mandante ||
           subset[0].visitante !== modal.visitante) valid = false;
-      if (valid) scores = subset.map(s => ({
+      if (!valid) return null; // fonte inconsistente: não exibir previsão corrompida
+      scores = subset.map(s => ({
         home: s.mandante, away: s.visitante, pct: s.probabilidade_pct
       }));
+    } else if (native != null && (!Array.isArray(native) || native.length !== 0)) {
+      return null; // Top-3 parcial não pode aparecer como previsão certificada.
     }
     return {
       modal: { home: modal.mandante, away: modal.visitante },
