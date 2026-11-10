@@ -51,7 +51,7 @@ assert.equal(api.render({ ...row, placares_mais_provaveis: [
 
 const legacy = api.render({ ...row, placares_mais_provaveis: undefined });
 assert.match(legacy, /Chance individual indisponível/);
-assert.match(legacy, /aguardando o Top-3/);
+assert.match(legacy, /Outros cenários indisponíveis/);
 assert.doesNotMatch(legacy, /2º cenário/);
 assert.ok(legacy.endsWith('</section>'));
 
