@@ -1,0 +1,141 @@
+/* E2 · apenas apresentação pré-jogo; mesmo componente em Jogos e Ao Vivo.
+   Escopo isolado para não alterar escudos, placar factual ou menus. */
+.af-e2-prediction {
+  box-sizing: border-box;
+  width: min(100%, 850px);
+  max-width: 100%;
+  margin: 16px auto 2px;
+  padding: 13px 17px 11px;
+  border: 1px solid rgba(163,230,53,.24);
+  border-radius: 15px;
+  background: linear-gradient(115deg, rgba(163,230,53,.075), rgba(96,165,250,.065) 85%);
+  color: #eaf2f6;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.af-e2-prediction *,
+.af-e2-prediction *::before,
+.af-e2-prediction *::after { box-sizing: border-box; }
+.af-e2-upper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.af-e2-primary { min-width: 0; flex: 1 1 auto; }
+.af-e2-eyebrow {
+  display: block;
+  font-size: 10px;
+  line-height: 1.45;
+  font-weight: 900;
+  color: #cfe8d1;
+  letter-spacing: .035em;
+}
+.af-e2-primary-line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 13px;
+  margin-top: 4px;
+}
+.af-e2-main-score {
+  color: #ddff8b;
+  line-height: 1.15;
+  font-size: clamp(24px, 2.5vw, 34px);
+  letter-spacing: -.025em;
+}
+.af-e2-main-pct { font-size: 11px; color: #b9d7cb; font-weight: 800; }
+.af-e2-means {
+  flex: 0 0 auto;
+  min-width: 118px;
+  text-align: right;
+  padding-left: 14px;
+  border-left: 1px solid rgba(203,213,225,.18);
+}
+.af-e2-means > span {
+  display: block;
+  color: #a7b6c5;
+  font-size: 10px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.af-e2-means strong { color: #f7fafc; font-size: 15px; }
+.af-e2-alternatives {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 11px;
+}
+.af-e2-alternative {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px 9px;
+  padding: 8px 11px;
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 9px;
+  background: rgba(2,10,16,.31);
+}
+.af-e2-alt-label { color: #a8bac8; font-size: 10px; font-weight: 700; }
+.af-e2-alternative strong { color: #e5f2fe; font-size: 15px; white-space: nowrap; }
+.af-e2-alt-pct {
+  margin-left: auto;
+  color: #b6d9f7;
+  font-size: 11px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+.af-e2-note {
+  margin: 9px 0 0;
+  color: #9eb2c1;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.af-e2-note strong { color: #cddbe5; }
+.af-e2-unavailable {
+  margin: 8px 0 0;
+  color: #b8bdc7;
+  font-size: 11px;
+}
+.af-e2-aovivo { margin-top: 18px; }
+.af-e2-jogos { margin-top: 10px; margin-bottom: 7px; }
+
+@media (max-width: 760px) {
+  .af-e2-prediction { padding: 11px 12px 10px; border-radius: 12px; margin-top: 12px; }
+  .af-e2-main-score { font-size: 28px; }
+  .af-e2-primary-line { gap: 4px 10px; }
+  .af-e2-means { min-width: 105px; padding-left: 10px; }
+  .af-e2-means strong { font-size: 13px; }
+  .af-e2-alternative { padding: 7px 9px; }
+}
+@media (max-width: 480px) {
+  .af-e2-prediction { padding: 10px 11px; }
+  .af-e2-upper { gap: 7px; align-items: center; }
+  .af-e2-eyebrow { font-size: 9px; letter-spacing: 0; }
+  .af-e2-main-score { font-size: 25px; }
+  .af-e2-main-pct { display: block; width: 100%; font-size: 10px; }
+  .af-e2-means { min-width: 95px; padding-left: 7px; }
+  .af-e2-means > span { font-size: 9px; }
+  .af-e2-means strong { font-size: 12px; white-space: nowrap; }
+  .af-e2-alternatives { gap: 6px; }
+  .af-e2-alternative {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 7px 9px;
+  }
+  .af-e2-alternative strong { font-size: 15px; }
+  .af-e2-alt-pct { margin-left: 0; font-size: 10px; }
+  .af-e2-note { font-size: 9.5px; }
+}
+@media (max-width: 350px) {
+  .af-e2-upper { align-items: flex-start; }
+  .af-e2-eyebrow { font-size: 8.5px; }
+  .af-e2-means { min-width: 88px; }
+  .af-e2-means strong { font-size: 11px; }
+  .af-e2-main-score { font-size: 23px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .af-e2-prediction * { transition: none !important; animation: none !important; }
+}
