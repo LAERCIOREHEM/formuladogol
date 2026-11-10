@@ -40,6 +40,7 @@ on:
       - 'css/br-jogos.css'
       - 'css/br-aovivo.css'
       - 'css/br-af-scorecards.css'
+      - 'css/br-af-resultados.css'
       - 'css/br-agenda.css'
       - 'css/br-estatisticas.css'
       - 'css/br-acuracia.css'
@@ -52,6 +53,9 @@ on:
       - 'css/br-alertas.css'
       - 'js/br-aovivo.js'
       - 'js/br-af-scorecards.js'
+      - 'js/br-af-resultados.js'
+      - 'tests/test-af-e3-resultados.mjs'
+      - 'scripts/gerar_resultados_af_e3.py'
       - 'tests/test-af-e2-scorecards.mjs'
       - 'js/br-live-goal-sync.js'
       - 'tests/test-br-live-goal-sync.mjs'
@@ -185,6 +189,27 @@ jobs:
           print("AF acurácia regenerada e validada:", games["jogos_avaliados"], "partidas únicas")
           PY
 
+      - name: Certificar e gerar painel E3 de resultados documentados
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/gerar_resultados_af_e3.py
+          python scripts/gerar_resultados_af_e3.py --self-test
+          python scripts/gerar_resultados_af_e3.py
+          node --check js/br-af-resultados.js
+          node tests/test-af-e3-resultados.mjs
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          report = json.loads(Path('dados-br/resultados-af-placares-2026.json').read_text(encoding='utf-8'))
+          source = Path('dados-br/auditoria-historica-placares-af-2026.json').read_bytes()
+          assert report['origem']['sha256_arquivo'] == hashlib.sha256(source).hexdigest()
+          assert report['resumo']['previsoes_certificadas'] == sum(
+            x['situacao'] == 'comprovado' for x in report['jogos'])
+          assert all('placar_previsto' not in x for x in report['jogos'] if x['situacao'] != 'comprovado')
+          print('AF E3: dados públicos rastreáveis à auditoria E1')
+          PY
+
       - name: Montar site público
         shell: bash
         run: |
@@ -234,6 +259,7 @@ jobs:
             css/br-jogos.css
             css/br-aovivo.css
             css/br-af-scorecards.css
+            css/br-af-resultados.css
             css/br-agenda.css
             css/br-estatisticas.css
             css/br-acuracia.css
@@ -254,6 +280,7 @@ jobs:
             js/br-live-goal-sync.js
             js/br-aovivo.js
             js/br-af-scorecards.js
+            js/br-af-resultados.js
             js/br-agenda.js
             js/br-analises.js
             js/br-clube-retorno.js
@@ -304,6 +331,7 @@ jobs:
             dados-br/museu-brasileirao.json
             dados-br/probabilidades-brasileirao.json
             dados-br/probabilidades-jogos.json
+            dados-br/resultados-af-placares-2026.json
             dados-br/probabilidades-por-pontuacao.json
             dados-br/ranking-desempenho.json
             dados-br/resultados-manuais.json
