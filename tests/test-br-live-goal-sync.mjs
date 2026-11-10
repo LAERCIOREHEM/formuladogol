@@ -33,6 +33,6 @@ const earlyFactsIndex = page.indexOf('renderMain(currentSelectedGame(), data, al
 const statsRetryIndex = page.indexOf('await waitWithSignal(PARTIAL_STATS_RETRY_DELAY_MS', firstSummaryIndex);
 assert.ok(firstSummaryIndex >= 0 && earlyFactsIndex > firstSummaryIndex && statsRetryIndex > earlyFactsIndex,
   'R10R17.3 deve exibir o autor assim que o gateway entrega facts, antes do retry das estatísticas');
-assert.match(fs.readFileSync('aovivo.html','utf8'), /br-aovivo\.js\?v=20261014-r10r17-3/);
+assert.match(fs.readFileSync('aovivo.html','utf8'), /br-aovivo\.js\?v=20261110-ux-r1/);
 
 console.log('br-live-goal-sync R10R17.2: PASS');
