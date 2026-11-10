@@ -187,3 +187,14 @@
 @media(prefers-reduced-motion:reduce) {
   .af-e3-summary::after { transition: none; }
 }
+
+.af-e3-coverage {
+  margin: 8px 0 13px;
+  padding: 9px 12px;
+  border-left: 3px solid rgba(163,230,53,.58);
+  border-radius: 0 8px 8px 0;
+  background: rgba(163,230,53,.045);
+  color: #c1d5db;
+  font-size: 11px;
+  line-height: 1.5;
+}
