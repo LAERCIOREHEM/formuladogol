@@ -54,7 +54,7 @@ for(const test of cases) {
     const status=await page.locator('#af-e4-status').innerText();
     assert.match(status,/certificada/,test.name);
     const initial=await page.locator('#af-e4-summary').innerText();
-    assert.match(initial,/157/,test.name);
+    assert.ok(initial.includes(String(JSON.parse(data).metricas.jogos)), test.name);
     await page.locator('#af-e4-calibration-type').selectOption('top3');
     assert.match(await page.locator('#af-e4-calibration-reading').innerText(),/O modelo esperava/,test.name);
     await page.locator('#af-e4-club').selectOption({index:1});
@@ -64,7 +64,7 @@ for(const test of cases) {
     await page.locator('#af-e4-round').selectOption('');
     await page.locator('#af-e4-club').selectOption('');
     const status2=await page.locator('#af-e4-summary').innerText();
-    assert.match(status2,/157/,test.name);
+    assert.ok(status2.includes(String(JSON.parse(data).metricas.jogos)), test.name);
     const width=await page.evaluate(()=>{
       const section=document.querySelector('.af-e4-section');
       const rect=section.getBoundingClientRect();
@@ -80,6 +80,12 @@ for(const test of cases) {
     });
     assert.ok(width.scrollWidth <= width.viewport + 1,test.name+' page overflow '+JSON.stringify(width));
     assert.equal(width.overflow.length,0,test.name+' element overflow '+JSON.stringify(width));
+    const selectStyles=await page.locator('#af-e4-club').evaluate(el => {
+      const styles=getComputedStyle(el);
+      return {background:styles.backgroundColor,color:styles.color,appearance:styles.appearance};
+    });
+    assert.notEqual(selectStyles.background,'rgb(255, 255, 255)',
+      test.name + ' select branco/ilegível');
     assert.equal(issues.length,0,test.name+' runtime exceptions '+issues.join(', '));
     await page.screenshot({path:'test-results/af-e4/'+test.name+'.png',fullPage:true});
     console.log('AF E4 VIEWPORT PASS',test.name,width.viewport);
