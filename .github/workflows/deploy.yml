@@ -231,7 +231,9 @@ jobs:
           assert report['origem']['e3_sha256'] == hashlib.sha256(src).hexdigest()
           assert report['metricas']['jogos'] == report['escopo']['jogos_com_previsao_certificada']
           assert report['metricas']['placares_exatos'] <= report['metricas']['top3_confirmados']
-          assert report['escopo']['sem_prova_historica'] == 182
+          assert (report['escopo']['sem_prova_historica'] +
+                  report['escopo']['em_quarentena'] + report['metricas']['jogos'] ==
+                  report['escopo']['resultados_finais_auditados'])
           print('AF E4: painel historicamente certificado e consistente com E3')
           PY
 
