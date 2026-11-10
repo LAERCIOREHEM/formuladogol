@@ -97,11 +97,10 @@
           '<strong>' + means(data.means.home) + ' × ' + means(data.means.away) + '</strong>' +
         '</div>' +
       '</div>' +
-      alt.length === 2
-      ? alternatives +
-        '<p class="af-e2-note">Os três percentuais são de <strong>placares isolados</strong>, não de vitória, empate ou derrota. Nenhum placar é garantido.</p>'
-      : alternatives +
-        '<p class="af-e2-note">O placar previsto é uma possibilidade, não uma garantia. As chances V/E/D somam diferentes placares.</p>' +
+      alternatives +
+      (alt.length === 2
+        ? '<p class="af-e2-note">Os três percentuais são de <strong>placares isolados</strong>, não de vitória, empate ou derrota. Nenhum placar é garantido.</p>'
+        : '<p class="af-e2-note">O placar previsto é uma possibilidade, não uma garantia. As chances V/E/D somam diferentes placares.</p>') +
       '</section>';
   }
 
