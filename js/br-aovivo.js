@@ -1934,9 +1934,9 @@
     const hours = Math.floor(diff / 3600000); diff %= 3600000;
     const mins = Math.floor(diff / 60000);
     const secs = Math.floor((diff % 60000) / 1000);
-    if (days > 0) return "Começa em " + days + "d " + hours + "h " + mins + "min";
-    if (hours > 0) return "Começa em " + hours + "h " + mins + "min";
-    return "Começa em " + mins + "min " + String(secs).padStart(2, "0") + "s";
+    if (days > 0) return "Faltam " + days + "d " + hours + "h " + mins + "min";
+    if (hours > 0) return "Faltam " + hours + "h " + mins + "min";
+    return "Faltam " + mins + "min " + String(secs).padStart(2, "0") + "s";
   }
 
   function teamIdMap(g) {

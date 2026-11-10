@@ -1,0 +1,113 @@
+name: AF UX R1 - Placar centralizado e acertos legíveis
+
+on:
+  push:
+    branches:
+      - hotfix/ux-r1-placares-resultados-20261110
+    paths:
+      - '.github/workflows/af-ux-r1-hotfix-ci.yml'
+      - 'index.html'
+      - 'aovivo.html'
+      - 'js/br-af-scorecards.js'
+      - 'css/br-af-scorecards.css'
+      - 'js/br-af-resultados.js'
+      - 'css/br-af-resultados.css'
+      - 'js/br-aovivo.js'
+      - 'css/br-aovivo.css'
+      - 'tests/test-af-e2-scorecards.mjs'
+      - 'tests/test-af-e2-viewports.mjs'
+      - 'tests/test-af-e3-resultados.mjs'
+      - 'tests/test-af-e3-viewports.mjs'
+      - '.github/workflows/deploy.yml'
+  pull_request:
+    paths:
+      - '.github/workflows/af-ux-r1-hotfix-ci.yml'
+      - 'index.html'
+      - 'aovivo.html'
+      - 'js/br-af-scorecards.js'
+      - 'css/br-af-scorecards.css'
+      - 'js/br-af-resultados.js'
+      - 'css/br-af-resultados.css'
+      - 'js/br-aovivo.js'
+      - 'css/br-aovivo.css'
+      - 'tests/test-af-e2-scorecards.mjs'
+      - 'tests/test-af-e2-viewports.mjs'
+      - 'tests/test-af-e3-resultados.mjs'
+      - 'tests/test-af-e3-viewports.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: af-ux-r1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  certificar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verificar código, dados históricos e semântica dos acertos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check js/br-af-scorecards.js
+          node --check js/br-af-resultados.js
+          node --check js/br-aovivo.js
+          node tests/test-af-e2-scorecards.mjs
+          node tests/test-af-e3-resultados.mjs
+          node tests/test-af-e4-acuracia.mjs
+          python scripts/gerar_acuracia_placares_e4.py --self-test
+          python - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+          source=json.loads(Path("dados-br/acuracia-placares-af-2026.json").read_text())
+          evidence=json.loads(Path("dados-br/auditoria-historica-placares-af-2026.json").read_text())
+          view=json.loads(Path("dados-br/resultados-af-placares-2026.json").read_text())
+          assert source["metricas"]["jogos"] == view["resumo"]["previsoes_certificadas"]
+          assert view["resumo"]["previsoes_certificadas"] == evidence["resumo"]["jogos_com_placar_prejogo_comprovado"]
+          assert source["integridade"]["hash_jogos"] != ""
+          assert hashlib.sha256(Path("dados-br/resultados-af-placares-2026.json").read_bytes()).hexdigest()==source["origem"]["e3_sha256"]
+          print("AF UX R1: E1/E3/E4 consistentes, sem recalcular resultados")
+          PY
+
+      - name: Instalar Chromium Android e WebKit iPhone
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --ignore-scripts playwright@1.56.1
+          npx playwright install --with-deps chromium webkit
+
+      - name: Testar JOGOS e AO VIVO em seis tamanhos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/test-af-e2-viewports.mjs
+
+      - name: Testar RESULTADOS em seis tamanhos
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/test-af-e3-viewports.mjs
+
+      - name: Arquivar imagens de QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: af-ux-r1-jogos-aovivo-resultados
+          path: |
+            test-results/af-e2/*.png
+            test-results/af-e3/*.png
+          retention-days: 14
+          if-no-files-found: warn

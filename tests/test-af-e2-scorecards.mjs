@@ -32,6 +32,13 @@ assert.match(pregame, /9,5%/);
 assert.match(pregame, /1,38 × 0,97/);
 assert.equal((pregame.match(/class="af-e2-alternative"/g) || []).length, 2);
 assert.ok(pregame.endsWith('</section>'));
+assert.match(pregame, /af-e2-primary/);
+assert.match(pregame, /af-e2-footer/);
+assert.match(pregame, /Projeção pré-jogo · não é o resultado/);
+assert.match(pregame, /chance desse placar/);
+assert.equal((pregame.match(/class="af-e2-alt-score"/g) || []).length, 2);
+assert.ok(pregame.indexOf('af-e2-primary') < pregame.indexOf('af-e2-alternatives'));
+assert.ok(pregame.indexOf('af-e2-alternatives') < pregame.indexOf('af-e2-footer'));
 assert.doesNotMatch(pregame, /46,3% de chance desse placar/);
 
 assert.match(api.render(row, { context: 'aovivo' }), /af-e2-aovivo/);
@@ -44,7 +51,7 @@ assert.equal(api.render({ ...row, placares_mais_provaveis: [
 
 const legacy = api.render({ ...row, placares_mais_provaveis: undefined });
 assert.match(legacy, /Chance individual indisponível/);
-assert.match(legacy, /aguardando o Top-3/);
+assert.match(legacy, /Outros cenários indisponíveis/);
 assert.doesNotMatch(legacy, /2º cenário/);
 assert.ok(legacy.endsWith('</section>'));
 
@@ -52,8 +59,8 @@ const home = readFileSync('index.html', 'utf8');
 const live = readFileSync('aovivo.html', 'utf8');
 const liveJs = readFileSync('js/br-aovivo.js', 'utf8');
 for (const html of [home, live]) {
-  assert.ok(html.includes('css/br-af-scorecards.css?v=20261110-e2'));
-  assert.ok(html.includes('js/br-af-scorecards.js?v=20261110-e2'));
+  assert.ok(html.includes('css/br-af-scorecards.css?v=20261110-ux-r1'));
+  assert.ok(html.includes('js/br-af-scorecards.js?v=20261110-ux-r1'));
 }
 assert.ok(home.indexOf('br-af-scorecards.js') < home.indexOf('function probabilidadesPreJogoDoJogo'));
 assert.match(home, /const previsaoElegivel = estado\.estado === 'pre'/);
@@ -64,5 +71,5 @@ assert.match(liveJs, /probabilityMobile \+\s*placaresPreJogo \+/);
 const css = readFileSync('css/br-af-scorecards.css', 'utf8');
 assert.match(css, /max-width:\s*480px/);
 assert.match(css, /max-width:\s*350px/);
-assert.match(css, /minmax\(0, 1fr\)/);
+assert.match(css, /minmax\(0,\s*1fr\)/);
 console.log('E2 SCORECARDS: PASS — modal, Top-3, percentuais, legado, desktop/mobile e não exibição em FINAL');

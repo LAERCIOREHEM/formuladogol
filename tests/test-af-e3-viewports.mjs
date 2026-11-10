@@ -62,9 +62,15 @@ for (const test of cases) {
     }, { data, p: proven, m: missing });
     assert.equal(await page.locator('#match1 details.af-e3-result').count(), 1, test.name);
     assert.equal(await page.locator('#match2 .af-e3-outcome-missing').count(), 1, test.name);
+    assert.equal(await page.locator('#match1 .af-e3-featured').count(), 1, test.name);
+    assert.equal(await page.locator('#match1 .af-e3-breakdown').isVisible(), false,
+      test.name + ': avaliação técnica não deve poluir o cartão fechado');
     await page.locator('#match1 details.af-e3-result summary').click();
     assert.ok(await page.locator('#match1 details.af-e3-result').evaluate(el => el.open), test.name);
     assert.equal(await page.locator('#match1 .af-e3-score-option').count(), 3);
+    assert.equal(await page.locator('#match1 .af-e3-breakdown').isVisible(), true, test.name);
+    assert.equal(await page.locator('#match1 .af-e3-breakdown .af-e3-chip').count(), 3,
+      test.name + ': preservar critérios V/E/D, exato e Top-3 independentes');
     const metrics = await page.evaluate(() => {
       const card = document.querySelector('#match1 .af-e3-result');
       const box = card.getBoundingClientRect();

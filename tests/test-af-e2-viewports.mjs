@@ -56,6 +56,23 @@ for (const s of scenarios) {
     assert.ok(sizes.scroll <= sizes.inner + 1, s.name + ': rolagem horizontal: ' + JSON.stringify(sizes));
     assert.ok(!sizes.overflow.length, s.name + ': texto/elemento fora da tela: ' + JSON.stringify(sizes));
     assert.ok(sizes.card > 220 && sizes.card < sizes.inner + 1, s.name + ': card fora dos limites');
+    const alignment = await page.evaluate(() => {
+      const card = document.querySelector('.af-e2-prediction').getBoundingClientRect();
+      const main = document.querySelector('.af-e2-main-score').getBoundingClientRect();
+      const scenarios = [...document.querySelectorAll('.af-e2-alternative')].map(el => el.getBoundingClientRect());
+      const center = r => (r.left + r.right) / 2;
+      return {
+        mainOffset: Math.abs(center(main) - center(card)),
+        scenarioWidths: scenarios.map(r => r.width),
+        mainFont: parseFloat(getComputedStyle(document.querySelector('.af-e2-main-score')).fontSize),
+        scenarioFont: parseFloat(getComputedStyle(document.querySelector('.af-e2-alt-score')).fontSize)
+      };
+    });
+    assert.ok(alignment.mainOffset <= 2, s.name + ': placar central desalinhado ' + JSON.stringify(alignment));
+    assert.ok(Math.abs(alignment.scenarioWidths[0] - alignment.scenarioWidths[1]) <= 1,
+      s.name + ': cenários assimétricos ' + JSON.stringify(alignment));
+    assert.ok(alignment.mainFont <= 30 && alignment.mainFont >= 22, s.name + ': placar principal excessivo');
+    assert.ok(alignment.scenarioFont < alignment.mainFont, s.name + ': hierarquia visual invertida');
     await page.screenshot({ path: 'test-results/af-e2/' + s.name + '.png', fullPage: true });
     console.log('VIEWPORT PASS:', s.name, sizes.inner + 'px', Math.round(sizes.card) + 'px');
     await context.close();
