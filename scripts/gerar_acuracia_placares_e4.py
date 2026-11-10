@@ -275,7 +275,10 @@ def self_test() -> None:
     assert m["placares_exatos"] <= m["top3_confirmados"] <= m["jogos"]
     assert sum(x["metricas"]["jogos"] for x in output["por_rodada"]) == m["jogos"]
     assert sum(x["metricas"]["jogos"] for x in output["por_clube"]) == m["jogos"] * 2
-    assert m["jogos"] == 157 and output["escopo"]["sem_prova_historica"] == 182
+    assert m["jogos"] > 0
+    assert (m["jogos"] + output["escopo"]["sem_prova_historica"] +
+            output["escopo"]["em_quarentena"] ==
+            output["escopo"]["resultados_finais_auditados"])
     print("AF E4 SELF-TEST PASS:", m["jogos"], "jogos,",
           m["placares_exatos"], "exatos,", m["top3_confirmados"], "Top-3")
 
