@@ -76,34 +76,32 @@
     const mainScore = data.modal.home + " × " + data.modal.away;
     const alt = data.scores ? data.scores.slice(1, 3) : [];
     const alternatives = alt.length === 2
-      ? '<div class="af-e2-alternatives" aria-label="Dois outros placares possíveis">' +
+      ? '<div class="af-e2-alternatives" aria-label="Segundo e terceiro placares mais prováveis">' +
           alt.map(function (s, index) {
-            return '<div class="af-e2-alternative"><span class="af-e2-alt-label">' +
-              (index === 0 ? "2º cenário" : "3º cenário") + '</span>' +
-              '<strong>' + s.home + ' × ' + s.away + '</strong>' +
-              '<span class="af-e2-alt-pct">' + pct(s.pct) + '</span></div>';
+            return '<div class="af-e2-alternative">' +
+              '<span class="af-e2-alt-label">' + (index === 0 ? "2º cenário" : "3º cenário") + '</span>' +
+              '<strong class="af-e2-alt-score">' + s.home + ' × ' + s.away + '</strong>' +
+              '<span class="af-e2-alt-pct">' + pct(s.pct) + ' de chance</span>' +
+              '</div>';
           }).join("") + '</div>'
-      : '<p class="af-e2-unavailable">Outros placares: aguardando o Top-3 do modelo.</p>';
+      : '<p class="af-e2-unavailable">Outros cenários indisponíveis nesta previsão.</p>';
 
     return '<section class="af-e2-prediction af-e2-' + context +
-      '" aria-label="AF-Previsão: distribuição de placares antes do jogo">' +
-      '<div class="af-e2-upper">' +
-        '<div class="af-e2-primary">' +
-          '<span class="af-e2-eyebrow">⚽ AF-PREVISÃO · PLACAR MAIS PROVÁVEL</span>' +
-          '<div class="af-e2-primary-line"><strong class="af-e2-main-score">' + mainScore +
-            '</strong><span class="af-e2-main-pct">' +
-            (primary ? pct(primary.pct) + ' de chance desse placar' : 'Chance individual indisponível') +
-          '</span></div>' +
-        '</div>' +
-        '<div class="af-e2-means">' +
-          '<span>Gols projetados</span>' +
-          '<strong>' + means(data.means.home) + ' × ' + means(data.means.away) + '</strong>' +
-        '</div>' +
+      '" aria-label="AF-Previsão: placares possíveis antes do jogo, não são o resultado real">' +
+      '<div class="af-e2-primary">' +
+        '<span class="af-e2-eyebrow">⚽ AF-PREVISÃO · PLACAR MAIS PROVÁVEL</span>' +
+        '<strong class="af-e2-main-score">' + mainScore + '</strong>' +
+        '<span class="af-e2-main-pct">' +
+        (primary ? pct(primary.pct) + ' de chance desse placar' : 'Chance individual indisponível') +
+        '</span>' +
       '</div>' +
       alternatives +
-      (alt.length === 2
-        ? '<p class="af-e2-note">Os três percentuais são de <strong>placares isolados</strong>, não de vitória, empate ou derrota. Nenhum placar é garantido.</p>'
-        : '<p class="af-e2-note">O placar previsto é uma possibilidade, não uma garantia. As chances V/E/D somam diferentes placares.</p>') +
+      '<div class="af-e2-footer">' +
+        '<span class="af-e2-means"><span>Gols projetados</span> <strong>' +
+          means(data.means.home) + ' × ' + means(data.means.away) + '</strong></span>' +
+        '<span class="af-e2-projection-label">Projeção pré-jogo · não é o resultado</span>' +
+      '</div>' +
+      '<p class="af-e2-note">Cada percentual é de um <strong>placar isolado</strong>, não da chance total de vitória ou empate.</p>' +
       '</section>';
   }
 
