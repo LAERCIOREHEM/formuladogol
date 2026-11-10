@@ -51,7 +51,7 @@ assert.equal(assessment.exact, true);
 assert.equal(assessment.top3, true);
 let html = api.render(game, report);
 assert.match(html, /AF-Previsão/);
-assert.match(html, /Placar previsto/);
+assert.match(html, /Previsão principal/);
 assert.match(html, /1 × 1/);
 assert.match(html, /13,2% desse placar/);
 assert.match(html, /V\/E\/D não confirmado/);
