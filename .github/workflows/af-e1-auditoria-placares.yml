@@ -1,0 +1,91 @@
+name: AF-Previsão E1 - Auditoria Histórica de Placares
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/auditar_historico_placares_af.py'
+      - '.github/workflows/af-e1-auditoria-placares.yml'
+      - 'docs/AF-E1-AUDITORIA-PLACARES-2026.md'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/auditar_historico_placares_af.py'
+      - '.github/workflows/af-e1-auditoria-placares.yml'
+      - 'docs/AF-E1-AUDITORIA-PLACARES-2026.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# O workflow que escreve em main respeita o lock global dos demais publicadores.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && 'af-e1-auditoria-pr' || 'repo-write-main' }}
+  cancel-in-progress: false
+
+jobs:
+  recuperar:
+    name: Recuperar previsões factualmente anteriores aos jogos
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout histórico completo (obrigatório para E1)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Python para auditoria isolada
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Autotestes de cronologia, integridade e ausência de retroprevisão
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/auditar_historico_placares_af.py
+          python scripts/auditar_historico_placares_af.py --self-test
+
+      - name: Examinar TODO histórico Git (sem completar lacunas)
+        run: |
+          set -euo pipefail
+          python scripts/auditar_historico_placares_af.py
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+
+          result = json.loads(Path("dados-br/auditoria-historica-placares-af-2026.json").read_text(encoding="utf-8"))
+          assert result["schema_version"] == 1
+          summary = result["resumo"]
+          assert summary["total_resultados_unicos"] > 0, "Nenhum resultado encontrado"
+          assert summary["jogos_com_placar_prejogo_comprovado"] > 0, "Nenhum placar de arquivo pré-jogo recuperado"
+          assert summary["partidas_sem_previsao_nao_foram_reconstituidas"] is True
+          original = Path("dados-br/historico-probabilidades-jogos.json").read_bytes()
+          actual = hashlib.sha256(original).hexdigest()
+          assert actual == result["historico_ved_preexistente"]["arquivo_sha256_antes_da_auditoria"]
+          assert result["historico_ved_preexistente"]["alterado_pela_e1"] is False
+          assert sum(item["situacao"] == "comprovado" for item in result["jogos"]) == summary["jogos_com_placar_prejogo_comprovado"]
+          print("E1 APROVADA: " + json.dumps(summary, ensure_ascii=False))
+          PY
+
+      - name: Publicar relatório imutável da execução como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: af-e1-auditoria-placares-2026
+          path: dados-br/auditoria-historica-placares-af-2026.json
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Gravar somente o relatório E1 na main
+        if: ${{ github.event_name != 'pull_request' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dados-br/auditoria-historica-placares-af-2026.json
+          if git diff --cached --quiet; then
+            echo "Auditoria E1 idêntica à versão publicada; nenhuma alteração."
+            exit 0
+          fi
+          git commit -m "data(AF E1): relatório histórico documental de placares pré-jogo"
+          git push origin HEAD:main
