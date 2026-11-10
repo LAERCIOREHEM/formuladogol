@@ -2757,6 +2757,8 @@
     const hasProbabilities = g.competitionKey === "brasileirao" && g.probabilitiesAvailable === true;
     const probabilityDesktop = s.key === "pre" && hasProbabilities ? renderPregameProbability(g, "desktop") : "";
     const probabilityMobile = s.key === "pre" && hasProbabilities ? renderPregameProbability(g, "mobile") : "";
+    const placaresPreJogo = s.key === "pre" && hasProbabilities && window.FDGScoreCards
+      ? window.FDGScoreCards.render(probabilityRowForGame(g), { context: "aovivo" }) : "";
     const probabilityHome = probabilityDesktop && probabilityDesktop.home ? probabilityDesktop.home : "";
     const probabilityDraw = probabilityDesktop && probabilityDesktop.draw ? probabilityDesktop.draw : "";
     const probabilityAway = probabilityDesktop && probabilityDesktop.away ? probabilityDesktop.away : "";
@@ -2773,6 +2775,7 @@
       (countdown ? '<div class="live-countdown" data-countdown-game="' + esc(g.id) + '">' + esc(countdown) + '</div>' : "") + '</div>' +
       teamLink(g.away, '<div class="live-team">' + probabilityAway + teamLogo(g.away) + '<div class="live-team-name">' + esc(g.away.nome) + '</div>' + goalLines.away + '<div class="live-team-abbr">' + esc(g.away.sigla || SIGLAS[g.away.nome] || "") + '</div></div>') + '</div>' +
       probabilityMobile +
+      placaresPreJogo +
       (hasProbabilities ? renderProbabilidadeDinamica(g) : "") +
       '<div class="live-meta">' + venue + transmission + '</div>' +
       renderTransmission(g) +
