@@ -17,12 +17,12 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 4,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 34,
+    "candidatos_oficiais_encontrados": 29,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
-    "transmissoes_publicadas": 5,
-    "sem_transmissao": 0,
+    "transmissoes_publicadas": 4,
+    "sem_transmissao": 1,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -69,16 +69,14 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401913107",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Vasco da Gama x Palmeiras",
-      "data_iso": "2026-11-08T17:00:00-03:00",
-      "principal": "GE TV",
-      "fontes_encontradas": [
-        "GE TV"
-      ],
+      "event_id": "401841175",
+      "rodada": 21,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Chapecoense x Vasco da Gama",
+      "data_iso": "2026-11-14T20:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
       "manual": false,
       "descoberta_antecipada": false
     },
@@ -141,23 +139,6 @@
   ],
   "aceitos": [
     {
-      "event_id": "401913107",
-      "jogo": "Vasco da Gama x Palmeiras",
-      "fonte": "getv",
-      "video_id": "iI_CDCgFJ1Y",
-      "url": "https://www.youtube.com/watch?v=iI_CDCgFJ1Y",
-      "titulo": "AO VIVO: VASCO X PALMEIRAS | COPA DO BRASIL | SEMIFINAL | ge tv",
-      "status": "live",
-      "confianca": 0.925,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (90 min de diferença)"
-      ]
-    },
-    {
       "event_id": "401841322",
       "jogo": "Palmeiras x Flamengo",
       "fonte": "getv",
@@ -197,12 +178,12 @@
       "url": "https://www.youtube.com/watch?v=9B48Zrg5s18",
       "titulo": "AO VIVO: CORITIBA X SANTOS | BRASILEIRÃO 2026 | 35ª RODADA",
       "status": "upcoming",
-      "confianca": 0.95,
+      "confianca": 0.875,
       "motivos": [
         "os dois clubes aparecem no título",
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
-        "horário compatível (0 min de diferença)"
+        "horário compatível (90 min de diferença)"
       ]
     },
     {
@@ -224,6 +205,16 @@
   ],
   "rejeitados": [
     {
+      "video_id": "ZP1Kyp7hHEw",
+      "url": "https://www.youtube.com/watch?v=ZP1Kyp7hHEw",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "PITTSBURGH STEELERS X CINCINNATI BENGALS  | AQUECIMENTO AO VIVO | NFL | #live | sportv",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-15T18:10:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "uLqXRKXOB8E",
       "url": "https://www.youtube.com/watch?v=uLqXRKXOB8E",
       "fonte": "sbt",
@@ -234,143 +225,113 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "0QYNVo7UroY",
-      "url": "https://www.youtube.com/watch?v=0QYNVo7UroY",
+      "video_id": "CtXu2Tr61Nk",
+      "url": "https://www.youtube.com/watch?v=CtXu2Tr61Nk",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "COMPACTO: BRUNA TAKAHASHI NO WTT CONTENDER DE ISTAMBUL",
+      "status": "live",
+      "inicio_programado": "2026-11-14T08:50:00-03:00",
+      "motivo": "conteúdo rejeitado: compacto"
+    },
+    {
+      "video_id": "1A1ipVlsdnQ",
+      "url": "https://www.youtube.com/watch?v=1A1ipVlsdnQ",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: GREEN BAY PACKERS X NEW ENGLAND PATRIOTS | NFL 2026/27 | ge tv",
+      "titulo": "AO VIVO: GUARULHOS X MINAS | SUPERLIGA MASCULINA 2026/27 | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-11-08T17:00:00-03:00",
+      "inicio_programado": "2026-11-16T18:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "1SacMDj6QUc",
-      "url": "https://www.youtube.com/watch?v=1SacMDj6QUc",
+      "video_id": "9D6hmbgDGuQ",
+      "url": "https://www.youtube.com/watch?v=9D6hmbgDGuQ",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: PINHEIROS X PAULISTANO BARUERI | SUPERLIGA FEMININA 2026/27 | ge tv",
+      "titulo": "AO VIVO: NEW ENGLAND PATRIOTS X DETROIT LIONS | NFL MUNICH GAME 2026 | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-11-12T18:00:00-03:00",
+      "inicio_programado": "2026-11-15T11:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "2f7PMzpd8u8",
-      "url": "https://www.youtube.com/watch?v=2f7PMzpd8u8",
+      "video_id": "A-xUFpjFaUM",
+      "url": "https://www.youtube.com/watch?v=A-xUFpjFaUM",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: SÃO JOSÉ X MONTES CLAROS | SUPERLIGA MASCULINA DE VÔLEI 2026/27 | ge tv",
+      "titulo": "AO VIVO: FLUMINENSE X MINAS  | SUPERLIGA FEMININA DE VÔLEI 2026/27 | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-11-10T18:15:00-03:00",
+      "inicio_programado": "2026-11-17T18:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "50fYjfnzpvY",
-      "url": "https://www.youtube.com/watch?v=50fYjfnzpvY",
+      "video_id": "CbtaDJWmOmo",
+      "url": "https://www.youtube.com/watch?v=CbtaDJWmOmo",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: BRASIL X SINGAPURA | AMISTOSO INTERNACIONAL | ge tv",
+      "titulo": "AO VIVO: INDIANAPOLIS COLTS X HOUSTON TEXANS | NFL 2026/27 | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-11-17T06:30:00-03:00",
+      "inicio_programado": "2026-11-19T22:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "6eBH1D_HzCs",
-      "url": "https://www.youtube.com/watch?v=6eBH1D_HzCs",
+      "video_id": "FjXzPtcFUl4",
+      "url": "https://www.youtube.com/watch?v=FjXzPtcFUl4",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: SÉRVIA X ALEMANHA | UEFA NATIONS LEAGUE 2026 | FASE DE GRUPOS | ge tv",
+      "titulo": "AO VIVO! BRASIL X SINGAPURA: TUDO SOBRE O AMISTOSO DA SELEÇÃO! | Denilson show | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-11-13T15:15:00-03:00",
+      "inicio_programado": "2026-11-17T19:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "7XADElFTlQY",
-      "url": "https://www.youtube.com/watch?v=7XADElFTlQY",
+      "video_id": "T-J8o6Y-y-Q",
+      "url": "https://www.youtube.com/watch?v=T-J8o6Y-y-Q",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: MINAS X MONTE CARMELO | SUPERLIGA MASCULINA DE VÔLEI 2026/27 | ge tv",
+      "titulo": "AO VIVO: MACKENZIE X BRUSQUE VÔLEI | SUPERLIGA FEMININA DE VÔLEI 2026/27 | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-11-09T18:15:00-03:00",
+      "inicio_programado": "2026-11-19T18:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "9VJFjJ7_T5M",
-      "url": "https://www.youtube.com/watch?v=9VJFjJ7_T5M",
+      "video_id": "VvVZpiSaodc",
+      "url": "https://www.youtube.com/watch?v=VvVZpiSaodc",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "JOSH ALLEN, JOE BURROW, BROCK PURDY: QUEM ESTÁ NA CORRIDA PELO MVP DA NFL | PRIMEIRA DESCIDA | ge tv",
+      "titulo": "REPRISE: FLAMENGO X INTERNACIONAL | FINAL (IDA) | COPA DO BRASIL FEMININA 2026 | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-11-08T22:25:00-03:00",
+      "inicio_programado": "2026-11-15T14:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "EzrCE26qeqU",
-      "url": "https://www.youtube.com/watch?v=EzrCE26qeqU",
+      "video_id": "Xp2Skvaa6Vo",
+      "url": "https://www.youtube.com/watch?v=Xp2Skvaa6Vo",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: RED BULL LADEIRA ABAIXO 2026 | CORRIDA DE CARROS  | ge tv",
+      "titulo": "AO VIVO: CRUZEIRO X PALMEIRAS | PRÉ-JOGO | BRASILEIRÃO 2026 | Premiere",
       "status": "upcoming",
-      "inicio_programado": "2026-11-15T10:00:00-03:00",
+      "inicio_programado": "2026-11-18T19:30:00-03:00",
+      "motivo": "conteúdo rejeitado: pre jogo"
+    },
+    {
+      "video_id": "bkLvd44mKU0",
+      "url": "https://www.youtube.com/watch?v=bkLvd44mKU0",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: RICARDINHO E CAROL GATTAZ NO LEVANTOU, CORTOU! + GUARULHOS X MINAS | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-16T17:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "FOxiEjWu0Ss",
-      "url": "https://www.youtube.com/watch?v=FOxiEjWu0Ss",
+      "video_id": "gng_aJwf5hQ",
+      "url": "https://www.youtube.com/watch?v=gng_aJwf5hQ",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "TAMPA BAY BUCCANEERS X CHICAGO BEARS | AQUECIMENTO AO VIVO | NFL | #live | sportv",
+      "titulo": "AO VIVO! PREPARAÇÃO DA SELEÇÃO BRASILEIRA PARA BRASIL X SINGAPURA | Panela Sportv",
       "status": "upcoming",
-      "inicio_programado": "2026-11-08T21:25:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "IYqqYugncRI",
-      "url": "https://www.youtube.com/watch?v=IYqqYugncRI",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: PRAIA CLUBE X MACKENZIE | SUPERLIGA FEMININA DE VÔLEI 2026/27 | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-13T18:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "KkaVAd-H8LY",
-      "url": "https://www.youtube.com/watch?v=KkaVAd-H8LY",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: CONVOCAÇÃO DA SELEÇÃO BRASILEIRA FEMININA PARA OS ÚLTIMOS AMISTOSOS DO ANO | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-10T14:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "MHuhtQWm4nQ",
-      "url": "https://www.youtube.com/watch?v=MHuhtQWm4nQ",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: SÃO BERNARDO X ATHLETIC-MG | BRASILEIRÃO SÉRIE B 2026 | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-14T16:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "OJ4ry4Foi7E",
-      "url": "https://www.youtube.com/watch?v=OJ4ry4Foi7E",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: NORDE VÔLEI X SÃO JOSÉ | SUPERLIGA MASCULINA DE VÔLEI 2026/27 | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-14T14:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "bX2K4tv8y0U",
-      "url": "https://www.youtube.com/watch?v=bX2K4tv8y0U",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: CAROL GATTAZ E RICARDINHO NO LEVANTOU, CORTOU! + MINAS X MONTE CARMELO | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-09T17:00:00-03:00",
+      "inicio_programado": "2026-11-16T20:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -380,17 +341,27 @@
       "canal": "ge tv",
       "titulo": "AO VIVO: FRANÇA X TURQUIA | UEFA NATIONS LEAGUE 2026 | FASE DE GRUPOS | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-11-15T15:15:00-03:00",
+      "inicio_programado": "2026-11-15T16:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "j80QKov4xqw",
-      "url": "https://www.youtube.com/watch?v=j80QKov4xqw",
+      "video_id": "ihN-Xzob9_4",
+      "url": "https://www.youtube.com/watch?v=ihN-Xzob9_4",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: BRASIL X JAPÃO | AMISTOSO INTERNACIONAL | ge tv",
+      "titulo": "JOGO COMPLETO: PRAIA CLUBE X MACKENZIE | SUPERLIGA FEMININA DE VÔLEI 2026/27 | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-11-14T06:15:00-03:00",
+      "inicio_programado": "2026-11-16T15:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "k427py2dD0g",
+      "url": "https://www.youtube.com/watch?v=k427py2dD0g",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: MINNESOTA VIKINGS X GREEN BAY PACKERS | NFL 2026/27 | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-15T14:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -404,127 +375,107 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "rQHVI7D6xyc",
-      "url": "https://www.youtube.com/watch?v=rQHVI7D6xyc",
+      "video_id": "rMl0tB4Cf0I",
+      "url": "https://www.youtube.com/watch?v=rMl0tB4Cf0I",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: TIME BRASIL NA SLS TÓQUIO 2026 | FINAIS | SKATE | ge tv",
+      "titulo": "AO VIVO: INTERNACIONAL X FLAMENGO | FINAL | COPA DO BRASIL FEMININA 2026 | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-11-14T05:45:00-03:00",
+      "inicio_programado": "2026-11-15T15:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "tWBzbr4NQSM",
-      "url": "https://www.youtube.com/watch?v=tWBzbr4NQSM",
+      "video_id": "sjbsQZiGmtI",
+      "url": "https://www.youtube.com/watch?v=sjbsQZiGmtI",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: WASHINGTON COMMANDERS X NEW YORK GIANTS | NFL 2026/27 | ge tv",
+      "titulo": "AO VIVO: ARGENTINA X COSTA RICA | AMISTOSO INTERNACIONAL | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-11-12T22:00:00-03:00",
+      "inicio_programado": "2026-11-17T20:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "1D0AbfOI6WU",
-      "url": "https://www.youtube.com/watch?v=1D0AbfOI6WU",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "SURFE AO VIVO: BRASIL NA ÁGUA! TAINÁ HINCKEL E LAURA RAUPP NO ISA GAMES 2026",
-      "status": "live",
-      "inicio_programado": "2026-11-08T08:50:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "1oZymalSAno",
-      "url": "https://www.youtube.com/watch?v=1oZymalSAno",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: COPA DO BRASIL DEFINE O 2º FINALISTA E TEM ATLÉTICO DE MADRID X BARÇA | SEIS EM UM",
+      "video_id": "vXXyx0PH7ss",
+      "url": "https://www.youtube.com/watch?v=vXXyx0PH7ss",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: SEATTLE SEAHWAKS X LAS VEGAS RAIDERS | NFL 2026/27 | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-11-08T18:50:00-03:00",
+      "inicio_programado": "2026-11-15T16:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "3_bkj6_3Jvc",
-      "url": "https://www.youtube.com/watch?v=3_bkj6_3Jvc",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ATLÉTICO DE MADRID X BARCELONA | LALIGA 26/27 | 12ª RODADA",
+      "video_id": "qKtrNa2jUjU",
+      "url": "https://www.youtube.com/watch?v=qKtrNa2jUjU",
+      "fonte": "sbt",
+      "canal": "SBT",
+      "titulo": "Especial de 1 Ano do Viva a Noite - 14/01/26",
       "status": "upcoming",
-      "inicio_programado": "2026-11-08T15:45:00-03:00",
+      "inicio_programado": "2026-11-15T02:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "HHvQ1ygYR6U",
-      "url": "https://www.youtube.com/watch?v=HHvQ1ygYR6U",
+      "video_id": "60z1cnR4EZI",
+      "url": "https://www.youtube.com/watch?v=60z1cnR4EZI",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: CELTA X LEVANTE | LALIGA 26/27 | 12ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-08T14:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "M6zzug9n3B0",
-      "url": "https://www.youtube.com/watch?v=M6zzug9n3B0",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): LENS X OLYMPIQUE MARSEILLE | LIGUE 1 26/27 | 10ª RODADA",
+      "titulo": "AO VIVO: JUDÔ | BEATRIZ SOUZA, A NOSSA CAMPEÃ OLÍMPICA, NO GRAND PRIX DE ZAGREB | 3º DIA",
       "status": "upcoming",
-      "inicio_programado": "2026-11-08T16:30:00-03:00",
+      "inicio_programado": "2026-11-15T12:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "QepsXssTzS0",
-      "url": "https://www.youtube.com/watch?v=QepsXssTzS0",
+      "video_id": "O7ReObyHY5M",
+      "url": "https://www.youtube.com/watch?v=O7ReObyHY5M",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: TÊNIS DE MESA | FINAIS DO WTT CHAMPIONS DE FRANKFURT",
-      "status": "live",
-      "inicio_programado": "2026-11-08T13:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "UaiedxBKwqA",
-      "url": "https://www.youtube.com/watch?v=UaiedxBKwqA",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: BRASIL X ESPANHA | FINALÍSSIMA DE FUTSAL 2026 | FINAL",
+      "titulo": "AO VIVO: TÊNIS DE MESA | FINAIS DO WTT CONTENDER DE ISTAMBUL",
       "status": "upcoming",
-      "inicio_programado": "2026-11-08T16:30:00-03:00",
+      "inicio_programado": "2026-11-15T08:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "Y2Qu7-tee0A",
-      "url": "https://www.youtube.com/watch?v=Y2Qu7-tee0A",
+      "video_id": "_ftUpKbu1GM",
+      "url": "https://www.youtube.com/watch?v=_ftUpKbu1GM",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: INTERNAZIONALE X COMO | SÉRIE A ITALIANA 26/27 | 11ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-08T13:15:00-03:00",
+      "titulo": "AO VIVO: É O DIA DA FINAL! A BRAZILIAN STORM NO ISA GAMES 2026 | ÚLTIMO DIA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-15T08:50:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "__m2KQAtId0",
-      "url": "https://www.youtube.com/watch?v=__m2KQAtId0",
+      "video_id": "ogW-j4KBYPs",
+      "url": "https://www.youtube.com/watch?v=ogW-j4KBYPs",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: ARGENTINA X PORTUGAL | FINALÍSSIMA DE FUTSAL 2026 | DISPUTA DE 3º LUGAR",
-      "status": "live",
-      "inicio_programado": "2026-11-08T14:30:00-03:00",
+      "titulo": "AO VIVO: COPA DO MUNDO DE ESQUI ALPINO | LUCAS PINHEIRO DEFENDE O TÍTULO EM LEVI!",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-15T05:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
   "search_api_pulados": [],
-  "sem_transmissao": [],
+  "sem_transmissao": [
+    {
+      "event_id": "401841175",
+      "rodada": 21,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Chapecoense x Vasco da Gama",
+      "data_iso": "2026-11-14T20:30:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
+    }
+  ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 87,
+    "unidades": 88,
     "requisicoes": {
       "channels": 4,
-      "videos": 43,
+      "videos": 44,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-11-08T15:31:44-03:00"
+  "atualizado_em": "2026-11-14T19:01:42-03:00"
 }
