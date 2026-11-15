@@ -163,6 +163,105 @@ def prediction_display(pred: dict[str, Any]) -> dict[str, str]:
     }
 
 
+def certified_match_e3(game: dict[str, Any], result: dict[str, Any], evidence: dict[str, Any] | None) -> dict[str, Any]:
+    """Aceita o registro E3 somente com identidade, início e placar final idênticos."""
+    if not evidence or evidence.get("situacao") != "comprovado" or not result:
+        return {}
+    if (slugify(evidence.get("mandante")) != slugify(team_name(game, "mandante")) or
+            slugify(evidence.get("visitante")) != slugify(team_name(game, "visitante"))):
+        return {}
+    event_id = normalize_event_id(game.get("event_id"))
+    if event_id and event_id not in set(map(str, evidence.get("event_ids") or [])):
+        return {}
+    actual = evidence.get("placar_final_auditado") or {}
+    try:
+        if (int(result.get("placar_mandante")) != int(actual.get("mandante")) or
+                int(result.get("placar_visitante")) != int(actual.get("visitante"))):
+            return {}
+    except (TypeError, ValueError):
+        return {}
+    start = parse_dt(evidence.get("inicio_factual"))
+    scheduled = parse_dt(result.get("data_iso") or game.get("data_iso"))
+    if start is None or scheduled is None or abs((start - scheduled).total_seconds()) > 300:
+        return {}
+    if len(evidence.get("top3_placares") or []) != 3:
+        return {}
+    if not isinstance(evidence.get("prova"), dict) or not re.fullmatch(
+            "[0-9a-f]{40}", str(evidence["prova"].get("commit") or "")):
+        return {}
+    return evidence
+
+
+def certified_prediction(evidence: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "probabilidades_pct": evidence["probabilidades_ved_pct"],
+        "gols_esperados": evidence["gols_projetados"],
+        "placar_modal": evidence["placar_previsto"],
+        "placares_mais_provaveis": evidence["top3_placares"],
+        "gerado_em": evidence["prova"]["gerado_em"],
+    }
+
+
+def prediction_scores_html(pred: dict[str, Any]) -> str:
+    scores = pred.get("placares_mais_provaveis") or []
+    if len(scores) < 3:
+        return ""
+    cards = []
+    for pos, item in enumerate(scores[:3], start=1):
+        try:
+            h, a = int(item["mandante"]), int(item["visitante"])
+            probability = float(item["probabilidade_pct"])
+        except (KeyError, TypeError, ValueError):
+            return ""
+        if not 0 <= probability <= 100:
+            return ""
+        cards.append(
+            f'<div class="game-af-scenario"><small>{pos}º cenário</small>'
+            f'<strong>{h} × {a}</strong><span>{fmt_decimal(probability, 1)}% de chance</span></div>'
+        )
+    return '<div class="game-af-scenarios" aria-label="Três placares pré-jogo mais prováveis">' + "".join(cards) + '</div>'
+
+
+def result_evaluation_html(evidence: dict[str, Any], hs: Any, as_: Any) -> str:
+    if not evidence:
+        return ""
+    home, away = int(hs), int(as_)
+    modal = evidence["placar_previsto"]
+    top3 = evidence["top3_placares"]
+    result = "mandante" if home > away else "visitante" if away > home else "empate"
+    ved = evidence.get("palpite_resultado_top1")
+    is_ved = ved == result if ved in ("mandante", "empate", "visitante") else None
+    exact = (home, away) == (int(modal["mandante"]), int(modal["visitante"]))
+    top_hit = any((home, away) == (int(p["mandante"]), int(p["visitante"])) for p in top3)
+    if exact:
+        message = "Acertou o placar exato"
+    elif is_ved and top_hit:
+        message = "Acertou V/E/D e Top-3"
+    elif is_ved:
+        message = "Acertou o empate" if result == "empate" else "Acertou o vencedor"
+    elif top_hit:
+        message = "Placar no Top-3"
+    else:
+        message = "Sem acerto nos critérios principais"
+    def metric(text: str, hit: bool | None) -> str:
+        token = "—" if hit is None else ("✓" if hit else "×")
+        color = "neutral" if hit is None else ("hit" if hit else "miss")
+        return f'<span class="game-af-chip {color}">{token} {esc(text)}</span>'
+    proof = evidence["prova"]["commit"]
+    return f'''<div class="game-af-evaluation">
+      <strong class="game-af-highlight">{esc(message)}</strong>
+      <p>Resultado real: {home} × {away} · Placar principal previsto:
+      {int(modal["mandante"])} × {int(modal["visitante"])}.</p>
+      <div class="game-af-checks">
+        {metric("Resultado principal V/E/D", is_ved)}
+        {metric("Placar exato", exact)}
+        {metric("Placar no Top-3", top_hit)}
+      </div>
+      <small>Previsão registrada antes da partida. <a href="https://github.com/LAERCIOREHEM/formuladogol/commit/{proof}"
+      target="_blank" rel="noopener noreferrer">Conferir registro original</a>.</small>
+    </div>'''
+
+
 def compact_title(home: str, away: str, completed: bool, hs: Any, as_: Any) -> str:
     if completed and hs is not None and as_ is not None:
         base = f"{home} {hs} x {as_} {away} | Fórmula do Gol"
@@ -277,6 +376,7 @@ def render_page(
     details: dict[str, Any],
     current_pred: dict[str, Any],
     historical_pred: dict[str, Any],
+    certified_e3: dict[str, Any],
     tv: dict[str, Any],
     club_map: dict[str, dict[str, Any]],
     table_map: dict[str, dict[str, Any]],
@@ -338,6 +438,9 @@ def render_page(
             extras.append(f"Snapshot: {fmt_date(pred_generated)}")
         prob_note = " · ".join(extras)
         prob_footer = f'<p class="game-note">{esc(prob_note)}</p>' if prob_note else ""
+        prob_footer += prediction_scores_html(pred)
+        if completed and certified_e3:
+            prob_footer += result_evaluation_html(certified_e3, hs, as_)
     else:
         if completed:
             msg = "Não existe snapshot pré-jogo preservado e publicável para esta partida; nenhuma probabilidade foi reconstruída retroativamente."
@@ -430,6 +533,7 @@ def render_page(
   <link rel="stylesheet" href="/css/br-global.css?v=20260801-footer-institucional-v1">
   <link rel="stylesheet" href="/css/br-alertas.css?v=20260905-push-resiliencia-v1">
   <link rel="stylesheet" href="/css/br-jogo.css?v=20260907-org5-v1">
+  <link rel="stylesheet" href="/css/br-af-partida-posjogo.css?v=20261114-posjogo">
   <script type="application/ld+json">{json_ld}</script>
 </head>
 <body>
@@ -585,6 +689,7 @@ def build(site_dir: Path, *, check: bool) -> dict[str, Any]:
     details_manifest = load(data / "jogos-detalhes.json", {})
     current_prob_manifest = load(data / "probabilidades-jogos.json", {})
     history_manifest = load(data / "historico-probabilidades-jogos.json", {})
+    e3_manifest = load(data / "resultados-af-placares-2026.json", {})
     tv_manifest = load(data / "transmissoes-tv.json", {})
     clubs_manifest = load(data / "clubes.json", {})
     table_manifest = load(site_dir / "tabela.json", {})
@@ -596,6 +701,10 @@ def build(site_dir: Path, *, check: bool) -> dict[str, Any]:
     details_map = details_manifest.get("jogos") or {}
     current_probs = current_prob_manifest.get("jogos") or []
     history = history_manifest.get("previsoes") or []
+    if e3_manifest.get("status") != "ok":
+        raise ValueError("Arquivo E3 de resultados certificado indisponível")
+    e3_records = e3_manifest.get("jogos") or []
+    e3_by_id = {str(eid): row for row in e3_records for eid in row.get("event_ids") or []}
     tv_map = tv_manifest.get("jogos") or {}
     clubs = clubs_manifest.get("clubes") or []
     table = table_manifest.get("tabela") or []
@@ -656,7 +765,8 @@ def build(site_dir: Path, *, check: bool) -> dict[str, Any]:
         else:
             upcoming_count += 1
         kickoff = parse_dt(game.get("data_iso"))
-        historical_pred = latest_safe_prediction(history_map.get(eid, []), kickoff) if completed else {}
+        e3_evidence = certified_match_e3(game, result, e3_by_id.get(eid)) if completed else {}
+        historical_pred = certified_prediction(e3_evidence) if e3_evidence else {}
         if historical_pred:
             historical_safe += 1
         current_pred = current_prob_map.get(eid) or {}
@@ -682,6 +792,7 @@ def build(site_dir: Path, *, check: bool) -> dict[str, Any]:
             details=details_map.get(eid) or {},
             current_pred=current_pred,
             historical_pred=historical_pred,
+            certified_e3=e3_evidence,
             tv=tv_map.get(eid) or {},
             club_map=club_map,
             table_map=table_map,
