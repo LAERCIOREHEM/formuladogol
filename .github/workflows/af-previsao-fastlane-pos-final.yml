@@ -308,6 +308,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run deploy.yml --ref main
 
+      - name: Enfileirar auditoria documental E1–E4 pós-FINAL
+        if: steps.publish.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run af-postgame-audit.yml --ref main
+
       - name: Enfileirar reconciliação completa fora do caminho crítico
         if: steps.publish.outputs.published == 'true'
         env:
