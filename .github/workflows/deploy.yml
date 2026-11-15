@@ -91,6 +91,7 @@ on:
       - 'scripts/gerar_fundacao_organica.py'
       - 'scripts/gerar_paginas_clubes.py'
       - 'scripts/gerar_paginas_jogos.py'
+      - 'tests/test-af-postgame-pages.py'
       - 'scripts/gerar_hubs_competicoes.py'
       - 'scripts/gerar_fechamento_organico.py'
       - 'scripts/validar_org_final.py'
@@ -99,6 +100,7 @@ on:
       - 'scripts/validar_contrato_publicos_fastlane.py'
       - 'css/br-clube.css'
       - 'css/br-jogo.css'
+      - 'css/br-af-partida-posjogo.css'
       - 'css/br-competicoes.css'
       - 'jogos/**'
       - 'tabela/**'
@@ -320,6 +322,7 @@ jobs:
             css/br-alertas.css
             css/br-clube.css
             css/br-jogo.css
+            css/br-af-partida-posjogo.css
             css/br-competicoes.css
             css/br-arquivo-jogos.css
           )
@@ -559,7 +562,18 @@ jobs:
 
       - name: ORG-5 — páginas SEO de partidas do Brasileirão
         run: |
+          python tests/test-af-postgame-pages.py
           python scripts/gerar_paginas_jogos.py --site-root _site --check
+          python - <<'PY'
+          from pathlib import Path
+          page=Path('_site/jogo/mirassol-x-atletico-mg-2026-11-14/index.html')
+          assert page.exists(), 'Página Mirassol × Atlético-MG não foi gerada'
+          text=page.read_text(encoding='utf-8')
+          assert 'Placar no Top-3' in text, 'Resultado real 0×0 não foi avaliado'
+          assert 'Conferir registro original' in text, 'A prova anterior ao jogo está ausente'
+          assert '0 × 0' in text and '1 × 0' in text
+          print('ORG-5 PÓS-FINAL CERTIFICADO: Mirassol 0×0 Atlético-MG reconhecido no Top-3')
+          PY
 
       - name: ORG-6 — hubs de competições, Discover e mascotes
         shell: bash
