@@ -57,6 +57,8 @@ on:
       - 'js/br-af-resultados.js'
       - 'tests/test-af-e3-resultados.mjs'
       - 'scripts/gerar_resultados_af_e3.py'
+      - 'scripts/auditar_historico_placares_af.py'
+      - 'tests/test-af-postgame-auto.py'
       - 'tests/test-af-e2-scorecards.mjs'
       - 'js/br-live-goal-sync.js'
       - 'tests/test-br-live-goal-sync.mjs'
@@ -132,7 +134,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: main
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Node para validações LiveState
         uses: actions/setup-node@v4
@@ -191,6 +193,24 @@ jobs:
           assert sum(x["amostra"] for x in games["insights"]["faixas_confianca"]) == games["jogos_avaliados"]
           assert games["controle_qualidade"]["partidas_unicas"] == games["jogos_avaliados"]
           print("AF acurácia regenerada e validada:", games["jogos_avaliados"], "partidas únicas")
+          PY
+
+      - name: E1 — renovar auditoria de previsões ANTERIORES a jogos concluídos
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/auditar_historico_placares_af.py --self-test
+          python scripts/auditar_historico_placares_af.py
+          python tests/test-af-postgame-auto.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('dados-br/auditoria-historica-placares-af-2026.json').read_text(encoding='utf-8'))
+          results=json.loads(Path('resultados.json').read_text(encoding='utf-8'))
+          assert data['resumo']['total_resultados_unicos'] == len(results['resultados'])
+          assert data['resumo']['jogos_com_placar_prejogo_comprovado'] >= 157
+          assert data['resumo']['partidas_sem_previsao_nao_foram_reconstituidas']
+          print('E1 PÓS-JOGO:', data['resumo'])
           PY
 
       - name: Certificar e gerar painel E3 de resultados documentados
