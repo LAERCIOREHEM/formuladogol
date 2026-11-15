@@ -1,0 +1,48 @@
+/* Pós-FINAL AF-Previsão: mesmo significado das métricas da aba Resultados. */
+.game-af-scenarios {
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px;
+  margin:16px 0 12px; max-width:100%;
+}
+.game-af-scenario {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:5px; padding:13px 8px; text-align:center;
+  border:1px solid rgba(148,163,184,.24); border-radius:11px;
+  background:rgba(8,23,31,.70); min-width:0; font-variant-numeric:tabular-nums;
+}
+.game-af-scenario small {font-size:11px; color:#afc5d1; font-weight:700}
+.game-af-scenario strong {font-size:24px; color:#e9f5fb; white-space:nowrap}
+.game-af-scenario span {font-size:12px; color:#bcdafa}
+.game-af-evaluation {
+  margin-top:13px; padding:16px; max-width:100%;
+  border:1px solid rgba(163,230,53,.28); border-radius:12px;
+  background:linear-gradient(115deg,rgba(163,230,53,.075),rgba(96,165,250,.05));
+  color:#cbdde7; line-height:1.5;
+}
+.game-af-highlight {
+  display:inline-block; color:#ddff9d; font-size:17px;
+  padding:5px 11px; border-radius:20px;
+  border:1px solid rgba(163,230,53,.32); background:rgba(163,230,53,.12);
+}
+.game-af-evaluation p {font-size:13px; margin:12px 0 10px}
+.game-af-checks {display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px}
+.game-af-chip {display:inline-block; font-size:12px; padding:6px 9px; border-radius:18px;
+  border:1px solid rgba(148,163,184,.24)}
+.game-af-chip.hit {color:#d9ff9c; border-color:rgba(163,230,53,.32);background:rgba(163,230,53,.08)}
+.game-af-chip.miss {color:#f3c4ab; border-color:rgba(245,158,11,.28);background:rgba(245,158,11,.06)}
+.game-af-chip.neutral {color:#bccbd7}
+.game-af-evaluation small {font-size:11px; color:#aebfca}
+.game-af-evaluation a {color:#bce2ff; text-decoration:underline}
+@media(max-width:550px) {
+  .game-af-scenarios {gap:6px}
+  .game-af-scenario {padding:10px 4px}
+  .game-af-scenario strong {font-size:18px}
+  .game-af-scenario small,.game-af-scenario span {font-size:10px}
+  .game-af-evaluation {padding:12px}
+  .game-af-highlight {font-size:14px}
+  .game-af-chip {font-size:11px}
+}
+@media(max-width:360px) {
+  .game-af-scenario strong {font-size:16px}
+  .game-af-scenario span {font-size:9px}
+  .game-af-scenario small {font-size:9px}
+}

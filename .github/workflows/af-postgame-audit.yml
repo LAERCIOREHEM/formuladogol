@@ -1,0 +1,109 @@
+name: AF-Previsão — Certificação automática após resultado FINAL
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - resultados.json
+      - scripts/auditar_historico_placares_af.py
+      - scripts/gerar_resultados_af_e3.py
+      - scripts/gerar_acuracia_placares_e4.py
+      - scripts/gerar_paginas_jogos.py
+      - .github/workflows/af-postgame-audit.yml
+  pull_request:
+    paths:
+      - resultados.json
+      - scripts/auditar_historico_placares_af.py
+      - scripts/gerar_resultados_af_e3.py
+      - scripts/gerar_acuracia_placares_e4.py
+      - scripts/gerar_paginas_jogos.py
+      - tests/test-af-postgame-auto.py
+      - tests/test-af-postgame-pages.py
+      - tests/test-af-e3-resultados.mjs
+      - .github/workflows/af-postgame-audit.yml
+      - .github/workflows/deploy.yml
+
+permissions:
+  contents: write
+
+# Serializa com Fastlane e publicador Pages, ambos escritores na main.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && 'af-postgame-pr' || 'repo-write-main' }}
+  cancel-in-progress: false
+
+jobs:
+  auditar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Renovar E1 com todo o Git anterior ao início factual
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse --is-shallow-repository)" = "false"
+          python -m py_compile scripts/auditar_historico_placares_af.py
+          python scripts/auditar_historico_placares_af.py --self-test
+          python scripts/auditar_historico_placares_af.py
+          python tests/test-af-postgame-auto.py
+
+      - name: Atualizar E3 e E4 sem inventar previsões
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/gerar_resultados_af_e3.py --self-test
+          python scripts/gerar_resultados_af_e3.py
+          python scripts/gerar_acuracia_placares_e4.py --self-test
+          python scripts/gerar_acuracia_placares_e4.py
+          node tests/test-af-e3-resultados.mjs
+          node tests/test-af-e4-acuracia.mjs
+          python tests/test-af-postgame-pages.py
+
+      - name: Conferir invariantes de integridade e coberturas
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          a_raw=Path('dados-br/auditoria-historica-placares-af-2026.json').read_bytes()
+          e_raw=Path('dados-br/resultados-af-placares-2026.json').read_bytes()
+          a=json.loads(a_raw)
+          e=json.loads(e_raw)
+          v=json.loads(Path('dados-br/acuracia-placares-af-2026.json').read_bytes())
+          results=json.loads(Path('resultados.json').read_bytes())
+          assert a['resumo']['total_resultados_unicos'] == len(results['resultados'])
+          assert e['resumo']['resultados_auditados'] == len(results['resultados'])
+          assert v['escopo']['resultados_finais_auditados'] == len(results['resultados'])
+          assert e['resumo']['previsoes_certificadas'] == v['metricas']['jogos']
+          assert e['origem']['sha256_arquivo'] == hashlib.sha256(a_raw).hexdigest()
+          assert v['origem']['e3_sha256'] == hashlib.sha256(e_raw).hexdigest()
+          assert all('placar_previsto' not in r for r in e['jogos']
+                     if r['situacao'] != 'comprovado')
+          print('AF PÓS-FINAL CERTIFICADO:',e['resumo'])
+          PY
+
+      - name: Persistir relatórios E1, E3 e E4 no Git (apenas em main)
+        if: ${{ github.event_name != 'pull_request' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- dados-br/auditoria-historica-placares-af-2026.json \
+                     dados-br/resultados-af-placares-2026.json \
+                     dados-br/acuracia-placares-af-2026.json
+          if git diff --cached --quiet; then
+            echo "Relatórios já sincronizados."
+          else
+            git commit -m "data(AF pós-FINAL): E1/E3/E4 revalidadas após resultado consolidado"
+            git push origin HEAD:main
+          fi

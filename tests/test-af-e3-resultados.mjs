@@ -140,7 +140,7 @@ assert.equal(api.decide({
   placar_mandante: real.placar_final_auditado.mandante,
   placar_visitante: real.placar_final_auditado.visitante
 }, persisted).status, 'comprovado');
-// Regressão ponta a ponta usando os 339 resultados reais, não só exemplos sintéticos.
+// Regressão ponta a ponta usando TODOS os resultados atuais, sem total congelado.
 const actualResults = readFileSync('resultados.json');
 const actualDocument = JSON.parse(actualResults.toString('utf8'));
 const sourceDigest = createHash('sha256').update(actualResults).digest('hex');
@@ -156,8 +156,9 @@ for (const game of actualDocument.resultados || []) {
 assert.ok(matches.comprovado > 0, 'Nenhuma previsão E1 é exibível nos resultados reais');
 if (sourceDigest === JSON.parse(readFileSync('dados-br/auditoria-historica-placares-af-2026.json', 'utf8'))
     .fontes_resultados.arquivo_sha256) {
-  assert.equal(matches.comprovado, 157, 'Snapshot de resultados idêntico à E1 precisa exibir 157 provas');
-  assert.equal(matches.sem_prova, 182, 'Snapshot idêntico precisa preservar 182 lacunas');
+  assert.equal(matches.comprovado, persisted.resumo.previsoes_certificadas, 'Cada previsão documental deve ser exibível');
+  assert.equal(matches.sem_prova, persisted.resumo.sem_snapshot_certificado, 'Jogos sem prova devem continuar sem previsão');
+  assert.equal(matches.comprovado+matches.sem_prova+matches.inconsistente, persisted.resumo.resultados_auditados);
   assert.equal(matches.inconsistente, 0);
   assert.equal(matches.nao_auditado, 0);
 }

@@ -204,7 +204,7 @@ def self_test() -> None:
     original = (ROOT / AUDIT_SOURCE).read_bytes()
     audit = json.loads(original)
     view = project(audit, original)
-    assert view["resumo"]["previsoes_certificadas"] == 157 or view["resumo"]["previsoes_certificadas"] > 0
+    assert view["resumo"]["previsoes_certificadas"] > 0
     assert view["resumo"]["resultados_auditados"] == len(view["jogos"])
     assert view["resumo"]["sem_snapshot_certificado"] + view["resumo"]["previsoes_certificadas"] + (
         view["resumo"]["quarentena_por_conflito"] + view["resumo"]["sem_horario_factual"]
