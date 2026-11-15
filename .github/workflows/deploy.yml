@@ -58,6 +58,8 @@ on:
       - 'tests/test-af-e3-resultados.mjs'
       - 'scripts/gerar_resultados_af_e3.py'
       - 'scripts/auditar_historico_placares_af.py'
+      - 'tests/test-af-rollover-final.mjs'
+      - 'scripts/auditar_historico_placares_af.py'
       - 'tests/test-af-postgame-auto.py'
       - 'tests/test-af-e2-scorecards.mjs'
       - 'js/br-live-goal-sync.js'
@@ -215,6 +217,32 @@ jobs:
           print('E1 PÓS-JOGO:', data['resumo'])
           PY
 
+      - name: AF-Rollover — recuperar previsões pré-jogo após cada resultado final
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Histórico completo, não apenas o último snapshot: resultados novos
+          # jamais podem ser avaliados com probabilidades recalculadas após o jogo.
+          if [[ "$(git rev-parse --is-shallow-repository)" != "false" ]]; then
+            echo "ERRO: checkout raso, impossível certificar previsão anterior ao jogo"
+            exit 1
+          fi
+          python scripts/auditar_historico_placares_af.py --self-test
+          python scripts/auditar_historico_placares_af.py
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          source = Path("resultados.json").read_bytes()
+          audit = json.loads(Path("dados-br/auditoria-historica-placares-af-2026.json").read_text(encoding="utf-8"))
+          n = audit["resumo"]["total_resultados_unicos"]
+          assert audit["fontes_resultados"]["arquivo_sha256"] == hashlib.sha256(source).hexdigest()
+          assert n == len(audit["jogos"])
+          assert audit["resumo"]["jogos_com_placar_prejogo_comprovado"] > 0
+          assert audit["resumo"]["partidas_sem_previsao_nao_foram_reconstituidas"] is True
+          print("AF ROLLOVER: %d resultados, %d previsões com prova pré-jogo." % (
+            n, audit["resumo"]["jogos_com_placar_prejogo_comprovado"]))
+          PY
+
       - name: Certificar e gerar painel E3 de resultados documentados
         shell: bash
         run: |
@@ -224,6 +252,7 @@ jobs:
           python scripts/gerar_resultados_af_e3.py
           node --check js/br-af-resultados.js
           node tests/test-af-e3-resultados.mjs
+          node tests/test-af-rollover-final.mjs
           python - <<'PY'
           import hashlib, json
           from pathlib import Path
@@ -361,6 +390,7 @@ jobs:
             dados-br/auditoria-publicos-identidade.json
             dados-br/auditoria-modelos-af-previsao.json
             dados-br/auditoria-probabilidades.json
+            dados-br/auditoria-historica-placares-af-2026.json
             dados-br/avaliacao-af-previsao.json
             dados-br/acuracia-af-previsao.json
             dados-br/acuracia-placares-af-2026.json
