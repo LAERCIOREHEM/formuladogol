@@ -1008,7 +1008,8 @@ jobs:
           # deploy.yml aceita workflow_dispatch, portanto o acionamos
           # explicitamente após o commit ter sido publicado no main.
           gh workflow run deploy.yml --ref main
-          echo "Deploy do site disparado para o main recém-publicado."
+          gh workflow run af-postgame-audit.yml --ref main
+          echo "Deploy e certificação histórica E1–E4 disparados para o main recém-publicado."
 
       - name: Garantir publicação editorial de rodada fechada
         # R10R23: o resultado FINAL pode chegar via updater completo, mesmo
