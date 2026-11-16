@@ -176,7 +176,7 @@ function icon(s){ return s==='red'?'🔴':s==='yellow'?'🟡':'🟢'; }
 export function cloudflareSeverity(cf){
   if(!cf?.configured||!cf?.ok||!cf?.workers) return 'yellow';
   const w=cf.workers;
-  if(w.status!=='verified') return 'yellow'; // jamais transformar dado incompleto em GREEN
+  if(w.status!=='verified'||cf.billedCost==null) return 'yellow'; // CPU ou custo incompletos nunca ficam GREEN
   const actual=Math.max(w.cpuUsedPct??0,w.requestUsedPct??0);
   const projected=Math.max(w.projectedCpuPct??0,w.projectedRequestPct??0);
   if(w.currentOverageUsd>0||actual>=100) return 'red';
@@ -191,9 +191,10 @@ function cloudflareDetail(cf){
   const w=cf.workers||{};
   if(w.status!=='verified')
     return `CPU/requests sem confirmação · ${text(w.reason)||'dados incompletos'} · conferir detalhamento`;
+  const extra=cf.billedCost==null?' · custo agregado inconclusivo':'';
   const total=cf.currency==='USD'&&cf.billedCost!=null
     ?` · custo variável conta USD ${cf.billedCost.toFixed(2)} (todos os produtos)`:'';
-  return `CPU ${fmtNum(w.cpuMs)} / ${fmtNum(w.cpuIncludedMs)} ms (${fmtPct(w.cpuUsedPct)}) · requests ${fmtNum(w.requests)} / ${fmtNum(w.requestsIncluded)} (${fmtPct(w.requestUsedPct)})${total}`;
+  return `CPU ${fmtNum(w.cpuMs)} / ${fmtNum(w.cpuIncludedMs)} ms (${fmtPct(w.cpuUsedPct)}) · requests ${fmtNum(w.requests)} / ${fmtNum(w.requestsIncluded)} (${fmtPct(w.requestUsedPct)})${total}${extra}`;
 }
 
 export function githubActionsSeverity({ dormant=false, dispatches=0, previousDispatches=0, pendingPostgameTasks=0, hoursToNext=Infinity, hasPrevious=false } = {}) {
@@ -471,7 +472,7 @@ export function cloudflareDigestLines(cf){
     `Custo variável da família Workers: ${money(cf.workersBilledCost)}`,
     'Composição por família de produto:',
     ...(products.length?products:['- Nenhum produto validado no ciclo.']),
-    `Registros: ${cf.inCycleRows||0} no ciclo · ${excluded.otherCycle||0} de outros ciclos ignorados · ${excluded.missingCycle||0} sem ciclo · ${excluded.invalidQuantity||0} com unidade inválida · ${excluded.missingCost||0} sem custo · ${excluded.duplicateRows||0} duplicados`,
+    `Registros: ${cf.inCycleRows||0} no ciclo · ${excluded.otherCycle||0} de outros ciclos ignorados · ${excluded.missingCycle||0} sem ciclo · ${excluded.invalidQuantity||0} com unidade inválida · ${excluded.missingCost||0} sem custo · ${excluded.missingCurrency||0} sem moeda · ${excluded.duplicateRows||0} duplicados`,
     'CPU por Worker individual: indisponível nesta API (requer Workers Analytics Read).',
     'A API publica custos com atraso. Ausência de registro de hoje não significa consumo zero.',
   ];
