@@ -127,6 +127,18 @@ assert.equal(stale.workers.status,'stale');
 assert.equal(stale.workers.projectedCpuMs,null);
 assert.equal(cloudflareSeverity(stale),'yellow');
 
+const distinctCycles=auditCloudflareBilling([
+  row('cpu',500000,'Milliseconds'),
+  row('requests',250,'Requests'),
+  { ...row('cpu',10_000_000,'Milliseconds'),ServiceFamilyName:'R2',
+    ServiceName:'R2 Storage',x_BillableMetricId:'r2_class_a',
+    BillingPeriodStart:'2026-11-01T00:00:00Z',BilledCost:30 }
+],NOW);
+assert.equal(distinctCycles.workers.periodStart,'2026-10-19T00:00:00.000Z');
+assert.equal(distinctCycles.workers.cpuMs,500000);
+assert.equal(distinctCycles.workers.status,'verified');
+assert.equal(distinctCycles.billedCost,null,'não conciliar custos de dois ciclos atuais diferentes');
+assert.equal(cloudflareSeverity(distinctCycles),'yellow');
 const anotherPeriod=auditCloudflareBilling([
   row('cpu',200,'Milliseconds',{BillingPeriodStart:'2026-11-01T00:00:00Z',
     ChargePeriodStart:'2026-11-15T00:00:00Z',ChargePeriodEnd:'2026-11-16T00:00:00Z'}),
