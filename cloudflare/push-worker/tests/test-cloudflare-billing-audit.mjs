@@ -34,7 +34,7 @@ assert.equal(result.workers.status,'verified');
 assert.equal(result.workers.cpuMs,14_708_270,'CPU deve ignorar ciclos antigos e outros produtos');
 assert.equal(result.workers.requests,66_826);
 assert.equal(result.workers.cpuUsedPct,49.0276);
-assert.equal(result.workers.periodStart,period);
+assert.equal(result.workers.periodStart,'2026-10-19T00:00:00.000Z');
 assert.equal(result.workers.periodEnd,'2026-11-19T00:00:00.000Z');
 assert.equal(result.workers.periodEndEstimated,true);
 assert.equal(result.workers.todayCpuMs,null,'ausência de linha hoje não significa 0 CPU');
