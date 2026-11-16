@@ -92,7 +92,7 @@ export function auditCloudflareBilling(rows=[],now=Date.now()) {
     configured:true,ok:!!cycle,at:iso(now),
     currency:null,billedCost:null,workersBilledCost:null,
     products:[],rowCount:list.length,inCycleRows:0,
-    excluded:{otherCycle:0,missingCycle:0,invalidChargePeriod:0,duplicateRows:0,invalidQuantity:0,missingCost:0,mixedCurrency:0},
+    excluded:{otherCycle:0,missingCycle:0,invalidChargePeriod:0,duplicateRows:0,invalidQuantity:0,missingCost:0,missingCurrency:0,mixedCurrency:0},
     workers:null,
   };
   if(!cycle) {
@@ -132,8 +132,9 @@ export function auditCloudflareBilling(rows=[],now=Date.now()) {
     const last=chargeEnd??Math.min(now,chargeStart+DAY);
     maxEnd=Math.max(maxEnd,last);
     const group=family(row),m=workerMetric(row),cost=asMoney(row);
-    const curr=str(row.BillingCurrency)||'USD';
-    currencies.add(curr);
+    const curr=str(row.BillingCurrency);
+    if(curr) currencies.add(curr);
+    else {missingCost=true;base.excluded.missingCurrency++;}
     const existing=families.get(group)||{name:group,costUsd:0,rows:0,costKnown:true};
     existing.rows++;
     if(cost==null) {existing.costKnown=false;missingCost=true;base.excluded.missingCost++;}
@@ -148,26 +149,26 @@ export function auditCloudflareBilling(rows=[],now=Date.now()) {
       const amount=cpuMs(row.ConsumedQuantity,row.ConsumedUnit);
       if(amount==null){ambiguous=true;base.excluded.invalidQuantity++;continue;}
       cpu+=amount;nCpu++;latestCpu=Math.max(latestCpu,last);
-      if(brDate(chargeStart)===brDate(now)){todayCpu+=amount;nTodayCpu++;}
+      if(iso(chargeStart).slice(0,10)===brDate(now)){todayCpu+=amount;nTodayCpu++;}
       observedCpu=Math.max(observedCpu,last);
     }
     if(m==='requests') {
       const amount=requestCount(row.ConsumedQuantity,row.ConsumedUnit);
       if(amount==null){ambiguous=true;base.excluded.invalidQuantity++;continue;}
       requests+=amount;nReq++;latestReq=Math.max(latestReq,last);
-      if(brDate(chargeStart)===brDate(now)){todayReq+=amount;nTodayReq++;}
+      if(iso(chargeStart).slice(0,10)===brDate(now)){todayReq+=amount;nTodayReq++;}
       observedReq=Math.max(observedReq,last);
     }
   }
   if(currencies.size>1){base.excluded.mixedCurrency=currencies.size;missingCost=true;ambiguous=true;}
   base.currency=currencies.size===1?[...currencies][0]:null;
-  base.billedCost=missingCost?null:round(total,6);
-  base.workersBilledCost=unknownCostWorkers?null:round(workerCost,6);
+  base.billedCost=missingCost||currencies.size!==1?null:round(total,6);
+  base.workersBilledCost=unknownCostWorkers||currencies.size!==1?null:round(workerCost,6);
   base.products=[...families.values()].map(v=>({
     name:v.name,rows:v.rows,
     costUsd:v.costKnown&&currencies.size===1?round(v.costUsd,6):null
   })).sort((a,b)=>(b.costUsd??-Infinity)-(a.costUsd??-Infinity)||a.name.localeCompare(b.name));
-  const staleMs=Math.max(0,now-Math.max(latestCpu,latestReq));
+  const staleMs=Math.max(0,now-Math.min(latestCpu||0,latestReq||0));
   const missingMetrics=nCpu===0||nReq===0;
   const incomplete=ambiguous||missingMetrics||base.inCycleRows===0;
   const stale=staleMs>72*HOUR;
@@ -189,7 +190,7 @@ export function auditCloudflareBilling(rows=[],now=Date.now()) {
   };
   const workers={
     status,reason:status==='verified'?'ok':missingMetrics?'missing_workers_standard_metrics':incomplete?'incomplete_billing_rows':'billing_data_stale',
-    periodStart:iso(start),periodEnd:iso(end),periodEndEstimated:!list.some(r=>r.BillingPeriodEnd),
+    periodStart:iso(start),periodEnd:iso(end),periodEndEstimated:true, // fim derivado: API V1 não garante BillingPeriodEnd
     dataAsOf:maxEnd?iso(Math.min(maxEnd,now)):null,
     latestCpuAt:latestCpu?iso(Math.min(latestCpu,now)):null,
     latestRequestsAt:latestReq?iso(Math.min(latestReq,now)):null,
