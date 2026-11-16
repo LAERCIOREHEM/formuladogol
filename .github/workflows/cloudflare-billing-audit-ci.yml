@@ -10,6 +10,7 @@ on:
       - 'cloudflare/push-worker/tests/test-health-monitor.mjs'
       - 'cloudflare/push-worker/package.json'
       - 'cloudflare/push-worker/src/postgame-rss-discovery.js'
+      - 'cloudflare/push-worker/src/postgame-search-profile.js'
       - 'cloudflare/push-worker/tests/test-postgame-rss-discovery.mjs'
       - '.github/workflows/cloudflare-billing-audit-ci.yml'
   pull_request:
@@ -20,6 +21,7 @@ on:
       - 'cloudflare/push-worker/tests/test-health-monitor.mjs'
       - 'cloudflare/push-worker/package.json'
       - 'cloudflare/push-worker/src/postgame-rss-discovery.js'
+      - 'cloudflare/push-worker/src/postgame-search-profile.js'
       - 'cloudflare/push-worker/tests/test-postgame-rss-discovery.mjs'
       - '.github/workflows/cloudflare-billing-audit-ci.yml'
   workflow_dispatch:
