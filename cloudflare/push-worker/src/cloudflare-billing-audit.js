@@ -29,8 +29,9 @@ function nextMonthUtc(start) {
 }
 function family(row) {
   const given=str(row.ServiceFamilyName||row.x_ProductFamilyName||'');
-  if (given) return given;
   const service=str(row.ServiceName);
+  if(norm(given)==='workers' && service && norm(service)!=='workers_standard') return service;
+  if (given) return given;
   if (/^Workers AI\b/i.test(service)) return 'Workers AI';
   if (/^Workers\b/i.test(service)) return 'Workers';
   return service || 'Sem categoria';
@@ -51,6 +52,13 @@ function workerMetric(row) {
   const name=norm(row.x_BillableMetricName || row.ChargeDescription);
   if (name==='workers_standard_cpu_time' || name==='workers_standard_cpu_time_daily_usage') return 'cpu';
   if (name==='workers_standard_requests' || name==='workers_standard_requests_daily_usage') return 'requests';
+  // API V1 pode fornecer apenas ServiceName + ConsumedUnit, sem x_BillableMetricId.
+  // Somente o produto exatamente Workers Standard entra neste fallback.
+  if (service==='workers_standard' && (!name || name.startsWith('workers_standard_usage_measured_in_'))) {
+    const unit=norm(row.ConsumedUnit);
+    if (['milliseconds','millisecond','cpu_ms','ms','microseconds','nanoseconds','seconds'].includes(unit)) return 'cpu';
+    if (['requests','request'].includes(unit)) return 'requests';
+  }
   return '';
 }
 function cpuMs(raw,unitRaw) {
