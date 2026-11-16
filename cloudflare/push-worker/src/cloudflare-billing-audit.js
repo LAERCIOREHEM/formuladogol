@@ -112,21 +112,27 @@ export function auditCloudflareBilling(rows=[],now=Date.now()) {
   let maxEnd=0,latestCpu=0,latestReq=0,observedCpu=0,observedReq=0;
   let cpu=0,requests=0,todayCpu=0,todayReq=0;
   let nCpu=0,nReq=0,nTodayCpu=0,nTodayReq=0;
-  let total=0,workerCost=0,missingCost=false,unknownCostWorkers=false;
+  let total=0,workerCost=0,missingCost=false,costUncertain=false,unknownCostWorkers=false;
   const families=new Map(),currencies=new Set(),seen=new Set();
   let ambiguous=false;
   for(const row of list) {
     const startRow=validDate(row.BillingPeriodStart);
-    if(startRow==null){base.excluded.missingCycle++;ambiguous=true;continue;}
+    if(startRow==null){base.excluded.missingCycle++;costUncertain=true;
+      if(workerMetric(row)||norm(row.ServiceName)==='workers_standard') ambiguous=true;
+      continue;}
     if(startRow!==start){base.excluded.otherCycle++;continue;}
     const chargeStart=validDate(row.ChargePeriodStart);
     const chargeEnd=validDate(row.ChargePeriodEnd);
     if(chargeStart==null||chargeStart<start||chargeStart>=end ||
        (chargeEnd!=null&&(chargeEnd<=chargeStart||chargeEnd>end+DAY))){
-      base.excluded.invalidChargePeriod++;ambiguous=true;continue;
+      base.excluded.invalidChargePeriod++;costUncertain=true;
+      if(workerMetric(row)||norm(row.ServiceName)==='workers_standard') ambiguous=true;
+      continue;
     }
     const signature=JSON.stringify(row,Object.keys(row).sort());
-    if(seen.has(signature)){base.excluded.duplicateRows++;ambiguous=true;continue;}
+    if(seen.has(signature)){base.excluded.duplicateRows++;costUncertain=true;
+      if(workerMetric(row)||norm(row.ServiceName)==='workers_standard') ambiguous=true;
+      continue;}
     seen.add(signature);
     base.inCycleRows++;
     const last=chargeEnd??Math.min(now,chargeStart+DAY);
@@ -162,7 +168,7 @@ export function auditCloudflareBilling(rows=[],now=Date.now()) {
   }
   if(currencies.size>1){base.excluded.mixedCurrency=currencies.size;missingCost=true;ambiguous=true;}
   base.currency=currencies.size===1?[...currencies][0]:null;
-  base.billedCost=missingCost||currencies.size!==1?null:round(total,6);
+  base.billedCost=missingCost||costUncertain||currencies.size!==1?null:round(total,6);
   base.workersBilledCost=unknownCostWorkers||currencies.size!==1?null:round(workerCost,6);
   base.products=[...families.values()].map(v=>({
     name:v.name,rows:v.rows,
