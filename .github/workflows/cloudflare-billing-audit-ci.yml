@@ -1,0 +1,56 @@
+name: HOTFIX — Cloudflare Billing Audit R1
+on:
+  push:
+    branches:
+      - fix/cloudflare-billing-audit-cycle-r1-20261116
+    paths:
+      - 'cloudflare/push-worker/src/cloudflare-billing-audit.js'
+      - 'cloudflare/push-worker/src/health-monitor.js'
+      - 'cloudflare/push-worker/tests/test-cloudflare-billing-audit.mjs'
+      - 'cloudflare/push-worker/tests/test-health-monitor.mjs'
+      - 'cloudflare/push-worker/package.json'
+      - '.github/workflows/cloudflare-billing-audit-ci.yml'
+  pull_request:
+    paths:
+      - 'cloudflare/push-worker/src/cloudflare-billing-audit.js'
+      - 'cloudflare/push-worker/src/health-monitor.js'
+      - 'cloudflare/push-worker/tests/test-cloudflare-billing-audit.mjs'
+      - 'cloudflare/push-worker/tests/test-health-monitor.mjs'
+      - 'cloudflare/push-worker/package.json'
+      - '.github/workflows/cloudflare-billing-audit-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cloudflare-billing-audit-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    defaults:
+      run:
+        working-directory: cloudflare/push-worker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Sintaxe do parser e monitor
+        run: |
+          set -euo pipefail
+          node --check src/cloudflare-billing-audit.js
+          node --check src/health-monitor.js
+          node --check tests/test-cloudflare-billing-audit.mjs
+          node --check tests/test-health-monitor.mjs
+      - name: Conciliar histórico e custos por produto
+        run: |
+          set -euo pipefail
+          node tests/test-cloudflare-billing-audit.mjs
+          node tests/test-health-monitor.mjs
+      - name: Testar integridade operacional do Push Worker
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npm run check
+          npm run test:sports
