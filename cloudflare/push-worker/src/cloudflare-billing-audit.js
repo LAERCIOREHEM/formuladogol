@@ -93,7 +93,10 @@ function currentCycle(rows,now) {
  *  custos por produto e visibilidade explícita de lacunas. */
 export function auditCloudflareBilling(rows=[],now=Date.now()) {
   const list=Array.isArray(rows)?rows:[];
-  const cycle=currentCycle(list,now);
+  const workersOnly=list.filter(row=>workerMetric(row)||norm(row.ServiceName)==='workers_standard');
+  // A franquia é do Workers Standard: produtos com outro aniversário
+  // de faturamento não podem determinar o denominador da CPU.
+  const cycle=currentCycle(workersOnly,now)||currentCycle(list,now);
   const base={
     auditVersion:CF_BILLING_AUDIT_VERSION,
     source:'Cloudflare Billable Usage v1 (conta, agregado por produto)',
@@ -128,11 +131,15 @@ export function auditCloudflareBilling(rows=[],now=Date.now()) {
     if(startRow==null){base.excluded.missingCycle++;costUncertain=true;
       if(workerMetric(row)||norm(row.ServiceName)==='workers_standard') ambiguous=true;
       continue;}
-    if(startRow!==start){base.excluded.otherCycle++;continue;}
+    if(startRow!==start) {
+      base.excluded.otherCycle++;
+      if(startRow<=now && now<nextMonthUtc(startRow)) costUncertain=true;
+      continue;
+    }
     const chargeStart=validDate(row.ChargePeriodStart);
     const chargeEnd=validDate(row.ChargePeriodEnd);
     if(chargeStart==null||chargeStart<start||chargeStart>=end ||
-       (chargeEnd!=null&&(chargeEnd<=chargeStart||chargeEnd>end+DAY))){
+       (chargeEnd!=null&&(chargeEnd<=chargeStart||chargeEnd>end))){
       base.excluded.invalidChargePeriod++;costUncertain=true;
       if(workerMetric(row)||norm(row.ServiceName)==='workers_standard') ambiguous=true;
       continue;
