@@ -1,5 +1,7 @@
 import { sendMail, mailConfig, maskAddress } from './mailer.js';
 import { aiUsageSummary, providerUsageSummary, postgamePublicCostSummary } from './ai-usage.js';
+import { auditCloudflareBilling } from './cloudflare-billing-audit.js';
+export { summarizeCloudflareWorkersUsage } from './cloudflare-billing-audit.js';
 import { OPS_INTELLIGENCE_CONSTANTS, opsIntelligenceStatus } from './ops-intelligence.js';
 import { buildActionCenter, healthActionMessage, healthActionDigestLines, healthYellowDecision, HEALTH_ACTION_CENTER_VERSION } from './health-action-center.js';
 
@@ -10,10 +12,7 @@ const DAILY_HOUR_BRT = 8;
 const DAILY_RECOVERY_END_HOUR_BRT = 12; // exclusivo: recupera até 11:59 BRT
 const DAILY_RETRY_MS = 15 * 60_000;
 const CF_BILLING_CACHE_MS = 60 * 60_000;
-const CF_WORKERS_CPU_INCLUDED_MS = 30_000_000;
-const CF_WORKERS_REQUESTS_INCLUDED = 10_000_000;
-const CF_CPU_OVERAGE_PER_MILLION_USD = 0.02;
-const CF_REQUEST_OVERAGE_PER_MILLION_USD = 0.30;
+const CF_BILLING_COST_WARNING_USD = 50; // apenas alerta de observação, não limite de cobrança
 export const HEALTH_POLICY_VERSION = 14;
 export const HUNTER_DAILY_WARNING_USD = 5;
 export const HUNTER_DAILY_CRITICAL_USD = 10;
@@ -108,99 +107,22 @@ export function classifyPagesAvailability(probe, previous=null, now=Date.now()) 
   };
 }
 
-function workersMetricKind(row={}){
-  const family=[row?.ServiceName,row?.ServiceFamilyName,row?.x_ProductFamilyName,row?.x_ProductCategoryName].map(text).join(' ').toLowerCase();
-  const metric=[row?.x_BillableMetricId,row?.x_BillableMetricName,row?.ChargeDescription,row?.ConsumedUnit,row?.PricingUnit].map(text).join(' ').toLowerCase();
-  if(!family.includes('worker')&&!metric.includes('worker')) return '';
-  if(metric.includes('request')) return 'requests';
-  if(metric.includes('cpu')) return 'cpu';
-  const unit=text(row?.ConsumedUnit).toLowerCase();
-  if(/millisecond|microsecond|nanosecond|cpu.?ms|\bms\b|second|minute|hour/.test(unit)) return 'cpu';
-  return '';
-}
-function cpuToMs(value,unitRaw=''){
-  const valueN=n(value); const unit=text(unitRaw).toLowerCase();
-  if(unit.includes('nanosecond')) return valueN/1_000_000;
-  if(unit.includes('microsecond')) return valueN/1_000;
-  if(unit.includes('millisecond')||unit.includes('cpu-ms')||unit.includes('cpu ms')||unit==='ms') return valueN;
-  if(unit.includes('minute')) return valueN*60_000;
-  if(unit.includes('hour')) return valueN*3_600_000;
-  if(unit.includes('second')) return valueN*1_000;
-  // O medidor Workers Standard CPU é precificado em CPU-ms. Se a API omitir
-  // a unidade, manter a quantidade como ms é a interpretação conservadora.
-  return valueN;
-}
-function linearProjection(value,startRaw,endRaw,now=Date.now()){
-  const start=Date.parse(text(startRaw)); const end=Date.parse(text(endRaw));
-  if(!Number.isFinite(start)||!Number.isFinite(end)||end<=start||now<=start) return null;
-  const periodDays=(end-start)/86_400_000;
-  const elapsedDays=Math.max(1,(Math.min(now,end)-start)/86_400_000);
-  return n(value)*(periodDays/elapsedDays);
-}
-
-export function summarizeCloudflareWorkersUsage(rows=[], now=Date.now()){
-  const list=Array.isArray(rows)?rows:[]; const today=brParts(now).date;
-  let cpuMs=0, requests=0, todayCpuMs=0, todayRequests=0, billedCost=0;
-  let periodStart='', periodEnd='';
-  for(const row of list){
-    const kind=workersMetricKind(row); if(!kind) continue;
-    billedCost+=n(row?.BilledCost);
-    const start=text(row?.BillingPeriodStart); const end=text(row?.BillingPeriodEnd);
-    if(start&&(!periodStart||Date.parse(start)<Date.parse(periodStart))) periodStart=start;
-    if(end&&(!periodEnd||Date.parse(end)>Date.parse(periodEnd))) periodEnd=end;
-    const isToday=dateOnly(row?.ChargePeriodStart)===today;
-    if(kind==='cpu'){
-      const value=cpuToMs(row?.ConsumedQuantity,row?.ConsumedUnit);
-      cpuMs+=value; if(isToday) todayCpuMs+=value;
-    } else if(kind==='requests'){
-      const value=n(row?.ConsumedQuantity);
-      requests+=value; if(isToday) todayRequests+=value;
-    }
-  }
-  const cpuUsedPct=pct(cpuMs,CF_WORKERS_CPU_INCLUDED_MS);
-  const requestUsedPct=pct(requests,CF_WORKERS_REQUESTS_INCLUDED);
-  const projectedCpuMs=linearProjection(cpuMs,periodStart,periodEnd,now);
-  const projectedRequests=linearProjection(requests,periodStart,periodEnd,now);
-  const currentOverageUsd=Math.max(0,cpuMs-CF_WORKERS_CPU_INCLUDED_MS)/1_000_000*CF_CPU_OVERAGE_PER_MILLION_USD+
-    Math.max(0,requests-CF_WORKERS_REQUESTS_INCLUDED)/1_000_000*CF_REQUEST_OVERAGE_PER_MILLION_USD;
-  const projectedOverageUsd=(projectedCpuMs==null?0:Math.max(0,projectedCpuMs-CF_WORKERS_CPU_INCLUDED_MS)/1_000_000*CF_CPU_OVERAGE_PER_MILLION_USD)+
-    (projectedRequests==null?0:Math.max(0,projectedRequests-CF_WORKERS_REQUESTS_INCLUDED)/1_000_000*CF_REQUEST_OVERAGE_PER_MILLION_USD);
-  return {
-    today, periodStart, periodEnd,
-    cpuMs:Number(cpuMs.toFixed(3)), todayCpuMs:Number(todayCpuMs.toFixed(3)), cpuIncludedMs:CF_WORKERS_CPU_INCLUDED_MS,
-    cpuUsedPct:Number(cpuUsedPct.toFixed(4)), cpuRemainingPct:Number(clamp(100-cpuUsedPct,0,100).toFixed(4)),
-    requests:Number(requests.toFixed(3)), todayRequests:Number(todayRequests.toFixed(3)), requestsIncluded:CF_WORKERS_REQUESTS_INCLUDED,
-    requestUsedPct:Number(requestUsedPct.toFixed(4)), requestRemainingPct:Number(clamp(100-requestUsedPct,0,100).toFixed(4)),
-    projectedCpuMs:projectedCpuMs==null?null:Number(projectedCpuMs.toFixed(3)), projectedCpuPct:projectedCpuMs==null?null:Number(pct(projectedCpuMs,CF_WORKERS_CPU_INCLUDED_MS).toFixed(4)),
-    projectedRequests:projectedRequests==null?null:Number(projectedRequests.toFixed(3)), projectedRequestPct:projectedRequests==null?null:Number(pct(projectedRequests,CF_WORKERS_REQUESTS_INCLUDED).toFixed(4)),
-    billedCost:Number(billedCost.toFixed(6)), currentOverageUsd:Number(currentOverageUsd.toFixed(6)), projectedOverageUsd:Number(projectedOverageUsd.toFixed(6))
-  };
-}
-
 async function cloudflareBillingSummary(env, now=Date.now()) {
   const token=text(env.CLOUDFLARE_BILLING_READ_TOKEN);
   const account=text(env.AI_GATEWAY_ACCOUNT_ID);
   if(!token||!account) return {configured:false,ok:false,reason:'not_configured'};
   const cache=safeJson(await metaGet(env,'cloudflare_billing_cache'),null);
-  if(cache?.workers&&now-(Date.parse(cache.at)||0)<CF_BILLING_CACHE_MS) return cache;
+  if(cache?.auditVersion===2 && cache?.workers &&
+     now-(Date.parse(cache.at)||0)<CF_BILLING_CACHE_MS) return cache;
   try {
     const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/billable-usage`,{headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},cache:'no-store'});
     const raw=await r.json().catch(()=>null);
-    const rows=Array.isArray(raw?.result)?raw.result:[];
-    if(!r.ok||raw?.success===false){
+    const rows=Array.isArray(raw?.result)?raw.result:null;
+    if(!r.ok||raw?.success!==true||!rows){
       const out={configured:true,ok:false,at:iso(now),reason:`http_${r.status}`};
       await metaPut(env,'cloudflare_billing_cache',JSON.stringify(out)); return out;
     }
-    let billed=0; let currency='USD'; const products={};
-    for(const row of rows){
-      billed+=n(row?.BilledCost); currency=text(row?.BillingCurrency)||currency;
-      const family=text(row?.ServiceName||row?.ServiceFamilyName||row?.x_ProductFamilyName||'Cloudflare');
-      const key=family||'Cloudflare';
-      const item=products[key]||(products[key]={billedCost:0,metrics:[]}); item.billedCost+=n(row?.BilledCost);
-      if(item.metrics.length<8) item.metrics.push({name:text(row?.x_BillableMetricName||row?.ChargeDescription),quantity:n(row?.ConsumedQuantity),unit:text(row?.ConsumedUnit)});
-    }
-    const workers=summarizeCloudflareWorkersUsage(rows,now);
-    const out={configured:true,ok:true,at:iso(now),currency,billedCost:Number(billed.toFixed(6)),rows:rows.length,products,workers};
+    const out=auditCloudflareBilling(rows,now);
     await metaPut(env,'cloudflare_billing_cache',JSON.stringify(out)); return out;
   } catch(e){
     const out={configured:true,ok:false,at:iso(now),reason:text(e?.message||e).slice(0,160)};
@@ -251,18 +173,28 @@ export function reliabilityIntelligenceIndicators({orchestratorHealth={},orchest
   return [sporting,factual,rag,control,mcp];
 }
 function icon(s){ return s==='red'?'🔴':s==='yellow'?'🟡':'🟢'; }
-function cloudflareSeverity(cf){
+export function cloudflareSeverity(cf){
   if(!cf?.configured||!cf?.ok||!cf?.workers) return 'yellow';
-  const w=cf.workers; const actual=Math.max(n(w.cpuUsedPct),n(w.requestUsedPct)); const projected=Math.max(n(w.projectedCpuPct),n(w.projectedRequestPct));
-  if(n(w.currentOverageUsd)>0||actual>=100) return 'red';
+  const w=cf.workers;
+  if(w.status!=='verified'||cf.billedCost==null) return 'yellow'; // CPU ou custo incompletos nunca ficam GREEN
+  const actual=Math.max(w.cpuUsedPct??0,w.requestUsedPct??0);
+  const projected=Math.max(w.projectedCpuPct??0,w.projectedRequestPct??0);
+  if(w.currentOverageUsd>0||actual>=100) return 'red';
   if(projected>=100||actual>=80||projected>=80) return 'yellow';
+  if(cf.currency==='USD'&&cf.billedCost!=null&&cf.billedCost>=CF_BILLING_COST_WARNING_USD)
+    return 'yellow'; // custo variável da conta, não consumo CPU
   return 'green';
 }
 function cloudflareDetail(cf){
   if(!cf?.configured) return 'Billing Read não configurado';
-  if(!cf?.ok) return `uso faturável indisponível (${text(cf?.reason)||'erro'})`;
+  if(!cf?.ok) return `faturamento sem validação (${text(cf?.reason)||'ciclo indisponível'})`;
   const w=cf.workers||{};
-  return `CPU ${fmtNum(w.cpuMs)} / ${fmtNum(w.cpuIncludedMs)} ms (${fmtPct(w.cpuUsedPct)}) · requests ${fmtNum(w.requests)} / ${fmtNum(w.requestsIncluded)} (${fmtPct(w.requestUsedPct)}) · hoje ${fmtNum(w.todayCpuMs)} ms`;
+  if(w.status!=='verified')
+    return `CPU/requests sem confirmação · ${text(w.reason)||'dados incompletos'} · conferir detalhamento`;
+  const extra=cf.billedCost==null?' · custo agregado inconclusivo':'';
+  const total=cf.currency==='USD'&&cf.billedCost!=null
+    ?` · custo variável conta USD ${cf.billedCost.toFixed(2)} (todos os produtos)`:'';
+  return `CPU ${fmtNum(w.cpuMs)} / ${fmtNum(w.cpuIncludedMs)} ms (${fmtPct(w.cpuUsedPct)}) · requests ${fmtNum(w.requests)} / ${fmtNum(w.requestsIncluded)} (${fmtPct(w.requestUsedPct)})${total}${extra}`;
 }
 
 export function githubActionsSeverity({ dormant=false, dispatches=0, previousDispatches=0, pendingPostgameTasks=0, hoursToNext=Infinity, hasPrevious=false } = {}) {
@@ -508,23 +440,41 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   return snapshot;
 }
 
-function cloudflareDigestLines(cf){
-  if(!cf?.configured) return ['CLOUDFLARE WORKERS — conta','Billing Read não configurado.'];
-  if(!cf?.ok) return ['CLOUDFLARE WORKERS — conta',`Uso faturável indisponível: ${text(cf?.reason)||'erro'}.`];
-  const w=cf.workers||{};
-  const period=w.periodStart&&w.periodEnd?`${fmtDateOnly(w.periodStart)} → ${fmtDateOnly(w.periodEnd)}`:'período atual';
-  const projectedCpu=w.projectedCpuMs==null?'—':`${fmtNum(w.projectedCpuMs)} ms (${fmtPct(w.projectedCpuPct)})`;
-  const projectedReq=w.projectedRequests==null?'—':`${fmtNum(w.projectedRequests)} (${fmtPct(w.projectedRequestPct)})`;
+export function cloudflareDigestLines(cf){
+  if(!cf?.configured) return ['CLOUDFLARE — AUDITORIA DE FATURAMENTO','Billing Read não configurado.'];
+  if(!cf?.ok) return [
+    'CLOUDFLARE — AUDITORIA DE FATURAMENTO',
+    `Sem dado mensal verificável: ${text(cf?.reason)||'API indisponível'}.`,
+    'Nenhum valor zero é presumido quando faltam dados da API.'
+  ];
+  const w=cf.workers||{},valid=w.status==='verified';
+  const period=w.periodStart&&w.periodEnd?`${fmtDateOnly(w.periodStart)} → ${fmtDateOnly(w.periodEnd)} (fim exclusivo)`:'ciclo indisponível';
+  const cpu=w.cpuMs==null?'indisponível':`${fmtNum(w.cpuMs)} / ${fmtNum(w.cpuIncludedMs)} ms · ${fmtPct(w.cpuUsedPct)}`;
+  const req=w.requests==null?'indisponível':`${fmtNum(w.requests)} / ${fmtNum(w.requestsIncluded)} · ${fmtPct(w.requestUsedPct)}`;
+  const todayCpu=w.todayCpuMs==null?'sem medição publicada para hoje':`${fmtNum(w.todayCpuMs)} ms`;
+  const todayReq=w.todayRequests==null?'sem medição publicada para hoje':fmtNum(w.todayRequests);
+  const projectedCpu=valid&&w.projectedCpuMs!=null?`${fmtNum(w.projectedCpuMs)} ms (${fmtPct(w.projectedCpuPct)})`:'não estimável com segurança';
+  const projectedReq=valid&&w.projectedRequests!=null?`${fmtNum(w.projectedRequests)} (${fmtPct(w.projectedRequestPct)})`:'não estimável com segurança';
+  const money=(v)=>v==null?'não disponível':`${cf.currency||'moeda indefinida'} ${Number(v).toFixed(2)}`;
+  const products=(cf.products||[]).map(p=>`- ${p.name}: ${money(p.costUsd)} (${p.rows} registro(s))`);
+  const excluded=cf.excluded||{};
   return [
-    'CLOUDFLARE WORKERS — uso agregado da conta',
-    `Hoje: CPU ${fmtNum(w.todayCpuMs)} ms · Requests ${fmtNum(w.todayRequests)}`,
-    `Ciclo ${period}`,
-    `CPU: ${fmtNum(w.cpuMs)} / ${fmtNum(w.cpuIncludedMs)} ms · ${fmtPct(w.cpuUsedPct)} usado · ${fmtPct(w.cpuRemainingPct)} disponível`,
-    `Requests: ${fmtNum(w.requests)} / ${fmtNum(w.requestsIncluded)} · ${fmtPct(w.requestUsedPct)} usado · ${fmtPct(w.requestRemainingPct)} disponível`,
-    `Projeção linear até o fechamento: CPU ${projectedCpu} · Requests ${projectedReq}`,
-    `Excedente Workers registrado: ${fmtUsd(w.currentOverageUsd)} · projetado: ${fmtUsd(w.projectedOverageUsd)}`,
-    `Uso faturável adicional Cloudflare registrado pela API: ${cf.currency||'USD'} ${Number(cf.billedCost||0).toFixed(2)}`,
-    'Observação: a franquia Workers Paid é mensal; o consumo de hoje é informativo e os dados de billing podem ter atraso de processamento.'
+    'CLOUDFLARE — AUDITORIA DE FATURAMENTO',
+    `Qualidade da medição: ${String(w.status||'unavailable').toUpperCase()} · versão de auditoria ${cf.auditVersion}`,
+    `Ciclo faturável: ${period}${w.periodEndEstimated?' · fim inferido pelo aniversário mensal':''}`,
+    `CPU Workers Standard: ${cpu}`,
+    `Requisições Workers Standard: ${req}`,
+    `Últimos dados CPU: ${w.latestCpuAt?fmtDate(w.latestCpuAt):'—'} · requisições: ${w.latestRequestsAt?fmtDate(w.latestRequestsAt):'—'}`,
+    `Hoje (API de faturamento): CPU ${todayCpu} · requests ${todayReq}`,
+    `Projeção linear até o fechamento: CPU ${projectedCpu} · requests ${projectedReq}`,
+    `Excedente Workers estimado agora: ${w.currentOverageUsd==null?'indisponível':fmtUsd(w.currentOverageUsd)} · ao fechamento: ${w.projectedOverageUsd==null?'indisponível':fmtUsd(w.projectedOverageUsd)}`,
+    `Custos variáveis registrados de toda a conta: ${money(cf.billedCost)} (NÃO é só CPU nem assinatura mensal)`,
+    `Custo variável da família Workers: ${money(cf.workersBilledCost)}`,
+    'Composição por família de produto:',
+    ...(products.length?products:['- Nenhum produto validado no ciclo.']),
+    `Registros: ${cf.inCycleRows||0} no ciclo · ${excluded.otherCycle||0} de outros ciclos ignorados · ${excluded.missingCycle||0} sem ciclo · ${excluded.invalidQuantity||0} com unidade inválida · ${excluded.missingCost||0} sem custo · ${excluded.missingCurrency||0} sem moeda · ${excluded.duplicateRows||0} duplicados`,
+    'CPU por Worker individual: indisponível nesta API (requer Workers Analytics Read).',
+    'A API publica custos com atraso. Ausência de registro de hoje não significa consumo zero.',
   ];
 }
 

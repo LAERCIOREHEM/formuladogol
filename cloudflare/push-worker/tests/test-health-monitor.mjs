@@ -49,22 +49,22 @@ const usage=summarizeCloudflareWorkersUsage([
   {
     ServiceFamilyName:'Workers', x_BillableMetricName:'Workers Standard CPU Time',
     ChargeDescription:'Workers Standard CPU Time — daily usage', ConsumedQuantity:100000, ConsumedUnit:'Milliseconds',
-    ChargePeriodStart:'2026-09-25T00:00:00Z', BillingPeriodStart:'2026-09-19T00:00:00Z', BillingPeriodEnd:'2026-10-19T00:00:00Z', BilledCost:0
+    ChargePeriodStart:'2026-09-25T00:00:00Z', BillingPeriodStart:'2026-09-19T00:00:00Z', BillingPeriodEnd:'2026-10-19T00:00:00Z', BillingCurrency:'USD', BilledCost:0
   },
   {
     ServiceFamilyName:'Workers', x_BillableMetricName:'Workers Standard CPU Time',
     ChargeDescription:'Workers Standard CPU Time — daily usage', ConsumedQuantity:77246, ConsumedUnit:'Milliseconds',
-    ChargePeriodStart:'2026-09-26T00:00:00Z', BillingPeriodStart:'2026-09-19T00:00:00Z', BillingPeriodEnd:'2026-10-19T00:00:00Z', BilledCost:0
+    ChargePeriodStart:'2026-09-26T00:00:00Z', BillingPeriodStart:'2026-09-19T00:00:00Z', BillingPeriodEnd:'2026-10-19T00:00:00Z', BillingCurrency:'USD', BilledCost:0
   },
   {
     ServiceFamilyName:'Workers', x_BillableMetricName:'Workers Standard Requests',
     ChargeDescription:'Workers Standard Requests — daily usage', ConsumedQuantity:30000, ConsumedUnit:'Requests',
-    ChargePeriodStart:'2026-09-25T00:00:00Z', BillingPeriodStart:'2026-09-19T00:00:00Z', BillingPeriodEnd:'2026-10-19T00:00:00Z', BilledCost:0
+    ChargePeriodStart:'2026-09-25T00:00:00Z', BillingPeriodStart:'2026-09-19T00:00:00Z', BillingPeriodEnd:'2026-10-19T00:00:00Z', BillingCurrency:'USD', BilledCost:0
   },
   {
     ServiceFamilyName:'Workers', x_BillableMetricName:'Workers Standard Requests',
     ChargeDescription:'Workers Standard Requests — daily usage', ConsumedQuantity:14900, ConsumedUnit:'Requests',
-    ChargePeriodStart:'2026-09-26T00:00:00Z', BillingPeriodStart:'2026-09-19T00:00:00Z', BillingPeriodEnd:'2026-10-19T00:00:00Z', BilledCost:0
+    ChargePeriodStart:'2026-09-26T00:00:00Z', BillingPeriodStart:'2026-09-19T00:00:00Z', BillingPeriodEnd:'2026-10-19T00:00:00Z', BillingCurrency:'USD', BilledCost:0
   },
   { ServiceFamilyName:'R2', x_BillableMetricName:'R2 Class A', ConsumedQuantity:999999, ConsumedUnit:'Requests', ChargePeriodStart:'2026-09-26T00:00:00Z', BilledCost:9 }
 ],now);

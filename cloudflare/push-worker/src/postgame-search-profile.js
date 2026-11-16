@@ -526,10 +526,12 @@ export function buildAttendanceSearchQueries(task) {
 
   // Fallbacks sem amarrar a pesquisa a sites: título invertido, apelidos e estádio.
   if (stadium) add(`"${home}" "${away}" "${stadium}" público renda`);
+  const informalHome = teamSearchVariants(home,8).find((alias)=>SEARCH_ONLY_WEAK_IDENTITY_ALIASES.has(normalizeText(alias)));
+  // Incluir o apelido ANTES do corte de 10 consultas, preservando descoberta
+  // observável (ex.: Galo) sem elevar gastos nem relaxar Match Identity Gate.
+  if (informalHome) add(`"${informalHome}" "${away}" público renda ${year}`);
   const pairs = pairVariants(home, away);
   for (const [h, a] of pairs.slice(1, 4)) add(`"${h}" "${a}" público renda ${year}`);
-  const informalHome = teamSearchVariants(home,8).find((alias)=>SEARCH_ONLY_WEAK_IDENTITY_ALIASES.has(normalizeText(alias)));
-  if (informalHome) add(`"${informalHome}" "${away}" público renda ${year}`);
   add(`"${away}" "${home}" público renda ${year}`);
   return queries.slice(0, 10);
 }
