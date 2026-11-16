@@ -42,7 +42,13 @@ export function parsePublicSearchRss(xml,task={},limit=10){
     const desc=decodeXml(entry.match(/<description\b[^>]*>([\s\S]*?)<\/description>/i)?.[1]||'');
     const link=publisherUrl(entry.match(/<link\b[^>]*>([\s\S]*?)<\/link>/i)?.[1]||'');
     if(!link||out.includes(link))continue;
-    const context=slug(title+' '+desc+' '+new URL(link).pathname.replace(/-/g,' '));
+    // Fonte datada de temporada anterior não pode fundamentar jogo atual.
+    // Não bloqueia páginas sem data explícita na URL.
+    const path=new URL(link).pathname;
+    const articleDate=/\/(20\d{2})\/(?:0?[1-9]|1[0-2])\/(?:0?[1-9]|[12]\d|3[01])\//.exec(path);
+    const matchYear=text(task.kickoff||task.data_iso).slice(0,4);
+    if(articleDate&&/^20\d{2}$/.test(matchYear)&&articleDate[1]!==matchYear)continue;
+    const context=slug(title+' '+desc+' '+path.replace(/-/g,' '));
     if(!matches(context,homeTerms)||!matches(context,awayTerms))continue;
     // Rejeita "ingressos" pré-jogo como fonte prioritaria, mas não
     // exige público/renda no título; ficha técnica pode estar no corpo.
