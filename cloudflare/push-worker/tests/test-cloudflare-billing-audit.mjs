@@ -69,6 +69,17 @@ assert.equal(mismatch.workers.cpuMs,null);
 assert.equal(mismatch.workers.projectedCpuMs,null);
 assert.equal(cloudflareSeverity(mismatch),'yellow');
 
+// V1 sem x_BillableMetricId: unidade CPU válida apenas em Workers Standard.
+const v1Legacy=auditCloudflareBilling([
+  row('cpu',3100,'Milliseconds',{x_BillableMetricId:null,x_BillableMetricName:null,
+    ChargeDescription:'Workers Standard usage measured in Milliseconds'}),
+  row('requests',99,'Requests',{x_BillableMetricId:null,x_BillableMetricName:null,
+    ChargeDescription:'Workers Standard usage measured in Requests'})
+],NOW);
+assert.equal(v1Legacy.workers.cpuMs,3100);
+assert.equal(v1Legacy.workers.requests,99);
+assert.equal(v1Legacy.workers.status,'verified');
+
 const otherService=auditCloudflareBilling([
   { ...row('cpu',5_000_000,'Milliseconds'),ServiceName:'Workers AI',ServiceFamilyName:'Workers AI' },
   row('requests',10,'Requests')
@@ -106,6 +117,7 @@ const missingCurrency=auditCloudflareBilling([
 assert.equal(missingCurrency.billedCost,null);
 assert.equal(missingCurrency.workers.cpuMs,100);
 assert.equal(missingCurrency.workers.status,'verified','moeda ausente não invalida contagem CPU');
+assert.equal(cloudflareSeverity(missingCurrency),'yellow','custo total inconclusivo não deve ficar verde');
 
 const stale=auditCloudflareBilling([
   row('cpu',100,'Milliseconds',{ChargePeriodStart:'2026-10-20T00:00:00Z',ChargePeriodEnd:'2026-10-21T00:00:00Z'}),
