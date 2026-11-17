@@ -27,37 +27,69 @@ function nextMonthUtc(start) {
   const lastDay=new Date(Date.UTC(y,m+1,0)).getUTCDate();
   return Date.UTC(y,m,Math.min(day,lastDay),d.getUTCHours(),d.getUTCMinutes(),d.getUTCSeconds());
 }
+// Billable Usage V1 identifica algumas métricas pelo nome comercial de cobrança,
+// sem ServiceName='Workers Standard' ou x_BillableMetricId. Aceitar apenas
+// rótulos conhecidos e unidades compatíveis; nunca classificar produtos adjacentes.
+const V1_CPU_LABELS = new Set([
+  'workers_cpu_ms_first_30m_are_included',
+  'workers_standard_cpu_time',
+  'workers_standard_cpu_time_daily_usage',
+  'workers_standard_usage_measured_in_milliseconds',
+]);
+const V1_REQUEST_LABELS = new Set([
+  'workers_standard_requests_first_10m_are_included',
+  'workers_standard_requests',
+  'workers_standard_requests_daily_usage',
+  'workers_standard_usage_measured_in_requests',
+]);
+function metricLabelKind(value) {
+  const name=norm(value);
+  if(V1_CPU_LABELS.has(name)) return 'cpu';
+  if(V1_REQUEST_LABELS.has(name)) return 'requests';
+  return '';
+}
 function family(row) {
   const given=str(row.ServiceFamilyName||row.x_ProductFamilyName||'');
   const service=str(row.ServiceName);
-  if(norm(given)==='workers' && service && norm(service)!=='workers_standard') return service;
+  if(norm(given)==='workers' && service && norm(service)!=='workers_standard' &&
+    !metricLabelKind(service)) return service;
   if (given) return given;
-  if (/^Workers AI\b/i.test(service)) return 'Workers AI';
-  if (/^Workers\b/i.test(service)) return 'Workers';
+  if (metricLabelKind(service)||norm(service)==='workers_standard') return 'Workers';
+  if (/^Workers AI\\b/i.test(service)) return 'Workers AI';
+  if (/^Workers\\b/i.test(service)) return 'Workers';
   return service || 'Sem categoria';
 }
 function workerMetric(row) {
   const fam=norm(row.ServiceFamilyName||row.x_ProductFamilyName);
   const service=norm(row.ServiceName);
-  if (fam!=='workers' && service!=='workers_standard') return '';
-  // Nunca confundir Workers AI, Workflows, Durables ou KV com Workers Standard.
-  if (service && service!=='workers_standard') return '';
+  const validFamily=fam===''||fam==='workers';
+  if(!validFamily) return '';
+  const standardService=service===''||service==='workers_standard';
+  const serviceKind=metricLabelKind(row.ServiceName);
+  if(!standardService&&!serviceKind) return '';
   const id=norm(row.x_BillableMetricId);
-  if (id) {
-    if (id==='workers_standard_cpu_time') return 'cpu';
-    if (id==='workers_standard_requests') return 'requests';
+  if(id) {
+    if(id==='workers_standard_cpu_time') return 'cpu';
+    if(id==='workers_standard_requests') return 'requests';
     return '';
   }
-  // V1 omite x_BillableMetricId: fallback limitado aos nomes literais oficiais.
-  const name=norm(row.x_BillableMetricName || row.ChargeDescription);
-  if (name==='workers_standard_cpu_time' || name==='workers_standard_cpu_time_daily_usage') return 'cpu';
-  if (name==='workers_standard_requests' || name==='workers_standard_requests_daily_usage') return 'requests';
-  // API V1 pode fornecer apenas ServiceName + ConsumedUnit, sem x_BillableMetricId.
-  // Somente o produto exatamente Workers Standard entra neste fallback.
-  if (service==='workers_standard' && (!name || name.startsWith('workers_standard_usage_measured_in_'))) {
-    const unit=norm(row.ConsumedUnit);
-    if (['milliseconds','millisecond','cpu_ms','ms','microseconds','nanoseconds','seconds'].includes(unit)) return 'cpu';
-    if (['requests','request'].includes(unit)) return 'requests';
+  const labels=[row.x_BillableMetricName,row.ChargeDescription,row.ServiceName]
+    .map(metricLabelKind).filter(Boolean);
+  if(new Set(labels).size>1) return ''; // campos contraditórios: não presumir métrica
+  const kind=labels[0]||'';
+  const unit=norm(row.ConsumedUnit);
+  const cpuUnit=['milliseconds','millisecond','cpu_ms','ms','microseconds','microsecond',
+    'nanoseconds','nanosecond','seconds','second'].includes(unit);
+  const requestUnit=['requests','request','count'].includes(unit);
+  if(kind==='cpu') return cpuUnit?'cpu':'';
+  if(kind==='requests') return requestUnit?'requests':'';
+  // Fallback de unidade permitido SOMENTE para ServiceName Workers Standard.
+  // Nunca deduzir o uso de outros serviços apenas por suas unidades.
+  if(service==='workers_standard' &&
+    (!norm(row.x_BillableMetricName)&&!norm(row.ChargeDescription)||
+      norm(row.ChargeDescription).startsWith('workers_standard_usage_measured_in_'))) {
+    if(cpuUnit) return 'cpu';
+    if(requestUnit) return 'requests';
   }
   return '';
 }
