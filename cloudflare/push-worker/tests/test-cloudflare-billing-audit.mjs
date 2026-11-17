@@ -150,6 +150,46 @@ assert.equal(anotherPeriod.workers.periodStart,'2026-11-01T00:00:00.000Z');
 assert.equal(anotherPeriod.workers.cpuMs,200);
 assert.equal(anotherPeriod.excluded.otherCycle,1);
 
+// Regressão: produção V1 usa nomes de cobrança comerciais, não IDs técnicos.
+const commercialRows=[
+  {ServiceFamilyName:'Workers',ServiceName:'Workers CPU ms (first 30M are included)',
+    ChargeDescription:'Workers CPU ms (first 30M are included)',
+    ConsumedQuantity:1_500_000,ConsumedUnit:'Milliseconds',
+    ChargePeriodStart:at,ChargePeriodEnd:'2026-11-16T00:00:00Z',
+    BillingPeriodStart:period,BillingCurrency:'USD',BilledCost:0},
+  {ServiceFamilyName:'Workers',ServiceName:'Workers Standard Requests (first 10M are included)',
+    ChargeDescription:'Workers Standard Requests (first 10M are included)',
+    ConsumedQuantity:25_000,ConsumedUnit:'Requests',
+    ChargePeriodStart:at,ChargePeriodEnd:'2026-11-16T00:00:00Z',
+    BillingPeriodStart:period,BillingCurrency:'USD',BilledCost:0}
+];
+const commercial=auditCloudflareBilling(commercialRows,NOW);
+assert.equal(commercial.workers.status,'verified','rótulos comerciais devem fornecer métricas válidas');
+assert.equal(commercial.workers.cpuMs,1_500_000);
+assert.equal(commercial.workers.requests,25_000);
+assert.equal(commercial.workersBilledCost,0);
+assert.equal(cloudflareSeverity(commercial),'green');
+const commercialWithD1=auditCloudflareBilling([
+  ...commercialRows,
+  {...commercialRows[0],ServiceFamilyName:'D1',ServiceName:'D1 Database',
+    ChargeDescription:'D1 rows read',ConsumedQuantity:999_999_999,ConsumedUnit:'Requests',BilledCost:79.74}
+],NOW);
+assert.equal(commercialWithD1.workers.cpuMs,1_500_000,'D1 não deve contaminar CPU');
+assert.equal(commercialWithD1.workers.requests,25_000,'D1 não deve contaminar requests');
+assert.equal(commercialWithD1.billedCost,79.74);
+assert.equal(cloudflareSeverity(commercialWithD1),'yellow','custo D1 acima de USD 50 continua em atenção');
+const wrongUnit=auditCloudflareBilling([
+  {...commercialRows[0],ConsumedUnit:'Requests'},
+  commercialRows[1]
+],NOW);
+assert.equal(wrongUnit.workers.cpuMs,null);
+assert.equal(cloudflareSeverity(wrongUnit),'yellow','não aceitar unidade inconsistente');
+const contradictory=auditCloudflareBilling([
+  {...commercialRows[0],x_BillableMetricName:'Workers Standard Requests'},
+  commercialRows[1]
+],NOW);
+assert.equal(contradictory.workers.cpuMs,null,'campos contraditórios não são confiáveis');
+
 const testFacade=summarizeCloudflareWorkersUsage(sample.slice(0,2),NOW);
 assert.equal(testFacade.cpuMs,14_708_270);
 assert.equal(testFacade.status,'verified');
