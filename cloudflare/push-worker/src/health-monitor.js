@@ -112,7 +112,7 @@ async function cloudflareBillingSummary(env, now=Date.now()) {
   const account=text(env.AI_GATEWAY_ACCOUNT_ID);
   if(!token||!account) return {configured:false,ok:false,reason:'not_configured'};
   const cache=safeJson(await metaGet(env,'cloudflare_billing_cache'),null);
-  if(cache?.auditVersion===2 && cache?.workers &&
+  if(cache?.auditVersion===3 && cache?.workers &&
      now-(Date.parse(cache.at)||0)<CF_BILLING_CACHE_MS) return cache;
   try {
     const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/billable-usage`,{headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},cache:'no-store'});
@@ -458,6 +458,13 @@ export function cloudflareDigestLines(cf){
   const money=(v)=>v==null?'não disponível':`${cf.currency||'moeda indefinida'} ${Number(v).toFixed(2)}`;
   const products=(cf.products||[]).map(p=>`- ${p.name}: ${money(p.costUsd)} (${p.rows} registro(s))`);
   const excluded=cf.excluded||{};
+  const diagnostics=cf.metricDiagnostics||{};
+  const diagnosticLines=diagnostics.schemaVersion===1?[
+    `Diagnóstico Workers V1: ${diagnostics.candidateRows||0} registro(s) candidatos · CPU reconhecidos ${diagnostics.recognizedCpuRows||0} · requests reconhecidos ${diagnostics.recognizedRequestRows||0} · não reconhecidos ${diagnostics.unrecognizedRows||0}`,
+    ...Object.entries(diagnostics.reasons||{}).map(([reason,count])=>`- Motivo ${reason}: ${count} registro(s)`),
+    ...((w.status!=='verified')?(diagnostics.examples||[]).slice(0,3).map((d,i)=>
+      `- Exemplo ${i+1} (${d.reason}): família=${d.serviceFamily||'—'}; serviço=${d.serviceName||'—'}; métrica=${d.metricName||d.metricId||d.chargeDescription||'—'}; unidade=${d.consumedUnit||'—'}; pricing=${d.pricingUnit||'—'}`):[])
+  ]:[];
   return [
     'CLOUDFLARE — AUDITORIA DE FATURAMENTO',
     `Qualidade da medição: ${String(w.status||'unavailable').toUpperCase()} · versão de auditoria ${cf.auditVersion}`,
@@ -473,6 +480,7 @@ export function cloudflareDigestLines(cf){
     'Composição por família de produto:',
     ...(products.length?products:['- Nenhum produto validado no ciclo.']),
     `Registros: ${cf.inCycleRows||0} no ciclo · ${excluded.otherCycle||0} de outros ciclos ignorados · ${excluded.missingCycle||0} sem ciclo · ${excluded.invalidQuantity||0} com unidade inválida · ${excluded.missingCost||0} sem custo · ${excluded.missingCurrency||0} sem moeda · ${excluded.duplicateRows||0} duplicados`,
+    ...diagnosticLines,
     'CPU por Worker individual: indisponível nesta API (requer Workers Analytics Read).',
     'A API publica custos com atraso. Ausência de registro de hoje não significa consumo zero.',
   ];

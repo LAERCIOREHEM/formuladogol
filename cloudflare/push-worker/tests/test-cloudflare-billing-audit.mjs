@@ -29,7 +29,7 @@ const sample=[
 ];
 const result=auditCloudflareBilling(sample,NOW);
 assert.equal(result.ok,true);
-assert.equal(result.auditVersion,2);
+assert.equal(result.auditVersion,3);
 assert.equal(result.workers.status,'verified');
 assert.equal(result.workers.cpuMs,14_708_270,'CPU deve ignorar ciclos antigos e outros produtos');
 assert.equal(result.workers.requests,66_826);
@@ -190,6 +190,40 @@ const contradictory=auditCloudflareBilling([
 ],NOW);
 assert.equal(contradictory.workers.cpuMs,null,'campos contraditórios não são confiáveis');
 
+// R38-E1: evidence-first diagnostics and recovery for optional V1 fields.
+const recoveredWithoutService=auditCloudflareBilling([
+  {...commercialRows[0],ServiceName:null,x_BillableMetricName:'Workers Standard CPU Time',
+    ChargeDescription:'Workers CPU ms (first 30M are included)'},
+  {...commercialRows[1],ServiceName:null,x_BillableMetricName:'Workers Standard Requests'}
+],NOW);
+assert.equal(recoveredWithoutService.auditVersion,3);
+assert.equal(recoveredWithoutService.workers.status,'verified');
+assert.equal(recoveredWithoutService.workers.cpuMs,1_500_000);
+assert.equal(recoveredWithoutService.workers.requests,25_000);
+assert.equal(recoveredWithoutService.metricDiagnostics.recognizedCpuRows,1);
+assert.equal(recoveredWithoutService.metricDiagnostics.recognizedRequestRows,1);
+assert.equal(recoveredWithoutService.metricDiagnostics.unrecognizedRows,0);
+const opaqueWorkers=auditCloudflareBilling([
+  {...commercialRows[0],ServiceName:'Workers Standard',ChargeDescription:'Workers Standard novel CPU metric',
+    x_BillableMetricName:null,ConsumedUnit:'Milliseconds'},
+  {...commercialRows[1],ServiceName:'Workers Standard',ChargeDescription:'Workers novel request class',
+    x_BillableMetricName:null}
+],NOW);
+assert.equal(opaqueWorkers.workers.status,'unavailable');
+assert.equal(opaqueWorkers.metricDiagnostics.candidateRows,2);
+assert.equal(opaqueWorkers.metricDiagnostics.unrecognizedRows,2);
+assert.equal(opaqueWorkers.metricDiagnostics.reasons.unrecognized_metric_label,2);
+assert.equal(opaqueWorkers.metricDiagnostics.examples.length,2);
+assert.ok(!JSON.stringify(opaqueWorkers.metricDiagnostics).includes('1_500_000'));
+assert.match(cloudflareDigestLines(opaqueWorkers).join('\n'),/Diagnóstico Workers V1: 2 registro/);
+assert.match(cloudflareDigestLines(opaqueWorkers).join('\n'),/unrecognized_metric_label/);
+const rejectedOtherProducts=auditCloudflareBilling([
+  ...commercialRows,
+  {...commercialRows[0],ServiceFamilyName:'Workers AI',ServiceName:'Workers AI',
+    x_BillableMetricName:'Workers Standard CPU Time',ConsumedQuantity:9999999}
+],NOW);
+assert.equal(rejectedOtherProducts.workers.cpuMs,1_500_000);
+assert.equal(rejectedOtherProducts.metricDiagnostics.candidateRows,2);
 const testFacade=summarizeCloudflareWorkersUsage(sample.slice(0,2),NOW);
 assert.equal(testFacade.cpuMs,14_708_270);
 assert.equal(testFacade.status,'verified');

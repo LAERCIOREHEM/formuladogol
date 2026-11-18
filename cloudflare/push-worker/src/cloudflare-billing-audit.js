@@ -6,7 +6,7 @@ export const CF_WORKERS_CPU_INCLUDED_MS = 30_000_000;
 export const CF_WORKERS_REQUESTS_INCLUDED = 10_000_000;
 const CPU_OVERAGE_PER_MILLION_USD = 0.02;
 const REQUEST_OVERAGE_PER_MILLION_USD = 0.30;
-export const CF_BILLING_AUDIT_VERSION = 2;
+export const CF_BILLING_AUDIT_VERSION = 3;
 const HOUR = 3_600_000;
 const DAY = 86_400_000;
 
@@ -35,12 +35,14 @@ const V1_CPU_LABELS = new Set([
   'workers_standard_cpu_time',
   'workers_standard_cpu_time_daily_usage',
   'workers_standard_usage_measured_in_milliseconds',
+  'workers_standard_usage_measured_in_ms',
 ]);
 const V1_REQUEST_LABELS = new Set([
   'workers_standard_requests_first_10m_are_included',
   'workers_standard_requests',
   'workers_standard_requests_daily_usage',
   'workers_standard_usage_measured_in_requests',
+  'workers_standard_usage_measured_in_count',
 ]);
 function metricLabelKind(value) {
   const name=norm(value);
@@ -59,39 +61,54 @@ function family(row) {
   if (/^Workers\\b/i.test(service)) return 'Workers';
   return service || 'Sem categoria';
 }
-function workerMetric(row) {
+// Closed classification: recognized semantic label plus compatible measured unit.
+function workerMetricAssessment(row) {
   const fam=norm(row.ServiceFamilyName||row.x_ProductFamilyName);
   const service=norm(row.ServiceName);
-  const validFamily=fam===''||fam==='workers';
-  if(!validFamily) return '';
-  const standardService=service===''||service==='workers_standard';
-  const serviceKind=metricLabelKind(row.ServiceName);
-  if(!standardService&&!serviceKind) return '';
-  const id=norm(row.x_BillableMetricId);
-  if(id) {
-    if(id==='workers_standard_cpu_time') return 'cpu';
-    if(id==='workers_standard_requests') return 'requests';
-    return '';
-  }
   const labels=[row.x_BillableMetricName,row.ChargeDescription,row.ServiceName]
     .map(metricLabelKind).filter(Boolean);
-  if(new Set(labels).size>1) return ''; // campos contraditórios: não presumir métrica
-  const kind=labels[0]||'';
+  const id=norm(row.x_BillableMetricId);
+  const recognizedId=id==='workers_standard_cpu_time'?'cpu':
+    id==='workers_standard_requests'?'requests':'';
+  const standardFamily=fam===''||fam==='workers';
+  const excludedService=/^(workers_ai|durable_objects|d1|r2|queues|worker_build|workers_kv|workflows)(_|$)/.test(service);
+  if(!standardFamily||excludedService) return {kind:'',reason:'outside_workers_standard'};
+  if(id&&!recognizedId) return {kind:'',reason:'unknown_metric_id'};
+  if(new Set(labels).size>1||recognizedId&&labels.length&&labels.some(x=>x!==recognizedId))
+    return {kind:'',reason:'conflicting_metric_fields'};
+  const kind=recognizedId||labels[0]||'';
+  if(!kind) return {kind:'',reason:'unrecognized_metric_label'};
   const unit=norm(row.ConsumedUnit);
-  const cpuUnit=['milliseconds','millisecond','cpu_ms','ms','microseconds','microsecond',
-    'nanoseconds','nanosecond','seconds','second'].includes(unit);
-  const requestUnit=['requests','request','count'].includes(unit);
-  if(kind==='cpu') return cpuUnit?'cpu':'';
-  if(kind==='requests') return requestUnit?'requests':'';
-  // Fallback de unidade permitido SOMENTE para ServiceName Workers Standard.
-  // Nunca deduzir o uso de outros serviços apenas por suas unidades.
-  if(service==='workers_standard' &&
-    (!norm(row.x_BillableMetricName)&&!norm(row.ChargeDescription)||
-      norm(row.ChargeDescription).startsWith('workers_standard_usage_measured_in_'))) {
-    if(cpuUnit) return 'cpu';
-    if(requestUnit) return 'requests';
-  }
-  return '';
+  const cpuUnits=['milliseconds','millisecond','cpu_ms','ms','microseconds',
+    'microsecond','nanoseconds','nanosecond','seconds','second'];
+  const reqUnits=['requests','request','count'];
+  if(kind==='cpu'&&!cpuUnits.includes(unit)||kind==='requests'&&!reqUnits.includes(unit))
+    return {kind:'',reason:'unsupported_consumed_unit'};
+  return {kind,reason:'recognized'};
+}
+function workerMetric(row) { return workerMetricAssessment(row).kind; }
+function isWorkersBillingRow(row) {
+  const fam=norm(row.ServiceFamilyName||row.x_ProductFamilyName);
+  const service=norm(row.ServiceName);
+  if(fam&&fam!=='workers') return false;
+  if(/^(workers_ai|durable_objects|d1|r2|queues|worker_build|workers_kv|workflows)(_|$)/.test(service)) return false;
+  return fam==='workers'||service==='workers_standard'||
+    metricLabelKind(row.ServiceName)!==''||metricLabelKind(row.ChargeDescription)!=='';
+}
+// Structural only; do not publish account IDs, amounts, quantities or full API rows.
+function publicMetricDescriptor(row,reason) {
+  const clean=x=>str(x).slice(0,96);
+  return {
+    reason,
+    serviceFamily:clean(row.ServiceFamilyName||row.x_ProductFamilyName),
+    serviceName:clean(row.ServiceName),
+    metricId:clean(row.x_BillableMetricId),
+    metricName:clean(row.x_BillableMetricName),
+    chargeDescription:clean(row.ChargeDescription),
+    consumedUnit:clean(row.ConsumedUnit),
+    pricingUnit:clean(row.PricingUnit),
+    quantityPresent:row.ConsumedQuantity!=null,
+  };
 }
 function cpuMs(raw,unitRaw) {
   const qty=n(raw);
@@ -125,12 +142,14 @@ function currentCycle(rows,now) {
  *  custos por produto e visibilidade explícita de lacunas. */
 export function auditCloudflareBilling(rows=[],now=Date.now()) {
   const list=Array.isArray(rows)?rows:[];
-  const workersOnly=list.filter(row=>workerMetric(row)||norm(row.ServiceName)==='workers_standard');
+  const workersOnly=list.filter(isWorkersBillingRow);
   // A franquia é do Workers Standard: produtos com outro aniversário
   // de faturamento não podem determinar o denominador da CPU.
   const cycle=currentCycle(workersOnly,now)||currentCycle(list,now);
   const base={
     auditVersion:CF_BILLING_AUDIT_VERSION,
+    metricDiagnostics:{candidateRows:0,recognizedCpuRows:0,recognizedRequestRows:0,
+      unrecognizedRows:0,reasons:{},examples:[],source:'billing-v1',schemaVersion:1},
     source:'Cloudflare Billable Usage v1 (conta, agregado por produto)',
     configured:true,ok:!!cycle,at:iso(now),
     currency:null,billedCost:null,workersBilledCost:null,
@@ -141,6 +160,7 @@ export function auditCloudflareBilling(rows=[],now=Date.now()) {
   if(!cycle) {
     base.reason='no_current_billing_cycle';
     base.workers={
+      metricDiagnostics:base.metricDiagnostics,
       status:'unavailable',reason:'no_current_billing_cycle',
       cpuIncludedMs:CF_WORKERS_CPU_INCLUDED_MS,requestsIncluded:CF_WORKERS_REQUESTS_INCLUDED,
       cpuMs:null,requests:null,todayCpuMs:null,todayRequests:null,
@@ -184,7 +204,18 @@ export function auditCloudflareBilling(rows=[],now=Date.now()) {
     base.inCycleRows++;
     const last=chargeEnd??Math.min(now,chargeStart+DAY);
     maxEnd=Math.max(maxEnd,last);
-    const group=family(row),m=workerMetric(row),cost=asMoney(row);
+    const group=family(row),assessment=workerMetricAssessment(row),m=assessment.kind,cost=asMoney(row);
+    if(isWorkersBillingRow(row)) {
+      const diag=base.metricDiagnostics;
+      diag.candidateRows++;
+      if(m==='cpu') diag.recognizedCpuRows++;
+      else if(m==='requests') diag.recognizedRequestRows++;
+      else {
+        diag.unrecognizedRows++;
+        diag.reasons[assessment.reason]=(diag.reasons[assessment.reason]||0)+1;
+        if(diag.examples.length<6) diag.examples.push(publicMetricDescriptor(row,assessment.reason));
+      }
+    }
     const curr=str(row.BillingCurrency);
     if(curr) currencies.add(curr);
     else {missingCost=true;base.excluded.missingCurrency++;}
@@ -263,6 +294,7 @@ export function auditCloudflareBilling(rows=[],now=Date.now()) {
     billedCost:base.workersBilledCost,
     rowCount:{cpu:nCpu,requests:nReq},
     perWorker:{available:false,reason:'Billable Usage oferece agregado por produto, não por script; Analytics Read não configurado.'},
+    metricDiagnostics:base.metricDiagnostics,
   };
   base.workers=workers;
   return base;
