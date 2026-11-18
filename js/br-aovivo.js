@@ -397,6 +397,7 @@
       away: { ...localTeam(j.visitante), score: j.placar_visitante },
       raw: null,
       source: "local",
+      officialKickoff: /^CBF oficial/i.test(String(j.fonte_calendario || "")) && j.estado === "pre" && j.adiado !== true && Boolean(j.data_iso),
       competitionKey: String(j.competicao_chave || "brasileirao"),
       competitionName: String(j.competicao_nome || "Campeonato Brasileiro Série A"),
       competitionShort: String(j.competicao_nome_curto || "Brasileirão"),
@@ -577,8 +578,11 @@
       ...loc,
       ...game,
       rodada: loc.rodada || game.rodada,
-      date: game.date || loc.date,
-      dataIso: game.dataIso || loc.dataIso,
+      // Official CBF schedule wins over a stale ESPN PRE-game kickoff.
+      // Live/FINAL status and score remain owned by the live sports feed.
+      date: loc.officialKickoff && game.state !== "in" && game.state !== "post" ? loc.date : (game.date || loc.date),
+      dataIso: loc.officialKickoff && game.state !== "in" && game.state !== "post" ? loc.dataIso : (game.dataIso || loc.dataIso),
+      officialKickoff: loc.officialKickoff === true,
       venue: game.venue || loc.venue,
       transmissao: loc.transmissao || game.transmissao,
       adiado: loc.adiado || game.adiado,
@@ -1446,8 +1450,11 @@
       ...primary,
       id: primary.id || secondary.id,
       rodada: primary.rodada || secondary.rodada,
-      date: primary.date || secondary.date,
-      dataIso: primary.dataIso || secondary.dataIso,
+      date: (a?.officialKickoff || b?.officialKickoff) && primary.state !== "in" && primary.state !== "post"
+        ? (a?.officialKickoff ? a.date : b.date) : (primary.date || secondary.date),
+      dataIso: (a?.officialKickoff || b?.officialKickoff) && primary.state !== "in" && primary.state !== "post"
+        ? (a?.officialKickoff ? a.dataIso : b.dataIso) : (primary.dataIso || secondary.dataIso),
+      officialKickoff: a?.officialKickoff === true || b?.officialKickoff === true,
       detail: primary.detail || secondary.detail,
       clock: primary.clock || secondary.clock,
       venue: primary.venue || secondary.venue,
