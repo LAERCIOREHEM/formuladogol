@@ -91,6 +91,8 @@ on:
       - 'scripts/gerar_fundacao_organica.py'
       - 'scripts/gerar_paginas_clubes.py'
       - 'scripts/gerar_paginas_jogos.py'
+      - 'scripts/gerar_agenda_clubes_brasileirao.py'
+      - 'tests/test_calendario_finais_cbf_2026.py'
       - 'tests/test-af-postgame-pages.py'
       - 'scripts/gerar_hubs_competicoes.py'
       - 'scripts/gerar_fechamento_organico.py'
@@ -178,6 +180,30 @@ jobs:
         run: |
           python -m py_compile atualizar_espn.py scripts/gerar_agenda_clubes_brasileirao.py
           python tests/test_calendario_finais_cbf_2026.py
+
+      # O feed ESPN pode regenerar a agenda sem metadados CBF entre o último
+      # commit e o checkout. Reconciliar no workspace garante que o artefato
+      # enviado ao Pages carregue a evidência documental, não apenas o JS.
+      - name: Reconciliar agenda publicada com correções documentais da CBF
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from scripts.gerar_agenda_clubes_brasileirao import apply_official_cbf_overrides
+          path = Path('dados-br/agenda-clubes-br.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          before = data.get('jogos')
+          if not isinstance(before, list):
+              raise SystemExit('Agenda publicada inválida: jogos não é lista')
+          after = apply_official_cbf_overrides(before, Path('.'))
+          fixed = [str(new.get('event_id')) for old, new in zip(before, after) if old != new]
+          if fixed:
+              data['jogos'] = sorted(after, key=lambda x: str(x.get('data_iso') or ''))
+              path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print('Agenda CBF reconciliada para empacotamento:', len(fixed), fixed)
+          PY
 
       - name: Bloquear publicação de horário CBF incorreto (Grêmio x Bahia R35)
         shell: bash

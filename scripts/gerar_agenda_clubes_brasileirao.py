@@ -552,6 +552,60 @@ def cup_games(spec: Mapping[str, Any]) -> Iterable[dict[str, Any]]:
         }
 
 
+def apply_official_cbf_overrides(
+    candidates: Iterable[dict[str, Any]], root: Path
+) -> list[dict[str, Any]]:
+    """Aplica ajustes documentais CBF aos jogos PRÉ sem alterar LIVE/FINAL.
+
+    A agenda é regenerada periodicamente a partir do feed ESPN. O registro
+    oficial em ajustes-calendario.json deve prevalecer também na PROVENIÊNCIA,
+    mesmo se a ESPN já estiver exibindo a hora certa sem metadados CBF.
+    """
+    payload = load_json(root / "dados-br" / "ajustes-calendario.json", {"ajustes": []})
+    official: dict[str, dict[str, Any]] = {}
+    for fix in payload.get("ajustes") or []:
+        if not isinstance(fix, Mapping):
+            continue
+        if not str(fix.get("fonte_calendario") or "").startswith("CBF oficial — tabela detalhada"):
+            continue
+        if not str(fix.get("origem_calendario") or "").startswith("https://www.cbf.com.br/"):
+            continue
+        if fix.get("data_definir") is True or fix.get("adiado") is True:
+            continue
+        event_id = str(fix.get("event_id") or "").strip()
+        if not event_id or parse_dt(fix.get("data_iso")) is None:
+            continue
+        official[event_id] = dict(fix)
+
+    out = []
+    for raw in candidates:
+        item = dict(raw)
+        event_id = str(item.get("event_id") or "").strip()
+        fix = official.get(event_id)
+        if fix and item.get("competicao_chave") == "brasileirao":
+            state = str(item.get("estado") or "").lower()
+            home = item.get("mandante")
+            away = item.get("visitante")
+            home = home.get("nome") if isinstance(home, Mapping) else home
+            away = away.get("nome") if isinstance(away, Mapping) else away
+            same_fixture = (
+                norm(home) == norm(fix.get("mandante"))
+                and norm(away) == norm(fix.get("visitante"))
+                and int(item.get("rodada") or 0) == int(fix.get("rodada") or -1)
+            )
+            if same_fixture and state == "pre" and item.get("concluido") is not True:
+                old_date = str(item.get("data_iso") or "")
+                if old_date and parse_dt(old_date) != parse_dt(fix["data_iso"]):
+                    item["data_fonte_anterior"] = old_date
+                item["data_iso"] = str(fix["data_iso"])
+                item["fonte_calendario"] = str(fix["fonte_calendario"])
+                item["origem_calendario"] = str(fix["origem_calendario"])
+                item["adiado"] = False
+                item["data_definir"] = False
+        out.append(item)
+    return out
+
+
 def build(
     root: Path, now: datetime, official_schedule: Iterable[CBFAgendaPartida] = ()
 ) -> dict[str, Any]:
@@ -560,7 +614,9 @@ def build(
     end = end_of_next_month(now)
     probs = probabilities_ids(root)
 
-    candidates = list(brasileirao_games(root, probs, official_schedule))
+    candidates = apply_official_cbf_overrides(
+        brasileirao_games(root, probs, official_schedule), root
+    )
     for spec in COMPETICOES:
         candidates.extend(cup_games(spec))
     # A fonte documental CONMEBOL cobre transições de fase quando o snapshot

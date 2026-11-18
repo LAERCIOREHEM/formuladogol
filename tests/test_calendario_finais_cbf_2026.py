@@ -13,7 +13,9 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import atualizar_espn as espn  # noqa: E402
-from scripts.gerar_agenda_clubes_brasileirao import brasileirao_games  # noqa: E402
+from scripts.gerar_agenda_clubes_brasileirao import (
+    brasileirao_games, apply_official_cbf_overrides,
+)  # noqa: E402
 
 def load(name):
     return json.loads((ROOT / name).read_text(encoding="utf-8"))
@@ -146,6 +148,35 @@ with patch.object(espn, "carregar_ajustes_calendario", return_value=[r35]):
     espn.aplicar_ajustes_calendario(gremio_events)
     assert gremio_bahia["data_iso"] == "2026-11-18T21:30"
     assert (gremio_bahia["placar_mandante"], gremio_bahia["placar_visitante"]) == (2, 1)
+
+# O regenerador do site deve manter a prova CBF mesmo que o feed ESPN
+# publique 17h ou já traga 21h30 sem a fonte oficial.
+stale_card = {
+    "event_id": "401841312", "competicao_chave": "brasileirao", "rodada": 35,
+    "mandante": {"nome": "Grêmio"}, "visitante": {"nome": "Bahia"},
+    "estado": "pre", "concluido": False,
+    "data_iso": "2026-11-18T17:00", "fonte_calendario": "ESPN",
+    "origem_calendario": "",
+}
+reconciled = apply_official_cbf_overrides([stale_card], ROOT)[0]
+assert reconciled["data_iso"] == "2026-11-18T21:30"
+assert reconciled["fonte_calendario"] == r35["fonte_calendario"]
+assert reconciled["origem_calendario"] == r35["origem_calendario"]
+assert reconciled["data_fonte_anterior"] == "2026-11-18T17:00"
+assert stale_card["data_iso"] == "2026-11-18T17:00", "Fonte não pode ser alterada in-place"
+already_correct = apply_official_cbf_overrides(
+    [{**stale_card, "data_iso": "2026-11-18T21:30"}], ROOT
+)[0]
+assert already_correct["fonte_calendario"].startswith("CBF oficial")
+assert "data_fonte_anterior" not in already_correct
+for other in (
+    {**stale_card, "estado": "in"},
+    {**stale_card, "estado": "post", "concluido": True},
+    {**stale_card, "event_id": "401841313"},
+    {**stale_card, "mandante": {"nome": "Flamengo"}},
+):
+    original = dict(other)
+    assert apply_official_cbf_overrides([other], ROOT)[0] == original
 
 # O portal de credenciamento antigo não tem precedência sobre o PDF detalhado.
 stale = SimpleNamespace(
