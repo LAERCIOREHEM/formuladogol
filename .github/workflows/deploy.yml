@@ -177,6 +177,26 @@ jobs:
           python -m py_compile atualizar_espn.py scripts/gerar_agenda_clubes_brasileirao.py
           python tests/test_calendario_finais_cbf_2026.py
 
+      - name: Bloquear publicação de horário CBF incorreto (Grêmio x Bahia R35)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          if datetime.now(ZoneInfo('America/Sao_Paulo')).date().isoformat()>'2026-11-19':
+              raise SystemExit('Gate de horário R35 concluído após a data da partida')
+          p=Path('dados-br/agenda-clubes-br.json')
+          match=next((g for g in json.loads(p.read_text(encoding='utf-8')).get('jogos', [])
+                     if str(g.get('event_id'))=='401841312'),None)
+          if match and str(match.get('estado'))=='pre':
+              assert str(match.get('fonte_calendario','')).startswith('CBF oficial'), 'Horário pré-jogo sem proveniência CBF'
+              assert str(match['data_iso']).startswith('2026-11-18T21:30'), 'Horário pré-jogo divergente da CBF'
+          print('OK: agenda oficial Grêmio x Bahia protegida')
+          PY
+
       - name: Verificar e regenerar aferição probabilística
         shell: bash
         run: |
@@ -467,6 +487,30 @@ jobs:
             fi
             cp -a "$item" "_site/$item"
           done
+
+          # Antes do upload, assegurar que o card público receba o horário CBF.
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          if datetime.now(ZoneInfo('America/Sao_Paulo')).date().isoformat()>'2026-11-19':
+              raise SystemExit('Gate de artefato R35 concluído após a data da partida')
+          for rel in ['jogos.json','espn_eventos.json','dados-br/agenda-clubes-br.json','dados-br/probabilidades-jogos.json']:
+              doc=json.loads((Path('_site')/rel).read_text(encoding='utf-8'))
+              matches=[]
+              def visit(v):
+                  if isinstance(v,dict):
+                      if str(v.get('event_id',''))=='401841312' and v.get('data_iso'):
+                          matches.append(v['data_iso'])
+                      for x in v.values():visit(x)
+                  elif isinstance(v,list):
+                      for x in v:visit(x)
+              visit(doc)
+              if matches:
+                  assert all(str(x).startswith('2026-11-18T21:30') for x in matches),(rel,matches)
+                  print('Deploy artifact CBF horário OK:',rel,matches)
+          PY
 
           # R10R17: publica somente o manifesto e o índice operacional derivado.
           # O corpus-fonte permanece em docs/operations; o índice não entra no
