@@ -90,6 +90,8 @@ function workerMetric(row) { return workerMetricAssessment(row).kind; }
 function isWorkersBillingRow(row) {
   const fam=norm(row.ServiceFamilyName||row.x_ProductFamilyName);
   const service=norm(row.ServiceName);
+  if(fam&&fam!=='workers') return false;
+  if(/^(workers_ai|durable_objects|d1|r2|queues|worker_build|workers_kv|workflows)(_|$)/.test(service)) return false;
   return fam==='workers'||service==='workers_standard'||
     metricLabelKind(row.ServiceName)!==''||metricLabelKind(row.ChargeDescription)!=='';
 }
