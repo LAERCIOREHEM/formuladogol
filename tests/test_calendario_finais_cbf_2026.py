@@ -8,6 +8,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -79,8 +80,19 @@ fixture = {
     "data_definir": False, "status": "0'", "placar_mandante": 0,
     "placar_visitante": 0,
 }
+# Este teste certifica exclusivamente as rodadas 37/38: ajustes de outras
+# rodadas (ex.: Grêmio x Bahia, R35) são testados separadamente e não devem
+# aumentar o conjunto de fixtures desta regressão.
+def aplicar_apenas_rodadas_finais(eventos):
+    # Fixar a data do teste: partidas futuras em novembro/dezembro não podem
+    # deixar de existir só porque o CI voltou a rodar semanas depois.
+    clock = datetime.fromisoformat("2026-11-18T18:00:00-03:00")
+    with patch.object(espn, "carregar_ajustes_calendario", return_value=fixes), \
+         patch.object(espn, "agora_brt", return_value=clock):
+        espn.aplicar_ajustes_calendario(eventos)
+
 events = [fixture]
-espn.aplicar_ajustes_calendario(events)
+aplicar_apenas_rodadas_finais(events)
 assert len(events) == 20, len(events)
 assert fixture["data_iso"] == base["data_iso"]
 assert fixture["fonte_calendario"].startswith("CBF oficial — tabela detalhada")
@@ -91,7 +103,7 @@ real = copy.deepcopy(old)
 real["event_id"] = "401842999"  # ID ESPN de teste, não usado na publicação
 real["data_iso"] = "2026-12-06T17:00"
 events.append(real)
-espn.aplicar_ajustes_calendario(events)
+aplicar_apenas_rodadas_finais(events)
 matched = [x for x in events if x["mandante_nome"] == round38["mandante"]
            and x["visitante_nome"] == round38["visitante"]]
 assert len(matched) == 1 and matched[0]["event_id"] == "401842999"
@@ -102,9 +114,38 @@ assert len(events) == 20
 fixture["concluido"], fixture["estado"] = True, "post"
 fixture["placar_mandante"], fixture["placar_visitante"] = 2, 1
 fixture["data_iso"] = "2026-11-24T19:00"
-espn.aplicar_ajustes_calendario(events)
+aplicar_apenas_rodadas_finais(events)
 assert fixture["data_iso"] == "2026-11-24T19:00"
 assert (fixture["placar_mandante"], fixture["placar_visitante"]) == (2, 1)
+
+# Regressão independente da 35ª rodada: o novo ajuste Grêmio x Bahia
+# não integra as 20 partidas das rodadas finais, mas deve continuar válido.
+r35 = next(x for x in load("dados-br/ajustes-calendario.json")["ajustes"]
+           if str(x.get("event_id")) == "401841312")
+assert r35["rodada"] == 35 and r35["data_iso"] == "2026-11-18T21:30"
+gremio_bahia = {
+    "event_id": "401841312", "rodada": 35,
+    "mandante_nome": "Grêmio", "visitante_nome": "Bahia",
+    "mandante": espn.info_time("Grêmio"), "visitante": espn.info_time("Bahia"),
+    "data_iso": "2026-11-18T17:00",
+    "data_dt": datetime.fromisoformat("2026-11-18T17:00:00-03:00"),
+    "_sort": datetime.fromisoformat("2026-11-18T17:00:00-03:00").timestamp(),
+    "estado": "pre", "concluido": False, "adiado": False,
+    "data_definir": False, "status": "0'",
+    "placar_mandante": 0, "placar_visitante": 0,
+}
+with patch.object(espn, "carregar_ajustes_calendario", return_value=[r35]):
+    gremio_events = [gremio_bahia]
+    espn.aplicar_ajustes_calendario(gremio_events)
+    assert len(gremio_events) == 1, "CBF R35 não deve duplicar partida"
+    assert gremio_bahia["data_iso"] == "2026-11-18T21:30"
+    assert gremio_bahia["fonte_calendario"].startswith("CBF oficial")
+    gremio_bahia["concluido"], gremio_bahia["estado"] = True, "post"
+    gremio_bahia["data_iso"] = "2026-11-18T21:30"
+    gremio_bahia["placar_mandante"], gremio_bahia["placar_visitante"] = 2, 1
+    espn.aplicar_ajustes_calendario(gremio_events)
+    assert gremio_bahia["data_iso"] == "2026-11-18T21:30"
+    assert (gremio_bahia["placar_mandante"], gremio_bahia["placar_visitante"]) == (2, 1)
 
 # O portal de credenciamento antigo não tem precedência sobre o PDF detalhado.
 stale = SimpleNamespace(
@@ -118,5 +159,5 @@ card = next(x for x in cards if x["rodada"] == 37
 assert card["data_iso"].startswith(base["data_iso"]), card
 assert "tabela detalhada" in card["fonte_calendario"], card
 
-print("PASS CBF 2026: 20/20 datas oficiais em quatro artefatos; fixture R38 restaurado,"
-      " ESPN real deduplicado; FINAL protegido; credenciamento antigo sem precedência")
+print("PASS CBF 2026: R37/R38 20/20 datas oficiais; R35 Grêmio x Bahia 21h30,"
+      " ESPN deduplicado; FINAL protegido; credenciamento antigo sem precedência")

@@ -1,0 +1,40 @@
+name: CBF Calendar Regression CI
+
+on:
+  pull_request:
+    paths:
+      - 'tests/test_calendario_finais_cbf_2026.py'
+      - 'atualizar_espn.py'
+      - 'scripts/gerar_agenda_clubes_brasileirao.py'
+      - 'dados-br/ajustes-calendario.json'
+      - 'dados-br/calendario-completo.json'
+      - '.github/workflows/cbf-calendar-regression-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tests/test_calendario_finais_cbf_2026.py'
+      - 'atualizar_espn.py'
+      - 'scripts/gerar_agenda_clubes_brasileirao.py'
+      - 'dados-br/ajustes-calendario.json'
+      - 'dados-br/calendario-completo.json'
+      - '.github/workflows/cbf-calendar-regression-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  calendar-regression:
+    name: Validar R35 e R37/R38 sem dados de rede
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testar sintaxe e integridade do calendário CBF
+        run: |
+          set -euo pipefail
+          python -m py_compile atualizar_espn.py scripts/gerar_agenda_clubes_brasileirao.py tests/test_calendario_finais_cbf_2026.py
+          python tests/test_calendario_finais_cbf_2026.py
