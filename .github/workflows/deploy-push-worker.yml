@@ -38,6 +38,7 @@ jobs:
       FDG_PUSH_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       FDG_PUSH_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       FDG_PUSH_CF_BILLING_READ_TOKEN: ${{ secrets.FDG_CF_BILLING_READ_TOKEN }}
+      FDG_PUSH_CF_ANALYTICS_READ_TOKEN: ${{ secrets.FDG_CF_ANALYTICS_READ_TOKEN }}
       FDG_PUSH_OPS_MCP_TOKEN: ${{ secrets.OPS_MCP_TOKEN }}
     defaults:
       run:
@@ -206,6 +207,12 @@ jobs:
             echo 'Secret opcional CLOUDFLARE_BILLING_READ_TOKEN atualizado (somente leitura de custos Cloudflare).'
           else
             echo 'INFO: FDG_CF_BILLING_READ_TOKEN ausente; relatório diário continuará sem custo Cloudflare exato.'
+          fi
+          if [ -n "${FDG_PUSH_CF_ANALYTICS_READ_TOKEN:-}" ]; then
+            printf '%s' "$FDG_PUSH_CF_ANALYTICS_READ_TOKEN" | npx wrangler secret put CLOUDFLARE_ANALYTICS_READ_TOKEN --config wrangler.generated.jsonc
+            echo 'Secret opcional CLOUDFLARE_ANALYTICS_READ_TOKEN configurado (Account Analytics Read).'
+          else
+            echo 'INFO: FDG_CF_ANALYTICS_READ_TOKEN ausente; GraphQL operacional permanece indisponível, sem alterar billing.'
           fi
           if [ -n "${FDG_PUSH_OPS_MCP_TOKEN:-}" ]; then
             printf '%s' "$FDG_PUSH_OPS_MCP_TOKEN" | npx wrangler secret put OPS_MCP_TOKEN --config wrangler.generated.jsonc
