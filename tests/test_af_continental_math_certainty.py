@@ -111,17 +111,43 @@ for name in ("Flamengo", "Palmeiras"):
     assert stale["probabilidades_detalhes"]["sul_americana"]["exibicao"] == "0%"
     assert stale["probabilidades_detalhes"]["sem_competicao_continental"]["exibicao"] == "0%"
 
-# O terceiro colocado tem no máximo a 9ª posição pelo limite de pontos.
-# Portanto, ter vaga continental é certeza, mas Libertadores vs Sul-Americana
-# ainda não está decidido: preservar as probabilidades integradas.
+# O Cruzeiro tem vaga continental assegurada pelo limite de posição.
+# Seu destino Libertadores/Sul-Americana continua condicionado ao campeonato:
+# 2 milhões de simulações podem observar 100/0 SEM demonstrar certeza/impossibilidade.
+# Testar prova estrutural separadamente da frequência empírica, sem fixar valores
+# intermediários que mudam naturalmente quando resultados novos são incorporados.
 cruz = next(row for row in data["clubes"] if row["clube"] == "Cruzeiro")
 assert cruz["situacao_matematica"]["vaga_continental_garantida"] is True
 assert cruz["situacao_matematica"]["limite_posicao_pior"] <= 11
 assert cruz["probabilidades_pct"]["sem_competicao_continental"] == 0
 assert cruz["probabilidades_detalhes"]["sem_competicao_continental"]["exibicao"] == "0%"
 assert cruz["probabilidades_detalhes"]["sem_competicao_continental"]["impossivel_estruturalmente"] is True
-assert 0 < cruz["probabilidades_pct"]["libertadores"] < 100
-assert 0 < cruz["probabilidades_pct"]["sul_americana"] < 100
+assert cruz["probabilidades_detalhes"]["sem_competicao_continental"]["motivo_impossibilidade"]
+for destino in ("libertadores", "sul_americana"):
+    chance = cruz["probabilidades_pct"][destino]
+    detail = cruz["probabilidades_detalhes"][destino]
+    total = cruz["decomposicao_chances"][destino]["total"]
+    assert 0 <= chance <= 100, (destino, chance)
+    assert detail["percentual_estimado"] == chance, (destino, detail)
+    assert detail["exibicao"] == total["exibicao"], destino
+    if detail["certeza_estrutural"]:
+        assert chance == 100 and detail["exibicao"] == "100%"
+        assert detail["motivo_certeza"]
+    elif detail["impossivel_estruturalmente"]:
+        assert chance == 0 and detail["exibicao"] == "0%"
+        assert detail["motivo_impossibilidade"]
+    else:
+        # Nunca publicar 100%/0% como certeza só porque a amostra saturou.
+        if chance == 100:
+            assert detail["exibicao"] == ">99,999%", (destino, detail)
+            assert detail["ocorrencias"] == detail["simulacoes"]
+        elif chance == 0:
+            assert detail["exibicao"] == "<0,001%", (destino, detail)
+            assert detail["ocorrencias"] == 0
+        else:
+            assert 0 < chance < 100
+        assert detail["certeza_estrutural"] is False
+        assert detail["impossivel_estruturalmente"] is False
 cruz_replay = copy.deepcopy(cruz)
 cruz_replay["probabilidades_detalhes"]["sem_competicao_continental"].update({
     "exibicao": "<0,001%", "impossivel_estruturalmente": False,
