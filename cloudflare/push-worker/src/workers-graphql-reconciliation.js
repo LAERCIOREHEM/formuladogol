@@ -40,7 +40,7 @@ export function reconcileWorkersAnalytics(billing,analytics) {
     analyticsReason:g.reason||null,
     operationalCpuMs:g.status==='estimated'?g.cpuMs:null,
     operationalRequests:g.status==='estimated'?g.requests:null,
-    operationalScriptCount:g.status==='estimated'?g.scripts?.length:null,
+    operationalScriptCount:g.status==='estimated'?g.scriptCount:null,
     operationalScripts:g.status==='estimated'?g.scripts:[],
     analyticsPeriodStart:g.periodStart||null,
     analyticsPeriodEnd:g.periodEnd||null,
@@ -53,7 +53,7 @@ export function reconcileWorkersAnalytics(billing,analytics) {
     warning:'GraphQL é estimativa operacional, não substitui consumo faturável nem valida franquias/cobranças.',
   };
 }
-export async function fetchWorkersAnalyticsGraphQL({token,account,start,end,fetchImpl=fetch,timeoutMs=9000}) {
+export async function fetchWorkersAnalyticsGraphQL({token,account,start,end,periodEnd=end,fetchImpl=fetch,timeoutMs=9000}) {
   if(!token||!account) return unusable('analytics_read_not_configured');
   const windows=analyticsWindows(start,end);
   if(!windows.length) return unusable('invalid_or_excessive_window');
@@ -97,7 +97,7 @@ export async function fetchWorkersAnalyticsGraphQL({token,account,start,end,fetc
     return unusable('graphql_overflow');
   return {
     status:'estimated',source:'workersInvocationsAdaptive',reason:'adaptive_sampled_operational',
-    periodStart:start,periodEnd:end,
+    periodStart:start,periodEnd:periodEnd,observedThrough:end,
     requests:Number(requests.toFixed(2)),cpuMs:Number((cpuUs/1000).toFixed(3)),
     rows:count,windows:windows.length,
     scripts:[...scripts.values()].sort((a,b)=>b.cpuMs-a.cpuMs).slice(0,20).map(r=>({
