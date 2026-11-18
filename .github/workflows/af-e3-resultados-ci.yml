@@ -69,10 +69,22 @@ jobs:
           assert view == again, 'E3 não reproduz a prova histórica E1'
           assert view['origem']['sha256_arquivo'] == hashlib.sha256(src).hexdigest()
           assert view['integridade']['hash_jogos'] == digest(view['jogos'])
-          assert view['resumo']['resultados_auditados'] == 339
-          assert view['resumo']['previsoes_certificadas'] == 157
-          assert view['resumo']['sem_snapshot_certificado'] == 182
-          print('E3 CERTIFICADO: 157/339 documentados; sem retroprevisões')
+          # A auditoria E1 cresce a cada FINAL: não congelar totais da rodada anterior.
+          fonte = evidence['resumo']
+          resumo = view['resumo']
+          assert resumo['resultados_auditados'] == len(evidence['jogos']) == fonte['total_resultados_unicos']
+          assert resumo['previsoes_certificadas'] == fonte['jogos_com_placar_prejogo_comprovado']
+          assert resumo['sem_snapshot_certificado'] == fonte['jogos_sem_prova_prejogo']
+          assert resumo['quarentena_por_conflito'] == fonte['jogos_com_conflito']
+          assert resumo['sem_horario_factual'] == fonte['jogos_sem_inicio_factual']
+          assert sum(resumo[k] for k in (
+              'previsoes_certificadas', 'sem_snapshot_certificado',
+              'quarentena_por_conflito', 'sem_horario_factual'
+          )) == resumo['resultados_auditados']
+          assert fonte['partidas_sem_previsao_nao_foram_reconstituidas'] is True
+          assert resumo['previsoes_certificadas'] >= 157, 'regressão na prova E1'
+          print('E3 CERTIFICADO: %d/%d previsões com prova E1; sem retroprevisões' % (
+              resumo['previsoes_certificadas'], resumo['resultados_auditados']))
           PY
 
       - name: Verificar código e semântica dos acertos
