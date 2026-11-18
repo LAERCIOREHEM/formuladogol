@@ -1,6 +1,7 @@
 import { sendMail, mailConfig, maskAddress } from './mailer.js';
 import { aiUsageSummary, providerUsageSummary, postgamePublicCostSummary } from './ai-usage.js';
 import { auditCloudflareBilling } from './cloudflare-billing-audit.js';
+import { fetchWorkersAnalyticsGraphQL, reconcileWorkersAnalytics } from './workers-graphql-reconciliation.js';
 export { summarizeCloudflareWorkersUsage } from './cloudflare-billing-audit.js';
 import { OPS_INTELLIGENCE_CONSTANTS, opsIntelligenceStatus } from './ops-intelligence.js';
 import { buildActionCenter, healthActionMessage, healthActionDigestLines, healthYellowDecision, HEALTH_ACTION_CENTER_VERSION } from './health-action-center.js';
@@ -112,7 +113,7 @@ async function cloudflareBillingSummary(env, now=Date.now()) {
   const account=text(env.AI_GATEWAY_ACCOUNT_ID);
   if(!token||!account) return {configured:false,ok:false,reason:'not_configured'};
   const cache=safeJson(await metaGet(env,'cloudflare_billing_cache'),null);
-  if(cache?.auditVersion===3 && cache?.workers &&
+  if(cache?.auditVersion===3 && cache?.reconciliationVersion===2 && cache?.workers &&
      now-(Date.parse(cache.at)||0)<CF_BILLING_CACHE_MS) return cache;
   try {
     const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/billable-usage`,{headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},cache:'no-store'});
@@ -123,6 +124,18 @@ async function cloudflareBillingSummary(env, now=Date.now()) {
       await metaPut(env,'cloudflare_billing_cache',JSON.stringify(out)); return out;
     }
     const out=auditCloudflareBilling(rows,now);
+    const start=out.workers?.periodStart,end=out.workers?.periodEnd;
+    let analytics={status:'unavailable',reason:'billing_cycle_unavailable'};
+    if(start&&end) {
+      const through=new Date(Math.min(now,Date.parse(end)-1)).toISOString();
+      analytics=await fetchWorkersAnalyticsGraphQL({
+        token:text(env.CLOUDFLARE_ANALYTICS_READ_TOKEN),
+        account,start,end:through,periodEnd:end
+      });
+    }
+    out.analytics=analytics;
+    out.reconciliation=reconcileWorkersAnalytics(out,analytics);
+    out.reconciliationVersion=2;
     await metaPut(env,'cloudflare_billing_cache',JSON.stringify(out)); return out;
   } catch(e){
     const out={configured:true,ok:false,at:iso(now),reason:text(e?.message||e).slice(0,160)};
@@ -481,6 +494,17 @@ export function cloudflareDigestLines(cf){
     ...(products.length?products:['- Nenhum produto validado no ciclo.']),
     `Registros: ${cf.inCycleRows||0} no ciclo · ${excluded.otherCycle||0} de outros ciclos ignorados · ${excluded.missingCycle||0} sem ciclo · ${excluded.invalidQuantity||0} com unidade inválida · ${excluded.missingCost||0} sem custo · ${excluded.missingCurrency||0} sem moeda · ${excluded.duplicateRows||0} duplicados`,
     ...diagnosticLines,
+    ...((cf.reconciliationVersion===2)?[
+      'WORKERS ANALYTICS GRAPHQL — RECONCILIAÇÃO OPERACIONAL',
+      `Estado: ${cf.analytics?.status||'unavailable'} · origem: workersInvocationsAdaptive · ${cf.analytics?.reason||'sem detalhe'}`,
+      ...(cf.analytics?.status==='estimated'?[
+        `Janela observada até: ${fmtDate(cf.analytics.observedThrough)} · ${cf.analytics.windows||0} consulta(s) · ${cf.analytics.rows||0} linha(s)`,
+        `CPU operacional estimada: ${fmtNum(cf.analytics.cpuMs)} ms · requisições operacionais estimadas: ${fmtNum(cf.analytics.requests)}`,
+        `Workers distintos: ${cf.analytics.scriptCount||0} · divergência CPU: ${cf.reconciliation?.cpuDifferencePct==null?'não comparável':fmtPct(cf.reconciliation.cpuDifferencePct)} · requisições: ${cf.reconciliation?.requestDifferencePct==null?'não comparável':fmtPct(cf.reconciliation.requestDifferencePct)}`,
+        ...((cf.analytics.scripts||[]).slice(0,5).map(x=>`- ${x.name}: CPU estimada ${fmtNum(x.cpuMs)} ms · ${fmtNum(x.requests)} requests`))
+      ]:[]),
+      'GraphQL: valores operacionais amostrados, NÃO substituem CPU/requisições faturáveis da Billing API.'
+    ]:[]),
     'CPU por Worker individual: indisponível nesta API (requer Workers Analytics Read).',
     'A API publica custos com atraso. Ausência de registro de hoje não significa consumo zero.',
   ];
