@@ -5259,6 +5259,36 @@ function calcularFormaTimes() {
 // ========================================================================
 // PRÓXIMOS JOGOS
 // ========================================================================
+// Agenda publicada pela ESPN pode ter horário provisório. Somente uma correção
+// oficial da CBF com ID e clubes coincidentes pode substituir o kickoff pré-jogo.
+function aplicarCorrecoesKickoffOficial(jogos, ajustes) {
+  if (!Array.isArray(jogos) || !Array.isArray(ajustes)) return jogos;
+  const normalizar = (v) => String((v && typeof v === 'object' ? v.nome : v) || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ').trim();
+  const oficiais = new Map();
+  for (const fix of ajustes) {
+    if (!fix || !/^CBF oficial — tabela detalhada/i.test(String(fix.fonte_calendario || ''))) continue;
+    if (!/^\d{4}-\d\d-\d\dT\d\d:\d\d$/.test(String(fix.data_iso || ''))) continue;
+    if (!fix.origem_calendario || !/^https:\/\/www\.cbf\.com\.br\//.test(String(fix.origem_calendario))) continue;
+    const id = String(fix.event_id || '').trim();
+    if (id) oficiais.set(id, fix);
+  }
+  return jogos.map(j => {
+    const id = String(j?.event_id || j?.id || '').trim();
+    const fix = oficiais.get(id);
+    if (!fix) return j;
+    const estado = String(j.estado || j.status_estado || '').toLowerCase();
+    if (j.concluido === true || j.adiado === true || j.data_definir === true ||
+        ['in', 'post', 'live', 'final', 'encerrado', 'em_andamento'].includes(estado)) return j;
+    if (normalizar(j.mandante) !== normalizar(fix.mandante) ||
+        normalizar(j.visitante) !== normalizar(fix.visitante)) return j;
+    const iso = fix.data_iso + ':00-03:00';
+    if (Number.isNaN(new Date(iso).getTime())) return j;
+    return { ...j, data_iso: iso, fonte_calendario: fix.fonte_calendario,
+      origem_calendario: fix.origem_calendario, kickoff_oficial_cbf: true };
+  });
+}
 async function carregarJogos(opcoes = {}) {
   try {
     const url = 'jogos.json?t=' + Date.now();
@@ -5321,6 +5351,20 @@ async function carregarJogos(opcoes = {}) {
         possui_clube_serie_a_2026: true
       }));
     }
+  }
+
+  // Refaz a precedência em tempo de execução, inclusive quando um robô ESPN
+  // reintroduz a data provisória entre dois deploys. A fonte CBF fica publicada
+  // separadamente para que o navegador possa reconciliar os feeds.
+  try {
+    const r = await fetch('dados-br/ajustes-calendario.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    if (!d || !Array.isArray(d.ajustes)) throw new Error('Correções oficiais inválidas');
+    state.jogos = aplicarCorrecoesKickoffOficial(state.jogos, d.ajustes);
+    state.agendaJogos = aplicarCorrecoesKickoffOficial(state.agendaJogos, d.ajustes);
+  } catch (e) {
+    if (!opcoes.silencioso) console.warn('Correções oficiais CBF indisponíveis:', e);
   }
 
   // Acessórios (tolerantes a 404 — se não existirem, o site segue normal):
