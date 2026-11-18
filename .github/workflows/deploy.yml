@@ -103,6 +103,7 @@ on:
       - 'css/br-af-partida-posjogo.css'
       - 'css/br-competicoes.css'
       - 'jogos/**'
+      - 'tests/test-cbf-kickoff-runtime.mjs'
       - 'tabela/**'
       - 'resultados/**'
       - 'copa2026/**'
@@ -152,6 +153,7 @@ jobs:
           node --check js/br-aovivo.js
           node --check js/br-af-scorecards.js
           node tests/test-af-e2-scorecards.mjs
+          node tests/test-cbf-kickoff-runtime.mjs
           node --check js/br-live-goal-sync.js
           node tests/test-br-live-goal-sync.mjs
           node --check js/br-resultados-freshness.js
@@ -375,6 +377,7 @@ jobs:
 
           PUBLIC_DATA=(
             dados-br/agenda-clubes-br.json
+            dados-br/ajustes-calendario.json
             dados-br/auditoria-estatisticas.json
             dados-br/auditoria-publicos.json
             dados-br/auditoria-reconciliacao-publicos.json
@@ -496,6 +499,7 @@ jobs:
           from zoneinfo import ZoneInfo
           if datetime.now(ZoneInfo('America/Sao_Paulo')).date().isoformat()>'2026-11-19':
               raise SystemExit('Gate de artefato R35 concluído após a data da partida')
+          assert 'function aplicarCorrecoesKickoffOficial(' in (Path('_site')/'index.html').read_text(encoding='utf-8'), 'Guarda de horário CBF ausente do site'
           for rel in ['jogos.json','espn_eventos.json','dados-br/agenda-clubes-br.json','dados-br/probabilidades-jogos.json']:
               doc=json.loads((Path('_site')/rel).read_text(encoding='utf-8'))
               matches=[]
@@ -1704,6 +1708,54 @@ jobs:
           error_count: 20
           reporting_interval: 5000
         timeout-minutes: 12
+
+      - name: Certificar horário CBF NA PRODUÇÃO — Grêmio x Bahia 21h30
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          if datetime.now(ZoneInfo('America/Sao_Paulo')).date().isoformat() > '2026-11-19':
+              print('Smoke especial da rodada 35 encerrado.')
+              raise SystemExit(0)
+          import json, time, urllib.request
+          base='https://formuladogol.com.br'
+          error=''
+          for attempt in range(1,13):
+              try:
+                  stamp=str(int(time.time()))+'-'+str(attempt)
+                  headers={'User-Agent':'FDG-CBF-Kickoff-Production/1.0','Cache-Control':'no-cache, no-store'}
+                  def get(path):
+                      req=urllib.request.Request(base+path+'?cbf_prod='+stamp,headers=headers)
+                      with urllib.request.urlopen(req,timeout=18) as r:
+                          if r.status != 200: raise ValueError('HTTP '+str(r.status))
+                          return r.read()
+                  agenda=json.loads(get('/dados-br/agenda-clubes-br.json'))
+                  matches=[g for g in agenda.get('jogos',[]) if str(g.get('event_id'))=='401841312']
+                  if len(matches)!=1:
+                      raise AssertionError('evento 401841312 ausente ou duplicado na produção')
+                  game=matches[0]
+                  if not str(game.get('data_iso','')).startswith('2026-11-18T21:30'):
+                      raise AssertionError('horário servido incorreto: '+str(game.get('data_iso')))
+                  if not str(game.get('fonte_calendario','')).startswith('CBF oficial'):
+                      raise AssertionError('fonte CBF não identificada em produção')
+                  fixes=json.loads(get('/dados-br/ajustes-calendario.json'))
+                  if not any(str(f.get('event_id'))=='401841312' and f.get('data_iso')=='2026-11-18T21:30' for f in fixes.get('ajustes',[])):
+                      raise AssertionError('correção oficial não publicada')
+                  html=get('/index.html').decode('utf-8',errors='replace')
+                  if 'function aplicarCorrecoesKickoffOficial(' not in html:
+                      raise AssertionError('homepage não possui reconciliação CBF')
+                  print('PRODUÇÃO CERTIFICADA: Grêmio x Bahia 21h30 BRT; CBF e UI presentes na versão servida')
+                  break
+              except (Exception) as exc:
+                  error=str(exc)
+                  print('Tentativa %d/12: %s' % (attempt,error))
+                  if attempt<12: time.sleep(10)
+          else:
+              raise SystemExit('FALHA: deploy não entregou 21h30 no domínio real: '+error)
+          PY
 
       - name: ORG-7R — smoke test público pós-deploy
         if: success()
