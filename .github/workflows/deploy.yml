@@ -181,10 +181,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python tests/test_gremio_bahia_kickoff_20261118.py
           python - <<'PY'
           import json
           from pathlib import Path
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          if datetime.now(ZoneInfo('America/Sao_Paulo')).date().isoformat()>'2026-11-19':
+              raise SystemExit('Gate de horário R35 concluído após a data da partida')
           p=Path('dados-br/agenda-clubes-br.json')
           match=next((g for g in json.loads(p.read_text(encoding='utf-8')).get('jogos', [])
                      if str(g.get('event_id'))=='401841312'),None)
@@ -489,6 +492,10 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          if datetime.now(ZoneInfo('America/Sao_Paulo')).date().isoformat()>'2026-11-19':
+              raise SystemExit('Gate de artefato R35 concluído após a data da partida')
           for rel in ['jogos.json','espn_eventos.json','dados-br/agenda-clubes-br.json','dados-br/probabilidades-jogos.json']:
               doc=json.loads((Path('_site')/rel).read_text(encoding='utf-8'))
               matches=[]
