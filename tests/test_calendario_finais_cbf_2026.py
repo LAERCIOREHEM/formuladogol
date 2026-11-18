@@ -114,6 +114,35 @@ aplicar_apenas_rodadas_finais(events)
 assert fixture["data_iso"] == "2026-11-24T19:00"
 assert (fixture["placar_mandante"], fixture["placar_visitante"]) == (2, 1)
 
+# Regressão independente da 35ª rodada: o novo ajuste Grêmio x Bahia
+# não integra as 20 partidas das rodadas finais, mas deve continuar válido.
+r35 = next(x for x in load("dados-br/ajustes-calendario.json")["ajustes"]
+           if str(x.get("event_id")) == "401841312")
+assert r35["rodada"] == 35 and r35["data_iso"] == "2026-11-18T21:30"
+gremio_bahia = {
+    "event_id": "401841312", "rodada": 35,
+    "mandante_nome": "Grêmio", "visitante_nome": "Bahia",
+    "mandante": espn.info_time("Grêmio"), "visitante": espn.info_time("Bahia"),
+    "data_iso": "2026-11-18T17:00",
+    "data_dt": datetime.fromisoformat("2026-11-18T17:00:00-03:00"),
+    "_sort": datetime.fromisoformat("2026-11-18T17:00:00-03:00").timestamp(),
+    "estado": "pre", "concluido": False, "adiado": False,
+    "data_definir": False, "status": "0'",
+    "placar_mandante": 0, "placar_visitante": 0,
+}
+with patch.object(espn, "carregar_ajustes_calendario", return_value=[r35]):
+    gremio_events = [gremio_bahia]
+    espn.aplicar_ajustes_calendario(gremio_events)
+    assert len(gremio_events) == 1, "CBF R35 não deve duplicar partida"
+    assert gremio_bahia["data_iso"] == "2026-11-18T21:30"
+    assert gremio_bahia["fonte_calendario"].startswith("CBF oficial")
+    gremio_bahia["concluido"], gremio_bahia["estado"] = True, "post"
+    gremio_bahia["data_iso"] = "2026-11-18T21:30"
+    gremio_bahia["placar_mandante"], gremio_bahia["placar_visitante"] = 2, 1
+    espn.aplicar_ajustes_calendario(gremio_events)
+    assert gremio_bahia["data_iso"] == "2026-11-18T21:30"
+    assert (gremio_bahia["placar_mandante"], gremio_bahia["placar_visitante"]) == (2, 1)
+
 # O portal de credenciamento antigo não tem precedência sobre o PDF detalhado.
 stale = SimpleNamespace(
     mandante=base["mandante"], visitante=base["visitante"],
@@ -126,5 +155,5 @@ card = next(x for x in cards if x["rodada"] == 37
 assert card["data_iso"].startswith(base["data_iso"]), card
 assert "tabela detalhada" in card["fonte_calendario"], card
 
-print("PASS CBF 2026: 20/20 datas oficiais em quatro artefatos; fixture R38 restaurado,"
-      " ESPN real deduplicado; FINAL protegido; credenciamento antigo sem precedência")
+print("PASS CBF 2026: R37/R38 20/20 datas oficiais; R35 Grêmio x Bahia 21h30,"
+      " ESPN deduplicado; FINAL protegido; credenciamento antigo sem precedência")
