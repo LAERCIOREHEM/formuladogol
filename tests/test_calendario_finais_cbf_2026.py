@@ -8,6 +8,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -79,8 +80,15 @@ fixture = {
     "data_definir": False, "status": "0'", "placar_mandante": 0,
     "placar_visitante": 0,
 }
+# Este teste certifica exclusivamente as rodadas 37/38: ajustes de outras
+# rodadas (ex.: Grêmio x Bahia, R35) são testados separadamente e não devem
+# aumentar o conjunto de fixtures desta regressão.
+def aplicar_apenas_rodadas_finais(eventos):
+    with patch.object(espn, "carregar_ajustes_calendario", return_value=fixes):
+        espn.aplicar_ajustes_calendario(eventos)
+
 events = [fixture]
-espn.aplicar_ajustes_calendario(events)
+aplicar_apenas_rodadas_finais(events)
 assert len(events) == 20, len(events)
 assert fixture["data_iso"] == base["data_iso"]
 assert fixture["fonte_calendario"].startswith("CBF oficial — tabela detalhada")
@@ -91,7 +99,7 @@ real = copy.deepcopy(old)
 real["event_id"] = "401842999"  # ID ESPN de teste, não usado na publicação
 real["data_iso"] = "2026-12-06T17:00"
 events.append(real)
-espn.aplicar_ajustes_calendario(events)
+aplicar_apenas_rodadas_finais(events)
 matched = [x for x in events if x["mandante_nome"] == round38["mandante"]
            and x["visitante_nome"] == round38["visitante"]]
 assert len(matched) == 1 and matched[0]["event_id"] == "401842999"
@@ -102,7 +110,7 @@ assert len(events) == 20
 fixture["concluido"], fixture["estado"] = True, "post"
 fixture["placar_mandante"], fixture["placar_visitante"] = 2, 1
 fixture["data_iso"] = "2026-11-24T19:00"
-espn.aplicar_ajustes_calendario(events)
+aplicar_apenas_rodadas_finais(events)
 assert fixture["data_iso"] == "2026-11-24T19:00"
 assert (fixture["placar_mandante"], fixture["placar_visitante"]) == (2, 1)
 
