@@ -15,13 +15,13 @@
   "resumo": {
     "jogos_na_janela": 42,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 8,
+    "descobertas_antecipadas": 9,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 29,
+    "candidatos_oficiais_encontrados": 33,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
-    "transmissoes_publicadas": 8,
+    "transmissoes_publicadas": 9,
     "sem_transmissao": 1,
     "erros": 0
   },
@@ -69,18 +69,6 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841312",
-      "rodada": 35,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Grêmio x Bahia",
-      "data_iso": "2026-11-18T21:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
       "event_id": "401841315",
       "rodada": 35,
       "competicao_chave": "brasileirao",
@@ -93,6 +81,18 @@
       ],
       "manual": false,
       "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401841310",
+      "rodada": 35,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Remo x Chapecoense",
+      "data_iso": "2026-11-18T20:00:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841313",
@@ -191,9 +191,40 @@
       ],
       "manual": false,
       "descoberta_antecipada": true
+    },
+    {
+      "event_id": "cbf-2026-378",
+      "rodada": 38,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Athletico-PR x São Paulo",
+      "data_iso": "2026-12-02T21:30:00-03:00",
+      "principal": "CazéTV",
+      "fontes_encontradas": [
+        "CazéTV"
+      ],
+      "manual": false,
+      "descoberta_antecipada": true
     }
   ],
   "aceitos": [
+    {
+      "event_id": "401841315",
+      "jogo": "Coritiba x Santos",
+      "fonte": "cazetv",
+      "video_id": "9B48Zrg5s18",
+      "url": "https://www.youtube.com/watch?v=9B48Zrg5s18",
+      "titulo": "AO VIVO: CORITIBA X SANTOS | BRASILEIRÃO 2026 | 35ª RODADA",
+      "status": "live",
+      "confianca": 0.925,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "transmissão já está ao vivo",
+        "horário compatível (90 min de diferença)"
+      ]
+    },
     {
       "event_id": "401841322",
       "jogo": "Palmeiras x Flamengo",
@@ -275,12 +306,12 @@
       ]
     },
     {
-      "event_id": "401841315",
-      "jogo": "Coritiba x Santos",
+      "event_id": "cbf-2026-378",
+      "jogo": "Athletico-PR x São Paulo",
       "fonte": "cazetv",
-      "video_id": "9B48Zrg5s18",
-      "url": "https://www.youtube.com/watch?v=9B48Zrg5s18",
-      "titulo": "AO VIVO: CORITIBA X SANTOS | BRASILEIRÃO 2026 | 35ª RODADA",
+      "video_id": "djYK6lMheNs",
+      "url": "https://www.youtube.com/watch?v=djYK6lMheNs",
+      "titulo": "AO VIVO: ATHLETICO-PR X SÃO PAULO | BRASILEIRÃO 2026 | 38ª RODADA",
       "status": "upcoming",
       "confianca": 0.875,
       "motivos": [
@@ -415,6 +446,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "LKwpO-D0opc",
+      "url": "https://www.youtube.com/watch?v=LKwpO-D0opc",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: FC LORIENT X RENNES | LIGUE 1 26/27 | 11ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-22T12:35:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "Lw7vRSSNgHg",
       "url": "https://www.youtube.com/watch?v=Lw7vRSSNgHg",
       "fonte": "cazetv",
@@ -515,6 +556,26 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "tIM_T-D66iI",
+      "url": "https://www.youtube.com/watch?v=tIM_T-D66iI",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: RACING CLUB X REAL SOCIEDAD | LALIGA 26/27 | 13ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-22T12:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "tsmmAd5U064",
+      "url": "https://www.youtube.com/watch?v=tsmmAd5U064",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: PARIS FC X ANGERS | LIGUE 1 26/27 | 11ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-22T10:20:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "uj3ua2ddfsc",
       "url": "https://www.youtube.com/watch?v=uj3ua2ddfsc",
       "fonte": "cazetv",
@@ -538,12 +599,12 @@
   "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401841312",
+      "event_id": "401841310",
       "rodada": 35,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Grêmio x Bahia",
-      "data_iso": "2026-11-18T21:30:00-03:00",
+      "jogo": "Remo x Chapecoense",
+      "data_iso": "2026-11-18T20:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -557,5 +618,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-11-18T15:31:44-03:00"
+  "atualizado_em": "2026-11-18T18:36:07-03:00"
 }

@@ -7462,14 +7462,58 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Grade oficial confirmada para o Brasil: Grêmio x Bahia, Campeonato Brasileiro Série A 2026, fase única, rodada 35, será em 18/11/2026 às 21h30 (horário de Brasília), na Arena do Grêmio, em Porto Alegre. O horário 17h00 informado no dossiê está divergente: CBF e ge apontam 21h30. A transmissão integral confirmada é do Premiere. Não há evidência nas fontes consultadas de Globo, SporTV, GE TV, CazéTV ou outra plataforma para esta partida. Exclusividade não foi afirmada expressamente pelas fontes, portanto marcada como false."
+    },
+    {
+      "event_id": "401841310",
+      "jogo": "Remo x Chapecoense",
+      "data_iso": "2026-11-18T20:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-11-18T18:38:07-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Premiere"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://credencial.cbf.com.br/competicoes/listar/42/1",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/30/cbf-divulga-tabela-detalhada-das-rodadas-35-e-36-da-serie-a.ghtml",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/06/cbf-divulga-datas-e-horarios-das-duas-ultimas-rodadas-do-brasileirao-veja-detalhes.ghtml",
+        "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/18/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-35a-rodada.ghtml",
+        "https://ge.globo.com/google/amp/pa/futebol/times/remo/noticia/2026/10/30/cbf-divulga-tabela-detalhada-das-rodadas-35-e-36-da-serie-a-veja-jogos-do-remo.ghtml",
+        "https://ge.globo.com/google/amp/sc/futebol/times/chapecoense/noticia/2026/11/13/escalacao-da-chapecoense-comissao-interina-na-beira-do-gramado-e-novidade-no-gol.ghtml",
+        "https://ge.globo.com/pa/futebol/brasileirao-serie-a/jogo/18-11-2026/remo-chapecoense.ghtml",
+        "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/11/18/remo-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/pa/futebol/times/remo",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/remo-x-chapecoense/832240",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/brasileirao-35-rodada-comeca-com-empate-sem-gols-entre-mirassol-e-galo",
+        "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a",
+        "https://www.youtube.com/watch?v=vMU4pd7CY24",
+        "https://www.youtube.com/watch?v=zgjp8XfCSQc"
+      ],
+      "canais_depois": [
+        "Premiere"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/11/18/remo-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/18/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-35a-rodada.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/remo-x-chapecoense/832240"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Remo x Chapecoense, Brasileirão Série A 2026, fase única, rodada 35, nesta quarta-feira (18/11/2026), às 20h (horário de Brasília), no Mangueirão, em Belém. A grade completa identificada para a transmissão integral é Premiere. O ge lista somente o Premiere para esta partida; a CBF confirma o confronto, data, horário e competição. Não há evidência consultada de transmissão simultânea por outro canal permitido nem de exclusividade formal declarada, por isso exclusive=false."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841312",
-    "jogo": "Grêmio x Bahia",
-    "data_iso": "2026-11-18T17:00:00-03:00",
+    "event_id": "401841310",
+    "jogo": "Remo x Chapecoense",
+    "data_iso": "2026-11-18T20:00:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-11-18T15:34:21-03:00",
+    "executado_em": "2026-11-18T18:38:07-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
@@ -7478,18 +7522,20 @@
     "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
+      "https://credencial.cbf.com.br/competicoes/listar/42/1",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/30/cbf-divulga-tabela-detalhada-das-rodadas-35-e-36-da-serie-a.ghtml",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/06/cbf-divulga-datas-e-horarios-das-duas-ultimas-rodadas-do-brasileirao-veja-detalhes.ghtml",
       "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/18/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-35a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/times/bahia/noticia/2026/11/18/kike-olivera-desfalca-o-bahia-contra-o-gremio.ghtml",
-      "https://ge.globo.com/google/amp/rs/futebol/brasileirao-serie-a/noticia/2026/11/18/gremio-x-bahia-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/negocios-do-esporte/noticia/2025/01/31/globo-fecha-acordo-com-clubes-da-lfu-para-transmissao-do-brasileirao-de-2025-a-2029.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/jogo/18-11-2026/gremio-bahia.ghtml",
-      "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/11/05/villasanti-leva-cartao-amarelo-e-desfalca-o-gremio-a-pedido-de-renato-que-reclama-da-data-fifa.ghtml",
-      "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/11/10/gremio-lanca-promocao-de-ingressos-para-jogo-contra-o-bahia-na-retomada-do-brasileirao.ghtml",
-      "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/11/11/gremio-tem-retornos-do-departamento-medico-no-primeiro-treino-da-data-fifa.ghtml",
-      "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/11/12/gremio-comeca-a-definir-time-que-enfrenta-o-bahia-na-volta-do-brasileirao.ghtml",
-      "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/11/18/gremio-busca-levar-espirito-copeiro-para-o-brasileirao-em-serie-de-jogos-para-sobreviver.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/x/832237",
-      "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a"
+      "https://ge.globo.com/google/amp/pa/futebol/times/remo/noticia/2026/10/30/cbf-divulga-tabela-detalhada-das-rodadas-35-e-36-da-serie-a-veja-jogos-do-remo.ghtml",
+      "https://ge.globo.com/google/amp/sc/futebol/times/chapecoense/noticia/2026/11/13/escalacao-da-chapecoense-comissao-interina-na-beira-do-gramado-e-novidade-no-gol.ghtml",
+      "https://ge.globo.com/pa/futebol/brasileirao-serie-a/jogo/18-11-2026/remo-chapecoense.ghtml",
+      "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/11/18/remo-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/pa/futebol/times/remo",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/remo-x-chapecoense/832240",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/brasileirao-35-rodada-comeca-com-empate-sem-gols-entre-mirassol-e-galo",
+      "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a",
+      "https://www.youtube.com/watch?v=vMU4pd7CY24",
+      "https://www.youtube.com/watch?v=zgjp8XfCSQc"
     ],
     "canais_depois": [
       "Premiere"
@@ -7497,14 +7543,14 @@
     "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/x/832237",
-      "https://ge.globo.com/google/amp/rs/futebol/brasileirao-serie-a/noticia/2026/11/18/gremio-x-bahia-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/18/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-35a-rodada.ghtml"
+      "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/11/18/remo-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/18/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-35a-rodada.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/remo-x-chapecoense/832240"
     ],
     "youtube": [],
     "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Grade oficial confirmada para o Brasil: Grêmio x Bahia, Campeonato Brasileiro Série A 2026, fase única, rodada 35, será em 18/11/2026 às 21h30 (horário de Brasília), na Arena do Grêmio, em Porto Alegre. O horário 17h00 informado no dossiê está divergente: CBF e ge apontam 21h30. A transmissão integral confirmada é do Premiere. Não há evidência nas fontes consultadas de Globo, SporTV, GE TV, CazéTV ou outra plataforma para esta partida. Exclusividade não foi afirmada expressamente pelas fontes, portanto marcada como false."
+    "resumo": "Confirmado para o Brasil: Remo x Chapecoense, Brasileirão Série A 2026, fase única, rodada 35, nesta quarta-feira (18/11/2026), às 20h (horário de Brasília), no Mangueirão, em Belém. A grade completa identificada para a transmissão integral é Premiere. O ge lista somente o Premiere para esta partida; a CBF confirma o confronto, data, horário e competição. Não há evidência consultada de transmissão simultânea por outro canal permitido nem de exclusividade formal declarada, por isso exclusive=false."
   },
-  "atualizado_em": "2026-11-18T15:34:21-03:00"
+  "atualizado_em": "2026-11-18T18:38:07-03:00"
 }
