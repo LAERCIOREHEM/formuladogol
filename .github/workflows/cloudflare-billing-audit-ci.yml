@@ -1,10 +1,12 @@
-name: HOTFIX — Cloudflare Billing Audit R1
+name: R38 — Cloudflare Billing + GraphQL Reconciliation CI
 on:
   push:
     branches:
       - fix/cloudflare-billing-audit-cycle-r1-20261116
     paths:
       - 'cloudflare/push-worker/src/cloudflare-billing-audit.js'
+      - 'cloudflare/push-worker/src/workers-graphql-reconciliation.js'
+      - 'cloudflare/push-worker/tests/test-workers-graphql-reconciliation.mjs'
       - 'cloudflare/push-worker/src/health-monitor.js'
       - 'cloudflare/push-worker/tests/test-cloudflare-billing-audit.mjs'
       - 'cloudflare/push-worker/tests/test-health-monitor.mjs'
@@ -16,6 +18,8 @@ on:
   pull_request:
     paths:
       - 'cloudflare/push-worker/src/cloudflare-billing-audit.js'
+      - 'cloudflare/push-worker/src/workers-graphql-reconciliation.js'
+      - 'cloudflare/push-worker/tests/test-workers-graphql-reconciliation.mjs'
       - 'cloudflare/push-worker/src/health-monitor.js'
       - 'cloudflare/push-worker/tests/test-cloudflare-billing-audit.mjs'
       - 'cloudflare/push-worker/tests/test-health-monitor.mjs'
@@ -46,6 +50,8 @@ jobs:
         run: |
           set -euo pipefail
           node --check src/cloudflare-billing-audit.js
+          node --check src/workers-graphql-reconciliation.js
+          node --check tests/test-workers-graphql-reconciliation.mjs
           node --check src/health-monitor.js
           node --check tests/test-cloudflare-billing-audit.mjs
           node --check tests/test-health-monitor.mjs
@@ -53,6 +59,7 @@ jobs:
         run: |
           set -euo pipefail
           node tests/test-cloudflare-billing-audit.mjs
+          node tests/test-workers-graphql-reconciliation.mjs
           node tests/test-health-monitor.mjs
       - name: Testar integridade operacional do Push Worker
         run: |
