@@ -84,7 +84,11 @@ fixture = {
 # rodadas (ex.: Grêmio x Bahia, R35) são testados separadamente e não devem
 # aumentar o conjunto de fixtures desta regressão.
 def aplicar_apenas_rodadas_finais(eventos):
-    with patch.object(espn, "carregar_ajustes_calendario", return_value=fixes):
+    # Fixar a data do teste: partidas futuras em novembro/dezembro não podem
+    # deixar de existir só porque o CI voltou a rodar semanas depois.
+    clock = datetime.fromisoformat("2026-11-18T18:00:00-03:00")
+    with patch.object(espn, "carregar_ajustes_calendario", return_value=fixes), \
+         patch.object(espn, "agora_brt", return_value=clock):
         espn.aplicar_ajustes_calendario(eventos)
 
 events = [fixture]
