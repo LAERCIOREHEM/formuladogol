@@ -11,12 +11,14 @@ on:
       - 'dados-br/calendario-completo.json'
       - 'dados-br/probabilidades-brasileirao.json'
       - 'dados-br/auditoria-jogos-detalhes.json'
+      - '.github/workflows/deploy.yml'
       - '.github/workflows/cbf-final-archive-contract-ci.yml'
   push:
     branches: [main]
     paths:
       - 'tests/test-cbf-kickoff-runtime.mjs'
       - 'dados-br/ajustes-calendario.json'
+      - '.github/workflows/deploy.yml'
       - '.github/workflows/cbf-final-archive-contract-ci.yml'
   workflow_dispatch:
 
@@ -37,6 +39,22 @@ jobs:
           python-version: '3.12'
       - name: CBF kickoff and PRE to FINAL lifecycle
         run: node tests/test-cbf-kickoff-runtime.mjs
+      - name: Certificar sintaxe e contrato do smoke pós-FINAL
+        run: |
+          python - <<'PY'
+          import ast, textwrap
+          from pathlib import Path
+          wf=Path('.github/workflows/deploy.yml').read_text(encoding='utf-8')
+          match=wf.split('      - name: Certificar ciclo CBF PRE → FINAL NA PRODUÇÃO',1)[1].split('      - name: ORG-7R — smoke test público pós-deploy',1)[0]
+          code=match.split("python - <<'PY'\\n",1)[1].split('\\n          PY',1)[0]
+          ast.parse(textwrap.dedent(code))
+          assert 'if finals:' in code
+          assert 'len(future)==0 and len(pending)==0' in code
+          assert "get('/resultados.json')" in code
+          assert "get('/dados-br/probabilidades-brasileirao.json')" in code
+          assert "get('/dados-br/calendario-completo.json')" in code
+          print('PASS: verificação de produção cobre PRE/FINAL, CBF, AF e classificação')
+          PY
       - name: Confirmar 380 partidas, FINAL, AF e estatísticas gerais sem inconsistência
         run: |
           python - <<'PY'
