@@ -39,10 +39,11 @@ permissions:
   contents: write
   actions: write
 
-# GRUPO GLOBAL DE ESCRITA (repo-write-main) — o mesmo dos demais workflows
-# que dao git push no main. Serializa as escritas -> zero corrida de push.
+# O coletor COMPLETO faz rede/estatísticas por dezenas de minutos. Ele não
+# pode bloquear o Fastlane de FINAL nem o Pages; escritores concorrentes usam
+# push otimista e o guard de monotonicidade abaixo antes de republicar.
 concurrency:
-  group: repo-write-main
+  group: fdg-full-espn-enrichment
   cancel-in-progress: false
   queue: max
 
@@ -955,6 +956,13 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             git clean -fd
+
+            # Enquanto esta coleta extensa estava no ar, o Fastlane pode ter
+            # publicado outros FINALS. Nunca substituir dados mais recentes.
+            if ! python scripts/guard_stale_full_snapshot.py "$TMP_DIR/resultados.json" "resultados.json"; then
+              echo "::warning::Coleta completa obsoleta — publicar novamente a partir da ESPN atual, sem reverter o Fastlane."
+              exit 0
+            fi
 
             for f in "${FILES[@]}"; do
               if [[ -e "$TMP_DIR/$f" ]]; then

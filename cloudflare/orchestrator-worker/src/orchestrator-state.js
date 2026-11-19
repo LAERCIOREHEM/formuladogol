@@ -342,7 +342,9 @@ export class OrchestratorState {
       return { result: 'shadow', reason: 'SHADOW: decisão registrada sem chamar GitHub', candidate };
     }
 
-    const writer = await activeWriter(this.env);
+    const writer = await activeWriter(this.env, {
+      urgentFinal: candidate?.action === 'atualizar_brasileirao',
+    });
     if (writer) {
       return {
         result: 'blocked_writer',

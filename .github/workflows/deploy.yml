@@ -119,14 +119,14 @@ permissions:
   deployments: read
   actions: read  # consultar histórico e etapas para deduplicação de incidentes
 
-# Lock global de escrita/publicação. Este workflow também pode persistir o estado
-# da notificação editorial em main; portanto precisa compartilhar o mesmo grupo
-# dos demais writers para eliminar corrida de push. O mesmo lock também serializa
-# os deploys do Pages.
+# O Pages publica arquivos já certificados; NÃO pode ficar aguardando a
+# coleta ESPN (até 45 minutos) para mostrar um FINAL já gravado no main.
+# A pequena escrita editorial pós-deploy usa git pull/retry e não modifica
+# os artefatos esportivos. Serializar apenas publicações Pages entre si.
 concurrency:
-  group: repo-write-main
+  group: fdg-pages-publication
   cancel-in-progress: false
-  queue: max  # não cancelar deploys pendentes durante atualização ESPN/AF
+  queue: max
 
 jobs:
   deploy:

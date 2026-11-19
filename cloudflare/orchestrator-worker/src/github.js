@@ -35,14 +35,19 @@ function headers(env) {
   };
 }
 
-export async function activeWriter(env) {
+export async function activeWriter(env, { urgentFinal = false } = {}) {
   const { owner, repo } = repoParts(env);
   const branch = encodeURIComponent(String(env.GITHUB_BRANCH || 'main'));
   const url = `https://api.github.com/repos/${owner}/${repo}/actions/runs?branch=${branch}&per_page=50`;
   const response = await fetch(url, { headers: headers(env) });
   if (!response.ok) throw new Error(`GitHub runs HTTP ${response.status}: ${(await response.text()).slice(0, 400)}`);
   const payload = await response.json();
-  return (payload?.workflow_runs || []).find((run) => WRITER_NAMES.has(String(run?.name || '')) && ['queued', 'in_progress', 'waiting', 'pending', 'requested'].includes(String(run?.status || ''))) || null;
+  // O FINAL é prioritário: coleta completa ESPN (até 45 min), editorial e
+  // deploy Pages não podem impedir o disparo do Fastlane. O próprio
+  // workflow Fastlane serializa sua escrita via repo-write-main.
+  const names = urgentFinal ? new Set(['AF-Previsão Fastlane pós-FINAL']) : WRITER_NAMES;
+  return (payload?.workflow_runs || []).find((run) => names.has(String(run?.name || '')) &&
+    ['queued', 'in_progress', 'waiting', 'pending', 'requested'].includes(String(run?.status || ''))) || null;
 }
 
 export async function dispatchWorkflow(env, workflow, inputs = {}) {
