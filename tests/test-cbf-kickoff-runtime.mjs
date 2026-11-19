@@ -49,8 +49,9 @@ if(results.length){
   assert.match(results[0].data_iso,/^2026-11-18T21:30/,'resultado preserva kickoff CBF');
   assert.ok(Number.isInteger(results[0].placar_mandante));
   assert.ok(Number.isInteger(results[0].placar_visitante));
-  assert.equal(results[0].placar_mandante,archive[0].placar_mandante);
-  assert.equal(results[0].placar_visitante,archive[0].placar_visitante);
+  // calendario-completo.json guarda fase, data e identidades, não placar.
+  assert.equal(results[0].mandante.nome,archive[0].mandante);
+  assert.equal(results[0].visitante.nome,archive[0].visitante);
 }else{
   assert.equal(pending.length,1,'PRE deve constar exatamente uma vez em jogos.json');
   assert.equal(agenda.length,1,'PRE deve constar exatamente uma vez na agenda futura');
