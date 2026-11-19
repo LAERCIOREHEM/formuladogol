@@ -1742,7 +1742,7 @@ jobs:
           reporting_interval: 5000
         timeout-minutes: 12
 
-      - name: Certificar horário CBF NA PRODUÇÃO — Grêmio x Bahia 21h30
+      - name: Certificar ciclo CBF PRE → FINAL NA PRODUÇÃO — Grêmio x Bahia 21h30
         if: success()
         shell: bash
         run: |
@@ -1755,39 +1755,61 @@ jobs:
               raise SystemExit(0)
           import json, time, urllib.request
           base='https://formuladogol.com.br'
+          event_id='401841312'
           error=''
           for attempt in range(1,13):
               try:
                   stamp=str(int(time.time()))+'-'+str(attempt)
-                  headers={'User-Agent':'FDG-CBF-Kickoff-Production/1.0','Cache-Control':'no-cache, no-store'}
+                  headers={'User-Agent':'FDG-CBF-FINAL-Production/2.0','Cache-Control':'no-cache, no-store'}
                   def get(path):
                       req=urllib.request.Request(base+path+'?cbf_prod='+stamp,headers=headers)
-                      with urllib.request.urlopen(req,timeout=18) as r:
-                          if r.status != 200: raise ValueError('HTTP '+str(r.status))
-                          return r.read()
-                  agenda=json.loads(get('/dados-br/agenda-clubes-br.json'))
-                  matches=[g for g in agenda.get('jogos',[]) if str(g.get('event_id'))=='401841312']
-                  if len(matches)!=1:
-                      raise AssertionError('evento 401841312 ausente ou duplicado na produção')
-                  game=matches[0]
-                  if not str(game.get('data_iso','')).startswith('2026-11-18T21:30'):
-                      raise AssertionError('horário servido incorreto: '+str(game.get('data_iso')))
-                  if not str(game.get('fonte_calendario','')).startswith('CBF oficial'):
-                      raise AssertionError('fonte CBF não identificada em produção')
+                      with urllib.request.urlopen(req,timeout=18) as response:
+                          if response.status != 200: raise ValueError('HTTP '+str(response.status))
+                          return response.read()
                   fixes=json.loads(get('/dados-br/ajustes-calendario.json'))
-                  if not any(str(f.get('event_id'))=='401841312' and f.get('data_iso')=='2026-11-18T21:30' for f in fixes.get('ajustes',[])):
-                      raise AssertionError('correção oficial não publicada')
+                  assert any(str(x.get('event_id'))==event_id and x.get('data_iso')=='2026-11-18T21:30' and
+                             str(x.get('fonte_calendario','')).startswith('CBF oficial') for x in fixes.get('ajustes',[])), 'ajuste documental da CBF ausente'
+                  results=json.loads(get('/resultados.json'))
+                  upcoming=json.loads(get('/jogos.json'))
+                  agenda=json.loads(get('/dados-br/agenda-clubes-br.json'))
+                  calendar=json.loads(get('/dados-br/calendario-completo.json'))
+                  af=json.loads(get('/dados-br/probabilidades-brasileirao.json'))
+                  table=json.loads(get('/tabela.json'))
                   html=get('/index.html').decode('utf-8',errors='replace')
-                  if 'function aplicarCorrecoesKickoffOficial(' not in html:
-                      raise AssertionError('homepage não possui reconciliação CBF')
-                  print('PRODUÇÃO CERTIFICADA: Grêmio x Bahia 21h30 BRT; CBF e UI presentes na versão servida')
+                  assert 'function aplicarCorrecoesKickoffOficial(' in html, 'homepage sem reconciliador CBF'
+                  finals=[x for x in results.get('resultados',[]) if str(x.get('event_id'))==event_id]
+                  future=[x for x in upcoming.get('jogos',[]) if str(x.get('event_id'))==event_id]
+                  pending=[x for x in agenda.get('jogos',[]) if str(x.get('event_id'))==event_id]
+                  archived=[x for x in calendar.get('jogos',[]) if str(x.get('event_id'))==event_id]
+                  assert len(archived)==1, 'calendário completo sem evento único'
+                  assert str(archived[0].get('data_iso','')).startswith('2026-11-18T21:30'), 'horário CBF perdido no arquivo'
+                  assert len(finals)+len(future)==1, 'evento ausente/duplicado entre futuro e FINAL'
+                  if finals:
+                      game=finals[0]
+                      assert game.get('estado')=='post', 'resultado sem estado FINAL'
+                      assert len(future)==0 and len(pending)==0, 'FINAL indevidamente na agenda futura'
+                      assert archived[0].get('estado')=='post' and archived[0].get('concluido') is True, 'calendário não refletiu FINAL'
+                      assert str(game.get('data_iso','')).startswith('2026-11-18T21:30'), 'kickoff do FINAL divergente da CBF'
+                      assert isinstance(game.get('placar_mandante'),int) and isinstance(game.get('placar_visitante'),int), 'placar FINAL ausente'
+                  else:
+                      assert len(future)==1 and len(pending)==1, 'pré-jogo sem agenda única'
+                      assert str(future[0].get('data_iso','')).startswith('2026-11-18T21:30'), 'kickoff pré-jogo incorreto'
+                      assert str(pending[0].get('data_iso','')).startswith('2026-11-18T21:30'), 'agenda pré-jogo incorreta'
+                  n=len(results.get('resultados',[]))
+                  assert results.get('total_resultados')==n, 'cobertura de resultados inconsistentes'
+                  base_af=af.get('base_corrente') or {}
+                  assert af.get('status')=='ok' and base_af.get('partidas_concluidas')==n, 'AF não recalculado na produção'
+                  assert base_af.get('partidas_totais')==380 and base_af.get('partidas_restantes')==len(upcoming.get('jogos',[])), 'AF/agenda divergentes'
+                  assert sum(int(x.get('jogos') or 0) for x in table.get('tabela',[]))==2*n, 'classificação atrasada'
+                  print('PRODUÇÃO CERTIFICADA: CBF 21h30, '+('FINAL' if finals else 'PRE')+
+                        ', '+str(n)+' resultados consolidados, AF e tabela coerentes')
                   break
-              except (Exception) as exc:
+              except Exception as exc:
                   error=str(exc)
                   print('Tentativa %d/12: %s' % (attempt,error))
                   if attempt<12: time.sleep(10)
           else:
-              raise SystemExit('FALHA: deploy não entregou 21h30 no domínio real: '+error)
+              raise SystemExit('FALHA: Pages não serviu snapshot CBF/FINAL/AF coerente: '+error)
           PY
 
       - name: ORG-7R — smoke test público pós-deploy
