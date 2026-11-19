@@ -1,0 +1,32 @@
+name: CF-COST-SHIELD R1 — Production Proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/cost-shield-production-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Validate live coordinator, billing freshness and D1 latch
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --max-time 15 \
+            'https://push.formuladogol.com.br/v1/cost-shield/status' -o /tmp/cf-shield-status.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          state=json.loads(Path('/tmp/cf-shield-status.json').read_text())
+          safe={key:state.get(key) for key in
+            ['version','halted','reason','lastCheckedAt','lastSuccessAt',
+             'hourlyUsd','dailyUsd','cycleUsd','d1Read','d1Written','cycleStart']}
+          print(json.dumps(safe,indent=2))
+          assert state.get('version')==1, 'controller version not deployed'
+          assert state.get('halted') is False, 'controller is halted or unavailable'
+          assert state.get('lastSuccessAt'), 'no verified billing sample'
+          print('CF-COST-SHIELD LIVE VERIFIED')
+          PY
