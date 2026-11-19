@@ -46,7 +46,7 @@ jobs:
           from pathlib import Path
           wf=Path('.github/workflows/deploy.yml').read_text(encoding='utf-8')
           match=wf.split('      - name: Certificar ciclo CBF PRE → FINAL NA PRODUÇÃO',1)[1].split('      - name: ORG-7R — smoke test público pós-deploy',1)[0]
-          code=match.split("python - <<'PY'\\n",1)[1].split('\\n          PY',1)[0]
+          code=match.split("python - <<'PY'",1)[1].split('          PY',1)[0]
           ast.parse(textwrap.dedent(code))
           assert 'if finals:' in code
           assert 'len(future)==0 and len(pending)==0' in code
