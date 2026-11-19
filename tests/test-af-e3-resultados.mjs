@@ -140,7 +140,11 @@ for (const item of historical.jogos) {
   }
   if(d.top1&&!d.exact) audit.vedNoExact++;
 }
-assert.deepEqual(audit,{total:347,proven:165,missing:182,modalNoExact:49,modalOnly:10,vedNoExact:72});
+assert.equal(audit.total,historical.resumo.resultados_auditados);
+assert.equal(audit.proven,historical.resumo.previsoes_certificadas);
+assert.equal(audit.missing,historical.resumo.sem_snapshot_certificado);
+assert.ok(audit.total>=347 && audit.modalNoExact>=49 && audit.modalOnly>=10 && audit.vedNoExact>=72,
+  'R35 baseline must be preserved without freezing later completed matches');
 const gremioBahia=lookup('Grêmio','Bahia');
 assert.ok(gremioBahia && gremioBahia.rodada_auditada===35);
 const gb=api.decide(toResult(gremioBahia),historical);
