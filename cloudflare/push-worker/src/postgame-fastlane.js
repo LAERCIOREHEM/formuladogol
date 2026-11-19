@@ -326,7 +326,10 @@ function firstMatch(textValue, patterns, parser) {
 export function extractPublicFromTextDeterministic(sourceText, sourceUrl = '') {
   const body = text(sourceText).replace(/\s+/g, ' ');
   const publico = firstMatch(body, [
-    /\bp[úu]blico(?!\s+pagante)(?:\s+(?:presente|total|geral))?\s*(?:[:\-–—]|(?:foi\s+)?de)\s*([0-9][0-9.\s]{2,8})\b/i,
+    // R35: em "Público: 43.190 pagantes (público total: 43.576)",
+    // o primeiro número NÃO é público presente. Preferir o total explícito.
+    /\bp[úu]blico\s+(?:total|presente|geral)\s*(?:[:\-–—]|(?:foi\s+)?de)\s*([0-9][0-9.\s]{2,8})\b/i,
+    /\bp[úu]blico(?!\s+pagante)(?:\s+(?:presente|total|geral))?\s*(?:[:\-–—]|(?:foi\s+)?de)\s*([0-9][0-9.\s]{2,8})\b(?!\s*pagantes?\b)/i,
     /\bp[úu]blico(?!\s+pagante)\s+([0-9]{1,3}(?:\.[0-9]{3})+|[0-9]{3,6})\s+(?:torcedores|pessoas|presentes)\b/i,
     /\b([0-9]{1,3}(?:\.[0-9]{3})+|[0-9]{3,6})\s+(?:torcedores?\s+)?presentes?\b/i,
   ], parseBrIntToken);
