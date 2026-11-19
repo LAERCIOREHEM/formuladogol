@@ -608,8 +608,21 @@ export default {
 
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (url.pathname === '/v1/cost-shield/status' && request.method === 'GET')
-      return json(request, await readCostShield(env), 200, {'Cache-Control':'no-store'});
+    if (url.pathname === '/v1/cost-shield/status' && request.method === 'GET') {
+      // Fixed cache key shared across public callers. Avoid turning the safety
+      // endpoint itself into a Durable Object billing amplification vector.
+      const cache=globalThis.caches?.default;
+      const key=new Request('https://push.formuladogol.com.br/__cost_shield_cache/v1/state');
+      if(cache){
+        const hit=await cache.match(key);
+        if(hit)return json(request,await hit.json(),200,{'Cache-Control':'no-store'});
+      }
+      const state=await readCostShield(env);
+      if(cache)await cache.put(key,new Response(JSON.stringify(state),{
+        headers:{'content-type':'application/json','cache-control':'public,max-age=10'}
+      })).catch(()=>{});
+      return json(request,state,200,{'Cache-Control':'no-store'});
+    }
     if (url.pathname === '/v1/cost-shield/reset' && request.method === 'POST') {
       const token = String(env.OPS_MCP_TOKEN||'').trim();
       const given = String(request.headers.get('Authorization')||'');
