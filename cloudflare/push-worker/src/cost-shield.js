@@ -1,4 +1,5 @@
 import { auditCloudflareBilling } from './cloudflare-billing-audit.js';
+import { sendMail, mailConfig } from './mailer.js';
 
 export const COST_SHIELD_VERSION = 1;
 export const COST_SHIELD_POLICY = Object.freeze({
@@ -95,7 +96,17 @@ export async function pollCostShield(env, now=Date.now(), fetcher=fetch) {
       method:'POST',headers:{'content-type':'application/json'},
       body:JSON.stringify({report,d1,now})});
     if(!res.ok)throw new Error('state_write_failed_'+res.status);
-    return await res.json();
+    const result=await res.json();
+    if(result.justHalted){
+      console.error(JSON.stringify({type:'COST_SHIELD_EMERGENCY_STOP',reason:result.reason,at:iso(now)}));
+      try{if(mailConfig(env).configured)await sendMail(env,{
+        subject:'[CF-COST-SHIELD] EMERGENCY STOP — Cloudflare',
+        body:'O bloqueio financeiro global foi acionado. Motivo: '+result.reason+
+          '\\nCusto do ciclo: US$ '+String(result.cycleUsd??'indisponível')+
+          '\\nA reativação exige verificação e autorização manual.'
+      });}catch(e){console.error('COST_SHIELD_EMAIL_FAILED:'+String(e?.message||e).slice(0,120));}
+    }
+    return result;
   }catch(e){console.error(JSON.stringify({type:'cost_shield_poll_error',reason:String(e?.message||e).slice(0,120)}));
     return {ok:false,halted:true,reason:'state_unavailable'};}
 }
@@ -126,11 +137,24 @@ export class CostShieldState {
         d1Read:s.d1Read??null,d1Written:s.d1Written??null,
         cycleStart:s.cycleStart||null};
     };
-    if(url.pathname==='/status'&&request.method==='GET')return json(publicStatus(saved));
+    if(url.pathname==='/status'&&request.method==='GET'){
+      const current=publicStatus(saved);
+      if(current.halted&&!saved.halted){
+        saved.halted=true;saved.reason=current.reason;saved.haltedAt=now;
+        await this.state.storage.put('status',saved);
+      }
+      return json(publicStatus(saved));
+    }
     if(url.pathname==='/sample'&&request.method==='POST'){
       const body=await request.json().catch(()=>null);
       if(!body||!Number.isFinite(body.now))return json({error:'invalid_sample'},400);
       const data={...saved,lastCheckedAt:body.now};
+      // Monitoring failure is a real stop condition, not an automatic
+      // reset as soon as the next API response becomes available.
+      if(!data.halted && ((data.lastSuccessAt&&body.now-data.lastSuccessAt>COST_SHIELD_POLICY.staleAfterMs) ||
+        (!data.lastSuccessAt&&body.now-data.createdAt>=COST_SHIELD_POLICY.bootstrapGraceMs))){
+        data.halted=true;data.reason='billing_monitor_stale';data.haltedAt=body.now;
+      }
       if(body.report?.ok&&positive(body.report.costUsd)){
         if(data.cycleStart!==body.report.cycleStart)data.samples=[];
         data.cycleStart=body.report.cycleStart;
@@ -146,8 +170,9 @@ export class CostShieldState {
         data.d1Read=body.d1.read;data.d1Written=body.d1.written;
         if(body.d1.reason){data.halted=true;data.reason=body.d1.reason;data.haltedAt=data.haltedAt||body.now;}
       }
+      const justHalted=!saved.halted&&data.halted;
       await this.state.storage.put('status',data);
-      return json(publicStatus(data));
+      return json({...publicStatus(data),justHalted});
     }
     if(url.pathname==='/reset'&&request.method==='POST'){
       // Reset requires authenticated outer Worker route and a new independent
