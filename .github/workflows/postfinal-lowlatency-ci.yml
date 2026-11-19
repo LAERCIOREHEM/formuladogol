@@ -14,6 +14,8 @@ on:
       - 'cloudflare/orchestrator-worker/src/github.js'
       - 'cloudflare/orchestrator-worker/src/orchestrator-state.js'
       - 'cloudflare/orchestrator-worker/tests/urgent-final-priority.test.mjs'
+      - 'cloudflare/orchestrator-worker/tests/af-fastlane.test.mjs'
+      - 'cloudflare/orchestrator-worker/tests/contracts.test.mjs'
       - '.github/workflows/postfinal-lowlatency-ci.yml'
   push:
     branches: [main]
@@ -29,6 +31,8 @@ on:
       - 'cloudflare/orchestrator-worker/src/github.js'
       - 'cloudflare/orchestrator-worker/src/orchestrator-state.js'
       - 'cloudflare/orchestrator-worker/tests/urgent-final-priority.test.mjs'
+      - 'cloudflare/orchestrator-worker/tests/af-fastlane.test.mjs'
+      - 'cloudflare/orchestrator-worker/tests/contracts.test.mjs'
       - '.github/workflows/postfinal-lowlatency-ci.yml'
   workflow_dispatch:
 
@@ -58,6 +62,10 @@ jobs:
           node --check cloudflare/orchestrator-worker/src/orchestrator-state.js
           node tests/test-postfinal-bridge.mjs
           node --test cloudflare/orchestrator-worker/tests/urgent-final-priority.test.mjs
+      - name: Suite completa de contratos do Orchestrator (sem deploy)
+        run: |
+          cd cloudflare/orchestrator-worker
+          npm run validate
       - name: Contratos operacionais e publicação desacoplada
         run: |
           python - <<'PY'
@@ -67,6 +75,9 @@ jobs:
           fast=Path('.github/workflows/af-previsao-fastlane-pos-final.yml').read_text()
           html=Path('index.html').read_text()
           assert 'group: fdg-pages-publication' in page
+          public_js = page.split('PUBLIC_JS=(',1)[1].split(')',1)[0]
+          assert 'js/br-final-canonical-bridge.js' in public_js
+          assert 'test -s _site/js/br-final-canonical-bridge.js' in page
           assert 'group: fdg-full-espn-enrichment' in full
           assert 'group: fdg-urgent-final-core' in fast
           assert 'python scripts/guard_stale_full_snapshot.py' in fast

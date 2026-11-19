@@ -384,6 +384,7 @@ jobs:
             js/br-aovivo.js
             js/br-af-scorecards.js
             js/br-af-resultados.js
+            js/br-final-canonical-bridge.js
             js/br-agenda.js
             js/br-analises.js
             js/br-clube-retorno.js
@@ -969,6 +970,8 @@ jobs:
           node --check _site/js/br-aovivo.js
           test -s _site/js/br-live-goal-sync.js
           node --check _site/js/br-live-goal-sync.js
+          test -s _site/js/br-final-canonical-bridge.js
+          node --check _site/js/br-final-canonical-bridge.js
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' _site/index.html
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' _site/estatisticas.html
           grep -q 'br-estatisticas.js?v=20260920-live-facts-v6' _site/estatisticas.html
