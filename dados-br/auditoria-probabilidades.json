@@ -5,7 +5,7 @@
   "etapa": "Execução 5 — histórico encadeado e avaliação científica preparada",
   "gerado_em": "2026-11-18T23:24:00-03:00",
   "referencia_esportiva_em": "2026-11-18T23:24:00-03:00",
-  "calculado_em": "2026-11-18T23:43:13-03:00",
+  "calculado_em": "2026-11-18T23:43:22-03:00",
   "status": "ok",
   "hash_entrada": "720502b88463fe3e93e9b56161c6451b69cb82879d0a6b8edc72cb3dc4cb1a62",
   "responsavel": {
@@ -360,12 +360,12 @@
     "motivo": "A Execução 1 mostrou melhora de calibração, mas piora nas três regras próprias de pontuação. A versão 1.0 mantém rho=0 e publica esta sensibilidade para reavaliação versionada.",
     "diferenca_media_absoluta_1x2_pontos_percentuais": 1.239947,
     "diferenca_maxima_1x2_pontos_percentuais": 2.133274,
-    "alteracao_media_massa_placares_baixos_pontos_percentuais": -0.0
+    "alteracao_media_massa_placares_baixos_pontos_percentuais": 0.0
   },
   "diagnostico_af_score": {
     "disponivel": true,
     "cobertura_clubes": 20,
-    "correlacao_pearson_com_forca_map": 0.907268,
+    "correlacao_pearson_com_forca_map": 0.902542,
     "aplicado_na_producao": false,
     "motivo": "O AF-Score não possui série histórica homogênea em 2023–2025. Incluí-lo agora impediria backtesting temporal equivalente e poderia introduzir vazamento."
   },
@@ -478,7 +478,7 @@
         {
           "chave": "copa_do_brasil",
           "nome": "Copa do Brasil",
-          "gerado_em": "2026-11-18T22:55:13-03:00",
+          "gerado_em": "2026-11-18T23:37:46-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -488,12 +488,12 @@
           },
           "eventos_finalizados": 154,
           "eventos_pendentes": 1,
-          "modo_coleta": "completa"
+          "modo_coleta": "incremental"
         },
         {
           "chave": "libertadores",
           "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-11-18T22:55:16-03:00",
+          "gerado_em": "2026-11-18T23:37:46-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -503,12 +503,12 @@
           },
           "eventos_finalizados": 154,
           "eventos_pendentes": 1,
-          "modo_coleta": "completa"
+          "modo_coleta": "incremental"
         },
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-11-18T22:55:19-03:00",
+          "gerado_em": "2026-11-18T23:37:47-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -518,12 +518,12 @@
           },
           "eventos_finalizados": 156,
           "eventos_pendentes": 1,
-          "modo_coleta": "completa"
+          "modo_coleta": "incremental"
         }
       ],
-      "referencia_mais_antiga_em": "2026-11-18T22:55:13-03:00",
-      "referencia_mais_recente_em": "2026-11-18T22:55:19-03:00",
-      "snapshots_atualizados_em": "2026-11-18T22:55:19-03:00"
+      "referencia_mais_antiga_em": "2026-11-18T23:37:46-03:00",
+      "referencia_mais_recente_em": "2026-11-18T23:37:47-03:00",
+      "snapshots_atualizados_em": "2026-11-18T23:37:47-03:00"
     }
   },
   "validacoes": {
