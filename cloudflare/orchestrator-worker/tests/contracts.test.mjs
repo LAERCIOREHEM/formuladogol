@@ -59,13 +59,16 @@ test('transmission publication ignores volatile clock-only audit fields', async 
   assert.match(py, /semantic_audit_payload/);
 });
 
-test('all normal writers touched by this package share repo-write-main', async () => {
+test('writers non-critical keep repo-write-main while Pages and full ESPN are independent', async () => {
   const continental = await read('.github/workflows/publicar-analise-continentais.yml');
   const bets = await read('.github/workflows/apurar-brasileirao.yml');
   const deploy = await read('.github/workflows/deploy.yml');
   assert.match(continental, /group: repo-write-main/);
   assert.match(bets, /group: repo-write-main/);
-  assert.match(deploy, /group: repo-write-main/);
+  assert.match(deploy, /group: fdg-pages-publication/);
+  const full = await read('.github/workflows/atualizar-brasileirao.yml');
+  assert.match(full, /group: fdg-full-espn-enrichment/);
+  assert.match(full, /guard_stale_full_snapshot\.py/);
   assert.match(deploy, /cancel-in-progress: false/);
 });
 
