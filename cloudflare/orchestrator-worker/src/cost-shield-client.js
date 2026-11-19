@@ -7,6 +7,13 @@ export const COST_SHIELD_CLIENT_VERSION = 1;
 const CACHE_MS=15_000;
 let cached=null;
 let cachedAt=0;
+// Explicit injection is used solely by unit tests. Production entrypoints
+// never call this; it is not reachable through an HTTP route.
+let testTransport=null;
+export function setCostShieldTransportForTests(transport){
+  if(typeof transport!=='function')throw new TypeError('transport must be a function');
+  testTransport=transport;cached=null;cachedAt=0;
+}
 
 export function validateShieldStatus(value) {
   if(!value||value.version!==1||typeof value.halted!=='boolean' ||
@@ -19,7 +26,7 @@ export function validateShieldStatus(value) {
 export async function checkCostShield(fetcher=fetch, now=Date.now()) {
   if(cached&&now-cachedAt>=0&&now-cachedAt<CACHE_MS)return cached;
   try{
-    const response=await fetcher(COST_SHIELD_STATUS_URL,{
+    const response=await (testTransport||fetcher)(COST_SHIELD_STATUS_URL,{
       method:'GET',headers:{accept:'application/json'},
       cache:'no-store',signal:AbortSignal.timeout(2500)
     });
