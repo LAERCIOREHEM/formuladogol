@@ -154,12 +154,12 @@ assert.equal(gb.exact,false);
 assert.equal(api.highlight(gb).label,'Acertou o empate pelo placar previsto');
 
 const src = readFileSync('index.html', 'utf8');
-assert.match(src, /js\/br-af-resultados\.js\?v=20261110-ux-r1/);
+assert.match(src, /js\/br-af-resultados\.js\?v=20261119-r35/);
 assert.match(src, /css\/br-af-resultados\.css\?v=20261110-ux-r1/);
 assert.match(src, /FDGResultadosAF\.render\(r, state\.afE3Resultados\)/);
 assert.match(src, /\$\{afericaoHistorica\}\s*\$\{paginaResultado/);
 assert.match(src, /if \(state\.afE3Resultados\)/);
-assert.ok(src.indexOf('br-af-resultados.js?v=20261110-ux-r1') < src.indexOf('function renderResultados()'));
+assert.ok(src.indexOf('br-af-resultados.js?v=20261119-r35') < src.indexOf('function renderResultados()'));
 const css = readFileSync('css/br-af-resultados.css', 'utf8');
 assert.match(css, /min-height: 44px/);
 assert.match(css, /max-width:480px/);
