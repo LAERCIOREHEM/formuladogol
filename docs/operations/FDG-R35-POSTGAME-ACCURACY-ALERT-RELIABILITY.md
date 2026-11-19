@@ -27,7 +27,7 @@ O front `js/br-af-resultados.js` e as páginas estáticas de `scripts/gerar_pagi
 | 401841314 | Cruzeiro 2×1 Palmeiras | 49.664 | não informado | R$ 2.046.742,50 |
 | 401841310 | Remo 2×0 Chapecoense | 13.973 | não informado | R$ 274.020,00 |
 
-Fontes por campo estão em `dados-br/correcoes/publicos-verificados.json`. Para Corinthians, total/renda: UOL; pagantes: BOL/UOL; corroboração: Meu Timão. Cruzeiro: BOL/UOL e Itatiaia. Remo: Diário do Iguaçu (ficha técnica de 18/11). **Jamais usar pagantes para preencher público presente** e jamais estimar o número de pagantes quando omitido.
+Fontes por campo estão em `dados-br/correcoes/publicos-verificados.json`. Para Corinthians, total/renda: UOL; pagantes: ficha técnica do Meu Timão. Cruzeiro: Itatiaia, com identificação explícita dos dois valores. Remo: Diário do Iguaçu (ficha técnica de 18/11). **Jamais usar pagantes para preencher público presente** e jamais estimar o número de pagantes quando omitido.
 
 O parser determinístico de `postgame-fastlane.js` prefere campo "público total" antes de "público" e rejeita valores acompanhados por "pagantes" no campo total. `diregional.com.br` passa a integrar as fontes editoriais identificadas. Continuam em vigor Match Identity, data factual, validação por campo, orçamento mensal e retry gratuito; a publicação estática curada reconcilia o D1 pelo ciclo de seed do Fastlane.
 
