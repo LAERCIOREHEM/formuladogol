@@ -5,19 +5,19 @@
   "temporada": 2026,
   "status": "auditado_com_lacunas",
   "resumo": {
-    "total_resultados_unicos": 343,
-    "jogos_com_placar_prejogo_comprovado": 161,
+    "total_resultados_unicos": 345,
+    "jogos_com_placar_prejogo_comprovado": 163,
     "jogos_sem_prova_prejogo": 182,
     "jogos_com_conflito": 0,
     "jogos_sem_inicio_factual": 0,
-    "jogos_com_top3_original": 161,
+    "jogos_com_top3_original": 163,
     "jogos_sem_top3_original": 0,
     "partidas_sem_previsao_nao_foram_reconstituidas": true
   },
   "fontes_resultados": {
     "caminho": "resultados.json",
-    "arquivo_sha256": "8fad579a94101d2a7ae03ac6328c188176f62402794b97d6d97e8aadeb5a20b2",
-    "atualizado_em": "2026-11-18T22:11:21.242529-03:00"
+    "arquivo_sha256": "5d866a93930dc5fd3d25b0d9d091fed6df80bdd3b4d121a56252bc8a72142c19",
+    "atualizado_em": "2026-11-18T22:41:26.581419-03:00"
   },
   "historico_ved_preexistente": {
     "caminho": "dados-br/historico-probabilidades-jogos.json",
@@ -41,18 +41,18 @@
   "varredura_git": {
     "fontes": {
       "dados-br/probabilidades-jogos.json": {
-        "commits_localizados": 148,
-        "snapshots_validos": 148,
-        "linhas_prejogo_elegiveis": 11552
+        "commits_localizados": 149,
+        "snapshots_validos": 149,
+        "linhas_prejogo_elegiveis": 11844
       },
       "dados-br/probabilidades-brasileirao.json": {
-        "commits_localizados": 276,
-        "snapshots_validos": 276,
-        "linhas_prejogo_elegiveis": 25919
+        "commits_localizados": 277,
+        "snapshots_validos": 277,
+        "linhas_prejogo_elegiveis": 26467
       }
     },
     "linhas_rejeitadas": {
-      "apos_inicio_factual": 157
+      "apos_inicio_factual": 165
     }
   },
   "jogos": [
@@ -12761,11 +12761,131 @@
         "versao_modelo": "AF-Previsão 1.3",
         "hash_entrada_modelo": "c884ced5c1eb61677be39d182d97025bfd1b845743bf7b3cc3d67bac980a62a6"
       }
+    },
+    {
+      "event_id": "401841314",
+      "rodada": 35,
+      "mandante": "Cruzeiro",
+      "visitante": "Palmeiras",
+      "inicio_factual": "2026-11-18T23:30:00+00:00",
+      "placar_final": {
+        "mandante": 2,
+        "visitante": 1
+      },
+      "identidade_partida": "cruzeiro|palmeiras",
+      "ids_resultado": [
+        "401841314"
+      ],
+      "situacao": "comprovado",
+      "event_id_previsao": "401841314",
+      "previsao": {
+        "gols_esperados": {
+          "mandante": 1.0733,
+          "visitante": 1.2653
+        },
+        "placar_modal": {
+          "mandante": 1,
+          "visitante": 1
+        },
+        "probabilidades_ved_pct": {
+          "mandante": 31.3352,
+          "empate": 27.9255,
+          "visitante": 40.7393
+        }
+      },
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 13.1001
+        },
+        {
+          "mandante": 0,
+          "visitante": 1,
+          "probabilidade_pct": 12.2059
+        },
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 10.3534
+        }
+      ],
+      "top3_situacao": "nativo_documentado",
+      "proveniencia": {
+        "origem": "dados-br/probabilidades-jogos.json",
+        "commit": "39f2ffbdc743eb5d7fb84fcf1e5000ec89b11d37",
+        "commit_em": "2026-11-18T19:48:53+00:00",
+        "arquivo_sha256": "07125f291a75f0ee15e53c39b5f91e09d52a5159f7cc1aa0ec6950ac7b88f7b6",
+        "linha_sha256": "1b30607c9a250ff7af00ebd466146f67717a8754e63e1f6833f67ca5f22d6b78",
+        "gerado_em_modelo": "2026-11-15T01:23:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_entrada_modelo": "c884ced5c1eb61677be39d182d97025bfd1b845743bf7b3cc3d67bac980a62a6"
+      }
+    },
+    {
+      "event_id": "401841313",
+      "rodada": 35,
+      "mandante": "Flamengo",
+      "visitante": "Athletico-PR",
+      "inicio_factual": "2026-11-18T23:30:00+00:00",
+      "placar_final": {
+        "mandante": 2,
+        "visitante": 1
+      },
+      "identidade_partida": "flamengo|athletico pr",
+      "ids_resultado": [
+        "401841313"
+      ],
+      "situacao": "comprovado",
+      "event_id_previsao": "401841313",
+      "previsao": {
+        "gols_esperados": {
+          "mandante": 2.3177,
+          "visitante": 0.8161
+        },
+        "placar_modal": {
+          "mandante": 2,
+          "visitante": 0
+        },
+        "probabilidades_ved_pct": {
+          "mandante": 71.0617,
+          "empate": 17.4116,
+          "visitante": 11.5267
+        }
+      },
+      "top3_placares": [
+        {
+          "mandante": 2,
+          "visitante": 0,
+          "probabilidade_pct": 11.6978
+        },
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 10.0941
+        },
+        {
+          "mandante": 2,
+          "visitante": 1,
+          "probabilidade_pct": 9.5466
+        }
+      ],
+      "top3_situacao": "nativo_documentado",
+      "proveniencia": {
+        "origem": "dados-br/probabilidades-jogos.json",
+        "commit": "39f2ffbdc743eb5d7fb84fcf1e5000ec89b11d37",
+        "commit_em": "2026-11-18T19:48:53+00:00",
+        "arquivo_sha256": "07125f291a75f0ee15e53c39b5f91e09d52a5159f7cc1aa0ec6950ac7b88f7b6",
+        "linha_sha256": "5a6a7b01882cd341321f2da170e1a4e6c8e85bb606410b1b76dd01c1b88b148a",
+        "gerado_em_modelo": "2026-11-15T01:23:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_entrada_modelo": "c884ced5c1eb61677be39d182d97025bfd1b845743bf7b3cc3d67bac980a62a6"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "5fcccc49a65d6d307faf6066c0f3e5a763ea1952990bdc25f81237448c3d617a",
-    "hash_resumo": "f024c3f0ae90cc01259fa4dceeaa61f9d2d59ae9e400f2331a7e0891143defc4"
+    "hash_jogos": "0ca2610bcedc733e98ef3a0adbbad5550b3235a8b459cb1f35be3175932dce51",
+    "hash_resumo": "6587f63702c3665eb368c00127b78d0e8714c10ce00e267a92925b969464ffbc"
   }
 }
