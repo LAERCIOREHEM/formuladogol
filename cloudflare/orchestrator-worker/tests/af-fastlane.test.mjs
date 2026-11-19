@@ -19,10 +19,11 @@ test('FINAL do Brasileirão é roteado para o AF Fastlane', () => {
   );
 });
 
-test('AF Fastlane mantém lock global, 2M simulações e reconciliação completa posterior', async () => {
+test('AF Fastlane usa lock exclusivo prioritário, 2M simulações e reconciliação completa posterior', async () => {
   const yml = await read('.github/workflows/af-previsao-fastlane-pos-final.yml');
   assert.match(yml, /name: AF-Previsão Fastlane pós-FINAL/);
-  assert.match(yml, /group: repo-write-main/);
+  assert.match(yml, /group: fdg-urgent-final-core/);
+  assert.match(yml, /guard_stale_full_snapshot\.py/);
   assert.match(yml, /python atualizar_espn\.py/);
   assert.match(yml, /gerar_agenda_clubes_brasileirao\.py/);
   assert.match(yml, /reconciliar_af_continental\.py --force --max-attempts 2/);
