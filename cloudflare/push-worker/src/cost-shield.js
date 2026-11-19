@@ -21,8 +21,18 @@ export function evaluateSpend(samples, now=Date.now(), policy=COST_SHIELD_POLICY
   const series=samples.filter(s=>s.cycleStart===current.cycleStart && s.ts<=now);
   const diff=(windowMs)=>{
     const older=series.filter(s=>s.ts<=now-windowMs).at(-1);
-    if(!older)return null;
-    return Math.max(0,current.costUsd-older.costUsd);
+    if(older)return Math.max(0,current.costUsd-older.costUsd);
+    // In a new billing cycle (<24h old), the entire cycle spend was accrued
+    // inside this 24h window, even before the first monitor sample.
+    if(windowMs===86_400_000 &&
+      now-Date.parse(current.cycleStart)>=0 &&
+      now-Date.parse(current.cycleStart)<=windowMs)return current.costUsd;
+    // For hourly guard, use first observed sample as a conservative lower
+    // bound. Never claim unknown history was zero.
+    const first=series[0];
+    if(windowMs===3_600_000&&first&&now-first.ts<=windowMs)
+      return Math.max(0,current.costUsd-first.costUsd);
+    return null;
   };
   const hour=diff(3_600_000), day=diff(86_400_000);
   const reason=current.costUsd>=policy.cycleStopUsd?'cycle_limit':
