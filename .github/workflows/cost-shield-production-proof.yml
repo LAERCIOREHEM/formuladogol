@@ -9,14 +9,27 @@ permissions:
 jobs:
   proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 9
     steps:
       - name: Validate live coordinator, billing freshness and D1 latch
         shell: bash
         run: |
           set -euo pipefail
-          curl --fail --silent --show-error --max-time 15 \
-            'https://push.formuladogol.com.br/v1/cost-shield/status' -o /tmp/cf-shield-status.json
+          for attempt in $(seq 1 48); do
+            curl --fail --silent --show-error --max-time 15 \
+              'https://push.formuladogol.com.br/v1/cost-shield/status' -o /tmp/cf-shield-status.json
+            if python3 - <<'PY'
+import json
+from pathlib import Path
+s=json.loads(Path('/tmp/cf-shield-status.json').read_text())
+if s.get('version') != 1 or s.get('halted'):
+  raise SystemExit(1)
+raise SystemExit(0 if s.get('lastSuccessAt') else 2)
+PY
+            then break; fi
+            echo "Coordinator warming up or not yet funded by verified API; check $attempt/48"
+            sleep 10
+          done
           python3 - <<'PY'
           import json
           from pathlib import Path
