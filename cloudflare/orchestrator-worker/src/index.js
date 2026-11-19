@@ -1,4 +1,5 @@
 import { OrchestratorState } from './orchestrator-state.js';
+import { checkCostShield, shieldStoppedResponse } from './cost-shield-client.js';
 import { orchestratorHealth } from './contract.js';
 
 export { OrchestratorState };
@@ -24,6 +25,8 @@ async function forwardState(env, path, init = {}) {
 
 export default {
   async scheduled(_controller, env, ctx) {
+    const shield=await checkCostShield();
+    if(shield.halted){console.error('COST_SHIELD_HALTED:'+shield.reason);return;}
     ctx.waitUntil((async () => {
       const response = await forwardState(env, '/tick', { method: 'POST' });
       if (!response.ok) {
@@ -45,6 +48,10 @@ export default {
 
   async fetch(request, env) {
     const url = new URL(request.url);
+    if(url.pathname!=='/' && url.pathname!=='/health'){
+      const shield=await checkCostShield();
+      if(shield.halted)return shieldStoppedResponse(shield);
+    }
     if (url.pathname === '/' || url.pathname === '/health') {
       return json(orchestratorHealth(env.ORCHESTRATOR_MODE || 'shadow'));
     }
