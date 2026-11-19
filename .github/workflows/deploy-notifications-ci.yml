@@ -1,0 +1,47 @@
+name: Deploy Notification Incident CI
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/deploy_notifications.py'
+      - 'tests/test_deploy_notifications.py'
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/deploy-notifications-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/deploy_notifications.py'
+      - 'tests/test_deploy_notifications.py'
+      - '.github/workflows/deploy-notifications-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-deploy-alerts:
+    name: Certificar classificação, deduplicação e recuperação
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testes offline — nenhum e-mail nem deploy
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/deploy_notifications.py tests/test_deploy_notifications.py
+          python -m unittest discover -s tests -p 'test_deploy_notifications.py' -v
+      - name: Verificar contrato de notificação no workflow
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text = Path('.github/workflows/deploy.yml').read_text()
+          assert 'actions: read' in text
+          assert 'python scripts/deploy_notifications.py recovery' in text
+          assert 'python scripts/deploy_notifications.py failure' in text
+          assert "O deploy do GitHub Pages falhou. A última versão publicada continua no ar." not in text
+          assert text.count('if: failure()') == 1
+          print('PASS: notify first failure + certified recovery; no legacy generic alert')
+          PY

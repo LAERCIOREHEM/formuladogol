@@ -115,6 +115,7 @@ permissions:
   pages: write
   id-token: write
   deployments: read
+  actions: read  # consultar histórico e etapas para deduplicação de incidentes
 
 # Lock global de escrita/publicação. Este workflow também pode persistir o estado
 # da notificação editorial em main; portanto precisa compartilhar o mesmo grupo
@@ -2137,48 +2138,30 @@ jobs:
               print("IndexNow: deploy continua mesmo com este aviso")
           INNER
 
-      - name: Alertar falha de deploy por e-mail
-        if: failure()
+      # Só reporta recuperação depois da publicação E smoke público válidos.
+      # O histórico do próprio GitHub evita avisos repetidos sem estado extra.
+      - name: Notificar recuperação de incidente após deploy certificado
+        if: success()
         continue-on-error: true
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO_SUGESTOES }}
-        run: |
-          python - <<'PY'
-          import os
-          import smtplib
-          import ssl
-          from email.message import EmailMessage
-          from email.utils import formataddr
+        run: python scripts/deploy_notifications.py recovery
 
-          obrigatorios = ('SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'EMAIL_DESTINO')
-          ausentes = [nome for nome in obrigatorios if not os.environ.get(nome, '').strip()]
-          if ausentes:
-              print('::warning title=Alerta de deploy não enviado::Secrets SMTP ausentes: ' + ', '.join(ausentes))
-              raise SystemExit(0)
-          url_execucao = f"{os.environ.get('GITHUB_SERVER_URL', 'https://github.com')}/{os.environ.get('GITHUB_REPOSITORY', '')}/actions/runs/{os.environ.get('GITHUB_RUN_ID', '')}"
-          mensagem = EmailMessage()
-          mensagem['From'] = formataddr(('Fórmula do Gol', os.environ['SMTP_USER']))
-          mensagem['To'] = os.environ['EMAIL_DESTINO']
-          mensagem['Subject'] = 'Fórmula do Gol: falha no deploy do site'
-          mensagem.set_content('O deploy do GitHub Pages falhou. A última versão publicada continua no ar.\n\n' + url_execucao)
-          try:
-              porta = int(os.environ['SMTP_PORT'])
-              contexto = ssl.create_default_context()
-              if porta == 465:
-                  with smtplib.SMTP_SSL(os.environ['SMTP_HOST'], porta, context=contexto, timeout=30) as servidor:
-                      servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
-                      servidor.send_message(mensagem)
-              else:
-                  with smtplib.SMTP(os.environ['SMTP_HOST'], porta, timeout=30) as servidor:
-                      servidor.ehlo()
-                      servidor.starttls(context=contexto)
-                      servidor.ehlo()
-                      servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
-                      servidor.send_message(mensagem)
-          except (OSError, ValueError, smtplib.SMTPException) as erro:
-              print(f'::warning title=Alerta de deploy não enviado::{erro}')
-          PY
+      # Falhas de pré-validação não se chamam mais 'falha na publicação'.
+      # Uma sequência de falhas de mesmo workflow gera um único e-mail.
+      - name: Notificar primeiro incidente do deploy (sem duplicatas)
+        if: failure()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO_SUGESTOES }}
+        run: python scripts/deploy_notifications.py failure
