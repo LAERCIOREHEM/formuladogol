@@ -11,35 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 9
     steps:
-      - name: Validate live coordinator, billing freshness and D1 latch
+      - name: Validate coordinator billing samples and latch
         shell: bash
         run: |
           set -euo pipefail
           for attempt in $(seq 1 48); do
             curl --fail --silent --show-error --max-time 15 \
               'https://push.formuladogol.com.br/v1/cost-shield/status' -o /tmp/cf-shield-status.json
-            if python3 - <<'PY'
-import json
-from pathlib import Path
-s=json.loads(Path('/tmp/cf-shield-status.json').read_text())
-if s.get('version') != 1 or s.get('halted'):
-  raise SystemExit(1)
-raise SystemExit(0 if s.get('lastSuccessAt') else 2)
-PY
-            then break; fi
-            echo "Coordinator warming up or not yet funded by verified API; check $attempt/48"
+            if python3 -c 'import json; s=json.load(open("/tmp/cf-shield-status.json")); raise SystemExit(0 if s.get("version")==1 and s.get("halted") is False and s.get("lastSuccessAt") else 1)'; then
+              break
+            fi
+            echo "Coordinator waiting for verified billing sample ($attempt/48)"
             sleep 10
           done
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          state=json.loads(Path('/tmp/cf-shield-status.json').read_text())
-          safe={key:state.get(key) for key in
-            ['version','halted','reason','lastCheckedAt','lastSuccessAt',
-             'hourlyUsd','dailyUsd','cycleUsd','d1Read','d1Written','cycleStart']}
-          print(json.dumps(safe,indent=2))
-          assert state.get('version')==1, 'controller version not deployed'
-          assert state.get('halted') is False, 'controller is halted or unavailable'
-          assert state.get('lastSuccessAt'), 'no verified billing sample'
-          print('CF-COST-SHIELD LIVE VERIFIED')
-          PY
+          python3 -c 'import json; s=json.load(open("/tmp/cf-shield-status.json")); print(json.dumps({k:s.get(k) for k in ("version","halted","reason","lastCheckedAt","lastSuccessAt","hourlyUsd","dailyUsd","cycleUsd","d1Read","d1Written","cycleStart")},indent=2)); assert s.get("version")==1 and s.get("halted") is False and bool(s.get("lastSuccessAt")), "not confirmed: billing sample or controller healthy state"; print("CF-COST-SHIELD LIVE VERIFIED")'
