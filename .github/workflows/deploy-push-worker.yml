@@ -96,6 +96,9 @@ jobs:
       - name: Validar código
         run: npm run check
 
+      - name: CF-COST-SHIELD R1 regressão obrigatória
+        run: node tests/test-cost-shield.mjs
+
       - name: R10R17.6 - Action Center (sintaxe, evidências e ciclo de alertas)
         run: |
           node --check src/health-action-center.js
