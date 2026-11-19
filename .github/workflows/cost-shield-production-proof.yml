@@ -9,19 +9,12 @@ permissions:
 jobs:
   proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 9
+    timeout-minutes: 4
     steps:
-      - name: Validate coordinator billing samples and latch
+      - name: Verify live coordinator and last billing sample
         shell: bash
         run: |
           set -euo pipefail
-          for attempt in $(seq 1 48); do
-            curl --fail --silent --show-error --max-time 15 \
-              'https://push.formuladogol.com.br/v1/cost-shield/status' -o /tmp/cf-shield-status.json
-            if python3 -c 'import json; s=json.load(open("/tmp/cf-shield-status.json")); raise SystemExit(0 if s.get("version")==1 and s.get("halted") is False and s.get("lastSuccessAt") else 1)'; then
-              break
-            fi
-            echo "Coordinator waiting for verified billing sample ($attempt/48)"
-            sleep 10
-          done
-          python3 -c 'import json; s=json.load(open("/tmp/cf-shield-status.json")); print(json.dumps({k:s.get(k) for k in ("version","halted","reason","lastCheckedAt","lastSuccessAt","hourlyUsd","dailyUsd","cycleUsd","d1Read","d1Written","cycleStart")},indent=2)); assert s.get("version")==1 and s.get("halted") is False and bool(s.get("lastSuccessAt")), "not confirmed: billing sample or controller healthy state"; print("CF-COST-SHIELD LIVE VERIFIED")'
+          curl --fail --silent --show-error --max-time 15 \
+            'https://push.formuladogol.com.br/v1/cost-shield/status' -o /tmp/cf-shield-status.json
+          python3 -c 'import json; s=json.load(open("/tmp/cf-shield-status.json")); print(json.dumps({k:s.get(k) for k in ("version","halted","reason","lastCheckedAt","lastSuccessAt","hourlyUsd","dailyUsd","cycleUsd","d1Read","d1Written","cycleStart")},indent=2)); assert s.get("version")==1 and s.get("halted") is False and bool(s.get("lastSuccessAt")), "not confirmed: billing sample or coordinator healthy state"; print("CF-COST-SHIELD LIVE VERIFIED")'
