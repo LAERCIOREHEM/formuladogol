@@ -4,60 +4,60 @@
   "tipo": "acuracia_placares_af_previsao",
   "status": "ok",
   "escopo": {
-    "resultados_finais_auditados": 342,
-    "jogos_com_previsao_certificada": 160,
+    "resultados_finais_auditados": 343,
+    "jogos_com_previsao_certificada": 161,
     "sem_prova_historica": 182,
     "em_quarentena": 0,
     "observacao": "Esta é uma amostra documental histórica, não a totalidade do Brasileirão."
   },
   "origem": {
     "e1": "dados-br/auditoria-historica-placares-af-2026.json",
-    "e1_sha256": "01cdb7f22801115366f154ca55ccb11125722990e91578ac2a7f65b0531da053",
-    "e1_hash_jogos": "c95518a514331b18320666e9a020afaf46f2d4b4fbed3e8dd34eb6d88f1e45db",
+    "e1_sha256": "4ea4f7047c15bab9e47707e413bc9e06888f037e386780728742694ee71bebc1",
+    "e1_hash_jogos": "5fcccc49a65d6d307faf6066c0f3e5a763ea1952990bdc25f81237448c3d617a",
     "e3": "dados-br/resultados-af-placares-2026.json",
-    "e3_sha256": "311075f3c55c6cb56413b13af5d868fb70ad7c256352e6895b90c5a6b5d6e0b6",
-    "e3_hash_jogos": "6bb6a9f5ae7fc89df1097c24abb818079981193f87ff81c056dc2296edd48f1a"
+    "e3_sha256": "c5c560144d6abb441e2350fcf7fbadc9272520539a5b2327ae72c8b8ec26a52b",
+    "e3_hash_jogos": "ee53963ba9db180b6110e1a25520760139db097a9f231b74f9690f5325216cff"
   },
   "metricas": {
-    "jogos": 160,
+    "jogos": 161,
     "placares_exatos": 27,
-    "top3_confirmados": 56,
-    "taxa_placar_exato_pct": 16.88,
-    "taxa_top3_pct": 35.0,
+    "top3_confirmados": 57,
+    "taxa_placar_exato_pct": 16.77,
+    "taxa_top3_pct": 35.4,
     "ic95_placar_exato_pct": [
-      11.86,
-      23.44
+      11.79,
+      23.3
     ],
     "ic95_top3_pct": [
-      28.04,
-      42.66
+      28.44,
+      43.05
     ],
-    "erro_absoluto_medio_gols_por_equipe": 0.849,
-    "erro_absoluto_medio_gols_mandante": 0.8765,
-    "erro_absoluto_medio_gols_visitante": 0.8215,
-    "erro_absoluto_medio_total_gols": 1.2574,
-    "previsoes_ved_top1_avaliaveis": 160,
-    "acertos_ved_top1": 81,
-    "taxa_ved_top1_pct": 50.62,
-    "probabilidade_media_modal_pct": 12.66,
-    "frequencia_modal_observada_pct": 16.88,
-    "probabilidade_media_top3_pct": 34.09,
-    "frequencia_top3_observada_pct": 35.0,
+    "erro_absoluto_medio_gols_por_equipe": 0.8469,
+    "erro_absoluto_medio_gols_mandante": 0.8712,
+    "erro_absoluto_medio_gols_visitante": 0.8226,
+    "erro_absoluto_medio_total_gols": 1.2556,
+    "previsoes_ved_top1_avaliaveis": 161,
+    "acertos_ved_top1": 82,
+    "taxa_ved_top1_pct": 50.93,
+    "probabilidade_media_modal_pct": 12.64,
+    "frequencia_modal_observada_pct": 16.77,
+    "probabilidade_media_top3_pct": 34.07,
+    "frequencia_top3_observada_pct": 35.4,
     "calibracao_modal": [
       {
         "faixa_pct": [
           10,
           15
         ],
-        "amostra": 153,
+        "amostra": 154,
         "ocorrencias": 27,
-        "ocorrencias_esperadas": 19.1721,
-        "probabilidade_media_pct": 12.53,
-        "frequencia_observada_pct": 17.65,
-        "diferenca_observado_menos_previsto_pp": 5.12,
+        "ocorrencias_esperadas": 19.2733,
+        "probabilidade_media_pct": 12.52,
+        "frequencia_observada_pct": 17.53,
+        "diferenca_observado_menos_previsto_pp": 5.02,
         "intervalo_wilson_95_pct": [
-          12.42,
-          24.46
+          12.34,
+          24.31
         ],
         "amostra_reduzida": false
       },
@@ -102,15 +102,15 @@
           30,
           40
         ],
-        "amostra": 149,
-        "ocorrencias": 54,
-        "ocorrencias_esperadas": 51.0075,
-        "probabilidade_media_pct": 34.23,
-        "frequencia_observada_pct": 36.24,
-        "diferenca_observado_menos_previsto_pp": 2.01,
+        "amostra": 150,
+        "ocorrencias": 55,
+        "ocorrencias_esperadas": 51.3093,
+        "probabilidade_media_pct": 34.21,
+        "frequencia_observada_pct": 36.67,
+        "diferenca_observado_menos_previsto_pp": 2.46,
         "intervalo_wilson_95_pct": [
-          28.96,
-          44.22
+          29.38,
+          44.62
         ],
         "amostra_reduzida": false
       },
@@ -1531,29 +1531,29 @@
     {
       "rodada": 35,
       "metricas": {
-        "jogos": 2,
+        "jogos": 3,
         "placares_exatos": 0,
-        "top3_confirmados": 2,
+        "top3_confirmados": 3,
         "taxa_placar_exato_pct": 0.0,
         "taxa_top3_pct": 100.0,
         "ic95_placar_exato_pct": [
           0,
-          65.76
+          56.15
         ],
         "ic95_top3_pct": [
-          34.24,
+          43.85,
           100
         ],
-        "erro_absoluto_medio_gols_por_equipe": 1.0131,
-        "erro_absoluto_medio_gols_mandante": 1.3699,
-        "erro_absoluto_medio_gols_visitante": 0.6562,
-        "erro_absoluto_medio_total_gols": 2.0261,
-        "previsoes_ved_top1_avaliaveis": 2,
-        "acertos_ved_top1": 0,
-        "taxa_ved_top1_pct": 0.0,
-        "probabilidade_media_modal_pct": 12.7,
+        "erro_absoluto_medio_gols_por_equipe": 0.8463,
+        "erro_absoluto_medio_gols_mandante": 0.9223,
+        "erro_absoluto_medio_gols_visitante": 0.7702,
+        "erro_absoluto_medio_total_gols": 1.6744,
+        "previsoes_ved_top1_avaliaveis": 3,
+        "acertos_ved_top1": 1,
+        "taxa_ved_top1_pct": 33.33,
+        "probabilidade_media_modal_pct": 11.84,
         "frequencia_modal_observada_pct": 0.0,
-        "probabilidade_media_top3_pct": 32.91,
+        "probabilidade_media_top3_pct": 32.0,
         "frequencia_top3_observada_pct": 100.0,
         "calibracao_modal": [
           {
@@ -1561,15 +1561,15 @@
               10,
               15
             ],
-            "amostra": 2,
+            "amostra": 3,
             "ocorrencias": 0,
-            "ocorrencias_esperadas": 0.254,
-            "probabilidade_media_pct": 12.7,
+            "ocorrencias_esperadas": 0.3552,
+            "probabilidade_media_pct": 11.84,
             "frequencia_observada_pct": 0.0,
-            "diferenca_observado_menos_previsto_pp": -12.7,
+            "diferenca_observado_menos_previsto_pp": -11.84,
             "intervalo_wilson_95_pct": [
               0,
-              65.76
+              56.15
             ],
             "amostra_reduzida": true
           }
@@ -1580,14 +1580,14 @@
               30,
               40
             ],
-            "amostra": 2,
-            "ocorrencias": 2,
-            "ocorrencias_esperadas": 0.6583,
-            "probabilidade_media_pct": 32.91,
+            "amostra": 3,
+            "ocorrencias": 3,
+            "ocorrencias_esperadas": 0.96,
+            "probabilidade_media_pct": 32.0,
             "frequencia_observada_pct": 100.0,
-            "diferenca_observado_menos_previsto_pp": 67.09,
+            "diferenca_observado_menos_previsto_pp": 68.0,
             "intervalo_wilson_95_pct": [
-              34.24,
+              43.85,
               100
             ],
             "amostra_reduzida": true
@@ -2020,45 +2020,45 @@
     {
       "clube": "Chapecoense",
       "metricas": {
-        "jogos": 16,
+        "jogos": 17,
         "placares_exatos": 0,
-        "top3_confirmados": 2,
+        "top3_confirmados": 3,
         "taxa_placar_exato_pct": 0.0,
-        "taxa_top3_pct": 12.5,
+        "taxa_top3_pct": 17.65,
         "ic95_placar_exato_pct": [
           0,
-          19.36
+          18.43
         ],
         "ic95_top3_pct": [
-          3.5,
-          36.02
+          6.19,
+          41.03
         ],
-        "erro_absoluto_medio_gols_por_equipe": 0.8976,
-        "erro_absoluto_medio_gols_mandante": 0.8857,
-        "erro_absoluto_medio_gols_visitante": 0.9095,
-        "erro_absoluto_medio_total_gols": 1.0637,
-        "previsoes_ved_top1_avaliaveis": 16,
-        "acertos_ved_top1": 10,
-        "taxa_ved_top1_pct": 62.5,
-        "probabilidade_media_modal_pct": 11.36,
+        "erro_absoluto_medio_gols_por_equipe": 0.8749,
+        "erro_absoluto_medio_gols_mandante": 0.8352,
+        "erro_absoluto_medio_gols_visitante": 0.9147,
+        "erro_absoluto_medio_total_gols": 1.0582,
+        "previsoes_ved_top1_avaliaveis": 17,
+        "acertos_ved_top1": 11,
+        "taxa_ved_top1_pct": 64.71,
+        "probabilidade_media_modal_pct": 11.29,
         "frequencia_modal_observada_pct": 0.0,
-        "probabilidade_media_top3_pct": 31.17,
-        "frequencia_top3_observada_pct": 12.5,
+        "probabilidade_media_top3_pct": 31.11,
+        "frequencia_top3_observada_pct": 17.65,
         "calibracao_modal": [
           {
             "faixa_pct": [
               10,
               15
             ],
-            "amostra": 16,
+            "amostra": 17,
             "ocorrencias": 0,
-            "ocorrencias_esperadas": 1.8178,
-            "probabilidade_media_pct": 11.36,
+            "ocorrencias_esperadas": 1.9189,
+            "probabilidade_media_pct": 11.29,
             "frequencia_observada_pct": 0.0,
-            "diferenca_observado_menos_previsto_pp": -11.36,
+            "diferenca_observado_menos_previsto_pp": -11.29,
             "intervalo_wilson_95_pct": [
               0,
-              19.36
+              18.43
             ],
             "amostra_reduzida": true
           }
@@ -2086,15 +2086,15 @@
               30,
               40
             ],
-            "amostra": 12,
-            "ocorrencias": 2,
-            "ocorrencias_esperadas": 3.8254,
-            "probabilidade_media_pct": 31.88,
-            "frequencia_observada_pct": 16.67,
-            "diferenca_observado_menos_previsto_pp": -15.21,
+            "amostra": 13,
+            "ocorrencias": 3,
+            "ocorrencias_esperadas": 4.1272,
+            "probabilidade_media_pct": 31.75,
+            "frequencia_observada_pct": 23.08,
+            "diferenca_observado_menos_previsto_pp": -8.67,
             "intervalo_wilson_95_pct": [
-              4.7,
-              44.8
+              8.18,
+              50.26
             ],
             "amostra_reduzida": true
           }
@@ -2843,45 +2843,45 @@
     {
       "clube": "Remo",
       "metricas": {
-        "jogos": 16,
+        "jogos": 17,
         "placares_exatos": 4,
-        "top3_confirmados": 5,
-        "taxa_placar_exato_pct": 25.0,
-        "taxa_top3_pct": 31.25,
+        "top3_confirmados": 6,
+        "taxa_placar_exato_pct": 23.53,
+        "taxa_top3_pct": 35.29,
         "ic95_placar_exato_pct": [
-          10.18,
-          49.5
+          9.56,
+          47.26
         ],
         "ic95_top3_pct": [
-          14.16,
-          55.6
+          17.31,
+          58.7
         ],
-        "erro_absoluto_medio_gols_por_equipe": 0.7341,
-        "erro_absoluto_medio_gols_mandante": 0.8775,
-        "erro_absoluto_medio_gols_visitante": 0.5908,
-        "erro_absoluto_medio_total_gols": 1.177,
-        "previsoes_ved_top1_avaliaveis": 16,
-        "acertos_ved_top1": 8,
-        "taxa_ved_top1_pct": 50.0,
-        "probabilidade_media_modal_pct": 12.19,
-        "frequencia_modal_observada_pct": 25.0,
-        "probabilidade_media_top3_pct": 33.08,
-        "frequencia_top3_observada_pct": 31.25,
+        "erro_absoluto_medio_gols_por_equipe": 0.7211,
+        "erro_absoluto_medio_gols_mandante": 0.8274,
+        "erro_absoluto_medio_gols_visitante": 0.6148,
+        "erro_absoluto_medio_total_gols": 1.1649,
+        "previsoes_ved_top1_avaliaveis": 17,
+        "acertos_ved_top1": 9,
+        "taxa_ved_top1_pct": 52.94,
+        "probabilidade_media_modal_pct": 12.07,
+        "frequencia_modal_observada_pct": 23.53,
+        "probabilidade_media_top3_pct": 32.91,
+        "frequencia_top3_observada_pct": 35.29,
         "calibracao_modal": [
           {
             "faixa_pct": [
               10,
               15
             ],
-            "amostra": 15,
+            "amostra": 16,
             "ocorrencias": 4,
-            "ocorrencias_esperadas": 1.7964,
-            "probabilidade_media_pct": 11.98,
-            "frequencia_observada_pct": 26.67,
-            "diferenca_observado_menos_previsto_pp": 14.69,
+            "ocorrencias_esperadas": 1.8975,
+            "probabilidade_media_pct": 11.86,
+            "frequencia_observada_pct": 25.0,
+            "diferenca_observado_menos_previsto_pp": 13.14,
             "intervalo_wilson_95_pct": [
-              10.9,
-              51.95
+              10.18,
+              49.5
             ],
             "amostra_reduzida": true
           },
@@ -2926,15 +2926,15 @@
               30,
               40
             ],
-            "amostra": 14,
-            "ocorrencias": 5,
-            "ocorrencias_esperadas": 4.5925,
-            "probabilidade_media_pct": 32.8,
-            "frequencia_observada_pct": 35.71,
-            "diferenca_observado_menos_previsto_pp": 2.91,
+            "amostra": 15,
+            "ocorrencias": 6,
+            "ocorrencias_esperadas": 4.8942,
+            "probabilidade_media_pct": 32.63,
+            "frequencia_observada_pct": 40.0,
+            "diferenca_observado_menos_previsto_pp": 7.37,
             "intervalo_wilson_95_pct": [
-              16.34,
-              61.24
+              19.82,
+              64.25
             ],
             "amostra_reduzida": true
           },
@@ -10815,6 +10815,53 @@
       "erro_absoluto_gols_visitante": 0.3427,
       "erro_absoluto_total_gols": 1.7029,
       "commit_prova": "39f2ffbdc743eb5d7fb84fcf1e5000ec89b11d37"
+    },
+    {
+      "event_id": "401841310",
+      "rodada": 35,
+      "mandante": "Remo",
+      "visitante": "Chapecoense",
+      "inicio_factual": "2026-11-18T23:00:00+00:00",
+      "placar_final": {
+        "mandante": 2,
+        "visitante": 0
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      },
+      "gols_projetados": {
+        "mandante": 1.9729,
+        "visitante": 0.9982
+      },
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 10.1107
+        },
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 10.0923
+        },
+        {
+          "mandante": 2,
+          "visitante": 0,
+          "probabilidade_pct": 9.9738
+        }
+      ],
+      "probabilidade_modal_pct": 10.1107,
+      "probabilidade_top3_pct": 30.1768,
+      "acerto_exato": false,
+      "acerto_top3": true,
+      "acerto_ved_top1": true,
+      "palpite_ved_top1": "mandante",
+      "resultado_ved_observado": "mandante",
+      "erro_absoluto_gols_mandante": 0.0271,
+      "erro_absoluto_gols_visitante": 0.9982,
+      "erro_absoluto_total_gols": 0.9711,
+      "commit_prova": "39f2ffbdc743eb5d7fb84fcf1e5000ec89b11d37"
     }
   ],
   "metodologia": {
@@ -10830,7 +10877,7 @@
   },
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "de6ff30f96e9002715ddef2cd41588ffe73f8f73dd0db1742436a02253f244d7",
-    "hash_metricas": "000f3098142bf2e76d7762b11153fc487933951d9e4b620ac172bf94cc9cb225"
+    "hash_jogos": "ccb9df363af77ddbb469134be1a8b5cb8a1a29f0d38edb7ae0654c182873b9fa",
+    "hash_metricas": "a67a90c8650ac2f18d492375e22569ce363c899d03aee41e66ca0f66057aa4e2"
   }
 }
