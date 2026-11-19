@@ -1,0 +1,74 @@
+name: Post-FINAL Low-Latency Safety CI
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/guard_stale_full_snapshot.py'
+      - 'tests/test_postfinal_monotonic.py'
+      - 'index.html'
+      - 'js/br-final-canonical-bridge.js'
+      - 'tests/test-postfinal-bridge.mjs'
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/atualizar-brasileirao.yml'
+      - 'cloudflare/orchestrator-worker/src/github.js'
+      - 'cloudflare/orchestrator-worker/src/orchestrator-state.js'
+      - 'cloudflare/orchestrator-worker/tests/urgent-final-priority.test.mjs'
+      - '.github/workflows/postfinal-lowlatency-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/guard_stale_full_snapshot.py'
+      - 'tests/test_postfinal_monotonic.py'
+      - 'index.html'
+      - 'js/br-final-canonical-bridge.js'
+      - 'tests/test-postfinal-bridge.mjs'
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/atualizar-brasileirao.yml'
+      - 'cloudflare/orchestrator-worker/src/github.js'
+      - 'cloudflare/orchestrator-worker/src/orchestrator-state.js'
+      - 'cloudflare/orchestrator-worker/tests/urgent-final-priority.test.mjs'
+      - '.github/workflows/postfinal-lowlatency-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  safety:
+    name: Testar prioridade FINAL, monotonicidade e bridge pública
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: FINAL/AF sem regressão
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/guard_stale_full_snapshot.py
+          python tests/test_postfinal_monotonic.py -v
+          node --check js/br-final-canonical-bridge.js
+          node --check cloudflare/orchestrator-worker/src/github.js
+          node --check cloudflare/orchestrator-worker/src/orchestrator-state.js
+          node tests/test-postfinal-bridge.mjs
+          node --test cloudflare/orchestrator-worker/tests/urgent-final-priority.test.mjs
+      - name: Contratos operacionais e publicação desacoplada
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          page=Path('.github/workflows/deploy.yml').read_text()
+          full=Path('.github/workflows/atualizar-brasileirao.yml').read_text()
+          html=Path('index.html').read_text()
+          assert 'group: fdg-pages-publication' in page
+          assert 'group: fdg-full-espn-enrichment' in full
+          assert 'python scripts/guard_stale_full_snapshot.py' in full
+          assert 'js/br-final-canonical-bridge.js?v=' in html
+          assert 'window.BRFinalCanonicalBridge.check(' in html
+          assert 'fetchRaw(' in Path('js/br-final-canonical-bridge.js').read_text()
+          assert 'candidate?.action === \'atualizar_brasileirao\'' in Path('cloudflare/orchestrator-worker/src/orchestrator-state.js').read_text()
+          print('PASS: Pages, full ESPN and urgent FINAL are independent; no static-result rollback')
+          PY
