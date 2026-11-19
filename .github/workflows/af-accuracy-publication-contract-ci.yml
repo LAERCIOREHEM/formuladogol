@@ -27,6 +27,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Instalar dependências reais do AF-Previsão
+        run: python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
       - name: Sintaxe e teste do contrato público AF
         run: |
           set -euo pipefail
