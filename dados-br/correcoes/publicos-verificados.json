@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "_comentario": "Correções documentais verificadas manualmente. O coletor mescla somente os event_ids e campos explicitamente listados; não substitui o restante do snapshot.",
-  "verificado_em": "2026-10-28T22:10:00-03:00",
+  "verificado_em": "2026-11-19T07:20:00-03:00",
   "jogos": {
     "401841169": {
       "confronto": "São Paulo 1 x 2 Santos",
@@ -433,6 +433,54 @@
         "estado": "pendente_bordero_CBF"
       },
       "nota": "Palmeiras 6 x 1 Remo, 05/11/2026, Nubank Parque. UOL/Agência Estado: 36.520 presentes e R$ 2.428.351,43 de renda. Gazeta Esportiva: 33.520 e R$ 2.428.352,43. Valor da ficha UOL adotado provisoriamente; divergência pendente de borderô oficial. Pagantes não informados."
+    },
+    "401841310": {
+      "confronto": "Remo 2 x 0 Chapecoense",
+      "rodada": 35,
+      "data": "2026-11-18",
+      "tipo": "presente",
+      "publico": 13973,
+      "renda": 274020,
+      "pagantes_status": "nao_divulgado",
+      "fonte_publico": "https://diregional.com.br/diario-do-iguacu/esporte/chapecoense/2026-11-18-chapecoense-perde-na-estreia-de-bergantin-em-jogo-decidido-em-menos-de-20-minutos",
+      "fonte_renda": "https://diregional.com.br/diario-do-iguacu/esporte/chapecoense/2026-11-18-chapecoense-perde-na-estreia-de-bergantin-em-jogo-decidido-em-menos-de-20-minutos",
+      "origem": "Diário do Iguaçu (ficha técnica pós-jogo)",
+      "verificado_em": "2026-11-19",
+      "nota": "Mangueirão, 18/11/2026, ESPN 401841310: 13.973 presentes; renda R$ 274.020,00. Pagantes não divulgados."
+    },
+    "401841314": {
+      "confronto": "Cruzeiro 2 x 1 Palmeiras",
+      "rodada": 35,
+      "data": "2026-11-18",
+      "tipo": "presente",
+      "publico": 49664,
+      "renda": 2046742.5,
+      "pagantes_status": "nao_divulgado",
+      "fonte_publico": "https://www.itatiaia.com.br/esportes/futebol/futebol-nacional/futebol-mineiro/cruzeiro/mineirao-lotado-veja-publico-e-renda-de-cruzeiro-x-palmeiras-pelo-brasileirao/",
+      "fonte_renda": "https://www.itatiaia.com.br/esportes/futebol/futebol-nacional/futebol-mineiro/cruzeiro/mineirao-lotado-veja-publico-e-renda-de-cruzeiro-x-palmeiras-pelo-brasileirao/",
+      "fonte_confirmacao": "https://www.itatiaia.com.br/esportes/futebol/futebol-nacional/futebol-mineiro/cruzeiro/mineirao-lotado-veja-publico-e-renda-de-cruzeiro-x-palmeiras-pelo-brasileirao/",
+      "origem": "Rádio Itatiaia — público e renda publicados em 18/11 às 22h41",
+      "verificado_em": "2026-11-19",
+      "nota": "Mineirão, 18/11/2026, ESPN 401841314: 49.664 presentes e R$ 2.046.742,50. Não presumir pagantes."
+    },
+    "401841316": {
+      "confronto": "Corinthians 4 x 0 Botafogo",
+      "rodada": 35,
+      "data": "2026-11-18",
+      "tipo": "presente",
+      "publico": 43576,
+      "pagantes": 43190,
+      "renda": 2802655.15,
+      "fonte_publico": "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/11/18/corinthians-botafogo-brasileirao-2026-35-rodada-como-foi.ghtm",
+      "fonte_pagantes": "https://www.meutimao.com.br/amp-noticia/544329/ficha-tecnica-corinthians-4-x-0-botafogo",
+      "fonte_renda": "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/11/18/corinthians-botafogo-brasileirao-2026-35-rodada-como-foi.ghtm",
+      "fonte_confirmacao": "https://www.meutimao.com.br/amp-noticia/544329/ficha-tecnica-corinthians-4-x-0-botafogo",
+      "publico_status": "confirmado_presentes",
+      "pagantes_status": "confirmado_pagantes",
+      "renda_status": "confirmado_imprensa",
+      "origem": "UOL para público total e renda; Meu Timão para público pagante (ficha técnica de 18/11)",
+      "verificado_em": "2026-11-19",
+      "nota": "Neo Química Arena, 18/11/2026, ESPN 401841316: 43.576 presentes; 43.190 pagantes; R$ 2.802.655,15. Campos distintos."
     }
   }
 }

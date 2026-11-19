@@ -592,7 +592,8 @@ export function overallRecoveryDecision(previousSnapshot, currentSnapshot, { dai
   if (text(currentSnapshot?.state) !== 'green') return false;
   if (pending) return true;
   const previousState = text(previousSnapshot?.state);
-  return Boolean(previousState && previousState !== 'green');
+  // Oscilação YELLOW é informada no digest; não gera recuperação geral extra.
+  return previousState === 'red';
 }
 
 function overallRecoveryMessage(snapshot, now = Date.now()) {
@@ -619,6 +620,9 @@ function overallRecoveryMessage(snapshot, now = Date.now()) {
 export async function syncOverallRecovery(env, previousSnapshot, snapshot, { dailySentThisRun = false, coveredByActionRecovery = false, now = Date.now() } = {}) {
   const pendingRaw = await metaGet(env, 'overall_recovery_pending');
   const pending = safeJson(pendingRaw, null);
+  // Recuperação geral nunca antecipa as recuperações específicas ainda em confirmação.
+  const unstable=await env.DB.prepare("SELECT incident_key FROM health_incidents WHERE status='recovering' LIMIT 1").first();
+  if(unstable) return {sent:false,status:'awaiting_stable_recovery'};
   // Incidente específico já comunicou a recuperação; não enviar um segundo
   // aviso genérico no mesmo ciclo nem deixar o estado geral pendente para amanhã.
   if (coveredByActionRecovery && text(snapshot?.state) === 'green') {
@@ -659,6 +663,11 @@ export async function syncOverallRecovery(env, previousSnapshot, snapshot, { dai
   return { sent: false, status: text(status) || 'failed' };
 }
 
+// FDG R35: recuperação somente após observações verdes consecutivas no cron.
+// Reutiliza status/tempos existentes no D1; não exige migração nem novo serviço.
+export const HEALTH_RECOVERY_STABLE_MS = 10 * 60_000;
+export const HEALTH_RECOVERY_MAX_GAP_MS = 7 * 60_000;
+
 // R10R17.6: amarelo confirmado após 15 minutos; vermelho imediato.
 // Usa o D1 health_incidents já existente, sem migração, para deduplicar por indicador.
 export async function syncIncidents(env,snapshot,now=Date.now(),{dailySentThisRun=false}={}){
@@ -676,10 +685,26 @@ export async function syncIncidents(env,snapshot,now=Date.now(),{dailySentThisRu
       Number(snapshot.providerFailureSummary.activeUnresolved||0)===0 &&
       Number(snapshot.postgame?.cost?.last24h?.estimatedUsd||0)<5;
     const nonActionablePostgame = text(action.id)==='postgame' && text(action.responsibility)==='AUTO';
-    if(recoveredProvider || nonActionablePostgame)continue;
+    // IA amarela e de correção automática, abaixo do teto de US$ 5/24h,
+    // fica no digest das 08h; não envia alerta/resolução a cada oscilação.
+    const nonActionableAI = text(action.id)==='openai' && action.severity==='yellow' &&
+      text(action.responsibility)==='AUTO' &&
+      Number(snapshot.postgame?.cost?.last24h?.estimatedUsd||0)<5;
     const key=`health:${text(action.id)}`;
+    if(nonActionablePostgame || nonActionableAI) {
+      // Pendência controlada ainda está ATIVA: não declarar RECUPERADO.
+      active.add(key);
+      continue;
+    }
+    if(recoveredProvider)continue;
     active.add(key);
-    const row=await env.DB.prepare('SELECT * FROM health_incidents WHERE incident_key=?').bind(key).first();
+    let row=await env.DB.prepare('SELECT * FROM health_incidents WHERE incident_key=?').bind(key).first();
+    if(row?.status==='recovering'){
+      // Uma nova falha cancela a contagem verde sem recriar o incidente nem spam.
+      await env.DB.prepare("UPDATE health_incidents SET status='open',resolved_at=NULL WHERE incident_key=?")
+        .bind(key).run();
+      row={...row,status:'open',resolved_at:null};
+    }
     const detail=text(action.problem);
     if(action.severity==='yellow'){
       const decision=healthYellowDecision(row,now);
@@ -731,15 +756,40 @@ export async function syncIncidents(env,snapshot,now=Date.now(),{dailySentThisRu
         .bind(detail,iso(now),text(mailStatus),text(mailStatus),iso(now),key).run();
     }
   }
-  const rows=await env.DB.prepare("SELECT * FROM health_incidents WHERE status IN ('open','observing')").all();
+  const rows=await env.DB.prepare("SELECT * FROM health_incidents WHERE status IN ('open','observing','recovering')").all();
   for(const row of rows?.results||[]){
     if(active.has(text(row.incident_key))) continue;
     const id=text(row.incident_key).replace(/^health:/,'');
+    // Não anunciar recuperação de pós-jogo se qualquer público/renda segue pendente,
+    // mesmo quando a severidade baixou de RED para YELLOW/GREEN.
+    if(id==='postgame' && Number(snapshot.postgame?.pending||0)>0) {
+      if(row.status==='recovering') await env.DB.prepare(
+        "UPDATE health_incidents SET status='open',resolved_at=NULL WHERE incident_key=?"
+      ).bind(row.incident_key).run();
+      continue;
+    }
     const current=snapshot.indicators.find(x=>x.id===id)||{id,label:text(row.indicator),detail:'normalizado'};
     const hadAlert=['sent','covered_by_daily'].includes(text(row.email_status)) || text(row.email_status).startsWith('recovery_');
     if(!hadAlert||row.status==='observing'){
       silentRecovery += 1;
       await env.DB.prepare("UPDATE health_incidents SET status='resolved',resolved_at=?,email_status='resolved_silent' WHERE incident_key=?")
+        .bind(iso(now),row.incident_key).run();
+      continue;
+    }
+    // Registrar 1ª leitura saudável e exigir ao menos 3 ciclos consecutivos
+    // (t0, t+5min, t+10min). Recomeçar se houver lacuna de polling.
+    const started=Date.parse(text(row.resolved_at));
+    const previousCheck=Date.parse(text(row.last_seen_at));
+    const gap=now-previousCheck;
+    if(row.status!=='recovering' || !Number.isFinite(started) ||
+       !Number.isFinite(previousCheck) || gap<0 || gap>HEALTH_RECOVERY_MAX_GAP_MS){
+      await env.DB.prepare(
+        "UPDATE health_incidents SET status='recovering',resolved_at=?,last_seen_at=? WHERE incident_key=?"
+      ).bind(iso(now),iso(now),row.incident_key).run();
+      continue;
+    }
+    if(now-started<HEALTH_RECOVERY_STABLE_MS){
+      await env.DB.prepare("UPDATE health_incidents SET last_seen_at=? WHERE incident_key=?")
         .bind(iso(now),row.incident_key).run();
       continue;
     }

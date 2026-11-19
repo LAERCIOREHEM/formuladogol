@@ -2166,30 +2166,8 @@ jobs:
               print("IndexNow: deploy continua mesmo com este aviso")
           INNER
 
-      # Só reporta recuperação depois da publicação E smoke público válidos.
-      # O histórico do próprio GitHub evita avisos repetidos sem estado extra.
-      - name: Notificar recuperação de incidente após deploy certificado
-        if: success()
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO_SUGESTOES }}
-        run: python scripts/deploy_notifications.py recovery
-
-      # Falhas de pré-validação não se chamam mais 'falha na publicação'.
-      # Uma sequência de falhas de mesmo workflow gera um único e-mail.
-      - name: Notificar primeiro incidente do deploy (sem duplicatas)
-        if: failure()
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO_SUGESTOES }}
-        run: python scripts/deploy_notifications.py failure
+      # FDG R35 — Falha de build/validação NÃO é indisponibilidade do site.
+      # A versão estável do GitHub Pages é preservada pelo fail-closed.
+      # Suprimir SMTP por execução: incidentes de disponibilidade são notificados
+      # exclusivamente pelo Health Monitor (duas sondagens + digest das 08h).
+      # Ações/erros continuam registrados no GitHub Actions.

@@ -584,3 +584,16 @@ console.log('R10R16.1 factual integrity guard tests: PASS');
 console.log('R10R30: Palmeiras x Remo UOL fiche fiscal long article: PASS');
 
 console.log('R10R33 chronology safeguard Coritiba-Vitória: PASS');
+
+ 
+// FDG R35: público total NÃO pode virar público pagante por ordem de aparição.
+{
+  const fiche='CORINTHIANS 4 X 0 BOTAFOGO. Público: 43.190 pagantes (público total: 43.576). Renda: R$ 2.802.655,15.';
+  const fields=extractPublicFromTextDeterministic(fiche,'https://www.uol.com.br/esporte/futebol/2026/11/18/corinthians-botafogo.ghtm');
+  assert.equal(fields.publico,43576,'presentes ficam separados de pagantes');
+  assert.equal(fields.publico_pagante,43190,'pagantes não podem virar total');
+  assert.equal(fields.renda,2802655.15,'não perder centavos da renda');
+  const pending='REMO 2 X 0 CHAPECOENSE. Público: 13.973 (total). Renda: R$ 274.020,00.';
+  const r=extractPublicFromTextDeterministic(pending,'https://diregional.com.br/diario-do-iguacu/esporte/chapecoense/2026-11-18-partida');
+  assert.equal(r.publico,13973);assert.equal(r.publico_pagante,null);assert.equal(r.renda,274020);
+}

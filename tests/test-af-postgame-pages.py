@@ -42,3 +42,23 @@ assert "1 × 0" in page and "0 × 0" in page
 assert "9,5% de chance" in page
 assert canonical.endswith("/jogo/mirassol-x-atletico-mg-2026-11-14/")
 print("PÁGINAS AF PÓS-FINAL PASS: 0×0 no Top-3, V/E/D principal não confirmado e prova de origem")
+
+# FDG R35 — empate previsto no placar, embora favorito V/E/D difira.
+from gerar_paginas_jogos import result_evaluation_html
+gremio_bahia = next(x for x in data["jogos"] if x["mandante"]=="Grêmio" and x["visitante"]=="Bahia" and x["rodada_auditada"]==35)
+r35_html = result_evaluation_html(gremio_bahia,0,0)
+assert "Acertou o empate pelo placar previsto" in r35_html
+assert "Resultado principal V/E/D" in r35_html
+assert "Desfecho do placar previsto" in r35_html
+assert "Placar exato" in r35_html
+
+# R35 — fonte documental por evento, jamais substituir total por pagantes.
+verified = json.loads((root / "dados-br/correcoes/publicos-verificados.json").read_text())["jogos"]
+assert verified["401841316"]["publico"] == 43576
+assert verified["401841316"]["pagantes"] == 43190
+assert verified["401841316"]["renda"] == 2802655.15
+assert verified["401841314"]["publico"] == 49664
+assert verified["401841314"]["renda"] == 2046742.50
+assert "pagantes" not in verified["401841314"]
+assert verified["401841310"]["renda"] == 274020
+assert "pagantes" not in verified["401841310"]

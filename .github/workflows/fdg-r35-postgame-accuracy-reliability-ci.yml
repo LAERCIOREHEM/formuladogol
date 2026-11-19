@@ -1,0 +1,72 @@
+name: FDG R35 — Postgame Accuracy and Alert Reliability CI
+
+on:
+  pull_request:
+    paths:
+      - 'js/br-af-resultados.js'
+      - 'scripts/gerar_paginas_jogos.py'
+      - 'index.html'
+      - 'tests/test-af-e3-resultados.mjs'
+      - 'tests/test-af-postgame-pages.py'
+      - 'dados-br/correcoes/publicos-verificados.json'
+      - 'cloudflare/push-worker/src/health-monitor.js'
+      - 'cloudflare/push-worker/src/health-action-center.js'
+      - 'cloudflare/push-worker/src/postgame-fastlane.js'
+      - 'cloudflare/push-worker/src/postgame-search-profile.js'
+      - 'cloudflare/push-worker/tests/test-health-action-center.mjs'
+      - 'cloudflare/push-worker/tests/test-health-monitor.mjs'
+      - 'cloudflare/push-worker/tests/test-postgame-fastlane.mjs'
+      - '.github/workflows/fdg-r35-postgame-accuracy-reliability-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'js/br-af-resultados.js'
+      - 'cloudflare/push-worker/src/health-monitor.js'
+      - 'dados-br/correcoes/publicos-verificados.json'
+      - '.github/workflows/fdg-r35-postgame-accuracy-reliability-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  r35-certification:
+    name: Historical results + source extraction + D1 mail lifecycle
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Certificar 347 resultados e páginas por evento
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check js/br-af-resultados.js
+          node tests/test-af-e3-resultados.mjs
+          python -m py_compile scripts/gerar_paginas_jogos.py
+          python tests/test-af-postgame-pages.py
+      - name: Dependências Cloudflare Worker (somente CI)
+        working-directory: cloudflare/push-worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+      - name: Certificar Hunter + incidentes + monitor sem chamadas pagas
+        working-directory: cloudflare/push-worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check src/postgame-fastlane.js
+          node --check src/postgame-search-profile.js
+          node --check src/health-monitor.js
+          node --check src/health-action-center.js
+          node tests/test-postgame-fastlane.mjs
+          node tests/test-health-monitor.mjs
+          node tests/test-health-action-center.mjs
+          node tests/test-health-action-snapshot.mjs
+          echo 'FDG R35: regression suite PASS'

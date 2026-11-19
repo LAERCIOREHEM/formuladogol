@@ -47,11 +47,12 @@ let assessment = api.decide(game, report);
 // Top-1 derrota, placar modal exato. NUNCA confundir as duas avaliações.
 assert.equal(assessment.status, 'comprovado');
 assert.equal(assessment.top1, false);
+assert.equal(assessment.modalHit, true);
 assert.equal(assessment.exact, true);
 assert.equal(assessment.top3, true);
 let html = api.render(game, report);
 assert.match(html, /AF-Previsão/);
-assert.match(html, /Previsão principal/);
+assert.match(html, /Placar mais provável/);
 assert.match(html, /1 × 1/);
 assert.match(html, /13,2% desse placar/);
 assert.match(html, /V\/E\/D não confirmado/);
@@ -71,6 +72,7 @@ const diff = { ...record, placar_final_auditado: { mandante: 2, visitante: 1 } }
 const docs = { ...report, jogos: [diff, unavailable] };
 assessment = api.decide({ ...game, placar_mandante: 2, placar_visitante: 1 }, docs);
 assert.equal(assessment.top1, true);
+assert.equal(assessment.modalHit, false);
 assert.equal(assessment.exact, false);
 assert.equal(assessment.top3, false);
 assert.match(api.render({ ...game, placar_mandante: 2, placar_visitante: 1 }, docs), /Acertou o vencedor/);
@@ -115,13 +117,49 @@ assert.match(api.render(toResult(saoPauloCor),historical),/Placar exato não con
 const allBad={...saoPauloDecision,top3:false};
 assert.equal(api.highlight(allBad).label,'Sem acerto principal');
 
+// R35: auditoria completa de TODOS os resultados E1, sem fabricar previsões pré-jogo.
+const audit={total:0,proven:0,missing:0,modalNoExact:0,modalOnly:0,vedNoExact:0};
+for (const item of historical.jogos) {
+  audit.total++;
+  if (item.situacao!=='comprovado') { audit.missing++; continue; }
+  audit.proven++;
+  const d=api.decide(toResult(item),historical);
+  assert.equal(d.status,'comprovado','Prova de partida '+item.identidade_partida);
+  const predicted=item.placar_previsto, actual=item.placar_final_auditado;
+  const derived=(h,a)=>h>a?'mandante':h<a?'visitante':'empate';
+  assert.equal(d.modalHit,derived(predicted.mandante,predicted.visitante)===derived(actual.mandante,actual.visitante));
+  assert.equal(d.top1,item.palpite_resultado_top1===derived(actual.mandante,actual.visitante));
+  assert.equal(d.exact,predicted.mandante===actual.mandante&&predicted.visitante===actual.visitante);
+  const rendered=api.render(toResult(item),historical);
+  assert.match(rendered,/Desfecho do placar previsto/);
+  if(d.modalHit&&!d.exact) audit.modalNoExact++;
+  if(d.modalHit&&!d.exact&&!d.top1) {
+    audit.modalOnly++;
+    assert.doesNotMatch(rendered,/Sem acerto principal/,'Não pode ignorar desfecho modal '+item.identidade_partida);
+    assert.match(rendered,/pelo placar previsto|Top-3 e desfecho previsto/);
+  }
+  if(d.top1&&!d.exact) audit.vedNoExact++;
+}
+assert.equal(audit.total,historical.resumo.resultados_auditados);
+assert.equal(audit.proven,historical.resumo.previsoes_certificadas);
+assert.equal(audit.missing,historical.resumo.sem_snapshot_certificado);
+assert.ok(audit.total>=347 && audit.modalNoExact>=49 && audit.modalOnly>=10 && audit.vedNoExact>=72,
+  'R35 baseline must be preserved without freezing later completed matches');
+const gremioBahia=lookup('Grêmio','Bahia');
+assert.ok(gremioBahia && gremioBahia.rodada_auditada===35);
+const gb=api.decide(toResult(gremioBahia),historical);
+assert.equal(gb.modalHit,true);
+assert.equal(gb.top1,false);
+assert.equal(gb.exact,false);
+assert.equal(api.highlight(gb).label,'Acertou o empate pelo placar previsto');
+
 const src = readFileSync('index.html', 'utf8');
-assert.match(src, /js\/br-af-resultados\.js\?v=20261110-ux-r1/);
+assert.match(src, /js\/br-af-resultados\.js\?v=20261119-r35/);
 assert.match(src, /css\/br-af-resultados\.css\?v=20261110-ux-r1/);
 assert.match(src, /FDGResultadosAF\.render\(r, state\.afE3Resultados\)/);
 assert.match(src, /\$\{afericaoHistorica\}\s*\$\{paginaResultado/);
 assert.match(src, /if \(state\.afE3Resultados\)/);
-assert.ok(src.indexOf('br-af-resultados.js?v=20261110-ux-r1') < src.indexOf('function renderResultados()'));
+assert.ok(src.indexOf('br-af-resultados.js?v=20261119-r35') < src.indexOf('function renderResultados()'));
 const css = readFileSync('css/br-af-resultados.css', 'utf8');
 assert.match(css, /min-height: 44px/);
 assert.match(css, /max-width:480px/);

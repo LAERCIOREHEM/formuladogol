@@ -36,8 +36,8 @@ assert.equal(dailyDigestDecision({date:'2026-09-26',hour:11,minute:22},'',{now,l
 assert.equal(dailyDigestDecision({date:'2026-09-26',hour:12,minute:0},'',{now}).state,'missed');
 assert.equal(dailyDigestDecision({date:'2026-09-26',hour:11,minute:22},'2026-09-26',{now}).state,'sent');
 
-// Recuperação geral: YELLOW/RED -> GREEN gera e-mail imediato sem mexer no digest das 08:00.
-assert.equal(overallRecoveryDecision({state:'yellow'},{state:'green'}),true);
+// Recuperação geral somente para RED estável; YELLOW é informado no digest das 08h.
+assert.equal(overallRecoveryDecision({state:'yellow'},{state:'green'}),false);
 assert.equal(overallRecoveryDecision({state:'red'},{state:'green'}),true);
 assert.equal(overallRecoveryDecision({state:'green'},{state:'green'}),false);
 assert.equal(overallRecoveryDecision({state:'yellow'},{state:'yellow'}),false);

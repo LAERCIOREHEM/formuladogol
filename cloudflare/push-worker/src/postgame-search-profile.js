@@ -93,6 +93,7 @@ export const PREFERRED_EDITORIAL_SOURCE_SUFFIXES = Object.freeze([
   'bahianoticias.com.br', 'itatiaia.com.br', 'otempo.com.br', 'em.com.br',
   'gauchazh.clicrbs.com.br', 'nsctotal.com.br', 'diariodonordeste.verdesmares.com.br',
   'opovo.com.br', 'gp1.com.br', 'oliberal.com', 'acritica.com',
+  'diregional.com.br', // Diário do Iguaçu: ficha técnica factual de jogos catarinenses
 ]);
 
 const REJECTED_SOURCE_HOST_RE = /(facebook|instagram|twitter|x\.com$|tiktok|youtube|reddit|forum|foro|blogspot|wordpress|bet|bets|aposta|torcida)/i;

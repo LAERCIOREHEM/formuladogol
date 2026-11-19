@@ -69,8 +69,8 @@ for (const test of cases) {
     assert.ok(await page.locator('#match1 details.af-e3-result').evaluate(el => el.open), test.name);
     assert.equal(await page.locator('#match1 .af-e3-score-option').count(), 3);
     assert.equal(await page.locator('#match1 .af-e3-breakdown').isVisible(), true, test.name);
-    assert.equal(await page.locator('#match1 .af-e3-breakdown .af-e3-chip').count(), 3,
-      test.name + ': preservar critérios V/E/D, exato e Top-3 independentes');
+    assert.equal(await page.locator('#match1 .af-e3-breakdown .af-e3-chip').count(), 4,
+      test.name + ': preservar quatro indicadores independentes: V/E/D, desfecho modal, exato e Top-3');
     const metrics = await page.evaluate(() => {
       const card = document.querySelector('#match1 .af-e3-result');
       const box = card.getBoundingClientRect();
