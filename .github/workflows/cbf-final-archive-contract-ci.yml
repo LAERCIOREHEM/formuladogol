@@ -1,0 +1,73 @@
+name: CBF FINAL archive and AF publication contract CI
+
+on:
+  pull_request:
+    paths:
+      - 'tests/test-cbf-kickoff-runtime.mjs'
+      - 'resultados.json'
+      - 'jogos.json'
+      - 'tabela.json'
+      - 'dados-br/agenda-clubes-br.json'
+      - 'dados-br/calendario-completo.json'
+      - 'dados-br/probabilidades-brasileirao.json'
+      - 'dados-br/auditoria-jogos-detalhes.json'
+      - '.github/workflows/cbf-final-archive-contract-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tests/test-cbf-kickoff-runtime.mjs'
+      - 'dados-br/ajustes-calendario.json'
+      - '.github/workflows/cbf-final-archive-contract-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  certificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: CBF kickoff and PRE to FINAL lifecycle
+        run: node tests/test-cbf-kickoff-runtime.mjs
+      - name: Confirmar 380 partidas, FINAL, AF e estatísticas gerais sem inconsistência
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          def read(name):
+              return json.loads(Path(name).read_text(encoding="utf-8"))
+          r=read("resultados.json")
+          p=read("jogos.json")
+          a=read("dados-br/probabilidades-brasileirao.json")
+          t=read("tabela.json")
+          st=read("dados-br/estatisticas.json")
+          au=read("dados-br/auditoria-jogos-detalhes.json")
+          cal=read("dados-br/calendario-completo.json")
+          results=r["resultados"]
+          pending=p["jogos"]
+          ids=[str(x["event_id"]) for x in results+pending]
+          assert len(ids)==len(set(ids)), "Partidas duplicadas entre futuras e FINAL"
+          assert len(results)+len(pending)==380, "Cobertura incompleta da temporada"
+          assert len(cal["jogos"])==380
+          assert all(x["estado"]=="post" and isinstance(x["placar_mandante"],int) and
+                     isinstance(x["placar_visitante"],int) for x in results)
+          assert a["status"]=="ok"
+          assert a["base_corrente"]["partidas_concluidas"]==len(results)
+          assert a["base_corrente"]["partidas_restantes"]==len(pending)
+          assert a["base_corrente"]["partidas_totais"]==380
+          assert sum(int(x["jogos"]) for x in t["tabela"])==2*len(results)
+          assert st["total_resultados_lidos"]==st["total_eventos_processados"]==len(results)
+          assert au["total_resultados_lidos"]==len(results)
+          assert au["total_com_estatisticas"]==len(results)
+          assert au["total_eventos_validados"]==len(results)
+          assert au["total_inconsistencias_eventos"]==0
+          print(f"PASS: {len(results)} FINALS / {len(pending)} futuras; AF, tabela e detalhes estatísticos coerentes")
+          PY
