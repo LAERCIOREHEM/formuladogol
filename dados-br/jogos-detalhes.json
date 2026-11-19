@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-19T00:01:11.158029-03:00",
+  "gerado_em": "2026-11-19T00:21:40.626426-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 347,
   "total_com_estatisticas": 347,
-  "total_com_publico": 341,
+  "total_com_publico": 345,
   "total_com_eventos": 347,
   "total_com_jogadores": 347,
   "total_eventos_validados": 347,
@@ -20,9 +20,9 @@
       "placar_mandante": 0,
       "placar_visitante": 0,
       "estadio": "Arena do Grêmio",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 48786,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://sports.sbt.com.br/noticia/sbt-sports/em-jogo-morno-gremio-e-bahia-ficam-em-um-empate-ruim-para-os-dois",
       "arbitro": "",
       "stats": [
         {
@@ -551,7 +551,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-19T00:00:58.845928-03:00"
+      "atualizado_em": "2026-11-19T00:00:58.845928-03:00",
+      "renda": 2173539.48
     },
     "401841316": {
       "event_id": "401841316",
@@ -1150,9 +1151,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Estadio do Maracana",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 68545,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/11/18/em-noite-de-golacos-flamengo-vira-sobre-o-athletico-pr-e-pode-ser-campeao-no-sabado.htm",
       "arbitro": "",
       "stats": [
         {
@@ -1714,7 +1715,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-19T00:01:03.770407-03:00"
+      "atualizado_em": "2026-11-19T00:01:03.770407-03:00",
+      "renda": 6813310
     },
     "401841314": {
       "event_id": "401841314",
@@ -2301,7 +2303,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-19T00:01:06.449381-03:00"
+      "atualizado_em": "2026-11-19T00:01:06.449381-03:00",
+      "publico_pagante": 26944,
+      "renda": 1039800
     },
     "401841310": {
       "event_id": "401841310",
@@ -2313,9 +2317,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Mangueirão",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 7698,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.oliberal.com/esportes/bruno-duarte-decide-vasco-supera-a-chapecoense-e-encaminha-permanencia-no-brasileirao-1.1194452",
       "arbitro": "",
       "stats": [
         {
@@ -2887,9 +2891,9 @@
       "placar_mandante": 0,
       "placar_visitante": 1,
       "estadio": "Couto Pereira",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 33195,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.oliberal.com/esportes/gabriel-barbosa-marca-aos-48-do-2-santos-bate-coritiba-e-mantem-chances-de-ir-a-libertadores-1.1195923",
       "arbitro": "",
       "stats": [
         {
@@ -3431,7 +3435,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-19T00:01:11.073329-03:00"
+      "atualizado_em": "2026-11-19T00:01:11.073329-03:00",
+      "publico_pagante": 33195
     },
     "401841175": {
       "event_id": "401841175",
@@ -196268,5 +196273,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 314,
+  "total_com_renda": 344
 }

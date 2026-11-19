@@ -1,15 +1,88 @@
 {
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
-  "jogos_finalizados": 341,
-  "jogos_com_publico": 341,
-  "jogos_sem_publico": 0,
-  "publico_total": 8442086,
-  "jogos_com_renda": 341,
-  "aguardando_fonte": [],
+  "jogos_finalizados": 347,
+  "jogos_com_publico": 345,
+  "jogos_sem_publico": 2,
+  "publico_total": 8600310,
+  "jogos_com_renda": 344,
+  "aguardando_fonte": [
+    {
+      "event_id": "401841316",
+      "mandante": "Corinthians",
+      "visitante": "Botafogo",
+      "estado": "AGUARDANDO_FONTE"
+    },
+    {
+      "event_id": "401841314",
+      "mandante": "Cruzeiro",
+      "visitante": "Palmeiras",
+      "estado": "AGUARDANDO_FONTE"
+    }
+  ],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
+    {
+      "event_id": "401841312",
+      "tipo_publico": "presente",
+      "publico_presente": 48786,
+      "publico_pagante": null,
+      "renda": 2173539.48,
+      "fonte_publico": "https://sports.sbt.com.br/noticia/sbt-sports/em-jogo-morno-gremio-e-bahia-ficam-em-um-empate-ruim-para-os-dois",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
+    },
+    {
+      "event_id": "401841316",
+      "tipo_publico": "",
+      "publico_presente": null,
+      "publico_pagante": null,
+      "renda": null,
+      "fonte_publico": "",
+      "origem": "",
+      "estado": "AGUARDANDO_FONTE"
+    },
+    {
+      "event_id": "401841313",
+      "tipo_publico": "presente",
+      "publico_presente": 68545,
+      "publico_pagante": null,
+      "renda": 6813310.0,
+      "fonte_publico": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/11/18/em-noite-de-golacos-flamengo-vira-sobre-o-athletico-pr-e-pode-ser-campeao-no-sabado.htm",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
+    },
+    {
+      "event_id": "401841314",
+      "tipo_publico": "",
+      "publico_presente": null,
+      "publico_pagante": 26944,
+      "renda": 1039800.0,
+      "fonte_publico": "",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "AGUARDANDO_FONTE"
+    },
+    {
+      "event_id": "401841310",
+      "tipo_publico": "presente",
+      "publico_presente": 7698,
+      "publico_pagante": null,
+      "renda": null,
+      "fonte_publico": "https://www.oliberal.com/esportes/bruno-duarte-decide-vasco-supera-a-chapecoense-e-encaminha-permanencia-no-brasileirao-1.1194452",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
+    },
+    {
+      "event_id": "401841315",
+      "tipo_publico": "presente",
+      "publico_presente": 33195,
+      "publico_pagante": 33195,
+      "renda": null,
+      "fonte_publico": "https://www.oliberal.com/esportes/gabriel-barbosa-marca-aos-48-do-2-santos-bate-coritiba-e-mantem-chances-de-ir-a-libertadores-1.1195923",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
+    },
     {
       "event_id": "401841175",
       "tipo_publico": "presente",
@@ -3421,5 +3494,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-11-15T03:26:43.479712-03:00"
+  "gerado_em": "2026-11-19T00:21:41.361131-03:00"
 }
