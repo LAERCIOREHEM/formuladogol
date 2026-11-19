@@ -1,0 +1,45 @@
+name: AF Accuracy Publication Contract CI
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/gerar_acuracia_af_previsao.py'
+      - 'scripts/validar_publicacao_brasileirao.py'
+      - '.github/workflows/af-accuracy-publication-contract-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/gerar_acuracia_af_previsao.py'
+      - 'scripts/validar_publicacao_brasileirao.py'
+      - '.github/workflows/af-accuracy-publication-contract-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  accuracy-contract:
+    name: Certificar escopo agregado e impedir bloqueio de publicação ESPN
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Sintaxe e teste do contrato público AF
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/gerar_acuracia_af_previsao.py scripts/validar_publicacao_brasileirao.py
+          python scripts/gerar_acuracia_af_previsao.py --self-test
+      - name: Confrontar produtor e validador completo
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          gen=Path('scripts/gerar_acuracia_af_previsao.py').read_text()
+          val=Path('scripts/validar_publicacao_brasileirao.py').read_text()
+          assert '"avaliacao_jogo_individual_publica": False' in gen
+          assert "get('avaliacao_jogo_individual_publica') is False" in val
+          assert 'observacao_avaliacao_jogos' in gen
+          print('PASS: produtor e validador exigem o mesmo booleano False; sem acurácia jogo a jogo')
+          PY
