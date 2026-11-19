@@ -32,8 +32,11 @@ permissions:
   actions: write
 
 # Mesmo lock dos demais writers. O Fastlane não concorre com outro commit no main.
+# PRIORIDADE ABSOLUTA PARA FINAL: o cálculo esportivo e seu commit
+# não esperam por busca de público, editoriais, coleta completa ou Pages.
+# A escrita usa fetch/reset/push otimista e guarda monotônica pós-fetch.
 concurrency:
-  group: repo-write-main
+  group: fdg-urgent-final-core
   cancel-in-progress: false
   queue: max
 
@@ -279,6 +282,13 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             git clean -fd
+
+            # Outra coleta pode ter publicado mais FINALS enquanto o AF
+            # calculava. Nunca reabrir uma partida nem sobrescrever placar.
+            if ! python scripts/guard_stale_full_snapshot.py "$TMP_DIR/resultados.json" "resultados.json"; then
+              echo "::warning title=AF Fastlane obsoleto::Snapshot mais recente já existe; preservar main e aguardar nova captura."
+              exit 0
+            fi
 
             for f in "${EXISTING[@]}"; do
               rm -rf "$f"
