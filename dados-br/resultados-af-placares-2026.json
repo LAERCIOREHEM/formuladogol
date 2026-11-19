@@ -5,13 +5,13 @@
   "status": "ok",
   "origem": {
     "arquivo": "dados-br/auditoria-historica-placares-af-2026.json",
-    "sha256_arquivo": "789a82ef20efe2b660aeab53e87e59829547ba8c5b8922b772f0dd52db7be3e3",
-    "hash_jogos_e1": "0ca2610bcedc733e98ef3a0adbbad5550b3235a8b459cb1f35be3175932dce51",
-    "data_fonte_resultados": "2026-11-18T22:54:38.454120-03:00"
+    "sha256_arquivo": "a40630a8ab3e4690699ccdb832138993920f0e6bf86ae86e2efb0def71fb31e2",
+    "hash_jogos_e1": "97600535ef19be018dea7df604679da48e450115d6e346b7cdd4b279e7b26288",
+    "data_fonte_resultados": "2026-11-18T23:49:01.130419-03:00"
   },
   "resumo": {
-    "resultados_auditados": 345,
-    "previsoes_certificadas": 163,
+    "resultados_auditados": 347,
+    "previsoes_certificadas": 165,
     "sem_snapshot_certificado": 182,
     "quarentena_por_conflito": 0,
     "sem_horario_factual": 0
@@ -11223,10 +11223,114 @@
         "versao_modelo": "AF-Previsão 1.3",
         "top3_origem": "nativo_documentado"
       }
+    },
+    {
+      "identidade_partida": "corinthians|botafogo",
+      "event_ids": [
+        "401841316"
+      ],
+      "rodada_auditada": 35,
+      "mandante": "Corinthians",
+      "visitante": "Botafogo",
+      "inicio_factual": "2026-11-19T00:30:00+00:00",
+      "placar_final_auditado": {
+        "mandante": 4,
+        "visitante": 0
+      },
+      "situacao": "comprovado",
+      "placar_previsto": {
+        "mandante": 1,
+        "visitante": 1
+      },
+      "gols_projetados": {
+        "mandante": 1.2988,
+        "visitante": 1.0793
+      },
+      "probabilidades_ved_pct": {
+        "mandante": 41.5322,
+        "empate": 27.6012,
+        "visitante": 30.8666
+      },
+      "palpite_resultado_top1": "mandante",
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 12.9983
+        },
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 12.0427
+        },
+        {
+          "mandante": 0,
+          "visitante": 1,
+          "probabilidade_pct": 10.0078
+        }
+      ],
+      "prova": {
+        "commit": "39f2ffbdc743eb5d7fb84fcf1e5000ec89b11d37",
+        "gerado_em": "2026-11-15T01:23:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "top3_origem": "nativo_documentado"
+      }
+    },
+    {
+      "identidade_partida": "gremio|bahia",
+      "event_ids": [
+        "401841312"
+      ],
+      "rodada_auditada": 35,
+      "mandante": "Grêmio",
+      "visitante": "Bahia",
+      "inicio_factual": "2026-11-19T00:30:00+00:00",
+      "placar_final_auditado": {
+        "mandante": 0,
+        "visitante": 0
+      },
+      "situacao": "comprovado",
+      "placar_previsto": {
+        "mandante": 1,
+        "visitante": 1
+      },
+      "gols_projetados": {
+        "mandante": 1.4568,
+        "visitante": 1.1993
+      },
+      "probabilidades_ved_pct": {
+        "mandante": 43.0544,
+        "empate": 25.8118,
+        "visitante": 31.1338
+      },
+      "palpite_resultado_top1": "mandante",
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 12.2687
+        },
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 10.2299
+        },
+        {
+          "mandante": 2,
+          "visitante": 1,
+          "probabilidade_pct": 8.9365
+        }
+      ],
+      "prova": {
+        "commit": "39f2ffbdc743eb5d7fb84fcf1e5000ec89b11d37",
+        "gerado_em": "2026-11-15T01:23:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "top3_origem": "nativo_documentado"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "dfbefa01c03b0ea6c07c46d584b4bceaa6158e13040ff6abcca862aaaf2cf4ee"
+    "hash_jogos": "c3a46aa928c6c0e1ec694e4088f06e2f02a04923d50eac29070676eaa6346eec"
   }
 }
