@@ -39,12 +39,14 @@ jobs:
           from pathlib import Path
           text = Path('.github/workflows/deploy.yml').read_text()
           assert 'actions: read' in text
-          assert 'python scripts/deploy_notifications.py recovery' in text
-          assert 'python scripts/deploy_notifications.py failure' in text
+          assert 'python scripts/deploy_notifications.py recovery' not in text
+          assert 'python scripts/deploy_notifications.py failure' not in text
+          assert 'GitHub Pages' in text
+          # A disponibilidade e o envio de e-mails são da responsabilidade do Health Monitor.
           assert "O deploy do GitHub Pages falhou. A última versão publicada continua no ar." not in text
-          assert text.count('if: failure()') == 1
+          assert text.count('if: failure()') == 0
           assert 'concurrency:\n  group: fdg-pages-publication\n  cancel-in-progress: false\n  queue: max' in text
           assert "- 'scripts/gerar_acuracia_af_previsao.py'" in text
           assert "- 'scripts/validar_publicacao_brasileirao.py'" in text
-          print('PASS: notify first failure + certified recovery; no legacy generic alert')
+          print('PASS: notification only for real site incidents via Health Monitor, no per-deploy SMTP')
           PY
