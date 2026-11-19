@@ -75,6 +75,9 @@ jobs:
           fast=Path('.github/workflows/af-previsao-fastlane-pos-final.yml').read_text()
           html=Path('index.html').read_text()
           assert 'group: fdg-pages-publication' in page
+          public_js = page.split('PUBLIC_JS=(',1)[1].split(')',1)[0]
+          assert 'js/br-final-canonical-bridge.js' in public_js
+          assert 'test -s _site/js/br-final-canonical-bridge.js' in page
           assert 'group: fdg-full-espn-enrichment' in full
           assert 'group: fdg-urgent-final-core' in fast
           assert 'python scripts/guard_stale_full_snapshot.py' in fast
