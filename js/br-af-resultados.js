@@ -141,6 +141,9 @@
       predicted: predicted,
       outcome: outcome,
       top1: WIN.includes(predictedOutcome) ? predictedOutcome === outcome : null,
+      // O desfecho do placar mais provável não é o V/E/D agregado de E4.
+      modalOutcome: actualOutcome(predicted.h, predicted.a),
+      modalHit: actualOutcome(predicted.h, predicted.a) === outcome,
       exact: predicted.h === current.h && predicted.a === current.a,
       top3: topScores.some(x => x.h === current.h && x.a === current.a),
     };
@@ -160,7 +163,12 @@
       const label = decision.outcome === "empate" ? "Acertou o empate" : "Acertou o vencedor";
       return { label: label, kind: "success" };
     }
+    if (decision.top3 && decision.modalHit)
+      return { label: "Placar no Top-3 e desfecho previsto", kind: "success" };
     if (decision.top3) return { label: "Placar no Top-3", kind: "success" };
+    if (decision.modalHit)
+      return { label: decision.outcome === "empate"
+        ? "Acertou o empate pelo placar previsto" : "Acertou o vencedor pelo placar previsto", kind: "success" };
     return { label: "Sem acerto principal", kind: "neutral" };
   }
   function missing(label, detail) {
@@ -191,6 +199,7 @@
     const top1Label = decision.top1 === null ? "Sem palpite V/E/D único" :
       decision.top1 ? "Resultado V/E/D" : "V/E/D não confirmado";
     const exactLabel = decision.exact ? "Placar exato" : "Placar exato não confirmado";
+    const modalLabel = decision.modalHit ? "Desfecho do placar previsto" : "Desfecho do placar previsto não confirmado";
     const featured = highlight(decision);
     const top3Text = decision.top3 ? "O placar final estava entre os três principais." :
       "O placar final não estava entre os três principais.";
@@ -205,9 +214,9 @@
     const sourceUrl = 'https://github.com/LAERCIOREHEM/formuladogol/commit/' + source.commit;
     return '<details class="af-e3-result" data-af-e3="certificado">' +
       '<summary class="af-e3-summary" aria-label="Expandir avaliação do AF-Previsão: ' +
-        safe(featured.label) + ', previsão principal ' + predicted + '">' +
+        safe(featured.label) + ', placar mais provável ' + predicted + '">' +
         '<span class="af-e3-line"><span class="af-e3-prefix">AF-Previsão</span>' +
-          '<span class="af-e3-summary-label">Previsão principal</span>' +
+          '<span class="af-e3-summary-label">Placar mais provável</span>' +
           '<strong class="af-e3-score">' + predicted + '</strong>' +
           '<span class="af-e3-pct">' + pct(bestPct) + ' desse placar</span></span>' +
         '<span class="af-e3-featured af-e3-featured-' + featured.kind + '">' +
@@ -218,9 +227,10 @@
         '<p><strong>Placar real:</strong> ' + actual +
           ' · <strong>Palpite V/E/D:</strong> ' +
           (e.palpite_resultado_top1 ? safe(labels[e.palpite_resultado_top1]) : 'indefinido por empate de probabilidades') +
-          '. Acertar o vencedor/empate não é o mesmo que acertar o placar exato.</p>' +
+          '. O V/E/D principal soma as probabilidades de TODOS os placares e pode divergir do desfecho implícito no placar mais provável.</p>' +
         '<div class="af-e3-breakdown" aria-label="Indicadores independentes de acerto">' +
           chip(decision.top1, top1Label) +
+          chip(decision.modalHit, modalLabel) +
           chip(decision.exact, exactLabel) +
           chip(decision.top3, decision.top3 ? "Placar no Top-3" : "Fora do Top-3") +
         '</div>' +
