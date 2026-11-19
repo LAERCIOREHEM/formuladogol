@@ -698,7 +698,8 @@ def generate_accuracy(history_games: Mapping[str, Any]) -> dict[str, Any]:
             "inicio_historico_jogos": history_games.get("primeiro_registro"),
             "observacao": "Histórico auditável disponível a partir da segunda metade do Brasileirão 2026.",
             "avaliacao_alvo": "resultado_v_e_d",
-            "avaliacao_jogo_individual_publica": "somente exemplos ilustrativos de jogos reais; sem ranking individual",
+            "avaliacao_jogo_individual_publica": False,
+            "observacao_avaliacao_jogos": "Acurácia publicada somente em indicadores agregados; sem ranking individual.",
         },
         "integridade": {
             "historico_temporada_schema": history_season.get("schema_version"),
@@ -722,6 +723,12 @@ def generate_accuracy(history_games: Mapping[str, Any]) -> dict[str, Any]:
 def validate_accuracy(payload: Mapping[str, Any]) -> None:
     if payload.get("status") != "ok":
         raise ValueError("acurácia com status inválido")
+    scope = payload.get("escopo_publico") or {}
+    if scope.get("avaliacao_alvo") != "resultado_v_e_d":
+        raise ValueError("painel público não deve mudar o alvo V/E/D")
+    if scope.get("avaliacao_jogo_individual_publica") is not False:
+        raise ValueError("painel público não deve expor acurácia jogo a jogo")
+
     timelines = payload.get("timeline_clubes") or {}
     if not isinstance(timelines, Mapping):
         raise ValueError("timeline_clubes inválida")
@@ -912,6 +919,31 @@ def self_test() -> None:
     outcome_accuracy = season_outcome_accuracy(synthetic_timelines, outcomes)
     if outcome_accuracy["eventos"]["campeao"]["alta_confianca_80"]["amostra"] != 1:
         raise AssertionError("alta confiança contou o mesmo clube mais de uma vez")
+    # Contrato público exigido também pelo validador completo: sem acurácia
+    # individual. A descrição editorial não substitui o booleano auditável.
+    panel = {
+        "status": "ok",
+        "escopo_publico": {
+            "avaliacao_alvo": "resultado_v_e_d",
+            "avaliacao_jogo_individual_publica": False,
+        },
+        "timeline_clubes": {},
+        "jogos": {"maior_probabilidade": {"amostra": 0, "confirmadas": 0},
+                  "jogos_avaliados": 0,
+                  "insights": {"faixas_confianca": []},
+                  "controle_qualidade": {"partidas_unicas": 0}},
+    }
+    validate_accuracy(panel)
+    for unsafe in (True, "somente exemplos ilustrativos de jogos reais; sem ranking individual", None):
+        bad = deepcopy(panel)
+        bad["escopo_publico"]["avaliacao_jogo_individual_publica"] = unsafe
+        try:
+            validate_accuracy(bad)
+        except ValueError as exc:
+            if "acurácia jogo a jogo" not in str(exc):
+                raise
+        else:
+            raise AssertionError("contrato público deveria bloquear campo não booleano ou ativado")
     print("Self-test acurácia AF-Previsão: OK")
 
 
