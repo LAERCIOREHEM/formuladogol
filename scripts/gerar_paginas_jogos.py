@@ -232,6 +232,9 @@ def result_evaluation_html(evidence: dict[str, Any], hs: Any, as_: Any) -> str:
     ved = evidence.get("palpite_resultado_top1")
     is_ved = ved == result if ved in ("mandante", "empate", "visitante") else None
     exact = (home, away) == (int(modal["mandante"]), int(modal["visitante"]))
+    modal_home, modal_away = int(modal["mandante"]), int(modal["visitante"])
+    modal_outcome = "mandante" if modal_home > modal_away else "visitante" if modal_away > modal_home else "empate"
+    modal_hit = modal_outcome == result
     top_hit = any((home, away) == (int(p["mandante"]), int(p["visitante"])) for p in top3)
     if exact:
         message = "Acertou o placar exato"
@@ -239,8 +242,12 @@ def result_evaluation_html(evidence: dict[str, Any], hs: Any, as_: Any) -> str:
         message = "Acertou V/E/D e Top-3"
     elif is_ved:
         message = "Acertou o empate" if result == "empate" else "Acertou o vencedor"
+    elif top_hit and modal_hit:
+        message = "Placar no Top-3 e desfecho previsto"
     elif top_hit:
         message = "Placar no Top-3"
+    elif modal_hit:
+        message = "Acertou o empate pelo placar previsto" if result == "empate" else "Acertou o vencedor pelo placar previsto"
     else:
         message = "Sem acerto nos critérios principais"
     def metric(text: str, hit: bool | None) -> str:
@@ -250,10 +257,12 @@ def result_evaluation_html(evidence: dict[str, Any], hs: Any, as_: Any) -> str:
     proof = evidence["prova"]["commit"]
     return f'''<div class="game-af-evaluation">
       <strong class="game-af-highlight">{esc(message)}</strong>
-      <p>Resultado real: {home} × {away} · Placar principal previsto:
-      {int(modal["mandante"])} × {int(modal["visitante"])}.</p>
+      <p>Resultado real: {home} × {away} · Placar mais provável:
+      {int(modal["mandante"])} × {int(modal["visitante"])}.
+      O V/E/D principal soma as probabilidades de todos os placares; os dois desfechos podem divergir.</p>
       <div class="game-af-checks">
         {metric("Resultado principal V/E/D", is_ved)}
+        {metric("Desfecho do placar previsto", modal_hit)}
         {metric("Placar exato", exact)}
         {metric("Placar no Top-3", top_hit)}
       </div>
