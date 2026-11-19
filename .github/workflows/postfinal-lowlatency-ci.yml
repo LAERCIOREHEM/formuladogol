@@ -10,6 +10,7 @@ on:
       - 'tests/test-postfinal-bridge.mjs'
       - '.github/workflows/deploy.yml'
       - '.github/workflows/atualizar-brasileirao.yml'
+      - '.github/workflows/af-previsao-fastlane-pos-final.yml'
       - 'cloudflare/orchestrator-worker/src/github.js'
       - 'cloudflare/orchestrator-worker/src/orchestrator-state.js'
       - 'cloudflare/orchestrator-worker/tests/urgent-final-priority.test.mjs'
@@ -24,6 +25,7 @@ on:
       - 'tests/test-postfinal-bridge.mjs'
       - '.github/workflows/deploy.yml'
       - '.github/workflows/atualizar-brasileirao.yml'
+      - '.github/workflows/af-previsao-fastlane-pos-final.yml'
       - 'cloudflare/orchestrator-worker/src/github.js'
       - 'cloudflare/orchestrator-worker/src/orchestrator-state.js'
       - 'cloudflare/orchestrator-worker/tests/urgent-final-priority.test.mjs'
@@ -62,9 +64,12 @@ jobs:
           from pathlib import Path
           page=Path('.github/workflows/deploy.yml').read_text()
           full=Path('.github/workflows/atualizar-brasileirao.yml').read_text()
+          fast=Path('.github/workflows/af-previsao-fastlane-pos-final.yml').read_text()
           html=Path('index.html').read_text()
           assert 'group: fdg-pages-publication' in page
           assert 'group: fdg-full-espn-enrichment' in full
+          assert 'group: fdg-urgent-final-core' in fast
+          assert 'python scripts/guard_stale_full_snapshot.py' in fast
           assert 'python scripts/guard_stale_full_snapshot.py' in full
           assert 'js/br-final-canonical-bridge.js?v=' in html
           assert 'window.BRFinalCanonicalBridge.check(' in html
