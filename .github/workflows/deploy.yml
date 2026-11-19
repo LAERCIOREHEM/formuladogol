@@ -92,6 +92,8 @@ on:
       - 'scripts/gerar_paginas_clubes.py'
       - 'scripts/gerar_paginas_jogos.py'
       - 'scripts/gerar_agenda_clubes_brasileirao.py'
+      - 'scripts/gerar_acuracia_af_previsao.py'
+      - 'scripts/validar_publicacao_brasileirao.py'
       - 'tests/test_calendario_finais_cbf_2026.py'
       - 'tests/test-af-postgame-pages.py'
       - 'scripts/gerar_hubs_competicoes.py'
@@ -124,6 +126,7 @@ permissions:
 concurrency:
   group: repo-write-main
   cancel-in-progress: false
+  queue: max  # não cancelar deploys pendentes durante atualização ESPN/AF
 
 jobs:
   deploy:

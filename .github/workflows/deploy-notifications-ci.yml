@@ -43,5 +43,8 @@ jobs:
           assert 'python scripts/deploy_notifications.py failure' in text
           assert "O deploy do GitHub Pages falhou. A última versão publicada continua no ar." not in text
           assert text.count('if: failure()') == 1
+          assert 'concurrency:\n  group: repo-write-main\n  cancel-in-progress: false\n  queue: max' in text
+          assert "- 'scripts/gerar_acuracia_af_previsao.py'" in text
+          assert "- 'scripts/validar_publicacao_brasileirao.py'" in text
           print('PASS: notify first failure + certified recovery; no legacy generic alert')
           PY
