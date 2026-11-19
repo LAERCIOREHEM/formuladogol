@@ -78,7 +78,9 @@ class FakeDB {
 // Os dois incidentes reais da Copa do Brasil NÃO são falhas operacionais.
 {
   const db=new FakeDB();
-  const monitor=new SportsMonitor({storage:new FakeStorage()},{DB:db});
+  const shield={idFromName:()=> 'test',get:()=>({fetch:async()=>
+    Response.json({version:1,halted:false,reason:'ok'})})};
+  const monitor=new SportsMonitor({storage:new FakeStorage()},{DB:db,COST_SHIELD:shield});
   const sent=[];
   monitor.notifyReadinessIncident=async (game, checkpoint, readiness, severity)=>{
     sent.push({id:game.eventId,checkpoint,severity,reasons:readiness.reasons});
