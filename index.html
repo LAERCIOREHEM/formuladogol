@@ -2958,6 +2958,7 @@ body > .container > section.hero > img {
 <script src="js/br-estatisticas-ordem.js?v=20260816-ordem-canonica-v1"></script>
 <script src="js/br-classificacao-live.js?v=20260920-monitor-facts-v7"></script>
 <script src="js/br-resultados-freshness.js?v=20261004-r10r9"></script>
+<script src="js/br-final-canonical-bridge.js?v=20261119-fast-final-r1"></script>
 <script src="js/br-af-scorecards.js?v=20261110-ux-r1"></script>
 <script src="js/br-af-resultados.js?v=20261110-ux-r1"></script>
 <script>
@@ -6110,6 +6111,39 @@ async function espnLiveTick() {
   }
   try {
     await espnLiveBuscar();
+    // Após FINAL real ESPN, buscar CORE+AF canônicos sem esperar o Pages.
+    // Só aceita snapshots com ID/equipes/placar e contagens idênticas.
+    if (state.view === 'resultados' && window.BRFinalCanonicalBridge) {
+      window.BRFinalCanonicalBridge.check({
+        liveMap: state.espnLive,
+        publishedRows: state.resultados,
+        currentCount: state.resultados.length,
+        isFinal: espnLiveEhFinalReal,
+        fetcher: fetch.bind(window)
+      }).then(snapshot => {
+        if (!snapshot) return;
+        const atual = Number(state.resultadosMeta?.total_resultados || state.resultados.length);
+        if (snapshot.results.total_resultados < atual) return;
+        state.resultados = mesclarResultadosManuais(filtrarResultadosValidos(snapshot.results.resultados));
+        state.resultadosTimes = [...new Set(state.resultados.flatMap(r =>
+          [(r.mandante || {}).nome, (r.visitante || {}).nome]).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
+        state.resultadosMeta = {
+          atualizado_em: snapshot.results.atualizado_em,
+          atualizado_em_br: snapshot.results.atualizado_em_br,
+          fonte: snapshot.results.fonte,
+          ultima_rodada_disputada: snapshot.results.ultima_rodada_disputada,
+          total_resultados: state.resultados.length
+        };
+        state.probabilidadesBrasileirao = snapshot.probabilities;
+        state.tabela = snapshot.table.tabela;
+        state._atualizadoEmServidor = snapshot.table.atualizado_em || null;
+        state._fonteServidor = snapshot.table.fonte || 'ESPN';
+        state.jogos = state.jogos.filter(x => !state.resultados.some(r =>
+          String(r.event_id) === String(x.event_id) && r.estado === 'post'));
+        if (state.view === 'resultados') renderResultados();
+        if (state.view === 'tabela') renderTabela();
+      }).catch(error => console.warn('Reconciliação pós-FINAL:', error.message));
+    }
     if (state.view === 'jogos') renderJogos();
     if (state.view === 'tabela') renderTabela();
     if (state.view === 'resultados') renderResultados();
@@ -6167,7 +6201,11 @@ async function carregarResultados(opcoes = {}) {
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
     await carregarResultadosManuais();
-    state.resultados = mesclarResultadosManuais(filtrarResultadosValidos(data.resultados));
+    const incoming = mesclarResultadosManuais(filtrarResultadosValidos(data.resultados));
+    // O Pages pode servir um snapshot anterior após o navegador já ter
+    // reconciliado um FINAL oficial na main. Nunca regredir a contagem.
+    if (incoming.length < state.resultados.length) return;
+    state.resultados = incoming;
     state.resultadosTimes = [...new Set(state.resultados.flatMap(r => [(r.mandante || {}).nome, (r.visitante || {}).nome]).filter(Boolean))].sort((a,b) => a.localeCompare(b, "pt-BR"));
     state.resultadosMeta = {
       atualizado_em: data.atualizado_em,
