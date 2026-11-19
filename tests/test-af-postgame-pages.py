@@ -51,3 +51,14 @@ assert "Acertou o empate pelo placar previsto" in r35_html
 assert "Resultado principal V/E/D" in r35_html
 assert "Desfecho do placar previsto" in r35_html
 assert "Placar exato" in r35_html
+
+# R35 — fonte documental por evento, jamais substituir total por pagantes.
+verified = json.loads((root / "dados-br/correcoes/publicos-verificados.json").read_text())["jogos"]
+assert verified["401841316"]["publico"] == 43576
+assert verified["401841316"]["pagantes"] == 43190
+assert verified["401841316"]["renda"] == 2802655.15
+assert verified["401841314"]["publico"] == 49664
+assert verified["401841314"]["renda"] == 2046742.50
+assert "pagantes" not in verified["401841314"]
+assert verified["401841310"]["renda"] == 274020
+assert "pagantes" not in verified["401841310"]
