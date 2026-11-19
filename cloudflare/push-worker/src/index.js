@@ -1,5 +1,6 @@
 import { buildPushPayload } from '@block65/webcrypto-web-push';
 import { PushState } from './push-state.js';
+import { CostShieldState, pollCostShield, readCostShield, getShieldStub } from './cost-shield.js';
 import { SportsMonitor } from './sports-monitor.js';
 import { enrichSportsMonitorLiveFacts, SPORTS_MONITOR_FACTS_VERSION } from './monitor-live-facts.js';
 import { dispatchStatus, enqueueSportsEvent, handleQueueBatch } from './push-dispatch.js';
@@ -16,7 +17,7 @@ import { handleOpsMcp, OPS_MCP_CONSTANTS } from './ops-mcp.js';
 import { OPS_INTELLIGENCE_CONSTANTS, opsIntelligenceStatus, searchOpsRag } from './ops-intelligence.js';
 import { RED_CARD_EVENT_POLICY_VERSION } from './readiness-guardian.js';
 
-export { PushState, SportsMonitor };
+export { PushState, SportsMonitor, CostShieldState };
 
 const ALLOWED_ORIGINS = new Set([
   'https://formuladogol.com.br',
@@ -567,6 +568,10 @@ export default {
     // operacional, pós-jogo e feedback. Isso também torna a entrega do e-mail
     // diário independente do caminho esportivo de 1 minuto.
     if (cron === '*/5 * * * *') {
+      // Billing is checked before the five-minute health lane. A latched stop
+      // is never cleared by a new day, deploy or Worker restart.
+      const shield = await pollCostShield(env);
+      if (shield.halted) { console.error('COST_SHIELD_HALTED:'+shield.reason); return; }
       ctx.waitUntil((async()=>{
         let status=null;
         try { const r=await monitor.fetch('https://internal/status'); if(r.ok) status=await r.json(); } catch(_) {}
@@ -574,6 +579,9 @@ export default {
       })().catch((error)=>{ console.error(`health monitor failed: ${String(error?.message||error).slice(0,500)}`); }));
       return;
     }
+
+    const shield = await readCostShield(env);
+    if (shield.halted) { console.error('COST_SHIELD_HALTED:'+shield.reason); return; }
 
     // Lane operacional de 1 minuto. Falhas são isoladas entre si.
     // Cron vazio é aceito como fallback de desenvolvimento/manual.
@@ -589,11 +597,42 @@ export default {
   },
 
   async queue(batch, env) {
+    const shield = await readCostShield(env);
+    if (shield.halted) {
+      // Never ACK an undelivered sporting event as successful.
+      batch.retryAll({delaySeconds:3600});
+      return;
+    }
     await handleQueueBatch(batch, env);
   },
 
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === '/v1/cost-shield/status' && request.method === 'GET') {
+      // Fixed cache key shared across public callers. Avoid turning the safety
+      // endpoint itself into a Durable Object billing amplification vector.
+      const cache=globalThis.caches?.default;
+      const key=new Request('https://push.formuladogol.com.br/__cost_shield_cache/v1/state');
+      if(cache){
+        const hit=await cache.match(key);
+        if(hit)return json(request,await hit.json(),200,{'Cache-Control':'no-store'});
+      }
+      const state=await readCostShield(env);
+      if(cache)await cache.put(key,new Response(JSON.stringify(state),{
+        headers:{'content-type':'application/json','cache-control':'public,max-age=10'}
+      })).catch(()=>{});
+      return json(request,state,200,{'Cache-Control':'no-store'});
+    }
+    if (url.pathname === '/v1/cost-shield/reset' && request.method === 'POST') {
+      const token = String(env.OPS_MCP_TOKEN||'').trim();
+      const given = String(request.headers.get('Authorization')||'');
+      if (!token || given !== 'Bearer '+token) return json(request,{ok:false,error:'forbidden'},403);
+      const response=await getShieldStub(env).fetch('https://shield.internal/reset',{method:'POST'});
+      return json(request,await response.json(),response.status,{'Cache-Control':'no-store'});
+    }
+    // Enforced before all dynamic routes, including /health and push registration.
+    const shield = await readCostShield(env);
+    if (shield.halted) return json(request,{ok:false,error:'cost_shield_halted',reason:shield.reason},503,{'Retry-After':'3600'});
 
     // R10R17 — MCP oficial, somente leitura e fora do caminho crítico esportivo.
     if (url.pathname === OPS_MCP_CONSTANTS.endpoint) {

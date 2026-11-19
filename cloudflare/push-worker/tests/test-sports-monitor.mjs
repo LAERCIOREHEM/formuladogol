@@ -105,7 +105,9 @@ globalThis.fetch = async (url) => {
 try {
   const storage = new FakeStorage();
   const db = new FakeDB();
-  const monitor = new SportsMonitor({ storage }, { DB: db });
+  const shield = { idFromName: () => 'test', get: () => ({ fetch: async () =>
+    Response.json({ version:1, halted:false, reason:'ok' }) }) };
+  const monitor = new SportsMonitor({ storage }, { DB: db, COST_SHIELD: shield });
 
   let status = await monitor.bootstrap();
   assert.equal(status.watchCount, 1);

@@ -52,6 +52,10 @@
       {
         "name": "SPORTS_MONITOR",
         "class_name": "SportsMonitor"
+      },
+      {
+        "name": "COST_SHIELD",
+        "class_name": "CostShieldState"
       }
     ]
   },
@@ -66,6 +70,12 @@
       "tag": "v2",
       "new_sqlite_classes": [
         "SportsMonitor"
+      ]
+    },
+    {
+      "tag": "v3-cost-shield",
+      "new_sqlite_classes": [
+        "CostShieldState"
       ]
     }
   ],
