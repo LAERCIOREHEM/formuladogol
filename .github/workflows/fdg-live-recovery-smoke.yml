@@ -36,9 +36,12 @@ jobs:
               for e in live.get('data',{}).get('events',[])
               if str(e.get('id')) in required
           ]
+          tracked={str(m.get('eventId','')):m.get('state') for m in monitor.get('matches',[])}
+          live_now=[str(g.get('id')) for g in game_rows
+                    if g.get('status',{}).get('type',{}).get('state')=='in']
           diagnostics={
               'shield': {k:shield.get(k) for k in ('version','halted','reason','lastCheckedAt','lastSuccessAt')},
-              'monitor': {k:monitor.get(k) for k in ('ok','watchCount','lastBootstrapAt','lastPollAt','activeGames','lastPollError')},
+              'monitor': {**{k:monitor.get(k) for k in ('ok','watchCount','lastBootstrapAt','lastPollAt','activeGames','lastPollError')}, 'trackedMatchStates':{x:tracked.get(x) for x in sorted(required)}},
               'live': {'ok':live.get('ok'),'source':live.get('source'),'stale':live.get('stale'),
                        'fetchAt':live.get('fetchedAt'),'eventCount':len(live.get('data',{}).get('events',[])),
                        'expectedEventIdsPresent':sorted(ids.intersection(required)), 'games':game_rows},
@@ -47,6 +50,7 @@ jobs:
           assert live.get('ok') is True and required.issubset(ids), 'Live ESPN scoreboard sem ambas as partidas'
           assert int(monitor.get('watchCount') or 0)>=2, 'SportsMonitor sem agenda'
           assert int(monitor.get('lastBootstrapAt') or 0)>0, 'SportsMonitor sem bootstrap'
+          assert all(tracked.get(x)=='in' for x in live_now), 'ESPN LIVE, mas SportsMonitor não acompanha a partida: '+str(tracked)
           assert int(shield.get('version') or 0)==1, 'COST SHIELD desconhecido'
           assert shield.get('reason') not in ('cycle_limit','hourly_limit','rolling_24h_limit',
                     'd1_daily_rows_read','d1_daily_rows_written'), 'Limite financeiro real foi atingido'
