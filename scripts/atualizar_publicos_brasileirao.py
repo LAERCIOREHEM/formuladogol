@@ -718,6 +718,17 @@ def aplicar_correcoes_verificadas(
                 novo[key] = value
                 alteracoes += 1
 
+        # R35: campo "pagantes_status=nao_divulgado" é uma correção
+        # documental NEGATIVA, não só um rótulo. A remoção deve acontecer
+        # na mesclagem autoritativa de TODA execução (rede ou offline).
+        # Caso contrário a etapa seguinte restaura uma contagem legada
+        # e a auditoria interrompe inclusive outros jogos íntegros.
+        if raw.get("pagantes_status") == "nao_divulgado" and pagantes is None:
+            for key in ("pagantes", "publico_pagante", "fonte_pagantes", "fonte_publico_pagante"):
+                if key in novo:
+                    del novo[key]
+                    alteracoes += 1
+
         # R10R15: uma nova correção não deve reescrever a data de verificação
         # de TODAS as correções históricas. Cada jogo pode carregar seu próprio
         # verificado_em; o valor de topo fica apenas como fallback legado.
@@ -725,7 +736,7 @@ def aplicar_correcoes_verificadas(
         fontes = {
             "fonte": str(raw.get("fonte_publico") or raw.get("fonte") or "").strip(),
             "fonte_publico": str(raw.get("fonte_publico") or raw.get("fonte") or "").strip(),
-            "fonte_pagantes": str(raw.get("fonte_pagantes") or raw.get("fonte_publico") or raw.get("fonte") or "").strip(),
+            "fonte_pagantes": str(raw.get("fonte_pagantes") or raw.get("fonte_publico") or raw.get("fonte") or "").strip() if pagantes is not None and raw.get("pagantes_status") != "nao_divulgado" else "",
             "fonte_renda": str(raw.get("fonte_renda") or raw.get("fonte_publico") or raw.get("fonte") or "").strip(),
             "origem": str(raw.get("origem") or "correção documental verificada").strip(),
             "verificado_em": verificado_jogo,
@@ -1215,6 +1226,29 @@ def self_test() -> None:
     mapa = {"a": {"publico": 16772, "tipo": "presente", "fonte": "teste"}}
     n, conflitos = propagar_duplicados(resultados, mapa)
     assert n == 1 and not conflitos and mapa["b"]["publico"] == 16772
+
+    # R35: correção negativa vence a fonte legada e se mantém após
+    # consolidação offline repetida, sem ressuscitar pagantes ou URL.
+    mapa_sem_pagantes = {"401841314": {
+        "publico": 49664, "pagantes": 26944,
+        "pagantes_status": "divulgado",
+        "fonte_pagantes": "https://fonte-inadequada.example/noticia",
+        "renda": 2046742.5,
+    }}
+    correcao_sem_pagantes = {"jogos": {"401841314": {
+        "publico": 49664, "renda": 2046742.5,
+        "pagantes_status": "nao_divulgado",
+        "fonte_publico": "https://www.itatiaia.com.br/esportes/cruzeiro",
+        "fonte_renda": "https://www.itatiaia.com.br/esportes/cruzeiro",
+    }}}
+    nfix, _ = aplicar_correcoes_verificadas(mapa_sem_pagantes, correcao_sem_pagantes)
+    assert nfix > 0
+    assert mapa_sem_pagantes["401841314"]["pagantes_status"] == "nao_divulgado"
+    assert "pagantes" not in mapa_sem_pagantes["401841314"]
+    assert "fonte_pagantes" not in mapa_sem_pagantes["401841314"]
+    nfix2, _ = aplicar_correcoes_verificadas(mapa_sem_pagantes, correcao_sem_pagantes)
+    assert nfix2 == 0, "correção negativa deve ser idempotente"
+    assert "pagantes" not in mapa_sem_pagantes["401841314"]
 
     mapa_conflito = {"x": {"publico": 12345, "fonte": "antiga"}}
     mudou, conflito = _registrar_complemento(mapa_conflito, "x", 54321, "nova")
