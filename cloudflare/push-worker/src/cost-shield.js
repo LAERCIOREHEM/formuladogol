@@ -7,6 +7,35 @@ export const COST_SHIELD_POLICY = Object.freeze({
   staleAfterMs: 10 * 60_000, bootstrapGraceMs: 5 * 60_000,
   dailyRowsReadStop: 5_000_000_000, dailyRowsWrittenStop: 10_000_000
 });
+// The stale-billing emergency lane restores only essential, rate-limited sports
+// services. It DOES NOT clear the persistent latch or reactivate paid enrichment.
+// Financial/D1 threshold trips and coordinator failures are never bypassed.
+export const ESSENTIAL_SPORTS_ROUTE_POLICY = Object.freeze({
+  GET: Object.freeze([
+    '/v1/config', '/v1/preferences', '/v1/live/scoreboard',
+    '/v1/live/state', '/v1/live/summary',
+    '/v1/monitor/status', '/v1/monitor/events', '/v1/dispatch/status'
+  ]),
+  POST: Object.freeze(['/v1/subscribe', '/v1/unsubscribe']),
+  PUT: Object.freeze(['/v1/preferences'])
+});
+export function allowEssentialSportsWhileBillingStale(state) {
+  if (!state?.halted) return true;
+  if (state.reason !== 'billing_monitor_stale') return false;
+  const thresholds = [
+    ['hourlyUsd', COST_SHIELD_POLICY.hourlyStopUsd],
+    ['dailyUsd', COST_SHIELD_POLICY.dailyStopUsd],
+    ['cycleUsd', COST_SHIELD_POLICY.cycleStopUsd],
+    ['d1Read', COST_SHIELD_POLICY.dailyRowsReadStop],
+    ['d1Written', COST_SHIELD_POLICY.dailyRowsWrittenStop]
+  ];
+  return thresholds.every(([key, ceiling]) =>
+    state[key] == null || (Number.isFinite(Number(state[key])) && Number(state[key]) < ceiling));
+}
+export function essentialSportsRoute(method, path) {
+  return (ESSENTIAL_SPORTS_ROUTE_POLICY[String(method || '').toUpperCase()] || [])
+    .includes(String(path || ''));
+}
 const SHIELD_NAME = 'cloudflare-account-global-cost-shield';
 const json = (data, status=200) => new Response(JSON.stringify(data), {
   status, headers:{'content-type':'application/json','cache-control':'no-store'}

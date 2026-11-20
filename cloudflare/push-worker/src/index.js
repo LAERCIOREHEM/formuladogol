@@ -1,6 +1,6 @@
 import { buildPushPayload } from '@block65/webcrypto-web-push';
 import { PushState } from './push-state.js';
-import { CostShieldState, pollCostShield, readCostShield, getShieldStub } from './cost-shield.js';
+import { CostShieldState, pollCostShield, readCostShield, getShieldStub, allowEssentialSportsWhileBillingStale, essentialSportsRoute } from './cost-shield.js';
 import { SportsMonitor } from './sports-monitor.js';
 import { enrichSportsMonitorLiveFacts, SPORTS_MONITOR_FACTS_VERSION } from './monitor-live-facts.js';
 import { dispatchStatus, enqueueSportsEvent, handleQueueBatch } from './push-dispatch.js';
@@ -571,7 +571,12 @@ export default {
       // Billing is checked before the five-minute health lane. A latched stop
       // is never cleared by a new day, deploy or Worker restart.
       const shield = await pollCostShield(env);
-      if (shield.halted) { console.error('COST_SHIELD_HALTED:'+shield.reason); return; }
+      if (shield.halted) {
+        console.error('COST_SHIELD_HALTED:'+shield.reason);
+        // The one-minute lane alone may maintain cheap essential sports when
+        // billing is stale. Keep Health, AI and paid background lanes stopped.
+        return;
+      }
       ctx.waitUntil((async()=>{
         let status=null;
         try { const r=await monitor.fetch('https://internal/status'); if(r.ok) status=await r.json(); } catch(_) {}
@@ -581,7 +586,20 @@ export default {
     }
 
     const shield = await readCostShield(env);
-    if (shield.halted) { console.error('COST_SHIELD_HALTED:'+shield.reason); return; }
+    if (shield.halted) {
+      if (allowEssentialSportsWhileBillingStale(shield)) {
+        // Emergency sports-only wake-up; no postgame Hunter, AI, maintenance
+        // cleanup or feedback workers while billing is unverified.
+        ctx.waitUntil(monitor.fetch('https://internal/bootstrap', { method: 'POST' })
+          .then(async response => {
+            if (!response.ok) throw new Error('sports_bootstrap_http_'+response.status);
+            await response.arrayBuffer();
+          }).catch(error => console.error('essential_sports_bootstrap_failed:'+String(error?.message||error).slice(0,300))));
+      } else {
+        console.error('COST_SHIELD_HALTED:'+shield.reason);
+      }
+      return;
+    }
 
     // Lane operacional de 1 minuto. Falhas são isoladas entre si.
     // Cron vazio é aceito como fallback de desenvolvimento/manual.
@@ -599,8 +617,20 @@ export default {
   async queue(batch, env) {
     const shield = await readCostShield(env);
     if (shield.halted) {
-      // Never ACK an undelivered sporting event as successful.
-      batch.retryAll({delaySeconds:3600});
+      if (!allowEssentialSportsWhileBillingStale(shield)) {
+        // Never ACK an undelivered sporting event as successful.
+        batch.retryAll({delaySeconds:3600});
+        return;
+      }
+      // Only deliver previously verified sporting events. Technical direct
+      // tests and unknown queue work stay deferred under the billing latch.
+      const safe = [], deferred = [];
+      for (const message of batch.messages || []) {
+        const kind = String(message.body?.kind || '');
+        (kind === 'event_dispatch' || kind === 'delivery_batch' ? safe : deferred).push(message);
+      }
+      for (const message of deferred) message.retry({delaySeconds:3600});
+      if (safe.length) await handleQueueBatch({messages:safe},env);
       return;
     }
     await handleQueueBatch(batch, env);
@@ -630,9 +660,14 @@ export default {
       const response=await getShieldStub(env).fetch('https://shield.internal/reset',{method:'POST'});
       return json(request,await response.json(),response.status,{'Cache-Control':'no-store'});
     }
-    // Enforced before all dynamic routes, including /health and push registration.
+    // Monetary/D1 threshold trips remain absolute. If the ONLY reason is
+    // stale Cloudflare billing telemetry, restore essential sporting paths,
+    // never the expensive Hunter/AI, health or administrative endpoints.
     const shield = await readCostShield(env);
-    if (shield.halted) return json(request,{ok:false,error:'cost_shield_halted',reason:shield.reason},503,{'Retry-After':'3600'});
+    const essential = essentialSportsRoute(request.method, url.pathname) ||
+      request.method === 'OPTIONS';
+    if (shield.halted && !(allowEssentialSportsWhileBillingStale(shield) && essential))
+      return json(request,{ok:false,error:'cost_shield_halted',reason:shield.reason},503,{'Retry-After':'3600'});
 
     // R10R17 — MCP oficial, somente leitura e fora do caminho crítico esportivo.
     if (url.pathname === OPS_MCP_CONSTANTS.endpoint) {

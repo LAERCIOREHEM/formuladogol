@@ -27,7 +27,7 @@ import { recordPostgameFinal } from './postgame-fastlane.js';
 import { buildSportsMonitorLiveFacts, SPORTS_MONITOR_FACTS_VERSION } from './monitor-live-facts.js';
 import { resolveTrackedLiveGoalMatch, LIVE_GOAL_IDENTITY_VERSION } from './live-goal-identity.js';
 import { sendMail, mailConfig } from './mailer.js';
-import { readCostShield } from './cost-shield.js';
+import { readCostShield, allowEssentialSportsWhileBillingStale } from './cost-shield.js';
 import { countWebSearchCalls, recordAiUsage, recordProviderUsage } from './ai-usage.js';
 import { fetchOpenAiResponses, openAiUsage } from './ai-router.js';
 
@@ -974,7 +974,9 @@ export class SportsMonitor {
       let resolved = resolveScoreboardEvent(leagueEvents, { ...game, sourceEventId: watchlist[game.eventId]?.sourceEventId || game.sourceEventId });
       let aiAttempted = false;
       let aiRecovered = false;
-      if (!resolved && dueCheckpoints.length) {
+      // Never invoke paid AI to resolve an ESPN identity when spending
+      // telemetry is unavailable (or any global financial latch is active).
+      if (!resolved && dueCheckpoints.length && !(await readCostShield(this.env)).halted) {
         const ai = await this.resolveWithAi(game, dueCheckpoints[0].key);
         aiAttempted = ai.attempted;
         aiRecovered = ai.recovered;
@@ -1364,12 +1366,14 @@ export class SportsMonitor {
   async alarm() {
     // Do not let 10-second DO alarms bypass the global account breaker.
     const shield = await readCostShield(this.env);
-    if (shield.halted) return;
-    // O alarme do Durable Object já acorda a cada 10 s na janela T-20; por isso
-    // ele funciona como segunda via do T-15, independente do cron de 1 minuto.
+    if (shield.halted && !allowEssentialSportsWhileBillingStale(shield)) return;
+    // Cost telemetry outage: essential match polling and real sporting
+    // notifications continue; optional hot tests remain stopped.
     await this.emitPrematchReminders();
-    await this.pollHotEspnTest();
-    await this.pollHotMatchTest();
+    if (!shield.halted) {
+      await this.pollHotEspnTest();
+      await this.pollHotMatchTest();
+    }
     await this.pollOnce();
     await this.ensureNextAlarm();
   }
