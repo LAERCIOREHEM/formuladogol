@@ -752,7 +752,24 @@ jobs:
           }
           NODE
 
-          curl -fsS --max-time 10 'https://push.formuladogol.com.br/v1/health-monitor/status' >/tmp/fdg-health-monitor-status.json
+          # R2: after recovering from the previous R1 account-wide halt,
+          # the Health Monitor may legitimately be stale until the NEXT */5
+          # cron. Do not fail a healthy deploy before allowing that first tick.
+          # The guard still fails after a bounded grace period if truly stale.
+          for i in $(seq 1 13); do
+            curl -fsS --max-time 10 'https://push.formuladogol.com.br/v1/health-monitor/status' >/tmp/fdg-health-monitor-status.json
+            if node - <<'NODE'
+          const fs=require('node:fs');
+          const h=JSON.parse(fs.readFileSync('/tmp/fdg-health-monitor-status.json','utf8'));
+          process.exit(h.ok===true && h.scheduler?.stale===false ? 0 : 1);
+          NODE
+            then
+              echo 'Health Monitor R2: cron de cinco minutos confirmado.'
+              break
+            fi
+            echo "Aguardando cron Health Monitor após recuperação R1 (${i}/13)..."
+            if [ "$i" -lt 13 ]; then sleep 30; fi
+          done
           node <<'NODE'
           const fs = require('fs');
           const h = JSON.parse(fs.readFileSync('/tmp/fdg-health-monitor-status.json', 'utf8'));
