@@ -1087,12 +1087,12 @@
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
           "percentual_estimado": 100.0,
-          "exibicao": ">99,999%",
+          "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
-          "certeza_estrutural": false,
-          "motivo_certeza": null,
+          "certeza_estrutural": true,
+          "motivo_certeza": "Certificação combinatória: pior classificação possível 4º; confrontos diretos, pontos e vitórias respeitados em todos os cenários.",
           "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
@@ -1113,12 +1113,12 @@
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
           "percentual_estimado": 100.0,
-          "exibicao": ">99,999%",
+          "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
-          "certeza_estrutural": false,
-          "motivo_certeza": null,
+          "certeza_estrutural": true,
+          "motivo_certeza": "Certificação combinatória: pior classificação possível 4º; confrontos diretos, pontos e vitórias respeitados em todos os cenários.",
           "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
@@ -1152,12 +1152,12 @@
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
           "percentual_estimado": 100.0,
-          "exibicao": ">99,999%",
+          "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
-          "certeza_estrutural": false,
-          "motivo_certeza": null,
+          "certeza_estrutural": true,
+          "motivo_certeza": "G6 matematicamente garantido O G6 dá vaga à Libertadores pelo repasse da Copa do Brasil (final Palmeiras x Grêmio); a fase exata ainda depende do cenário.",
           "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
@@ -1165,14 +1165,14 @@
           "ocorrencias": 0,
           "simulacoes": 2000000,
           "percentual_estimado": 0.0,
-          "exibicao": "<0,001%",
+          "exibicao": "0%",
           "zero_observado": true,
-          "possivel_estruturalmente": true,
-          "impossivel_estruturalmente": false,
+          "possivel_estruturalmente": false,
+          "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": null,
-          "limite_superior_95_regra_dos_tres_pct": 0.00015
+          "motivo_impossibilidade": "G6 matematicamente garantido O G6 dá vaga à Libertadores pelo repasse da Copa do Brasil (final Palmeiras x Grêmio); a fase exata ainda depende do cenário.",
+          "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
           "ocorrencias": 0,
@@ -1184,7 +1184,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "No máximo 6º lugar pelos limites de pontuação. O modelo assegura vaga continental aos 11 primeiros (5 Libertadores-base e 6 Sul-Americana).",
+          "motivo_impossibilidade": "G6 matematicamente garantido O G6 dá vaga à Libertadores pelo repasse da Copa do Brasil (final Palmeiras x Grêmio); a fase exata ainda depende do cenário.",
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -1251,12 +1251,12 @@
             "ocorrencias": 2000000,
             "simulacoes": 2000000,
             "percentual_estimado": 100.0,
-            "exibicao": ">99,999%",
+            "exibicao": "100%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
-            "certeza_estrutural": false,
-            "motivo_certeza": null,
+            "certeza_estrutural": true,
+            "motivo_certeza": "G6 matematicamente garantido O G6 dá vaga à Libertadores pelo repasse da Copa do Brasil (final Palmeiras x Grêmio); a fase exata ainda depende do cenário.",
             "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
@@ -1375,14 +1375,14 @@
             "ocorrencias": 0,
             "simulacoes": 2000000,
             "percentual_estimado": 0.0,
-            "exibicao": "<0,001%",
+            "exibicao": "0%",
             "zero_observado": true,
-            "possivel_estruturalmente": true,
-            "impossivel_estruturalmente": false,
+            "possivel_estruturalmente": false,
+            "impossivel_estruturalmente": true,
             "certeza_estrutural": false,
             "motivo_certeza": null,
-            "motivo_impossibilidade": null,
-            "limite_superior_95_regra_dos_tres_pct": 0.00015
+            "motivo_impossibilidade": "G6 matematicamente garantido O G6 dá vaga à Libertadores pelo repasse da Copa do Brasil (final Palmeiras x Grêmio); a fase exata ainda depende do cenário.",
+            "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
             "via_brasileirao": {
@@ -1425,7 +1425,7 @@
             "impossivel_estruturalmente": true,
             "certeza_estrutural": false,
             "motivo_certeza": null,
-            "motivo_impossibilidade": "No máximo 6º lugar pelos limites de pontuação. O modelo assegura vaga continental aos 11 primeiros (5 Libertadores-base e 6 Sul-Americana).",
+            "motivo_impossibilidade": "G6 matematicamente garantido O G6 dá vaga à Libertadores pelo repasse da Copa do Brasil (final Palmeiras x Grêmio); a fase exata ainda depende do cenário.",
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "regra": "complemento exclusivo após Libertadores e Sul-Americana"
@@ -1434,7 +1434,10 @@
       "situacao_matematica": {
         "vaga_continental_garantida": true,
         "limite_posicao_pior": 6,
-        "fundamento_vaga_continental": "No máximo 6º lugar pelos limites de pontuação. O modelo assegura vaga continental aos 11 primeiros (5 Libertadores-base e 6 Sul-Americana)."
+        "fundamento_vaga_continental": "No máximo 6º lugar pelos limites de pontuação. O modelo assegura vaga continental aos 11 primeiros (5 Libertadores-base e 6 Sul-Americana).",
+        "fundamento_posicao_pior": "Limite combinatório conservador com confrontos remanescentes e vitórias.",
+        "destino_continental": "libertadores_confirmado",
+        "fundamento_continental": "G6 matematicamente garantido O G6 dá vaga à Libertadores pelo repasse da Copa do Brasil (final Palmeiras x Grêmio); a fase exata ainda depende do cenário."
       }
     },
     {
@@ -1484,12 +1487,12 @@
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
           "percentual_estimado": 100.0,
-          "exibicao": ">99,999%",
+          "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
-          "certeza_estrutural": false,
-          "motivo_certeza": null,
+          "certeza_estrutural": true,
+          "motivo_certeza": "Certificação combinatória: pior classificação possível 6º; confrontos diretos, pontos e vitórias respeitados em todos os cenários.",
           "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
@@ -1536,12 +1539,12 @@
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
           "percentual_estimado": 100.0,
-          "exibicao": ">99,999%",
+          "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
-          "certeza_estrutural": false,
-          "motivo_certeza": null,
+          "certeza_estrutural": true,
+          "motivo_certeza": "G6 matematicamente garantido O G6 dá vaga à Libertadores pelo repasse da Copa do Brasil (final Palmeiras x Grêmio); a fase exata ainda depende do cenário.",
           "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
@@ -1549,14 +1552,14 @@
           "ocorrencias": 0,
           "simulacoes": 2000000,
           "percentual_estimado": 0.0,
-          "exibicao": "<0,001%",
+          "exibicao": "0%",
           "zero_observado": true,
-          "possivel_estruturalmente": true,
-          "impossivel_estruturalmente": false,
+          "possivel_estruturalmente": false,
+          "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": null,
-          "limite_superior_95_regra_dos_tres_pct": 0.00015
+          "motivo_impossibilidade": "G6 matematicamente garantido O G6 dá vaga à Libertadores pelo repasse da Copa do Brasil (final Palmeiras x Grêmio); a fase exata ainda depende do cenário.",
+          "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
           "ocorrencias": 0,
@@ -1568,7 +1571,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "No máximo 7º lugar pelos limites de pontuação. O modelo assegura vaga continental aos 11 primeiros (5 Libertadores-base e 6 Sul-Americana).",
+          "motivo_impossibilidade": "G6 matematicamente garantido O G6 dá vaga à Libertadores pelo repasse da Copa do Brasil (final Palmeiras x Grêmio); a fase exata ainda depende do cenário.",
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -1635,12 +1638,12 @@
             "ocorrencias": 2000000,
             "simulacoes": 2000000,
             "percentual_estimado": 100.0,
-            "exibicao": ">99,999%",
+            "exibicao": "100%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
-            "certeza_estrutural": false,
-            "motivo_certeza": null,
+            "certeza_estrutural": true,
+            "motivo_certeza": "G6 matematicamente garantido O G6 dá vaga à Libertadores pelo repasse da Copa do Brasil (final Palmeiras x Grêmio); a fase exata ainda depende do cenário.",
             "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
@@ -1759,14 +1762,14 @@
             "ocorrencias": 0,
             "simulacoes": 2000000,
             "percentual_estimado": 0.0,
-            "exibicao": "<0,001%",
+            "exibicao": "0%",
             "zero_observado": true,
-            "possivel_estruturalmente": true,
-            "impossivel_estruturalmente": false,
+            "possivel_estruturalmente": false,
+            "impossivel_estruturalmente": true,
             "certeza_estrutural": false,
             "motivo_certeza": null,
-            "motivo_impossibilidade": null,
-            "limite_superior_95_regra_dos_tres_pct": 0.00015
+            "motivo_impossibilidade": "G6 matematicamente garantido O G6 dá vaga à Libertadores pelo repasse da Copa do Brasil (final Palmeiras x Grêmio); a fase exata ainda depende do cenário.",
+            "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
             "via_brasileirao": {
@@ -1809,7 +1812,7 @@
             "impossivel_estruturalmente": true,
             "certeza_estrutural": false,
             "motivo_certeza": null,
-            "motivo_impossibilidade": "No máximo 7º lugar pelos limites de pontuação. O modelo assegura vaga continental aos 11 primeiros (5 Libertadores-base e 6 Sul-Americana).",
+            "motivo_impossibilidade": "G6 matematicamente garantido O G6 dá vaga à Libertadores pelo repasse da Copa do Brasil (final Palmeiras x Grêmio); a fase exata ainda depende do cenário.",
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "regra": "complemento exclusivo após Libertadores e Sul-Americana"
@@ -1817,8 +1820,11 @@
       },
       "situacao_matematica": {
         "vaga_continental_garantida": true,
-        "limite_posicao_pior": 7,
-        "fundamento_vaga_continental": "No máximo 7º lugar pelos limites de pontuação. O modelo assegura vaga continental aos 11 primeiros (5 Libertadores-base e 6 Sul-Americana)."
+        "limite_posicao_pior": 6,
+        "fundamento_vaga_continental": "No máximo 7º lugar pelos limites de pontuação. O modelo assegura vaga continental aos 11 primeiros (5 Libertadores-base e 6 Sul-Americana).",
+        "fundamento_posicao_pior": "Limite combinatório conservador com confrontos remanescentes e vitórias.",
+        "destino_continental": "libertadores_confirmado",
+        "fundamento_continental": "G6 matematicamente garantido O G6 dá vaga à Libertadores pelo repasse da Copa do Brasil (final Palmeiras x Grêmio); a fase exata ainda depende do cenário."
       }
     },
     {
