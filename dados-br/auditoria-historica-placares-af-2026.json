@@ -5,19 +5,19 @@
   "temporada": 2026,
   "status": "auditado_com_lacunas",
   "resumo": {
-    "total_resultados_unicos": 347,
-    "jogos_com_placar_prejogo_comprovado": 165,
+    "total_resultados_unicos": 349,
+    "jogos_com_placar_prejogo_comprovado": 167,
     "jogos_sem_prova_prejogo": 182,
     "jogos_com_conflito": 0,
     "jogos_sem_inicio_factual": 0,
-    "jogos_com_top3_original": 165,
+    "jogos_com_top3_original": 167,
     "jogos_sem_top3_original": 0,
     "partidas_sem_previsao_nao_foram_reconstituidas": true
   },
   "fontes_resultados": {
     "caminho": "resultados.json",
-    "arquivo_sha256": "07845546d414081de4aa3e759ccc4e2263e031981365079bdf03815cba3dbde6",
-    "atualizado_em": "2026-11-19T00:00:56.259885-03:00"
+    "arquivo_sha256": "ff7bf2aba7fb2e3ba903f083e39709b974a7e73e25ffe3cc3635fffd4d5106b1",
+    "atualizado_em": "2026-11-19T21:51:15.718712-03:00"
   },
   "historico_ved_preexistente": {
     "caminho": "dados-br/historico-probabilidades-jogos.json",
@@ -41,14 +41,14 @@
   "varredura_git": {
     "fontes": {
       "dados-br/probabilidades-jogos.json": {
-        "commits_localizados": 150,
-        "snapshots_validos": 150,
-        "linhas_prejogo_elegiveis": 12136
+        "commits_localizados": 151,
+        "snapshots_validos": 151,
+        "linhas_prejogo_elegiveis": 12436
       },
       "dados-br/probabilidades-brasileirao.json": {
-        "commits_localizados": 279,
-        "snapshots_validos": 279,
-        "linhas_prejogo_elegiveis": 27015
+        "commits_localizados": 280,
+        "snapshots_validos": 280,
+        "linhas_prejogo_elegiveis": 27573
       }
     },
     "linhas_rejeitadas": {
@@ -13001,11 +13001,133 @@
         "versao_modelo": "AF-Previsão 1.3",
         "hash_entrada_modelo": "c884ced5c1eb61677be39d182d97025bfd1b845743bf7b3cc3d67bac980a62a6"
       }
+    },
+    {
+      "event_id": "401841308",
+      "rodada": 35,
+      "mandante": "Vasco da Gama",
+      "visitante": "Internacional",
+      "inicio_factual": "2026-11-19T22:30:00+00:00",
+      "placar_final": {
+        "mandante": 2,
+        "visitante": 1
+      },
+      "identidade_partida": "vasco da gama|internacional",
+      "ids_resultado": [
+        "401841308"
+      ],
+      "situacao": "comprovado",
+      "event_id_previsao": "401841308",
+      "previsao": {
+        "gols_esperados": {
+          "mandante": 1.5347,
+          "visitante": 1.1015
+        },
+        "placar_modal": {
+          "mandante": 1,
+          "visitante": 1
+        },
+        "probabilidades_ved_pct": {
+          "mandante": 47.2796,
+          "empate": 25.4599,
+          "visitante": 27.2604
+        }
+      },
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 12.1092
+        },
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 10.9934
+        },
+        {
+          "mandante": 2,
+          "visitante": 1,
+          "probabilidade_pct": 9.2923
+        }
+      ],
+      "top3_situacao": "nativo_documentado",
+      "proveniencia": {
+        "origem": "dados-br/probabilidades-brasileirao.json",
+        "commit": "520e9fe69a5e9a32244948c175eb99624c616c29",
+        "commit_em": "2026-11-19T02:43:38+00:00",
+        "arquivo_sha256": "6814a98b82bd29b7612b6d60ae7542e75d0d5ad47f66f176026dcecf865effde",
+        "linha_sha256": "8a645d7e3fe370d2cc1ed54e3e8bb3037cab2d1316ca37b7e9a07f76130d173d",
+        "gerado_em_modelo": "2026-11-19T02:24:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_entrada_modelo": "720502b88463fe3e93e9b56161c6451b69cb82879d0a6b8edc72cb3dc4cb1a62",
+        "calculado_em": "2026-11-19T02:43:22+00:00"
+      }
+    },
+    {
+      "event_id": "401841317",
+      "rodada": 35,
+      "mandante": "Vitória",
+      "visitante": "Bragantino",
+      "inicio_factual": "2026-11-19T22:30:00+00:00",
+      "placar_final": {
+        "mandante": 2,
+        "visitante": 1
+      },
+      "identidade_partida": "vitoria|bragantino",
+      "ids_resultado": [
+        "401841317"
+      ],
+      "situacao": "comprovado",
+      "event_id_previsao": "401841317",
+      "previsao": {
+        "gols_esperados": {
+          "mandante": 1.1591,
+          "visitante": 1.1375
+        },
+        "placar_modal": {
+          "mandante": 1,
+          "visitante": 1
+        },
+        "probabilidades_ved_pct": {
+          "mandante": 36.3391,
+          "empate": 28.3921,
+          "visitante": 35.2688
+        }
+      },
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 13.2639
+        },
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 11.6608
+        },
+        {
+          "mandante": 0,
+          "visitante": 1,
+          "probabilidade_pct": 11.443
+        }
+      ],
+      "top3_situacao": "nativo_documentado",
+      "proveniencia": {
+        "origem": "dados-br/probabilidades-brasileirao.json",
+        "commit": "520e9fe69a5e9a32244948c175eb99624c616c29",
+        "commit_em": "2026-11-19T02:43:38+00:00",
+        "arquivo_sha256": "6814a98b82bd29b7612b6d60ae7542e75d0d5ad47f66f176026dcecf865effde",
+        "linha_sha256": "c08de0a1b2a2cc12bab38f8553baf8374f73924ee3e78adb3630e50842528557",
+        "gerado_em_modelo": "2026-11-19T02:24:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_entrada_modelo": "720502b88463fe3e93e9b56161c6451b69cb82879d0a6b8edc72cb3dc4cb1a62",
+        "calculado_em": "2026-11-19T02:43:22+00:00"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "97600535ef19be018dea7df604679da48e450115d6e346b7cdd4b279e7b26288",
-    "hash_resumo": "7943b6f59d6a4968734f53fecdee945edef6bdf7dd955b2cfcb2f5928aab7af5"
+    "hash_jogos": "e9bc8799419fe329873a20122439c6aa9428353a9f70ebd15ce89d23a116617f",
+    "hash_resumo": "d94ae71d5e297d6e28f9c547f22c320326b65176adba877931fd0e9455af164a"
   }
 }
