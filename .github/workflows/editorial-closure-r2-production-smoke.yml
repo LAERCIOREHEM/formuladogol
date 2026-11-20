@@ -1,0 +1,98 @@
+name: EDITORIAL-CLOSURE R2 — Verified Delivery Smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/editorial-closure-r2-production-smoke.yml'
+  workflow_run:
+    workflows:
+      - Deploy site (GitHub Pages)
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  delivery:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Prove public article, public manifest, and analysis hub
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,datetime,urllib.request,time,re,unicodedata
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+          ROOT=Path('.')
+          rows=json.loads((ROOT/'resultados.json').read_text(encoding='utf-8')).get('resultados',[])
+          manifest=json.loads((ROOT/'dados-br/analises.json').read_text(encoding='utf-8'))
+          def name(value):
+              s=str(value.get('nome','') if isinstance(value,dict) else value or '')
+              return ''.join(c for c in unicodedata.normalize('NFD',s.lower()) if unicodedata.category(c)!='Mn')
+          def final(row):
+              if row.get('estado')!='post' or not row.get('finalizado_em'):return False
+              if row.get('placar_mandante') is None or row.get('placar_visitante') is None:return False
+              try:
+                  ended=datetime.datetime.fromisoformat(row['finalizado_em'].replace('Z','+00:00'))
+                  return ended<=datetime.datetime.now(datetime.timezone.utc)
+              except (ValueError,TypeError):return False
+          complete=[]
+          for round in (35,36,37,38):
+              games={}
+              for g in rows:
+                  if int(g.get('rodada') or 0)!=round or not final(g):continue
+                  games[(name(g.get('mandante')),name(g.get('visitante')))]=g
+              article=next((a for a in manifest.get('artigos',[])
+                 if a.get('tipo')=='brasileirao_rodada' and int(a.get('rodada') or 0)==round),None)
+              count=len(games)
+              print('R'+str(round)+': '+str(count)+'/10 FINAL, article='+str(bool(article)))
+              if count==10:
+                  assert article and int(article.get('jogos_concluidos') or 0)==10, \
+                      'R'+str(round)+' complete but article missing from main'
+                  complete.append(round)
+          if not complete:
+              print('EDITORIAL_R2_NO_COMPLETED_ROUND: skip proof')
+              raise SystemExit(0)
+          round=max(complete)
+          path=f'/analises/brasileirao-2026-rodada-{round}.html'
+          base='https://formuladogol.com.br'
+          error=''
+          for attempt in range(1,37):
+              try:
+                  def fetch(p):
+                      stamp=f'{int(time.time())}-{attempt}'
+                      request=urllib.request.Request(base+p+('?editorial_r2='+stamp),
+                          headers={'Cache-Control':'no-cache','Pragma':'no-cache',
+                              'User-Agent':'FDG-Editorial-R2-Verified-Delivery/1.0'})
+                      with urllib.request.urlopen(request,timeout=13) as response:
+                          assert response.status==200
+                          return response.read().decode('utf-8')
+                  html=fetch(path)
+                  index=fetch('/analises/')
+                  public=json.loads(fetch('/dados-br/analises.json'))
+                  public_article=next((a for a in public.get('artigos',[])
+                      if a.get('tipo')=='brasileirao_rodada' and int(a.get('rodada') or 0)==round),None)
+                  cards=html.count('class="analysis-game-card"')
+                  assert f'data-fdg-analise-rodada="{round}"' in html,'round marker not public'
+                  assert cards==10,f'not 10 matches: {cards}'
+                  assert public_article and int(public_article.get('jogos_concluidos') or 0)==10,'manifest not public'
+                  assert f'brasileirao-2026-rodada-{round}.html' in index,'analysis hub not public'
+                  print(json.dumps({
+                      'result':'EDITORIAL_CLOSURE_R2_SITE_VERIFIED',
+                      'round':round,'games_final':10,'cards':cards,
+                      'page':base+path,'manifest':'PUBLIC','hub':'PUBLIC',
+                      'check_attempt':attempt
+                  },ensure_ascii=False,indent=2))
+                  break
+              except Exception as e:
+                  error=str(e)
+                  print('EDITORIAL_R2_DELIVERY_PENDING attempt',attempt,'reason',error[:200])
+                  if attempt<36:time.sleep(10)
+          else:
+              raise SystemExit('EDITORIAL_R2_DELIVERY_FAILED: '+error)
+          PY

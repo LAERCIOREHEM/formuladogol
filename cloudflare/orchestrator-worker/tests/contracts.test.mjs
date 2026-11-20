@@ -134,7 +134,7 @@ test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', 
   assert.match(state, /transmissoes_guardian/);
   const contract = await read('cloudflare/orchestrator-worker/src/contract.js');
   assert.match(contract, /transmissionGuardian:\s*true/);
-  assert.match(contract, /version:\s*'2\.5\.0'/);
+  assert.match(contract, /version:\s*'2\.6\.0'/);
   assert.match(contract, /transmissionGuardianNeedGate:\s*true/);
   assert.match(contract, /transmissionNeedDrivenV2:\s*true/);
   assert.match(contract, /adaptiveSlowPath:\s*true/);

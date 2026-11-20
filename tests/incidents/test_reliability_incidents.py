@@ -51,7 +51,7 @@ class ReliabilityIncidentRegressionSuite(unittest.TestCase):
         contract=(ROOT/'cloudflare/orchestrator-worker/src/contract.js').read_text(encoding='utf-8')
         pkg=json.loads((ROOT/'cloudflare/orchestrator-worker/package.json').read_text(encoding='utf-8'))
         self.assertIn('__ORCHESTRATOR_VERSION__',wrangler)
-        self.assertEqual(pkg['version'], '2.5.0', 'R10R17.1 preserva o Orchestrator 2.5.0')
+        self.assertEqual(pkg['version'], '2.6.0', 'R10R17.1 preserva o Orchestrator 2.6.0')
         version = re.search(r"\bversion:\s*'([^']+)'", contract)
         self.assertIsNotNone(version, 'contract.js precisa conter uma versão explícita')
         self.assertEqual(version.group(1), pkg['version'], 'o contrato e o package.json devem coincidir')

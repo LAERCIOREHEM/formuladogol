@@ -10,14 +10,14 @@ const repo = path.resolve(here, '../../..');
 const read = (p) => readFile(path.join(repo, p), 'utf8');
 
 test('R10R16 contract.js governa versão, schema e SLOs', async () => {
-  assert.equal(ORCHESTRATOR_CONTRACT.version, '2.5.0');
+  assert.equal(ORCHESTRATOR_CONTRACT.version, '2.6.0');
   assert.equal(ORCHESTRATOR_CONTRACT.configSchemaVersion, 8);
   assert.equal(ORCHESTRATOR_CONTRACT.reliability.controlPlane, true);
   assert.equal(ORCHESTRATOR_CONTRACT.reliability.sportingIntegrityGuard, true);
   assert.equal(ORCHESTRATOR_CONTRACT.reliability.sloMinutes.finalToAf, 10);
   assert.deepEqual(ORCHESTRATOR_CONTRACT.reliability.healthStates, ['CORE_GREEN','ENRICHMENT_PENDING','DEGRADED','CRITICAL']);
   const health = orchestratorHealth('active');
-  assert.equal(health.version, '2.5.0');
+  assert.equal(health.version, '2.6.0');
   assert.equal(health.reliabilityControlPlane, true);
   assert.equal(health.sportingSnapshotIntegrityGuard, true);
   assert.equal(health.reliabilityFinalToAfSloMinutes, 10);

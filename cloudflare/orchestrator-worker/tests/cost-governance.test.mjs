@@ -7,7 +7,7 @@ import {
 
 assert.equal(COST_SHIELD_CLIENT_VERSION,2);
 const essential={optionalAllowed:false,secondaryAllowed:false,mode:'secondary_paused'};
-for (const action of ['atualizar_brasileirao','refresh_continentais']) {
+for (const action of ['atualizar_brasileirao','refresh_continentais','editorial_rodada','deploy_editorial']) {
   assert.equal(orchestratorCostDecision(action,essential).allowed,true,action);
 }
 for (const action of ['transmissao_aovivo','transmissoes_tv']) {
@@ -17,7 +17,7 @@ for (const action of ['transmissao_aovivo','transmissoes_tv']) {
   }).allowed,true,action);
 }
 for (const action of ['publicos','melhores_momentos','transmissoes_guardian',
-  'melhores_momentos_continentais','editorial_rodada','editorial_continentais']) {
+  'melhores_momentos_continentais','editorial_continentais']) {
   assert.equal(orchestratorCostDecision(action,{
     optionalAllowed:false,secondaryAllowed:true,mode:'optional_paused'
   }).allowed,false,action);

@@ -1,0 +1,108 @@
+name: EDITORIAL-CLOSURE R2 — FINAL Event Backstop
+run-name: Editorial closure · ${{ github.event_name }}
+on:
+  workflow_run:
+    workflows:
+      - AF-Previsão Fastlane pós-FINAL
+      - Atualizar Brasileirao (ESPN)
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: fdg-editorial-closure-r2-backstop
+  cancel-in-progress: false
+jobs:
+  check:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Select most recent 10/10 certified round without an article
+        id: plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          from datetime import datetime, timezone
+          import json,os,unicodedata,re
+          rows=json.loads(Path('resultados.json').read_text(encoding='utf-8')).get('resultados',[])
+          articles=json.loads(Path('dados-br/analises.json').read_text(encoding='utf-8')).get('artigos',[])
+          def team(value):
+              raw=str(value.get('nome','') if isinstance(value,dict) else value or '')
+              return re.sub(r'[^a-z0-9]+',' ',''.join(c for c in unicodedata.normalize('NFD',raw.lower()) if unicodedata.category(c)!='Mn')).strip()
+          def verified(row):
+              if row.get('estado')!='post' or not row.get('finalizado_em'):return False
+              try:
+                  stamp=datetime.fromisoformat(row['finalizado_em'].replace('Z','+00:00'))
+                  if stamp.tzinfo is None:stamp=stamp.replace(tzinfo=timezone.utc)
+                  if stamp>datetime.now(timezone.utc):return False
+                  return row.get('placar_mandante') is not None and row.get('placar_visitante') is not None
+              except (ValueError,TypeError):return False
+          closed=[]
+          for round in (35,36,37,38):
+              physical={}
+              for item in rows:
+                  if int(item.get('rodada') or 0)!=round or not verified(item):continue
+                  key=(round,team(item.get('mandante')),team(item.get('visitante')))
+                  physical[key]=item
+              count=len(physical)
+              article=next((a for a in articles if a.get('tipo')=='brasileirao_rodada' and int(a.get('rodada') or 0)==round),None)
+              print(f'R{round}: FINALs={count}/10; article_on_main={bool(article)}')
+              if count==10 and (not article or int(article.get('jogos_concluidos') or 0)<10):
+                  closed.append(round)
+          pending=max(closed,default=0)
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:
+              out.write(f'round={pending}\n')
+          if pending:print(f'EDITORIAL_R2_DISPATCH_READY=R{pending}')
+          else:print('EDITORIAL_R2_NO_ACTION: article already published on main or round incomplete')
+          PY
+      - name: Deduplicate and dispatch only the required round
+        if: steps.plan.outputs.round != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RODADA: ${{ steps.plan.outputs.round }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          python3 - <<'PY'
+          import datetime,json,os,subprocess
+          round=os.environ['RODADA']
+          data=json.loads(subprocess.check_output([
+            'gh','run','list','--workflow','publicar-analise-rodada.yml',
+            '--limit','30','--json','displayTitle,status,createdAt'
+          ],text=True))
+          now=datetime.datetime.now(datetime.timezone.utc)
+          for run in data:
+              if f'Editorial R{round} ' not in str(run.get('displayTitle') or ''):continue
+              created=datetime.datetime.fromisoformat(str(run.get('createdAt','')).replace('Z','+00:00'))
+              age=(now-created).total_seconds()/60
+              if age<12 and str(run.get('status')) in ('queued','in_progress','waiting','pending','completed'):
+                  print(f'EDITORIAL_R2_DEDUP: R{round}, previous run age {age:.1f} min')
+                  raise SystemExit(11)
+          PY
+          STATUS=$?
+          set -e
+          if [[ "$STATUS" == 11 ]]; then exit 0; fi
+          if [[ "$STATUS" != 0 ]]; then exit "$STATUS"; fi
+          # No system billing API = no invented USD. Ask shield only to decide
+          # if paid prose is optional; deterministic article always allowed.
+          USE_AI=false
+          if curl -fsS --max-time 5 https://push.formuladogol.com.br/v1/cost-shield/status \
+              -o /tmp/closure-cost.json; then
+            USE_AI="$(python3 - <<'PY'
+          import json
+          s=json.load(open('/tmp/closure-cost.json'))
+          print('true' if s.get('optionalAllowed') is True else 'false')
+          PY
+          )"
+          fi
+          gh workflow run publicar-analise-rodada.yml --ref main \
+            -f rodada="$RODADA" -f usar_ia="$USE_AI"
+          echo "EDITORIAL_R2_BACKSTOP_DISPATCHED=R$RODADA useAI=$USE_AI"
