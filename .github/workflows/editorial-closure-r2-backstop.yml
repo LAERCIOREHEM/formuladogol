@@ -1,6 +1,10 @@
 name: EDITORIAL-CLOSURE R2 — FINAL Event Backstop
 run-name: Editorial closure · ${{ github.event_name }}
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/editorial-closure-r2-backstop.yml'
   workflow_run:
     workflows:
       - AF-Previsão Fastlane pós-FINAL
