@@ -31,7 +31,7 @@ import {
 import { activeWriter, dispatchSpec, dispatchWorkflow } from './github.js';
 import { orchestratorCostDecision } from './cost-governance.js';
 import { ORCHESTRATOR_CONTRACT, correlationIdForEvent } from './contract.js';
-import { editorialClosureDecision, eligibleRoundFromAgenda } from './editorial-closure.js';
+import { editorialClosureDecision, eligibleRoundFromAgenda, mergeHistoricalFinals, upcomingEditorialRounds, verifyEditorialDelivery } from './editorial-closure.js';
 import { fetchPostgameFastlane, fetchSiteBundle, probeEspn, probeEspnAvailability, repositoryFallbacks } from './sources.js';
 
 // O Worker acorda a cada 5 minutos. O caminho rápido continua compacto:
@@ -355,6 +355,8 @@ export class OrchestratorState {
 
     const writer = await activeWriter(this.env, {
       urgentFinal: candidate?.action === 'atualizar_brasileirao',
+      urgentEditorial: candidate?.action === 'editorial_rodada',
+      urgentDeploy: candidate?.action === 'deploy_editorial',
     });
     if (writer) {
       return {
@@ -367,6 +369,16 @@ export class OrchestratorState {
     const spec = dispatchSpec(candidate);
     await dispatchWorkflow(this.env, spec.workflow, spec.inputs);
     await this.notePostgameDispatch(candidate, now);
+    if(candidate.action==='deploy_editorial'){
+      const key='editorial:delivery:'+candidate.round;
+      const previous=(await this.state.storage.get(key))||{};
+      const first=Date.parse(previous.firstAttemptAt||'');
+      const sameDay=Number.isFinite(first)&&now.getTime()-first<24*3_600_000;
+      await this.state.storage.put(key,{
+        firstAttemptAt:sameDay?previous.firstAttemptAt:now.toISOString(),
+        lastAttemptAt:now.toISOString(),attempts:(sameDay?Number(previous.attempts||0):0)+1
+      });
+    }
     const updates = { [retry.key]: now.toISOString() };
     for (const [key, value] of Object.entries(candidate.stateUpdates || {})) updates[key] = value;
     await Promise.all(Object.entries(updates).map(([key, value]) => this.state.storage.put(key, value)));
@@ -421,73 +433,100 @@ export class OrchestratorState {
   }
 
   async editorialClosureGuard(games, now) {
-    // Cheap pre-gate: só consulta manifesto/config quando a agenda canônica já
-    // demonstra que alguma rodada pode estar editorialmente fechada.
-    const preliminary = eligibleRoundFromAgenda(games, now);
-    if (!preliminary) return { candidate: null, hint: { state: 'idle', slaMinutes: 15 } };
-
-    const cachedResolved = (await this.state.storage.get('editorial:closure:lastResolved')) || {};
-    if (Number(cachedResolved.round || 0) === preliminary.round && Number(cachedResolved.completed || 0) >= preliminary.completed) {
-      return {
-        candidate: null,
-        hint: { ...preliminary, state: 'resolved_cached', eligible: true, slaMinutes: 15, priority: 'closure-guarantee' },
-      };
-    }
-
-    const bundle = await fetchSiteBundle(this.env, EDITORIAL_CLOSURE_PATHS);
-    const errors = bundleErrors(bundle);
-    if (!bundleReady(bundle, EDITORIAL_CLOSURE_PATHS)) {
-      return {
-        candidate: null,
-        errors,
-        hint: {
-          state: 'degraded', round: preliminary.round, completed: preliminary.completed,
-          pending: preliminary.pending, slaMinutes: 15,
-          reason: 'manifesto/config editorial indisponível; fail closed',
-        },
-      };
-    }
-
-    const analyses = data(bundle, 'dados-br/analises.json', { artigos: [] });
-    const config = data(bundle, 'dados-br/config-analises.json', {});
-    const decision = editorialClosureDecision(games, analyses, now, config);
-    if (!decision.eligible) return { candidate: null, errors, hint: { ...decision, slaMinutes: 15 } };
-
-    const firstKey = `editorial:closure:${decision.round}:firstEligibleAt`;
-    let firstEligibleAt = await this.storageDate(firstKey);
-    if (!firstEligibleAt) {
-      firstEligibleAt = now;
-      await this.state.storage.put(firstKey, now.toISOString());
-    }
-    const ageMinutes = minutesBetween(firstEligibleAt, now);
-    const overdue = ageMinutes >= 15 && decision.state !== 'resolved';
-
-    const hint = {
-      ...decision,
-      firstEligibleAt: firstEligibleAt.toISOString(),
-      ageMinutes: Math.round(ageMinutes * 10) / 10,
-      slaMinutes: 15,
-      overdue,
-      priority: 'closure-guarantee',
+    // R2: the upcoming agenda deliberately drops completed rounds. Read the
+    // FINAL repository snapshot every 5 minutes (a single static GET) and
+    // overlay it by physical match, without inference from clock time alone.
+    const finalBundle=await fetchSiteBundle(this.env,['resultados.json']);
+    const errors=bundleErrors(finalBundle);
+    if(!bundleReady(finalBundle,['resultados.json']))return {
+      candidate:null,errors,hint:{state:'degraded',priority:'final-driven',
+        reason:'canonical FINAL history unavailable; no speculative closing',slaMinutes:15}
     };
+    const historical=data(finalBundle,'resultados.json',{resultados:[]});
+    const merged=mergeHistoricalFinals(games,historical,now);
+    const future=upcomingEditorialRounds(merged,now);
+    const preliminary=eligibleRoundFromAgenda(merged,now);
+    if(!preliminary)return {candidate:null,errors,hint:{
+      state:'armed',priority:'final-driven',slaMinutes:15,futureRounds:future,
+      reason:'waiting for officially certified 10/10 FINAL (or justified postponement)'
+    }};
 
-    if (decision.state === 'resolved') {
-      await this.state.storage.put('editorial:closure:lastResolved', { round: decision.round, completed: decision.completed, articleId: decision.articleId || '', resolvedAt: now.toISOString() });
-      return { candidate: null, errors, hint };
+    const cached=(await this.state.storage.get('editorial:closure:lastResolved'))||{};
+    const recentlyVerified=Number(cached.version)===2&&cached.siteVerified===true&&
+      Number(cached.round)===preliminary.round&&Number(cached.completed)>=preliminary.completed&&
+      (now.getTime()-Date.parse(cached.verifiedAt||'')<30*60_000);
+    if(recentlyVerified)return {candidate:null,errors,hint:{
+      ...preliminary,state:'site_verified_cached',eligible:true,siteVerified:true,
+      verifiedAt:cached.verifiedAt,priority:'final-driven',slaMinutes:15,futureRounds:future
+    }};
+
+    const bundle=await fetchSiteBundle(this.env,EDITORIAL_CLOSURE_PATHS);
+    errors.push(...bundleErrors(bundle));
+    if(!bundleReady(bundle,EDITORIAL_CLOSURE_PATHS))return {
+      candidate:null,errors,hint:{...preliminary,state:'degraded',
+        priority:'final-driven',reason:'editorial manifest/config unavailable',
+        slaMinutes:15,futureRounds:future}
+    };
+    const analyses=data(bundle,'dados-br/analises.json',{artigos:[]});
+    const config=data(bundle,'dados-br/config-analises.json',{});
+    const decision=editorialClosureDecision(merged,analyses,now,config);
+    if(!decision.eligible)return {candidate:null,errors,hint:{...decision,
+      priority:'final-driven',slaMinutes:15,futureRounds:future}};
+    const firstKey='editorial:closure:'+decision.round+':firstEligibleAt';
+    let firstEligibleAt=await this.storageDate(firstKey);
+    if(!firstEligibleAt){
+      const lastFinal=decision.lastFinalAt?new Date(decision.lastFinalAt):now;
+      firstEligibleAt=lastFinal.getTime()<=now.getTime()?lastFinal:now;
+      await this.state.storage.put(firstKey,firstEligibleAt.toISOString());
+    }
+    const ageMinutes=minutesBetween(firstEligibleAt,now);
+    const hint={...decision,priority:'final-driven',slaMinutes:15,
+      firstEligibleAt:firstEligibleAt.toISOString(),ageMinutes:Math.round(ageMinutes*10)/10,
+      overdue:ageMinutes>=15,alertDue:ageMinutes>=30,
+      futureRounds:future};
+
+    if(decision.state==='resolved'){
+      const live=await verifyEditorialDelivery(this.env,decision.round,decision.completed,now);
+      hint.delivery=live;
+      if(live.ok){
+        await this.state.storage.put('editorial:closure:lastResolved',{
+          version:2,siteVerified:true,round:decision.round,completed:decision.completed,
+          articleId:decision.articleId||'',verifiedAt:now.toISOString()
+        });
+        return {candidate:null,errors,hint:{...hint,state:'site_verified',
+          siteVerified:true,verifiedAt:now.toISOString()}};
+      }
+      // Never pay for or regenerate an article already present on main:
+      // recover the Pages delivery stage only.
+      const recoveryKey='editorial:delivery:'+decision.round;
+      const stored=(await this.state.storage.get(recoveryKey))||{};
+      const first=Date.parse(stored.firstAttemptAt||'');
+      const withinDay=Number.isFinite(first)&&now.getTime()-first<24*3_600_000;
+      const attempts=withinDay?Number(stored.attempts||0):0;
+      hint.deliveryRecoveries=attempts;
+      if(attempts>=4){
+        hint.state='delivery_manual_attention';
+        hint.reason='site still missing after 4 bounded automated deploy attempts in 24h';
+        console.error('FDG_EDITORIAL_R2_DELIVERY_ALERT:'+JSON.stringify({
+          round:decision.round,attempts,reason:live.reason,ageMinutes:hint.ageMinutes}));
+        return {candidate:null,errors,hint};
+      }
+      return {errors,hint:{...hint,state:'delivery_pending',siteVerified:false},
+        candidate:{
+          action:'deploy_editorial',round:decision.round,
+          reason:'R'+decision.round+' saved to main but not public ('+live.reason+'); redeploy Pages without AI',
+          editorialClosureGuarantee:true,retryMinutes:10,deliveryRecovery:true,
+          stateUpdates:{['editorial:closure:'+decision.round+':lastRecoveryAt']:now.toISOString()}
+        }};
     }
 
-    return {
-      errors,
-      hint,
-      candidate: {
-        action: 'editorial_rodada',
-        round: decision.round,
-        reason: `EDITORIAL CLOSURE GUARANTEE: rodada ${decision.round} elegível (${decision.reason}), editorial ausente; prioridade até publicação.`,
-        retryMinutes: 5,
-        editorialClosureGuarantee: true,
-        stateUpdates: { [`editorial:closure:${decision.round}:lastDispatchAt`]: now.toISOString() },
-      },
-    };
+    return {errors,hint:{...hint,state:'generation_pending',siteVerified:false},candidate:{
+      action:'editorial_rodada',round:decision.round,
+      reason:'EDITORIAL CLOSURE R2: R'+decision.round+' '+decision.completed+
+        '/10 certified FINAL, no article on main. Generate factual editorial immediately.',
+      editorialClosureGuarantee:true,retryMinutes:5,
+      stateUpdates:{['editorial:closure:'+decision.round+':lastDispatchAt']:now.toISOString()}
+    }};
   }
 
   async tick(governance={}) {
@@ -586,6 +625,8 @@ export class OrchestratorState {
         errors.push(...(closure.errors || []));
         hints.editorialClosure = closure.hint;
         candidate = closure.candidate || null;
+        if(candidate?.action==='editorial_rodada')
+          candidate.useAI=governance.optionalAllowed!==false;
       }
 
       if (!candidate) {

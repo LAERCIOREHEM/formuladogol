@@ -1,4 +1,5 @@
 name: Publicar análise editorial da rodada
+run-name: Editorial R${{ inputs.rodada || 'auto' }} · ${{ github.event_name }}
 
 on:
   # R10R23: publica a primeira matéria após o fechamento esportivo.
@@ -15,6 +16,11 @@ on:
         description: 'Rodada específica (vazio = detectar automaticamente)'
         required: false
         type: string
+      usar_ia:
+        description: 'Permitir redação por IA se o orçamento operacional permitir'
+        required: false
+        default: true
+        type: boolean
       forcar:
         description: 'Publicar mesmo fora da janela editorial'
         required: false
@@ -26,7 +32,9 @@ permissions:
   actions: write
 
 concurrency:
-  group: repo-write-main
+  # R2: never queue editorial behind a 45-minute ESPN full collector.
+  # Publication uses optimistic git rebase/push retries on main.
+  group: fdg-editorial-r2-${{ inputs.rodada || 'auto' }}
   cancel-in-progress: false
   queue: max
 
@@ -80,7 +88,7 @@ jobs:
           sys.path.insert(0, str(Path('scripts').resolve()))
           from gerar_analise_rodada import agora_br, carregar_json, estado_rodada, ARQUIVO_CONFIG
 
-          requested = str(os.environ.get('RODADA') or '').strip()
+          requested = str(os.environ.get('RODADA') or '').strip().replace('\\n','').replace('\\r','')
           if requested:
               round_number = int(requested)
               if not 1 <= round_number <= 38:
@@ -126,6 +134,7 @@ jobs:
         env:
           RODADA: ${{ inputs.rodada }}
           FORCAR: ${{ inputs.forcar }}
+          USAR_IA: ${{ inputs.usar_ia }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FDG_AI_GATEWAY_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           FDG_AI_GATEWAY_ID: ${{ vars.FDG_AI_GATEWAY_ID || 'default' }}
@@ -135,7 +144,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          args=(--usar-ia)
+          # IA is optional; factual editorial and delivery remain essential
+          # under COST-SHIELD R2. No paid request when optional work is paused.
+          args=()
+          if [[ "${USAR_IA:-true}" != "false" ]]; then args+=(--usar-ia); else args+=(--sem-ia); fi
           if [[ -n "${RODADA:-}" ]]; then args+=(--rodada "$RODADA"); fi
           if [[ "${FORCAR:-false}" == "true" ]]; then args+=(--forcar); fi
           python scripts/gerar_analise_rodada.py "${args[@]}"

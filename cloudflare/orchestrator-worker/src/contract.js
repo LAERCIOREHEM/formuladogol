@@ -4,7 +4,7 @@
 // metadados e são bloqueadas por testes de drift.
 export const ORCHESTRATOR_CONTRACT = Object.freeze({
   service: 'formula-do-gol-orchestrator',
-  version: '2.5.0',
+  version: '2.6.0',
   configSchemaVersion: 8,
   cron: '*/5 * * * *',
   reliability: Object.freeze({
@@ -76,7 +76,12 @@ export const ORCHESTRATOR_CONTRACT = Object.freeze({
     afPostFinalFastlaneWorkflow: 'af-previsao-fastlane-pos-final.yml',
     afPostFinalFullReconciliationQueued: true,
     editorialClosureGuarantee: true,
-    editorialClosureGuaranteeVersion: 1,
+    editorialClosureGuaranteeVersion: 2,
+    editorialClosureFinalDriven: true,
+    editorialClosureRepositoryFinalSource: true,
+    editorialClosurePublicSiteProof: true,
+    editorialClosureRecoveryWithoutAi: true,
+    editorialClosureNextRoundsArmed: [36,37,38],
     editorialClosureSlaMinutes: 15,
     editorialClosureCronMinutes: 5,
     editorialClosurePriority: 'after-final-before-enrichment',

@@ -35,7 +35,7 @@ function headers(env) {
   };
 }
 
-export async function activeWriter(env, { urgentFinal = false } = {}) {
+export async function activeWriter(env, { urgentFinal = false, urgentEditorial = false, urgentDeploy = false } = {}) {
   const { owner, repo } = repoParts(env);
   const branch = encodeURIComponent(String(env.GITHUB_BRANCH || 'main'));
   const url = `https://api.github.com/repos/${owner}/${repo}/actions/runs?branch=${branch}&per_page=50`;
@@ -45,7 +45,13 @@ export async function activeWriter(env, { urgentFinal = false } = {}) {
   // O FINAL é prioritário: coleta completa ESPN (até 45 min), editorial e
   // deploy Pages não podem impedir o disparo do Fastlane. O próprio
   // workflow Fastlane serializa sua escrita via repo-write-main.
-  const names = urgentFinal ? new Set(['AF-Previsão Fastlane pós-FINAL']) : WRITER_NAMES;
+  const names = urgentFinal ? new Set(['AF-Previsão Fastlane pós-FINAL'])
+    : urgentEditorial ? new Set(['Publicar análise editorial da rodada'])
+    : urgentDeploy ? new Set(['Deploy site (GitHub Pages)','Publicar análise editorial da rodada'])
+    : WRITER_NAMES;
+  // A closed round cannot wait 45 minutes for unrelated ESPN enrichment.
+  // Editorial writes use optimistic Git retries and a dedicated concurrency
+  // group; only the SAME editorial or delivery run blocks urgent dispatch.
   return (payload?.workflow_runs || []).find((run) => names.has(String(run?.name || '')) &&
     ['queued', 'in_progress', 'waiting', 'pending', 'requested'].includes(String(run?.status || ''))) || null;
 }
@@ -109,7 +115,13 @@ export function dispatchSpec(decision) {
     case 'editorial_continentais':
       return { workflow: 'publicar-analise-continentais.yml', inputs: {} };
     case 'editorial_rodada':
-      return { workflow: 'publicar-analise-rodada.yml', inputs: { rodada: String(decision.round || '') } };
+      return { workflow:'publicar-analise-rodada.yml', inputs:{
+        rodada:String(decision.round||''),usar_ia:decision.useAI===false?'false':'true'
+      } };
+    case 'deploy_editorial':
+      // Repository artifact already exists. Retry delivery ONLY, never
+      // re-run the paid AI generation to solve a GitHub Pages failure.
+      return {workflow:'deploy.yml',inputs:{}};
     default:
       throw new Error(`ação sem workflow: ${decision?.action || 'none'}`);
   }
