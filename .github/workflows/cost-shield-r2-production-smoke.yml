@@ -57,8 +57,12 @@ jobs:
           assert isinstance(shield.get('providerUsage'),dict)
           monitor=get(PUSH+'/v1/monitor/status')
           dispatch=get(PUSH+'/v1/dispatch/status')
+          health=get(PUSH+'/v1/health-monitor/status')
           assert monitor.get('ok') is True and monitor.get('lastBootstrapAt',0)>0
           assert dispatch.get('ok') is True
+          assert health.get('ok') is True
+          print('Health scheduler:',json.dumps(health.get('scheduler',{}),ensure_ascii=False))
+          assert health.get('scheduler',{}).get('stale') is False, 'Health Cron remains stale after R2 deployment'
           assert isinstance(dispatch.get('activeSubscriptions'),int)
           # The scores endpoint is read-only, independent of costly search
           # probes, and may legitimately contain no games on a quiet date.
@@ -75,6 +79,7 @@ jobs:
               'monitor':{k:monitor.get(k) for k in ('ok','watchCount','activeGames',
                   'lastBootstrapAt','lastPollAt','lastPollError')},
               'dispatch':{k:dispatch.get(k) for k in ('activeSubscriptions','pendingEvents','deliveries')},
+              'healthScheduler':health.get('scheduler',{}),
               'orchestrator':{k:orch.get(k) for k in ('ok','mode','costShieldMode','lastTickAt','result')},
               'scoreboard':{'date':day,'events':len(live['data']['events']),'source':live.get('source')}
           },ensure_ascii=False,indent=2))
