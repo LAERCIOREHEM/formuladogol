@@ -48,7 +48,7 @@ jobs:
               'monitor': {**{k:monitor.get(k) for k in ('ok','watchCount','matchCount','lastBootstrapAt','lastPollAt','lastPollCompletedAt','activeGames','lastPollError','lastAgendaError','espnPollingSuppressed','scoreboardSources','sourceAttempts')}, 'trackedMatchStates':{x:tracked.get(x) for x in sorted(required)}}, 'agendaToday':agenda_today,
               'live': {'ok':live.get('ok'),'source':live.get('source'),'stale':live.get('stale'),
                        'fetchAt':live.get('fetchedAt'),'eventCount':len(live.get('data',{}).get('events',[])),
-                       'expectedEventIdsPresent':sorted(ids.intersection(required)), 'games':game_rows},
+                       'expectedEventIdsPresent':sorted(ids.intersection(required)), 'gameSources':{id:live.get('selectedSources',{}).get(id) for id in sorted(required)}, 'sourceAttempts':live.get('attempts'), 'games':game_rows},
           }
           print(json.dumps(diagnostics,indent=2,ensure_ascii=False))
           assert live.get('ok') is True and required.issubset(ids), 'Live ESPN scoreboard sem ambas as partidas'
