@@ -22,11 +22,15 @@ jobs:
           curl -fsS --retry 3 --retry-delay 3 --max-time 12 "$BASE/v1/cost-shield/status" -o /tmp/fdg-shield.json
           curl -fsS --retry 3 --retry-delay 3 --max-time 15 "$BASE/v1/monitor/status" -o /tmp/fdg-monitor.json
           curl -fsS --retry 3 --retry-delay 3 --max-time 20 "$BASE/v1/live/state?league=bra.1&dates=20261119&fresh=1" -o /tmp/fdg-live.json
+          curl -fsS --retry 3 --retry-delay 3 --max-time 12 "https://formuladogol.com.br/dados-br/agenda-clubes-br.json" -o /tmp/fdg-agenda.json
           python3 - <<'PY'
           import json
           shield=json.load(open('/tmp/fdg-shield.json'))
           monitor=json.load(open('/tmp/fdg-monitor.json'))
           live=json.load(open('/tmp/fdg-live.json'))
+          agenda=json.load(open('/tmp/fdg-agenda.json'))
+          agenda_today=[{'id':str(row.get('event_id')),'kickoff':row.get('data_iso')}
+                      for row in agenda.get('jogos',[]) if str(row.get('data_iso','')).startswith('2026-11-19')]
           ids={str(x.get('id','')) for x in live.get('data',{}).get('events',[])}
           required={'401841308','401841317'}
           game_rows=[
@@ -41,7 +45,7 @@ jobs:
                     if g.get('status',{}).get('type',{}).get('state')=='in']
           diagnostics={
               'shield': {k:shield.get(k) for k in ('version','halted','reason','lastCheckedAt','lastSuccessAt')},
-              'monitor': {**{k:monitor.get(k) for k in ('ok','watchCount','lastBootstrapAt','lastPollAt','activeGames','lastPollError')}, 'trackedMatchStates':{x:tracked.get(x) for x in sorted(required)}},
+              'monitor': {**{k:monitor.get(k) for k in ('ok','watchCount','matchCount','lastBootstrapAt','lastPollAt','lastPollCompletedAt','activeGames','lastPollError','lastAgendaError','espnPollingSuppressed','scoreboardSources','sourceAttempts')}, 'trackedMatchStates':{x:tracked.get(x) for x in sorted(required)}}, 'agendaToday':agenda_today,
               'live': {'ok':live.get('ok'),'source':live.get('source'),'stale':live.get('stale'),
                        'fetchAt':live.get('fetchedAt'),'eventCount':len(live.get('data',{}).get('events',[])),
                        'expectedEventIdsPresent':sorted(ids.intersection(required)), 'games':game_rows},
