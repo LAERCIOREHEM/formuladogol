@@ -2,30 +2,23 @@
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
   "jogos_finalizados": 350,
-  "jogos_com_publico": 349,
-  "jogos_sem_publico": 1,
-  "publico_total": 8733614,
-  "jogos_com_renda": 349,
-  "aguardando_fonte": [
-    {
-      "event_id": "401841309",
-      "mandante": "São Paulo",
-      "visitante": "Fluminense",
-      "estado": "AGUARDANDO_FONTE"
-    }
-  ],
+  "jogos_com_publico": 350,
+  "jogos_sem_publico": 0,
+  "publico_total": 8758117,
+  "jogos_com_renda": 350,
+  "aguardando_fonte": [],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
     {
       "event_id": "401841309",
-      "tipo_publico": "",
-      "publico_presente": null,
+      "tipo_publico": "presente",
+      "publico_presente": 24503,
       "publico_pagante": null,
-      "renda": null,
-      "fonte_publico": "",
-      "origem": "",
-      "estado": "AGUARDANDO_FONTE"
+      "renda": 854515.0,
+      "fonte_publico": "https://ge.globo.com/gato-mestre/noticia/2026/11/19/flamengo-2-x-1-athletico-pr-tem-o-maior-publico-da-35a-rodada-do-brasileiro-veja-a-lista.ghtml",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
     },
     {
       "event_id": "401841308",
@@ -3518,5 +3511,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-11-19T23:52:44.510735-03:00"
+  "gerado_em": "2026-11-20T00:01:35.906059-03:00"
 }
