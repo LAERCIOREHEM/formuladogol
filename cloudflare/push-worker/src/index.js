@@ -878,7 +878,7 @@ export default {
           ? singletonMonitor(env).fetch(`https://internal/live-facts?event=${encodeURIComponent(eventId)}&league=${encodeURIComponent(league)}`).catch(() => null)
           : Promise.resolve(null);
         const resultPromise = isEspnEvent ? resolveLiveSummary(url, {
-          apiFootballKey: env.API_FOOTBALL_KEY,
+          apiFootballKey: shield.halted ? undefined : env.API_FOOTBALL_KEY,
           statsStore: createLiveStatsStore(env.DB)
         }) : Promise.resolve({ status: 404, body: { ok: false, error: 'documentary_match_not_tracked' } });
         const [result, monitorResponse] = await Promise.all([resultPromise, monitorPromise]);

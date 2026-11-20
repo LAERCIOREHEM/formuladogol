@@ -62,6 +62,10 @@ export function shouldRetryMissingScorers(previous, observation, missing, now = 
   return now - num(previous?.lastScorerRecoveryAt, 0) >= SCORER_RECOVERY_INTERVAL_MS;
 }
 const LIVE_POLL_LATE_START_MS = 45 * 60_000;
+// Incident recovery: if a global shield/outage prevents seeing kickoff, use
+// the existing one-minute maintenance cron to rediscover matches for 3h.
+// We DO NOT arm 10-second DO alarms until ESPN actually confirms LIVE.
+const LIVE_LATE_DISCOVERY_MS = 3 * 60 * 60_000;
 const LIVE_POLICY_VERSION = '6-R10';
 const READINESS_LIFECYCLE_POLICY_VERSION = '6-R10.3';
 const ESSENTIAL_EVENT_TYPES = new Set(['prematch_15', 'goal', 'goal_overturned', 'red_card', 'lineup_confirmed', 'match_start', 'final_whistle']);
@@ -343,7 +347,7 @@ export function promoteObservationFromPlays(observation, plays, previousMatch = 
   };
 }
 
-function shouldPollGame(entry, match, now) {
+export function shouldPollGame(entry, match, now) {
   if (match?.state === 'in') return true;
   // O gol pode estar confirmado no placar, mas sem autoria. Continue
   // consultando durante a retenção pós-FINAL, sem reemitir o evento.
@@ -356,7 +360,14 @@ function shouldPollGame(entry, match, now) {
   const kickoff = Date.parse(entry?.kickoff || match?.kickoff || '');
   if (!Number.isFinite(kickoff)) return false;
   const remaining = kickoff - now;
-  return remaining <= LIVE_POLL_PRE_MS && remaining >= -LIVE_POLL_LATE_START_MS;
+  if (remaining <= LIVE_POLL_PRE_MS && remaining >= -LIVE_POLL_LATE_START_MS) return true;
+  // Once first kickoff passed, ordinary pre-match checks stop at T+45.
+  // During outage recovery, however, ESPN may still be LIVE at T+90:
+  // a single minute-cadence probe is needed to re-establish the baseline.
+  // FINAL fixtures and events older than 3h never enter this recovery lane.
+  return remaining < -LIVE_POLL_LATE_START_MS &&
+    remaining >= -LIVE_LATE_DISCOVERY_MS &&
+    match?.state !== 'post' && entry?.lastState !== 'post';
 }
 
 function activeWatchEntry(entry, now) {

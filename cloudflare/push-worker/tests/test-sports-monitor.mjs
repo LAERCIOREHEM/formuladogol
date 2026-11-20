@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { SportsMonitor, promoteObservationFromPlays } from '../src/sports-monitor.js';
+import { SportsMonitor, promoteObservationFromPlays, shouldPollGame } from '../src/sports-monitor.js';
 import { buildHotEspnTestEvent, detectHotEspnMutation, hotEspnSnapshot } from '../src/hot-espn-test.js';
 import { buildHotMatchPrematchEvent, hotMatchPrematchDue, hotMatchTargetEvent, markHotMatchTechnicalEvent } from '../src/hot-match-test.js';
 
@@ -53,6 +53,14 @@ const realNow = Date.now;
 const realFetch = globalThis.fetch;
 let now = Date.parse('2026-09-02T00:05:00Z');
 Date.now = () => now;
+// Outage recovery must discover an already-running event after T+45,
+// but never turn late recovery into endless historical ESPN polling.
+const lateKickoff = new Date(now - 90*60_000).toISOString();
+assert.equal(shouldPollGame({kickoff:lateKickoff},{state:'pre',initialized:true},now),true);
+assert.equal(shouldPollGame({kickoff:lateKickoff},null,now),true);
+assert.equal(shouldPollGame({kickoff:lateKickoff},{state:'post'},now),false);
+assert.equal(shouldPollGame({kickoff:lateKickoff,lastState:'post'},null,now),false);
+assert.equal(shouldPollGame({kickoff:new Date(now-190*60_000).toISOString()},null,now),false);
 let phase = 'zero';
 const eventId = '401909112';
 const kickoff = '2026-09-01T21:00:00-03:00';
