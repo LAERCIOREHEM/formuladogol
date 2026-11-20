@@ -3977,25 +3977,26 @@ function toggleBolaoProjection(chave) {
 async function carregarMetasObjetivosTabela({ silencioso = false } = {}) {
   try {
     const stamp = Date.now();
-    const [rProb, rPts, rCopa, rLib, rSula] = await Promise.all([
+    // R35-R1: Pages publishes a verified compact snapshot, not raw private AF
+    // continental files. All three cup branches share the same response.
+    const [rProb, rPts, rVagas] = await Promise.all([
       fetch('dados-br/probabilidades-brasileirao.json?t=' + stamp, { cache: 'no-store' }),
       fetch('dados-br/probabilidades-por-pontuacao.json?t=' + stamp, { cache: 'no-store' }),
-      fetch('dados-br/competicoes-af-previsao/copa-do-brasil.json?t=' + stamp, { cache: 'no-store' }),
-      fetch('dados-br/competicoes-af-previsao/libertadores.json?t=' + stamp, { cache: 'no-store' }),
-      fetch('dados-br/competicoes-af-previsao/sul-americana.json?t=' + stamp, { cache: 'no-store' })
+      fetch('dados-br/vagas-libertadores-2027.json?t=' + stamp, { cache: 'no-store' })
     ]);
     if (!rProb.ok) throw new Error('probabilidades-brasileirao HTTP ' + rProb.status);
     if (!rPts.ok) throw new Error('probabilidades-por-pontuacao HTTP ' + rPts.status);
-    const [prob, pts, copa, libertadores, sulamericana] = await Promise.all([
-      rProb.json(), rPts.json(),
-      rCopa.ok ? rCopa.json() : Promise.resolve(null),
-      rLib.ok ? rLib.json() : Promise.resolve(null),
-      rSula.ok ? rSula.json() : Promise.resolve(null)
+    if (!rVagas.ok) throw new Error('vagas-libertadores-2027 HTTP ' + rVagas.status);
+    const [prob, pts, vagasSnapshot] = await Promise.all([
+      rProb.json(), rPts.json(), rVagas.json()
     ]);
+    if (vagasSnapshot?.schema_version !== 1 || !vagasSnapshot.copa || !vagasSnapshot.libertadores || !vagasSnapshot.sulamericana) {
+      throw new Error('vagas-libertadores-2027 inválido');
+    }
     if (!prob || prob.status !== 'ok' || !Array.isArray(prob.clubes)) throw new Error('probabilidades-brasileirao inválido');
     if (!pts || pts.status !== 'ok' || !Array.isArray(pts.niveis)) throw new Error('probabilidades-por-pontuacao inválido');
     state.probabilidadesBrasileirao = prob;
-    state.vagasLibertadores2027 = { copa, libertadores, sulamericana };
+    state.vagasLibertadores2027 = vagasSnapshot;
     state.probabilidadesPorPontuacao = pts;
     state.metasObjetivosErro = null;
   } catch (e) {

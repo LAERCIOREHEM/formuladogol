@@ -312,6 +312,19 @@ jobs:
           print('AF E4: painel historicamente certificado e consistente com E3')
           PY
 
+      - name: R35-R1 — Gerar zonas dinâmicas públicas da Libertadores
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/gerar_status_vagas_libertadores.py --self-test
+          python scripts/gerar_status_vagas_libertadores.py
+          python - <<'PY'
+          import json
+          p=json.load(open('dados-br/vagas-libertadores-2027.json',encoding='utf-8'))
+          assert p['schema_version']==1 and len(p['copa']['eventos'])==1
+          print('R35-R1 public artifact validation OK')
+          PY
+
       - name: Montar site público
         shell: bash
         run: |
@@ -438,6 +451,7 @@ jobs:
             dados-br/melhores-momentos.json
             dados-br/museu-brasileirao.json
             dados-br/probabilidades-brasileirao.json
+            dados-br/vagas-libertadores-2027.json
             dados-br/probabilidades-jogos.json
             dados-br/resultados-af-placares-2026.json
             dados-br/probabilidades-por-pontuacao.json
