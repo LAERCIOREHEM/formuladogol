@@ -200,6 +200,18 @@ def main() -> None:
     OUT.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     if args.stdout: print(json.dumps(payload,ensure_ascii=False,indent=2))
     else: print(f"R10R16.1 sweep: {payload['total_registros_publicos']} registros; OK={payload['total_ok']}; avisos={payload['total_avisos']}; observações={payload['total_observacoes']}; críticos={payload['total_criticos']}")
+    if payload['total_criticos']:
+        # Auditoria crítica precisa informar QUAL evento e QUAL evidência falhou.
+        # O workflow mantém fail-closed, mas o incidente deixa de ser opaco.
+        for row in payload['criticos']:
+            print('FDG_PUBLICO_AUDIT_CRITICAL='+json.dumps({
+                'event_id':row['event_id'],
+                'confronto':str(row.get('mandante',''))+' x '+str(row.get('visitante','')),
+                'problemas':row['problemas'],
+                'publico':row.get('publico'),
+                'pagantes':row.get('pagantes'),
+                'renda':row.get('renda')
+            },ensure_ascii=False,sort_keys=True))
     if args.fail_on_critical and payload['total_criticos']:
         raise SystemExit(3)
 if __name__=='__main__': main()

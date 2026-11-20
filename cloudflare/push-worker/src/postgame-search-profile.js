@@ -94,6 +94,7 @@ export const PREFERRED_EDITORIAL_SOURCE_SUFFIXES = Object.freeze([
   'gauchazh.clicrbs.com.br', 'nsctotal.com.br', 'diariodonordeste.verdesmares.com.br',
   'opovo.com.br', 'gp1.com.br', 'oliberal.com', 'acritica.com',
   'diregional.com.br', // Diário do Iguaçu: ficha técnica factual de jogos catarinenses
+  'netvasco.com.br', 'supervasco.com', 'vasconoticias.com.br', // imprensa do Vasco, nunca autoridade sem Match Identity Gate
 ]);
 
 const REJECTED_SOURCE_HOST_RE = /(facebook|instagram|twitter|x\.com$|tiktok|youtube|reddit|forum|foro|blogspot|wordpress|bet|bets|aposta|torcida)/i;

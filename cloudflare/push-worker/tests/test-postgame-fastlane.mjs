@@ -604,3 +604,25 @@ console.log('R10R33 chronology safeguard Coritiba-Vitória: PASS');
   const r=extractPublicFromTextDeterministic(pending,'https://diregional.com.br/diario-do-iguacu/esporte/chapecoense/2026-11-18-partida');
   assert.equal(r.publico,13973);assert.equal(r.publico_pagante,null);assert.equal(r.renda,274020);
 }
+
+
+// R35: imprensa do clube pode ser usada na descoberta gratuita, mas requer
+// cronologia, identidade de Vasco x Internacional e números documentais explícitos.
+{
+ const {attendanceSourceQuality, evaluateSourceMatchIdentity, evaluateAttendanceSourceChronology} =
+   await import('../src/postgame-search-profile.js');
+ const task={event_id:'401841308',home:'Vasco da Gama',away:'Internacional',
+   home_score:2,away_score:1,round:35,kickoff:'2026-11-19T22:30:00Z',stadium:'São Januário'};
+ const url='https://www.netvasco.com.br/n/396718/sao-januario-recebeu-19370-torcedores-para-vasco-x-internacional';
+ const source='São Januário recebeu 19.370 torcedores para Vasco x Internacional. Quinta-feira, 19/11/2026 - 21:30. Público presente: 19.370. Renda: R$ 1.030.864,50.';
+ assert.equal(attendanceSourceQuality(url,task),'robust');
+ assert.equal(evaluateAttendanceSourceChronology(task,url,'',source).accepted,true);
+ const identity=evaluateSourceMatchIdentity(task,source,url);
+ assert.equal(identity.accepted,true,JSON.stringify(identity));
+ const parsed=extractPublicFromTextDeterministic(identity.window,url);
+ assert.equal(parsed.publico,19370);
+ assert.equal(parsed.renda,1030864.50);
+ assert.equal(parsed.publico_pagante,null);
+ assert.equal(attendanceSourceQuality('https://m.supervasco.com/noticias/vasco-recebeu-19370-torcedores-contra-o-internacional-460174.html',task),'robust');
+ assert.equal(attendanceSourceQuality('https://vasconoticias.com.br/noticias/publico-e-renda-de-vasco-2-x-1-internacional-em-sao-januario/',task),'robust');
+}
