@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { SportsMonitor, promoteObservationFromPlays, shouldPollGame } from '../src/sports-monitor.js';
+import { SportsMonitor, promoteObservationFromPlays, shouldPollGame, scoreboardDatesForGames } from '../src/sports-monitor.js';
 import { buildHotEspnTestEvent, detectHotEspnMutation, hotEspnSnapshot } from '../src/hot-espn-test.js';
 import { buildHotMatchPrematchEvent, hotMatchPrematchDue, hotMatchTargetEvent, markHotMatchTechnicalEvent } from '../src/hot-match-test.js';
 
@@ -53,6 +53,13 @@ const realNow = Date.now;
 const realFetch = globalThis.fetch;
 let now = Date.parse('2026-09-02T00:05:00Z');
 Date.now = () => now;
+// A mixed two-day watchlist MUST produce two ESPN single-day requests.
+// Never submit a range string: the CDN can return HTTP 200 without live fixtures.
+assert.deepEqual(scoreboardDatesForGames([
+  {kickoff:'2026-11-18T19:30:00-03:00'},
+  {kickoff:'2026-11-19T19:30:00-03:00'},
+  {kickoff:'2026-11-19T21:30:00-03:00'}]),['20261118','20261119']);
+assert.deepEqual(scoreboardDatesForGames([{kickoff:'2026-11-19T19:30:00-03:00'}]),['20261119']);
 // Outage recovery must discover an already-running event after T+45,
 // but never turn late recovery into endless historical ESPN polling.
 const lateKickoff = new Date(now - 90*60_000).toISOString();

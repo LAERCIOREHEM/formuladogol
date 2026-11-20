@@ -272,6 +272,10 @@ function brDateKey(isoOrMs) {
   }).formatToParts(date).reduce((acc, p) => { acc[p.type] = p.value; return acc; }, {});
   return `${parts.year}${parts.month}${parts.day}`;
 }
+export function scoreboardDatesForGames(games) {
+  return [...new Set((Array.isArray(games) ? games : []).map(game => brDateKey(game?.kickoff)).filter(Boolean))].sort();
+}
+
 
 function eventMap(payload) {
   const map = new Map();
@@ -952,20 +956,44 @@ export class SportsMonitor {
     let scorerEnrichmentResolvedThisPoll = 0;
     let scorerMissingAtDispatchThisPoll = 0;
     const scoreboardSelectedSources = {};
+    // ESPN's soccer CDN accepts single-day dates reliably, but on mixed
+    // previous-day/current-day watchlists a dates=YYYYMMDD-YYYYMMDD query
+    // can omit LIVE events while still returning HTTP 200 and events[].
+    // Query each date independently and merge by ESPN event ID. A one-day
+    // match window still costs exactly one scoreboard pass (as before).
     await Promise.all([...byLeague.entries()].map(async ([league, games]) => {
-      try {
-        const days = games.map((game) => brDateKey(game.kickoff)).filter(Boolean).sort();
-        const start = days[0] || brDateKey(Date.now());
-        const end = days.at(-1) || start;
-        const dates = start === end ? start : `${start}-${end}`;
-        const result = await fetchEspnScoreboardFresh(league, dates);
-        scoreboardResults.set(league, eventMap(result.data));
-        scoreboardSources[league] = result.source;
-        sourceAttempts[league] = result.attempts;
-        for (const [eventId, source] of Object.entries(result.selectedSources || {})) scoreboardSelectedSources[eventId] = source;
-      } catch (error) {
-        sourceAttempts[league] = Array.isArray(error?.attempts) ? error.attempts : [];
-        sourceErrors.push(`${league}: ${text(error?.message || error)}`);
+      const dates = scoreboardDatesForGames(games);
+      const dayResults = await Promise.all(dates.map(async date => {
+        try {
+          return { date, result: await fetchEspnScoreboardFresh(league, date) };
+        } catch (error) {
+          return { date, error };
+        }
+      }));
+      const merged = new Map();
+      const successful = dayResults.filter(item => item.result);
+      for (const { date, result, error } of dayResults) {
+        if (result) {
+          for (const [eventId, event] of eventMap(result.data)) {
+            // Only match an event to the day actually requested; this prevents
+            // stale historical fixtures from taking over today's live state.
+            const eventDay = brDateKey(event?.date || event?.competitions?.[0]?.date || '');
+            if (eventDay && eventDay !== date) continue;
+            merged.set(eventId, event);
+            if (result.selectedSources?.[eventId]) scoreboardSelectedSources[eventId] = result.selectedSources[eventId];
+          }
+        } else if (error) {
+          sourceErrors.push(`${league}/${date}: ${text(error?.message || error)}`);
+        }
+      }
+      if (successful.length) {
+        scoreboardResults.set(league, merged);
+        scoreboardSources[league] = successful[0].result.source;
+        sourceAttempts[league] = dayResults.flatMap(({date,result,error}) =>
+          result ? (result.attempts || []).map(attempt => ({...attempt, date})) :
+            [{source:'date_partition',date,ok:false,error:text(error?.message || error)}]);
+      } else if (!dayResults.length) {
+        sourceErrors.push(`${league}: nenhuma data ESPN válida`);
       }
     }));
 
