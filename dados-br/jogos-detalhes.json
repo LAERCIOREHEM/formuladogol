@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-19T22:02:41.714096-03:00",
+  "gerado_em": "2026-11-19T23:52:43.567422-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 349,
   "total_com_estatisticas": 349,
-  "total_com_publico": 345,
+  "total_com_publico": 349,
   "total_com_eventos": 349,
   "total_com_jogadores": 349,
   "total_eventos_validados": 349,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Estádio São Januário",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 19370,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.netvasco.com.br/n/396718/sao-januario-recebeu-19370-torcedores-para-vasco-x-internacional",
       "arbitro": "",
       "stats": [
         {
@@ -600,7 +600,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-19T22:02:25.957446-03:00"
+      "atualizado_em": "2026-11-19T22:02:25.957446-03:00",
+      "renda": 1030864.5
     },
     "401841317": {
       "event_id": "401841317",
@@ -612,9 +613,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Estadio Manoel Barradas",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 14419,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.futebolinterior.com.br/vitoria-vence-red-bull-bragantino-brasi",
       "arbitro": "",
       "stats": [
         {
@@ -1197,7 +1198,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-19T22:02:28.266582-03:00"
+      "atualizado_em": "2026-11-19T22:02:28.266582-03:00",
+      "renda": 307118
     },
     "401841312": {
       "event_id": "401841312",
@@ -1753,9 +1755,9 @@
       "placar_mandante": 4,
       "placar_visitante": 0,
       "estadio": "Neo Química Arena",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 43576,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/11/18/corinthians-botafogo-brasileirao-2026-35-rodada-como-foi.ghtm",
       "arbitro": "",
       "stats": [
         {
@@ -2328,7 +2330,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-19T22:02:32.748154-03:00"
+      "atualizado_em": "2026-11-19T22:02:32.748154-03:00",
+      "publico_pagante": 43190,
+      "renda": 2802655.15
     },
     "401841313": {
       "event_id": "401841313",
@@ -2917,9 +2921,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Estadio Mineirão",
-      "publico": null,
+      "publico": 49664,
       "publico_tipo": "presente",
-      "publico_fonte": "",
+      "publico_fonte": "https://www.itatiaia.com.br/esportes/futebol/futebol-nacional/futebol-mineiro/cruzeiro/mineirao-lotado-veja-publico-e-renda-de-cruzeiro-x-palmeiras-pelo-brasileirao/",
       "arbitro": "",
       "stats": [
         {
@@ -3493,8 +3497,7 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-11-19T22:02:37.240028-03:00",
-      "publico_pagante": 26944,
-      "renda": 1039800
+      "renda": 2046742.5
     },
     "401841310": {
       "event_id": "401841310",
@@ -3506,9 +3509,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Mangueirão",
-      "publico": 7698,
+      "publico": 13973,
       "publico_tipo": "presente",
-      "publico_fonte": "https://www.oliberal.com/esportes/bruno-duarte-decide-vasco-supera-a-chapecoense-e-encaminha-permanencia-no-brasileirao-1.1194452",
+      "publico_fonte": "https://diregional.com.br/diario-do-iguacu/esporte/chapecoense/2026-11-18-chapecoense-perde-na-estreia-de-bergantin-em-jogo-decidido-em-menos-de-20-minutos",
       "arbitro": "",
       "stats": [
         {
@@ -4068,7 +4071,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-19T22:02:39.429283-03:00"
+      "atualizado_em": "2026-11-19T22:02:39.429283-03:00",
+      "renda": 274020
     },
     "401841315": {
       "event_id": "401841315",
@@ -197463,5 +197467,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 314,
+  "total_com_renda": 349
 }
