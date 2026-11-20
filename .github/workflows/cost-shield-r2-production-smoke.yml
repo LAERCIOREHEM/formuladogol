@@ -36,14 +36,20 @@ jobs:
               try:
                   shield=get(PUSH+'/v1/cost-shield/status')
                   orch=get(ORCH+'/status')
-                  if shield.get('version')==2 and shield.get('halted') is False and orch.get('ok') is True:
-                      print('R2 coordinator and orchestrator reachable, attempt',attempt)
+                  valid=shield.get('version')==2 and shield.get('halted') is False and orch.get('ok') is True
+                  quota_ready=isinstance(shield.get('providerUsage'),dict)
+                  if valid and quota_ready:
+                      print('R2 coordinator, quotas and orchestrator reachable, attempt',attempt)
                       break
+                  print('R2 settling',attempt,'mode='+str(shield.get('mode')),
+                        'reason='+str(shield.get('reason')),
+                        'billingError='+str(shield.get('billingError')),
+                        'providerUsage='+str(shield.get('providerUsage')))
               except Exception as e:
                   print('R2 rollout pending, attempt',attempt,str(e)[:130])
               time.sleep(12)
           else:
-              raise RuntimeError('R2 cost coordinator/orchestrator not converged in production')
+              raise RuntimeError('R2 cost coordinator, atomic provider quotas and/or orchestrator not converged in production: shield='+str(shield))
           assert shield['essentialSportsAllowed'] is True
           assert isinstance(shield.get('optionalAllowed'),bool)
           assert isinstance(shield.get('secondaryAllowed'),bool)
