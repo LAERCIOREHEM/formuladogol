@@ -1440,7 +1440,10 @@ def executar(args: argparse.Namespace) -> int:
         and anterior.get("hash_dossie") == hash_dossie
         and not args.forcar
         and anterior_valido
-        and (anterior_reutilizavel or args.sem_ia)
+        # R2: one paid editorial attempt per factual dossier. A verified
+        # deterministic fallback is still PUBLISHED content, not a reason to
+        # call OpenAI again on every push/deploy. Explicit --forcar can refine.
+        and isinstance(editorial_anterior, dict)
     ):
         print(f"Rodada {rodada} já publicada com o mesmo dossiê e editorial validado; API e arquivos não foram acionados.")
         return 0
@@ -1449,7 +1452,8 @@ def executar(args: argparse.Namespace) -> int:
         anterior
         and not args.forcar
         and anterior_valido
-        and (anterior_reutilizavel or args.sem_ia)
+        # Even a deterministic fallback remains reusable while the editorial
+        # facts are unchanged; no repeat paid API call to fix unrelated media.
         and anterior.get("hash_editorial") == hash_fatos_editoriais
         and isinstance(editorial_anterior, dict)
     )
