@@ -1,3 +1,4 @@
+import { reserveProviderCall } from './cost-shield.js';
 import { recordProviderUsage } from './ai-usage.js';
 import { extractArticlePublishedAt } from './postgame-public-observability.js';
 import { buildAttendanceSearchQueries, teamSearchAliasesNormalized, attendanceSourcePolicyText } from './postgame-search-profile.js';
@@ -178,6 +179,8 @@ function retryDirectForGatewayStatus(status,detail=''){
 async function runGeminiCall(env,{url,body,gateway,kind,route,model,task,started}){
   let response=null; let raw=null; let detail=''; let status=null;
   try{
+    const quota=await reserveProviderCall(env,'gemini',task?.event_id,1);
+    if(!quota.allowed)throw new Error('cost_shield_provider_quota:'+quota.reason);
     response=await fetchGemini(env,url,body,{gateway}); status=response.status;
     const rawText=await response.text().catch(()=> '');
     raw=safeJson(rawText,null); detail=text(rawText).slice(0,240);
@@ -220,6 +223,7 @@ export async function searchPublicWithGemini(env,task,missing){
    // API nova é chamada diretamente para eliminar uma camada de incompatibilidade.
    if (!(await readGeminiInteractionsCooldown(env))) {
       const first=await run({url:directInteractionUrl,body:interactionBody,gateway:false,kind:'interaction',route:'direct_interactions_v10_discovery'});
+      if (first.detail?.includes('cost_shield_provider_quota')) throw new Error('cost_shield_provider_quota');
       if (geminiInteractionsCompatibilityFailure(first.status) && !first.response?.ok) {
         await markGeminiInteractionsCooldown(env,first.status);
       }
@@ -329,6 +333,8 @@ export async function extractPublicWithWorkersAI(env,task,source){
  if(!workersAiConfigured(env)||!source?.text) return {found:false,reason:'workers_ai_unavailable',model};
  const prompt=`Extraia somente dados explícitos deste texto sobre ${text(task.home)} x ${text(task.away)}. Não estime. Retorne APENAS JSON válido: {"encontrado":true|false,"publico":integer|null,"publico_pagante":integer|null,"renda":number|null,"confianca":number}. Público é presença total; pagantes é separado; renda em reais. TEXTO: ${source.text}`;
  const started=Date.now();
+ const quota=await reserveProviderCall(env,'workers-ai',task?.event_id,1);
+ if(!quota.allowed)return {found:false,reason:'cost_shield_provider_quota:'+quota.reason,model};
  try{
    const raw=await env.AI.run(model,{prompt,max_tokens:500,temperature:0},{gateway:{id:aiGatewayId(env),skipCache:true,collectLog:true,metadata:{project:'formula-do-gol',component:'postgame',purpose:'source-extraction',eventId:text(task.event_id),provider:'workers-ai'}}});
    const answer=cleanModelText(raw?.response||raw?.result?.response||raw?.text||''); const parsed=safeJson(answer,null); const u=raw?.usage||{};
@@ -343,6 +349,9 @@ export function openAiUsage(raw){ return tokenUsageOpenAI(raw); }
 export async function fetchOpenAiResponses(env,payload,{signal=null,metadata={}}={}){
   const apiKey=text(env?.OPENAI_API_KEY);
   if(!apiKey) throw new Error('openai_key_missing');
+  // Reserve both potential paid attempts (AI Gateway and direct fallback).
+  const quota=await reserveProviderCall(env,'openai',metadata?.eventId,2);
+  if(!quota.allowed)throw new Error('cost_shield_provider_quota:'+quota.reason);
   const gatewayUrl=openAiGatewayResponsesUrl(env);
   const viaGateway=gatewayUrl.startsWith('https://gateway.ai.cloudflare.com/');
   const providerHeaders={authorization:`Bearer ${apiKey}`,'content-type':'application/json'};

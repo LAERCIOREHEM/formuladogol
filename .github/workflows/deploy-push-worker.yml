@@ -96,7 +96,7 @@ jobs:
       - name: Validar código
         run: npm run check
 
-      - name: CF-COST-SHIELD R1 regressão obrigatória
+      - name: CF-COST-SHIELD R2 regressão obrigatória
         run: node tests/test-cost-shield.mjs
 
       - name: R10R17.6 - Action Center (sintaxe, evidências e ciclo de alertas)
@@ -684,26 +684,21 @@ jobs:
 
           # PROVA LIVE independente de pendências: executa (ou reutiliza por até 15 min)
           # uma pesquisa Gemini real e exige google_search observado + fonte citada.
-          PROBE_HTTP="$(curl -sS --max-time 45 -o /tmp/fdg-gemini-probe.json -w '%{http_code}' 'https://push.formuladogol.com.br/v1/postgame/search-probe' || true)"
-          PROBE_HTTP="$PROBE_HTTP" EXPECTED_POSTGAME="$EXPECTED_POSTGAME" node <<'NODE'
-          const fs = require('fs');
-          let p = null;
-          try { p = JSON.parse(fs.readFileSync('/tmp/fdg-gemini-probe.json', 'utf8')); } catch (_) {}
-          const problems = [];
-          if (process.env.PROBE_HTTP !== '200') problems.push(`http=${process.env.PROBE_HTTP}`);
-          if (!p || p.ok !== true) problems.push(`ok=${p?.ok}`);
-          if (Number(p?.policyVersion) !== Number(process.env.EXPECTED_POSTGAME || 0)) problems.push(`policyVersion=${p?.policyVersion}`);
-          if (p?.searchObserved !== true) problems.push('searchObserved!=true');
-          if (Number(p?.searchCalls || 0) < 1) problems.push(`searchCalls=${p?.searchCalls}`);
-          if (Number(p?.sourcesFound || 0) < 1) problems.push(`sourcesFound=${p?.sourcesFound}`);
-          if (p?.circuit?.open === true) problems.push(`circuit=open até ${p?.circuit?.openUntil}`);
-          if (problems.length) {
-            console.error('PROVA GEMINI SEARCH FALHOU: ' + problems.join(' | '));
-            console.error(JSON.stringify(p, null, 2));
-            process.exit(1);
-          }
-          console.log(`PROVA GEMINI SEARCH OK: calls=${p.searchCalls}; sources=${p.sourcesFound}; route=${p.route}; cached=${p.cached}.`);
-          console.log(`Fontes-amostra: ${(p.sampleSources || []).join(' | ')}`);
+          # R2: never run paid Google Search as a mandatory deploy probe.
+          # Actual provider search is budgeted and can be in cooldown without
+          # affecting ESPN/FINAL/push or the deployment contract.
+          curl -fsS --max-time 12 'https://push.formuladogol.com.br/v1/cost-shield/status' >/tmp/fdg-cost-shield-r2.json
+          node <<'NODE'
+          const fs=require('node:fs');
+          const shield=JSON.parse(fs.readFileSync('/tmp/fdg-cost-shield-r2.json','utf8'));
+          if(shield.version!==2 || shield.halted!==false ||
+             shield.essentialSportsAllowed!==true ||
+             typeof shield.optionalAllowed!=='boolean' ||
+             typeof shield.secondaryAllowed!=='boolean')
+            throw new Error('CF-COST-SHIELD R2 production contract missing');
+          console.log('COST-SHIELD R2: mode='+shield.mode+
+            ' billingVerified='+shield.billingVerified+
+            ' essentialSportsAllowed='+shield.essentialSportsAllowed);
           NODE
 
           # Prova que a telemetria de diagnóstico v10 existe e que o endpoint já

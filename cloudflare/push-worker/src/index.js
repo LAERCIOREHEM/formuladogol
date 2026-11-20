@@ -1,6 +1,6 @@
 import { buildPushPayload } from '@block65/webcrypto-web-push';
 import { PushState } from './push-state.js';
-import { CostShieldState, pollCostShield, readCostShield, getShieldStub, allowEssentialSportsWhileBillingStale, essentialSportsRoute } from './cost-shield.js';
+import { CostShieldState, pollCostShield, readCostShield, getShieldStub, COST_SHIELD_VERSION } from './cost-shield.js';
 import { SportsMonitor } from './sports-monitor.js';
 import { enrichSportsMonitorLiveFacts, SPORTS_MONITOR_FACTS_VERSION } from './monitor-live-facts.js';
 import { dispatchStatus, enqueueSportsEvent, handleQueueBatch } from './push-dispatch.js';
@@ -568,15 +568,9 @@ export default {
     // operacional, pós-jogo e feedback. Isso também torna a entrega do e-mail
     // diário independente do caminho esportivo de 1 minuto.
     if (cron === '*/5 * * * *') {
-      // Billing is checked before the five-minute health lane. A latched stop
-      // is never cleared by a new day, deploy or Worker restart.
+      // R2: financial observations never interrupt health or the 08h digest.
       const shield = await pollCostShield(env);
-      if (shield.halted) {
-        console.error('COST_SHIELD_HALTED:'+shield.reason);
-        // The one-minute lane alone may maintain cheap essential sports when
-        // billing is stale. Keep Health, AI and paid background lanes stopped.
-        return;
-      }
+      if (!shield.billingVerified) console.warn('COST_SHIELD_R2_UNVERIFIED:'+shield.reason);
       ctx.waitUntil((async()=>{
         let status=null;
         try { const r=await monitor.fetch('https://internal/status'); if(r.ok) status=await r.json(); } catch(_) {}
@@ -586,53 +580,27 @@ export default {
     }
 
     const shield = await readCostShield(env);
-    if (shield.halted) {
-      if (allowEssentialSportsWhileBillingStale(shield)) {
-        // Emergency sports-only wake-up; no postgame Hunter, AI, maintenance
-        // cleanup or feedback workers while billing is unverified.
-        ctx.waitUntil(monitor.fetch('https://internal/bootstrap', { method: 'POST' })
-          .then(async response => {
-            if (!response.ok) throw new Error('sports_bootstrap_http_'+response.status);
-            await response.arrayBuffer();
-          }).catch(error => console.error('essential_sports_bootstrap_failed:'+String(error?.message||error).slice(0,300))));
-      } else {
-        console.error('COST_SHIELD_HALTED:'+shield.reason);
-      }
-      return;
+    // The sporting core is independent of Cloudflare billing.
+    ctx.waitUntil(runOperationalMaintenance(env, monitor).catch(error => {
+      console.error('operational maintenance failed: '+String(error?.message||error).slice(0,500));
+    }));
+    if (shield.optionalAllowed) {
+      // Paid provider calls still require atomic per-provider reservations.
+      ctx.waitUntil(runPostgameMaintenance(env, monitor).catch(error => {
+        console.error('postgame fastlane failed: '+String(error?.message||error).slice(0,500));
+      }));
+    } else {
+      console.warn('COST_SHIELD_R2_OPTIONAL_PAUSED:'+shield.mode);
     }
-
-    // Lane operacional de 1 minuto. Falhas são isoladas entre si.
-    // Cron vazio é aceito como fallback de desenvolvimento/manual.
-    ctx.waitUntil(runOperationalMaintenance(env, monitor).catch((error) => {
-      console.error(`operational maintenance failed: ${String(error?.message || error).slice(0, 500)}`);
-    }));
-    ctx.waitUntil(runPostgameMaintenance(env, monitor).catch((error) => {
-      console.error(`postgame fastlane failed: ${String(error?.message || error).slice(0, 500)}`);
-    }));
-    ctx.waitUntil(runFeedbackNotifier(env).catch((error) => {
-      console.error(`feedback notifier failed: ${String(error?.message || error).slice(0, 500)}`);
-    }));
+    if (shield.secondaryAllowed) {
+      ctx.waitUntil(runFeedbackNotifier(env).catch(error => {
+        console.error('feedback notifier failed: '+String(error?.message||error).slice(0,500));
+      }));
+    }
   },
 
   async queue(batch, env) {
-    const shield = await readCostShield(env);
-    if (shield.halted) {
-      if (!allowEssentialSportsWhileBillingStale(shield)) {
-        // Never ACK an undelivered sporting event as successful.
-        batch.retryAll({delaySeconds:3600});
-        return;
-      }
-      // Only deliver previously verified sporting events. Technical direct
-      // tests and unknown queue work stay deferred under the billing latch.
-      const safe = [], deferred = [];
-      for (const message of batch.messages || []) {
-        const kind = String(message.body?.kind || '');
-        (kind === 'event_dispatch' || kind === 'delivery_batch' ? safe : deferred).push(message);
-      }
-      for (const message of deferred) message.retry({delaySeconds:3600});
-      if (safe.length) await handleQueueBatch({messages:safe},env);
-      return;
-    }
+    // Never delay real sporting notifications for financial telemetric faults.
     await handleQueueBatch(batch, env);
   },
 
@@ -660,14 +628,8 @@ export default {
       const response=await getShieldStub(env).fetch('https://shield.internal/reset',{method:'POST'});
       return json(request,await response.json(),response.status,{'Cache-Control':'no-store'});
     }
-    // Monetary/D1 threshold trips remain absolute. If the ONLY reason is
-    // stale Cloudflare billing telemetry, restore essential sporting paths,
-    // never the expensive Hunter/AI, health or administrative endpoints.
-    const shield = await readCostShield(env);
-    const essential = essentialSportsRoute(request.method, url.pathname) ||
-      request.method === 'OPTIONS';
-    if (shield.halted && !(allowEssentialSportsWhileBillingStale(shield) && essential))
-      return json(request,{ok:false,error:'cost_shield_halted',reason:shield.reason},503,{'Retry-After':'3600'});
+    // R2: no global 503 and no paid Durable Object lookup for routine traffic.
+    // All ESPN, push, FINAL, health and site endpoints remain available.
 
     // R10R17 — MCP oficial, somente leitura e fora do caminho crítico esportivo.
     if (url.pathname === OPS_MCP_CONSTANTS.endpoint) {
@@ -777,6 +739,10 @@ export default {
         healthEmailDailyBrt: '08:00',
         healthEmailRecoveryUntilBrt: '11:59',
         healthMonitorCron: '*/5 * * * *',
+        costShieldVersion: COST_SHIELD_VERSION,
+        costShieldSportsContinuity: true,
+        costShieldAutomaticRecovery: true,
+        costShieldProviderQuotas: true,
         healthEmailTransport: env.EMAIL ? 'cloudflare-email' : 'fallback',
         healthEmailSender: 'saude@formuladogol.com.br',
         healthEmailNoOpenAI: true,
@@ -864,6 +830,10 @@ export default {
         return json(request, await postgameStatus(env), 200, { 'Cache-Control': 'no-store' });
       }
       if (url.pathname === '/v1/postgame/search-probe' && request.method === 'GET') {
+        const shield = await readCostShield(env);
+        if (!shield.optionalAllowed) return json(request, {
+          ok:false,error:'cost_shield_optional_paused',mode:shield.mode
+        },429,{'Retry-After':'300'});
         if (!(await allowStatusRead(request, env, 'postgame-search-probe'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
         const probe = await postgameSearchProbe(env);
         return json(request, probe, probe.ok ? 200 : 503, { 'Cache-Control': 'no-store' });
@@ -878,7 +848,7 @@ export default {
           ? singletonMonitor(env).fetch(`https://internal/live-facts?event=${encodeURIComponent(eventId)}&league=${encodeURIComponent(league)}`).catch(() => null)
           : Promise.resolve(null);
         const resultPromise = isEspnEvent ? resolveLiveSummary(url, {
-          apiFootballKey: shield.halted ? undefined : env.API_FOOTBALL_KEY,
+          apiFootballKey: env.API_FOOTBALL_KEY,
           statsStore: createLiveStatsStore(env.DB)
         }) : Promise.resolve({ status: 404, body: { ok: false, error: 'documentary_match_not_tracked' } });
         const [result, monitorResponse] = await Promise.all([resultPromise, monitorPromise]);

@@ -1,5 +1,12 @@
 import assert from 'node:assert/strict';
-import { highlightTitleValid, highlightTaskValid, findOfficialHighlight, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI, geminiCircuitState, geminiStructuralFailure, staticSeedRefreshIntervalMs, hasLabeledFinancialEvidence, geRoundupSitemapUrls } from '../src/postgame-fastlane.js';
+import { highlightTitleValid, highlightTaskValid, findOfficialHighlight, retryMinutes, validatePublicPayload, extractPublicFromTextDeterministic, extractOpenAISources, searchPublicWithOpenAI as searchPublicWithOpenAIImpl, geminiCircuitState, geminiStructuralFailure, staticSeedRefreshIntervalMs, hasLabeledFinancialEvidence, geRoundupSitemapUrls } from '../src/postgame-fastlane.js';
+
+// Paid-provider mocks explicitly simulate quota approval. No production bypass.
+const TEST_COST_SHIELD={idFromName:()=> 'unit',get:()=>({
+  fetch:async()=>Response.json({allowed:true})
+})};
+const searchPublicWithOpenAI=(env,...args)=>searchPublicWithOpenAIImpl(
+  {...env,COST_SHIELD:TEST_COST_SHIELD},...args);
 
 assert.equal(highlightTitleValid('FLAMENGO 1 X 0 BRAGANTINO | MELHORES MOMENTOS | BRASILEIRÃO 2026', 'Flamengo', 'Bragantino'), true);
 assert.equal(highlightTitleValid('FLAMENGO X BRAGANTINO | AQUECIMENTO AO VIVO | BRASILEIRÃO', 'Flamengo', 'Bragantino'), false);

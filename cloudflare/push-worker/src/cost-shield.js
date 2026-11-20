@@ -1,85 +1,129 @@
+// CF-COST-SHIELD R2 — Intelligent Cost Governance & Sports Continuity.
+// Financial data are delayed observations, NOT a reliable per-request billing cap.
+// Sports monitoring, scores, web push, factual FINAL and health remain independent.
+// Paid AI has a separate atomic call quota, including during billing outages.
 import { auditCloudflareBilling } from './cloudflare-billing-audit.js';
 import { sendMail, mailConfig } from './mailer.js';
 
-export const COST_SHIELD_VERSION = 1;
+export const COST_SHIELD_VERSION = 2;
 export const COST_SHIELD_POLICY = Object.freeze({
-  hourlyStopUsd: 2, dailyStopUsd: 5, cycleStopUsd: 10,
-  staleAfterMs: 10 * 60_000, bootstrapGraceMs: 5 * 60_000,
-  dailyRowsReadStop: 5_000_000_000, dailyRowsWrittenStop: 10_000_000
+  dailyObserveUsd: 2,
+  dailyPauseOptionalUsd: 5,
+  dailyPauseSecondaryUsd: 10,
+  monthlyProjectionWarningUsd: 50,
+  staleAfterMs: 60 * 60_000,
+  dailyRowsReadWarning: 5_000_000_000,
+  dailyRowsWrittenWarning: 10_000_000
 });
-// The stale-billing emergency lane restores only essential, rate-limited sports
-// services. It DOES NOT clear the persistent latch or reactivate paid enrichment.
-// Financial/D1 threshold trips and coordinator failures are never bypassed.
-export const ESSENTIAL_SPORTS_ROUTE_POLICY = Object.freeze({
-  GET: Object.freeze([
-    '/v1/config', '/v1/preferences', '/v1/live/scoreboard',
-    '/v1/live/state', '/v1/live/summary',
-    '/v1/monitor/status', '/v1/monitor/events', '/v1/dispatch/status'
-  ]),
-  POST: Object.freeze(['/v1/subscribe', '/v1/unsubscribe']),
-  PUT: Object.freeze(['/v1/preferences'])
+export const COST_SHIELD_PROVIDER_LIMITS = Object.freeze({
+  gemini: Object.freeze({ daily: 80, hourly: 40, perEventDaily: 10 }),
+  openai: Object.freeze({ daily: 32, hourly: 12, perEventDaily: 6 }),
+  'workers-ai': Object.freeze({ daily: 120, hourly: 60, perEventDaily: 12 })
 });
-export function allowEssentialSportsWhileBillingStale(state) {
-  if (!state?.halted) return true;
-  if (state.reason !== 'billing_monitor_stale') return false;
-  const thresholds = [
-    ['hourlyUsd', COST_SHIELD_POLICY.hourlyStopUsd],
-    ['dailyUsd', COST_SHIELD_POLICY.dailyStopUsd],
-    ['cycleUsd', COST_SHIELD_POLICY.cycleStopUsd],
-    ['d1Read', COST_SHIELD_POLICY.dailyRowsReadStop],
-    ['d1Written', COST_SHIELD_POLICY.dailyRowsWrittenStop]
-  ];
-  return thresholds.every(([key, ceiling]) =>
-    state[key] == null || (Number.isFinite(Number(state[key])) && Number(state[key]) < ceiling));
-}
-export function essentialSportsRoute(method, path) {
-  return (ESSENTIAL_SPORTS_ROUTE_POLICY[String(method || '').toUpperCase()] || [])
-    .includes(String(path || ''));
-}
 const SHIELD_NAME = 'cloudflare-account-global-cost-shield';
 const json = (data, status=200) => new Response(JSON.stringify(data), {
   status, headers:{'content-type':'application/json','cache-control':'no-store'}
 });
-const n = v => Number.isFinite(Number(v)) ? Number(v) : null;
-const positive = v => v != null && Number.isFinite(v) && v >= 0;
-const iso = t => new Date(t).toISOString();
+const number = value => value == null || value === '' ? null :
+  (Number.isFinite(Number(value)) ? Number(value) : null);
+const money = value => value == null ? null : Math.round(value * 10000) / 10000;
+const positive = value => number(value) != null && Number(value) >= 0;
+const iso = time => new Date(time).toISOString();
+function brDay(now) {
+  return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'})
+    .format(new Date(now));
+}
+function brHour(now) {
+  return new Intl.DateTimeFormat('en-GB',{timeZone:'America/Sao_Paulo',hour:'2-digit',hourCycle:'h23'})
+    .format(new Date(now));
+}
+const MODES = Object.freeze(['unverified','normal','observe','optional_paused','secondary_paused']);
+const severity = mode => ({unverified:0,normal:0,observe:1,optional_paused:2,secondary_paused:3})[mode] || 0;
 
-export function evaluateSpend(samples, now=Date.now(), policy=COST_SHIELD_POLICY) {
-  const current=samples.at(-1);
-  if(!current || !positive(current.costUsd))
-    return {ok:false,reason:'billing_unavailable',hourlyUsd:null,dailyUsd:null,cycleUsd:null};
-  const series=samples.filter(s=>s.cycleStart===current.cycleStart && s.ts<=now);
-  const diff=(windowMs)=>{
-    const older=series.filter(s=>s.ts<=now-windowMs).at(-1);
-    if(older)return Math.max(0,current.costUsd-older.costUsd);
-    // In a new billing cycle (<24h old), the entire cycle spend was accrued
-    // inside this 24h window, even before the first monitor sample.
-    if(windowMs===86_400_000 &&
-      now-Date.parse(current.cycleStart)>=0 &&
-      now-Date.parse(current.cycleStart)<=windowMs)return current.costUsd;
-    // For hourly guard, use first observed sample as a conservative lower
-    // bound. Never claim unknown history was zero.
+/** Billed cost is cumulative and can lag. Never treat an unknown window as zero. */
+export function evaluateSpend(samples, now=Date.now(), policy=COST_SHIELD_POLICY, reportedDailyUsd=null) {
+  const current = Array.isArray(samples) ? samples.at(-1) : null;
+  if (!current || !positive(current.costUsd))
+    return {ok:false,reason:'billing_unavailable',hourlyUsd:null,dailyUsd:null,cycleUsd:null,monthlyProjectedUsd:null};
+  const series=samples.filter(s=>s.cycleStart===current.cycleStart && s.ts<=now)
+    .sort((a,b)=>a.ts-b.ts);
+  function delta(ms) {
+    const old=series.filter(s=>s.ts<=now-ms).at(-1);
+    if (old) return Math.max(0,current.costUsd-old.costUsd);
+    // For a cycle which started within the rolling period, all cycle spend
+    // belongs to that period. For other cycles no pre-observation assumption.
+    if (now-Date.parse(current.cycleStart)>=0 &&
+        now-Date.parse(current.cycleStart)<=ms) return current.costUsd;
     const first=series[0];
-    if(windowMs===3_600_000&&first&&now-first.ts<=windowMs)
-      return Math.max(0,current.costUsd-first.costUsd);
-    return null;
-  };
-  const hour=diff(3_600_000), day=diff(86_400_000);
-  const reason=current.costUsd>=policy.cycleStopUsd?'cycle_limit':
-    hour!==null&&hour>=policy.hourlyStopUsd?'hourly_limit':
-    day!==null&&day>=policy.dailyStopUsd?'rolling_24h_limit':null;
-  return {ok:true,reason,hourlyUsd:hour,dailyUsd:day,cycleUsd:current.costUsd};
+    return first && now-first.ts<=ms ? Math.max(0,current.costUsd-first.costUsd) : null;
+  }
+  const hourly=delta(3_600_000), rolling=delta(86_400_000);
+  const reported=positive(reportedDailyUsd) ? Number(reportedDailyUsd) : null;
+  const daily=rolling==null?reported:reported==null?rolling:Math.max(rolling,reported);
+  const elapsed=Math.max(1,(now-Date.parse(current.cycleStart))/86_400_000);
+  const projected=Number.isFinite(elapsed)?money(current.costUsd/elapsed*30):null;
+  const mode=daily!=null&&daily>=policy.dailyPauseSecondaryUsd?'secondary_paused':
+    daily!=null&&daily>=policy.dailyPauseOptionalUsd?'optional_paused':
+    daily!=null&&daily>=policy.dailyObserveUsd?'observe':'normal';
+  return {ok:true,reason:mode,mode,hourlyUsd:money(hourly),dailyUsd:money(daily),
+    cycleUsd:money(current.costUsd),monthlyProjectedUsd:projected,
+    dailyCostBasis:reported!=null?'billing_charge_period_and_rolling_samples':'rolling_billing_samples'};
 }
 
-export function evaluateD1Rows(rows, policy=COST_SHIELD_POLICY) {
-  if(!Array.isArray(rows))return {ok:false,reason:'analytics_unavailable'};
+/** Best-effort calendar-day evidence; no zero-cost inference from missing rows. */
+export function billingCalendarDayUsd(rows, now=Date.now(), cycleStart='') {
+  const day=brDay(now), seen=new Set();let total=0,found=0;
+  for (const row of Array.isArray(rows)?rows:[]) {
+    if (cycleStart && row?.BillingPeriodStart !== cycleStart) continue;
+    if (String(row?.BillingCurrency||'').toUpperCase()!=='USD') continue;
+    const start=Date.parse(row?.ChargePeriodStart||'');
+    if(!Number.isFinite(start)||brDay(start)!==day) continue;
+    const cost=number(row?.BilledCost??row?.ContractedCost);
+    if(cost==null||cost<0) continue;
+    const key=JSON.stringify(row,Object.keys(row).sort());
+    if(seen.has(key)) continue;
+    seen.add(key);total+=cost;found+=1;
+  }
+  return found?money(total):null;
+}
+
+export function evaluateD1Rows(rows,policy=COST_SHIELD_POLICY) {
+  if(!Array.isArray(rows)) return {ok:false,reason:'analytics_unavailable'};
   const total=rows.reduce((s,row)=>({
-    read:s.read+Math.max(0,n(row?.sum?.rowsRead)||0),
-    written:s.written+Math.max(0,n(row?.sum?.rowsWritten)||0)
+    read:s.read+Math.max(0,number(row?.sum?.rowsRead)||0),
+    written:s.written+Math.max(0,number(row?.sum?.rowsWritten)||0)
   }),{read:0,written:0});
   return {ok:true,read:total.read,written:total.written,
-    reason:total.read>=policy.dailyRowsReadStop?'d1_daily_rows_read':
-      total.written>=policy.dailyRowsWrittenStop?'d1_daily_rows_written':null};
+    reason:total.read>=policy.dailyRowsReadWarning?'d1_read_anomaly':
+      total.written>=policy.dailyRowsWrittenWarning?'d1_write_anomaly':null};
+}
+
+export function governanceDecision(state={}, now=Date.now(), policy=COST_SHIELD_POLICY) {
+  const valid=number(state.lastSuccessAt)>0 && now-Number(state.lastSuccessAt)<=policy.staleAfterMs;
+  const observed=valid?String(state.lastVerifiedMode||'normal'):'unverified';
+  const d1Fresh=number(state.d1LastSuccessAt)>0 && now-Number(state.d1LastSuccessAt)<=policy.staleAfterMs;
+  const d1Excess=d1Fresh&&(number(state.d1Read)>=policy.dailyRowsReadWarning ||
+    number(state.d1Written)>=policy.dailyRowsWrittenWarning);
+  const mode=d1Excess?'secondary_paused':MODES.includes(observed)?observed:'unverified';
+  const billingVerified=valid;
+  return {version:COST_SHIELD_VERSION,halted:false,mode,
+    reason:d1Excess?'d1_anomaly':mode==='unverified'?(state.billingError||'billing_unavailable'):
+      mode==='normal'?'within_budget':mode,
+    billingVerified,costUnverified:!billingVerified,
+    optionalAllowed:mode!=='optional_paused'&&mode!=='secondary_paused',
+    secondaryAllowed:mode!=='secondary_paused',
+    essentialSportsAllowed:true,
+    dataAsOf:state.lastSuccessAt?iso(state.lastSuccessAt):null,
+    lastCheckedAt:state.lastCheckedAt?iso(state.lastCheckedAt):null,
+    lastSuccessAt:state.lastSuccessAt?iso(state.lastSuccessAt):null,
+    hourlyUsd:state.hourlyUsd??null,dailyUsd:state.dailyUsd??null,
+    cycleUsd:state.cycleUsd??null,monthlyProjectedUsd:state.monthlyProjectedUsd??null,
+    d1Read:state.d1Read??null,d1Written:state.d1Written??null,
+    cycleStart:state.cycleStart||null,billingError:state.billingError||'',
+    dailyCostBasis:state.dailyCostBasis||null,
+    providerLimits:COST_SHIELD_PROVIDER_LIMITS,
+    // Older R1 halted latch is intentionally ignored (automatic migration).
+    legacyLatchIgnored:state.halted===true};
 }
 
 export function getShieldStub(env) {
@@ -96,13 +140,17 @@ export async function pollCostShield(env, now=Date.now(), fetcher=fetch) {
       const r=await fetcher('https://api.cloudflare.com/client/v4/accounts/'+encodeURIComponent(account)+'/billable-usage',{
         headers:{authorization:'Bearer '+token},signal:AbortSignal.timeout(8000)});
       const body=await r.json();
-      if(!r.ok||body?.success!==true||!Array.isArray(body?.result))throw new Error('billing_http_'+r.status);
+      if(!r.ok||body?.success!==true||!Array.isArray(body?.result))
+        throw new Error('billing_http_'+r.status);
       const audit=auditCloudflareBilling(body.result,now);
       if(!audit.ok||!positive(audit.billedCost)||!audit.workers?.periodStart)
         throw new Error('billing_cycle_unavailable');
+      if(String(audit.currency).toUpperCase()!=='USD')
+        throw new Error('billing_currency_not_usd');
       report={ok:true,cycleStart:audit.workers.periodStart,costUsd:audit.billedCost,
+        dailyUsd:billingCalendarDayUsd(body.result,now,audit.workers.periodStart),
         at:iso(now),source:'cloudflare_billable_usage'};
-    }catch(e){report={ok:false,reason:String(e?.message||e).slice(0,90),at:iso(now)};}
+    }catch(error){report={ok:false,reason:String(error?.message||error).slice(0,90),at:iso(now)};}
   }
   let d1=null;
   const analyticsToken=String(env.CLOUDFLARE_ANALYTICS_READ_TOKEN||'').trim();
@@ -118,7 +166,7 @@ export async function pollCostShield(env, now=Date.now(), fetcher=fetch) {
       const rows=data?.data?.viewer?.accounts?.[0]?.d1AnalyticsAdaptiveGroups;
       if(!r.ok||data.errors?.length||!Array.isArray(rows))throw new Error('d1_analytics_unavailable');
       d1=evaluateD1Rows(rows);
-    }catch(e){d1={ok:false,reason:String(e?.message||e).slice(0,90)};}
+    }catch(error){d1={ok:false,reason:String(error?.message||error).slice(0,90)};}
   }
   try{
     const res=await getShieldStub(env).fetch('https://shield.internal/sample',{
@@ -126,92 +174,133 @@ export async function pollCostShield(env, now=Date.now(), fetcher=fetch) {
       body:JSON.stringify({report,d1,now})});
     if(!res.ok)throw new Error('state_write_failed_'+res.status);
     const result=await res.json();
-    if(result.justHalted){
-      console.error(JSON.stringify({type:'COST_SHIELD_EMERGENCY_STOP',reason:result.reason,at:iso(now)}));
-      try{if(mailConfig(env).configured)await sendMail(env,{
-        subject:'[CF-COST-SHIELD] EMERGENCY STOP — Cloudflare',
-        body:'O bloqueio financeiro global foi acionado. Motivo: '+result.reason+
-          '\\nCusto do ciclo: US$ '+String(result.cycleUsd??'indisponível')+
-          '\\nA reativação exige verificação e autorização manual.'
-      });}catch(e){console.error('COST_SHIELD_EMAIL_FAILED:'+String(e?.message||e).slice(0,120));}
+    // One email for each worsening cost tier per Brazilian day. No email
+    // for stale billing or $2 observation alone.
+    if(result.justEscalated){
+      console.error(JSON.stringify({type:'COST_SHIELD_R2_CONTAINMENT',mode:result.mode,at:iso(now)}));
+      try{if(mailConfig(env).configured) await sendMail(env,{
+        subject:'[CF-COST-SHIELD R2] Contenção seletiva — Cloudflare',
+        body:['Custos Cloudflare: '+result.mode,
+          'Últimas 24h USD: '+String(result.dailyUsd??'não verificado'),
+          'Ciclo USD: '+String(result.cycleUsd??'não verificado'),
+          'Serviços esportivos e notificações permanecem ativos.',
+          'Tarefas opcionais: '+(result.optionalAllowed?'autorizadas':'pausadas'),
+          'A retomada é automática após normalização.'].join('\n')
+      });}catch(error){console.error('COST_SHIELD_EMAIL_FAILED:'+String(error?.message||error).slice(0,120));}
     }
     return result;
-  }catch(e){console.error(JSON.stringify({type:'cost_shield_poll_error',reason:String(e?.message||e).slice(0,120)}));
-    return {ok:false,halted:true,reason:'state_unavailable'};}
+  }catch(error){
+    console.error(JSON.stringify({type:'cost_shield_poll_error',reason:String(error?.message||error).slice(0,120)}));
+    return governanceDecision({billingError:'coordinator_unavailable'},now);
+  }
 }
 
 export async function readCostShield(env) {
   try{
-    const r=await getShieldStub(env).fetch('https://shield.internal/status');
-    if(!r.ok)throw new Error('read_failed');
-    return await r.json();
-  }catch{return {version:COST_SHIELD_VERSION,halted:true,reason:'state_unavailable'};}
+    const response=await getShieldStub(env).fetch('https://shield.internal/status');
+    if(!response.ok)throw new Error('read_failed_'+response.status);
+    const value=await response.json();
+    if(value?.version!==COST_SHIELD_VERSION)throw new Error('version_mismatch');
+    return value;
+  }catch{return governanceDecision({billingError:'coordinator_unavailable'});}
+}
+
+export async function reserveProviderCall(env,provider,eventId='',units=1) {
+  try {
+    const response=await getShieldStub(env).fetch('https://shield.internal/reserve',{
+      method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({provider,eventId:String(eventId||'global').slice(0,128),
+        units,now:Date.now()})
+    });
+    if(!response.ok)return {allowed:false,reason:'budget_coordinator_http_'+response.status};
+    return await response.json();
+  }catch{return {allowed:false,reason:'budget_coordinator_unavailable'};}
 }
 
 export class CostShieldState {
   constructor(state){this.state=state;}
   async fetch(request){
-    const url=new URL(request.url), now=Date.now();
-    const saved=await this.state.storage.get('status')||{
-      createdAt:now,halted:false,reason:'bootstrapping',samples:[],lastSuccessAt:0,lastCheckedAt:0
-    };
-    const publicStatus=s=>{
-      const stale=!s.lastSuccessAt&&now-s.createdAt>=COST_SHIELD_POLICY.bootstrapGraceMs ||
-        s.lastSuccessAt>0&&now-s.lastSuccessAt>COST_SHIELD_POLICY.staleAfterMs;
-      return {version:COST_SHIELD_VERSION,halted:Boolean(s.halted||stale),
-        reason:s.halted?s.reason:stale?'billing_monitor_stale':s.reason||'ok',
-        lastCheckedAt:s.lastCheckedAt?iso(s.lastCheckedAt):null,
-        lastSuccessAt:s.lastSuccessAt?iso(s.lastSuccessAt):null,
-        hourlyUsd:s.hourlyUsd??null,dailyUsd:s.dailyUsd??null,cycleUsd:s.cycleUsd??null,
-        d1Read:s.d1Read??null,d1Written:s.d1Written??null,
-        cycleStart:s.cycleStart||null};
+    const url=new URL(request.url),now=Date.now();
+    const storage=this.state.storage;
+    const saved=await storage.get('status')||{
+      createdAt:now,halted:false,reason:'bootstrapping',samples:[],
+      lastSuccessAt:0,lastCheckedAt:0,lastVerifiedMode:'normal'
     };
     if(url.pathname==='/status'&&request.method==='GET'){
-      const current=publicStatus(saved);
-      if(current.halted&&!saved.halted){
-        saved.halted=true;saved.reason=current.reason;saved.haltedAt=now;
-        await this.state.storage.put('status',saved);
-      }
-      return json(publicStatus(saved));
+      const status=governanceDecision(saved,now);
+      const quota=await storage.get('quota:'+brDay(now))||{};
+      return json({...status,providerUsage:Object.fromEntries(
+        Object.entries(COST_SHIELD_PROVIDER_LIMITS).map(([name])=>
+          [name,Number(quota?.[name]?.daily||0)]))});
     }
     if(url.pathname==='/sample'&&request.method==='POST'){
       const body=await request.json().catch(()=>null);
       if(!body||!Number.isFinite(body.now))return json({error:'invalid_sample'},400);
-      const data={...saved,lastCheckedAt:body.now};
-      // Monitoring failure is a real stop condition, not an automatic
-      // reset as soon as the next API response becomes available.
-      if(!data.halted && ((data.lastSuccessAt&&body.now-data.lastSuccessAt>COST_SHIELD_POLICY.staleAfterMs) ||
-        (!data.lastSuccessAt&&body.now-data.createdAt>=COST_SHIELD_POLICY.bootstrapGraceMs))){
-        data.halted=true;data.reason='billing_monitor_stale';data.haltedAt=body.now;
-      }
-      if(body.report?.ok&&positive(body.report.costUsd)){
+      const previous=governanceDecision(saved,body.now);
+      const data={...saved,halted:false,lastCheckedAt:body.now};
+      if(body.report?.ok&&positive(body.report.costUsd)&&body.report.cycleStart){
         if(data.cycleStart!==body.report.cycleStart)data.samples=[];
         data.cycleStart=body.report.cycleStart;
-        data.samples.push({ts:body.now,cycleStart:data.cycleStart,costUsd:body.report.costUsd});
-        data.samples=data.samples.filter(s=>body.now-s.ts<=50*3_600_000).slice(-650);
-        const evald=evaluateSpend(data.samples,body.now);
-        data.lastSuccessAt=body.now;data.hourlyUsd=evald.hourlyUsd;
-        data.dailyUsd=evald.dailyUsd;data.cycleUsd=evald.cycleUsd;
-        if(evald.reason){data.halted=true;data.reason=evald.reason;data.haltedAt=data.haltedAt||body.now;}
-        else if(!data.halted)data.reason='ok';
-      }else if(!data.halted)data.reason=body.report?.reason||'billing_unavailable';
+        data.samples=[...(data.samples||[]),{ts:body.now,cycleStart:data.cycleStart,costUsd:body.report.costUsd}]
+          .filter(s=>body.now-s.ts<=50*3_600_000).slice(-650);
+        const evald=evaluateSpend(data.samples,body.now,COST_SHIELD_POLICY,body.report.dailyUsd);
+        data.lastSuccessAt=body.now;data.lastVerifiedMode=evald.mode;
+        data.hourlyUsd=evald.hourlyUsd;data.dailyUsd=evald.dailyUsd;
+        data.cycleUsd=evald.cycleUsd;data.monthlyProjectedUsd=evald.monthlyProjectedUsd;
+        data.dailyCostBasis=evald.dailyCostBasis;data.billingError='';
+      }else{
+        data.billingError=String(body.report?.reason||'billing_unavailable').slice(0,90);
+      }
       if(body.d1?.ok){
         data.d1Read=body.d1.read;data.d1Written=body.d1.written;
-        if(body.d1.reason){data.halted=true;data.reason=body.d1.reason;data.haltedAt=data.haltedAt||body.now;}
+        data.d1LastSuccessAt=body.now;
       }
-      const justHalted=!saved.halted&&data.halted;
-      await this.state.storage.put('status',data);
-      return json({...publicStatus(data),justHalted});
+      const current=governanceDecision(data,body.now);
+      const day=brDay(body.now);
+      const previouslyAlerted=data.lastAlertDay===day?Number(data.lastAlertSeverity||0):0;
+      const justEscalated=severity(current.mode)>=2 && severity(current.mode)>previouslyAlerted;
+      if(justEscalated){
+        data.lastAlertDay=day;data.lastAlertSeverity=severity(current.mode);
+      }
+      await storage.put('status',data);
+      return json({...governanceDecision(data,body.now),justEscalated,
+        previousMode:previous.mode});
+    }
+    if(url.pathname==='/reserve'&&request.method==='POST'){
+      const body=await request.json().catch(()=>null);
+      const provider=String(body?.provider||'');
+      const limit=COST_SHIELD_PROVIDER_LIMITS[provider];
+      const units=Number(body?.units||1);
+      if(!limit||!Number.isInteger(units)||units<1||units>3)
+        return json({allowed:false,reason:'invalid_budget_request'},400);
+      const id=String(body?.eventId||'global').slice(0,128);
+      const clock=Number.isFinite(body?.now)?Number(body.now):now;
+      const policy=governanceDecision(saved,now);
+      if(!policy.optionalAllowed)return json({allowed:false,reason:'optional_work_paused',mode:policy.mode});
+      const key='quota:'+brDay(clock),hour=brHour(clock);
+      const mutate=async db=>{
+        const quota=await db.get(key)||{};
+        const lane=quota[provider]||{daily:0,hours:{},events:{}};
+        const daily=Number(lane.daily||0),hourly=Number(lane.hours?.[hour]||0);
+        const eventDaily=Number(lane.events?.[id]||0);
+        if(daily+units>limit.daily||hourly+units>limit.hourly||
+          eventDaily+units>limit.perEventDaily)
+          return {allowed:false,reason:'provider_call_quota',provider,daily,hourly,eventDaily,limit};
+        quota[provider]={daily:daily+units,
+          hours:{...lane.hours,[hour]:hourly+units},
+          events:{...lane.events,[id]:eventDaily+units}};
+        await db.put(key,quota);
+        return {allowed:true,provider,remainingDaily:limit.daily-daily-units,
+          remainingHourly:limit.hourly-hourly-units,
+          remainingEventDaily:limit.perEventDaily-eventDaily-units};
+      };
+      const answer=typeof storage.transaction==='function'?
+        await storage.transaction(mutate):await mutate(storage);
+      return json(answer);
     }
     if(url.pathname==='/reset'&&request.method==='POST'){
-      // Reset requires authenticated outer Worker route and a new independent
-      // explicit command. Never re-arm while the cycle limit remains exceeded.
-      if(!saved.lastSuccessAt||now-saved.lastSuccessAt>COST_SHIELD_POLICY.staleAfterMs||
-        (saved.cycleUsd??Infinity)>=COST_SHIELD_POLICY.cycleStopUsd)
-        return json({ok:false,error:'cannot_reset_unverified_or_over_budget'},409);
-      saved.halted=false;saved.reason='manual_reset';saved.haltedAt=null;
-      await this.state.storage.put('status',saved);
-      return json({ok:true,...publicStatus(saved)});
+      // R2 has no global latch. Keep old authenticated API non-destructive.
+      return json({ok:true,automaticRecovery:true,...governanceDecision(saved,now)});
     }
     return json({error:'not_found'},404);
   }

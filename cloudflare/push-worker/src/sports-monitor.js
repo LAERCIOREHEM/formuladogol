@@ -27,7 +27,7 @@ import { recordPostgameFinal } from './postgame-fastlane.js';
 import { buildSportsMonitorLiveFacts, SPORTS_MONITOR_FACTS_VERSION } from './monitor-live-facts.js';
 import { resolveTrackedLiveGoalMatch, LIVE_GOAL_IDENTITY_VERSION } from './live-goal-identity.js';
 import { sendMail, mailConfig } from './mailer.js';
-import { readCostShield, allowEssentialSportsWhileBillingStale } from './cost-shield.js';
+import { readCostShield } from './cost-shield.js';
 import { countWebSearchCalls, recordAiUsage, recordProviderUsage } from './ai-usage.js';
 import { fetchOpenAiResponses, openAiUsage } from './ai-router.js';
 
@@ -1015,7 +1015,7 @@ export class SportsMonitor {
       let aiRecovered = false;
       // Never invoke paid AI to resolve an ESPN identity when spending
       // telemetry is unavailable (or any global financial latch is active).
-      if (!resolved && dueCheckpoints.length && !(await readCostShield(this.env)).halted) {
+      if (!resolved && dueCheckpoints.length && (await readCostShield(this.env)).optionalAllowed) {
         const ai = await this.resolveWithAi(game, dueCheckpoints[0].key);
         aiAttempted = ai.attempted;
         aiRecovered = ai.recovered;
@@ -1403,16 +1403,11 @@ export class SportsMonitor {
   }
 
   async alarm() {
-    // Do not let 10-second DO alarms bypass the global account breaker.
-    const shield = await readCostShield(this.env);
-    if (shield.halted && !allowEssentialSportsWhileBillingStale(shield)) return;
-    // Cost telemetry outage: essential match polling and real sporting
-    // notifications continue; optional hot tests remain stopped.
+    // R2: 10-second ESPN monitoring never asks the billing coordinator.
+    // Paid AI is independently quota-protected at its provider call sites.
     await this.emitPrematchReminders();
-    if (!shield.halted) {
-      await this.pollHotEspnTest();
-      await this.pollHotMatchTest();
-    }
+    await this.pollHotEspnTest();
+    await this.pollHotMatchTest();
     await this.pollOnce();
     await this.ensureNextAlarm();
   }

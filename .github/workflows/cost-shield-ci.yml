@@ -1,4 +1,4 @@
-name: CF-COST-SHIELD R1 — Regression
+name: CF-COST-SHIELD R2 — Regression
 on:
   pull_request:
     paths:
@@ -16,13 +16,27 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --check cloudflare/push-worker/src/cost-shield.js
-      - run: node --check cloudflare/push-worker/src/index.js
-      - run: node --check cloudflare/push-worker/src/sports-monitor.js
-      - run: node --check cloudflare/orchestrator-worker/src/index.js
-      - run: node --test cloudflare/push-worker/tests/test-cost-shield.mjs
+      - name: Install Push Worker dependencies
+        working-directory: cloudflare/push-worker
+        run: npm ci
+      - name: Syntax and integration contracts
+        working-directory: cloudflare/push-worker
+        run: npm run check
+      - name: R2 budget, recovery and atomic quota tests
+        working-directory: cloudflare/push-worker
+        run: node --test tests/test-cost-shield.mjs
+      - name: Paid AI routes regression with explicit quota mocks
+        working-directory: cloudflare/push-worker
+        run: node tests/test-ai-router.mjs && node tests/test-postgame-fastlane.mjs
+      - name: Install Orchestrator dependencies
+        working-directory: cloudflare/orchestrator-worker
+        run: npm ci
+      - name: R2 orchestration and FINAL continuity
+        working-directory: cloudflare/orchestrator-worker
+        run: node --test tests/cost-governance.test.mjs && npm run validate

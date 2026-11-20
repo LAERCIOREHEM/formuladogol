@@ -29,6 +29,7 @@ import {
   tvCheckpointDue,
 } from './logic.js';
 import { activeWriter, dispatchSpec, dispatchWorkflow } from './github.js';
+import { orchestratorCostDecision } from './cost-governance.js';
 import { ORCHESTRATOR_CONTRACT, correlationIdForEvent } from './contract.js';
 import { editorialClosureDecision, eligibleRoundFromAgenda } from './editorial-closure.js';
 import { fetchPostgameFastlane, fetchSiteBundle, probeEspn, probeEspnAvailability, repositoryFallbacks } from './sources.js';
@@ -208,7 +209,12 @@ export class OrchestratorState {
     const url = new URL(request.url);
     if (url.pathname === '/tick') {
       if (request.method !== 'POST') return new Response('method_not_allowed', { status: 405 });
-      const result = await this.tick();
+      const governance={
+        optionalAllowed:url.searchParams.get('optional')!=='0',
+        secondaryAllowed:url.searchParams.get('secondary')!=='0',
+        mode:String(url.searchParams.get('tier')||'unverified').slice(0,40)
+      };
+      const result = await this.tick(governance);
       return Response.json(result);
     }
     if (url.pathname === '/status') {
@@ -326,7 +332,12 @@ export class OrchestratorState {
     return { allowed: dueFromLast(last, now, retry), key, last, permanent: false };
   }
 
-  async dispatchCandidate(candidate, now) {
+  async dispatchCandidate(candidate, now, governance={}) {
+    const budget=orchestratorCostDecision(candidate?.action,governance);
+    if(!budget.allowed){
+      return {result:'cost_deferred',reason:budget.reason,
+        candidate,costShieldMode:String(governance.mode||'unverified')};
+    }
     const mode = String(this.env.ORCHESTRATOR_MODE || 'shadow').toLowerCase();
     const retry = await this.candidateAllowedByRetry(candidate, now);
     if (!retry.allowed) {
@@ -479,7 +490,7 @@ export class OrchestratorState {
     };
   }
 
-  async tick() {
+  async tick(governance={}) {
     if (this.busy) return { ok: true, skipped: 'busy' };
     this.busy = true;
     const now = new Date();
@@ -634,7 +645,7 @@ export class OrchestratorState {
       }
 
       if (candidate) {
-        dispatchResult = await this.dispatchCandidate(candidate, now);
+        dispatchResult = await this.dispatchCandidate(candidate, now, governance);
         if (candidate.sourceRecovery && dispatchResult.result === 'dispatched') {
           const updatedBreaker = { ...brSource, state: 'half_open', halfOpenDispatched: true, lastHeavyAttemptAt: now.toISOString() };
           await this.state.storage.put('br:sourceBreaker', updatedBreaker);
@@ -673,6 +684,7 @@ export class OrchestratorState {
         githubDispatchesLast24h,
         relevantSportsGames: relevantCount,
         slowEvaluated,
+        costShieldMode:String(governance.mode||'unverified'),
         candidate: candidate ? {
           action: candidate.action,
           eventId: candidate.eventId || '',

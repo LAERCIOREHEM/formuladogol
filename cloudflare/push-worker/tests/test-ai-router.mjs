@@ -1,6 +1,15 @@
 import assert from 'node:assert/strict';
-import { aiGatewayId, gatewayBase, aiGatewayAuthHeaders, aiGatewayAuthConfigured, geminiConfigured, geminiGroundingSources, geminiSearchCount, geminiInteractionSearchCount, geminiInteractionSources, geminiInteractionText, geminiInteractionRequest, searchPublicWithGemini, isAiGatewayPreProviderFailure, fetchOpenAiResponses, publicSchemaInstruction, resolveWorkersAiExtractModel, WORKERS_AI_EXTRACT_DEFAULT_MODEL, geminiInteractionsCompatibilityFailure, GEMINI_INTERACTIONS_COOLDOWN_MS, geminiGeoNotSupported, GEMINI_GEO_COOLDOWN_MS, uolArticleAlternate, fetchSourceText } from '../src/ai-router.js';
+import { aiGatewayId, gatewayBase, aiGatewayAuthHeaders, aiGatewayAuthConfigured, geminiConfigured, geminiGroundingSources, geminiSearchCount, geminiInteractionSearchCount, geminiInteractionSources, geminiInteractionText, geminiInteractionRequest, searchPublicWithGemini as searchPublicWithGeminiImpl, isAiGatewayPreProviderFailure, fetchOpenAiResponses as fetchOpenAiResponsesImpl, publicSchemaInstruction, resolveWorkersAiExtractModel, WORKERS_AI_EXTRACT_DEFAULT_MODEL, geminiInteractionsCompatibilityFailure, GEMINI_INTERACTIONS_COOLDOWN_MS, geminiGeoNotSupported, GEMINI_GEO_COOLDOWN_MS, uolArticleAlternate, fetchSourceText } from '../src/ai-router.js';
 import { POSTGAME_SEARCH_PROFILE_VERSION, TEAM_SEARCH_PROFILES, buildAttendanceSearchQueries, officialClubDomainsForTask, attendanceSourceQuality, matchDayEditorialSources } from '../src/postgame-search-profile.js';
+
+// Provider tests use a coordinator stub. Production never bypasses quotas.
+const TEST_COST_SHIELD={idFromName:()=> 'unit',get:()=>({
+  fetch:async()=>Response.json({allowed:true})
+})};
+const searchPublicWithGemini=(env,...args)=>searchPublicWithGeminiImpl(
+  {...env,COST_SHIELD:TEST_COST_SHIELD},...args);
+const fetchOpenAiResponses=(env,...args)=>fetchOpenAiResponsesImpl(
+  {...env,COST_SHIELD:TEST_COST_SHIELD},...args);
 
 // R10R17.8: a configuração histórica/depreciada não deve chegar a env.AI.run().
 assert.equal(WORKERS_AI_EXTRACT_DEFAULT_MODEL, '@cf/meta/llama-3.1-8b-instruct-fp8');
