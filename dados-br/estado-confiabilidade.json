@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "atualizado_em": "2026-11-19T00:06:14-03:00",
-  "state": "CORE_GREEN",
+  "atualizado_em": "2026-11-19T21:56:53-03:00",
+  "state": "ENRICHMENT_PENDING",
   "core": {
     "status": "ok",
     "sporting_integrity": "ok",
-    "concluded": 347,
-    "remaining": 33,
+    "concluded": 349,
+    "remaining": 31,
     "simulations": 2000000,
-    "af_reference": "2026-11-18T23:24:00-03:00"
+    "af_reference": "2026-11-19T21:25:00-03:00"
   },
   "enrichment": {
-    "pending_public": 0,
+    "pending_public": 2,
     "pending_highlights": 0,
-    "pending_total": 0,
+    "pending_total": 2,
     "does_not_block_core": true
   },
   "source": {
@@ -29,15 +29,15 @@
       "commit_to_site": 5
     },
     "ultima_observacao": {
-      "trace_id": "fdg-401841314",
-      "event_id": "401841314",
-      "finalizado_em": "2026-11-18T22:26:00-03:00",
-      "af_calculado_em": "2026-11-18T22:47:22-03:00",
-      "final_para_af_minutos": 21.367,
+      "trace_id": "fdg-401841308",
+      "event_id": "401841308",
+      "finalizado_em": "2026-11-19T21:25:00-03:00",
+      "af_calculado_em": "2026-11-19T21:56:50-03:00",
+      "final_para_af_minutos": 31.833,
       "alvo_minutos": 10,
       "dentro_slo": false,
-      "registrado_em": "2026-11-18T22:47:25-03:00",
-      "run_id": "44438124594"
+      "registrado_em": "2026-11-19T21:56:53-03:00",
+      "run_id": "44648455882"
     }
   }
 }
