@@ -1,0 +1,65 @@
+name: HOTFIX R35-R1 — Matemática e Libertadores
+run-name: R35-R1 · Certificar G6 e publicar 100%
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/af_matematica_libertadores.py'
+      - 'scripts/aplicar_hotfix_r35_r1.py'
+      - 'scripts/gerar_probabilidades_brasileirao.py'
+      - '.github/workflows/hotfix-r35-r1.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: fdg-r35-r1-certification
+  cancel-in-progress: false
+jobs:
+  certify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Python syntax and proof regression (no paid API)
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/af_matematica_libertadores.py scripts/aplicar_hotfix_r35_r1.py scripts/gerar_probabilidades_brasileirao.py
+          python scripts/aplicar_hotfix_r35_r1.py --self-test
+      - name: Update existing probabilities WITHOUT Monte Carlo
+        id: publish
+        run: |
+          set -euo pipefail
+          git config user.name 'fdg-r35-r1[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            python scripts/aplicar_hotfix_r35_r1.py --apply
+            git add dados-br/probabilidades-brasileirao.json
+            if git diff --cached --quiet; then
+              echo 'CERTIFIED_ALREADY_PUBLISHED=true' >> "$GITHUB_OUTPUT"
+              echo 'R35-R1: no change, proofs already in main'
+              exit 0
+            fi
+            git commit -m 'fix(af): certify Fluminense 100% via R35-R1 and preserve 2M simulations [skip ci]'
+            if git push origin HEAD:main; then
+              echo 'CERTIFICATION_PUBLISHED=true' >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "::warning title=Concurrent writer::Retry $attempt/3"
+            sleep 3
+          done
+          echo "::error title=R35-R1::Could not publish proof under concurrent repository updates"
+          exit 1
+      - name: Explicit Pages deployment
+        if: steps.publish.outputs.CERTIFICATION_PUBLISHED == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main

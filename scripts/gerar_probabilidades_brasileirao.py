@@ -61,6 +61,9 @@ from af_previsao_backtest import (  # noqa: E402
     outcome_from_matrix,
     score_matrix,
 )
+from af_matematica_libertadores import (  # noqa: E402
+    certify_top_k, apply_g6_continental_certainty,
+)
 from af_previsao_continental import (  # noqa: E402
     ContinentalDataNotReady,
     display_probability,
@@ -1008,7 +1011,14 @@ def structural_status(
         }
 
         resultado[team] = criterios
-    return resultado
+    # R35-R1: prova adicional, válida para TODOS os clubes, com confronto
+    # direto e vitórias. Nunca substitui dados nem altera 2M simulações.
+    standings = {
+        team: {"pontos": int(state.points[i]), "vitorias": int(state.wins[i])}
+        for i, team in enumerate(teams)
+    }
+    fixtures = [(f.fixture.home, f.fixture.away) for f in forecasts]
+    return certify_top_k(resultado, standings, fixtures)
 
 
 def apply_continental_mathematical_certainty(
@@ -2679,9 +2689,29 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
             "sul_americana": integrated["sul_americana"],
             "sem_competicao_continental": integrated["sem_competicao_continental"],
         }
+    structural_final = structural_status(state, forecasts)
     apply_continental_mathematical_certainty(
-        teams, structural_status(state, forecasts), execution_25
+        teams, structural_final, execution_25
     )
+    # Prova de destino: G6 matemático + repasse mínimo CBF assegurado.
+    # O output percentual e as ocorrências da simulação permanecem intocados.
+    def _certify_g6_detail(detail, certain, reason):
+        detail["exibicao"] = "100%" if certain else "0%"
+        detail["possivel_estruturalmente"] = certain
+        detail["impossivel_estruturalmente"] = not certain
+        detail["certeza_estrutural"] = certain
+        detail["motivo_certeza"] = reason if certain else None
+        detail["motivo_impossibilidade"] = None if certain else reason
+        detail["limite_superior_95_regra_dos_tres_pct"] = None
+
+    certified_g6 = apply_g6_continental_certainty(
+        teams, structural_final,
+        load_json(ROOT / "dados-br" / "competicoes-af-previsao" / "copa-do-brasil.json"),
+        _certify_g6_detail,
+    )
+    if certified_g6:
+        print("HOTFIX R35-R1 — classificados matematicamente pelo G6:",
+              ", ".join(certified_g6))
     total_sul_integrada = sum(item["probabilidades_pct"]["sul_americana"] for item in teams)
     if abs(total_sul_integrada - 600.0) > 0.02:
         raise ValueError(f"soma integrada da Sul-Americana inválida: {total_sul_integrada:.6f}")

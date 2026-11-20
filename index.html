@@ -1939,6 +1939,10 @@
   }
   .zona-libertadores .tabela-pos-badge { color: #052e16; background: #4ade80; }
   .zona-prelibertadores .tabela-pos-badge { color: #13280a; background: #bef264; }
+  .zona-libertadores-condicional .tabela-pos-badge { color: #bbf7d0; background: rgba(34,197,94,.17); border: 1px dashed #22c55e; }
+  .tabela-vaga-badge { font-size: 9px; font-weight: 800; border:1px solid rgba(74,222,128,.4); background:rgba(74,222,128,.12); color:#86efac; border-radius:7px; padding:2px 5px; white-space:nowrap; }
+  .tabela-vagas-dinamicas { margin: 10px 0 14px; padding: 10px 13px; border:1px solid rgba(74,222,128,.23); border-radius:12px; color:#d1fae5; background:rgba(6,78,59,.13); font-size:12px; line-height:1.55; }
+  .tabela-vagas-dinamicas small { display:block; font-size:11px; color:#a8b6c5; margin-top:4px; }
   .zona-rebaixamento .tabela-pos-badge { color: #fff1f2; background: #e11d48; }
   .tabela-time-cel { gap: 10px; font-weight: 800; }
   .tabela-escudo { width: 26px; height: 26px; }
@@ -1946,6 +1950,7 @@
   .tabela-mini-label { display: none; }
   .zona-libertadores td:first-child { box-shadow: inset 4px 0 0 #22c55e; }
   .zona-prelibertadores td:first-child { box-shadow: inset 4px 0 0 #a3e635; }
+  .zona-libertadores-condicional td:first-child { box-shadow: inset 4px 0 0 rgba(34,197,94,.45); }
   .zona-rebaixamento td:first-child { box-shadow: inset 4px 0 0 #e11d48; }
   .forma-dot { box-shadow: 0 0 0 1px rgba(0,0,0,.15); }
 
@@ -3743,6 +3748,7 @@ let state = {
   probabilidadesJogosErro: null,
   // Tabela — painel "O que seu time precisa?" alimentado pelo mesmo AF-Previsão.
   probabilidadesBrasileirao: null,
+  vagasLibertadores2027: null,
   probabilidadesPorPontuacao: null,
   metasObjetivosErro: null,
   metasObjetivoClube: '',
@@ -3971,23 +3977,32 @@ function toggleBolaoProjection(chave) {
 async function carregarMetasObjetivosTabela({ silencioso = false } = {}) {
   try {
     const stamp = Date.now();
-    const [rProb, rPts] = await Promise.all([
+    const [rProb, rPts, rCopa, rLib, rSula] = await Promise.all([
       fetch('dados-br/probabilidades-brasileirao.json?t=' + stamp, { cache: 'no-store' }),
-      fetch('dados-br/probabilidades-por-pontuacao.json?t=' + stamp, { cache: 'no-store' })
+      fetch('dados-br/probabilidades-por-pontuacao.json?t=' + stamp, { cache: 'no-store' }),
+      fetch('dados-br/competicoes-af-previsao/copa-do-brasil.json?t=' + stamp, { cache: 'no-store' }),
+      fetch('dados-br/competicoes-af-previsao/libertadores.json?t=' + stamp, { cache: 'no-store' }),
+      fetch('dados-br/competicoes-af-previsao/sul-americana.json?t=' + stamp, { cache: 'no-store' })
     ]);
     if (!rProb.ok) throw new Error('probabilidades-brasileirao HTTP ' + rProb.status);
     if (!rPts.ok) throw new Error('probabilidades-por-pontuacao HTTP ' + rPts.status);
-    const [prob, pts] = await Promise.all([rProb.json(), rPts.json()]);
+    const [prob, pts, copa, libertadores, sulamericana] = await Promise.all([
+      rProb.json(), rPts.json(),
+      rCopa.ok ? rCopa.json() : Promise.resolve(null),
+      rLib.ok ? rLib.json() : Promise.resolve(null),
+      rSula.ok ? rSula.json() : Promise.resolve(null)
+    ]);
     if (!prob || prob.status !== 'ok' || !Array.isArray(prob.clubes)) throw new Error('probabilidades-brasileirao inválido');
     if (!pts || pts.status !== 'ok' || !Array.isArray(pts.niveis)) throw new Error('probabilidades-por-pontuacao inválido');
     state.probabilidadesBrasileirao = prob;
+    state.vagasLibertadores2027 = { copa, libertadores, sulamericana };
     state.probabilidadesPorPontuacao = pts;
     state.metasObjetivosErro = null;
   } catch (e) {
     state.metasObjetivosErro = e && e.message ? e.message : String(e || 'indisponível');
     if (!silencioso) console.warn('Painel de metas por clube indisponível:', e);
   }
-  if (state.view === 'tabela') renderObjetivosTime();
+  if (state.view === 'tabela') renderTabela();
 }
 
 async function atualizarDadosDoServidor(silencioso = false) {
@@ -5035,6 +5050,57 @@ function htmlTabelaReturno() {
   return html;
 }
 
+
+// HOTFIX R35-R1 — zona garantida + expansão condicional.
+// Jamais inferir título continental de presença em final ou de porcentagem.
+function vagasLibertadores2027(tabela) {
+  const snapshots = state.vagasLibertadores2027 || {};
+  const prob = (state.probabilidadesBrasileirao || {}).clubes || [];
+  const source = snapshots.copa;
+  const finals = (source && Array.isArray(source.eventos) ? source.eventos : [])
+    .filter(e => Number(e.fase_ordem) === 900);
+  const final = finals.length === 1 ? finals[0] : null;
+  const clubs = final ? [final.mandante?.nome, final.visitante?.nome] : [];
+  const isFinal = clubs.includes('Palmeiras') && clubs.includes('Grêmio');
+  const palmeirasAF = prob.find(e => e.clube === 'Palmeiras');
+  const palmeirasG4 = palmeirasAF?.probabilidades_detalhes?.g4?.certeza_estrutural === true;
+  // Rule audit: only claim G6 once Copa finalists AND Palmeiras group
+  // qualification are certified in the published probability snapshot.
+  let direct = 4, preliminary = 1;
+  const guaranteedG6 = isFinal && palmeirasG4;
+  if (guaranteedG6) preliminary = 2;
+  const gremio = tabela.find(t => t.time === 'Grêmio');
+  const relegated = gremio?.jogos === 38 && gremio?.pos >= 17;
+  const cupFinalistIneligible = guaranteedG6 && relegated;
+
+  // A continental title creates an extra *league* direct spot only if its
+  // winner is already qualified by league, with no duplicated group slot.
+  const winner = (snapshot) => {
+    const rows = (snapshot && Array.isArray(snapshot.eventos)) ? snapshot.eventos : [];
+    const finalsHere = rows.filter(e => Number(e.fase_ordem) === 900);
+    if (finalsHere.length !== 1) return '';
+    const e = finalsHere[0];
+    if (!(e.concluido === true || e.estado === 'post')) return '';
+    return String(e.vencedor || '').trim();
+  };
+  const palmeirasLibChampion = guaranteedG6 && winner(snapshots.libertadores) === 'Palmeiras';
+  const galoChampion = winner(snapshots.sulamericana) === 'Atlético-MG';
+  if (cupFinalistIneligible) direct++;
+  if (palmeirasLibChampion) direct++;
+  const atl = tabela.find(t => t.time === 'Atlético-MG');
+  if (galoChampion && atl && atl.pos <= direct + preliminary) direct++;
+  const guarantee = direct + preliminary;
+  const pending = [];
+  if (guaranteedG6) {
+    if (!cupFinalistIneligible) pending.push('queda do Grêmio');
+    if (!palmeirasLibChampion) pending.push('título do Palmeiras na Libertadores');
+    if (!galoChampion) pending.push('título do Atlético-MG na Sul-Americana e classificação na faixa relevante');
+    else if (atl && atl.pos > guarantee) pending.push('posição final do Atlético-MG e eventual repasse');
+  } else pending.push('validação dos finalistas da Copa do Brasil e do G4');
+  return {direct, preliminary, guarantee, conditionalMax: guaranteedG6 ? 9 : 9,
+    guaranteedG6, pending};
+}
+
 function renderTabela() {
   if (state.tabela.length === 0) {
     document.getElementById('view-tabela').innerHTML = '<div class="card empty">Carregando...</div>';
@@ -5043,6 +5109,7 @@ function renderTabela() {
 
   const projecaoAoVivo = tabelaComJogosAoVivo();
   const tabelaRender = projecaoAoVivo.tabela;
+  const vagas = vagasLibertadores2027(state.tabela || []);
   // Baseline canônico: classificação oficial publicada antes do overlay ao vivo.
   // Não depende mais do localStorage do navegador, portanto todos veem as mesmas setas.
   const posBase = Object.fromEntries((state.tabela || []).map(t => [t.time, Number(t.pos)]));
@@ -5064,6 +5131,8 @@ function renderTabela() {
       : (dataTabela ? `Atualizada ${formatarDataHoraBrCompleta(dataTabela)} · ${baseTabela}` : `Base: ${baseTabela}`));
   html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">${statusTabela}</span></div>`;
   html += '<div class="mobile-table-hint">↔ Arraste a tabela para os lados no celular para ver pontos, jogos, vitórias, empates, derrotas, gols, saldo, aproveitamento e forma.</div>';
+  html += '<div class="tabela-vagas-dinamicas" id="fdg-vagas-libertadores-r35r1"><strong>Libertadores 2027: G' + vagas.guarantee + ' assegurado</strong> · ' + vagas.direct + ' vagas de grupos + ' + vagas.preliminary + ' preliminares.' +
+    '<small>Faixa pontilhada: vagas adicionais condicionais (até G9). ' + brEscapeHtml(vagas.pending.join('; ') || 'Sem repasses pendentes conhecidos') + '. Classificação matemática de um clube é indicada por ✓, separadamente da faixa de sua posição atual.</small></div>';
   html += '<div class="tabela-shell"><div class="tabela-scroll" tabindex="0" aria-label="Tabela completa com rolagem horizontal"><table class="tabela-br"><thead><tr>' +
     '<th style="width:86px;">Pos</th><th>Time</th>' +
     '<th style="text-align:center;">P</th>' +
@@ -5081,11 +5150,14 @@ function renderTabela() {
   tabelaRender.forEach(t => {
     let cls = '';
     if (t.pos >= 17) cls = 'zona-rebaixamento';
-    else if (t.pos <= 4) cls = 'zona-libertadores';
-    else if (t.pos === 5) cls = 'zona-prelibertadores';
+    else if (t.pos <= vagas.direct) cls = 'zona-libertadores';
+    else if (t.pos <= vagas.guarantee) cls = 'zona-prelibertadores';
+    else if (t.pos <= vagas.conditionalMax) cls = 'zona-libertadores-condicional';
     const seta = projecaoAoVivo.jogos.length ? htmlSetaMovimento(posBase[t.time], t.pos, true) : '';
     const esc = escudoDe(t.time);
-    const identidade = `<div class="tabela-time-cel">${brEscudoImg(esc?.escudo || '', t.time, 'tabela-escudo')}<span>${brEscapeHtml(t.time)}</span>${t._aoVivo ? '<small style="color:#fb7185;font-size:8px;font-weight:900;letter-spacing:.08em;">AO VIVO</small>' : (t._provisorioFinal ? '<small style="color:var(--accent);font-size:8px;font-weight:900;letter-spacing:.08em;">FINAL</small>' : '')}</div>`;
+    const cert = !temTabelaAoVivo && !temFinalPendente && metasObjetivosProbClube(t.time)?.probabilidades_detalhes?.libertadores?.certeza_estrutural === true
+      ? '<span class="tabela-vaga-badge" title="Classificação à Libertadores comprovada matematicamente">✓ LIBERTADORES</span>' : '';
+    const identidade = `<div class="tabela-time-cel">${brEscudoImg(esc?.escudo || '', t.time, 'tabela-escudo')}<span>${brEscapeHtml(t.time)}</span>${cert}${t._aoVivo ? '<small style="color:#fb7185;font-size:8px;font-weight:900;letter-spacing:.08em;">AO VIVO</small>' : (t._provisorioFinal ? '<small style="color:var(--accent);font-size:8px;font-weight:900;letter-spacing:.08em;">FINAL</small>' : '')}</div>`;
     const celTime = linkClubeBrasileirao(t.time, identidade, 'tabela-time-link br-club-link');
     let celForma = '';
     if (forma) {
@@ -5107,7 +5179,7 @@ function renderTabela() {
       celForma + `</tr>`;
   });
   html += '</tbody></table></div></div>';
-  html += '<div class="legenda"><div class="legenda-item"><div class="legenda-dot" style="background:#22c55e;"></div>Libertadores (G4)</div><div class="legenda-item"><div class="legenda-dot" style="background:#a3e635;"></div>Pré-Libertadores (5º)</div><div class="legenda-item"><div class="legenda-dot" style="background:#e11d48;"></div>Rebaixamento (Z4)</div><div class="legenda-item"><span class="seta-mov seta-up">▲</span>Subiu</div><div class="legenda-item"><span class="seta-mov seta-down">▼</span>Caiu</div></div>';
+  html += '<div class="legenda"><div class="legenda-item"><div class="legenda-dot" style="background:#22c55e;"></div>Fase de grupos (1º–' + vagas.direct + 'º)</div><div class="legenda-item"><div class="legenda-dot" style="background:#a3e635;"></div>Pré-Libertadores (' + (vagas.direct+1) + 'º–' + vagas.guarantee + 'º)</div><div class="legenda-item"><div class="legenda-dot" style="background:#86efac;"></div>Condicional (' + (vagas.guarantee+1) + 'º–9º)</div><div class="legenda-item"><div class="legenda-dot" style="background:#e11d48;"></div>Rebaixamento (Z4)</div><div class="legenda-item"><span class="seta-mov seta-up">▲</span>Subiu</div><div class="legenda-item"><span class="seta-mov seta-down">▼</span>Caiu</div></div>';
   html += htmlObjetivosTimeBase();
   html += htmlTabelaReturno();
   document.getElementById('view-tabela').innerHTML = html;
