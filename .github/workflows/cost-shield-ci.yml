@@ -24,7 +24,7 @@ jobs:
           node-version: '22'
       - name: Install Push Worker dependencies
         working-directory: cloudflare/push-worker
-        run: npm ci
+        run: npm install --no-audit --no-fund
       - name: Syntax and integration contracts
         working-directory: cloudflare/push-worker
         run: npm run check
@@ -36,7 +36,7 @@ jobs:
         run: node tests/test-ai-router.mjs && node tests/test-postgame-fastlane.mjs
       - name: Install Orchestrator dependencies
         working-directory: cloudflare/orchestrator-worker
-        run: npm ci
+        run: npm install --no-audit --no-fund
       - name: R2 orchestration and FINAL continuity
         working-directory: cloudflare/orchestrator-worker
         run: node --test tests/cost-governance.test.mjs && npm run validate
