@@ -29,12 +29,19 @@ jobs:
           live=json.load(open('/tmp/fdg-live.json'))
           ids={str(x.get('id','')) for x in live.get('data',{}).get('events',[])}
           required={'401841308','401841317'}
+          game_rows=[
+              {'id':str(e.get('id')),'date':e.get('date'),'status':e.get('status'),
+               'teams':[{'name':c.get('team',{}).get('displayName'),'score':c.get('score')}
+                        for comp in e.get('competitions',[]) for c in comp.get('competitors',[])]}
+              for e in live.get('data',{}).get('events',[])
+              if str(e.get('id')) in required
+          ]
           diagnostics={
               'shield': {k:shield.get(k) for k in ('version','halted','reason','lastCheckedAt','lastSuccessAt')},
               'monitor': {k:monitor.get(k) for k in ('ok','watchCount','lastBootstrapAt','lastPollAt','activeGames','lastPollError')},
               'live': {'ok':live.get('ok'),'source':live.get('source'),'stale':live.get('stale'),
                        'fetchAt':live.get('fetchedAt'),'eventCount':len(live.get('data',{}).get('events',[])),
-                       'expectedEventIdsPresent':sorted(ids.intersection(required))},
+                       'expectedEventIdsPresent':sorted(ids.intersection(required)), 'games':game_rows},
           }
           print(json.dumps(diagnostics,indent=2,ensure_ascii=False))
           assert live.get('ok') is True and required.issubset(ids), 'Live ESPN scoreboard sem ambas as partidas'
