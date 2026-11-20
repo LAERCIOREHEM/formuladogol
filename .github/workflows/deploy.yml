@@ -218,8 +218,9 @@ jobs:
           from pathlib import Path
           from datetime import datetime
           from zoneinfo import ZoneInfo
-          if datetime.now(ZoneInfo('America/Sao_Paulo')).date().isoformat()>'2026-11-19':
-              raise SystemExit('Gate de horário R35 concluído após a data da partida')
+          # Editorial Closure R2: o teste documental é permanente; o calendário
+          # NÃO pode transformar a data histórica do jogo em um veto a futuros deploys.
+          # Resultados FINAL continuam sendo validados pelo restante do pipeline.
           p=Path('dados-br/agenda-clubes-br.json')
           match=next((g for g in json.loads(p.read_text(encoding='utf-8')).get('jogos', [])
                      if str(g.get('event_id'))=='401841312'),None)
@@ -528,8 +529,8 @@ jobs:
           from pathlib import Path
           from datetime import datetime
           from zoneinfo import ZoneInfo
-          if datetime.now(ZoneInfo('America/Sao_Paulo')).date().isoformat()>'2026-11-19':
-              raise SystemExit('Gate de artefato R35 concluído após a data da partida')
+          # Editorial Closure R2: validar a proveniência dos artefatos mesmo
+          # após R35; jamais falhar só porque a data atual avançou.
           assert 'function aplicarCorrecoesKickoffOficial(' in (Path('_site')/'index.html').read_text(encoding='utf-8'), 'Guarda de horário CBF ausente do site'
           for rel in ['jogos.json','espn_eventos.json','dados-br/agenda-clubes-br.json','dados-br/probabilidades-jogos.json']:
               doc=json.loads((Path('_site')/rel).read_text(encoding='utf-8'))
