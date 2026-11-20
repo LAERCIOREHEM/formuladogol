@@ -1,0 +1,60 @@
+name: FDG R35 — Vasco x Inter Público/Renda LIVE
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'dados-br/publicos-complementares.json'
+      - 'dados-br/correcoes/publicos-verificados.json'
+      - 'scripts/atualizar_publicos_brasileirao.py'
+      - '.github/workflows/fdg-r35-vasco-inter-publicos-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify public Pages JSON and factual audit, never paid AI
+        run: |
+          python3 - <<'PY'
+          import json,math,time,urllib.request
+          BASE='https://formuladogol.com.br'
+          def fetch(path):
+              url=BASE+path+('?' if '?' not in path else '&')+'t='+str(int(time.time()*1000))
+              req=urllib.request.Request(url,headers={
+                'Accept':'application/json','Cache-Control':'no-cache',
+                'User-Agent':'FDG-R35-Attendance-Production-Proof'
+              })
+              with urllib.request.urlopen(req,timeout=15) as response:
+                  return json.load(response)
+          error='not yet checked'
+          for attempt in range(1,37):
+              try:
+                  doc=fetch('/dados-br/publicos-complementares.json')
+                  row=(doc.get('jogos') or {}).get('401841308') or {}
+                  audit=fetch('/dados-br/auditoria-publicos-identidade.json')
+                  assert row.get('publico')==19370,'publico not published'
+                  assert math.isclose(float(row.get('renda',0)),1030864.50,abs_tol=0.01),'renda not published'
+                  assert 'pagantes' not in row and 'publico_pagante' not in row,'tickets incorrectly labeled as paying attendance'
+                  assert row.get('pagantes_status')=='nao_divulgado','paying attendance is not documented'
+                  assert audit.get('total_criticos')==0,'factual audit contains critical incidents'
+                  assert audit.get('total_registros_publicos',0)>=350,'published audit is stale'
+                  print(json.dumps({
+                    'result':'PUBLISHED_AND_AUDITED',
+                    'event_id':'401841308','score':'Vasco 2 x 1 Internacional',
+                    'present':row['publico'],'paying_attendance':'not_disclosed',
+                    'revenue_brl':row['renda'],'source':row.get('fonte_publico'),
+                    'public_snapshot_updated':doc.get('atualizado_em'),
+                    'audited_games':audit['total_registros_publicos'],
+                    'audit_critical':audit['total_criticos'],
+                    'attempt':attempt
+                  },ensure_ascii=False,indent=2))
+                  break
+              except Exception as exc:
+                  error=str(exc)
+                  print('Pages reconciliation not yet visible, attempt',attempt,'reason',error)
+                  if attempt<36: time.sleep(10)
+          else:
+              raise RuntimeError('Post-deploy Pages proof failed: '+error)
+          PY
