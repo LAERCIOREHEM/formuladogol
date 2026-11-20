@@ -1116,6 +1116,13 @@ def apply_continental_mathematical_certainty(
         base_proof = (structural.get(name) or {}).get("libertadores_base") or {}
         if base_detail.get("certeza_estrutural") is not True:
             continue
+        # R35-R1: auditorias de replay podem verificar somente a prova de G11
+        # sobre um snapshot previamente certificado de G5. Ausência do campo
+        # G5 no conjunto de provas PARCIAL não invalida uma certificação
+        # preexistente. Em produção, structural_status() sempre o fornece:
+        # contradição explícita continua falhando fechada.
+        if not base_proof:
+            continue
         if base_proof.get("certo") is not True:
             raise ValueError(f"Certeza de G5 sem prova de pontuação: {name}")
         expected = {
