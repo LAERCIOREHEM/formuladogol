@@ -646,7 +646,9 @@ export class SportsMonitor {
     // silently and re-arm both checkpoints. Never reset a completed match.
     const changedKickoffs = new Set();
     if (!agendaError) {
-      for (const candidate of candidates) {
+      // A new kickoff can be days away: inspect the entire 14-day schedule,
+      // not only candidates within the six-hour live-monitoring window.
+      for (const candidate of Object.values(scheduleSnapshot)) {
         const previous = current.scheduleSnapshot[candidate.eventId] || current.watchlist[candidate.eventId];
         if (current.matches?.[candidate.eventId]?.state === 'post') continue;
         if (kickoffRescheduled(previous, candidate)) changedKickoffs.add(candidate.eventId);
