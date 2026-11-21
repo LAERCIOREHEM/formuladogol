@@ -5,19 +5,19 @@
   "temporada": 2026,
   "status": "auditado_com_lacunas",
   "resumo": {
-    "total_resultados_unicos": 350,
-    "jogos_com_placar_prejogo_comprovado": 168,
+    "total_resultados_unicos": 351,
+    "jogos_com_placar_prejogo_comprovado": 169,
     "jogos_sem_prova_prejogo": 182,
     "jogos_com_conflito": 0,
     "jogos_sem_inicio_factual": 0,
-    "jogos_com_top3_original": 168,
+    "jogos_com_top3_original": 169,
     "jogos_sem_top3_original": 0,
     "partidas_sem_previsao_nao_foram_reconstituidas": true
   },
   "fontes_resultados": {
     "caminho": "resultados.json",
-    "arquivo_sha256": "5225d12af09d7d7fe0ea374be7e0e095b74c7603ecb3fd1ba1670088192ed9a0",
-    "atualizado_em": "2026-11-21T18:11:19.062966-03:00"
+    "arquivo_sha256": "420aa972a248531de650385277f468676bd6e2dbfb5af886d8b68596bd948494",
+    "atualizado_em": "2026-11-21T18:46:28.521190-03:00"
   },
   "historico_ved_preexistente": {
     "caminho": "dados-br/historico-probabilidades-jogos.json",
@@ -41,14 +41,14 @@
   "varredura_git": {
     "fontes": {
       "dados-br/probabilidades-jogos.json": {
-        "commits_localizados": 152,
-        "snapshots_validos": 152,
-        "linhas_prejogo_elegiveis": 12586
+        "commits_localizados": 153,
+        "snapshots_validos": 153,
+        "linhas_prejogo_elegiveis": 12738
       },
       "dados-br/probabilidades-brasileirao.json": {
-        "commits_localizados": 283,
-        "snapshots_validos": 283,
-        "linhas_prejogo_elegiveis": 27852
+        "commits_localizados": 284,
+        "snapshots_validos": 284,
+        "linhas_prejogo_elegiveis": 28135
       }
     },
     "linhas_rejeitadas": {
@@ -13184,11 +13184,72 @@
         "hash_entrada_modelo": "720502b88463fe3e93e9b56161c6451b69cb82879d0a6b8edc72cb3dc4cb1a62",
         "calculado_em": "2026-11-19T02:43:22+00:00"
       }
+    },
+    {
+      "event_id": "401841322",
+      "rodada": 36,
+      "mandante": "Palmeiras",
+      "visitante": "Flamengo",
+      "inicio_factual": "2026-11-21T19:30:00+00:00",
+      "placar_final": {
+        "mandante": 1,
+        "visitante": 1
+      },
+      "identidade_partida": "palmeiras|flamengo",
+      "ids_resultado": [
+        "401841322"
+      ],
+      "situacao": "comprovado",
+      "event_id_previsao": "401841322",
+      "previsao": {
+        "gols_esperados": {
+          "mandante": 1.4492,
+          "visitante": 1.0417
+        },
+        "placar_modal": {
+          "mandante": 1,
+          "visitante": 1
+        },
+        "probabilidades_ved_pct": {
+          "mandante": 46.467,
+          "empate": 26.3788,
+          "visitante": 27.1542
+        }
+      },
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 12.505
+        },
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 12.004
+        },
+        {
+          "mandante": 2,
+          "visitante": 1,
+          "probabilidade_pct": 9.0613
+        }
+      ],
+      "top3_situacao": "nativo_documentado",
+      "proveniencia": {
+        "origem": "dados-br/probabilidades-brasileirao.json",
+        "commit": "b9355a109268e90acaf9ea93de2618c0601c2512",
+        "commit_em": "2026-11-20T10:59:06+00:00",
+        "arquivo_sha256": "59321342f833ad065b8abb4911d569c9e8429118236d7f66c27a3a34ddf68bee",
+        "linha_sha256": "6bbb966ff8ea671e0e48156b4e9daf40b9370bf377d2f8bba24a2ced0b689965",
+        "gerado_em_modelo": "2026-11-20T02:23:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_entrada_modelo": "b8b3886e031143f76139a53a5b50f260e69ffade1d9a57855347c8c9294292c5",
+        "calculado_em": "2026-11-20T02:41:53+00:00"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "56d1d9071c14d556748412384fcc64ab6246453c3d1694054280c694a1f8c0b7",
-    "hash_resumo": "5483c8677642db1a1ab859287c90ff354ef575d367df098a01462d978e10985e"
+    "hash_jogos": "b23c04c096f404cb9906a93ba00d11ff8f90cb47946f8c3b433cf276df9a183f",
+    "hash_resumo": "6b289608f98afb7b165a2e2ee2393acdf0f5cdc26c1551ecf7e097a0252bdcc4"
   }
 }
