@@ -15,14 +15,14 @@
   "resumo": {
     "jogos_na_janela": 33,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 6,
+    "descobertas_antecipadas": 7,
     "busca_streams_executada": true,
     "candidatos_oficiais_encontrados": 50,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 7,
-    "sem_transmissao": 0,
+    "sem_transmissao": 1,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -79,6 +79,18 @@
       "fontes_encontradas": [
         "GE TV"
       ],
+      "manual": false,
+      "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401841326",
+      "rodada": 36,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Botafogo x São Paulo",
+      "data_iso": "2026-11-21T17:00:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
       "manual": false,
       "descoberta_antecipada": false
     },
@@ -304,16 +316,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "q-abbpI42es",
-      "url": "https://www.youtube.com/watch?v=q-abbpI42es",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: NEWCASTLE X ARSENAL | PREMIER LEAGUE 26/27 | 11ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-21T13:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "54xZw1Uo90s",
       "url": "https://www.youtube.com/watch?v=54xZw1Uo90s",
       "fonte": "getv",
@@ -459,7 +461,7 @@
       "fonte": "getv",
       "canal": "ge tv",
       "titulo": "AO VIVO: SÃO JOSÉ X CRUZEIRO | SUPERLIGA MASCULINA 2026/27 | ge tv",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-11-21T15:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -529,7 +531,7 @@
       "fonte": "sbt",
       "canal": "SBT",
       "titulo": "SONIA ABRÃO RELEMBRA histórias com SILVIO SANTOS e recebe LUCAS GUIMARÃES | Eita Lucas! (21/11/26)",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-11-21T16:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -629,7 +631,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: REAL MADRID X CELTA | LALIGA 26/27 | 13ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-11-21T16:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -684,6 +686,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "q-abbpI42es",
+      "url": "https://www.youtube.com/watch?v=q-abbpI42es",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: NEWCASTLE X ARSENAL | PREMIER LEAGUE 26/27 | 11ª RODADA",
+      "status": "live",
+      "inicio_programado": "2026-11-21T13:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "tIM_T-D66iI",
       "url": "https://www.youtube.com/watch?v=tIM_T-D66iI",
       "fonte": "cazetv",
@@ -715,16 +727,26 @@
     }
   ],
   "search_api_pulados": [],
-  "sem_transmissao": [],
+  "sem_transmissao": [
+    {
+      "event_id": "401841326",
+      "rodada": 36,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Botafogo x São Paulo",
+      "data_iso": "2026-11-21T17:00:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
+    }
+  ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 88,
+    "unidades": 87,
     "requisicoes": {
       "channels": 4,
-      "videos": 44,
+      "videos": 43,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-11-21T15:31:12-03:00"
+  "atualizado_em": "2026-11-21T16:01:16-03:00"
 }
