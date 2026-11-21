@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-21T19:53:20.931600-03:00",
+  "gerado_em": "2026-11-21T20:03:28.355239-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 352,
   "total_com_estatisticas": 352,
-  "total_com_publico": 350,
+  "total_com_publico": 352,
   "total_com_eventos": 352,
   "total_com_jogadores": 352,
   "total_eventos_validados": 352,
@@ -20,9 +20,9 @@
       "placar_mandante": 0,
       "placar_visitante": 1,
       "estadio": "Arena Fonte Nova",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 35113,
+      "publico_tipo": "presente",
+      "publico_fonte": "Painel oficial de público e renda da Arena Fonte Nova — foto enviada pelo responsável em 21/11/2026",
       "arbitro": "",
       "stats": [
         {
@@ -561,7 +561,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-21T19:53:15.668126-03:00"
+      "atualizado_em": "2026-11-21T19:53:15.668126-03:00",
+      "publico_pagante": 34799,
+      "renda": 1244687,
+      "dados_publico_fonte_adicional": "Bahia 0 x 1 Coritiba, 36ª rodada, 21/11/2026, Arena Fonte Nova: 10.780 bilheteria + 2.505 corporativo + 21.514 sócios = 34.799 pagantes; 314 não pagantes; 35.113 público total; renda bruta R$ 1.244.687,00. Transcrição literal do painel oficial fotografado, sem inferência."
     },
     "401841322": {
       "event_id": "401841322",
@@ -573,9 +576,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Allianz Parque",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 38631,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.gazetaesportiva.com/times/palmeiras/palmeiras-x-flamengo-36-rodada-brasileirao-21-11-2026",
       "arbitro": "",
       "stats": [
         {
@@ -1129,7 +1132,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-21T19:53:18.187754-03:00"
+      "atualizado_em": "2026-11-21T19:53:18.187754-03:00",
+      "renda": 4446565.71
     },
     "401841309": {
       "event_id": "401841309",
@@ -199133,5 +199137,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 317,
+  "total_com_renda": 352
 }
