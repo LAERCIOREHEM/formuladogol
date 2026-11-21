@@ -235,12 +235,12 @@ export function auditCloudflareBilling(rows=[],now=Date.now()) {
       diag.candidateRows++;
       if(m==='cpu') diag.recognizedCpuRows++;
       else if(m==='requests') diag.recognizedRequestRows++;
-      if(m&&assessment.inferredUnit) diag.inferredUnitRows++;
       else {
         diag.unrecognizedRows++;
         diag.reasons[assessment.reason]=(diag.reasons[assessment.reason]||0)+1;
         if(diag.examples.length<6) diag.examples.push(publicMetricDescriptor(row,assessment.reason));
       }
+      if(m&&assessment.inferredUnit) diag.inferredUnitRows++;
     }
     const curr=str(row.BillingCurrency);
     if(curr) currencies.add(curr);
