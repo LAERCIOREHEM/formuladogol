@@ -677,7 +677,7 @@ export class SportsMonitor {
       };
     }
     for (const [eventId, previous] of Object.entries(current.watchlist)) {
-      if (!watchlist[eventId] && activeWatchEntry(previous, now)) watchlist[eventId] = previous;
+      if (!watchlist[eventId] && !changedKickoffs.has(eventId) && activeWatchEntry(previous, now)) watchlist[eventId] = previous;
     }
     await this.state.storage.put('watchlist', watchlist);
 
