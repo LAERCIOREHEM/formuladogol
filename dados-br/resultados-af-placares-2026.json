@@ -5,13 +5,13 @@
   "status": "ok",
   "origem": {
     "arquivo": "dados-br/auditoria-historica-placares-af-2026.json",
-    "sha256_arquivo": "97b0857d7afd83c1bfcb8417e0e61712c08c7dd2113c622fbf1d0072afe06af7",
-    "hash_jogos_e1": "b23c04c096f404cb9906a93ba00d11ff8f90cb47946f8c3b433cf276df9a183f",
-    "data_fonte_resultados": "2026-11-21T19:11:15.484456-03:00"
+    "sha256_arquivo": "3ce2854ed83f47e5a159f67ad539cb4d6ba809cc24590c01b4086c3665d5647f",
+    "hash_jogos_e1": "246a0bf5015a00a6192bad0a105dfe7d8d555833b410ae26bf36bc17748e3481",
+    "data_fonte_resultados": "2026-11-21T19:42:02.795794-03:00"
   },
   "resumo": {
-    "resultados_auditados": 351,
-    "previsoes_certificadas": 169,
+    "resultados_auditados": 352,
+    "previsoes_certificadas": 170,
     "sem_snapshot_certificado": 182,
     "quarentena_por_conflito": 0,
     "sem_horario_factual": 0
@@ -11535,10 +11535,62 @@
         "versao_modelo": "AF-Previsão 1.3",
         "top3_origem": "nativo_documentado"
       }
+    },
+    {
+      "identidade_partida": "bahia|coritiba",
+      "event_ids": [
+        "401841327"
+      ],
+      "rodada_auditada": 36,
+      "mandante": "Bahia",
+      "visitante": "Coritiba",
+      "inicio_factual": "2026-11-21T20:30:00+00:00",
+      "placar_final_auditado": {
+        "mandante": 0,
+        "visitante": 1
+      },
+      "situacao": "comprovado",
+      "placar_previsto": {
+        "mandante": 1,
+        "visitante": 0
+      },
+      "gols_projetados": {
+        "mandante": 1.8709,
+        "visitante": 0.8791
+      },
+      "probabilidades_ved_pct": {
+        "mandante": 60.723,
+        "empate": 22.107,
+        "visitante": 17.17
+      },
+      "palpite_resultado_top1": "mandante",
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 11.9597
+        },
+        {
+          "mandante": 2,
+          "visitante": 0,
+          "probabilidade_pct": 11.1879
+        },
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 10.5142
+        }
+      ],
+      "prova": {
+        "commit": "b9355a109268e90acaf9ea93de2618c0601c2512",
+        "gerado_em": "2026-11-20T02:23:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "top3_origem": "nativo_documentado"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "381c5b5d087a3b8c31966347907ef09c48e90645d7318df9634acdd974addbf4"
+    "hash_jogos": "58c6d5b5f62f7a81429b474ceb3c6a727cf314873dc8a49862c52cc303dd2418"
   }
 }
