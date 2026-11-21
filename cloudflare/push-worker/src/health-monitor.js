@@ -1,6 +1,6 @@
 import { sendMail, mailConfig, maskAddress } from './mailer.js';
 import { aiUsageSummary, providerUsageSummary, postgamePublicCostSummary } from './ai-usage.js';
-import { auditCloudflareBilling } from './cloudflare-billing-audit.js';
+import { auditCloudflareBilling, CF_BILLING_AUDIT_VERSION } from './cloudflare-billing-audit.js';
 import { fetchWorkersAnalyticsGraphQL, reconcileWorkersAnalytics } from './workers-graphql-reconciliation.js';
 export { summarizeCloudflareWorkersUsage } from './cloudflare-billing-audit.js';
 import { OPS_INTELLIGENCE_CONSTANTS, opsIntelligenceStatus } from './ops-intelligence.js';
@@ -14,7 +14,7 @@ const DAILY_RECOVERY_END_HOUR_BRT = 12; // exclusivo: recupera até 11:59 BRT
 const DAILY_RETRY_MS = 15 * 60_000;
 const CF_BILLING_CACHE_MS = 60 * 60_000;
 const CF_BILLING_COST_WARNING_USD = 50; // apenas alerta de observação, não limite de cobrança
-export const HEALTH_POLICY_VERSION = 14;
+export const HEALTH_POLICY_VERSION = 15;
 export const HUNTER_DAILY_WARNING_USD = 5;
 export const HUNTER_DAILY_CRITICAL_USD = 10;
 const ONE_SHOT_REPORT_DATE = "2026-10-17";
@@ -113,7 +113,7 @@ async function cloudflareBillingSummary(env, now=Date.now()) {
   const account=text(env.AI_GATEWAY_ACCOUNT_ID);
   if(!token||!account) return {configured:false,ok:false,reason:'not_configured'};
   const cache=safeJson(await metaGet(env,'cloudflare_billing_cache'),null);
-  if(cache?.auditVersion===3 && cache?.reconciliationVersion===2 && cache?.workers &&
+  if(cache?.auditVersion===CF_BILLING_AUDIT_VERSION && cache?.reconciliationVersion===2 && cache?.workers &&
      now-(Date.parse(cache.at)||0)<CF_BILLING_CACHE_MS) return cache;
   try {
     const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/billable-usage`,{headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},cache:'no-store'});
@@ -474,6 +474,7 @@ export function cloudflareDigestLines(cf){
   const diagnostics=cf.metricDiagnostics||{};
   const diagnosticLines=diagnostics.schemaVersion===1?[
     `Diagnóstico Workers V1: ${diagnostics.candidateRows||0} registro(s) candidatos · CPU reconhecidos ${diagnostics.recognizedCpuRows||0} · requests reconhecidos ${diagnostics.recognizedRequestRows||0} · não reconhecidos ${diagnostics.unrecognizedRows||0}`,
+    ...((diagnostics.inferredUnitRows||0)>0?[`- Recuperação V1: ${diagnostics.inferredUnitRows} unidade(s) derivada(s) de rótulos comerciais explícitos e PricingUnit=Count; sem presumir outras unidades`]:[]),
     ...Object.entries(diagnostics.reasons||{}).map(([reason,count])=>`- Motivo ${reason}: ${count} registro(s)`),
     ...((w.status!=='verified')?(diagnostics.examples||[]).slice(0,3).map((d,i)=>
       `- Exemplo ${i+1} (${d.reason}): família=${d.serviceFamily||'—'}; serviço=${d.serviceName||'—'}; métrica=${d.metricName||d.metricId||d.chargeDescription||'—'}; unidade=${d.consumedUnit||'—'}; pricing=${d.pricingUnit||'—'}`):[])
