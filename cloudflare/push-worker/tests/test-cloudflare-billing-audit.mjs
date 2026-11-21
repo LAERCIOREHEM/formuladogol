@@ -29,7 +29,7 @@ const sample=[
 ];
 const result=auditCloudflareBilling(sample,NOW);
 assert.equal(result.ok,true);
-assert.equal(result.auditVersion,3);
+assert.equal(result.auditVersion,4);
 assert.equal(result.workers.status,'verified');
 assert.equal(result.workers.cpuMs,14_708_270,'CPU deve ignorar ciclos antigos e outros produtos');
 assert.equal(result.workers.requests,66_826);
@@ -196,7 +196,7 @@ const recoveredWithoutService=auditCloudflareBilling([
     ChargeDescription:'Workers CPU ms (first 30M are included)'},
   {...commercialRows[1],ServiceName:null,x_BillableMetricName:'Workers Standard Requests'}
 ],NOW);
-assert.equal(recoveredWithoutService.auditVersion,3);
+assert.equal(recoveredWithoutService.auditVersion,4);
 assert.equal(recoveredWithoutService.workers.status,'verified');
 assert.equal(recoveredWithoutService.workers.cpuMs,1_500_000);
 assert.equal(recoveredWithoutService.workers.requests,25_000);
@@ -224,6 +224,54 @@ const rejectedOtherProducts=auditCloudflareBilling([
 ],NOW);
 assert.equal(rejectedOtherProducts.workers.cpuMs,1_500_000);
 assert.equal(rejectedOtherProducts.metricDiagnostics.candidateRows,2);
+
+// R38-V4: live Billing V1 has no ConsumedUnit and reports PricingUnit=Count.
+// Recover ONLY the two explicitly named Workers Standard commercial units.
+const commercialCountRows=commercialRows.map(r=>({
+  ...r,ConsumedUnit:null,PricingUnit:'Count',
+  x_BillableMetricName:r.ServiceName+' usage measured in Count'
+}));
+const recoveredCount=auditCloudflareBilling(commercialCountRows,NOW);
+assert.equal(recoveredCount.auditVersion,4);
+assert.equal(recoveredCount.workers.status,'verified');
+assert.equal(recoveredCount.workers.cpuMs,1_500_000);
+assert.equal(recoveredCount.workers.requests,25_000);
+assert.equal(recoveredCount.metricDiagnostics.candidateRows,2);
+assert.equal(recoveredCount.metricDiagnostics.inferredUnitRows,2);
+assert.equal(cloudflareSeverity(recoveredCount),'green');
+assert.match(cloudflareDigestLines(recoveredCount).join('\\n'),/Recuperação V1: 2 unidade/);
+const countFour=auditCloudflareBilling([
+  ...commercialCountRows,
+  ...commercialCountRows.map(r=>({
+    ...r,ChargePeriodStart:'2026-11-14T00:00:00Z',
+    ChargePeriodEnd:'2026-11-15T00:00:00Z'
+  }))
+],NOW);
+assert.equal(countFour.metricDiagnostics.candidateRows,4);
+assert.equal(countFour.metricDiagnostics.inferredUnitRows,4);
+assert.equal(countFour.workers.cpuMs,3_000_000);
+assert.equal(countFour.workers.requests,50_000);
+assert.equal(countFour.workers.status,'verified');
+for(const first of [
+  {...commercialCountRows[0],PricingUnit:null},
+  {...commercialCountRows[0],PricingUnit:'Seconds'},
+  {...commercialCountRows[0],ServiceName:'Workers Standard'},
+  {...commercialCountRows[0],ChargeDescription:'Workers Standard Requests'},
+  {...commercialCountRows[0],x_BillableMetricName:'Workers Standard Requests'},
+  {...commercialCountRows[0],ConsumedUnit:'Count'}
+]) {
+  const invalid=auditCloudflareBilling([first,commercialCountRows[1]],NOW);
+  assert.equal(invalid.workers.status,'unavailable','unidade ambígua nunca certifica CPU');
+  assert.equal(invalid.workers.cpuMs,null);
+  assert.equal(cloudflareSeverity(invalid),'yellow');
+}
+const unrelatedCount=auditCloudflareBilling([
+  {...commercialCountRows[0],ServiceFamilyName:'Workers AI'},
+  commercialCountRows[1]
+],NOW);
+assert.equal(unrelatedCount.workers.cpuMs,null,'Workers AI não pode contaminar métricas Workers Standard');
+assert.equal(cloudflareSeverity(unrelatedCount),'yellow');
+
 const testFacade=summarizeCloudflareWorkersUsage(sample.slice(0,2),NOW);
 assert.equal(testFacade.cpuMs,14_708_270);
 assert.equal(testFacade.status,'verified');
