@@ -5,10 +5,10 @@
   "temporada": 2026,
   "gerado_em": "2026-11-21T19:32:22-03:00",
   "referencia_esportiva_em": "2026-11-21T19:32:22-03:00",
-  "calculado_em": "2026-11-21T19:59:12-03:00",
+  "calculado_em": "2026-11-21T20:11:00-03:00",
   "fonte_resultados_calendario": "ESPN",
   "status": "ok",
-  "hash_entrada": "10ca51e9e292ca5ab64f30a61dafb624cdde6ef6a51c2b443f8dec20df80bb86",
+  "hash_entrada": "0b05a1b90a6f3a1d14c36099169b3c156f9295c0ceefd6527ef603e271910d05",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -22,14 +22,14 @@
       "metodo": "EWMA de resíduos de gols sem componente sazonal",
       "janela_jogos": 12,
       "peso_no_modelo": 0.08,
-      "limite_ajuste_taxa_partida_pct": 10,
+      "limite_ajuste_taxa_partida_pct": 10.0,
       "regra": "ajuste marginal e limitado; não substitui a força acumulada nem a simulação da tabela restante"
     },
-    "decaimento_temporal_meia_vida_dias": 365,
+    "decaimento_temporal_meia_vida_dias": 365.0,
     "desvio_prior": 0.4,
     "dixon_coles": {
       "implementado": true,
-      "rho_producao": 0,
+      "rho_producao": 0.0,
       "regra": "ativação condicionada a ganho fora da amostra; atualmente mantido como sensibilidade"
     },
     "monte_carlo": 2000000,
@@ -87,7 +87,7 @@
         "vitorias_medias": 25.4860125,
         "saldo_medio": 46.812572,
         "gols_pro_medios": 79.2847285,
-        "posicao_media_simulada": 1
+        "posicao_media_simulada": 1.0
       },
       {
         "posicao": 2,
@@ -96,7 +96,7 @@
         "vitorias_medias": 22.458745,
         "saldo_medio": 41.1015135,
         "gols_pro_medios": 68.3994455,
-        "posicao_media_simulada": 2
+        "posicao_media_simulada": 2.0
       },
       {
         "posicao": 3,
@@ -258,20 +258,18 @@
         "vitorias_medias": 4.330432,
         "saldo_medio": -44.252307,
         "gols_pro_medios": 35.2570715,
-        "posicao_media_simulada": 20
+        "posicao_media_simulada": 20.0
       }
     ]
   },
   "destaques": {
     "maior_chance_titulo": {
       "clube": "Flamengo",
-      "probabilidade_pct": 100,
-      "certeza_estrutural": true,
-      "situacao": "Campeão brasileiro de 2026"
+      "probabilidade_pct": 100.0
     },
     "maior_chance_libertadores": {
       "clube": "Flamengo",
-      "probabilidade_pct": 100
+      "probabilidade_pct": 100.0
     },
     "maior_chance_sul_americana": {
       "clube": "São Paulo",
@@ -279,7 +277,7 @@
     },
     "maior_risco_rebaixamento": {
       "clube": "Chapecoense",
-      "probabilidade_pct": 100
+      "probabilidade_pct": 100.0
     }
   },
   "clubes": [
@@ -289,34 +287,34 @@
       "pontos_atuais": 80,
       "jogos_atuais": 36,
       "probabilidades_pct": {
-        "campeao": 100,
-        "g4": 100,
-        "g6": 100,
-        "libertadores_base": 100,
-        "sul_americana_base": 0,
-        "rebaixamento": 0,
-        "libertadores": 100,
-        "sul_americana": 0,
-        "sem_competicao_continental": 0
+        "campeao": 100.0,
+        "g4": 100.0,
+        "g6": 100.0,
+        "libertadores_base": 100.0,
+        "sul_americana_base": 0.0,
+        "rebaixamento": 0.0,
+        "libertadores": 100.0,
+        "sul_americana": 0.0,
+        "sem_competicao_continental": 0.0
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
           "certeza_estrutural": true,
-          "motivo_certeza": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_certeza": "Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -329,7 +327,7 @@
         "g6": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -342,7 +340,7 @@
         "libertadores_base": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -355,7 +353,7 @@
         "sul_americana_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -368,7 +366,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -381,7 +379,7 @@
         "libertadores": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -394,7 +392,7 @@
         "sul_americana": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -407,7 +405,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -420,14 +418,14 @@
       },
       "posicao_projetada": 1,
       "posicao_classificacao_projetada": 1,
-      "posicao_projetada_media": 1,
+      "posicao_projetada_media": 1.0,
       "posicao_projetada_mediana": 1,
       "classificacao_projetada_criterios": {
         "pontos_medios": 84.758635,
         "vitorias_medias": 25.4860125,
         "saldo_medio": 46.812572,
         "gols_pro_medios": 79.2847285,
-        "posicao_media_simulada": 1
+        "posicao_media_simulada": 1.0
       },
       "faixa_posicao_80": {
         "melhor": 1,
@@ -445,26 +443,26 @@
         "maximo_simulado": 86
       },
       "distribuicao_posicoes_pct": [
-        100,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        100.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -480,7 +478,7 @@
           "total": {
             "ocorrencias": 2000000,
             "simulacoes": 2000000,
-            "percentual_estimado": 100,
+            "percentual_estimado": 100.0,
             "exibicao": "100%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -494,7 +492,7 @@
             "via_brasileirao": {
               "ocorrencias": 2000000,
               "simulacoes": 2000000,
-              "percentual_estimado": 100,
+              "percentual_estimado": 100.0,
               "exibicao": "100%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -507,7 +505,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -520,7 +518,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -533,7 +531,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -546,7 +544,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -561,7 +559,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -574,7 +572,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -587,7 +585,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -598,13 +596,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 100
+          "soma_vias_pct": 100.0
         },
         "sul_americana": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "0%",
             "zero_observado": true,
             "possivel_estruturalmente": false,
@@ -618,7 +616,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -631,7 +629,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -642,13 +640,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0
+          "soma_vias_pct": 0.0
         },
         "sem_competicao_continental": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "0%",
             "zero_observado": true,
             "possivel_estruturalmente": false,
@@ -668,7 +666,7 @@
         "limite_posicao_pior": 1,
         "fundamento_vaga_continental": "No máximo 1º lugar pelos limites de pontuação. O modelo assegura vaga continental aos 11 primeiros (5 Libertadores-base e 6 Sul-Americana).",
         "titulo": "campeao_confirmado",
-        "fundamento_titulo": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos."
+        "fundamento_titulo": "Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão."
       }
     },
     {
@@ -677,34 +675,34 @@
       "pontos_atuais": 74,
       "jogos_atuais": 36,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 100,
-        "g6": 100,
-        "libertadores_base": 100,
-        "sul_americana_base": 0,
-        "rebaixamento": 0,
-        "libertadores": 100,
-        "sul_americana": 0,
-        "sem_competicao_continental": 0
+        "campeao": 0.0,
+        "g4": 100.0,
+        "g6": 100.0,
+        "libertadores_base": 100.0,
+        "sul_americana_base": 0.0,
+        "rebaixamento": 0.0,
+        "libertadores": 100.0,
+        "sul_americana": 0.0,
+        "sem_competicao_continental": 0.0
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -717,7 +715,7 @@
         "g6": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -730,7 +728,7 @@
         "libertadores_base": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -743,7 +741,7 @@
         "sul_americana_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -756,7 +754,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -769,7 +767,7 @@
         "libertadores": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -782,7 +780,7 @@
         "sul_americana": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -795,7 +793,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -808,14 +806,14 @@
       },
       "posicao_projetada": 2,
       "posicao_classificacao_projetada": 2,
-      "posicao_projetada_media": 2,
+      "posicao_projetada_media": 2.0,
       "posicao_projetada_mediana": 2,
       "classificacao_projetada_criterios": {
         "pontos_medios": 78.7268135,
         "vitorias_medias": 22.458745,
         "saldo_medio": 41.1015135,
         "gols_pro_medios": 68.3994455,
-        "posicao_media_simulada": 2
+        "posicao_media_simulada": 2.0
       },
       "faixa_posicao_80": {
         "melhor": 2,
@@ -833,26 +831,26 @@
         "maximo_simulado": 80
       },
       "distribuicao_posicoes_pct": [
-        0,
-        100,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        0.0,
+        100.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -868,7 +866,7 @@
           "total": {
             "ocorrencias": 2000000,
             "simulacoes": 2000000,
-            "percentual_estimado": 100,
+            "percentual_estimado": 100.0,
             "exibicao": "100%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -882,7 +880,7 @@
             "via_brasileirao": {
               "ocorrencias": 2000000,
               "simulacoes": 2000000,
-              "percentual_estimado": 100,
+              "percentual_estimado": 100.0,
               "exibicao": "100%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -895,7 +893,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -908,7 +906,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -921,7 +919,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -934,7 +932,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -949,7 +947,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -962,7 +960,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -975,7 +973,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -986,13 +984,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 100
+          "soma_vias_pct": 100.0
         },
         "sul_americana": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "0%",
             "zero_observado": true,
             "possivel_estruturalmente": false,
@@ -1006,7 +1004,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1019,7 +1017,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1030,13 +1028,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0
+          "soma_vias_pct": 0.0
         },
         "sem_competicao_continental": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "0%",
             "zero_observado": true,
             "possivel_estruturalmente": false,
@@ -1063,34 +1061,34 @@
       "pontos_atuais": 63,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 100,
-        "g6": 100,
-        "libertadores_base": 100,
-        "sul_americana_base": 0,
-        "rebaixamento": 0,
-        "libertadores": 100,
-        "sul_americana": 0,
-        "sem_competicao_continental": 0
+        "campeao": 0.0,
+        "g4": 100.0,
+        "g6": 100.0,
+        "libertadores_base": 100.0,
+        "sul_americana_base": 0.0,
+        "rebaixamento": 0.0,
+        "libertadores": 100.0,
+        "sul_americana": 0.0,
+        "sem_competicao_continental": 0.0
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -1103,7 +1101,7 @@
         "g6": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -1116,7 +1114,7 @@
         "libertadores_base": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -1129,7 +1127,7 @@
         "sul_americana_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1142,7 +1140,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1155,7 +1153,7 @@
         "libertadores": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -1168,7 +1166,7 @@
         "sul_americana": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1181,7 +1179,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1219,26 +1217,26 @@
         "maximo_simulado": 72
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
+        0.0,
+        0.0,
         86.3976,
         13.6024,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -1254,7 +1252,7 @@
           "total": {
             "ocorrencias": 2000000,
             "simulacoes": 2000000,
-            "percentual_estimado": 100,
+            "percentual_estimado": 100.0,
             "exibicao": "100%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -1268,7 +1266,7 @@
             "via_brasileirao": {
               "ocorrencias": 2000000,
               "simulacoes": 2000000,
-              "percentual_estimado": 100,
+              "percentual_estimado": 100.0,
               "exibicao": "100%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -1281,7 +1279,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1294,7 +1292,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1307,7 +1305,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1320,7 +1318,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1335,7 +1333,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1348,7 +1346,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1361,7 +1359,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1372,13 +1370,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 100
+          "soma_vias_pct": 100.0
         },
         "sul_americana": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "0%",
             "zero_observado": true,
             "possivel_estruturalmente": false,
@@ -1392,7 +1390,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1405,7 +1403,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1416,13 +1414,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0
+          "soma_vias_pct": 0.0
         },
         "sem_competicao_continental": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "0%",
             "zero_observado": true,
             "possivel_estruturalmente": false,
@@ -1449,28 +1447,28 @@
       "pontos_atuais": 60,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
+        "campeao": 0.0,
         "g4": 97.33595,
-        "g6": 100,
+        "g6": 100.0,
         "libertadores_base": 99.98575,
         "sul_americana_base": 0.01425,
-        "rebaixamento": 0,
-        "libertadores": 100,
-        "sul_americana": 0,
-        "sem_competicao_continental": 0
+        "rebaixamento": 0.0,
+        "libertadores": 100.0,
+        "sul_americana": 0.0,
+        "sem_competicao_continental": 0.0
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -1489,7 +1487,7 @@
         "g6": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -1528,7 +1526,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1541,7 +1539,7 @@
         "libertadores": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -1554,7 +1552,7 @@
         "sul_americana": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1567,7 +1565,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1605,26 +1603,26 @@
         "maximo_simulado": 69
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
+        0.0,
+        0.0,
         13.6024,
         83.73355,
         2.6498,
         0.01425,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -1640,7 +1638,7 @@
           "total": {
             "ocorrencias": 2000000,
             "simulacoes": 2000000,
-            "percentual_estimado": 100,
+            "percentual_estimado": 100.0,
             "exibicao": "100%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -1667,7 +1665,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1680,7 +1678,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1693,7 +1691,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1721,7 +1719,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1734,7 +1732,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1747,7 +1745,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -1758,13 +1756,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 100
+          "soma_vias_pct": 100.0
         },
         "sul_americana": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "0%",
             "zero_observado": true,
             "possivel_estruturalmente": false,
@@ -1778,7 +1776,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -1791,7 +1789,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -1802,13 +1800,13 @@
               "limite_superior_95_regra_dos_tres_pct": 0.00015
             }
           },
-          "soma_vias_pct": 0
+          "soma_vias_pct": 0.0
         },
         "sem_competicao_continental": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "0%",
             "zero_observado": true,
             "possivel_estruturalmente": false,
@@ -1835,28 +1833,28 @@
       "pontos_atuais": 54,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
+        "campeao": 0.0,
         "g4": 2.63055,
         "g6": 90.6664,
         "libertadores_base": 70.46315,
         "sul_americana_base": 29.53685,
-        "rebaixamento": 0,
+        "rebaixamento": 0.0,
         "libertadores": 98.4754,
         "sul_americana": 1.5246,
-        "sem_competicao_continental": 0
+        "sem_competicao_continental": 0.0
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -1914,7 +1912,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1953,7 +1951,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -1991,9 +1989,9 @@
         "maximo_simulado": 63
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
         2.63055,
         67.8326,
         20.20325,
@@ -2001,16 +1999,16 @@
         2.14345,
         0.1907,
         0.0001,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -2053,7 +2051,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2066,7 +2064,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2079,7 +2077,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2107,7 +2105,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2120,7 +2118,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2133,7 +2131,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2177,7 +2175,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -2194,7 +2192,7 @@
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "0%",
             "zero_observado": true,
             "possivel_estruturalmente": false,
@@ -2219,34 +2217,34 @@
       "pontos_atuais": 54,
       "jogos_atuais": 36,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 0,
+        "campeao": 0.0,
+        "g4": 0.0,
         "g6": 48.4706,
         "libertadores_base": 13.3082,
         "sul_americana_base": 86.6918,
-        "rebaixamento": 0,
+        "rebaixamento": 0.0,
         "libertadores": 86.9079,
         "sul_americana": 13.0921,
-        "sem_competicao_continental": 0
+        "sem_competicao_continental": 0.0
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -2298,7 +2296,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -2337,7 +2335,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -2375,26 +2373,26 @@
         "maximo_simulado": 60
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         13.3082,
         35.1624,
         28.5604,
         19.6473,
         3.2873,
         0.0344,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -2437,7 +2435,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2450,7 +2448,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2463,7 +2461,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2491,7 +2489,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2504,7 +2502,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2517,7 +2515,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2561,7 +2559,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -2578,7 +2576,7 @@
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "0%",
             "zero_observado": true,
             "possivel_estruturalmente": false,
@@ -2603,28 +2601,28 @@
       "pontos_atuais": 51,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
+        "campeao": 0.0,
         "g4": 0.0335,
         "g6": 39.5565,
         "libertadores_base": 11.32065,
         "sul_americana_base": 88.67935,
-        "rebaixamento": 0,
+        "rebaixamento": 0.0,
         "libertadores": 82.2794,
         "sul_americana": 17.7206,
-        "sem_competicao_continental": 0
+        "sem_competicao_continental": 0.0
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -2682,7 +2680,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -2721,7 +2719,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -2759,9 +2757,9 @@
         "maximo_simulado": 60
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
         0.0335,
         11.28715,
         28.23585,
@@ -2770,15 +2768,15 @@
         10.2375,
         2.7004,
         0.17745,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -2821,7 +2819,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2834,7 +2832,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2875,7 +2873,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2888,7 +2886,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2901,7 +2899,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -2945,7 +2943,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -2962,7 +2960,7 @@
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -2982,12 +2980,12 @@
       "pontos_atuais": 50,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 0,
+        "campeao": 0.0,
+        "g4": 0.0,
         "g6": 18.8971,
         "libertadores_base": 4.69865,
         "sul_americana_base": 95.21945,
-        "rebaixamento": 0,
+        "rebaixamento": 0.0,
         "libertadores": 63.436,
         "sul_americana": 36.56345,
         "sem_competicao_continental": 0.00055
@@ -2996,20 +2994,20 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -3061,7 +3059,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -3138,10 +3136,10 @@
         "maximo_simulado": 59
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         4.69865,
         14.19845,
         27.50825,
@@ -3151,13 +3149,13 @@
         1.25345,
         0.07875,
         0.0031,
-        0.00005,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        5e-05,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -3200,7 +3198,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3213,7 +3211,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3226,7 +3224,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3254,7 +3252,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3267,7 +3265,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3280,7 +3278,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3361,12 +3359,12 @@
       "pontos_atuais": 47,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 0,
+        "campeao": 0.0,
+        "g4": 0.0,
         "g6": 1.28845,
         "libertadores_base": 0.11315,
         "sul_americana_base": 96.87395,
-        "rebaixamento": 0,
+        "rebaixamento": 0.0,
         "libertadores": 19.9731,
         "sul_americana": 79.98555,
         "sem_competicao_continental": 0.04135
@@ -3375,20 +3373,20 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -3440,7 +3438,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -3517,10 +3515,10 @@
         "maximo_simulado": 56
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         0.11315,
         1.1753,
         5.87945,
@@ -3533,10 +3531,10 @@
         0.05465,
         0.0028,
         0.00025,
-        0,
-        0,
-        0,
-        0
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -3579,7 +3577,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3592,7 +3590,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3605,7 +3603,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3633,7 +3631,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3646,7 +3644,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3659,7 +3657,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3740,12 +3738,12 @@
       "pontos_atuais": 47,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 0,
+        "campeao": 0.0,
+        "g4": 0.0,
         "g6": 1.12095,
         "libertadores_base": 0.11045,
         "sul_americana_base": 94.08155,
-        "rebaixamento": 0,
+        "rebaixamento": 0.0,
         "libertadores": 13.6902,
         "sul_americana": 86.1676,
         "sem_competicao_continental": 0.1422
@@ -3754,20 +3752,20 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -3819,7 +3817,7 @@
         "rebaixamento": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -3896,10 +3894,10 @@
         "maximo_simulado": 56
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         0.11045,
         1.0105,
         4.4753,
@@ -3912,10 +3910,10 @@
         0.18385,
         0.01775,
         0.00025,
-        0,
-        0,
-        0,
-        0
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -3958,7 +3956,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3971,7 +3969,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -3984,7 +3982,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4012,7 +4010,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4025,7 +4023,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4038,7 +4036,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4119,10 +4117,10 @@
       "pontos_atuais": 44,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 0,
-        "g6": 0,
-        "libertadores_base": 0,
+        "campeao": 0.0,
+        "g4": 0.0,
+        "g6": 0.0,
+        "libertadores_base": 0.0,
         "sul_americana_base": 57.51615,
         "rebaixamento": 0.06105,
         "libertadores": 1.2394,
@@ -4133,20 +4131,20 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -4159,7 +4157,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -4172,7 +4170,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -4275,12 +4273,12 @@
         "maximo_simulado": 53
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         0.0771,
         0.95675,
         4.94405,
@@ -4293,8 +4291,8 @@
         0.8321,
         0.0605,
         0.00055,
-        0,
-        0
+        0.0,
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -4324,7 +4322,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -4337,7 +4335,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4350,7 +4348,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4363,7 +4361,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4391,7 +4389,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4404,7 +4402,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4417,7 +4415,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4498,10 +4496,10 @@
       "pontos_atuais": 42,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 0,
-        "g6": 0,
-        "libertadores_base": 0,
+        "campeao": 0.0,
+        "g4": 0.0,
+        "g6": 0.0,
+        "libertadores_base": 0.0,
         "sul_americana_base": 27.3865,
         "rebaixamento": 3.12915,
         "libertadores": 0.32395,
@@ -4512,20 +4510,20 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -4538,7 +4536,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -4551,7 +4549,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -4654,12 +4652,12 @@
         "maximo_simulado": 51
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         0.0001,
         0.19165,
         1.5632,
@@ -4672,8 +4670,8 @@
         7.9711,
         2.84225,
         0.2869,
-        0,
-        0
+        0.0,
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -4703,7 +4701,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -4716,7 +4714,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4729,7 +4727,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4742,7 +4740,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4770,7 +4768,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4783,7 +4781,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4796,7 +4794,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -4877,10 +4875,10 @@
       "pontos_atuais": 45,
       "jogos_atuais": 36,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 0,
-        "g6": 0,
-        "libertadores_base": 0,
+        "campeao": 0.0,
+        "g4": 0.0,
+        "g6": 0.0,
+        "libertadores_base": 0.0,
         "sul_americana_base": 9.5658,
         "rebaixamento": 0.0322,
         "libertadores": 0.03445,
@@ -4891,20 +4889,20 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -4917,7 +4915,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -4930,7 +4928,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5033,13 +5031,13 @@
         "maximo_simulado": 51
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         0.01015,
         0.19185,
         1.72295,
@@ -5050,9 +5048,9 @@
         10.3607,
         1.53935,
         0.03215,
-        0.00005,
-        0,
-        0
+        5e-05,
+        0.0,
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -5082,7 +5080,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -5095,7 +5093,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5108,7 +5106,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5121,7 +5119,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5149,7 +5147,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5162,7 +5160,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5175,7 +5173,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5256,10 +5254,10 @@
       "pontos_atuais": 41,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 0,
-        "g6": 0,
-        "libertadores_base": 0,
+        "campeao": 0.0,
+        "g4": 0.0,
+        "g6": 0.0,
+        "libertadores_base": 0.0,
         "sul_americana_base": 5.05385,
         "rebaixamento": 21.6581,
         "libertadores": 0.0116,
@@ -5270,20 +5268,20 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5296,7 +5294,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5309,7 +5307,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5412,13 +5410,13 @@
         "maximo_simulado": 50
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         0.0001,
         0.057,
         0.96865,
@@ -5431,7 +5429,7 @@
         13.21645,
         8.4043,
         0.03735,
-        0
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -5461,7 +5459,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -5474,7 +5472,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5487,7 +5485,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5500,7 +5498,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5528,7 +5526,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5541,7 +5539,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5554,7 +5552,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5635,10 +5633,10 @@
       "pontos_atuais": 41,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 0,
-        "g6": 0,
-        "libertadores_base": 0,
+        "campeao": 0.0,
+        "g4": 0.0,
+        "g6": 0.0,
+        "libertadores_base": 0.0,
         "sul_americana_base": 3.83595,
         "rebaixamento": 19.96845,
         "libertadores": 0.0184,
@@ -5649,20 +5647,20 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5675,7 +5673,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5688,7 +5686,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -5791,13 +5789,13 @@
         "maximo_simulado": 50
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         0.00425,
         0.12235,
         0.90625,
@@ -5809,8 +5807,8 @@
         20.8497,
         15.5982,
         4.37025,
-        0,
-        0
+        0.0,
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -5840,7 +5838,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -5853,7 +5851,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5866,7 +5864,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5879,7 +5877,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5907,7 +5905,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5920,7 +5918,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -5933,7 +5931,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6014,10 +6012,10 @@
       "pontos_atuais": 40,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 0,
-        "g6": 0,
-        "libertadores_base": 0,
+        "campeao": 0.0,
+        "g4": 0.0,
+        "g6": 0.0,
+        "libertadores_base": 0.0,
         "sul_americana_base": 5.0144,
         "rebaixamento": 22.2839,
         "libertadores": 0.00825,
@@ -6028,20 +6026,20 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6054,7 +6052,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6067,7 +6065,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6170,14 +6168,14 @@
         "maximo_simulado": 49
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         0.04775,
         1.09365,
         3.873,
@@ -6189,7 +6187,7 @@
         13.26375,
         8.90125,
         0.1189,
-        0
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -6219,7 +6217,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -6232,7 +6230,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6245,7 +6243,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6258,7 +6256,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6286,7 +6284,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6299,7 +6297,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6312,7 +6310,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6393,13 +6391,13 @@
       "pontos_atuais": 38,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 0,
-        "g6": 0,
-        "libertadores_base": 0,
+        "campeao": 0.0,
+        "g4": 0.0,
+        "g6": 0.0,
+        "libertadores_base": 0.0,
         "sul_americana_base": 0.35315,
         "rebaixamento": 59.1303,
-        "libertadores": 0,
+        "libertadores": 0.0,
         "sul_americana": 10.31795,
         "sem_competicao_continental": 89.68205
       },
@@ -6407,20 +6405,20 @@
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6433,7 +6431,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6446,7 +6444,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6485,7 +6483,7 @@
         "libertadores": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -6549,16 +6547,16 @@
         "maximo_simulado": 47
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         0.35315,
         1.73805,
         2.71335,
@@ -6568,7 +6566,7 @@
         33.9395,
         24.84845,
         0.34235,
-        0
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -6584,7 +6582,7 @@
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -6598,7 +6596,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -6611,7 +6609,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6624,7 +6622,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6637,7 +6635,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6650,7 +6648,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -6665,7 +6663,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6678,7 +6676,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6691,7 +6689,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -6702,7 +6700,7 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0
+          "soma_vias_pct": 0.0
         },
         "sul_americana": {
           "total": {
@@ -6772,34 +6770,34 @@
       "pontos_atuais": 38,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 0,
-        "g6": 0,
-        "libertadores_base": 0,
+        "campeao": 0.0,
+        "g4": 0.0,
+        "g6": 0.0,
+        "libertadores_base": 0.0,
         "sul_americana_base": 0.177,
         "rebaixamento": 73.739,
         "libertadores": 26.261,
-        "sul_americana": 0,
+        "sul_americana": 0.0,
         "sem_competicao_continental": 73.739
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6812,7 +6810,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6825,7 +6823,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -6877,7 +6875,7 @@
         "sul_americana": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -6928,16 +6926,16 @@
         "maximo_simulado": 47
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         0.177,
         0.97275,
         1.59535,
@@ -6947,7 +6945,7 @@
         20.8882,
         51.8893,
         0.9615,
-        0
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -6977,7 +6975,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -7003,7 +7001,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7016,7 +7014,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7029,7 +7027,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -7057,7 +7055,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -7087,7 +7085,7 @@
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -7101,7 +7099,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -7114,7 +7112,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -7125,7 +7123,7 @@
               "limite_superior_95_regra_dos_tres_pct": 0.00015
             }
           },
-          "soma_vias_pct": 0
+          "soma_vias_pct": 0.0
         },
         "sem_competicao_continental": {
           "total": {
@@ -7151,34 +7149,34 @@
       "pontos_atuais": 32,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 0,
-        "g6": 0,
-        "libertadores_base": 0,
-        "sul_americana_base": 0,
+        "campeao": 0.0,
+        "g4": 0.0,
+        "g6": 0.0,
+        "libertadores_base": 0.0,
+        "sul_americana_base": 0.0,
         "rebaixamento": 99.99785,
-        "libertadores": 0,
-        "sul_americana": 0,
-        "sem_competicao_continental": 100
+        "libertadores": 0.0,
+        "sul_americana": 0.0,
+        "sem_competicao_continental": 100.0
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -7191,7 +7189,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -7204,7 +7202,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -7217,7 +7215,7 @@
         "sul_americana_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -7243,7 +7241,7 @@
         "libertadores": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -7256,7 +7254,7 @@
         "sul_americana": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "<0,001%",
           "zero_observado": true,
           "possivel_estruturalmente": true,
@@ -7269,7 +7267,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": ">99,999%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -7307,26 +7305,26 @@
         "maximo_simulado": 41
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         0.00215,
         0.159,
         1.29895,
         98.5399,
-        0
+        0.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -7342,7 +7340,7 @@
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -7356,7 +7354,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -7369,7 +7367,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7382,7 +7380,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7395,7 +7393,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7408,7 +7406,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -7423,7 +7421,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7436,7 +7434,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7449,7 +7447,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7460,13 +7458,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0
+          "soma_vias_pct": 0.0
         },
         "sul_americana": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "<0,001%",
             "zero_observado": true,
             "possivel_estruturalmente": true,
@@ -7480,7 +7478,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -7493,7 +7491,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "<0,001%",
               "zero_observado": true,
               "possivel_estruturalmente": true,
@@ -7504,13 +7502,13 @@
               "limite_superior_95_regra_dos_tres_pct": 0.00015
             }
           },
-          "soma_vias_pct": 0
+          "soma_vias_pct": 0.0
         },
         "sem_competicao_continental": {
           "total": {
             "ocorrencias": 2000000,
             "simulacoes": 2000000,
-            "percentual_estimado": 100,
+            "percentual_estimado": 100.0,
             "exibicao": ">99,999%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -7530,34 +7528,34 @@
       "pontos_atuais": 21,
       "jogos_atuais": 35,
       "probabilidades_pct": {
-        "campeao": 0,
-        "g4": 0,
-        "g6": 0,
-        "libertadores_base": 0,
-        "sul_americana_base": 0,
-        "rebaixamento": 100,
-        "libertadores": 0,
-        "sul_americana": 0,
-        "sem_competicao_continental": 100
+        "campeao": 0.0,
+        "g4": 0.0,
+        "g6": 0.0,
+        "libertadores_base": 0.0,
+        "sul_americana_base": 0.0,
+        "rebaixamento": 100.0,
+        "libertadores": 0.0,
+        "sul_americana": 0.0,
+        "sem_competicao_continental": 100.0
       },
       "probabilidades_detalhes": {
         "campeao": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -7570,7 +7568,7 @@
         "g6": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -7583,7 +7581,7 @@
         "libertadores_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -7596,7 +7594,7 @@
         "sul_americana_base": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -7609,7 +7607,7 @@
         "rebaixamento": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -7622,7 +7620,7 @@
         "libertadores": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -7635,7 +7633,7 @@
         "sul_americana": {
           "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0,
+          "percentual_estimado": 0.0,
           "exibicao": "0%",
           "zero_observado": true,
           "possivel_estruturalmente": false,
@@ -7648,7 +7646,7 @@
         "sem_competicao_continental": {
           "ocorrencias": 2000000,
           "simulacoes": 2000000,
-          "percentual_estimado": 100,
+          "percentual_estimado": 100.0,
           "exibicao": "100%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -7661,14 +7659,14 @@
       },
       "posicao_projetada": 20,
       "posicao_classificacao_projetada": 20,
-      "posicao_projetada_media": 20,
+      "posicao_projetada_media": 20.0,
       "posicao_projetada_mediana": 20,
       "classificacao_projetada_criterios": {
         "pontos_medios": 22.4714885,
         "vitorias_medias": 4.330432,
         "saldo_medio": -44.252307,
         "gols_pro_medios": 35.2570715,
-        "posicao_media_simulada": 20
+        "posicao_media_simulada": 20.0
       },
       "faixa_posicao_80": {
         "melhor": 20,
@@ -7686,26 +7684,26 @@
         "maximo_simulado": 30
       },
       "distribuicao_posicoes_pct": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        100
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        100.0
       ],
       "tendencia_recente": {
         "metodo": "EWMA sem sazonalidade",
@@ -7721,7 +7719,7 @@
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "0%",
             "zero_observado": true,
             "possivel_estruturalmente": false,
@@ -7735,7 +7733,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7748,7 +7746,7 @@
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7761,7 +7759,7 @@
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7774,7 +7772,7 @@
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7787,7 +7785,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7802,7 +7800,7 @@
             "campeao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7815,7 +7813,7 @@
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7828,7 +7826,7 @@
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7839,13 +7837,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0
+          "soma_vias_pct": 0.0
         },
         "sul_americana": {
           "total": {
             "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0,
+            "percentual_estimado": 0.0,
             "exibicao": "0%",
             "zero_observado": true,
             "possivel_estruturalmente": false,
@@ -7859,7 +7857,7 @@
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7872,7 +7870,7 @@
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0,
+              "percentual_estimado": 0.0,
               "exibicao": "0%",
               "zero_observado": true,
               "possivel_estruturalmente": false,
@@ -7883,13 +7881,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0
+          "soma_vias_pct": 0.0
         },
         "sem_competicao_continental": {
           "total": {
             "ocorrencias": 2000000,
             "simulacoes": 2000000,
-            "percentual_estimado": 100,
+            "percentual_estimado": 100.0,
             "exibicao": "100%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -7919,14 +7917,14 @@
     ],
     "decomposicao_exclusiva_por_via": true,
     "limiar_exibicao_percentual": 0.001,
-    "hash_snapshots": "29789716ddcf5e605b004e914db48153ca3062fe0d78d6ed0e20d18bdff769ae",
+    "hash_snapshots": "522a3fa6d73f60adb7a8ffc0a311b448f72e8b15621d188d1844a78d62f74569",
     "cobertura": {
       "todas_consideradas": true,
       "competicoes": [
         {
           "chave": "copa_do_brasil",
           "nome": "Copa do Brasil",
-          "gerado_em": "2026-11-21T19:11:36-03:00",
+          "gerado_em": "2026-11-21T20:05:22-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -7941,7 +7939,7 @@
         {
           "chave": "libertadores",
           "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-11-21T19:11:37-03:00",
+          "gerado_em": "2026-11-21T20:05:22-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -7956,11 +7954,11 @@
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-11-21T19:53:34-03:00",
+          "gerado_em": "2026-11-21T20:05:23-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
-            "nome": "Final",
+            "nome": "2026 CONMEBOL Sudamericana, Final",
             "eventos": 1,
             "eventos_pendentes": 1
           },
@@ -7969,13 +7967,13 @@
           "modo_coleta": "incremental"
         }
       ],
-      "referencia_mais_antiga_em": "2026-11-21T19:11:36-03:00",
-      "referencia_mais_recente_em": "2026-11-21T19:53:34-03:00",
-      "snapshots_atualizados_em": "2026-11-21T19:53:34-03:00"
+      "referencia_mais_antiga_em": "2026-11-21T20:05:22-03:00",
+      "referencia_mais_recente_em": "2026-11-21T20:05:23-03:00",
+      "snapshots_atualizados_em": "2026-11-21T20:05:23-03:00"
     }
   },
   "cobertura_dados": {
-    "atualizado_em": "2026-11-21T19:59:12-03:00",
+    "atualizado_em": "2026-11-21T20:11:00-03:00",
     "brasileirao": {
       "fonte": "ESPN",
       "referencia_esportiva_em": "2026-11-21T19:32:22-03:00",
@@ -7988,7 +7986,7 @@
         {
           "chave": "copa_do_brasil",
           "nome": "Copa do Brasil",
-          "gerado_em": "2026-11-21T19:11:36-03:00",
+          "gerado_em": "2026-11-21T20:05:22-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -8003,7 +8001,7 @@
         {
           "chave": "libertadores",
           "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-11-21T19:11:37-03:00",
+          "gerado_em": "2026-11-21T20:05:22-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -8018,11 +8016,11 @@
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-11-21T19:53:34-03:00",
+          "gerado_em": "2026-11-21T20:05:23-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
-            "nome": "Final",
+            "nome": "2026 CONMEBOL Sudamericana, Final",
             "eventos": 1,
             "eventos_pendentes": 1
           },
@@ -8031,9 +8029,9 @@
           "modo_coleta": "incremental"
         }
       ],
-      "referencia_mais_antiga_em": "2026-11-21T19:11:36-03:00",
-      "referencia_mais_recente_em": "2026-11-21T19:53:34-03:00",
-      "snapshots_atualizados_em": "2026-11-21T19:53:34-03:00"
+      "referencia_mais_antiga_em": "2026-11-21T20:05:22-03:00",
+      "referencia_mais_recente_em": "2026-11-21T20:05:23-03:00",
+      "snapshots_atualizados_em": "2026-11-21T20:05:23-03:00"
     }
   },
   "total_previsoes_partidas": 28,
@@ -8488,7 +8486,7 @@
         "ajuste_taxa_visitante_pct": -1.5338
       },
       "probabilidades_pct": {
-        "mandante": 46,
+        "mandante": 46.0,
         "empate": 28.328,
         "visitante": 25.672
       },
@@ -9556,14 +9554,5 @@
     "Libertadores e Sul-Americana são probabilidades consolidadas e incluem os caminhos por copas e repasses regulamentares.",
     "Valores exibidos como <0,001% não significam impossibilidade matemática; indicam evento abaixo da resolução visual escolhida.",
     "O modelo não utiliza cotações de apostas."
-  ],
-  "titulo_matematico_2026": {
-    "campeao": "Flamengo",
-    "confirmado": true,
-    "probabilidade_pct": 100,
-    "rodada": 36,
-    "criterio": "pontos e maior número de vitórias",
-    "fonte": "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/flamengo-conquista-brasileirao-2026",
-    "fundamento": "Flamengo matematicamente campeão em 21/11/2026: 80 pontos e 24 vitórias; Palmeiras tem 74 pontos e 21 vitórias. Com dois jogos restantes, o Palmeiras alcança no máximo 80 pontos e 23 vitórias, abaixo do Flamengo no primeiro desempate. Os demais clubes também não alcançam 80 pontos."
-  }
+  ]
 }

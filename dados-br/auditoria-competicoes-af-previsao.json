@@ -2,58 +2,26 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-11-21T19:53:34-03:00",
+  "gerado_em": "2026-11-21T20:05:23-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "af_snapshot_seguro": true,
   "agenda_operacional_fresca": true,
   "snapshots_preservados": 0,
-  "mudanca_esportiva": false,
+  "mudanca_esportiva": true,
   "hash_estado_antes": "29789716ddcf5e605b004e914db48153ca3062fe0d78d6ed0e20d18bdff769ae",
-  "hash_estado_depois": "29789716ddcf5e605b004e914db48153ca3062fe0d78d6ed0e20d18bdff769ae",
+  "hash_estado_depois": "522a3fa6d73f60adb7a8ffc0a311b448f72e8b15621d188d1844a78d62f74569",
   "fonte": "ESPN + API-Football contingencial",
   "temporada": 2026,
   "competicoes": [
     {
       "competicao": "copa_do_brasil",
-      "status": "cache_valido",
-      "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-11-21T19:11:36-03:00",
-      "cache_efetivo_minutos": 45,
-      "eventos": 155,
-      "coleta": {
-        "modo": "incremental",
-        "janela_inicio": "2026-10-31T00:00:00-03:00",
-        "janela_fim": "2027-03-21T23:59:59-03:00",
-        "requisicoes": 3,
-        "ultima_completa_em": "2026-11-18T22:55:13-03:00",
-        "ajustes_editoriais_aplicados": 0
-      }
-    },
-    {
-      "competicao": "libertadores",
-      "status": "cache_valido",
-      "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-11-21T19:11:37-03:00",
-      "cache_efetivo_minutos": 45,
-      "eventos": 155,
-      "coleta": {
-        "modo": "incremental",
-        "janela_inicio": "2026-10-31T00:00:00-03:00",
-        "janela_fim": "2027-03-21T23:59:59-03:00",
-        "requisicoes": 3,
-        "ultima_completa_em": "2026-11-18T22:55:16-03:00",
-        "ajustes_editoriais_aplicados": 0
-      }
-    },
-    {
-      "competicao": "sul_americana",
       "status": "atualizado",
-      "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-11-21T19:53:34-03:00",
-      "cache_efetivo_minutos": 5,
-      "eventos": 157,
-      "finalizados": 156,
+      "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
+      "gerado_em": "2026-11-21T20:05:22-03:00",
+      "cache_efetivo_minutos": 45,
+      "eventos": 155,
+      "finalizados": 154,
       "pendentes": 1,
       "fase_atual": {
         "status": "em_andamento",
@@ -89,8 +57,119 @@
         "janela_inicio": "2026-10-31T00:00:00-03:00",
         "janela_fim": "2027-03-21T23:59:59-03:00",
         "requisicoes": 3,
+        "ultima_completa_em": "2026-11-18T22:55:13-03:00",
+        "ajustes_editoriais_aplicados": 0
+      }
+    },
+    {
+      "competicao": "libertadores",
+      "status": "atualizado",
+      "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
+      "gerado_em": "2026-11-21T20:05:22-03:00",
+      "cache_efetivo_minutos": 45,
+      "eventos": 155,
+      "finalizados": 154,
+      "pendentes": 1,
+      "fase_atual": {
+        "status": "em_andamento",
+        "ordem": 900,
+        "nome": "Final",
+        "eventos": 1,
+        "eventos_pendentes": 1
+      },
+      "summary_partidas_iniciadas": {
+        "consultados": 0,
+        "confirmados": 0,
+        "atualizados": 0,
+        "ao_vivo": [],
+        "finalizados": [],
+        "pendentes": [],
+        "pendentes_vencidos": [],
+        "erros": []
+      },
+      "api_football_resgate_resultados": {
+        "consultados": 0,
+        "finalizados": [],
+        "requisicoes": 0,
+        "erros": []
+      },
+      "api_football_auditoria_penaltis": {
+        "consultados": 1,
+        "corrigidos": [],
+        "datas_consultadas": [],
+        "requisicoes": 1,
+        "remaining": null,
+        "reserva": 12,
+        "erros": [
+          "401842648: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-11-20 to 2026-11-22.'}"
+        ]
+      },
+      "coleta": {
+        "modo": "incremental",
+        "janela_inicio": "2026-10-31T00:00:00-03:00",
+        "janela_fim": "2027-03-21T23:59:59-03:00",
+        "requisicoes": 3,
+        "ultima_completa_em": "2026-11-18T22:55:16-03:00",
+        "ajustes_editoriais_aplicados": 0
+      }
+    },
+    {
+      "competicao": "sul_americana",
+      "status": "atualizado",
+      "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
+      "gerado_em": "2026-11-21T20:05:23-03:00",
+      "cache_efetivo_minutos": 5,
+      "eventos": 157,
+      "finalizados": 156,
+      "pendentes": 1,
+      "fase_atual": {
+        "status": "em_andamento",
+        "ordem": 900,
+        "nome": "2026 CONMEBOL Sudamericana, Final",
+        "eventos": 1,
+        "eventos_pendentes": 1
+      },
+      "summary_partidas_iniciadas": {
+        "consultados": 1,
+        "confirmados": 1,
+        "atualizados": 1,
+        "ao_vivo": [
+          "401913961"
+        ],
+        "finalizados": [],
+        "pendentes": [],
+        "pendentes_vencidos": [],
+        "erros": []
+      },
+      "api_football_resgate_resultados": {
+        "consultados": 0,
+        "finalizados": [],
+        "requisicoes": 0,
+        "erros": []
+      },
+      "api_football_auditoria_penaltis": {
+        "consultados": 0,
+        "corrigidos": [],
+        "requisicoes": 0,
+        "erros": []
+      },
+      "coleta": {
+        "modo": "incremental",
+        "janela_inicio": "2026-10-31T00:00:00-03:00",
+        "janela_fim": "2027-03-21T23:59:59-03:00",
+        "requisicoes": 3,
         "ultima_completa_em": "2026-11-18T22:55:19-03:00",
-        "ajustes_editoriais_aplicados": 1
+        "ajustes_editoriais_aplicados": 2,
+        "summary_partidas_iniciadas": {
+          "consultados": 1,
+          "confirmados": 1,
+          "atualizados": 1,
+          "ao_vivo": [
+            "401913961"
+          ],
+          "finalizados": [],
+          "erros": []
+        }
       }
     }
   ],
