@@ -6,7 +6,7 @@ export const CF_WORKERS_CPU_INCLUDED_MS = 30_000_000;
 export const CF_WORKERS_REQUESTS_INCLUDED = 10_000_000;
 const CPU_OVERAGE_PER_MILLION_USD = 0.02;
 const REQUEST_OVERAGE_PER_MILLION_USD = 0.30;
-export const CF_BILLING_AUDIT_VERSION = 3;
+export const CF_BILLING_AUDIT_VERSION = 4;
 const HOUR = 3_600_000;
 const DAY = 86_400_000;
 
@@ -61,6 +61,30 @@ function family(row) {
   if (/^Workers\\b/i.test(service)) return 'Workers';
   return service || 'Sem categoria';
 }
+// Cloudflare Billable Usage V1 sometimes omits ConsumedUnit and uses PricingUnit
+// "Count" for both known commercial metrics. Recover the unit only when the
+// exact Workers label explicitly names CPU milliseconds or request counts.
+// Never use PricingUnit=Count alone to infer CPU units.
+function resolveWorkersUnit(row,kind) {
+  const consumed=norm(row.ConsumedUnit);
+  if(consumed) return {unit:consumed,inferred:false};
+  const service=norm(row.ServiceName);
+  const fam=norm(row.ServiceFamilyName||row.x_ProductFamilyName);
+  if(fam!=='workers'||norm(row.PricingUnit)!=='count')
+    return {unit:'',inferred:false};
+  const known={
+    workers_cpu_ms_first_30m_are_included:'milliseconds',
+    workers_standard_requests_first_10m_are_included:'count',
+  };
+  const expected=kind==='cpu'?'milliseconds':kind==='requests'?'count':'';
+  if(!expected||known[service]!==expected) return {unit:'',inferred:false};
+  for(const raw of [row.ChargeDescription,row.x_BillableMetricName]) {
+    const label=norm(raw);
+    if(label&&label!==service&&label!==service+'_usage_measured_in_count'&&
+       metricLabelKind(raw)!==kind) return {unit:'',inferred:false};
+  }
+  return {unit:expected,inferred:true};
+}
 // Closed classification: recognized semantic label plus compatible measured unit.
 function workerMetricAssessment(row) {
   const fam=norm(row.ServiceFamilyName||row.x_ProductFamilyName);
@@ -78,13 +102,14 @@ function workerMetricAssessment(row) {
     return {kind:'',reason:'conflicting_metric_fields'};
   const kind=recognizedId||labels[0]||'';
   if(!kind) return {kind:'',reason:'unrecognized_metric_label'};
-  const unit=norm(row.ConsumedUnit);
+  const resolvedUnit=resolveWorkersUnit(row,kind);
+  const unit=resolvedUnit.unit;
   const cpuUnits=['milliseconds','millisecond','cpu_ms','ms','microseconds',
     'microsecond','nanoseconds','nanosecond','seconds','second'];
   const reqUnits=['requests','request','count'];
   if(kind==='cpu'&&!cpuUnits.includes(unit)||kind==='requests'&&!reqUnits.includes(unit))
     return {kind:'',reason:'unsupported_consumed_unit'};
-  return {kind,reason:'recognized'};
+  return {kind,reason:'recognized',unit,inferredUnit:resolvedUnit.inferred};
 }
 function workerMetric(row) { return workerMetricAssessment(row).kind; }
 function isWorkersBillingRow(row) {
@@ -149,7 +174,7 @@ export function auditCloudflareBilling(rows=[],now=Date.now()) {
   const base={
     auditVersion:CF_BILLING_AUDIT_VERSION,
     metricDiagnostics:{candidateRows:0,recognizedCpuRows:0,recognizedRequestRows:0,
-      unrecognizedRows:0,reasons:{},examples:[],source:'billing-v1',schemaVersion:1},
+      inferredUnitRows:0,unrecognizedRows:0,reasons:{},examples:[],source:'billing-v1',schemaVersion:1},
     source:'Cloudflare Billable Usage v1 (conta, agregado por produto)',
     configured:true,ok:!!cycle,at:iso(now),
     currency:null,billedCost:null,workersBilledCost:null,
@@ -210,6 +235,7 @@ export function auditCloudflareBilling(rows=[],now=Date.now()) {
       diag.candidateRows++;
       if(m==='cpu') diag.recognizedCpuRows++;
       else if(m==='requests') diag.recognizedRequestRows++;
+      if(m&&assessment.inferredUnit) diag.inferredUnitRows++;
       else {
         diag.unrecognizedRows++;
         diag.reasons[assessment.reason]=(diag.reasons[assessment.reason]||0)+1;
@@ -230,14 +256,14 @@ export function auditCloudflareBilling(rows=[],now=Date.now()) {
       else unknownCostWorkers=true;
     }
     if(m==='cpu') {
-      const amount=cpuMs(row.ConsumedQuantity,row.ConsumedUnit);
+      const amount=cpuMs(row.ConsumedQuantity,assessment.unit);
       if(amount==null){ambiguous=true;base.excluded.invalidQuantity++;continue;}
       cpu+=amount;nCpu++;latestCpu=Math.max(latestCpu,last);
       if(iso(chargeStart).slice(0,10)===brDate(now)){todayCpu+=amount;nTodayCpu++;}
       observedCpu=Math.max(observedCpu,last);
     }
     if(m==='requests') {
-      const amount=requestCount(row.ConsumedQuantity,row.ConsumedUnit);
+      const amount=requestCount(row.ConsumedQuantity,assessment.unit);
       if(amount==null){ambiguous=true;base.excluded.invalidQuantity++;continue;}
       requests+=amount;nReq++;latestReq=Math.max(latestReq,last);
       if(iso(chargeStart).slice(0,10)===brDate(now)){todayReq+=amount;nTodayReq++;}
