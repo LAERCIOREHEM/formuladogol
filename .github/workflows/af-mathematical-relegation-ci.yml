@@ -10,6 +10,7 @@ on:
       - 'index.html'
       - 'dados-br/probabilidades-brasileirao.json'
       - 'tests/test_af_continental_math_certainty.py'
+      - 'tests/test_af_titulo_matematico_2026.py'
       - 'tests/test-af-continental-math-ui.mjs'
       - 'tests/test-af-math-objectives.mjs'
       - '.github/workflows/af-mathematical-relegation-ci.yml'
@@ -23,6 +24,7 @@ on:
       - 'js/br-estatisticas.js'
       - 'dados-br/probabilidades-brasileirao.json'
       - 'tests/test_af_continental_math_certainty.py'
+      - 'tests/test_af_titulo_matematico_2026.py'
       - 'tests/test-af-continental-math-ui.mjs'
       - '.github/workflows/af-mathematical-relegation-ci.yml'
 permissions:
@@ -75,6 +77,8 @@ jobs:
           PY
       - name: Regression of all three continental columns and automatic recalculation
         run: python tests/test_af_continental_math_certainty.py
+      - name: Campeão 2026 matematicamente certificado
+        run: python tests/test_af_titulo_matematico_2026.py
       - name: Browser formatting and all 20 club objectives
         run: |
           node tests/test-af-continental-math-ui.mjs

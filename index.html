@@ -5131,6 +5131,13 @@ function renderTabela() {
       ? `✓ Classificação provisória · ${baseTabela} · resultado final aguardando tabela ESPN`
       : (dataTabela ? `Atualizada ${formatarDataHoraBrCompleta(dataTabela)} · ${baseTabela}` : `Base: ${baseTabela}`));
   html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">${statusTabela}</span></div>`;
+  const campeaoMatematico = (state.probabilidadesBrasileirao?.clubes || []).find(clube =>
+    clube?.probabilidades_detalhes?.campeao?.certeza_estrutural === true &&
+    Number(clube?.probabilidades_pct?.campeao) === 100);
+  if (campeaoMatematico) {
+    html += `<div class="tabela-vagas-dinamicas" role="status" aria-label="Título brasileiro matematicamente confirmado"><strong>🏆 ${brEscapeHtml(campeaoMatematico.clube)} — CAMPEÃO BRASILEIRO 2026</strong> · título garantido matematicamente (100%).<small>Certificação por pontos e maior número de vitórias; resultado definitivo, não aproximação estatística.</small></div>`;
+  }
+
   html += '<div class="mobile-table-hint">↔ Arraste a tabela para os lados no celular para ver pontos, jogos, vitórias, empates, derrotas, gols, saldo, aproveitamento e forma.</div>';
   html += '<div class="tabela-vagas-dinamicas" id="fdg-vagas-libertadores-r35r1"><strong>Libertadores 2027: G' + vagas.guarantee + ' assegurado</strong> · ' + vagas.direct + ' vagas de grupos + ' + vagas.preliminary + ' preliminares.' +
     '<small>Faixa pontilhada: vagas adicionais condicionais (até G9). ' + brEscapeHtml(vagas.pending.join('; ') || 'Sem repasses pendentes conhecidos') + '. Classificação matemática de um clube é indicada por ✓, separadamente da faixa de sua posição atual.</small></div>';
@@ -5158,7 +5165,8 @@ function renderTabela() {
     const esc = escudoDe(t.time);
     const cert = !temTabelaAoVivo && !temFinalPendente && metasObjetivosProbClube(t.time)?.probabilidades_detalhes?.libertadores?.certeza_estrutural === true
       ? '<span class="tabela-vaga-badge" title="Classificação à Libertadores comprovada matematicamente">✓ LIBERTADORES</span>' : '';
-    const identidade = `<div class="tabela-time-cel">${brEscudoImg(esc?.escudo || '', t.time, 'tabela-escudo')}<span>${brEscapeHtml(t.time)}</span>${cert}${t._aoVivo ? '<small style="color:#fb7185;font-size:8px;font-weight:900;letter-spacing:.08em;">AO VIVO</small>' : (t._provisorioFinal ? '<small style="color:var(--accent);font-size:8px;font-weight:900;letter-spacing:.08em;">FINAL</small>' : '')}</div>`;
+    const campeaoBadge = campeaoMatematico?.clube === t.time ? '<span class="tabela-vaga-badge" title="Campeão brasileiro 2026 matematicamente confirmado">🏆 CAMPEÃO 2026</span>' : '';
+    const identidade = `<div class="tabela-time-cel">${brEscudoImg(esc?.escudo || '', t.time, 'tabela-escudo')}<span>${brEscapeHtml(t.time)}</span>${campeaoBadge}${cert}${t._aoVivo ? '<small style="color:#fb7185;font-size:8px;font-weight:900;letter-spacing:.08em;">AO VIVO</small>' : (t._provisorioFinal ? '<small style="color:var(--accent);font-size:8px;font-weight:900;letter-spacing:.08em;">FINAL</small>' : '')}</div>`;
     const celTime = linkClubeBrasileirao(t.time, identidade, 'tabela-time-link br-club-link');
     let celForma = '';
     if (forma) {

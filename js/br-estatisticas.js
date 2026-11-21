@@ -2064,12 +2064,13 @@
     const currentPosition = integer(current.posicao);
     const currentPoints = integer(current.pontos);
     const currentGames = integer(current.jogos);
+    const tituloGarantido = probabilityFieldDetail(club, "campeao")?.certeza_estrutural === true && titleValue === 100;
     return `<article class="probability-club-card" id="${escapeAttr(probabilityCardId(club?.clube))}" data-probability-club="${escapeAttr(clubSlug(club?.clube))}">
       <div class="probability-club-head">
         <span class="probability-order">${integer(order)}</span>
         <a class="probability-club-link" href="${escapeAttr(clubHref(club?.clube))}" aria-label="Abrir página de ${escapeAttr(club?.clube)}">${shield(info, "probability-club-shield")}</a>
         <div class="probability-club-title">
-          <a href="${escapeAttr(clubHref(club?.clube))}"><strong>${escapeHtml(club?.clube)}</strong></a>
+          <a href="${escapeAttr(clubHref(club?.clube))}"><strong>${escapeHtml(club?.clube)}</strong></a>${tituloGarantido ? '<span class="probability-current-label" style="color:#facc15;font-weight:900;">🏆 CAMPEÃO BRASILEIRO 2026</span>' : ""}
           <div class="probability-current-standing" aria-label="Situação atual: ${escapeAttr(currentPoints)} pontos, ${escapeAttr(currentPosition)}º lugar, ${escapeAttr(currentGames)} jogos">
             <span class="probability-current-label">Agora</span>
             <strong>${currentPoints} <em>pts</em></strong>
@@ -2130,8 +2131,11 @@
       target.innerHTML = "";
       return;
     }
-    target.innerHTML = `<div class="probability-highlight-grid">
-      ${probabilityHighlight("🏆", "Maior chance de título", highlights.maior_chance_titulo, "title", "campeao")}
+    const campeaoMatematico = (state.probabilities?.clubes || []).find(x =>
+      x?.probabilidades_detalhes?.campeao?.certeza_estrutural === true &&
+      Number(x?.probabilidades_pct?.campeao) === 100);
+    target.innerHTML = `${campeaoMatematico ? `<p role="status" style="margin:0 0 14px;font-weight:900;color:#facc15;">🏆 ${escapeHtml(campeaoMatematico.clube)} — CAMPEÃO BRASILEIRO 2026 · 100% de certeza matemática.</p>` : ""}<div class="probability-highlight-grid">
+      ${probabilityHighlight("🏆", campeaoMatematico ? "Campeão brasileiro 2026" : "Maior chance de título", highlights.maior_chance_titulo, "title", "campeao")}
       ${probabilityHighlight("🌎", "Maior chance de Libertadores", highlights.maior_chance_libertadores, "libertadores", "libertadores")}
       ${probabilityHighlight("🟦", "Maior chance de Sul-Americana", highlights.maior_chance_sul_americana, "sulamericana", "sul_americana")}
       ${probabilityHighlight("🔻", "Maior risco de rebaixamento", highlights.maior_risco_rebaixamento, "relegation", "rebaixamento")}
