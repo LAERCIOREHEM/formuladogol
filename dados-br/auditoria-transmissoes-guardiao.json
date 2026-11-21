@@ -7649,52 +7649,113 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado: Corinthians x Botafogo, Campeonato Brasileiro Série A 2026, fase única, 35ª rodada, será em 18/11/2026 às 21h30 (horário de Brasília), na Neo Química Arena. A transmissão integral oficial no Brasil é exclusiva do Premiere. Não há evidência de transmissão pela Globo; a cobertura em tempo real do ge não equivale à exibição da partida."
+    },
+    {
+      "event_id": "401841322",
+      "jogo": "Palmeiras x Flamengo",
+      "data_iso": "2026-11-21T16:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-11-21T15:32:55-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "GE TV"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/30/cbf-divulga-tabela-detalhada-das-rodadas-35-e-36-da-serie-a.ghtml",
+        "https://ge.globo.com/futebol/times/flamengo/noticia/2026/11/17/cbf-define-rodrigo-pereira-como-arbitro-de-palmeiras-x-flamengo-no-brasileirao.ghtml",
+        "https://ge.globo.com/futebol/times/flamengo/noticia/2026/11/21/flamengo-e-palmeiras-fazem-final-em-brasileirao-de-dominio-sobre-concorrentes.ghtml",
+        "https://ge.globo.com/futebol/times/palmeiras",
+        "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/10/30/palmeiras-x-flamengo-compare-os-jogos-e-quem-tem-o-caminho-mais-dificil-na-disputa-pelo-brasileiro.ghtml",
+        "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/10/30/palmeiras-x-flamengo-veja-quando-sera-confronto-direto-no-brasileiro.ghtml",
+        "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/21/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-36a-rodada.ghtml",
+        "https://ge.globo.com/google/amp/cartola/noticia/2026/11/21/cartola-2026-veja-suspensos-lesionados-e-escalacoes-provaveis-da-rodada-36-do-brasileirao.ghtml",
+        "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2026/11/21/palmeiras-x-flamengo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/google/amp/futebol/times/palmeiras/noticia/2026/11/21/ainda-vale-algo-veja-o-que-esta-em-jogo-para-o-palmeiras-no-confronto-direto-com-o-flamengo.ghtml",
+        "https://ge.globo.com/google/amp/gato-mestre/noticia/2026/11/21/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-36a-rodada-do-brasileirao.ghtml",
+        "https://ge.globo.com/sp/futebol/brasileirao-serie-a/jogo/21-11-2026/palmeiras-flamengo.ghtml",
+        "https://www.youtube.com/watch?v=_Lk5a5OR0vc",
+        "https://www.youtube.com/watch?v=uj_kMU8T1iY"
+      ],
+      "canais_depois": [
+        "GE TV",
+        "Globo",
+        "Premiere"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2026/11/21/palmeiras-x-flamengo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/21/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-36a-rodada.ghtml",
+        "https://ge.globo.com/sp/futebol/brasileirao-serie-a/jogo/21-11-2026/palmeiras-flamengo.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=Jb8_tiAM5Rk",
+          "scope": "match",
+          "valid_for_match": true,
+          "reason": "O dossiê identifica a live oficial da ge tv como “PALMEIRAS X FLAMENGO | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026”, iniciada às 14h30. A programação oficial do ge confirma ge tv como detentora da transmissão do jogo, junto de TV Globo e Premiere."
+        }
+      ],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Palmeiras x Flamengo, Brasileirão Série A 2026, 36ª rodada, hoje (sábado, 21/11/2026), às 16h30 (horário de Brasília), no Nubank Parque. A transmissão integral é de ge TV, TV Globo e Premiere. Não é exclusiva."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841316",
-    "jogo": "Corinthians x Botafogo",
-    "data_iso": "2026-11-18T21:30:00-03:00",
+    "event_id": "401841322",
+    "jogo": "Palmeiras x Flamengo",
+    "data_iso": "2026-11-21T16:30:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-11-18T20:48:00-03:00",
+    "executado_em": "2026-11-21T15:32:55-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "Premiere",
-      "Globo"
+      "GE TV"
     ],
     "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/06/cbf-divulga-datas-e-horarios-das-duas-ultimas-rodadas-do-brasileirao-veja-detalhes.ghtml",
-      "https://ge.globo.com/futebol/times/corinthians/noticia/2026/10/30/cbf-define-datas-para-jogos-do-corinthians-contra-botafogo-e-atletico-mg-pelo-brasileirao.ghtml",
-      "https://ge.globo.com/futebol/times/corinthians/noticia/2026/11/04/yuri-alberto-e-expulso-em-classico-e-corinthians-tem-mais-dois-suspensos-contra-o-botafogo.ghtml",
-      "https://ge.globo.com/futebol/times/corinthians/noticia/2026/11/15/corinthians-pode-ter-apenas-dois-zagueiros-a-disposicao-de-seedorf-contra-o-botafogo.ghtml",
-      "https://ge.globo.com/futebol/times/corinthians/noticia/2026/11/17/escalacao-do-corinthians-seedorf-fecha-preparacao-na-arena-e-tera-desfalques-contra-o-botafogo.ghtml",
-      "https://ge.globo.com/futebol/times/corinthians/noticia/2026/11/18/corinthians-x-botafogo-marca-reencontro-de-tite-e-seedorf-com-ex-clubes.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/18/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-35a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/futebol/times/botafogo/noticia/2026/11/18/no-botafogo-tite-ira-a-neo-quimica-arena-pela-primeira-vez-apos-nao-ao-corinthians.ghtml",
-      "https://ge.globo.com/google/amp/sp/futebol/brasileirao-serie-a/noticia/2026/11/18/corinthians-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/jogo/18-11-2026/corinthians-botafogo.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/x/832234",
-      "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a",
-      "https://www.youtube.com/watch?v=MY82-uXvDDA",
-      "https://www.youtube.com/watch?v=aYrBn9ovogQ"
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/10/30/cbf-divulga-tabela-detalhada-das-rodadas-35-e-36-da-serie-a.ghtml",
+      "https://ge.globo.com/futebol/times/flamengo/noticia/2026/11/17/cbf-define-rodrigo-pereira-como-arbitro-de-palmeiras-x-flamengo-no-brasileirao.ghtml",
+      "https://ge.globo.com/futebol/times/flamengo/noticia/2026/11/21/flamengo-e-palmeiras-fazem-final-em-brasileirao-de-dominio-sobre-concorrentes.ghtml",
+      "https://ge.globo.com/futebol/times/palmeiras",
+      "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/10/30/palmeiras-x-flamengo-compare-os-jogos-e-quem-tem-o-caminho-mais-dificil-na-disputa-pelo-brasileiro.ghtml",
+      "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/10/30/palmeiras-x-flamengo-veja-quando-sera-confronto-direto-no-brasileiro.ghtml",
+      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/21/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-36a-rodada.ghtml",
+      "https://ge.globo.com/google/amp/cartola/noticia/2026/11/21/cartola-2026-veja-suspensos-lesionados-e-escalacoes-provaveis-da-rodada-36-do-brasileirao.ghtml",
+      "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2026/11/21/palmeiras-x-flamengo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/google/amp/futebol/times/palmeiras/noticia/2026/11/21/ainda-vale-algo-veja-o-que-esta-em-jogo-para-o-palmeiras-no-confronto-direto-com-o-flamengo.ghtml",
+      "https://ge.globo.com/google/amp/gato-mestre/noticia/2026/11/21/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-36a-rodada-do-brasileirao.ghtml",
+      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/jogo/21-11-2026/palmeiras-flamengo.ghtml",
+      "https://www.youtube.com/watch?v=_Lk5a5OR0vc",
+      "https://www.youtube.com/watch?v=uj_kMU8T1iY"
     ],
     "canais_depois": [
+      "GE TV",
+      "Globo",
       "Premiere"
     ],
-    "exclusivo": true,
+    "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/google/amp/sp/futebol/brasileirao-serie-a/noticia/2026/11/18/corinthians-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/18/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-35a-rodada.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/x/832234"
+      "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2026/11/21/palmeiras-x-flamengo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/21/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-36a-rodada.ghtml",
+      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/jogo/21-11-2026/palmeiras-flamengo.ghtml"
     ],
-    "youtube": [],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=Jb8_tiAM5Rk",
+        "scope": "match",
+        "valid_for_match": true,
+        "reason": "O dossiê identifica a live oficial da ge tv como “PALMEIRAS X FLAMENGO | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026”, iniciada às 14h30. A programação oficial do ge confirma ge tv como detentora da transmissão do jogo, junto de TV Globo e Premiere."
+      }
+    ],
     "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado: Corinthians x Botafogo, Campeonato Brasileiro Série A 2026, fase única, 35ª rodada, será em 18/11/2026 às 21h30 (horário de Brasília), na Neo Química Arena. A transmissão integral oficial no Brasil é exclusiva do Premiere. Não há evidência de transmissão pela Globo; a cobertura em tempo real do ge não equivale à exibição da partida."
+    "resumo": "Confirmado para o Brasil: Palmeiras x Flamengo, Brasileirão Série A 2026, 36ª rodada, hoje (sábado, 21/11/2026), às 16h30 (horário de Brasília), no Nubank Parque. A transmissão integral é de ge TV, TV Globo e Premiere. Não é exclusiva."
   },
-  "atualizado_em": "2026-11-18T20:48:00-03:00"
+  "atualizado_em": "2026-11-21T15:32:55-03:00"
 }
