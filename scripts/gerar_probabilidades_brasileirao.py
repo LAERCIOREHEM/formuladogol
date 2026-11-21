@@ -922,6 +922,39 @@ def calculate_bolao_probabilities(
         },
     }
 
+def champion_certified_by_points_wins(
+    standings: Mapping[str, Mapping[str, int]],
+    fixtures: Sequence[tuple[str, str]],
+) -> str | None:
+    """Proof of an unassailable champion by points and then wins.
+
+    Assume each contender loses every remaining fixture and each opponent
+    wins every remaining fixture. No simulated scores or residual tiebreakers
+    are used. Caller must verify the complete 38-match-per-club schedule.
+    """
+    remaining = {name: 0 for name in standings}
+    for home, away in fixtures:
+        if home not in remaining or away not in remaining or home == away:
+            return None
+        remaining[home] += 1
+        remaining[away] += 1
+    certain = []
+    for name, team in standings.items():
+        points = int(team["pontos"])
+        wins = int(team["vitorias"])
+        if all(
+            rival == name
+            or int(other["pontos"]) + 3 * remaining[rival] < points
+            or (
+                int(other["pontos"]) + 3 * remaining[rival] == points
+                and int(other["vitorias"]) + remaining[rival] < wins
+            )
+            for rival, other in standings.items()
+        ):
+            certain.append(name)
+    return certain[0] if len(certain) == 1 else None
+
+
 def structural_status(
     state: "CurrentState",
     forecasts: Sequence["MatchForecast"],
@@ -1018,7 +1051,28 @@ def structural_status(
         for i, team in enumerate(teams)
     }
     fixtures = [(f.fixture.home, f.fixture.away) for f in forecasts]
-    return certify_top_k(resultado, standings, fixtures)
+    proven = certify_top_k(resultado, standings, fixtures)
+    # Incomplete or omitted fixtures must never imply a mathematical title.
+    complete = all(int(state.played[i]) + remaining[i] == 38 for i in range(len(teams)))
+    champion = champion_certified_by_points_wins(standings, fixtures) if complete else None
+    if champion:
+        lead = standings[champion]
+        proof = (
+            f"Título matematicamente confirmado: {champion} tem "
+            f"{lead['pontos']} pontos e {lead['vitorias']} vitórias. "
+            "Nenhum rival alcança pontos superiores ou iguala os pontos com "
+            "vitórias suficientes; cálculo considera os 38 jogos por clube "
+            "e o primeiro critério de desempate do Brasileirão."
+        )
+        for name, criteria in proven.items():
+            is_champion = name == champion
+            criteria["campeao"].update({
+                "possivel": is_champion,
+                "certo": is_champion,
+                "motivo": None if is_champion else f"Impossível: {proof}",
+                "motivo_certeza": proof if is_champion else None,
+            })
+    return proven
 
 
 def apply_continental_mathematical_certainty(
@@ -2700,6 +2754,21 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
     apply_continental_mathematical_certainty(
         teams, structural_final, execution_25
     )
+    for item in teams:
+        title_proof = structural_final[item["clube"]]["campeao"]
+        detail = item["probabilidades_detalhes"]["campeao"]
+        empirical = float(item["probabilidades_pct"]["campeao"])
+        if title_proof["certo"] is True:
+            if empirical != 100.0 or int(detail["ocorrencias"]) != int(detail["simulacoes"]):
+                raise ValueError(f"Prova de título contradiz Monte Carlo: {item['clube']}")
+            item["situacao_matematica"] = {
+                **item.get("situacao_matematica", {}),
+                "titulo": "campeao_confirmado",
+                "fundamento_titulo": title_proof["motivo_certeza"],
+            }
+        elif title_proof["possivel"] is False and empirical != 0.0:
+            raise ValueError(f"Eliminação matemática contradiz Monte Carlo: {item['clube']}")
+
     # Prova de destino: G6 matemático + repasse mínimo CBF assegurado.
     # O output percentual e as ocorrências da simulação permanecem intocados.
     def _certify_g6_detail(detail, certain, reason):
