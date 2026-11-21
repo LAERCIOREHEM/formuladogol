@@ -536,6 +536,13 @@ jobs:
           echo "::warning::O AF precisava de recálculo, mas a base local ou a coleta continental não passou nas travas de segurança."
           echo "Nenhum cenário novo será publicado até todas as fontes necessárias estarem íntegras."
 
+      - name: Certificar título matemático e validar a fotografia da Fonte Nova
+        if: steps.espn.outputs.sincronizado == 'true'
+        run: |
+          python scripts/reconciliar_titulo_matematico.py --apply
+          python scripts/reconciliar_titulo_matematico.py --self-test
+          python tests/test_fonte_nova_publico_20261121.py
+
       - name: Gerar estatísticas gerais da competição
         if: steps.espn.outputs.sincronizado == 'true'
         run: python scripts/gerar_estatisticas_competicao_brasileirao.py
@@ -891,6 +898,7 @@ jobs:
             "dados-br/jogos-detalhes.json"
             "dados-br/auditoria-jogos-detalhes.json"
             "dados-br/estatisticas-competicao.json"
+            "dados-br/probabilidades-brasileirao.json"
             "dados-br/auditoria-estatisticas.json"
             "dados-br/auditoria-cobertura-resultados.json"
             "dados-br/calendario-completo.json"
@@ -971,6 +979,10 @@ jobs:
                 cp -a "$TMP_DIR/$f" "$f"
               fi
             done
+
+            # Impedir que snapshots AF antigos sobrescrevam um título já
+            # certificado durante fetch/reset de commits concorrentes.
+            python scripts/reconciliar_titulo_matematico.py --apply
 
             if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
               echo "Apos atualizar com origin/main, nada mudou - sem commit."
