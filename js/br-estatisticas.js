@@ -1333,9 +1333,43 @@
     return Number(p[field]);
   }
 
+  // Certeza aritmética da tabela oficial tem precedência sobre um snapshot
+  // AF antigo, mas só certifica probabilidades cuja base coincide com a tabela.
+  function mathematicalChampionFromStandings() {
+    const rows = state.table?.tabela;
+    if (!Array.isArray(rows) || rows.length !== 20) return "";
+    const certified = rows.filter(candidate => {
+      const points=Number(candidate.pontos),wins=Number(candidate.vitorias),played=Number(candidate.jogos);
+      if (![points,wins,played].every(Number.isInteger) || played < 0 || played > 38) return false;
+      return rows.every(other => {
+        if (other.time===candidate.time) return true;
+        const remain=38-Number(other.jogos);
+        if (!Number.isInteger(remain) || remain<0) return false;
+        const maxPoints=Number(other.pontos)+3*remain;
+        return maxPoints<points || (maxPoints===points && Number(other.vitorias)+remain<wins);
+      });
+    });
+    return certified.length===1 ? certified[0].time : "";
+  }
+
   function probabilityFieldDetail(club, field) {
     const details = club?.probabilidades_detalhes || {};
-    return details[field] || (field === "libertadores" ? details.libertadores_base : field === "sul_americana" ? details.sul_americana_base : null);
+    const detail = details[field] || (field === "libertadores" ? details.libertadores_base : field === "sul_americana" ? details.sul_americana_base : null);
+    if (field !== "campeao") return detail;
+    const champion = mathematicalChampionFromStandings();
+    if (!champion || !club?.clube || !state.table?.tabela) return detail;
+    const current = state.table.tabela.find(item => item.time === club.clube);
+    const match = current &&
+      Number(current.pontos)===Number(club.pontos_atuais) &&
+      Number(current.jogos)===Number(club.jogos_atuais);
+    const certain = champion===club.clube;
+    const sample=Number(club?.probabilidades_pct?.campeao);
+    if (!match || sample!==(certain ? 100 : 0)) return detail;
+    return {...(detail || {}),exibicao:certain ? "100%" : "0%",
+      certeza_estrutural:certain,impossivel_estruturalmente:!certain,
+      possivel_estruturalmente:certain,
+      motivo_certeza:certain ? "Campeão matematicamente confirmado por pontos e maior número de vitórias." : null,
+      motivo_impossibilidade:certain ? null : "O campeão matemático já está confirmado pela classificação oficial."};
   }
 
   // Exibe a tríade exclusiva com a menor precisão que preserva todos os
@@ -2131,9 +2165,10 @@
       target.innerHTML = "";
       return;
     }
+    const confirmedByTable = mathematicalChampionFromStandings();
     const campeaoMatematico = (state.probabilities?.clubes || []).find(x =>
-      x?.probabilidades_detalhes?.campeao?.certeza_estrutural === true &&
-      Number(x?.probabilidades_pct?.campeao) === 100);
+      (x?.probabilidades_detalhes?.campeao?.certeza_estrutural === true &&
+       Number(x?.probabilidades_pct?.campeao) === 100) || x?.clube === confirmedByTable);
     target.innerHTML = `${campeaoMatematico ? `<p role="status" style="margin:0 0 14px;font-weight:900;color:#facc15;">🏆 ${escapeHtml(campeaoMatematico.clube)} — CAMPEÃO BRASILEIRO 2026 · 100% de certeza matemática.</p>` : ""}<div class="probability-highlight-grid">
       ${probabilityHighlight("🏆", campeaoMatematico ? "Campeão brasileiro 2026" : "Maior chance de título", highlights.maior_chance_titulo, "title", "campeao")}
       ${probabilityHighlight("🌎", "Maior chance de Libertadores", highlights.maior_chance_libertadores, "libertadores", "libertadores")}

@@ -5131,9 +5131,24 @@ function renderTabela() {
       ? `✓ Classificação provisória · ${baseTabela} · resultado final aguardando tabela ESPN`
       : (dataTabela ? `Atualizada ${formatarDataHoraBrCompleta(dataTabela)} · ${baseTabela}` : `Base: ${baseTabela}`));
   html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">${statusTabela}</span></div>`;
-  const campeaoMatematico = (state.probabilidadesBrasileirao?.clubes || []).find(clube =>
+  // Independente do AF: uma coleta antiga não pode retirar a taça já
+  // garantida por pontos + primeiro desempate (número de vitórias).
+  const proofCandidates = (state.tabela || []).filter(clube => {
+    const played=Number(clube.jogos), points=Number(clube.pontos), wins=Number(clube.vitorias);
+    if (![played,points,wins].every(Number.isInteger) || played>38 || played<0) return false;
+    return (state.tabela || []).every(rival => {
+      if (rival.time===clube.time) return true;
+      const rest=38-Number(rival.jogos);
+      const maxPoints=Number(rival.pontos)+3*rest;
+      return Number.isInteger(rest) && rest>=0 &&
+        (maxPoints<points || (maxPoints===points && Number(rival.vitorias)+rest<wins));
+    });
+  });
+  const titleByTable=state.tabela?.length===20 && proofCandidates.length===1 ? {clube:proofCandidates[0].time} : null;
+  const titleByAF=(state.probabilidadesBrasileirao?.clubes || []).find(clube =>
     clube?.probabilidades_detalhes?.campeao?.certeza_estrutural === true &&
     Number(clube?.probabilidades_pct?.campeao) === 100);
+  const campeaoMatematico = titleByTable || titleByAF;
   if (campeaoMatematico) {
     html += `<div class="tabela-vagas-dinamicas" role="status" aria-label="Título brasileiro matematicamente confirmado"><strong>🏆 ${brEscapeHtml(campeaoMatematico.clube)} — CAMPEÃO BRASILEIRO 2026</strong> · título garantido matematicamente (100%).<small>Certificação por pontos e maior número de vitórias; resultado definitivo, não aproximação estatística.</small></div>`;
   }
