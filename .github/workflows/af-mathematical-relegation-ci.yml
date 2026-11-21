@@ -75,6 +75,10 @@ jobs:
           assert empirical['exibicao']!='100%',empirical
           print('AF MATHEMATICAL RELEGATION PASS: proof, deterministic 0/100, empirical remains approximate')
           PY
+      - name: Validate championship proof without recomputing probabilities
+        run: |
+          python scripts/reconciliar_titulo_matematico.py --self-test
+          python tests/test_af_titulo_matematico_2026.py
       - name: Regression of all three continental columns and automatic recalculation
         run: python tests/test_af_continental_math_certainty.py
       - name: Campeão 2026 matematicamente certificado
