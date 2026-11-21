@@ -51,7 +51,8 @@ globalThis.fetch=async()=>Response.json({jogos:[{
 try{
  const monitor=new SportsMonitor({storage},{DB:db});
  await monitor.bootstrap();
- assert.equal((await storage.get('watchlist'))[ID].kickoff,NEW);
+ assert.equal((await storage.get('watchlist'))[ID],undefined,'old kickoff must leave the live watchlist immediately');
+ assert.equal((await storage.get('scheduleSnapshot'))[ID].kickoff,NEW,'new kickoff remains in the future schedule');
  assert.equal((await storage.get('preflight'))[ID],undefined,'historical T-10/T+3 must not block next kickoff');
  assert.equal(db.incidents.get(key).severity,'resolved');
  assert.equal(db.incidents.get(key).email_status,'rescheduled_silent');
