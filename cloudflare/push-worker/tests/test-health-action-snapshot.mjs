@@ -59,7 +59,7 @@ globalThis.fetch=async function(url){
 };
 try{
   const shot=await collectHealthSnapshot(env,{ok:true,activeGames:0,lastPollAt:now,readinessRed:0},now,true);
-  assert.equal(shot.policyVersion,14);
+  assert.equal(shot.policyVersion,15);
   assert.equal(shot.indicators.find(i=>i.id==='site')?.severity,'green');
   assert.equal(shot.pagesAvailability.failedCycles,0);
   assert.equal(shot.healthActionCenterVersion,1);
