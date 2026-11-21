@@ -3,7 +3,7 @@ import { analyticsWindows,fetchWorkersAnalyticsGraphQL,reconcileWorkersAnalytics
 import {auditCloudflareBilling,CF_BILLING_AUDIT_VERSION} from '../src/cloudflare-billing-audit.js';
 import {cloudflareSeverity,cloudflareDigestLines} from '../src/health-monitor.js';
 const start='2026-10-19T00:00:00.000Z',end='2026-11-19T00:00:00.000Z';
-assert.equal(CF_BILLING_AUDIT_VERSION,3);
+assert.equal(CF_BILLING_AUDIT_VERSION,4);
 assert.equal(analyticsWindows(start,'2026-11-18T12:00:00.000Z').length,5);
 assert.equal(analyticsWindows(start,'2026-12-30T00:00:00.000Z').length,0);
 assert.equal((await fetchWorkersAnalyticsGraphQL({token:'',account:'abc',start,end})).reason,'analytics_read_not_configured');
