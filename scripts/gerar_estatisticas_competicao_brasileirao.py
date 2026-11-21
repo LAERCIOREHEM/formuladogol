@@ -310,6 +310,54 @@ def club_goals(table: list[dict[str, Any]], leaders: dict[str, Any], details: di
     return output
 
 
+def merge_documented_attendance(
+    details: dict[str, Any],
+    complements: dict[str, Any],
+    verified: dict[str, Any],
+    results: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Reconcilia público, pagantes e renda por event_id sem alterar boxscores.
+
+    Evidência documental curada prevalece sobre detalhe ESPN desatualizado.
+    Outros complementos somente preenchem campos realmente ausentes.
+    """
+    output = dict(details)
+    current_ids = {str(game.get("event_id") or "") for game in results}
+    complementary = complements.get("jogos") if isinstance(complements.get("jogos"), dict) else {}
+    confirmed = verified.get("jogos") if isinstance(verified.get("jogos"), dict) else {}
+    for event_id in current_ids:
+        if not event_id:
+            continue
+        source = complementary.get(event_id) or {}
+        official = confirmed.get(event_id) or {}
+        if not isinstance(source, dict) or not isinstance(official, dict):
+            continue
+        present = output.get(event_id) or {}
+        present = dict(present) if isinstance(present, dict) else {}
+        for dest, field in (("publico", "publico"), ("publico_pagante", "pagantes"), ("renda", "renda")):
+            value = official.get(field)
+            authoritative = value is not None
+            if value is None:
+                value = source.get(field)
+            if value is None or isinstance(value, bool):
+                continue
+            try:
+                n = float(value)
+            except (ValueError, TypeError):
+                continue
+            if not (0 < n < 1_000_000_000):
+                continue
+            if not authoritative and present.get(dest) not in (None, ""):
+                continue
+            present[dest] = n if dest == "renda" else int(n)
+        if (present.get("publico") is not None and present.get("publico_pagante") is not None
+                and int(present["publico_pagante"]) > int(present["publico"])):
+            raise ValueError(f"pagantes acima do público presente: event_id={event_id}")
+        if present:
+            output[event_id] = present
+    return output
+
+
 def main() -> None:
     table_data = read_json(ROOT / "tabela.json", {})
     results_data = read_json(ROOT / "resultados.json", {})
@@ -322,6 +370,9 @@ def main() -> None:
     details = details_data.get("jogos") or {}
     if not isinstance(details, dict):
         details = {}
+    complements = read_json(ROOT / "dados-br" / "publicos-complementares.json", {})
+    verified = read_json(ROOT / "dados-br" / "correcoes" / "publicos-verificados.json", {})
+    details = merge_documented_attendance(details, complements, verified, results)
     if len(table) != 20:
         raise RuntimeError(f"tabela.json deve ter 20 clubes; recebido {len(table)}")
     if not results:
