@@ -146,6 +146,20 @@ function normalizeAgendaGame(item) {
   };
 }
 
+// A confirmed schedule correction changes the identity of readiness checkpoints,
+// but not the ESPN event ID. Keep historical D1 rows, re-arm the new kickoff.
+export function kickoffRescheduled(previous, next) {
+  if (!previous || !next || text(previous.eventId) !== text(next.eventId)) return false;
+  if (text(previous.league) !== text(next.league)) return false;
+  if (!text(previous.home?.name) || !text(previous.away?.name) ||
+      text(previous.home?.name) !== text(next.home?.name) ||
+      text(previous.away?.name) !== text(next.away?.name)) return false;
+  const oldTime = Date.parse(previous.kickoff || '');
+  const newTime = Date.parse(next.kickoff || '');
+  return Number.isFinite(oldTime) && Number.isFinite(newTime) &&
+    Math.abs(newTime - oldTime) >= SCHEDULE_CHANGE_MIN_MS;
+}
+
 export function selectAgendaCandidates(payload, nowMs = Date.now()) {
   const now = num(nowMs, Date.now());
   const rows = Array.isArray(payload?.jogos) ? payload.jogos : Array.isArray(payload) ? payload : [];
@@ -628,6 +642,24 @@ export class SportsMonitor {
       agendaError = text(error?.message || error);
     }
 
+    // Same event, new official kickoff: resolve the old T-10/T+3 incident
+    // silently and re-arm both checkpoints. Never reset a completed match.
+    const changedKickoffs = new Set();
+    if (!agendaError) {
+      for (const candidate of candidates) {
+        const previous = current.scheduleSnapshot[candidate.eventId] || current.watchlist[candidate.eventId];
+        if (current.matches?.[candidate.eventId]?.state === 'post') continue;
+        if (kickoffRescheduled(previous, candidate)) changedKickoffs.add(candidate.eventId);
+      }
+      for (const id of changedKickoffs) {
+        await this.env.DB.prepare(`
+          UPDATE monitor_incidents SET checkpoint='rescheduled',severity='resolved',
+            email_status='rescheduled_silent',updated_at=CURRENT_TIMESTAMP
+          WHERE incident_key=?
+        `).bind(`push_readiness:${id}`).run();
+      }
+    }
+
     // Publica somente o lembrete T-15; demais eventos legados de agenda seguem bloqueados.
     for (const event of scheduleEvents) await this.recordEvent(event);
     if (!agendaError) await this.state.storage.put('scheduleSnapshot', scheduleSnapshot);
@@ -638,8 +670,8 @@ export class SportsMonitor {
       if (previous.lastState === 'post' && num(previous.finalSince, 0) > 0 && now - num(previous.finalSince, 0) > FINAL_RETENTION_MS) continue;
       watchlist[candidate.eventId] = {
         ...candidate,
-        lastState: previous.lastState || 'pre',
-        finalSince: num(previous.finalSince, 0)
+        lastState: changedKickoffs.has(candidate.eventId) ? 'pre' : (previous.lastState || 'pre'),
+        finalSince: changedKickoffs.has(candidate.eventId) ? 0 : num(previous.finalSince, 0)
       };
     }
     for (const [eventId, previous] of Object.entries(current.watchlist)) {
@@ -651,7 +683,9 @@ export class SportsMonitor {
     // Registros antigos permanecem auditáveis no D1, mas são retirados do
     // estado ativo assim que a partida sai da janela do guardião. Isso evita
     // falso YELLOW em dias sem jogo.
-    const preflight = pruneReadinessPreflight(current.preflight, watchlist, current.matches, now);
+    const preflightSeed = { ...current.preflight };
+    for (const id of changedKickoffs) delete preflightSeed[id];
+    const preflight = pruneReadinessPreflight(preflightSeed, watchlist, current.matches, now);
     await this.state.storage.put('preflight', preflight);
     const readinessRed = countReadinessPending(preflight, watchlist, current.matches, now);
 
@@ -779,7 +813,7 @@ export class SportsMonitor {
         teams_ok,monitor_initialized,audience_json,reasons_json,ai_attempted,ai_recovered,checked_at,updated_at
       ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP)
       ON CONFLICT(event_id,checkpoint) DO UPDATE SET
-        readiness=excluded.readiness,source_event_id=excluded.source_event_id,resolution_strategy=excluded.resolution_strategy,
+        kickoff=excluded.kickoff,readiness=excluded.readiness,source_event_id=excluded.source_event_id,resolution_strategy=excluded.resolution_strategy,
         source_state=excluded.source_state,teams_ok=excluded.teams_ok,monitor_initialized=excluded.monitor_initialized,
         audience_json=excluded.audience_json,reasons_json=excluded.reasons_json,ai_attempted=excluded.ai_attempted,
         ai_recovered=excluded.ai_recovered,checked_at=excluded.checked_at,updated_at=CURRENT_TIMESTAMP
