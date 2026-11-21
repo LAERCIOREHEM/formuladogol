@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-21T19:11:25.526085-03:00",
+  "gerado_em": "2026-11-21T19:55:22.095957-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 351,
   "total_com_estatisticas": 351,
-  "total_com_publico": 350,
+  "total_com_publico": 352,
   "total_com_eventos": 351,
   "total_com_jogadores": 351,
   "total_eventos_validados": 351,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Allianz Parque",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 38631,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.gazetaesportiva.com/times/palmeiras/palmeiras-x-flamengo-36-rodada-brasileirao-21-11-2026",
       "arbitro": "",
       "stats": [
         {
@@ -576,7 +576,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-21T19:11:18.012771-03:00"
+      "atualizado_em": "2026-11-21T19:11:18.012771-03:00",
+      "renda": 4446565.71
     },
     "401841309": {
       "event_id": "401841309",
@@ -198579,6 +198580,16 @@
       "publico_pagante": 19535,
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
+    },
+    "401841327": {
+      "publico": 35113,
+      "publico_fonte": "Painel oficial de público e renda da Arena Fonte Nova — foto enviada pelo responsável em 21/11/2026",
+      "publico_tipo": "presente",
+      "publico_pagante": 34799,
+      "renda": 1244687,
+      "dados_publico_fonte_adicional": "Bahia 0 x 1 Coritiba, 36ª rodada, 21/11/2026, Arena Fonte Nova: 10.780 bilheteria + 2.505 corporativo + 21.514 sócios = 34.799 pagantes; 314 não pagantes; 35.113 público total; renda bruta R$ 1.244.687,00. Transcrição literal do painel oficial fotografado, sem inferência."
     }
-  }
+  },
+  "total_com_publico_pagante": 317,
+  "total_com_renda": 352
 }

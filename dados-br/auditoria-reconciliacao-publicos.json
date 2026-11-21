@@ -1,15 +1,35 @@
 {
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
-  "jogos_finalizados": 350,
-  "jogos_com_publico": 350,
+  "jogos_finalizados": 352,
+  "jogos_com_publico": 352,
   "jogos_sem_publico": 0,
-  "publico_total": 8758117,
-  "jogos_com_renda": 350,
+  "publico_total": 8831861,
+  "jogos_com_renda": 352,
   "aguardando_fonte": [],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
+    {
+      "event_id": "401841327",
+      "tipo_publico": "presente",
+      "publico_presente": 35113,
+      "publico_pagante": 34799,
+      "renda": 1244687.0,
+      "fonte_publico": "Painel oficial de público e renda da Arena Fonte Nova — foto enviada pelo responsável em 21/11/2026",
+      "origem": "Fotografia do painel oficial da Arena Fonte Nova, fornecida pelo responsável no estádio",
+      "estado": "CONFIRMADO"
+    },
+    {
+      "event_id": "401841322",
+      "tipo_publico": "presente",
+      "publico_presente": 38631,
+      "publico_pagante": null,
+      "renda": 4446565.71,
+      "fonte_publico": "https://www.gazetaesportiva.com/times/palmeiras/palmeiras-x-flamengo-36-rodada-brasileirao-21-11-2026",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
+    },
     {
       "event_id": "401841309",
       "tipo_publico": "presente",
@@ -3511,5 +3531,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-11-20T07:28:07.130850-03:00"
+  "gerado_em": "2026-11-21T19:55:22.995114-03:00"
 }
