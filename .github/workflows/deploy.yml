@@ -184,6 +184,7 @@ jobs:
         run: |
           python -m py_compile atualizar_espn.py scripts/gerar_agenda_clubes_brasileirao.py
           python tests/test_calendario_finais_cbf_2026.py
+          python tests/test_botafogo_sao_paulo_kickoff_20261123.py
 
       # O feed ESPN pode regenerar a agenda sem metadados CBF entre o último
       # commit e o checkout. Reconciliar no workspace garante que o artefato

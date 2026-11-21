@@ -17,6 +17,162 @@
     "acessos": "canais de direitos e plataformas de acesso são campos distintos; Claro tv+/Globoplay são opções para canais contratados, não novos detentores de direitos"
   },
   "jogos": {
+    "401841318": {
+      "event_id": "401841318",
+      "rodada": 36,
+      "mandante": "Athletico-PR",
+      "visitante": "Remo",
+      "data_iso": "2026-11-22T16:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Premiere"
+      ],
+      "origem": "snapshot anterior preservado",
+      "confianca": "preservado",
+      "estavel": false,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "snapshot anterior preservado",
+          "canais": [
+            "Premiere"
+          ],
+          "referencia": "dados-br/transmissoes-tv.json",
+          "capturado_em": "2026-11-21T16:41:23-03:00",
+          "autoridade": 10,
+          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401841319": {
+      "event_id": "401841319",
+      "rodada": 36,
+      "mandante": "Atlético-MG",
+      "visitante": "Corinthians",
+      "data_iso": "2026-11-25T20:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Globo"
+      ],
+      "origem": "GE guia editorial",
+      "confianca": "confirmado",
+      "estavel": false,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/21/bahia-x-coritiba-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-11-21T16:41:23-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/11/21/palmeiras-x-flamengo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+          "capturado_em": "2026-11-21T16:41:23-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401841320": {
+      "event_id": "401841320",
+      "rodada": 36,
+      "mandante": "Santos",
+      "visitante": "Grêmio",
+      "data_iso": "2026-11-23T21:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "GE TV"
+      ],
+      "origem": "YouTube oficial validado",
+      "confianca": "confirmado",
+      "estavel": false,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "GE TV"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=ZHpNObYBdXA",
+          "capturado_em": "2026-11-21T16:41:23-03:00",
+          "autoridade": 120,
+          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Assistir na GE TV",
+          "url": "https://www.youtube.com/watch?v=ZHpNObYBdXA",
+          "tipo": "player_oficial"
+        }
+      ]
+    },
+    "401841321": {
+      "event_id": "401841321",
+      "rodada": 36,
+      "mandante": "Bragantino",
+      "visitante": "Vasco da Gama",
+      "data_iso": "2026-11-22T19:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Premiere"
+      ],
+      "origem": "snapshot anterior preservado",
+      "confianca": "preservado",
+      "estavel": false,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "snapshot anterior preservado",
+          "canais": [
+            "Premiere"
+          ],
+          "referencia": "dados-br/transmissoes-tv.json",
+          "capturado_em": "2026-11-21T16:41:23-03:00",
+          "autoridade": 10,
+          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
     "401841322": {
       "event_id": "401841322",
       "rodada": 36,
@@ -70,12 +226,150 @@
         }
       ]
     },
+    "401841323": {
+      "event_id": "401841323",
+      "rodada": 36,
+      "mandante": "Internacional",
+      "visitante": "Vitória",
+      "data_iso": "2026-11-23T19:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo"
+      ],
+      "origem": "snapshot anterior preservado",
+      "confianca": "preservado",
+      "estavel": false,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "snapshot anterior preservado",
+          "canais": [
+            "GE TV",
+            "Premiere",
+            "SporTV",
+            "Globo"
+          ],
+          "referencia": "dados-br/transmissoes-tv.json",
+          "capturado_em": "2026-11-21T16:41:23-03:00",
+          "autoridade": 10,
+          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "GE TV no YouTube",
+          "url": "https://www.youtube.com/@getv/streams",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "SporTV no Globoplay",
+          "url": "https://globoplay.globo.com/canais/sportv-us/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "SporTV na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401841324": {
+      "event_id": "401841324",
+      "rodada": 36,
+      "mandante": "Fluminense",
+      "visitante": "Mirassol",
+      "data_iso": "2026-11-22T18:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "CazéTV"
+      ],
+      "origem": "YouTube oficial validado",
+      "confianca": "confirmado",
+      "estavel": false,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "CazéTV"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=n2KWc_xbPAA",
+          "capturado_em": "2026-11-21T16:41:23-03:00",
+          "autoridade": 120,
+          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Assistir na CazéTV",
+          "url": "https://www.youtube.com/watch?v=n2KWc_xbPAA",
+          "tipo": "player_oficial"
+        }
+      ]
+    },
+    "401841325": {
+      "event_id": "401841325",
+      "rodada": 36,
+      "mandante": "Chapecoense",
+      "visitante": "Cruzeiro",
+      "data_iso": "2026-11-21T21:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Premiere"
+      ],
+      "origem": "snapshot anterior preservado",
+      "confianca": "preservado",
+      "estavel": false,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "snapshot anterior preservado",
+          "canais": [
+            "Premiere"
+          ],
+          "referencia": "dados-br/transmissoes-tv.json",
+          "capturado_em": "2026-11-21T16:41:23-03:00",
+          "autoridade": 10,
+          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
     "401841326": {
       "event_id": "401841326",
       "rodada": 36,
       "mandante": "Botafogo",
       "visitante": "São Paulo",
-      "data_iso": "2026-11-21T17:00:00-03:00",
+      "data_iso": "2026-11-23T20:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "Prime Video"
@@ -151,175 +445,58 @@
         }
       ]
     },
-    "401913961": {
-      "event_id": "401913961",
-      "rodada": 0,
+    "401841328": {
+      "event_id": "401841328",
+      "rodada": 37,
       "mandante": "Atlético-MG",
-      "visitante": "Boca Juniors",
-      "data_iso": "2026-11-21T20:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "SBT",
-        "Disney+ / ESPN"
-      ],
-      "origem": "override editorial — transmissoes.json + YouTube oficial validado",
-      "confianca": "manual",
-      "estavel": true,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "override editorial — transmissoes.json",
-          "canais": [
-            "Disney+ / ESPN"
-          ],
-          "referencia": "https://www.disneyplus.com/pt-br/explore/articles/semifinais-libertadores-2026",
-          "capturado_em": "2026-11-21T16:41:23-03:00",
-          "autoridade": 1000,
-          "detalhe": "grade editorial verificada"
-        },
-        {
-          "fonte": "YouTube oficial validado",
-          "canais": [
-            "SBT"
-          ],
-          "referencia": "https://youtu.be/L_sWm8le_Es",
-          "capturado_em": "2026-11-21T16:41:23-03:00",
-          "autoridade": 120,
-          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
-        }
-      ],
-      "exibicao_confirmada": "Disney+ Premium",
-      "acessos": [
-        {
-          "nome": "Assistir no SBT",
-          "url": "https://youtu.be/L_sWm8le_Es",
-          "tipo": "player_oficial"
-        },
-        {
-          "nome": "Disney+ (ESPN)",
-          "url": "https://www.disneyplus.com/pt-br/",
-          "tipo": "acesso_oficial"
-        }
-      ]
-    },
-    "401841325": {
-      "event_id": "401841325",
-      "rodada": 36,
-      "mandante": "Chapecoense",
-      "visitante": "Cruzeiro",
-      "data_iso": "2026-11-21T21:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Premiere"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "Premiere"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-21T16:41:23-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "Premiere no Globoplay",
-          "url": "https://globoplay.globo.com/canais/premiere/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        }
-      ]
-    },
-    "401841318": {
-      "event_id": "401841318",
-      "rodada": 36,
-      "mandante": "Athletico-PR",
-      "visitante": "Remo",
-      "data_iso": "2026-11-22T16:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Premiere"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "Premiere"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-21T16:41:23-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "Premiere no Globoplay",
-          "url": "https://globoplay.globo.com/canais/premiere/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        }
-      ]
-    },
-    "401841324": {
-      "event_id": "401841324",
-      "rodada": 36,
-      "mandante": "Fluminense",
-      "visitante": "Mirassol",
-      "data_iso": "2026-11-22T18:30:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "CazéTV"
-      ],
-      "origem": "YouTube oficial validado",
-      "confianca": "confirmado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "YouTube oficial validado",
-          "canais": [
-            "CazéTV"
-          ],
-          "referencia": "https://www.youtube.com/watch?v=n2KWc_xbPAA",
-          "capturado_em": "2026-11-21T16:41:23-03:00",
-          "autoridade": 120,
-          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "Assistir na CazéTV",
-          "url": "https://www.youtube.com/watch?v=n2KWc_xbPAA",
-          "tipo": "player_oficial"
-        }
-      ]
-    },
-    "401841321": {
-      "event_id": "401841321",
-      "rodada": 36,
-      "mandante": "Bragantino",
       "visitante": "Vasco da Gama",
-      "data_iso": "2026-11-22T19:30:00-03:00",
+      "data_iso": "2026-11-29T19:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Premiere",
+        "Prime Video"
+      ],
+      "origem": "snapshot anterior preservado",
+      "confianca": "preservado",
+      "estavel": false,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "snapshot anterior preservado",
+          "canais": [
+            "Premiere",
+            "Prime Video"
+          ],
+          "referencia": "dados-br/transmissoes-tv.json",
+          "capturado_em": "2026-11-21T16:41:23-03:00",
+          "autoridade": 10,
+          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Prime Video",
+          "url": "https://www.primevideo.com/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401841330": {
+      "event_id": "401841330",
+      "rodada": 37,
+      "mandante": "Mirassol",
+      "visitante": "Athletico-PR",
+      "data_iso": "2026-11-29T18:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "Premiere"
@@ -353,12 +530,12 @@
         }
       ]
     },
-    "401841323": {
-      "event_id": "401841323",
-      "rodada": 36,
+    "401841331": {
+      "event_id": "401841331",
+      "rodada": 37,
       "mandante": "Internacional",
-      "visitante": "Vitória",
-      "data_iso": "2026-11-23T19:30:00-03:00",
+      "visitante": "Bragantino",
+      "data_iso": "2026-11-29T18:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "GE TV",
@@ -414,220 +591,6 @@
         {
           "nome": "TV Globo no Globoplay",
           "url": "https://globoplay.globo.com/",
-          "tipo": "acesso_oficial"
-        }
-      ]
-    },
-    "401841320": {
-      "event_id": "401841320",
-      "rodada": 36,
-      "mandante": "Santos",
-      "visitante": "Grêmio",
-      "data_iso": "2026-11-23T21:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "GE TV"
-      ],
-      "origem": "YouTube oficial validado",
-      "confianca": "confirmado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "YouTube oficial validado",
-          "canais": [
-            "GE TV"
-          ],
-          "referencia": "https://www.youtube.com/watch?v=ZHpNObYBdXA",
-          "capturado_em": "2026-11-21T16:41:23-03:00",
-          "autoridade": 120,
-          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "Assistir na GE TV",
-          "url": "https://www.youtube.com/watch?v=ZHpNObYBdXA",
-          "tipo": "player_oficial"
-        }
-      ]
-    },
-    "401841335": {
-      "event_id": "401841335",
-      "rodada": 37,
-      "mandante": "Chapecoense",
-      "visitante": "Palmeiras",
-      "data_iso": "2026-11-24T18:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "CazéTV"
-      ],
-      "origem": "YouTube oficial validado",
-      "confianca": "confirmado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "YouTube oficial validado",
-          "canais": [
-            "CazéTV"
-          ],
-          "referencia": "https://www.youtube.com/watch?v=jUd5TAB29NQ",
-          "capturado_em": "2026-11-21T16:41:23-03:00",
-          "autoridade": 120,
-          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "Assistir na CazéTV",
-          "url": "https://www.youtube.com/watch?v=jUd5TAB29NQ",
-          "tipo": "player_oficial"
-        }
-      ]
-    },
-    "401841319": {
-      "event_id": "401841319",
-      "rodada": 36,
-      "mandante": "Atlético-MG",
-      "visitante": "Corinthians",
-      "data_iso": "2026-11-25T20:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Globo"
-      ],
-      "origem": "GE guia editorial",
-      "confianca": "confirmado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/21/bahia-x-coritiba-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-11-21T16:41:23-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
-        {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/11/21/palmeiras-x-flamengo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-11-21T16:41:23-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "TV Globo no Globoplay",
-          "url": "https://globoplay.globo.com/",
-          "tipo": "acesso_oficial"
-        }
-      ]
-    },
-    "401841337": {
-      "event_id": "401841337",
-      "rodada": 37,
-      "mandante": "Fluminense",
-      "visitante": "Cruzeiro",
-      "data_iso": "2026-11-27T20:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Premiere",
-        "SporTV"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "Premiere",
-            "SporTV"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-21T16:41:23-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "Premiere no Globoplay",
-          "url": "https://globoplay.globo.com/canais/premiere/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "SporTV no Globoplay",
-          "url": "https://globoplay.globo.com/canais/sportv-us/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "SporTV na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        }
-      ]
-    },
-    "401841336": {
-      "event_id": "401841336",
-      "rodada": 37,
-      "mandante": "Botafogo",
-      "visitante": "Bahia",
-      "data_iso": "2026-11-28T21:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Premiere",
-        "SporTV"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "Premiere",
-            "SporTV"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-21T16:41:23-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "Premiere no Globoplay",
-          "url": "https://globoplay.globo.com/canais/premiere/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "SporTV no Globoplay",
-          "url": "https://globoplay.globo.com/canais/sportv-us/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "SporTV na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
           "tipo": "acesso_oficial"
         }
       ]
@@ -736,18 +699,50 @@
         }
       ]
     },
-    "401841331": {
-      "event_id": "401841331",
+    "401841335": {
+      "event_id": "401841335",
       "rodada": 37,
-      "mandante": "Internacional",
-      "visitante": "Bragantino",
-      "data_iso": "2026-11-29T18:30:00-03:00",
+      "mandante": "Chapecoense",
+      "visitante": "Palmeiras",
+      "data_iso": "2026-11-24T18:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "GE TV",
+        "CazéTV"
+      ],
+      "origem": "YouTube oficial validado",
+      "confianca": "confirmado",
+      "estavel": false,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "CazéTV"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=jUd5TAB29NQ",
+          "capturado_em": "2026-11-21T16:41:23-03:00",
+          "autoridade": 120,
+          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Assistir na CazéTV",
+          "url": "https://www.youtube.com/watch?v=jUd5TAB29NQ",
+          "tipo": "player_oficial"
+        }
+      ]
+    },
+    "401841336": {
+      "event_id": "401841336",
+      "rodada": 37,
+      "mandante": "Botafogo",
+      "visitante": "Bahia",
+      "data_iso": "2026-11-28T21:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
         "Premiere",
-        "SporTV",
-        "Globo"
+        "SporTV"
       ],
       "origem": "snapshot anterior preservado",
       "confianca": "preservado",
@@ -757,10 +752,8 @@
         {
           "fonte": "snapshot anterior preservado",
           "canais": [
-            "GE TV",
             "Premiere",
-            "SporTV",
-            "Globo"
+            "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
           "capturado_em": "2026-11-21T16:41:23-03:00",
@@ -769,11 +762,6 @@
         }
       ],
       "acessos": [
-        {
-          "nome": "GE TV no YouTube",
-          "url": "https://www.youtube.com/@getv/streams",
-          "tipo": "acesso_oficial"
-        },
         {
           "nome": "Premiere no Globoplay",
           "url": "https://globoplay.globo.com/canais/premiere/",
@@ -793,63 +781,19 @@
           "nome": "SporTV na Claro tv+",
           "url": "https://www.clarotvmais.com.br/",
           "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "TV Globo no Globoplay",
-          "url": "https://globoplay.globo.com/",
-          "tipo": "acesso_oficial"
         }
       ]
     },
-    "401841330": {
-      "event_id": "401841330",
+    "401841337": {
+      "event_id": "401841337",
       "rodada": 37,
-      "mandante": "Mirassol",
-      "visitante": "Athletico-PR",
-      "data_iso": "2026-11-29T18:30:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Premiere"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "Premiere"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-21T16:41:23-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "Premiere no Globoplay",
-          "url": "https://globoplay.globo.com/canais/premiere/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        }
-      ]
-    },
-    "401841328": {
-      "event_id": "401841328",
-      "rodada": 37,
-      "mandante": "Atlético-MG",
-      "visitante": "Vasco da Gama",
-      "data_iso": "2026-11-29T19:30:00-03:00",
+      "mandante": "Fluminense",
+      "visitante": "Cruzeiro",
+      "data_iso": "2026-11-27T20:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "Premiere",
-        "Prime Video"
+        "SporTV"
       ],
       "origem": "snapshot anterior preservado",
       "confianca": "preservado",
@@ -860,7 +804,7 @@
           "fonte": "snapshot anterior preservado",
           "canais": [
             "Premiere",
-            "Prime Video"
+            "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
           "capturado_em": "2026-11-21T16:41:23-03:00",
@@ -880,8 +824,98 @@
           "tipo": "acesso_oficial"
         },
         {
-          "nome": "Prime Video",
-          "url": "https://www.primevideo.com/",
+          "nome": "SporTV no Globoplay",
+          "url": "https://globoplay.globo.com/canais/sportv-us/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "SporTV na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401913106": {
+      "event_id": "401913106",
+      "rodada": 0,
+      "mandante": "Grêmio",
+      "visitante": "Palmeiras",
+      "data_iso": "2026-12-06T17:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "GE TV"
+      ],
+      "origem": "YouTube oficial validado",
+      "confianca": "confirmado",
+      "estavel": false,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "GE TV"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=QE3W-jo8a5E",
+          "capturado_em": "2026-11-21T16:41:23-03:00",
+          "autoridade": 120,
+          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Assistir na GE TV",
+          "url": "https://www.youtube.com/watch?v=QE3W-jo8a5E",
+          "tipo": "player_oficial"
+        }
+      ]
+    },
+    "401913961": {
+      "event_id": "401913961",
+      "rodada": 0,
+      "mandante": "Atlético-MG",
+      "visitante": "Boca Juniors",
+      "data_iso": "2026-11-21T20:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "SBT",
+        "Disney+ / ESPN"
+      ],
+      "origem": "override editorial — transmissoes.json + YouTube oficial validado",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "Disney+ / ESPN"
+          ],
+          "referencia": "https://www.disneyplus.com/pt-br/explore/articles/semifinais-libertadores-2026",
+          "capturado_em": "2026-11-21T16:41:23-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        },
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "SBT"
+          ],
+          "referencia": "https://youtu.be/L_sWm8le_Es",
+          "capturado_em": "2026-11-21T16:41:23-03:00",
+          "autoridade": 120,
+          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
+        }
+      ],
+      "exibicao_confirmada": "Disney+ Premium",
+      "acessos": [
+        {
+          "nome": "Assistir no SBT",
+          "url": "https://youtu.be/L_sWm8le_Es",
+          "tipo": "player_oficial"
+        },
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
           "tipo": "acesso_oficial"
         }
       ]
@@ -1387,40 +1421,6 @@
           "nome": "TV Globo no Globoplay",
           "url": "https://globoplay.globo.com/",
           "tipo": "acesso_oficial"
-        }
-      ]
-    },
-    "401913106": {
-      "event_id": "401913106",
-      "rodada": 0,
-      "mandante": "Grêmio",
-      "visitante": "Palmeiras",
-      "data_iso": "2026-12-06T17:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "GE TV"
-      ],
-      "origem": "YouTube oficial validado",
-      "confianca": "confirmado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "YouTube oficial validado",
-          "canais": [
-            "GE TV"
-          ],
-          "referencia": "https://www.youtube.com/watch?v=QE3W-jo8a5E",
-          "capturado_em": "2026-11-21T16:41:23-03:00",
-          "autoridade": 120,
-          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "Assistir na GE TV",
-          "url": "https://www.youtube.com/watch?v=QE3W-jo8a5E",
-          "tipo": "player_oficial"
         }
       ]
     }
