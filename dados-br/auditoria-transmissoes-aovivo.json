@@ -13,15 +13,15 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 33,
+    "jogos_na_janela": 29,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 7,
+    "descobertas_antecipadas": 5,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 50,
+    "candidatos_oficiais_encontrados": 34,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
-    "transmissoes_publicadas": 7,
+    "transmissoes_publicadas": 5,
     "sem_transmissao": 1,
     "erros": 0
   },
@@ -69,44 +69,16 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841322",
+      "event_id": "401841318",
       "rodada": 36,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Palmeiras x Flamengo",
-      "data_iso": "2026-11-21T16:30:00-03:00",
-      "principal": "GE TV",
-      "fontes_encontradas": [
-        "GE TV"
-      ],
-      "manual": false,
-      "descoberta_antecipada": true
-    },
-    {
-      "event_id": "401841327",
-      "rodada": 36,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Bahia x Coritiba",
-      "data_iso": "2026-11-21T17:30:00-03:00",
+      "jogo": "Athletico-PR x Remo",
+      "data_iso": "2026-11-22T16:00:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
       "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401913961",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Atlético-MG x Boca Juniors",
-      "data_iso": "2026-11-21T20:00:00-03:00",
-      "principal": "SBT",
-      "fontes_encontradas": [
-        "SBT"
-      ],
-      "manual": false,
-      "descoberta_antecipada": true
     },
     {
       "event_id": "401841324",
@@ -181,23 +153,6 @@
   ],
   "aceitos": [
     {
-      "event_id": "401841322",
-      "jogo": "Palmeiras x Flamengo",
-      "fonte": "getv",
-      "video_id": "Jb8_tiAM5Rk",
-      "url": "https://www.youtube.com/watch?v=Jb8_tiAM5Rk",
-      "titulo": "PALMEIRAS X FLAMENGO | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
-      "status": "live",
-      "confianca": 0.9,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (120 min de diferença)"
-      ]
-    },
-    {
       "event_id": "401913106",
       "jogo": "Grêmio x Palmeiras",
       "fonte": "getv",
@@ -227,22 +182,6 @@
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
         "horário compatível (60 min de diferença)"
-      ]
-    },
-    {
-      "event_id": "401913961",
-      "jogo": "Atlético-MG x Boca Juniors",
-      "fonte": "sbt_sports",
-      "video_id": "L_sWm8le_Es",
-      "url": "https://www.youtube.com/watch?v=L_sWm8le_Es",
-      "titulo": "AO VIVO | ATLÉTICO-MG X BOCA JUNIORS - FINAL DA SULAMERICANA",
-      "status": "upcoming",
-      "confianca": 0.8375,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "horário compatível (135 min de diferença)"
       ]
     },
     {
@@ -285,16 +224,26 @@
       "url": "https://www.youtube.com/watch?v=n2KWc_xbPAA",
       "titulo": "AO VIVO: FLUMINENSE X MIRASSOL | BRASILEIRÃO 2026 | 36ª RODADA",
       "status": "upcoming",
-      "confianca": 0.95,
+      "confianca": 0.875,
       "motivos": [
         "os dois clubes aparecem no título",
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
-        "horário compatível (0 min de diferença)"
+        "horário compatível (90 min de diferença)"
       ]
     }
   ],
   "rejeitados": [
+    {
+      "video_id": "54xZw1Uo90s",
+      "url": "https://www.youtube.com/watch?v=54xZw1Uo90s",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "JOGO COMPLETO: INDIANAPOLIS COLTS X HOUSTON TEXANS | NFL 2026/27 | SEMANA 11 | ge tv",
+      "status": "live",
+      "inicio_programado": "2026-11-22T14:32:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
     {
       "video_id": "CGoWQDnp6yA",
       "url": "https://www.youtube.com/watch?v=CGoWQDnp6yA",
@@ -306,23 +255,23 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "uLqXRKXOB8E",
-      "url": "https://www.youtube.com/watch?v=uLqXRKXOB8E",
+      "video_id": "KSMPCOTl23U",
+      "url": "https://www.youtube.com/watch?v=KSMPCOTl23U",
       "fonte": "sbt",
       "canal": "SBT",
-      "titulo": "SBT  Ao Vivo",
+      "titulo": "SBT Ao Vivo",
       "status": "live",
-      "inicio_programado": "2026-11-03T17:10:00-03:00",
+      "inicio_programado": "2026-11-21T17:35:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "54xZw1Uo90s",
-      "url": "https://www.youtube.com/watch?v=54xZw1Uo90s",
+      "video_id": "1kVw-HoI9lM",
+      "url": "https://www.youtube.com/watch?v=1kVw-HoI9lM",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "JOGO COMPLETO: INDIANAPOLIS COLTS X HOUSTON TEXANS | NFL 2026/27 | SEMANA 11 | ge tv",
+      "titulo": "QUEM SÃO OS FAVORITOS DE MEIO DE TEMPORADA? | PRIMEIRA DESCIDA | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-11-22T14:00:00-03:00",
+      "inicio_programado": "2026-11-22T22:19:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -334,16 +283,6 @@
       "status": "upcoming",
       "inicio_programado": "2026-11-25T19:00:00-03:00",
       "motivo": "conteúdo rejeitado: pre jogo"
-    },
-    {
-      "video_id": "EV1_xMOskYs",
-      "url": "https://www.youtube.com/watch?v=EV1_xMOskYs",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "ARTHUR ELIAS REVELA OS BASTIDORES DA CARREIRA E O FUTURO DA SELEÇÃO FEMININA | Abre Aspas | ge.globo",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-21T20:54:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "ISV7X1U0hqY",
@@ -406,16 +345,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "b85zrgVfxgg",
-      "url": "https://www.youtube.com/watch?v=b85zrgVfxgg",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "O MAIOR NOME DA HISTÓRIA DA LIBERTADORES | POLÊMICAS FORÇADAS #7 | Tropa ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-21T20:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "cLDBIryqUR4",
       "url": "https://www.youtube.com/watch?v=cLDBIryqUR4",
       "fonte": "getv",
@@ -436,6 +365,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "gERM1TyGDeY",
+      "url": "https://www.youtube.com/watch?v=gERM1TyGDeY",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "MERCADO DA BOLA 2027 E… DA PIZZA| PEDE QUE É GOL | ge tv",
+      "status": "live",
+      "inicio_programado": "2026-11-22T14:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "n3vHLCrjFRg",
       "url": "https://www.youtube.com/watch?v=n3vHLCrjFRg",
       "fonte": "getv",
@@ -453,16 +392,6 @@
       "titulo": "AO VIVO: BRASÍLIA X PINHEIROS | SUPERLIGA FEMININA DE VÔLEI 2026/27 | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-11-24T18:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "waVMxopbyKI",
-      "url": "https://www.youtube.com/watch?v=waVMxopbyKI",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: SÃO JOSÉ X CRUZEIRO | SUPERLIGA MASCULINA 2026/27 | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-11-21T15:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -516,53 +445,13 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "aPzCxQ42x4s",
-      "url": "https://www.youtube.com/watch?v=aPzCxQ42x4s",
-      "fonte": "sbt",
-      "canal": "SBT",
-      "titulo": "Pixote X Jeito Moleque | Viva A Noite (21/11/26)",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-22T02:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "osM9kVWhdV0",
-      "url": "https://www.youtube.com/watch?v=osM9kVWhdV0",
-      "fonte": "sbt",
-      "canal": "SBT",
-      "titulo": "SONIA ABRÃO RELEMBRA histórias com SILVIO SANTOS e recebe LUCAS GUIMARÃES | Eita Lucas! (21/11/26)",
-      "status": "live",
-      "inicio_programado": "2026-11-21T16:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "4OHKw9l6TIQ",
       "url": "https://www.youtube.com/watch?v=4OHKw9l6TIQ",
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: OSASUNA X MÁLAGA | LALIGA 26/27 | 13ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-11-22T14:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "DkeKLWqMyqE",
-      "url": "https://www.youtube.com/watch?v=DkeKLWqMyqE",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: BARCELONA X VILLARREAL | LALIGA 26/27 | 13ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-22T09:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "JnQqYZ18IIY",
-      "url": "https://www.youtube.com/watch?v=JnQqYZ18IIY",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: VINI JR RETORNA À LALIGA E GALO VAI EM BUSCA DO TÍTULO DA SULA | SEIS EM UM",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-21T18:50:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -571,18 +460,8 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: FC LORIENT X RENNES | LIGUE 1 26/27 | 11ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-11-22T12:35:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "Lw7vRSSNgHg",
-      "url": "https://www.youtube.com/watch?v=Lw7vRSSNgHg",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): LILLE X LYON | LIGUE 1 26/27 | 11ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-21T16:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -596,16 +475,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "RjzEIqqYrc4",
-      "url": "https://www.youtube.com/watch?v=RjzEIqqYrc4",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): STRASBOURG X STADE BRESTOIS | LIGUE 1 26/27 | 11ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-21T16:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "RwLcizFKewo",
       "url": "https://www.youtube.com/watch?v=RwLcizFKewo",
       "fonte": "cazetv",
@@ -614,46 +483,6 @@
       "status": "upcoming",
       "inicio_programado": "2026-11-25T12:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "T1efkRIfyJM",
-      "url": "https://www.youtube.com/watch?v=T1efkRIfyJM",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: MÔNACO X AUXERRE | LIGUE 1 26/27 | 11ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-21T16:05:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "T63APoIgZ5o",
-      "url": "https://www.youtube.com/watch?v=T63APoIgZ5o",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: REAL MADRID X CELTA | LALIGA 26/27 | 13ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-21T16:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "U783JSxqQlo",
-      "url": "https://www.youtube.com/watch?v=U783JSxqQlo",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: JUVENTUS X VENEZIA | SÉRIE A ITALIANA 26/27 | 12ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-22T08:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "W3Fat7nIC8Q",
-      "url": "https://www.youtube.com/watch?v=W3Fat7nIC8Q",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: NOCHE DE COPA | ATLÉTICO-MG X BOCA JUNIORS | FINAL DA COPA SUL-AMERICANA 2026",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-21T18:30:00-03:00",
-      "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
     },
     {
       "video_id": "YlVTi866wY4",
@@ -686,55 +515,25 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "q-abbpI42es",
-      "url": "https://www.youtube.com/watch?v=q-abbpI42es",
+      "video_id": "wRk_0qHQrl8",
+      "url": "https://www.youtube.com/watch?v=wRk_0qHQrl8",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: NEWCASTLE X ARSENAL | PREMIER LEAGUE 26/27 | 11ª RODADA",
+      "titulo": "AO VIVO: REACT DA FINAL DO ATP FINALS 2026 | ALCARAZ X ZVEREV",
       "status": "live",
-      "inicio_programado": "2026-11-21T13:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "tIM_T-D66iI",
-      "url": "https://www.youtube.com/watch?v=tIM_T-D66iI",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: RACING CLUB X REAL SOCIEDAD | LALIGA 26/27 | 13ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-22T12:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "tsmmAd5U064",
-      "url": "https://www.youtube.com/watch?v=tsmmAd5U064",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: PARIS FC X ANGERS | LIGUE 1 26/27 | 11ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-22T10:20:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "uyLHr3WgWzo",
-      "url": "https://www.youtube.com/watch?v=uyLHr3WgWzo",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): LENS X TOULOUSE | LIGUE 1 26/27 | 11ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-11-21T16:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
+      "inicio_programado": "2026-11-22T14:00:00-03:00",
+      "motivo": "conteúdo rejeitado: react"
     }
   ],
   "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401841327",
+      "event_id": "401841318",
       "rodada": 36,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
-      "jogo": "Bahia x Coritiba",
-      "data_iso": "2026-11-21T17:30:00-03:00",
+      "jogo": "Athletico-PR x Remo",
+      "data_iso": "2026-11-22T16:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -748,5 +547,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-11-21T16:21:22-03:00"
+  "atualizado_em": "2026-11-22T14:36:08-03:00"
 }
