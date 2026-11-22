@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-22T00:06:31.430262-03:00",
+  "gerado_em": "2026-11-22T02:01:41.883303-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 353,
   "total_com_estatisticas": 353,
-  "total_com_publico": 352,
+  "total_com_publico": 353,
   "total_com_eventos": 353,
   "total_com_jogadores": 353,
   "total_eventos_validados": 353,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 2,
       "estadio": "Arena Condá",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 3618,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.futebolinterior.com.br/chapecoense-1-x-2-cruzeiro-ritmo-treino",
       "arbitro": "",
       "stats": [
         {
@@ -570,7 +570,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-22T00:06:26.140908-03:00"
+      "atualizado_em": "2026-11-22T00:06:26.140908-03:00",
+      "renda": 154270
     },
     "401841327": {
       "event_id": "401841327",
@@ -199699,5 +199700,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 317,
+  "total_com_renda": 353
 }
