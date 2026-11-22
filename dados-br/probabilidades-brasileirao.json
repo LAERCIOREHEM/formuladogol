@@ -5,10 +5,10 @@
   "temporada": 2026,
   "gerado_em": "2026-11-21T22:53:00-03:00",
   "referencia_esportiva_em": "2026-11-21T22:53:00-03:00",
-  "calculado_em": "2026-11-21T23:11:58-03:00",
+  "calculado_em": "2026-11-21T23:23:34-03:00",
   "fonte_resultados_calendario": "ESPN",
   "status": "ok",
-  "hash_entrada": "36f1c78aed059af52aa1566e997c70c5f4cea1793cb82ee620f87495ea094545",
+  "hash_entrada": "3977c9aababc187daf90e4a33343635c6ddbe79698d34d36643c63f22b06dcb1",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -265,15 +265,17 @@
   "destaques": {
     "maior_chance_titulo": {
       "clube": "Flamengo",
-      "probabilidade_pct": 100.0
+      "probabilidade_pct": 100,
+      "certeza_estrutural": true,
+      "situacao": "Campeão brasileiro de 2026"
     },
     "maior_chance_libertadores": {
       "clube": "Flamengo",
       "probabilidade_pct": 100.0
     },
     "maior_chance_sul_americana": {
-      "clube": "São Paulo",
-      "probabilidade_pct": 92.0344
+      "clube": "Vasco da Gama",
+      "probabilidade_pct": 90.81255
     },
     "maior_risco_rebaixamento": {
       "clube": "Chapecoense",
@@ -307,7 +309,7 @@
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
           "certeza_estrutural": true,
-          "motivo_certeza": "Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_certeza": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
@@ -666,7 +668,7 @@
         "limite_posicao_pior": 1,
         "fundamento_vaga_continental": "No máximo 1º lugar pelos limites de pontuação. O modelo assegura vaga continental aos 11 primeiros (5 Libertadores-base e 6 Sul-Americana).",
         "titulo": "campeao_confirmado",
-        "fundamento_titulo": "Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão."
+        "fundamento_titulo": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes."
       }
     },
     {
@@ -696,7 +698,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -1082,7 +1084,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -1468,7 +1470,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -1839,8 +1841,8 @@
         "libertadores_base": 70.5008,
         "sul_americana_base": 29.4992,
         "rebaixamento": 0.0,
-        "libertadores": 98.4814,
-        "sul_americana": 1.5186,
+        "libertadores": 97.94285,
+        "sul_americana": 2.05715,
         "sem_competicao_continental": 0.0
       },
       "probabilidades_detalhes": {
@@ -1854,7 +1856,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -1923,10 +1925,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 1969628,
+          "ocorrencias": 1958857,
           "simulacoes": 2000000,
-          "percentual_estimado": 98.4814,
-          "exibicao": "98,5%",
+          "percentual_estimado": 97.94285,
+          "exibicao": "97,9%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -1936,10 +1938,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 30372,
+          "ocorrencias": 41143,
           "simulacoes": 2000000,
-          "percentual_estimado": 1.5186,
-          "exibicao": "1,5%",
+          "percentual_estimado": 2.05715,
+          "exibicao": "2,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -2022,10 +2024,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 1969628,
+            "ocorrencias": 1958857,
             "simulacoes": 2000000,
-            "percentual_estimado": 98.4814,
-            "exibicao": "98,5%",
+            "percentual_estimado": 97.94285,
+            "exibicao": "97,9%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2088,10 +2090,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 559612,
+              "ocorrencias": 548841,
               "simulacoes": 2000000,
-              "percentual_estimado": 27.9806,
-              "exibicao": "28,0%",
+              "percentual_estimado": 27.44205,
+              "exibicao": "27,4%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2142,14 +2144,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 98.4814
+          "soma_vias_pct": 97.94285
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 30372,
+            "ocorrencias": 41143,
             "simulacoes": 2000000,
-            "percentual_estimado": 1.5186,
-            "exibicao": "1,5%",
+            "percentual_estimado": 2.05715,
+            "exibicao": "2,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2160,10 +2162,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 30372,
+              "ocorrencias": 41143,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.5186,
-              "exibicao": "1,5%",
+              "percentual_estimado": 2.05715,
+              "exibicao": "2,1%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2186,7 +2188,7 @@
               "limite_superior_95_regra_dos_tres_pct": 0.00015
             }
           },
-          "soma_vias_pct": 1.5186
+          "soma_vias_pct": 2.05715
         },
         "sem_competicao_continental": {
           "total": {
@@ -2223,8 +2225,8 @@
         "libertadores_base": 13.3162,
         "sul_americana_base": 86.6838,
         "rebaixamento": 0.0,
-        "libertadores": 86.88285,
-        "sul_americana": 13.11715,
+        "libertadores": 81.91635,
+        "sul_americana": 18.08365,
         "sem_competicao_continental": 0.0
       },
       "probabilidades_detalhes": {
@@ -2238,7 +2240,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -2307,10 +2309,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 1737657,
+          "ocorrencias": 1638327,
           "simulacoes": 2000000,
-          "percentual_estimado": 86.88285,
-          "exibicao": "86,9%",
+          "percentual_estimado": 81.91635,
+          "exibicao": "81,9%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -2320,10 +2322,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 262343,
+          "ocorrencias": 361673,
           "simulacoes": 2000000,
-          "percentual_estimado": 13.11715,
-          "exibicao": "13,1%",
+          "percentual_estimado": 18.08365,
+          "exibicao": "18,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -2406,10 +2408,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 1737657,
+            "ocorrencias": 1638327,
             "simulacoes": 2000000,
-            "percentual_estimado": 86.88285,
-            "exibicao": "86,9%",
+            "percentual_estimado": 81.91635,
+            "exibicao": "81,9%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2472,10 +2474,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 1471333,
+              "ocorrencias": 1372003,
               "simulacoes": 2000000,
-              "percentual_estimado": 73.56665,
-              "exibicao": "73,6%",
+              "percentual_estimado": 68.60015,
+              "exibicao": "68,6%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2526,14 +2528,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 86.88285
+          "soma_vias_pct": 81.91635
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 262343,
+            "ocorrencias": 361673,
             "simulacoes": 2000000,
-            "percentual_estimado": 13.11715,
-            "exibicao": "13,1%",
+            "percentual_estimado": 18.08365,
+            "exibicao": "18,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2544,10 +2546,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 262343,
+              "ocorrencias": 361673,
               "simulacoes": 2000000,
-              "percentual_estimado": 13.11715,
-              "exibicao": "13,1%",
+              "percentual_estimado": 18.08365,
+              "exibicao": "18,1%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2570,7 +2572,7 @@
               "limite_superior_95_regra_dos_tres_pct": 0.00015
             }
           },
-          "soma_vias_pct": 13.11715
+          "soma_vias_pct": 18.08365
         },
         "sem_competicao_continental": {
           "total": {
@@ -2607,8 +2609,8 @@
         "libertadores_base": 11.2824,
         "sul_americana_base": 88.7176,
         "rebaixamento": 0.0,
-        "libertadores": 82.3068,
-        "sul_americana": 17.6932,
+        "libertadores": 71.83015,
+        "sul_americana": 28.16985,
         "sem_competicao_continental": 0.0
       },
       "probabilidades_detalhes": {
@@ -2622,7 +2624,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -2691,10 +2693,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 1646136,
+          "ocorrencias": 1436603,
           "simulacoes": 2000000,
-          "percentual_estimado": 82.3068,
-          "exibicao": "82,3%",
+          "percentual_estimado": 71.83015,
+          "exibicao": "71,8%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -2704,10 +2706,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 353864,
+          "ocorrencias": 563397,
           "simulacoes": 2000000,
-          "percentual_estimado": 17.6932,
-          "exibicao": "17,7%",
+          "percentual_estimado": 28.16985,
+          "exibicao": "28,2%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -2790,10 +2792,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 1646136,
+            "ocorrencias": 1436603,
             "simulacoes": 2000000,
-            "percentual_estimado": 82.3068,
-            "exibicao": "82,3%",
+            "percentual_estimado": 71.83015,
+            "exibicao": "71,8%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2843,23 +2845,23 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
-              "ocorrencias": 659783,
+              "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 32.98915,
-              "exibicao": "33,0%",
-              "zero_observado": false,
+              "percentual_estimado": 0.0,
+              "exibicao": "<0,001%",
+              "zero_observado": true,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
               "certeza_estrutural": false,
               "motivo_certeza": null,
               "motivo_impossibilidade": null,
-              "limite_superior_95_regra_dos_tres_pct": null
+              "limite_superior_95_regra_dos_tres_pct": 0.00015
             },
             "via_repasse": {
-              "ocorrencias": 760705,
+              "ocorrencias": 1210955,
               "simulacoes": 2000000,
-              "percentual_estimado": 38.03525,
-              "exibicao": "38,0%",
+              "percentual_estimado": 60.54775,
+              "exibicao": "60,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2910,14 +2912,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 82.3068
+          "soma_vias_pct": 71.83015
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 353864,
+            "ocorrencias": 563397,
             "simulacoes": 2000000,
-            "percentual_estimado": 17.6932,
-            "exibicao": "17,7%",
+            "percentual_estimado": 28.16985,
+            "exibicao": "28,2%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2928,10 +2930,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 353864,
+              "ocorrencias": 563397,
               "simulacoes": 2000000,
-              "percentual_estimado": 17.6932,
-              "exibicao": "17,7%",
+              "percentual_estimado": 28.16985,
+              "exibicao": "28,2%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2954,7 +2956,7 @@
               "limite_superior_95_regra_dos_tres_pct": 0.00015
             }
           },
-          "soma_vias_pct": 17.6932
+          "soma_vias_pct": 28.16985
         },
         "sem_competicao_continental": {
           "total": {
@@ -2986,9 +2988,9 @@
         "libertadores_base": 4.68985,
         "sul_americana_base": 95.23295,
         "rebaixamento": 0.0,
-        "libertadores": 63.3916,
-        "sul_americana": 36.6082,
-        "sem_competicao_continental": 0.0002
+        "libertadores": 55.939,
+        "sul_americana": 44.06045,
+        "sem_competicao_continental": 0.00055
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -3001,7 +3003,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -3070,10 +3072,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 1267832,
+          "ocorrencias": 1118780,
           "simulacoes": 2000000,
-          "percentual_estimado": 63.3916,
-          "exibicao": "63,4%",
+          "percentual_estimado": 55.939,
+          "exibicao": "55,9%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3083,10 +3085,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 732164,
+          "ocorrencias": 881209,
           "simulacoes": 2000000,
-          "percentual_estimado": 36.6082,
-          "exibicao": "36,6%",
+          "percentual_estimado": 44.06045,
+          "exibicao": "44,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3096,9 +3098,9 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 4,
+          "ocorrencias": 11,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0002,
+          "percentual_estimado": 0.00055,
           "exibicao": "<0,001%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -3169,10 +3171,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 1267832,
+            "ocorrencias": 1118780,
             "simulacoes": 2000000,
-            "percentual_estimado": 63.3916,
-            "exibicao": "63,4%",
+            "percentual_estimado": 55.939,
+            "exibicao": "55,9%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -3235,10 +3237,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 1174035,
+              "ocorrencias": 1024983,
               "simulacoes": 2000000,
-              "percentual_estimado": 58.70175,
-              "exibicao": "58,7%",
+              "percentual_estimado": 51.24915,
+              "exibicao": "51,2%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3289,14 +3291,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 63.3916
+          "soma_vias_pct": 55.939
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 732164,
+            "ocorrencias": 881209,
             "simulacoes": 2000000,
-            "percentual_estimado": 36.6082,
-            "exibicao": "36,6%",
+            "percentual_estimado": 44.06045,
+            "exibicao": "44,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -3307,10 +3309,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 730624,
+              "ocorrencias": 879676,
               "simulacoes": 2000000,
-              "percentual_estimado": 36.5312,
-              "exibicao": "36,5%",
+              "percentual_estimado": 43.9838,
+              "exibicao": "44,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3320,9 +3322,9 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 1540,
+              "ocorrencias": 1533,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.077,
+              "percentual_estimado": 0.07665,
               "exibicao": "0,077%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -3333,13 +3335,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 36.6082
+          "soma_vias_pct": 44.06045
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 4,
+            "ocorrencias": 11,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0002,
+            "percentual_estimado": 0.00055,
             "exibicao": "<0,001%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -3365,9 +3367,9 @@
         "libertadores_base": 0.11065,
         "sul_americana_base": 96.87345,
         "rebaixamento": 0.0,
-        "libertadores": 19.93265,
-        "sul_americana": 80.02755,
-        "sem_competicao_continental": 0.0398
+        "libertadores": 12.075,
+        "sul_americana": 87.864,
+        "sem_competicao_continental": 0.061
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -3380,7 +3382,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -3449,10 +3451,10 @@
           "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "libertadores": {
-          "ocorrencias": 398653,
+          "ocorrencias": 241500,
           "simulacoes": 2000000,
-          "percentual_estimado": 19.93265,
-          "exibicao": "19,9%",
+          "percentual_estimado": 12.075,
+          "exibicao": "12,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3462,10 +3464,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 1600551,
+          "ocorrencias": 1757280,
           "simulacoes": 2000000,
-          "percentual_estimado": 80.02755,
-          "exibicao": "80,0%",
+          "percentual_estimado": 87.864,
+          "exibicao": "87,9%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3475,10 +3477,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 796,
+          "ocorrencias": 1220,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0398,
-          "exibicao": "0,040%",
+          "percentual_estimado": 0.061,
+          "exibicao": "0,061%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3548,10 +3550,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 398653,
+            "ocorrencias": 241500,
             "simulacoes": 2000000,
-            "percentual_estimado": 19.93265,
-            "exibicao": "19,9%",
+            "percentual_estimado": 12.075,
+            "exibicao": "12,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -3614,10 +3616,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 396440,
+              "ocorrencias": 239287,
               "simulacoes": 2000000,
-              "percentual_estimado": 19.822,
-              "exibicao": "19,8%",
+              "percentual_estimado": 11.96435,
+              "exibicao": "12,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3668,14 +3670,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 19.93265
+          "soma_vias_pct": 12.075
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 1600551,
+            "ocorrencias": 1757280,
             "simulacoes": 2000000,
-            "percentual_estimado": 80.02755,
-            "exibicao": "80,0%",
+            "percentual_estimado": 87.864,
+            "exibicao": "87,9%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -3686,10 +3688,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 1541029,
+              "ocorrencias": 1698182,
               "simulacoes": 2000000,
-              "percentual_estimado": 77.05145,
-              "exibicao": "77,1%",
+              "percentual_estimado": 84.9091,
+              "exibicao": "84,9%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3699,9 +3701,9 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 59522,
+              "ocorrencias": 59098,
               "simulacoes": 2000000,
-              "percentual_estimado": 2.9761,
+              "percentual_estimado": 2.9549,
               "exibicao": "3,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -3712,14 +3714,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 80.02755
+          "soma_vias_pct": 87.864
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 796,
+            "ocorrencias": 1220,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0398,
-            "exibicao": "0,040%",
+            "percentual_estimado": 0.061,
+            "exibicao": "0,061%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -3744,9 +3746,9 @@
         "libertadores_base": 0.11285,
         "sul_americana_base": 94.08785,
         "rebaixamento": 0.0,
-        "libertadores": 13.71845,
-        "sul_americana": 86.1432,
-        "sem_competicao_continental": 0.13835
+        "libertadores": 8.9777,
+        "sul_americana": 90.81255,
+        "sem_competicao_continental": 0.20975
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -3759,7 +3761,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -3828,10 +3830,10 @@
           "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "libertadores": {
-          "ocorrencias": 274369,
+          "ocorrencias": 179554,
           "simulacoes": 2000000,
-          "percentual_estimado": 13.71845,
-          "exibicao": "13,7%",
+          "percentual_estimado": 8.9777,
+          "exibicao": "9,0%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3841,10 +3843,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 1722864,
+          "ocorrencias": 1816251,
           "simulacoes": 2000000,
-          "percentual_estimado": 86.1432,
-          "exibicao": "86,1%",
+          "percentual_estimado": 90.81255,
+          "exibicao": "90,8%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3854,10 +3856,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 2767,
+          "ocorrencias": 4195,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.13835,
-          "exibicao": "0,14%",
+          "percentual_estimado": 0.20975,
+          "exibicao": "0,21%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3927,10 +3929,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 274369,
+            "ocorrencias": 179554,
             "simulacoes": 2000000,
-            "percentual_estimado": 13.71845,
-            "exibicao": "13,7%",
+            "percentual_estimado": 8.9777,
+            "exibicao": "9,0%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -3993,10 +3995,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 272112,
+              "ocorrencias": 177297,
               "simulacoes": 2000000,
-              "percentual_estimado": 13.6056,
-              "exibicao": "13,6%",
+              "percentual_estimado": 8.86485,
+              "exibicao": "8,9%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4047,14 +4049,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 13.71845
+          "soma_vias_pct": 8.9777
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 1722864,
+            "ocorrencias": 1816251,
             "simulacoes": 2000000,
-            "percentual_estimado": 86.1432,
-            "exibicao": "86,1%",
+            "percentual_estimado": 90.81255,
+            "exibicao": "90,8%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4065,10 +4067,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 1609645,
+              "ocorrencias": 1704460,
               "simulacoes": 2000000,
-              "percentual_estimado": 80.48225,
-              "exibicao": "80,5%",
+              "percentual_estimado": 85.223,
+              "exibicao": "85,2%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4078,10 +4080,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 113219,
+              "ocorrencias": 111791,
               "simulacoes": 2000000,
-              "percentual_estimado": 5.66095,
-              "exibicao": "5,7%",
+              "percentual_estimado": 5.58955,
+              "exibicao": "5,6%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4091,14 +4093,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 86.1432
+          "soma_vias_pct": 90.81255
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 2767,
+            "ocorrencias": 4195,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.13835,
-            "exibicao": "0,14%",
+            "percentual_estimado": 0.20975,
+            "exibicao": "0,21%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4123,9 +4125,9 @@
         "libertadores_base": 0.0,
         "sul_americana_base": 57.542,
         "rebaixamento": 0.05975,
-        "libertadores": 1.24505,
-        "sul_americana": 92.0344,
-        "sem_competicao_continental": 6.72055
+        "libertadores": 0.42345,
+        "sul_americana": 90.63115,
+        "sem_competicao_continental": 8.9454
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -4138,7 +4140,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -4207,10 +4209,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 24901,
+          "ocorrencias": 8469,
           "simulacoes": 2000000,
-          "percentual_estimado": 1.24505,
-          "exibicao": "1,2%",
+          "percentual_estimado": 0.42345,
+          "exibicao": "0,42%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4220,10 +4222,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 1840688,
+          "ocorrencias": 1812623,
           "simulacoes": 2000000,
-          "percentual_estimado": 92.0344,
-          "exibicao": "92,0%",
+          "percentual_estimado": 90.63115,
+          "exibicao": "90,6%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4233,10 +4235,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 134411,
+          "ocorrencias": 178908,
           "simulacoes": 2000000,
-          "percentual_estimado": 6.72055,
-          "exibicao": "6,7%",
+          "percentual_estimado": 8.9454,
+          "exibicao": "8,9%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4306,10 +4308,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 24901,
+            "ocorrencias": 8469,
             "simulacoes": 2000000,
-            "percentual_estimado": 1.24505,
-            "exibicao": "1,2%",
+            "percentual_estimado": 0.42345,
+            "exibicao": "0,42%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4372,10 +4374,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 24901,
+              "ocorrencias": 8469,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.24505,
-              "exibicao": "1,2%",
+              "percentual_estimado": 0.42345,
+              "exibicao": "0,42%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4426,14 +4428,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 1.24505
+          "soma_vias_pct": 0.42345
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 1840688,
+            "ocorrencias": 1812623,
             "simulacoes": 2000000,
-            "percentual_estimado": 92.0344,
-            "exibicao": "92,0%",
+            "percentual_estimado": 90.63115,
+            "exibicao": "90,6%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4444,10 +4446,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 1125939,
+              "ocorrencias": 1142371,
               "simulacoes": 2000000,
-              "percentual_estimado": 56.29695,
-              "exibicao": "56,3%",
+              "percentual_estimado": 57.11855,
+              "exibicao": "57,1%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4457,10 +4459,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 714749,
+              "ocorrencias": 670252,
               "simulacoes": 2000000,
-              "percentual_estimado": 35.73745,
-              "exibicao": "35,7%",
+              "percentual_estimado": 33.5126,
+              "exibicao": "33,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4470,14 +4472,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 92.0344
+          "soma_vias_pct": 90.63115
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 134411,
+            "ocorrencias": 178908,
             "simulacoes": 2000000,
-            "percentual_estimado": 6.72055,
-            "exibicao": "6,7%",
+            "percentual_estimado": 8.9454,
+            "exibicao": "8,9%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4502,9 +4504,9 @@
         "libertadores_base": 0.0,
         "sul_americana_base": 27.3762,
         "rebaixamento": 3.1009,
-        "libertadores": 0.33355,
-        "sul_americana": 75.0708,
-        "sem_competicao_continental": 24.59565
+        "libertadores": 0.071,
+        "sul_americana": 70.7106,
+        "sem_competicao_continental": 29.2184
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -4517,7 +4519,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -4586,10 +4588,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 6671,
+          "ocorrencias": 1420,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.33355,
-          "exibicao": "0,33%",
+          "percentual_estimado": 0.071,
+          "exibicao": "0,071%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4599,10 +4601,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 1501416,
+          "ocorrencias": 1414212,
           "simulacoes": 2000000,
-          "percentual_estimado": 75.0708,
-          "exibicao": "75,1%",
+          "percentual_estimado": 70.7106,
+          "exibicao": "70,7%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4612,10 +4614,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 491913,
+          "ocorrencias": 584368,
           "simulacoes": 2000000,
-          "percentual_estimado": 24.59565,
-          "exibicao": "24,6%",
+          "percentual_estimado": 29.2184,
+          "exibicao": "29,2%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4685,10 +4687,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 6671,
+            "ocorrencias": 1420,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.33355,
-            "exibicao": "0,33%",
+            "percentual_estimado": 0.071,
+            "exibicao": "0,071%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4751,10 +4753,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 6671,
+              "ocorrencias": 1420,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.33355,
-              "exibicao": "0,33%",
+              "percentual_estimado": 0.071,
+              "exibicao": "0,071%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4805,14 +4807,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0.33355
+          "soma_vias_pct": 0.071
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 1501416,
+            "ocorrencias": 1414212,
             "simulacoes": 2000000,
-            "percentual_estimado": 75.0708,
-            "exibicao": "75,1%",
+            "percentual_estimado": 70.7106,
+            "exibicao": "70,7%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4823,10 +4825,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 540853,
+              "ocorrencias": 546104,
               "simulacoes": 2000000,
-              "percentual_estimado": 27.04265,
-              "exibicao": "27,0%",
+              "percentual_estimado": 27.3052,
+              "exibicao": "27,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4836,10 +4838,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 960563,
+              "ocorrencias": 868108,
               "simulacoes": 2000000,
-              "percentual_estimado": 48.02815,
-              "exibicao": "48,0%",
+              "percentual_estimado": 43.4054,
+              "exibicao": "43,4%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4849,14 +4851,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 75.0708
+          "soma_vias_pct": 70.7106
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 491913,
+            "ocorrencias": 584368,
             "simulacoes": 2000000,
-            "percentual_estimado": 24.59565,
-            "exibicao": "24,6%",
+            "percentual_estimado": 29.2184,
+            "exibicao": "29,2%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4881,9 +4883,9 @@
         "libertadores_base": 0.0,
         "sul_americana_base": 9.5734,
         "rebaixamento": 0.02985,
-        "libertadores": 0.03425,
-        "sul_americana": 77.39665,
-        "sem_competicao_continental": 22.5691
+        "libertadores": 0.0046,
+        "sul_americana": 69.3836,
+        "sem_competicao_continental": 30.6118
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -4896,7 +4898,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -4965,10 +4967,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 685,
+          "ocorrencias": 92,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.03425,
-          "exibicao": "0,034%",
+          "percentual_estimado": 0.0046,
+          "exibicao": "0,005%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4978,10 +4980,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 1547933,
+          "ocorrencias": 1387672,
           "simulacoes": 2000000,
-          "percentual_estimado": 77.39665,
-          "exibicao": "77,4%",
+          "percentual_estimado": 69.3836,
+          "exibicao": "69,4%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4991,10 +4993,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 451382,
+          "ocorrencias": 612236,
           "simulacoes": 2000000,
-          "percentual_estimado": 22.5691,
-          "exibicao": "22,6%",
+          "percentual_estimado": 30.6118,
+          "exibicao": "30,6%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5064,10 +5066,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 685,
+            "ocorrencias": 92,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.03425,
-            "exibicao": "0,034%",
+            "percentual_estimado": 0.0046,
+            "exibicao": "0,005%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5130,10 +5132,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 685,
+              "ocorrencias": 92,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.03425,
-              "exibicao": "0,034%",
+              "percentual_estimado": 0.0046,
+              "exibicao": "0,005%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5184,14 +5186,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0.03425
+          "soma_vias_pct": 0.0046
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 1547933,
+            "ocorrencias": 1387672,
             "simulacoes": 2000000,
-            "percentual_estimado": 77.39665,
-            "exibicao": "77,4%",
+            "percentual_estimado": 69.3836,
+            "exibicao": "69,4%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5202,10 +5204,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 190783,
+              "ocorrencias": 191376,
               "simulacoes": 2000000,
-              "percentual_estimado": 9.53915,
-              "exibicao": "9,5%",
+              "percentual_estimado": 9.5688,
+              "exibicao": "9,6%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5215,10 +5217,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 1357150,
+              "ocorrencias": 1196296,
               "simulacoes": 2000000,
-              "percentual_estimado": 67.8575,
-              "exibicao": "67,9%",
+              "percentual_estimado": 59.8148,
+              "exibicao": "59,8%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5228,14 +5230,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 77.39665
+          "soma_vias_pct": 69.3836
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 451382,
+            "ocorrencias": 612236,
             "simulacoes": 2000000,
-            "percentual_estimado": 22.5691,
-            "exibicao": "22,6%",
+            "percentual_estimado": 30.6118,
+            "exibicao": "30,6%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5260,9 +5262,9 @@
         "libertadores_base": 0.0,
         "sul_americana_base": 5.04825,
         "rebaixamento": 21.6679,
-        "libertadores": 0.0107,
-        "sul_americana": 38.72495,
-        "sem_competicao_continental": 61.26435
+        "libertadores": 0.0002,
+        "sul_americana": 32.67435,
+        "sem_competicao_continental": 67.32545
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -5275,7 +5277,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -5344,10 +5346,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 214,
+          "ocorrencias": 4,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0107,
-          "exibicao": "0,011%",
+          "percentual_estimado": 0.0002,
+          "exibicao": "<0,001%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5357,10 +5359,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 774499,
+          "ocorrencias": 653487,
           "simulacoes": 2000000,
-          "percentual_estimado": 38.72495,
-          "exibicao": "38,7%",
+          "percentual_estimado": 32.67435,
+          "exibicao": "32,7%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5370,10 +5372,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 1225287,
+          "ocorrencias": 1346509,
           "simulacoes": 2000000,
-          "percentual_estimado": 61.26435,
-          "exibicao": "61,3%",
+          "percentual_estimado": 67.32545,
+          "exibicao": "67,3%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5443,10 +5445,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 214,
+            "ocorrencias": 4,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0107,
-            "exibicao": "0,011%",
+            "percentual_estimado": 0.0002,
+            "exibicao": "<0,001%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5509,10 +5511,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 214,
+              "ocorrencias": 4,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0107,
-              "exibicao": "0,011%",
+              "percentual_estimado": 0.0002,
+              "exibicao": "<0,001%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5563,14 +5565,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0.0107
+          "soma_vias_pct": 0.0002
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 774499,
+            "ocorrencias": 653487,
             "simulacoes": 2000000,
-            "percentual_estimado": 38.72495,
-            "exibicao": "38,7%",
+            "percentual_estimado": 32.67435,
+            "exibicao": "32,7%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5581,9 +5583,9 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 100751,
+              "ocorrencias": 100961,
               "simulacoes": 2000000,
-              "percentual_estimado": 5.03755,
+              "percentual_estimado": 5.04805,
               "exibicao": "5,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -5594,10 +5596,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 673748,
+              "ocorrencias": 552526,
               "simulacoes": 2000000,
-              "percentual_estimado": 33.6874,
-              "exibicao": "33,7%",
+              "percentual_estimado": 27.6263,
+              "exibicao": "27,6%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5607,14 +5609,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 38.72495
+          "soma_vias_pct": 32.67435
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 1225287,
+            "ocorrencias": 1346509,
             "simulacoes": 2000000,
-            "percentual_estimado": 61.26435,
-            "exibicao": "61,3%",
+            "percentual_estimado": 67.32545,
+            "exibicao": "67,3%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5639,9 +5641,9 @@
         "libertadores_base": 0.0,
         "sul_americana_base": 3.81465,
         "rebaixamento": 20.0714,
-        "libertadores": 0.0196,
-        "sul_americana": 34.58275,
-        "sem_competicao_continental": 65.39765
+        "libertadores": 0.00125,
+        "sul_americana": 27.5004,
+        "sem_competicao_continental": 72.49835
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -5654,7 +5656,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -5723,10 +5725,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 392,
+          "ocorrencias": 25,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0196,
-          "exibicao": "0,020%",
+          "percentual_estimado": 0.00125,
+          "exibicao": "0,001%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5736,10 +5738,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 691655,
+          "ocorrencias": 550008,
           "simulacoes": 2000000,
-          "percentual_estimado": 34.58275,
-          "exibicao": "34,6%",
+          "percentual_estimado": 27.5004,
+          "exibicao": "27,5%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5749,10 +5751,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 1307953,
+          "ocorrencias": 1449967,
           "simulacoes": 2000000,
-          "percentual_estimado": 65.39765,
-          "exibicao": "65,4%",
+          "percentual_estimado": 72.49835,
+          "exibicao": "72,5%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5822,10 +5824,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 392,
+            "ocorrencias": 25,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0196,
-            "exibicao": "0,020%",
+            "percentual_estimado": 0.00125,
+            "exibicao": "0,001%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5888,10 +5890,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 392,
+              "ocorrencias": 25,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0196,
-              "exibicao": "0,020%",
+              "percentual_estimado": 0.00125,
+              "exibicao": "0,001%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5942,14 +5944,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0.0196
+          "soma_vias_pct": 0.00125
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 691655,
+            "ocorrencias": 550008,
             "simulacoes": 2000000,
-            "percentual_estimado": 34.58275,
-            "exibicao": "34,6%",
+            "percentual_estimado": 27.5004,
+            "exibicao": "27,5%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5960,9 +5962,9 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 75901,
+              "ocorrencias": 76268,
               "simulacoes": 2000000,
-              "percentual_estimado": 3.79505,
+              "percentual_estimado": 3.8134,
               "exibicao": "3,8%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -5973,10 +5975,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 615754,
+              "ocorrencias": 473740,
               "simulacoes": 2000000,
-              "percentual_estimado": 30.7877,
-              "exibicao": "30,8%",
+              "percentual_estimado": 23.687,
+              "exibicao": "23,7%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5986,14 +5988,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 34.58275
+          "soma_vias_pct": 27.5004
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 1307953,
+            "ocorrencias": 1449967,
             "simulacoes": 2000000,
-            "percentual_estimado": 65.39765,
-            "exibicao": "65,4%",
+            "percentual_estimado": 72.49835,
+            "exibicao": "72,5%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -6018,9 +6020,9 @@
         "libertadores_base": 0.0,
         "sul_americana_base": 5.00405,
         "rebaixamento": 22.32845,
-        "libertadores": 0.0095,
-        "sul_americana": 36.72735,
-        "sem_competicao_continental": 63.26315
+        "libertadores": 0.0,
+        "sul_americana": 30.98045,
+        "sem_competicao_continental": 69.01955
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -6033,7 +6035,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -6102,23 +6104,23 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 190,
+          "ocorrencias": 0,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0095,
-          "exibicao": "0,009%",
-          "zero_observado": false,
+          "percentual_estimado": 0.0,
+          "exibicao": "<0,001%",
+          "zero_observado": true,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
           "certeza_estrutural": false,
           "motivo_certeza": null,
           "motivo_impossibilidade": null,
-          "limite_superior_95_regra_dos_tres_pct": null
+          "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "sul_americana": {
-          "ocorrencias": 734547,
+          "ocorrencias": 619609,
           "simulacoes": 2000000,
-          "percentual_estimado": 36.72735,
-          "exibicao": "36,7%",
+          "percentual_estimado": 30.98045,
+          "exibicao": "31,0%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -6128,10 +6130,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 1265263,
+          "ocorrencias": 1380391,
           "simulacoes": 2000000,
-          "percentual_estimado": 63.26315,
-          "exibicao": "63,3%",
+          "percentual_estimado": 69.01955,
+          "exibicao": "69,0%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -6201,17 +6203,17 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 190,
+            "ocorrencias": 0,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0095,
-            "exibicao": "0,009%",
-            "zero_observado": false,
+            "percentual_estimado": 0.0,
+            "exibicao": "<0,001%",
+            "zero_observado": true,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
             "certeza_estrutural": false,
             "motivo_certeza": null,
             "motivo_impossibilidade": null,
-            "limite_superior_95_regra_dos_tres_pct": null
+            "limite_superior_95_regra_dos_tres_pct": 0.00015
           },
           "vias": {
             "via_brasileirao": {
@@ -6267,17 +6269,17 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 190,
+              "ocorrencias": 0,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0095,
-              "exibicao": "0,009%",
-              "zero_observado": false,
+              "percentual_estimado": 0.0,
+              "exibicao": "<0,001%",
+              "zero_observado": true,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
               "certeza_estrutural": false,
               "motivo_certeza": null,
               "motivo_impossibilidade": null,
-              "limite_superior_95_regra_dos_tres_pct": null
+              "limite_superior_95_regra_dos_tres_pct": 0.00015
             }
           },
           "subvias_copa_do_brasil": {
@@ -6321,14 +6323,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0.0095
+          "soma_vias_pct": 0.0
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 734547,
+            "ocorrencias": 619609,
             "simulacoes": 2000000,
-            "percentual_estimado": 36.72735,
-            "exibicao": "36,7%",
+            "percentual_estimado": 30.98045,
+            "exibicao": "31,0%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -6339,9 +6341,9 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 99891,
+              "ocorrencias": 100081,
               "simulacoes": 2000000,
-              "percentual_estimado": 4.99455,
+              "percentual_estimado": 5.00405,
               "exibicao": "5,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -6352,10 +6354,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 634656,
+              "ocorrencias": 519528,
               "simulacoes": 2000000,
-              "percentual_estimado": 31.7328,
-              "exibicao": "31,7%",
+              "percentual_estimado": 25.9764,
+              "exibicao": "26,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6365,14 +6367,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 36.72735
+          "soma_vias_pct": 30.98045
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 1265263,
+            "ocorrencias": 1380391,
             "simulacoes": 2000000,
-            "percentual_estimado": 63.26315,
-            "exibicao": "63,3%",
+            "percentual_estimado": 69.01955,
+            "exibicao": "69,0%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -6398,8 +6400,8 @@
         "sul_americana_base": 0.35455,
         "rebaixamento": 59.0177,
         "libertadores": 0.0,
-        "sul_americana": 10.3552,
-        "sem_competicao_continental": 89.6448
+        "sul_americana": 7.0718,
+        "sem_competicao_continental": 92.9282
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -6412,7 +6414,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -6494,10 +6496,10 @@
           "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "sul_americana": {
-          "ocorrencias": 207104,
+          "ocorrencias": 141436,
           "simulacoes": 2000000,
-          "percentual_estimado": 10.3552,
-          "exibicao": "10,4%",
+          "percentual_estimado": 7.0718,
+          "exibicao": "7,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -6507,10 +6509,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 1792896,
+          "ocorrencias": 1858564,
           "simulacoes": 2000000,
-          "percentual_estimado": 89.6448,
-          "exibicao": "89,6%",
+          "percentual_estimado": 92.9282,
+          "exibicao": "92,9%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -6704,10 +6706,10 @@
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 207104,
+            "ocorrencias": 141436,
             "simulacoes": 2000000,
-            "percentual_estimado": 10.3552,
-            "exibicao": "10,4%",
+            "percentual_estimado": 7.0718,
+            "exibicao": "7,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -6731,10 +6733,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 200013,
+              "ocorrencias": 134345,
               "simulacoes": 2000000,
-              "percentual_estimado": 10.00065,
-              "exibicao": "10,0%",
+              "percentual_estimado": 6.71725,
+              "exibicao": "6,7%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6744,14 +6746,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 10.3552
+          "soma_vias_pct": 7.0718
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 1792896,
+            "ocorrencias": 1858564,
             "simulacoes": 2000000,
-            "percentual_estimado": 89.6448,
-            "exibicao": "89,6%",
+            "percentual_estimado": 92.9282,
+            "exibicao": "92,9%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -6791,7 +6793,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -7170,7 +7172,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -7549,7 +7551,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
+          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -7917,14 +7919,14 @@
     ],
     "decomposicao_exclusiva_por_via": true,
     "limiar_exibicao_percentual": 0.001,
-    "hash_snapshots": "522a3fa6d73f60adb7a8ffc0a311b448f72e8b15621d188d1844a78d62f74569",
+    "hash_snapshots": "e19589b7457d23704ea87365268b88de095a273e2fa45b0e2feacebccef99d36",
     "cobertura": {
       "todas_consideradas": true,
       "competicoes": [
         {
           "chave": "copa_do_brasil",
           "nome": "Copa do Brasil",
-          "gerado_em": "2026-11-21T21:11:58-03:00",
+          "gerado_em": "2026-11-21T23:17:57-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -7939,7 +7941,7 @@
         {
           "chave": "libertadores",
           "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-11-21T21:11:59-03:00",
+          "gerado_em": "2026-11-21T23:17:57-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -7954,26 +7956,26 @@
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-11-21T21:12:00-03:00",
+          "gerado_em": "2026-11-21T23:17:58-03:00",
           "fase_atual": {
-            "status": "em_andamento",
+            "status": "encerrada",
             "ordem": 900,
             "nome": "2026 CONMEBOL Sudamericana, Final",
             "eventos": 1,
-            "eventos_pendentes": 1
+            "eventos_pendentes": 0
           },
-          "eventos_finalizados": 156,
-          "eventos_pendentes": 1,
+          "eventos_finalizados": 157,
+          "eventos_pendentes": 0,
           "modo_coleta": "incremental"
         }
       ],
-      "referencia_mais_antiga_em": "2026-11-21T21:11:58-03:00",
-      "referencia_mais_recente_em": "2026-11-21T21:12:00-03:00",
-      "snapshots_atualizados_em": "2026-11-21T21:12:00-03:00"
+      "referencia_mais_antiga_em": "2026-11-21T23:17:57-03:00",
+      "referencia_mais_recente_em": "2026-11-21T23:17:58-03:00",
+      "snapshots_atualizados_em": "2026-11-21T23:17:58-03:00"
     }
   },
   "cobertura_dados": {
-    "atualizado_em": "2026-11-21T23:11:58-03:00",
+    "atualizado_em": "2026-11-21T23:23:34-03:00",
     "brasileirao": {
       "fonte": "ESPN",
       "referencia_esportiva_em": "2026-11-21T22:53:00-03:00",
@@ -7986,7 +7988,7 @@
         {
           "chave": "copa_do_brasil",
           "nome": "Copa do Brasil",
-          "gerado_em": "2026-11-21T21:11:58-03:00",
+          "gerado_em": "2026-11-21T23:17:57-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -8001,7 +8003,7 @@
         {
           "chave": "libertadores",
           "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-11-21T21:11:59-03:00",
+          "gerado_em": "2026-11-21T23:17:57-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -8016,22 +8018,22 @@
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-11-21T21:12:00-03:00",
+          "gerado_em": "2026-11-21T23:17:58-03:00",
           "fase_atual": {
-            "status": "em_andamento",
+            "status": "encerrada",
             "ordem": 900,
             "nome": "2026 CONMEBOL Sudamericana, Final",
             "eventos": 1,
-            "eventos_pendentes": 1
+            "eventos_pendentes": 0
           },
-          "eventos_finalizados": 156,
-          "eventos_pendentes": 1,
+          "eventos_finalizados": 157,
+          "eventos_pendentes": 0,
           "modo_coleta": "incremental"
         }
       ],
-      "referencia_mais_antiga_em": "2026-11-21T21:11:58-03:00",
-      "referencia_mais_recente_em": "2026-11-21T21:12:00-03:00",
-      "snapshots_atualizados_em": "2026-11-21T21:12:00-03:00"
+      "referencia_mais_antiga_em": "2026-11-21T23:17:57-03:00",
+      "referencia_mais_recente_em": "2026-11-21T23:17:58-03:00",
+      "snapshots_atualizados_em": "2026-11-21T23:17:58-03:00"
     }
   },
   "total_previsoes_partidas": 27,
@@ -9500,5 +9502,14 @@
     "Libertadores e Sul-Americana são probabilidades consolidadas e incluem os caminhos por copas e repasses regulamentares.",
     "Valores exibidos como <0,001% não significam impossibilidade matemática; indicam evento abaixo da resolução visual escolhida.",
     "O modelo não utiliza cotações de apostas."
-  ]
+  ],
+  "titulo_matematico_2026": {
+    "campeao": "Flamengo",
+    "confirmado": true,
+    "probabilidade_pct": 100,
+    "rodada": 36,
+    "criterio": "pontos e vitórias",
+    "fonte": "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/flamengo-conquista-brasileirao-2026",
+    "fundamento": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes."
+  }
 }

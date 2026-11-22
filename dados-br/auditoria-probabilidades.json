@@ -5,9 +5,9 @@
   "etapa": "Execução 5 — histórico encadeado e avaliação científica preparada",
   "gerado_em": "2026-11-21T22:53:00-03:00",
   "referencia_esportiva_em": "2026-11-21T22:53:00-03:00",
-  "calculado_em": "2026-11-21T23:11:58-03:00",
+  "calculado_em": "2026-11-21T23:23:34-03:00",
   "status": "ok",
-  "hash_entrada": "36f1c78aed059af52aa1566e997c70c5f4cea1793cb82ee620f87495ea094545",
+  "hash_entrada": "3977c9aababc187daf90e4a33343635c6ddbe79698d34d36643c63f22b06dcb1",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -365,7 +365,7 @@
   "diagnostico_af_score": {
     "disponivel": true,
     "cobertura_clubes": 20,
-    "correlacao_pearson_com_forca_map": 0.889685,
+    "correlacao_pearson_com_forca_map": 0.889649,
     "aplicado_na_producao": false,
     "motivo": "O AF-Score não possui série histórica homogênea em 2023–2025. Incluí-lo agora impediria backtesting temporal equivalente e poderia introduzir vazamento."
   },
@@ -424,43 +424,23 @@
         ]
       },
       "sul_americana": {
-        "status": "simulado",
-        "fase_atual": "2026 CONMEBOL Sudamericana, Final",
-        "fase_ordem": 900,
-        "chaves_atuais": 1,
-        "equipes_ativas": 2,
-        "clubes_ativos": [
-          "Atlético-MG",
-          "Boca Juniors"
-        ],
-        "rodadas_simuladas_tamanhos": [
-          1
-        ],
-        "pareamento_futuro": "não aplicável",
-        "partidas_concluidas_no_ajuste": 156,
-        "principais_chances_titulo": [
-          {
-            "clube": "Boca Juniors",
-            "probabilidade_pct": 62.81515
-          },
-          {
-            "clube": "Atlético-MG",
-            "probabilidade_pct": 37.18485
-          }
-        ]
+        "status": "encerrada",
+        "campeao": "Boca Juniors",
+        "vice": "Atlético-MG",
+        "eventos": 157
       }
     },
     "alocacao_vagas": {
       "vagas_brasileirao_base": 5,
       "vagas_sul_americana": 6,
-      "media_clubes_serie_a_2026_na_libertadores": 7.926399,
+      "media_clubes_serie_a_2026_na_libertadores": 7.55455,
       "minimo_clubes_serie_a_2026_na_libertadores": 7,
-      "maximo_clubes_serie_a_2026_na_libertadores": 9,
-      "media_total_clubes_brasileiros_na_libertadores": 7.926399,
+      "maximo_clubes_serie_a_2026_na_libertadores": 8,
+      "media_total_clubes_brasileiros_na_libertadores": 7.55455,
       "minimo_total_clubes_brasileiros_na_libertadores": 7,
-      "maximo_total_clubes_brasileiros_na_libertadores": 9,
+      "maximo_total_clubes_brasileiros_na_libertadores": 8,
       "media_vagas_consumidas_por_clubes_brasileiros_fora_da_serie_a_2026": 0.0,
-      "soma_probabilidades_libertadores_pct": 792.63985,
+      "soma_probabilidades_libertadores_pct": 755.455,
       "soma_probabilidades_sul_americana_pct": 600.0,
       "regra_decomposicao": "vias exclusivas: G5 do Brasileirão primeiro; títulos/copa apenas quando necessários; sobreposições descem como repasse",
       "regra_elegibilidade": "Art. 4º, §§ 6º-9º REC Copa do Brasil 2026: finalistas rebaixados não podem exercer vaga na Libertadores 2027; essa vaga retorna à classificação do Brasileirão. Elegibilidade de títulos continentais deve ser tratada também conforme Manual de Clubes CONMEBOL."
@@ -478,7 +458,7 @@
         {
           "chave": "copa_do_brasil",
           "nome": "Copa do Brasil",
-          "gerado_em": "2026-11-21T21:11:58-03:00",
+          "gerado_em": "2026-11-21T23:17:57-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -493,7 +473,7 @@
         {
           "chave": "libertadores",
           "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-11-21T21:11:59-03:00",
+          "gerado_em": "2026-11-21T23:17:57-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -508,22 +488,22 @@
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-11-21T21:12:00-03:00",
+          "gerado_em": "2026-11-21T23:17:58-03:00",
           "fase_atual": {
-            "status": "em_andamento",
+            "status": "encerrada",
             "ordem": 900,
             "nome": "2026 CONMEBOL Sudamericana, Final",
             "eventos": 1,
-            "eventos_pendentes": 1
+            "eventos_pendentes": 0
           },
-          "eventos_finalizados": 156,
-          "eventos_pendentes": 1,
+          "eventos_finalizados": 157,
+          "eventos_pendentes": 0,
           "modo_coleta": "incremental"
         }
       ],
-      "referencia_mais_antiga_em": "2026-11-21T21:11:58-03:00",
-      "referencia_mais_recente_em": "2026-11-21T21:12:00-03:00",
-      "snapshots_atualizados_em": "2026-11-21T21:12:00-03:00"
+      "referencia_mais_antiga_em": "2026-11-21T23:17:57-03:00",
+      "referencia_mais_recente_em": "2026-11-21T23:17:58-03:00",
+      "snapshots_atualizados_em": "2026-11-21T23:17:58-03:00"
     }
   },
   "validacoes": {
@@ -531,7 +511,7 @@
     "soma_campeao_pct": 100.0,
     "soma_g4_pct": 400.0,
     "soma_g6_pct": 600.0,
-    "soma_libertadores_consolidada_pct": 792.63985,
+    "soma_libertadores_consolidada_pct": 755.455,
     "soma_sul_americana_base_pct": 600.0,
     "soma_sul_americana_consolidada_pct": 600.0,
     "soma_rebaixamento_pct": 400.0,

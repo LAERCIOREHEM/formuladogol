@@ -2,15 +2,15 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-11-21T21:12:00-03:00",
+  "gerado_em": "2026-11-21T23:17:58-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "af_snapshot_seguro": true,
   "agenda_operacional_fresca": true,
   "snapshots_preservados": 0,
-  "mudanca_esportiva": false,
+  "mudanca_esportiva": true,
   "hash_estado_antes": "522a3fa6d73f60adb7a8ffc0a311b448f72e8b15621d188d1844a78d62f74569",
-  "hash_estado_depois": "522a3fa6d73f60adb7a8ffc0a311b448f72e8b15621d188d1844a78d62f74569",
+  "hash_estado_depois": "e19589b7457d23704ea87365268b88de095a273e2fa45b0e2feacebccef99d36",
   "fonte": "ESPN + API-Football contingencial",
   "temporada": 2026,
   "competicoes": [
@@ -18,8 +18,8 @@
       "competicao": "copa_do_brasil",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-11-21T21:11:58-03:00",
-      "cache_efetivo_minutos": 0,
+      "gerado_em": "2026-11-21T23:17:57-03:00",
+      "cache_efetivo_minutos": 45,
       "eventos": 155,
       "finalizados": 154,
       "pendentes": 1,
@@ -65,8 +65,8 @@
       "competicao": "libertadores",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-11-21T21:11:59-03:00",
-      "cache_efetivo_minutos": 0,
+      "gerado_em": "2026-11-21T23:17:57-03:00",
+      "cache_efetivo_minutos": 45,
       "eventos": 155,
       "finalizados": 154,
       "pendentes": 1,
@@ -117,25 +117,23 @@
       "competicao": "sul_americana",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-11-21T21:12:00-03:00",
-      "cache_efetivo_minutos": 0,
+      "gerado_em": "2026-11-21T23:17:58-03:00",
+      "cache_efetivo_minutos": 5,
       "eventos": 157,
-      "finalizados": 156,
-      "pendentes": 1,
+      "finalizados": 157,
+      "pendentes": 0,
       "fase_atual": {
-        "status": "em_andamento",
+        "status": "encerrada",
         "ordem": 900,
         "nome": "2026 CONMEBOL Sudamericana, Final",
         "eventos": 1,
-        "eventos_pendentes": 1
+        "eventos_pendentes": 0
       },
       "summary_partidas_iniciadas": {
-        "consultados": 1,
-        "confirmados": 1,
-        "atualizados": 1,
-        "ao_vivo": [
-          "401913961"
-        ],
+        "consultados": 0,
+        "confirmados": 0,
+        "atualizados": 0,
+        "ao_vivo": [],
         "finalizados": [],
         "pendentes": [],
         "pendentes_vencidos": [],
@@ -159,17 +157,7 @@
         "janela_fim": "2027-03-21T23:59:59-03:00",
         "requisicoes": 3,
         "ultima_completa_em": "2026-11-18T22:55:19-03:00",
-        "ajustes_editoriais_aplicados": 2,
-        "summary_partidas_iniciadas": {
-          "consultados": 1,
-          "confirmados": 1,
-          "atualizados": 1,
-          "ao_vivo": [
-            "401913961"
-          ],
-          "finalizados": [],
-          "erros": []
-        }
+        "ajustes_editoriais_aplicados": 1
       }
     }
   ],
@@ -182,14 +170,14 @@
   "fontes_totalmente_atualizadas": true,
   "snapshots_prontos_para_af": true,
   "regras_operacionais": {
-    "cache_padrao_minutos": 0,
+    "cache_padrao_minutos": 45,
     "cache_janela_de_jogo_minutos": 5,
     "janela_de_jogo_horas_apos_inicio": 4,
     "janela_incremental_dias_passado": 21,
     "janela_incremental_dias_futuro": 120,
     "janela_scoreboard_dias": 1,
     "fallback_janela_scoreboard": "subdivisão progressiva até 1 dia em erro HTTP/transporte",
-    "reconstrucao_completa_horas": 0,
+    "reconstrucao_completa_horas": 168,
     "falha_de_rede": "preserva o último snapshot íntegro; --strict transforma a falha em erro",
     "nenhum_json_vazio": true
   }
