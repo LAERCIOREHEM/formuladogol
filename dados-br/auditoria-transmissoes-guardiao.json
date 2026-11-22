@@ -7850,57 +7850,109 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: Athletico-PR x Remo, Brasileirão Série A 2026, fase única, 36ª rodada, neste domingo (22/11/2026), às 16h (horário de Brasília), na Arena da Baixada, em Curitiba. A grade oficial consultada indica transmissão integral exclusivamente no Premiere. GE acompanha em tempo real, mas isso não constitui transmissão da partida."
+    },
+    {
+      "event_id": "401841324",
+      "jogo": "Fluminense x Mirassol",
+      "data_iso": "2026-11-22T18:30:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-11-22T17:07:40-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "CazéTV"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://credencial.cbf.com.br/competicoes/listar/42/1",
+        "https://ge.globo.com/agenda",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/21/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-36a-rodada.ghtml",
+        "https://ge.globo.com/futebol/times/atletico-mg/noticia/2026/10/30/brasileirao-cbf-marca-jogo-do-atletico-mg-em-data-fifa-e-duelo-com-corinthians-pos-final.ghtml",
+        "https://ge.globo.com/google/amp/cartola/noticia/2026/11/21/cartola-2026-veja-suspensos-lesionados-e-escalacoes-provaveis-da-rodada-36-do-brasileirao.ghtml",
+        "https://ge.globo.com/google/amp/futebol/times/fluminense/noticia/2026/11/22/fluminense-pode-conquistar-a-vaga-direta-para-a-libertadores-contra-o-mirassol-veja-os-calculos.ghtml",
+        "https://ge.globo.com/rj/futebol/brasileirao-serie-a/jogo/22-11-2026/fluminense-mirassol.ghtml",
+        "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/11/22/fluminense-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sp/tem-esporte/futebol/times/mirassol",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/fluminense-x-mirassol/832241",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/flamengo-pode-ser-campeao-brasileiro-de-2026-neste-sabado",
+        "https://www.cbf.com.br/futebol-brasileiro/tabelas/conmebol-libertadores/profissional/2026/2103",
+        "https://www.youtube.com/myfamily/static/pdfs/parentguide_uk.pdf"
+      ],
+      "canais_depois": [
+        "CazéTV",
+        "Premiere",
+        "Record"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/fluminense-x-mirassol/832241",
+        "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/11/22/fluminense-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=n2KWc_xbPAA",
+          "scope": "match",
+          "valid_for_match": true,
+          "reason": "O dossiê identifica o vídeo oficial da CazéTV como ao vivo, com o título “AO VIVO: FLUMINENSE X MIRASSOL | BRASILEIRÃO 2026 | 36ª RODADA”. A CBF também lista “YouTube / Cazé TV” entre as transmissões oficiais desta partida."
+        }
+      ],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado no Brasil: Fluminense x Mirassol, Campeonato Brasileiro Série A 2026, fase única, 36ª rodada, domingo, 22/11/2026, às 18h30 (BRT), no Maracanã. A grade completa é Premiere, Record e CazéTV (via YouTube). Não é exclusivo."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841318",
-    "jogo": "Athletico-PR x Remo",
-    "data_iso": "2026-11-22T16:00:00-03:00",
+    "event_id": "401841324",
+    "jogo": "Fluminense x Mirassol",
+    "data_iso": "2026-11-22T18:30:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-11-22T14:37:36-03:00",
+    "executado_em": "2026-11-22T17:07:40-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "Premiere"
+      "CazéTV"
     ],
-    "status": "confirmado",
+    "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://cdn.conmebol.com/wp-content/uploads/2022/01/Manual-de-clubes-2022-CS-PORT-actualizado-VERO.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2024/03/Manual-de-Clubes-CL-2024-POR-Digital.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR-Fev26.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/10/AVISO-INDICACIONES-NRH-FINAL-CONMEBOL-LIBERTADORES-2026-ESP-POR.pdf",
-      "https://download.uol.com.br/files/2023/05/1667102178_20230526173425_357.pdf",
-      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/11/21/problema-tecnico-faz-aviao-do-remo-retornar-a-belem-clube-pede-adiamento-de-jogo-contra-o-athletico-pr.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/jogo/22-11-2026/athletico-pr-remo.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/11/22/athletico-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/pr/futebol/times/athletico-pr/noticia/2026/11/09/agenda-do-athletico-veja-as-datas-dos-jogos-ate-a-ultima-rodada-do-brasileirao.ghtml",
-      "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/11/18/athletico-pr-x-remo-ao-vivo-onde-assistir-horario-e-escalacoes-pela-36-rodada-da-serie-a.html",
-      "https://s3.static.brasilescola.uol.com.br/be/2026/02/portaria-pe-de-meia-datas-2026.pdf",
-      "https://sports.sbt.com.br/futebol/brasileirao/jogo/22-11-2026/athletico-pr-x-remo",
-      "https://www.bol.uol.com.br/esporte/2026/11/22/athletico-pr-x-remo-horario-e-onde-assistir-ao-jogo-do-brasileirao.ghtm",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/athletico-paranaense-x-remo/832248",
-      "https://www.cnnbrasil.com.br/esportes/brasileirao/remo-pede-adiamento-de-jogo-do-brasileirao-apos-aviao-fazer-retorno-forcado",
-      "https://www.cnnbrasil.com.br/esportes/futebol/remo/apos-problema-com-aviao-remo-x-athletico-pr-e-mantido-para-as-16h",
-      "https://www.cnnbrasil.com.br/esportes/lances-ao-vivo/brasileiro-serie-a-2026/22-11-2026/athletico-pr-x-remo",
-      "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/11/22/athletico-pr-pega-o-remo-em-jogo-que-pode-decretar-rebaixamento-do-time-paraense-a-serie-b.htm",
-      "https://www.youtube.com/watch?v=ITWMDJiPK9M",
-      "https://www.youtube.com/watch?v=KmNqKuhTe7s"
+      "https://credencial.cbf.com.br/competicoes/listar/42/1",
+      "https://ge.globo.com/agenda",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/21/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-36a-rodada.ghtml",
+      "https://ge.globo.com/futebol/times/atletico-mg/noticia/2026/10/30/brasileirao-cbf-marca-jogo-do-atletico-mg-em-data-fifa-e-duelo-com-corinthians-pos-final.ghtml",
+      "https://ge.globo.com/google/amp/cartola/noticia/2026/11/21/cartola-2026-veja-suspensos-lesionados-e-escalacoes-provaveis-da-rodada-36-do-brasileirao.ghtml",
+      "https://ge.globo.com/google/amp/futebol/times/fluminense/noticia/2026/11/22/fluminense-pode-conquistar-a-vaga-direta-para-a-libertadores-contra-o-mirassol-veja-os-calculos.ghtml",
+      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/jogo/22-11-2026/fluminense-mirassol.ghtml",
+      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/11/22/fluminense-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sp/tem-esporte/futebol/times/mirassol",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/fluminense-x-mirassol/832241",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/flamengo-pode-ser-campeao-brasileiro-de-2026-neste-sabado",
+      "https://www.cbf.com.br/futebol-brasileiro/tabelas/conmebol-libertadores/profissional/2026/2103",
+      "https://www.youtube.com/myfamily/static/pdfs/parentguide_uk.pdf"
     ],
     "canais_depois": [
-      "Premiere"
+      "CazéTV",
+      "Premiere",
+      "Record"
     ],
-    "exclusivo": true,
+    "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/athletico-paranaense-x-remo/832248",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/11/22/athletico-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://www.cnnbrasil.com.br/esportes/futebol/remo/apos-problema-com-aviao-remo-x-athletico-pr-e-mantido-para-as-16h"
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/fluminense-x-mirassol/832241",
+      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/11/22/fluminense-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
     ],
-    "youtube": [],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=n2KWc_xbPAA",
+        "scope": "match",
+        "valid_for_match": true,
+        "reason": "O dossiê identifica o vídeo oficial da CazéTV como ao vivo, com o título “AO VIVO: FLUMINENSE X MIRASSOL | BRASILEIRÃO 2026 | 36ª RODADA”. A CBF também lista “YouTube / Cazé TV” entre as transmissões oficiais desta partida."
+      }
+    ],
     "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: Athletico-PR x Remo, Brasileirão Série A 2026, fase única, 36ª rodada, neste domingo (22/11/2026), às 16h (horário de Brasília), na Arena da Baixada, em Curitiba. A grade oficial consultada indica transmissão integral exclusivamente no Premiere. GE acompanha em tempo real, mas isso não constitui transmissão da partida."
+    "resumo": "Confirmado no Brasil: Fluminense x Mirassol, Campeonato Brasileiro Série A 2026, fase única, 36ª rodada, domingo, 22/11/2026, às 18h30 (BRT), no Maracanã. A grade completa é Premiere, Record e CazéTV (via YouTube). Não é exclusivo."
   },
-  "atualizado_em": "2026-11-22T14:37:36-03:00"
+  "atualizado_em": "2026-11-22T17:07:40-03:00"
 }
