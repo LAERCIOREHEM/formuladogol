@@ -11,3 +11,10 @@
 .fdg-alert-danger{border-color:rgba(239,68,68,.18)}.fdg-alert-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px}.fdg-alert-link{color:#34d399;font-size:.83rem;font-weight:800}.fdg-alert-disable{padding:8px 11px;border-radius:9px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08);color:inherit;font:inherit;font-size:.8rem;font-weight:800;cursor:pointer}.fdg-alert-disable:disabled{opacity:.45;cursor:not-allowed}.fdg-alert-empty,.fdg-alert-loading{padding:12px;border-radius:10px;background:rgba(148,163,184,.06);color:var(--muted,#94a3b8);font-size:.86rem}
 @media(max-width:680px){.fdg-alert-team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.fdg-alert-game{grid-template-columns:1fr}.fdg-alert-game .fdg-alert-button{width:100%}.fdg-alert-all{align-items:flex-start;flex-direction:column}.br-game-actions-right .fdg-game-alert-slot{flex-basis:100%;width:100%}.br-game-actions-right .fdg-game-alert-slot .fdg-alert-button{width:100%}.fdg-team-alert-slot .fdg-alert-button,.fdg-live-alert-action .fdg-alert-button{width:100%}}
 .fdg-alerts-shell{max-width:980px;margin:0 auto;padding-bottom:30px}.fdg-alerts-hero{margin-bottom:14px}.fdg-alerts-hero h1{margin:.25rem 0 .55rem}.fdg-alerts-lead{margin:0;max-width:780px;color:var(--muted,#94a3b8);line-height:1.55}
+
+/* R36 — status contextual do escopo de alertas; sem alterar escolhas do usuário. */
+.fdg-live-alert-action[hidden]{display:none}
+.fdg-live-goal-status{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;padding:9px 12px;border:1px solid rgba(148,163,184,.3);border-radius:12px;font-size:.82rem;font-weight:700;line-height:1.5;text-align:center;max-width:min(100%,680px)}
+.fdg-live-goal-status.is-active{border-color:rgba(16,185,129,.55);background:rgba(16,185,129,.11)}
+.fdg-live-goal-status.is-warning{border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.08)}
+.fdg-live-goal-status a{text-decoration:underline;color:inherit}.fdg-alert-test-inline{display:flex;flex-direction:column;align-items:flex-start;gap:7px}.fdg-alert-test-inline small{color:var(--muted,#94a3b8);font-size:.77rem}

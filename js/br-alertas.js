@@ -281,13 +281,56 @@
     return text(new URLSearchParams(location.search).get('event'));
   }
 
+  // Elegibilidade de gols por escopo: visualizar o jogo NÃO inscreve o aparelho.
+  // Mesma família de tokens usada pelo filtro de destinatários no Worker.
+  function goalCoverageForGame(eventId, preferences = state.preferences, agenda = state.agenda) {
+    const id = text(eventId);
+    if (!id) return 'no_game';
+    const p = normalizePreferences(preferences);
+    if (!p.goals) return 'goals_disabled';
+    if (p.allGames) return 'all_games';
+    if (p.games.includes(id)) return 'specific_game';
+    const game = (Array.isArray(agenda) ? agenda : []).find(row => text(row?.event_id || row?.id) === id);
+    if (!game) return 'not_selected';
+    const tokens = new Set();
+    for (const side of [game.mandante, game.visitante]) {
+      const name = text(side?.nome || side?.name);
+      const teamKey = slug(name);
+      if (teamKey) { tokens.add(teamKey); tokens.add(`team:${teamKey}`); }
+      const abbreviation = text(side?.sigla || side?.abbreviation).toUpperCase();
+      if (abbreviation) tokens.add(`abbr:${abbreviation}`);
+      const espn = text(side?.espn_id || side?.espnId || side?.id);
+      if (espn) tokens.add(`espn:${espn}`);
+    }
+    return p.teams.some(token => tokens.has(token)) ? 'selected_team' : 'not_selected';
+  }
+
+  function liveGoalCoverageHtml(eventId) {
+    if (!state.loaded) return '<span class="fdg-live-goal-status">Verificando alertas desta partida…</span>';
+    const permission = 'Notification' in window ? Notification.permission : 'unsupported';
+    if (permission === 'denied') return '<span class="fdg-live-goal-status is-warning">🔕 Notificações bloqueadas neste navegador. <a href="/alertas.html">Ver alertas</a></span>';
+    if (iosNeedsInstall()) return '<span class="fdg-live-goal-status is-warning">🔕 Instale o aplicativo no iPhone antes de ativar notificações. <a href="/alertas.html">Ver instruções</a></span>';
+    const scope = goalCoverageForGame(eventId);
+    if (scope === 'goals_disabled') return '<span class="fdg-live-goal-status is-warning">🔕 Gols desativados nas suas preferências. <a href="/alertas.html">Ativar gols</a></span>';
+    if (!state.subscription && hasScope()) {
+      return `<span class="fdg-live-goal-status is-warning">🔕 Este aparelho está desconectado do push. <button class="fdg-alert-button is-compact" data-fdg-live-reconnect="${escapeHtml(eventId)}">Reconectar alertas</button></span>`;
+    }
+    if (scope === 'all_games' || scope === 'specific_game' || scope === 'selected_team') {
+      if (!state.subscription) {
+        return `<span class="fdg-live-goal-status is-warning">🔕 Inscrição de push ausente. <button class="fdg-alert-button is-compact" data-fdg-live-reconnect="${escapeHtml(eventId)}">Reconectar alertas</button></span>`;
+      }
+      const source = scope === 'all_games' ? 'Todos os jogos' : scope === 'selected_team' ? 'Clube selecionado' : 'Partida selecionada';
+      return `<span class="fdg-live-goal-status is-active">🔔 Gols desta partida incluídos nas preferências · ${source}. <a href="/alertas.html">Gerenciar</a></span>`;
+    }
+    return `<span class="fdg-live-goal-status is-warning">🔕 Você não selecionou alertas para esta partida. Ver o placar não ativa o push. ${gameButtonHtml(eventId, true)}</span>`;
+  }
   function updateLiveSlot() {
     const slot = document.getElementById('fdg-live-alert-action');
     if (!slot) return;
     const eventId = currentLiveEventId();
     const ended = Boolean(document.querySelector('#live-app .live-state-badge.post'));
     slot.hidden = !eventId || ended;
-    const html = (!eventId || ended) ? '' : gameButtonHtml(eventId, false);
+    const html = (!eventId || ended) ? '' : liveGoalCoverageHtml(eventId);
     if (slot.innerHTML !== html) slot.innerHTML = html;
   }
 
@@ -405,6 +448,7 @@
       <section class="panel fdg-alert-panel fdg-alert-danger"><div class="panel-inner">
         <h2>Este aparelho</h2>
         <p>As escolhas ficam associadas anonimamente a este navegador/aparelho. Não há conta, login ou senha.</p>
+        <div class="fdg-alert-test-inline"><button type="button" class="fdg-alert-button" data-fdg-test-local>🔔 Testar notificação neste aparelho</button><small>Testa a exibição local do Android/navegador, não o envio pelo Cloudflare.</small></div>
         <div class="fdg-alert-actions"><a class="fdg-alert-link" href="/privacidade.html">Política de privacidade</a><button type="button" class="fdg-alert-disable" data-fdg-disable ${(state.subscription || hasScope()) ? '' : 'disabled'}>Desativar notificações neste aparelho</button></div>
       </div></section>`;
   }
@@ -423,10 +467,12 @@
     const team = event.target.closest('[data-fdg-team-alert]');
     const all = event.target.closest('[data-fdg-all-games]');
     const disable = event.target.closest('[data-fdg-disable]');
-    if (!game && !team && !all && !disable) return;
+    const reconnect = event.target.closest('[data-fdg-live-reconnect]');
+    const testLocal = event.target.closest('[data-fdg-test-local]');
+    if (!game && !team && !all && !disable && !reconnect && !testLocal) return;
     event.preventDefault();
     event.stopPropagation();
-    const button = game || team || all || disable;
+    const button = game || team || all || disable || reconnect || testLocal;
     if (button.disabled) return;
     button.disabled = true;
     try {
@@ -434,6 +480,14 @@
       else if (team) await toggleTeam(team.getAttribute('data-fdg-team-alert'), team.getAttribute('data-fdg-team-name'));
       else if (all) await setAllGames(!state.preferences.allGames);
       else if (disable) await disableDevice();
+      else if (reconnect) {
+        await ensureLoaded();
+        await persist(clonePreferences(), true);
+        showMessage('Inscrição de push reconectada neste aparelho.', 'success');
+      } else if (testLocal) {
+        await PUSH.showTestNotification();
+        showMessage('Teste local enviado. Confira a central de notificações.', 'success');
+      }
     } catch (error) {
       showMessage(text(error?.message || error), 'error');
     } finally {
@@ -475,7 +529,7 @@
   }, { once: true });
 
   window.FormulaDoGolAlerts = Object.freeze({
-    ensureLoaded, toggleGame, toggleTeam, setAllGames, disableDevice, updateSurfaces,
+    ensureLoaded, toggleGame, toggleTeam, setAllGames, disableDevice, updateSurfaces, goalCoverageForGame,
     get preferences() { return clonePreferences(); }
   });
 })();
