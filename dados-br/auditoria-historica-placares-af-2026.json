@@ -5,19 +5,19 @@
   "temporada": 2026,
   "status": "auditado_com_lacunas",
   "resumo": {
-    "total_resultados_unicos": 352,
-    "jogos_com_placar_prejogo_comprovado": 170,
+    "total_resultados_unicos": 353,
+    "jogos_com_placar_prejogo_comprovado": 171,
     "jogos_sem_prova_prejogo": 182,
     "jogos_com_conflito": 0,
     "jogos_sem_inicio_factual": 0,
-    "jogos_com_top3_original": 170,
+    "jogos_com_top3_original": 171,
     "jogos_sem_top3_original": 0,
     "partidas_sem_previsao_nao_foram_reconstituidas": true
   },
   "fontes_resultados": {
     "caminho": "resultados.json",
-    "arquivo_sha256": "751d69a9120d6860d024194da8e1f9daedbd8c30ec16692e98cba279fe413aa0",
-    "atualizado_em": "2026-11-21T21:11:33.311106-03:00"
+    "arquivo_sha256": "5087b59ce5f5d1ad0f094c3f24275fa3b49123cc4404ba31bf0dfdc9de4105d6",
+    "atualizado_em": "2026-11-21T23:06:24.173790-03:00"
   },
   "historico_ved_preexistente": {
     "caminho": "dados-br/historico-probabilidades-jogos.json",
@@ -41,14 +41,14 @@
   "varredura_git": {
     "fontes": {
       "dados-br/probabilidades-jogos.json": {
-        "commits_localizados": 157,
-        "snapshots_validos": 157,
-        "linhas_prejogo_elegiveis": 12890
+        "commits_localizados": 158,
+        "snapshots_validos": 158,
+        "linhas_prejogo_elegiveis": 13047
       },
       "dados-br/probabilidades-brasileirao.json": {
-        "commits_localizados": 293,
-        "snapshots_validos": 293,
-        "linhas_prejogo_elegiveis": 28418
+        "commits_localizados": 294,
+        "snapshots_validos": 294,
+        "linhas_prejogo_elegiveis": 28711
       }
     },
     "linhas_rejeitadas": {
@@ -13306,11 +13306,72 @@
         "hash_entrada_modelo": "b8b3886e031143f76139a53a5b50f260e69ffade1d9a57855347c8c9294292c5",
         "calculado_em": "2026-11-20T02:41:53+00:00"
       }
+    },
+    {
+      "event_id": "401841325",
+      "rodada": 36,
+      "mandante": "Chapecoense",
+      "visitante": "Cruzeiro",
+      "inicio_factual": "2026-11-22T00:00:00+00:00",
+      "placar_final": {
+        "mandante": 1,
+        "visitante": 2
+      },
+      "identidade_partida": "chapecoense|cruzeiro",
+      "ids_resultado": [
+        "401841325"
+      ],
+      "situacao": "comprovado",
+      "event_id_previsao": "401841325",
+      "previsao": {
+        "gols_esperados": {
+          "mandante": 0.9756,
+          "visitante": 1.8925
+        },
+        "placar_modal": {
+          "mandante": 0,
+          "visitante": 1
+        },
+        "probabilidades_ved_pct": {
+          "mandante": 19.0438,
+          "empate": 22.1273,
+          "visitante": 58.8289
+        }
+      },
+      "top3_placares": [
+        {
+          "mandante": 0,
+          "visitante": 1,
+          "probabilidade_pct": 10.7504
+        },
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 10.4885
+        },
+        {
+          "mandante": 0,
+          "visitante": 2,
+          "probabilidade_pct": 10.1725
+        }
+      ],
+      "top3_situacao": "nativo_documentado",
+      "proveniencia": {
+        "origem": "dados-br/probabilidades-brasileirao.json",
+        "commit": "606a18570e7eb90b37a47b54b1d5ad0ab914126d",
+        "commit_em": "2026-11-21T23:23:41+00:00",
+        "arquivo_sha256": "3ff7e2756d22a40cf09f9880ee2dc9fbcb5a5cd44ca51d26dd300ca54110f5d0",
+        "linha_sha256": "b9aacc15ed0653d9a284503ea3fd117678d8808553ed744ffce7ccc1a04a3cd7",
+        "gerado_em_modelo": "2026-11-21T22:32:22+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_entrada_modelo": "0b05a1b90a6f3a1d14c36099169b3c156f9295c0ceefd6527ef603e271910d05",
+        "calculado_em": "2026-11-21T23:23:21+00:00"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "246a0bf5015a00a6192bad0a105dfe7d8d555833b410ae26bf36bc17748e3481",
-    "hash_resumo": "fe468f714696468064d271a6e0a9a79ac503e0c2ed748c678cdc8c3d3a8bf1df"
+    "hash_jogos": "9eecf356acb2d97137d846afe1073b7715da161f72375f49bfef71dba035f492",
+    "hash_resumo": "a7e260bf7429037c6be194d402ca81be1458b08158d11c5c15b88bb9b4bd23ee"
   }
 }

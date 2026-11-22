@@ -5,13 +5,13 @@
   "status": "ok",
   "origem": {
     "arquivo": "dados-br/auditoria-historica-placares-af-2026.json",
-    "sha256_arquivo": "b9803081d70503c16a0dad9b93f2f04fa7922fdac206a6af0181445eac60fea9",
-    "hash_jogos_e1": "246a0bf5015a00a6192bad0a105dfe7d8d555833b410ae26bf36bc17748e3481",
-    "data_fonte_resultados": "2026-11-21T21:11:33.311106-03:00"
+    "sha256_arquivo": "ab04fdc053eb2b8b6435c84ed7863a95c438f5f032529c562d88964e944f0c38",
+    "hash_jogos_e1": "9eecf356acb2d97137d846afe1073b7715da161f72375f49bfef71dba035f492",
+    "data_fonte_resultados": "2026-11-21T23:06:24.173790-03:00"
   },
   "resumo": {
-    "resultados_auditados": 352,
-    "previsoes_certificadas": 170,
+    "resultados_auditados": 353,
+    "previsoes_certificadas": 171,
     "sem_snapshot_certificado": 182,
     "quarentena_por_conflito": 0,
     "sem_horario_factual": 0
@@ -11587,10 +11587,62 @@
         "versao_modelo": "AF-Previsão 1.3",
         "top3_origem": "nativo_documentado"
       }
+    },
+    {
+      "identidade_partida": "chapecoense|cruzeiro",
+      "event_ids": [
+        "401841325"
+      ],
+      "rodada_auditada": 36,
+      "mandante": "Chapecoense",
+      "visitante": "Cruzeiro",
+      "inicio_factual": "2026-11-22T00:00:00+00:00",
+      "placar_final_auditado": {
+        "mandante": 1,
+        "visitante": 2
+      },
+      "situacao": "comprovado",
+      "placar_previsto": {
+        "mandante": 0,
+        "visitante": 1
+      },
+      "gols_projetados": {
+        "mandante": 0.9756,
+        "visitante": 1.8925
+      },
+      "probabilidades_ved_pct": {
+        "mandante": 19.0438,
+        "empate": 22.1273,
+        "visitante": 58.8289
+      },
+      "palpite_resultado_top1": "visitante",
+      "top3_placares": [
+        {
+          "mandante": 0,
+          "visitante": 1,
+          "probabilidade_pct": 10.7504
+        },
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 10.4885
+        },
+        {
+          "mandante": 0,
+          "visitante": 2,
+          "probabilidade_pct": 10.1725
+        }
+      ],
+      "prova": {
+        "commit": "606a18570e7eb90b37a47b54b1d5ad0ab914126d",
+        "gerado_em": "2026-11-21T22:32:22+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "top3_origem": "nativo_documentado"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "58c6d5b5f62f7a81429b474ceb3c6a727cf314873dc8a49862c52cc303dd2418"
+    "hash_jogos": "84169f4cbebe4aeab80983f9295345ce7234e112db697bb6dd381c75dcb35708"
   }
 }
