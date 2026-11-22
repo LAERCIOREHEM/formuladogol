@@ -5,19 +5,19 @@
   "temporada": 2026,
   "status": "auditado_com_lacunas",
   "resumo": {
-    "total_resultados_unicos": 353,
-    "jogos_com_placar_prejogo_comprovado": 171,
+    "total_resultados_unicos": 354,
+    "jogos_com_placar_prejogo_comprovado": 172,
     "jogos_sem_prova_prejogo": 182,
     "jogos_com_conflito": 0,
     "jogos_sem_inicio_factual": 0,
-    "jogos_com_top3_original": 171,
+    "jogos_com_top3_original": 172,
     "jogos_sem_top3_original": 0,
     "partidas_sem_previsao_nao_foram_reconstituidas": true
   },
   "fontes_resultados": {
     "caminho": "resultados.json",
-    "arquivo_sha256": "225c0be1e79a9fec08b1e00da03031d7095c69ada48eb290dbf6398550ee91a5",
-    "atualizado_em": "2026-11-22T00:06:23.203217-03:00"
+    "arquivo_sha256": "718f133cc80c67cdc46891e62fe859efb885fa860538cb0cc2760b51bd4f3e2f",
+    "atualizado_em": "2026-11-22T18:11:25.505048-03:00"
   },
   "historico_ved_preexistente": {
     "caminho": "dados-br/historico-probabilidades-jogos.json",
@@ -41,14 +41,14 @@
   "varredura_git": {
     "fontes": {
       "dados-br/probabilidades-jogos.json": {
-        "commits_localizados": 158,
-        "snapshots_validos": 158,
-        "linhas_prejogo_elegiveis": 13047
+        "commits_localizados": 159,
+        "snapshots_validos": 159,
+        "linhas_prejogo_elegiveis": 13205
       },
       "dados-br/probabilidades-brasileirao.json": {
-        "commits_localizados": 295,
-        "snapshots_validos": 295,
-        "linhas_prejogo_elegiveis": 28711
+        "commits_localizados": 296,
+        "snapshots_validos": 296,
+        "linhas_prejogo_elegiveis": 29006
       }
     },
     "linhas_rejeitadas": {
@@ -13367,11 +13367,72 @@
         "hash_entrada_modelo": "0b05a1b90a6f3a1d14c36099169b3c156f9295c0ceefd6527ef603e271910d05",
         "calculado_em": "2026-11-21T23:23:21+00:00"
       }
+    },
+    {
+      "event_id": "401841318",
+      "rodada": 36,
+      "mandante": "Athletico-PR",
+      "visitante": "Remo",
+      "inicio_factual": "2026-11-22T19:00:00+00:00",
+      "placar_final": {
+        "mandante": 4,
+        "visitante": 2
+      },
+      "identidade_partida": "athletico pr|remo",
+      "ids_resultado": [
+        "401841318"
+      ],
+      "situacao": "comprovado",
+      "event_id_previsao": "401841318",
+      "previsao": {
+        "gols_esperados": {
+          "mandante": 1.9023,
+          "visitante": 0.9366
+        },
+        "placar_modal": {
+          "mandante": 1,
+          "visitante": 0
+        },
+        "probabilidades_ved_pct": {
+          "mandante": 59.9958,
+          "empate": 21.941,
+          "visitante": 18.0633
+        }
+      },
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 11.1266
+        },
+        {
+          "mandante": 2,
+          "visitante": 0,
+          "probabilidade_pct": 10.583
+        },
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 10.4212
+        }
+      ],
+      "top3_situacao": "nativo_documentado",
+      "proveniencia": {
+        "origem": "dados-br/probabilidades-brasileirao.json",
+        "commit": "0203ed289b552650a5eed3ac54a334f2f64b5f13",
+        "commit_em": "2026-11-22T02:23:51+00:00",
+        "arquivo_sha256": "8a69ce1f4207f2eedf1f641b880c98348d087def1f59680697d3337924194b61",
+        "linha_sha256": "9a355894a27894988d803fdd66d83e4302c3c81e7c69342d5f6729e1154b2932",
+        "gerado_em_modelo": "2026-11-22T01:53:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_entrada_modelo": "3977c9aababc187daf90e4a33343635c6ddbe79698d34d36643c63f22b06dcb1",
+        "calculado_em": "2026-11-22T02:23:34+00:00"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "9eecf356acb2d97137d846afe1073b7715da161f72375f49bfef71dba035f492",
-    "hash_resumo": "a7e260bf7429037c6be194d402ca81be1458b08158d11c5c15b88bb9b4bd23ee"
+    "hash_jogos": "c41d0b201264ca8a1d59b3bdf2e2ed182d35a2f6b7396a52547fe1235ea63ef0",
+    "hash_resumo": "d83856d5c6e29073839b3199e14e44a8b726981460d887ae1c9c34287a7ab60b"
   }
 }

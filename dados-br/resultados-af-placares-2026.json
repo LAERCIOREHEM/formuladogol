@@ -5,13 +5,13 @@
   "status": "ok",
   "origem": {
     "arquivo": "dados-br/auditoria-historica-placares-af-2026.json",
-    "sha256_arquivo": "5846be36fc3ad10542a49bb835905f7ed099c61bb272ad38e5dbcd3d139c5d76",
-    "hash_jogos_e1": "9eecf356acb2d97137d846afe1073b7715da161f72375f49bfef71dba035f492",
-    "data_fonte_resultados": "2026-11-22T00:06:23.203217-03:00"
+    "sha256_arquivo": "6aeb028f155b8effd31d2bf33a6289257d18c49c2c7a9e3a978622b97078eb8b",
+    "hash_jogos_e1": "c41d0b201264ca8a1d59b3bdf2e2ed182d35a2f6b7396a52547fe1235ea63ef0",
+    "data_fonte_resultados": "2026-11-22T18:11:25.505048-03:00"
   },
   "resumo": {
-    "resultados_auditados": 353,
-    "previsoes_certificadas": 171,
+    "resultados_auditados": 354,
+    "previsoes_certificadas": 172,
     "sem_snapshot_certificado": 182,
     "quarentena_por_conflito": 0,
     "sem_horario_factual": 0
@@ -11639,10 +11639,62 @@
         "versao_modelo": "AF-Previsão 1.3",
         "top3_origem": "nativo_documentado"
       }
+    },
+    {
+      "identidade_partida": "athletico pr|remo",
+      "event_ids": [
+        "401841318"
+      ],
+      "rodada_auditada": 36,
+      "mandante": "Athletico-PR",
+      "visitante": "Remo",
+      "inicio_factual": "2026-11-22T19:00:00+00:00",
+      "placar_final_auditado": {
+        "mandante": 4,
+        "visitante": 2
+      },
+      "situacao": "comprovado",
+      "placar_previsto": {
+        "mandante": 1,
+        "visitante": 0
+      },
+      "gols_projetados": {
+        "mandante": 1.9023,
+        "visitante": 0.9366
+      },
+      "probabilidades_ved_pct": {
+        "mandante": 59.9958,
+        "empate": 21.941,
+        "visitante": 18.0633
+      },
+      "palpite_resultado_top1": "mandante",
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 11.1266
+        },
+        {
+          "mandante": 2,
+          "visitante": 0,
+          "probabilidade_pct": 10.583
+        },
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 10.4212
+        }
+      ],
+      "prova": {
+        "commit": "0203ed289b552650a5eed3ac54a334f2f64b5f13",
+        "gerado_em": "2026-11-22T01:53:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "top3_origem": "nativo_documentado"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "84169f4cbebe4aeab80983f9295345ce7234e112db697bb6dd381c75dcb35708"
+    "hash_jogos": "925171ed0031a6cc3fa3ca286b51ebf8097f1bc81f98765e58b5089e504c667c"
   }
 }
