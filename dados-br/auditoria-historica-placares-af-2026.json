@@ -5,19 +5,19 @@
   "temporada": 2026,
   "status": "auditado_com_lacunas",
   "resumo": {
-    "total_resultados_unicos": 354,
-    "jogos_com_placar_prejogo_comprovado": 172,
+    "total_resultados_unicos": 355,
+    "jogos_com_placar_prejogo_comprovado": 173,
     "jogos_sem_prova_prejogo": 182,
     "jogos_com_conflito": 0,
     "jogos_sem_inicio_factual": 0,
-    "jogos_com_top3_original": 172,
+    "jogos_com_top3_original": 173,
     "jogos_sem_top3_original": 0,
     "partidas_sem_previsao_nao_foram_reconstituidas": true
   },
   "fontes_resultados": {
     "caminho": "resultados.json",
-    "arquivo_sha256": "9cd21e4e924c672de16d7b6374926b626954d69776d9fb8b479656cd5783d386",
-    "atualizado_em": "2026-11-22T18:22:41.108000-03:00"
+    "arquivo_sha256": "eb1fe34ee61004a7adbd2ec44435d490730e7830c99bc20c64814d01338a505f",
+    "atualizado_em": "2026-11-22T20:41:23.832655-03:00"
   },
   "historico_ved_preexistente": {
     "caminho": "dados-br/historico-probabilidades-jogos.json",
@@ -41,14 +41,14 @@
   "varredura_git": {
     "fontes": {
       "dados-br/probabilidades-jogos.json": {
-        "commits_localizados": 159,
-        "snapshots_validos": 159,
-        "linhas_prejogo_elegiveis": 13205
+        "commits_localizados": 160,
+        "snapshots_validos": 160,
+        "linhas_prejogo_elegiveis": 13364
       },
       "dados-br/probabilidades-brasileirao.json": {
-        "commits_localizados": 297,
-        "snapshots_validos": 297,
-        "linhas_prejogo_elegiveis": 29006
+        "commits_localizados": 298,
+        "snapshots_validos": 298,
+        "linhas_prejogo_elegiveis": 29303
       }
     },
     "linhas_rejeitadas": {
@@ -13428,11 +13428,72 @@
         "hash_entrada_modelo": "3977c9aababc187daf90e4a33343635c6ddbe79698d34d36643c63f22b06dcb1",
         "calculado_em": "2026-11-22T02:23:34+00:00"
       }
+    },
+    {
+      "event_id": "401841324",
+      "rodada": 36,
+      "mandante": "Fluminense",
+      "visitante": "Mirassol",
+      "inicio_factual": "2026-11-22T21:30:00+00:00",
+      "placar_final": {
+        "mandante": 1,
+        "visitante": 0
+      },
+      "identidade_partida": "fluminense|mirassol",
+      "ids_resultado": [
+        "401841324"
+      ],
+      "situacao": "comprovado",
+      "event_id_previsao": "401841324",
+      "previsao": {
+        "gols_esperados": {
+          "mandante": 1.5234,
+          "visitante": 0.8966
+        },
+        "placar_modal": {
+          "mandante": 1,
+          "visitante": 0
+        },
+        "probabilidades_ved_pct": {
+          "mandante": 51.9516,
+          "empate": 25.8714,
+          "visitante": 22.1769
+        }
+      },
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 13.5462
+        },
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 12.1457
+        },
+        {
+          "mandante": 2,
+          "visitante": 0,
+          "probabilidade_pct": 10.3181
+        }
+      ],
+      "top3_situacao": "nativo_documentado",
+      "proveniencia": {
+        "origem": "dados-br/probabilidades-brasileirao.json",
+        "commit": "b9966c0c97945a228d7c42f20bbb842ff123ef5b",
+        "commit_em": "2026-11-22T21:28:01+00:00",
+        "arquivo_sha256": "a7a225b44b71427138a046ff505d750ae75ddb838411f1eb387e6e6bdf1aac92",
+        "linha_sha256": "dc614df43e0113b88fb8618b0583865adf509b33be41b944419edea031c7b0cb",
+        "gerado_em_modelo": "2026-11-22T20:53:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_entrada_modelo": "56ef1a706b5b92f37e79949caccc0c3204fc3987fa9d055ec0e64537b7177744",
+        "calculado_em": "2026-11-22T21:17:01+00:00"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "c41d0b201264ca8a1d59b3bdf2e2ed182d35a2f6b7396a52547fe1235ea63ef0",
-    "hash_resumo": "d83856d5c6e29073839b3199e14e44a8b726981460d887ae1c9c34287a7ab60b"
+    "hash_jogos": "21e96e69786a35eb2d559ab578185177cafc75d4d57a5cd937be4e6cc9e638c6",
+    "hash_resumo": "f8c3343bb1746cb03f647cf3019aef03be26ccf2fac47a1f8a84b83cee658776"
   }
 }

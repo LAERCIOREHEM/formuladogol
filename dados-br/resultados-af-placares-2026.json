@@ -5,13 +5,13 @@
   "status": "ok",
   "origem": {
     "arquivo": "dados-br/auditoria-historica-placares-af-2026.json",
-    "sha256_arquivo": "910c8d5e4026b81389e46705b43312c6d6d7a1755de46907a3b14c62479c671e",
-    "hash_jogos_e1": "c41d0b201264ca8a1d59b3bdf2e2ed182d35a2f6b7396a52547fe1235ea63ef0",
-    "data_fonte_resultados": "2026-11-22T18:22:41.108000-03:00"
+    "sha256_arquivo": "972a3f70f0bde7b5d6648478026bccc46d75e4dd069350eb56073e4f0365cdbc",
+    "hash_jogos_e1": "21e96e69786a35eb2d559ab578185177cafc75d4d57a5cd937be4e6cc9e638c6",
+    "data_fonte_resultados": "2026-11-22T20:41:23.832655-03:00"
   },
   "resumo": {
-    "resultados_auditados": 354,
-    "previsoes_certificadas": 172,
+    "resultados_auditados": 355,
+    "previsoes_certificadas": 173,
     "sem_snapshot_certificado": 182,
     "quarentena_por_conflito": 0,
     "sem_horario_factual": 0
@@ -11691,10 +11691,62 @@
         "versao_modelo": "AF-Previsão 1.3",
         "top3_origem": "nativo_documentado"
       }
+    },
+    {
+      "identidade_partida": "fluminense|mirassol",
+      "event_ids": [
+        "401841324"
+      ],
+      "rodada_auditada": 36,
+      "mandante": "Fluminense",
+      "visitante": "Mirassol",
+      "inicio_factual": "2026-11-22T21:30:00+00:00",
+      "placar_final_auditado": {
+        "mandante": 1,
+        "visitante": 0
+      },
+      "situacao": "comprovado",
+      "placar_previsto": {
+        "mandante": 1,
+        "visitante": 0
+      },
+      "gols_projetados": {
+        "mandante": 1.5234,
+        "visitante": 0.8966
+      },
+      "probabilidades_ved_pct": {
+        "mandante": 51.9516,
+        "empate": 25.8714,
+        "visitante": 22.1769
+      },
+      "palpite_resultado_top1": "mandante",
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 13.5462
+        },
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 12.1457
+        },
+        {
+          "mandante": 2,
+          "visitante": 0,
+          "probabilidade_pct": 10.3181
+        }
+      ],
+      "prova": {
+        "commit": "b9966c0c97945a228d7c42f20bbb842ff123ef5b",
+        "gerado_em": "2026-11-22T20:53:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "top3_origem": "nativo_documentado"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "925171ed0031a6cc3fa3ca286b51ebf8097f1bc81f98765e58b5089e504c667c"
+    "hash_jogos": "54a5984e93132321b83c31de2bdf475ca9d55788b04a89a046a9027f1293bdef"
   }
 }
