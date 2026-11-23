@@ -47,11 +47,33 @@ jobs:
                      'future round hints absent: '+str(sorted(future))
                   assert all(future[n].get('scheduledGames')==10 for n in (36,37,38)),\
                      'calendar incomplete: '+str(future)
-                  assert all(future[n].get('pending')==10 for n in (36,37,38)),\
-                     'future rounds prematurely closed: '+str(future)
-                  assert closure.get('state') in ('site_verified','site_verified_cached'),\
-                     'R35 public status not verified: '+str(closure)
-                  assert int(closure.get('round') or 0)==35
+                  # R36 started on 21/11. The smoke must track actual FINAL
+                  # counts, not falsely require 10 pending games forever.
+                  for n in (36,37,38):
+                      completed=int(future[n].get('concluded') or 0)
+                      pending=int(future[n].get('pending') or 0)
+                      assert 0<=completed<=10 and 0<=pending<=10 and completed+pending==10,\
+                         'inconsistent R'+str(n)+' completion ledger: '+str(future[n])
+                      expected_state='armed' if pending else 'final_confirmed'
+                      assert future[n].get('state')==expected_state,\
+                         'incorrect R'+str(n)+' editorial readiness: '+str(future[n])
+                  closure_round=int(closure.get('round') or 0)
+                  closure_state=str(closure.get('state') or '')
+                  if closure_round==35:
+                      assert closure_state in ('site_verified','site_verified_cached'),\
+                         'R35 public status not verified: '+str(closure)
+                  else:
+                      assert closure_round in (36,37,38),\
+                         'unexpected editorial round: '+str(closure)
+                      assert int(future[closure_round].get('concluded') or 0)==10,\
+                         'new round selected before 10 certified FINALs: '+str(closure)
+                      assert closure_state in (
+                          'generation_pending','delivery_pending','site_verified',
+                          'site_verified_cached','delivery_manual_attention'
+                      ), 'unexpected editorial state: '+str(closure)
+                      if closure_state not in ('site_verified','site_verified_cached'):
+                          assert float(closure.get('ageMinutes') or 0)<15,\
+                             'editorial delivery outside 15-minute SLO: '+str(closure)
                   assert status.get('lastTickAt'),'cron has not produced a tick'
                   print(json.dumps({
                      'result':'EDITORIAL_CLOSURE_R2_ORCHESTRATOR_VERIFIED',
