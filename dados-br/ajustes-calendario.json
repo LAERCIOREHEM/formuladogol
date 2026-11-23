@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-11-07T08:38:00-03:00",
+  "atualizado_em": "2026-11-23T17:15:00-03:00",
   "descricao": "Correções para jogos adiados e tabela detalhada oficial da CBF 2026. As rodadas 37/38 prevalecem sobre datas provisórias da ESPN somente enquanto o jogo não estiver FINAL. Os IDs cbf-2026-NNN são locais e temporários, derivados do número de referência da tabela oficial, nunca IDs ESPN.",
   "ajustes": [
     {
@@ -351,6 +351,48 @@
       "fonte_calendario": "CBF oficial — tabela detalhada 36ª rodada de 30/10/2026",
       "origem_calendario": "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/botafogo-x-sao-paulo/832242",
       "motivo": "Horário oficial CBF: segunda-feira 23/11/2026 às 20h (BRT), e não 21/11 às 17h. Override permanente para impedir reversão pelo feed ESPN."
+    },
+    {
+      "event_id": "401841323",
+      "referencia_cbf": 357,
+      "rodada": 36,
+      "mandante": "Internacional",
+      "visitante": "Vitória",
+      "data_iso": "2026-11-23T19:30",
+      "estadio": "Beira-Rio",
+      "adiado": false,
+      "data_definir": false,
+      "fonte_calendario": "CBF oficial — tabela detalhada 36ª rodada, atualizada em 04/11/2026",
+      "origem_calendario": "https://stcbfsiteprdimgbrs.blob.core.windows.net/img-site/cdn/Tabela_Detalhada_BSA_2026_04_11_7e8eea9eb8.pdf",
+      "motivo": "Horário e local certificados na tabela detalhada CBF; prevalece sobre o feed ESPN enquanto a partida não estiver FINAL"
+    },
+    {
+      "event_id": "401841320",
+      "referencia_cbf": 353,
+      "rodada": 36,
+      "mandante": "Santos",
+      "visitante": "Grêmio",
+      "data_iso": "2026-11-23T21:00",
+      "estadio": "Morumbis",
+      "adiado": false,
+      "data_definir": false,
+      "fonte_calendario": "CBF oficial — tabela detalhada 36ª rodada, atualizada em 04/11/2026",
+      "origem_calendario": "https://stcbfsiteprdimgbrs.blob.core.windows.net/img-site/cdn/Tabela_Detalhada_BSA_2026_04_11_7e8eea9eb8.pdf",
+      "motivo": "Horário e local certificados na tabela detalhada CBF; prevalece sobre o feed ESPN enquanto a partida não estiver FINAL"
+    },
+    {
+      "event_id": "401841319",
+      "referencia_cbf": 356,
+      "rodada": 36,
+      "mandante": "Atlético-MG",
+      "visitante": "Corinthians",
+      "data_iso": "2026-11-25T20:00",
+      "estadio": "Arena MRV",
+      "adiado": false,
+      "data_definir": false,
+      "fonte_calendario": "CBF oficial — tabela detalhada 36ª rodada, atualizada em 04/11/2026",
+      "origem_calendario": "https://stcbfsiteprdimgbrs.blob.core.windows.net/img-site/cdn/Tabela_Detalhada_BSA_2026_04_11_7e8eea9eb8.pdf",
+      "motivo": "Horário e local certificados na tabela detalhada CBF; prevalece sobre o feed ESPN enquanto a partida não estiver FINAL"
     }
   ],
   "fonte_cbf_rodadas_finais": "https://stcbfsiteprdimgbrs.blob.core.windows.net/img-site/cdn/Tabela_Detalhada_Brasileiro_Serie_A_2026_37_e_38_rodada_ca107fa561.pdf"
