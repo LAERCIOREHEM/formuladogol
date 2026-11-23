@@ -1,4 +1,5 @@
 import { buildPushPayload } from '@block65/webcrypto-web-push';
+import { officialPrematchCheck } from './cbf-final-fixtures-2026.js';
 
 const DELIVERY_BATCH_SIZE = 5;
 const TARGET_PAGE_SIZE = 400;
@@ -360,6 +361,15 @@ async function expandSportsEvent(messageBody, env) {
       .bind(eventKey).run();
     return { kind: 'event_dispatch', eventKey, targetCount: 0, batchCount: 0, complete: true };
   }
+  // Segunda barreira R36: mesmo um evento T-15 já persistido no D1 e enfileirado
+  // não deve alcançar inscritos se contrariar a grade oficial da CBF.
+  const fixtureGuard = officialPrematchCheck(loaded.payload);
+  if (!fixtureGuard.allowed) {
+    await env.DB.prepare(`UPDATE push_event_dispatch
+      SET status='suppressed', last_error=?, updated_at=CURRENT_TIMESTAMP WHERE event_key=?`)
+      .bind('cbf_fixture_guard:' + fixtureGuard.reason, eventKey).run();
+    return { kind: 'event_dispatch', eventKey, targetCount: 0, batchCount: 0, complete: true, suppressed: true };
+  }
 
   const rows = await eligibleTargets(env, loaded.payload, afterSubscriptionId);
   const hasMore = rows.length > TARGET_PAGE_SIZE;
@@ -492,6 +502,10 @@ async function deliverSportsBatch(messageBody, env) {
   if (!eventKey || !ids.length) return { kind: 'delivery_batch', delivered: 0, transient: false };
   const loaded = await getEvent(env, eventKey);
   if (!loaded?.payload) return { kind: 'delivery_batch', delivered: 0, transient: false };
+  const fixtureGuard = officialPrematchCheck(loaded.payload);
+  if (!fixtureGuard.allowed) {
+    return { kind: 'delivery_batch', delivered: 0, transient: false, suppressed: true };
+  }
   const rows = await loadSubscriptions(env, ids);
   const results = await Promise.all(rows.map((row) => deliverOne(env, eventKey, loaded.payload, row)));
   return {
