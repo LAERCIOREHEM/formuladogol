@@ -630,6 +630,12 @@ jobs:
           # por evento sem alterar a origem principal do snapshot.
           python scripts/validar_publicacao_brasileirao.py
 
+      - name: R36-R38 / Copa — certificar calendário CBF antes de publicar
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tests/test_cbf_reta_final_2026.py
+
       - name: Publicar estado CORE / ENRICHMENT do Reliability Control Plane
         if: steps.espn.outputs.sincronizado == 'true'
         run: python scripts/gerar_estado_confiabilidade.py --profile full
