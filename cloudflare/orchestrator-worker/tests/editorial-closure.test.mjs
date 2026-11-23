@@ -71,6 +71,49 @@ test('R36, R37, R38 arm at 9/10 and fire immediately at the tenth verified FINAL
   }
 });
 
+test('R36 real CBF calendar: 23/11 nine FINALs cannot publish; 25/11 Atlético-MG x Corinthians closes',async()=>{
+  const calendar=JSON.parse(await readFile(new URL('../../../dados-br/calendario-completo.json',import.meta.url),'utf8'));
+  const r36=(calendar.jogos||[]).filter(g=>Number(g.rodada)===36);
+  assert.equal(r36.length,10,'CBF R36 must have exactly ten matches');
+  const last=r36.find(g=>String(g.event_id)==='401841319');
+  assert.equal(last?.data_iso,'2026-11-25T20:00');
+  assert.equal(last?.mandante,'Atlético-MG');
+  assert.equal(last?.visitante,'Corinthians');
+  assert.equal(Math.max(...r36.map(g=>Date.parse(g.data_iso+'-03:00'))),Date.parse(last.data_iso+'-03:00'));
+  const agenda=r36.map(g=>({
+    eventId:String(g.event_id),league:'bra.1',round:36,
+    kickoff:new Date(g.data_iso+'-03:00'),concluded:false,
+    home:String(g.mandante),away:String(g.visitante)
+  }));
+  const result=g=>({
+    event_id:String(g.event_id),rodada:36,estado:'post',
+    data_iso:g.data_iso,finalizado_em:new Date(Date.parse(g.data_iso+'-03:00')+2*3600_000).toISOString(),
+    mandante:{nome:String(g.mandante)},visitante:{nome:String(g.visitante)},
+    placar_mandante:1,placar_visitante:0
+  });
+  const nineRows=r36.filter(g=>String(g.event_id)!=='401841319').map(result);
+  const prior=new Date('2026-11-24T12:00:00-03:00');
+  const nine=mergeHistoricalFinals(agenda,{resultados:nineRows},prior);
+  assert.equal(upcomingEditorialRounds(nine,prior)[0].concluded,9);
+  assert.equal(upcomingEditorialRounds(nine,prior)[0].pending,1);
+  assert.equal(eligibleRoundFromAgenda(nine,prior),null,
+    'R36 must NOT publish on Monday night or Tuesday while Atlético-MG x Corinthians is pending');
+  const completeAt=new Date('2026-11-25T22:30:00-03:00');
+  const ten=mergeHistoricalFinals(agenda,{resultados:[...nineRows,result(last)]},completeAt);
+  const decision=editorialClosureDecision(ten,{artigos:[]},completeAt);
+  assert.equal(decision.round,36);
+  assert.equal(decision.completed,10);
+  assert.equal(decision.pending,0);
+  assert.equal(decision.state,'pending','R36 must be dispatched immediately after tenth certified FINAL');
+
+  const updater=await readFile(new URL('../../../.github/workflows/atualizar-brasileirao.yml',import.meta.url),'utf8');
+  const slash=String.fromCharCode(92);
+  assert.ok(updater.includes("output.write(f'editorial_round={alvo}"+slash+"n')"),
+    'fallback must write a real GitHub Actions output line, with one backslash-n');
+  assert.ok(!updater.includes("output.write(f'editorial_round={alvo}"+slash+slash+"n')"),
+    'literal backslash-n would corrupt GITHUB_OUTPUT and block fallback dispatch');
+});
+
 test('CBF placeholder event ID is replaced by ESPN FINAL for the same match',()=>{
   const future=fixtures(38);
   future[4].eventId='cbf-2026-384';
