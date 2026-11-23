@@ -314,6 +314,12 @@ jobs:
           print('AF E4: painel historicamente certificado e consistente com E3')
           PY
 
+      - name: CBF R36-R38 + final Copa 2026 — auditoria documental integral
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tests/test_cbf_reta_final_2026.py
+
       - name: R35-R1 — Gerar zonas dinâmicas públicas da Libertadores
         shell: bash
         run: |
