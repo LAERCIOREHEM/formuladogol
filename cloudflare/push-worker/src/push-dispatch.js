@@ -366,7 +366,7 @@ async function expandSportsEvent(messageBody, env) {
   const fixtureGuard = officialPrematchCheck(loaded.payload);
   if (!fixtureGuard.allowed) {
     await env.DB.prepare(`UPDATE push_event_dispatch
-      SET status='suppressed', last_error=?, updated_at=CURRENT_TIMESTAMP WHERE event_key=?`)
+      SET status='failed', last_error=?, updated_at=CURRENT_TIMESTAMP WHERE event_key=?`)
       .bind('cbf_fixture_guard:' + fixtureGuard.reason, eventKey).run();
     return { kind: 'event_dispatch', eventKey, targetCount: 0, batchCount: 0, complete: true, suppressed: true };
   }
