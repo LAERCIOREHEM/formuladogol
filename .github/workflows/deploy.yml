@@ -90,6 +90,7 @@ on:
       - 'analises/**'
       - 'scripts/gerar_fundacao_organica.py'
       - 'scripts/gerar_paginas_clubes.py'
+      - 'scripts/validar_integridade_continental_r36_r1.py'
       - 'scripts/gerar_paginas_jogos.py'
       - 'scripts/gerar_agenda_clubes_brasileirao.py'
       - 'scripts/gerar_acuracia_af_previsao.py'
@@ -654,6 +655,12 @@ jobs:
       - name: ORG-4 — 20 páginas completas de clubes
         run: |
           python scripts/gerar_paginas_clubes.py --site-root _site --check
+
+      - name: R36-R1 — certificar final continental, probabilidades e 20 páginas
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/validar_integridade_continental_r36_r1.py --repo-root . --site-dir _site
 
       - name: ORG-5 — páginas SEO de partidas do Brasileirão
         run: |
@@ -1827,6 +1834,21 @@ jobs:
           else:
               raise SystemExit('FALHA: Pages não serviu snapshot CBF/FINAL/AF coerente: '+error)
           PY
+
+      - name: R36-R1 — certificar publicação LIVE sem divergência continental
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5 6; do
+            if python scripts/validar_integridade_continental_r36_r1.py --repo-root . --live-url https://formuladogol.com.br; then
+              echo 'R36-R1: 20 clubes e vagas continentais certificados em produção'
+              exit 0
+            fi
+            if [ "$attempt" -lt 6 ]; then sleep 10; fi
+          done
+          echo '::error::R36-R1 detectou divergência entre as páginas públicas, o campeão continental e o AF'
+          exit 1
 
       - name: ORG-7R — smoke test público pós-deploy
         if: success()
