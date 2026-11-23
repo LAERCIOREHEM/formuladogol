@@ -13,6 +13,43 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "jogos": {
+    "401841320": {
+      "event_id": "401841320",
+      "rodada": 36,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Santos",
+      "visitante": "Grêmio",
+      "data_iso": "2026-11-23T21:00:00-03:00",
+      "estadio": "Morumbis",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "ZHpNObYBdXA",
+        "url": "https://www.youtube.com/watch?v=ZHpNObYBdXA",
+        "status": "live",
+        "inicio_programado": "2026-11-23T20:00:00-03:00",
+        "inicio_real": "2026-11-23T20:34:56-03:00",
+        "titulo": "SANTOS X GRÊMIO | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/ZHpNObYBdXA/maxresdefault.jpg?v=6aff3cf3",
+        "confianca": 0.95,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "transmissão já está ao vivo",
+          "horário compatível (60 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": true
+      },
+      "alternativas": []
+    },
     "401841335": {
       "event_id": "401841335",
       "rodada": 37,
@@ -122,5 +159,5 @@
       "alternativas": []
     }
   },
-  "atualizado_em": "2026-11-23T18:06:20-03:00"
+  "atualizado_em": "2026-11-23T20:51:17-03:00"
 }
