@@ -788,7 +788,12 @@ def simulate_competition(
             competition,
             tuple(all_teams),
             brazilian_team_names,
-            frozenset(normalize_text(name) for name in (champion, runner) if name),
+            # Após a FINAL continental, o vice NÃO pode obter vaga pelo título.
+            # Na Copa do Brasil, diferentemente, o vice ainda é elegível ao
+            # direito regulamentar de uma das vagas — manter ambos nessa Copa.
+            frozenset(normalize_text(name) for name in (
+                (champion, runner) if competition == 'copa_do_brasil' else (champion,)
+            ) if name),
             champion_ids,
             runner_ids,
             {
@@ -1459,6 +1464,24 @@ def self_test() -> None:
         "defence": {team: (0.15 if team == teams[0] else 0.0) for team in teams},
     }
 
+    # R36: final já homologada — o vice Atlético-MG é estruturalmente
+    # impossibilitado de conquistar o título da Sul-Americana.
+    closed_sula = {
+        'schema_version': 2, 'status': 'ok',
+        'competicao': {'chave': 'sul_americana', 'final_partida_unica': True},
+        'eventos': [{
+            'event_id': '401913961', 'data_iso': '2026-11-21T20:00:00-03:00',
+            'fase': 'Final', 'fase_ordem': 900, 'concluido': True,
+            'estado': 'post', 'vencedor': 'Boca Juniors', 'penaltis': False,
+            'mandante': {'nome': 'Atlético-MG', 'espn_id': '7632', 'serie_a_2026': True, 'placar': 0},
+            'visitante': {'nome': 'Boca Juniors', 'espn_id': '5', 'serie_a_2026': False, 'placar': 2},
+        }],
+    }
+    closed_sula_result = simulate_competition(closed_sula, league_model, teams, 32, 20261121, {})
+    assert set(closed_sula_result.champion_names()) == {'Boca Juniors'}
+    assert normalize_text('Atlético-MG') not in closed_sula_result.eligible_team_names
+    assert normalize_text('Boca Juniors') in closed_sula_result.eligible_team_names
+    assert closed_sula_result.audit['status'] == 'encerrada'
     def snapshot(key: str, active: Sequence[str], stage: str = "Quartas de final") -> dict[str, Any]:
         events = []
         for index in range(0, len(active), 2):

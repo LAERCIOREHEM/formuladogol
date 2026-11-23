@@ -41,7 +41,7 @@ test('R35 minimum confirmed zone is G6 with 4 groups + 2 preliminary',()=>{
  assert.equal(zone.direct,4);
  assert.equal(zone.preliminary,2);
  assert.equal(zone.guarantee,6);
- assert.equal(zone.conditionalMax,9);
+ assert.equal(zone.conditionalMax,8);
  assert.ok(html.includes('zona-libertadores-condicional'));
  assert.ok(html.includes('tabela-vaga-badge'));
  assert.ok(html.includes('vagasLibertadores2027(state.tabela || [])'));
@@ -55,6 +55,7 @@ test('future group reallocation is conditional, never inferred from a finalist a
  assert.equal(evaluate({table:gremioDown,libertadores:withChampion(libertadores,'Palmeiras')}).guarantee,8);
  const g9=[...gremioDown.map(x=>x.time==='Atlético-MG'?{...x,pos:7}:x)];
  assert.equal(evaluate({table:g9,libertadores:withChampion(libertadores,'Palmeiras'),sulamericana:withChampion(sulamericana,'Atlético-MG')}).guarantee,9);
+ assert.equal(evaluate({table:g9,libertadores:withChampion(libertadores,'Palmeiras'),sulamericana:withChampion(sulamericana,'Boca Juniors')}).guarantee,8);
 });
 test('mathematical 100% certified from published proof, not rounding',()=>{
  assert.equal(odds.simulacao.quantidade,2_000_000);
@@ -73,4 +74,21 @@ test('all executable inline scripts parse (including dynamically added zone)',()
   .filter(([,attrs,js])=>!/\bsrc\s*=/.test(attrs)&&!/application\/ld\+json/.test(attrs)&&js.trim());
  assert.ok(tags.length>=5);
  for(const [i,tag] of tags.entries())assert.doesNotThrow(()=>new vm.Script(tag[2],{filename:'inline-'+i+'.js'}));
+});
+
+test('Boca 2-0 Atlético-MG encerra a via Sul-Americana e G9 condicional',()=>{
+ const f=sulamericana.eventos.find(e=>Number(e.fase_ordem)===900);
+ assert.equal(f?.concluido,true);
+ assert.equal(f?.vencedor,'Boca Juniors');
+ assert.equal(f?.mandante?.nome,'Atlético-MG');
+ assert.equal(f?.mandante?.placar,0);
+ assert.equal(f?.visitante?.placar,2);
+ const zone=evaluate();
+ assert.equal(zone.conditionalMax,8);
+ assert.ok(!zone.pending.some(x=>x.includes('título do Atlético-MG')));
+ const hypothetical=withChampion(sulamericana,'Atlético-MG');
+ assert.equal(evaluate({sulamericana:hypothetical}).conditionalMax,9);
+ const galo=odds.clubes.find(x=>x.clube==='Atlético-MG');
+ assert.ok(galo);
+ assert.equal(galo.decomposicao_chances.libertadores.vias.via_titulo_sul_americana.ocorrencias,0);
 });

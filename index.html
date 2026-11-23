@@ -5085,7 +5085,10 @@ function vagasLibertadores2027(tabela) {
     return String(e.vencedor || '').trim();
   };
   const palmeirasLibChampion = guaranteedG6 && winner(snapshots.libertadores) === 'Palmeiras';
-  const galoChampion = winner(snapshots.sulamericana) === 'Atlético-MG';
+  const sulaWinner = winner(snapshots.sulamericana);
+  const galoChampion = sulaWinner === 'Atlético-MG';
+  const sulaFinal = (snapshots.sulamericana?.eventos || []).find(e => Number(e.fase_ordem) === 900);
+  const sulaPending = Boolean(sulaFinal) && !sulaWinner;
   if (cupFinalistIneligible) direct++;
   if (palmeirasLibChampion) direct++;
   const atl = tabela.find(t => t.time === 'Atlético-MG');
@@ -5095,10 +5098,19 @@ function vagasLibertadores2027(tabela) {
   if (guaranteedG6) {
     if (!cupFinalistIneligible) pending.push('queda do Grêmio');
     if (!palmeirasLibChampion) pending.push('título do Palmeiras na Libertadores');
-    if (!galoChampion) pending.push('título do Atlético-MG na Sul-Americana e classificação na faixa relevante');
-    else if (atl && atl.pos > guarantee) pending.push('posição final do Atlético-MG e eventual repasse');
+    // Depois de Boca 2 x 0 Atlético-MG, esta via foi eliminada.
+    // Não exibir cenário impossível apenas porque a final existiu.
+    if (sulaPending && [sulaFinal?.mandante?.nome, sulaFinal?.visitante?.nome].includes('Atlético-MG')) {
+      pending.push('eventual título do Atlético-MG na Sul-Americana');
+    } else if (galoChampion && atl && atl.pos > guarantee) {
+      pending.push('posição final do Atlético-MG e eventual repasse');
+    }
   } else pending.push('validação dos finalistas da Copa do Brasil e do G4');
-  return {direct, preliminary, guarantee, conditionalMax: guaranteedG6 ? 9 : 9,
+  // Limite por sobreposição: a final vencida pelo Boca não pode criar G9.
+  // Permanecem apenas repasses potenciais da Copa do Brasil e da Libertadores.
+  const sulaExtraPossible = sulaPending || Boolean(sulaWinner && tabela.some(t => t.time === sulaWinner));
+  const conditionalMax = 8 + Number(sulaExtraPossible);
+  return {direct, preliminary, guarantee, conditionalMax,
     guaranteedG6, pending};
 }
 

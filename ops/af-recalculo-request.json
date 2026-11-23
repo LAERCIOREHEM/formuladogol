@@ -1,22 +1,24 @@
 {
   "schema_version": 1,
-  "solicitado_em": "2026-11-08T23:54:38.033Z",
-  "solicitacao": "Forcar coleta continental atualizada, recálculo AF-Previsão 2 milhões cenários e editorial da Copa do Brasil após Grêmio x Palmeiras definidos",
-  "competicao": "copa_do_brasil",
-  "finalistas": [
-    "Grêmio",
-    "Palmeiras"
-  ],
-  "evento_semifinal_relevante": "401913107",
+  "solicitado_em": "2026-11-22T21:57:12-03:00",
+  "solicitacao": "Recalcular AF-Previsão da Libertadores 2027 após Boca Juniors 2 x 0 Atlético-MG na final da Sul-Americana 2026, eliminando a via do título do vice e o G9 impossível",
+  "competicao": "sul_americana",
+  "evento_final": "401913961",
+  "resultado_final": {
+    "data": "2026-11-21",
+    "mandante": "Atlético-MG",
+    "visitante": "Boca Juniors",
+    "placar_mandante": 0,
+    "placar_visitante": 2,
+    "campeao": "Boca Juniors"
+  },
   "af_recalculo_forcado": true,
   "coleta_continental_forcada": true,
-  "editorial_apos_atualizacao": true,
-  "restricoes": [
-    "Não publicar se semifinal ainda estiver pendente no snapshot",
-    "Não publicar Grêmio 100% com risco de rebaixamento",
-    "Só atribuir certeza após prova matemática",
-    "Preservar resultado e os dados anteriores se fontes falharem"
-  ],
-  "reexecucao": 2,
-  "causa_reexecucao": "Corrigido gate editorial que confundia via Copa 0% com eliminação de Palmeiras já garantido pela liga; regressão de G11 corrigida"
+  "validacoes": [
+    "Atlético-MG via título da Sul-Americana deve ser 0% com impossibilidade estrutural",
+    "Preservar probabilidade realista do Atlético-MG via Brasileirão e repasses de Copa/Libertadores",
+    "Zona condicional máxima G8 enquanto Boca campeão e Libertadores/Copa pendentes",
+    "Não publicar AF desatualizado nem alterar vagas sem fonte",
+    "Preservar Monte Carlo de 2.000.000 de simulações"
+  ]
 }
