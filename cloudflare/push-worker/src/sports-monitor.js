@@ -13,6 +13,7 @@ import {
   SPORTS_ENGINE_CONSTANTS
 } from './sports-engine.js';
 import { countEligibleTargets, enqueueSportsEvent } from './push-dispatch.js';
+import { officialPrematchCheck } from './cbf-final-fixtures-2026.js';
 import { reconcilePendingGoalScorers, SCORER_PUSH_GRACE_SECONDS } from './scorer-push-reconciliation.js';
 import {
   PRECHECK_FROM_MS, PRECHECK_POLL_MS, READINESS_VERSION, RED_CARD_EVENT_POLICY_VERSION,
@@ -256,6 +257,10 @@ export function deriveScheduleEvents(previousSnapshot, nextSnapshot, nowMs = Dat
     const remaining = kickoff - now;
     if (!game?.postponed && !game?.cancelled && Number.isFinite(kickoff)
         && remaining >= REMINDER_MIN_MS && remaining <= REMINDER_MAX_MS) {
+      // R36-R2: snapshots legados no Durable Object não podem disparar
+      // T-15 antes do horário documental da CBF.
+      const official = officialPrematchCheck(game);
+      if (!official.allowed) continue;
       events.push(scheduleEvent('prematch_15', game, now));
     }
   }
