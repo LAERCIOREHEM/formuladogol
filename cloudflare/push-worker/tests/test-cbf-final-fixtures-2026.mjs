@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { CBF_FIXTURES_2026, officialPrematchCheck } from '../src/cbf-final-fixtures-2026.js';
 import { deriveScheduleEvents } from '../src/sports-monitor.js';
+import { processQueueBody } from '../src/push-dispatch.js';
 
 const withTime = (league, home, away, kickoff) => ({
   type: 'prematch_15', eventId: 'test-cbf-2026', league, kickoff,
@@ -31,3 +32,36 @@ assert.equal(officialPrematchCheck(withTime('bra.copa_do_brazil','Grêmio','Palm
 assert.equal(officialPrematchCheck(withTime('conmebol.libertadores','Palmeiras','Estudiantes','2026-11-28T17:00:00-03:00')).allowed,true,'Libertadores não deve ser bloqueada');
 assert.equal(officialPrematchCheck({...botafogo,type:'goal'}).allowed,true,'gols nunca devem ser bloqueados');
 console.log('PASS R36: 24 jogos Série A + 1 final Copa; horários BRT, T-15 e filas incorretas bloqueados');
+
+// R36: despacho já registrado no D1 antes da correção documental não pode
+// expandir para destinatários. O banco aceita somente status='failed' no veto.
+{
+  const oldPush = withTime('bra.1','Botafogo','São Paulo','2026-11-23T17:00:00-03:00');
+  const oldEventKey = 'prematch_15:401841326:historical';
+  const updates = [];
+  const db = {
+    prepare(sql) {
+      let params = [];
+      return {
+        bind(...args) { params = args; return this; },
+        async first() {
+          if (sql.includes('FROM sports_events') || sql.includes('FROM essential_match_events')) return null;
+          if (sql.includes('FROM match_events')) {
+            return { event_key: oldEventKey, event_type: 'prematch_15', payload_json: JSON.stringify(oldPush) };
+          }
+          throw new Error('consulta D1 inesperada: '+sql.slice(0,70));
+        },
+        async run() {
+          updates.push({sql,params});
+          return {meta:{changes:1}};
+        }
+      };
+    }
+  };
+  const response = await processQueueBody({kind:'event_dispatch',eventKey:oldEventKey}, {DB:db, PUSH_QUEUE:{send:async()=>{throw Error('fila não deve ser alimentada')}}});
+  assert.equal(response.suppressed,true);
+  assert.equal(response.targetCount,0);
+  assert.equal(updates.length,1);
+  assert.match(updates[0].sql,/status='failed'/);
+  assert.match(updates[0].params[0],/cbf_fixture_guard:kickoff_mismatch/);
+}
