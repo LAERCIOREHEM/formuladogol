@@ -135,6 +135,13 @@ jobs:
       - name: HF6 - regressão do smoke SportsMonitor DO
         run: node tests/verify-monitor-deploy.mjs --self-test # R10R17.3-HF1: policies derived from sports-engine.js
 
+      - name: CBF 2026 — bloquear T-15 com kickoff defasado ou fuso incorreto
+        shell: bash
+        run: |
+          set -euo pipefail
+          python ../../tests/test_cbf_reta_final_2026.py
+          node tests/test-cbf-final-fixtures-2026.mjs
+
       - name: Testar distribuição de push
         run: npm run test:push
 
