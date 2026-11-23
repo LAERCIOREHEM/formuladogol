@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-22T22:07:08.636358-03:00",
+  "gerado_em": "2026-11-22T22:21:47.620721-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 356,
   "total_com_estatisticas": 356,
-  "total_com_publico": 353,
+  "total_com_publico": 356,
   "total_com_eventos": 356,
   "total_com_jogadores": 356,
   "total_eventos_validados": 356,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Estádio Municipal Cicero de Souza Marques",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 5047,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.futebolinterior.com.br/bragantino-1-x-0-vasco-brasileirao",
       "arbitro": "",
       "stats": [
         {
@@ -572,7 +572,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-22T22:06:57.248354-03:00"
+      "atualizado_em": "2026-11-22T22:06:57.248354-03:00",
+      "renda": 240280
     },
     "401841324": {
       "event_id": "401841324",
@@ -584,9 +585,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Estadio do Maracana",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 24549,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.oliberal.com/esportes/riquelme-marca-no-fim-fluminense-vence-o-mirassol-e-fica-perto-de-vaga-na-libertadores-1.1197194",
       "arbitro": "",
       "stats": [
         {
@@ -1116,7 +1117,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-22T22:06:59.373477-03:00"
+      "atualizado_em": "2026-11-22T22:06:59.373477-03:00",
+      "renda": 1016571
     },
     "401841318": {
       "event_id": "401841318",
@@ -1128,9 +1130,9 @@
       "placar_mandante": 4,
       "placar_visitante": 2,
       "estadio": "Arena da Baixada",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 21852,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://www.futebolinterior.com.br/athletico-pr-3-x-1-remo-brasileirao",
       "arbitro": "",
       "stats": [
         {
@@ -1743,7 +1745,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-22T22:07:01.540793-03:00"
+      "atualizado_em": "2026-11-22T22:07:01.540793-03:00",
+      "renda": 885210
     },
     "401841325": {
       "event_id": "401841325",
@@ -201435,5 +201438,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 317,
+  "total_com_renda": 356
 }
