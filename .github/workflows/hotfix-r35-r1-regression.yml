@@ -62,7 +62,7 @@ jobs:
                   assert flu['probabilidades_pct']['libertadores']==100
                   assert flu['probabilidades_detalhes']['libertadores']['certeza_estrutural'] is True
                   assert flu['probabilidades_detalhes']['libertadores']['exibicao']=='100%'
-                  assert flu['situacao_matematica']['limite_posicao_pior']==6
+                  assert 1 <= flu['situacao_matematica']['limite_posicao_pior'] <= 6
                   assert cru['probabilidades_detalhes']['g4']['certeza_estrutural'] is True
                   assert 'function vagasLibertadores2027(tabela)' in html
                   assert 'dados-br/vagas-libertadores-2027.json?t=' in html

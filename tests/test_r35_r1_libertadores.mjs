@@ -63,7 +63,8 @@ test('mathematical 100% certified from published proof, not rounding',()=>{
  assert.equal(flu.probabilidades_pct.libertadores,100);
  assert.equal(flu.probabilidades_detalhes.libertadores.certeza_estrutural,true);
  assert.equal(flu.probabilidades_detalhes.libertadores.exibicao,'100%');
- assert.equal(flu.situacao_matematica.limite_posicao_pior,6);
+ assert.ok(flu.situacao_matematica.limite_posicao_pior>=1 && flu.situacao_matematica.limite_posicao_pior<=6);
+ // O pior cenário pode melhorar para 5º após novos resultados; G6 permanece certo.
  assert.equal(flu.probabilidades_detalhes.g6.certeza_estrutural,true);
  const cru=odds.clubes.find(t=>t.clube==='Cruzeiro');
  assert.equal(cru.probabilidades_detalhes.g4.certeza_estrutural,true);
