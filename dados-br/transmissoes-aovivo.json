@@ -13,6 +13,42 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "jogos": {
+    "401841320": {
+      "event_id": "401841320",
+      "rodada": 36,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Santos",
+      "visitante": "Grêmio",
+      "data_iso": "2026-11-23T21:00:00-03:00",
+      "estadio": "Morumbis",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "ZHpNObYBdXA",
+        "url": "https://www.youtube.com/watch?v=ZHpNObYBdXA",
+        "status": "upcoming",
+        "inicio_programado": "2026-11-23T20:00:00-03:00",
+        "inicio_real": "",
+        "titulo": "SANTOS X GRÊMIO | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/ZHpNObYBdXA/maxresdefault.jpg?v=6aff3cf3",
+        "confianca": 0.9,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (60 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": true
+      },
+      "alternativas": []
+    },
     "401841324": {
       "event_id": "401841324",
       "rodada": 36,
@@ -47,42 +83,6 @@
         "origem_busca": "uploads",
         "escopo": "partida",
         "embeddable": false
-      },
-      "alternativas": []
-    },
-    "401841320": {
-      "event_id": "401841320",
-      "rodada": 36,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "espn_league": "bra.1",
-      "mandante": "Santos",
-      "visitante": "Grêmio",
-      "data_iso": "2026-11-23T21:00:00-03:00",
-      "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
-      "origem": "automático",
-      "principal": {
-        "fonte": "getv",
-        "nome": "GE TV",
-        "video_id": "ZHpNObYBdXA",
-        "url": "https://www.youtube.com/watch?v=ZHpNObYBdXA",
-        "status": "upcoming",
-        "inicio_programado": "2026-11-23T20:00:00-03:00",
-        "inicio_real": "",
-        "titulo": "SANTOS X GRÊMIO | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
-        "canal": "ge tv",
-        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
-        "thumbnail": "https://i.ytimg.com/vi/ZHpNObYBdXA/maxresdefault.jpg?v=6aff3cf3",
-        "confianca": 0.9,
-        "motivos": [
-          "os dois clubes aparecem no título",
-          "identifica Brasileirão/competição",
-          "identifica transmissão ao vivo",
-          "horário compatível (60 min de diferença)"
-        ],
-        "origem_busca": "uploads",
-        "escopo": "partida",
-        "embeddable": true
       },
       "alternativas": []
     },
@@ -122,6 +122,42 @@
       },
       "alternativas": []
     },
+    "401913106": {
+      "event_id": "401913106",
+      "rodada": 0,
+      "competicao_chave": "copa_do_brasil",
+      "competicao_nome": "Copa do Brasil",
+      "espn_league": "bra.copa_do_brazil",
+      "mandante": "Grêmio",
+      "visitante": "Palmeiras",
+      "data_iso": "2026-12-06T16:00:00-03:00",
+      "estadio": "Mané Garrincha",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "QE3W-jo8a5E",
+        "url": "https://www.youtube.com/watch?v=QE3W-jo8a5E",
+        "status": "upcoming",
+        "inicio_programado": "2026-12-06T14:30:00-03:00",
+        "inicio_real": "",
+        "titulo": "AO VIVO: GRÊMIO X PALMEIRAS | FINAL | COPA DO BRASIL 2026 | ge tv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/QE3W-jo8a5E/maxresdefault.jpg?v=6b01dc75",
+        "confianca": 0.825,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (150 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": true
+      },
+      "alternativas": []
+    },
     "cbf-2026-378": {
       "event_id": "cbf-2026-378",
       "rodada": 38,
@@ -155,42 +191,6 @@
         "origem_busca": "uploads",
         "escopo": "partida",
         "embeddable": false
-      },
-      "alternativas": []
-    },
-    "401913106": {
-      "event_id": "401913106",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "espn_league": "bra.copa_do_brazil",
-      "mandante": "Grêmio",
-      "visitante": "Palmeiras",
-      "data_iso": "2026-12-06T17:00:00-03:00",
-      "estadio": "Arena BRB Mané Garrincha",
-      "origem": "automático",
-      "principal": {
-        "fonte": "getv",
-        "nome": "GE TV",
-        "video_id": "QE3W-jo8a5E",
-        "url": "https://www.youtube.com/watch?v=QE3W-jo8a5E",
-        "status": "upcoming",
-        "inicio_programado": "2026-12-06T14:30:00-03:00",
-        "inicio_real": "",
-        "titulo": "AO VIVO: GRÊMIO X PALMEIRAS | FINAL | COPA DO BRASIL 2026 | ge tv",
-        "canal": "ge tv",
-        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
-        "thumbnail": "https://i.ytimg.com/vi/QE3W-jo8a5E/maxresdefault.jpg?v=6b01dc75",
-        "confianca": 0.825,
-        "motivos": [
-          "os dois clubes aparecem no título",
-          "identifica Brasileirão/competição",
-          "identifica transmissão ao vivo",
-          "horário compatível (150 min de diferença)"
-        ],
-        "origem_busca": "uploads",
-        "escopo": "partida",
-        "embeddable": true
       },
       "alternativas": []
     }
