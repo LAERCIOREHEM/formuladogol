@@ -25,3 +25,27 @@ except ValueError:
 else:
     raise AssertionError("lost revenue accepted")
 print("PASS R36-R7: CBF alias, true stadium mismatch, FINAL preservation, documentary attendance and regression guard")
+
+# R36-R7: as três partidas recuperadas da R36, incluindo nomes históricos.
+for raw, official in (
+    ("Estadio Beira-Rio", "Beira-Rio"),
+    ("Joao Havelange Stadium", "Nilton Santos"),
+    ("Estádio Olímpico João Havelange", "Nilton Santos"),
+    ("Engenhão", "Nilton Santos"),
+    ("Morumbi", "Morumbis"),
+    ("Estádio Cícero Pompeu de Toledo", "Morumbis"),
+):
+    assert normalizar_estadio_cbf(raw) == normalizar_estadio_cbf(official), (raw, official)
+    match = {**game, "estadio": raw}
+    adjustment = {**fix, "estadio": official}
+    preservar_estadios_cbf_finais([match], [adjustment])
+    assert match["estadio"] == official and match["estado"] == "post"
+    assert match["placar_mandante"] == 2 and match["placar_visitante"] == 5
+for raw, official in (
+    ("Maracanã", "Nilton Santos"),
+    ("Arena do Grêmio", "Beira-Rio"),
+    ("Vila Belmiro", "Morumbis"),
+    ("Estádio João Havelange de Uberlândia", "Nilton Santos"),
+):
+    assert normalizar_estadio_cbf(raw) != normalizar_estadio_cbf(official)
+print("PASS R36-R7: aliases históricos, tradução ESPN e rejeição de recintos distintos")

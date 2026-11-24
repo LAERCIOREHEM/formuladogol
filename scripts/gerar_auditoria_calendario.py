@@ -532,7 +532,20 @@ def normalizar_estadio_cbf(value: str) -> str:
     import re
     text = unicodedata.normalize("NFKD", str(value or "")).encode("ascii", "ignore").decode().lower()
     text = re.sub(r"[^a-z0-9]+", " ", text).strip()
-    return re.sub(r"^(estadio|stadium) +", "", text)
+    text = re.sub(r"^(estadio|stadium) +| +(estadio|stadium)$", "", text)
+    # Identidades explícitas: nomes históricos/atuais do mesmo recinto.
+    # Não usar correspondência aproximada nem inferir pelo clube mandante.
+    aliases = {
+        "joao havelange": "nilton santos",
+        "olimpico joao havelange": "nilton santos",
+        "joao havelange olympic": "nilton santos",
+        "olimpico nilton santos": "nilton santos",
+        "nilton santos olympic": "nilton santos",
+        "engenhao": "nilton santos",
+        "morumbi": "morumbis",
+        "cicero pompeu de toledo": "morumbis",
+    }
+    return aliases.get(text, text)
 
 
 def preservar_estadios_cbf_finais(calendario, ajustes):

@@ -12,6 +12,8 @@ on:
       - 'ops/af-recalculo-request.json'
       - 'dados-br/competicoes-af-previsao/libertadores.json'
       - 'dados-br/correcoes/agenda-continentais-oficial.json'
+      - 'scripts/gerar_auditoria_calendario.py'
+      - 'tests/test_recuperacao_estatistica_r36r7.py'
   workflow_dispatch:
     inputs:
       forcar_af:
@@ -124,6 +126,7 @@ jobs:
           python scripts/gerar_agenda_clubes_brasileirao.py --self-test
           python scripts/gerenciar_status_brasileirao.py --selftest
           python scripts/gerar_auditoria_calendario.py --self-test
+          python tests/test_recuperacao_estatistica_r36r7.py
           python scripts/buscar_lideres_jogadores_espn.py --self-test
           python scripts/atualizar_publicos_brasileirao.py --self-test
           python scripts/buscar_detalhes_jogos_brasileirao.py --self-test
