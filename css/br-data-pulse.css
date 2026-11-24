@@ -40,3 +40,75 @@
 @supports not (container-type:inline-size){@media(min-width:768px){.fdg-pulse-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,145px),1fr))}}}
 @media print{.fdg-pulse{background:white;color:#111;border-color:#555;break-inside:avoid}.fdg-pulse-brand,.fdg-pulse-status,.fdg-pulse-metric>span,.fdg-pulse-metric>strong,.fdg-pulse-metric>small,.fdg-pulse-footer{color:#111!important}}
 @media(forced-colors:active){.fdg-pulse{border:1px solid CanvasText}.fdg-pulse-track{border:1px solid CanvasText}.fdg-pulse-track>span{background:Highlight;forced-color-adjust:none}}
+
+/* R36-R6 FINAL — visual hierarchy only; no change to certification or refresh. */
+.fdg-pulse{margin:0 0 10px;padding:12px 14px;border-radius:14px}
+.fdg-pulse-header{padding-bottom:6px;gap:4px 10px}
+.fdg-pulse-brand,.fdg-pulse-status{font-size:14px;line-height:1.25}
+.fdg-pulse-grid{margin:8px 0;gap:8px 12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.fdg-pulse-metric{gap:2px;align-content:start;grid-template-rows:auto auto auto}
+.fdg-pulse-metric>span{font-size:14px;line-height:1.25;overflow-wrap:normal}
+.fdg-pulse-metric>strong,.fdg-pulse-temporal time>strong{display:block;font-size:26px;line-height:1.12;font-weight:850;letter-spacing:-.035em;font-variant-numeric:tabular-nums;white-space:nowrap;overflow-wrap:normal;color:#eef7ff}
+.fdg-pulse-metric>strong.fdg-pulse-positive,.fdg-pulse-temporal time>strong.fdg-pulse-positive,.fdg-pulse-temporal time:has(.fdg-pulse-positive)>small{color:#4ade80}
+.fdg-pulse-metric>strong.fdg-pulse-season{color:#facc15}
+.fdg-pulse-temporal time{display:grid;gap:2px;min-width:0}
+.fdg-pulse-temporal time>small{font-size:16px;font-weight:700;color:var(--pulse-tone);white-space:nowrap;font-variant-numeric:tabular-nums;line-height:1.25}
+.fdg-pulse-metric>small,.fdg-pulse-footer{font-size:13px;line-height:1.35}
+.fdg-pulse-track{margin:3px 0 5px;height:5px}
+@container fdg-pulse (min-width:480px){.fdg-pulse-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@container fdg-pulse (min-width:720px){
+ .fdg-pulse-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .fdg-pulse-grid[data-count="3"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .fdg-pulse-grid[data-count="5"],.fdg-pulse-grid[data-count="6"],.fdg-pulse-grid[data-count="7"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .fdg-pulse-metric>strong,.fdg-pulse-temporal time>strong{font-size:30px}
+}
+@container fdg-pulse (min-width:960px){.fdg-pulse-grid[data-count="5"]{grid-template-columns:repeat(5,minmax(0,1fr))}.fdg-pulse-metric>strong,.fdg-pulse-temporal time>strong{font-size:32px}}
+@container fdg-pulse (min-width:1130px){.fdg-pulse-grid[data-count="6"]{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@container fdg-pulse (min-width:1320px){.fdg-pulse-grid[data-count="7"]{grid-template-columns:repeat(7,minmax(0,1fr))}}
+@container fdg-pulse (max-width:379px){
+ .fdg-pulse-metric>strong{font-size:22px}
+ .fdg-pulse-temporal time>strong{font-size:24px}
+ .fdg-pulse-temporal time>small{font-size:14px}
+ .fdg-pulse-metric>span,.fdg-pulse-metric>small,.fdg-pulse-footer,.fdg-pulse-brand,.fdg-pulse-status{font-size:12px}
+ .fdg-pulse-grid{gap:8px}
+}
+@container fdg-pulse (max-width:259px){.fdg-pulse-grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:700px){.fdg-pulse{padding:10px 12px;margin-bottom:8px}.fdg-pulse-status{font-size:13px}.fdg-pulse-metric>span{font-size:13px}}
+/* Agenda: published timestamp is not a certification of all competitions. */
+.fdg-freshness{display:grid;gap:2px;align-content:center;min-width:0;padding:7px 12px;background:#102129;border:1px solid #344b50;border-radius:12px;color:#e8f1f7;text-align:left;line-height:1.25}
+.fdg-freshness-label,.fdg-freshness-state{font-size:13px;font-weight:700;color:#b6c7d3}
+.fdg-freshness time{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.fdg-freshness time strong{font-size:28px;font-weight:850;white-space:nowrap}
+.fdg-freshness time span{font-size:16px;font-weight:700;white-space:nowrap}
+.fdg-freshness--live .fdg-freshness-state{color:#60a5fa}
+.fdg-freshness--pending .fdg-freshness-state{color:#facc15}
+.fdg-games-title-copy{min-width:0;flex:1}
+.fdg-games-competitions{margin-top:4px;font-size:13px;color:#b6c7d3;line-height:1.3}
+body.fdg-ux-main .br-games-heading{align-items:center;gap:8px;margin-bottom:8px}
+body.fdg-ux-main .br-panel-title,body.fdg-ux-main .resultados-header{margin-bottom:8px}
+body.fdg-ux-main .br-games-archive-strip{margin-top:0;margin-bottom:8px}
+@media(max-width:700px){body.fdg-ux-main .br-games-heading{display:flex;flex-direction:column;align-items:stretch}.fdg-freshness{width:100%;padding:8px 10px}.fdg-freshness time strong{font-size:24px}.fdg-freshness time span{font-size:14px}.fdg-freshness-label,.fdg-freshness-state,.fdg-games-competitions{font-size:12px}}
+/* Stats: remove the double inset above the first ranking. */
+body.fdg-ux-stats .stats-tabs-panel{margin:8px 0 10px}
+body.fdg-ux-stats .stats-tabs{gap:6px;padding:8px}
+body.fdg-ux-stats .stats-tab{min-height:44px;padding:8px;font-size:clamp(13px,1.3vw,16px);line-height:1.2}
+body.fdg-ux-stats .stats-tab-featured{min-height:44px;font-size:clamp(14px,1.5vw,18px)}
+body.fdg-ux-stats .stats-view>.panel>.panel-inner{padding:12px}
+body.fdg-ux-stats #probabilidades-ranking>.probability-ranking-section{margin-top:0;padding-top:0;border-top:0}
+body.fdg-ux-stats .section-head,body.fdg-ux-stats .probability-section-head{margin-bottom:8px}
+body.fdg-ux-stats .stats-data-status,body.fdg-ux-accuracy .accuracy-update-status{font-size:13px;line-height:1.4;letter-spacing:0}
+body.fdg-ux-stats .stats-data-status::before{content:none}
+body.fdg-ux-stats .probability-table-hint{font-size:12px;margin:0 0 6px}
+body.fdg-ux-stats .probability-comparison-table{font-size:15px;font-variant-numeric:tabular-nums}
+body.fdg-ux-stats .probability-comparison-table thead th{font-size:12px;letter-spacing:.015em}
+body.fdg-ux-stats .probability-comparison-table td,body.fdg-ux-stats .probability-comparison-table th{height:46px;padding-block:6px}
+body.fdg-ux-stats .probability-table-number strong,body.fdg-ux-stats .probability-table-projection strong{font-size:16px}
+body.fdg-ux-stats .stats-player-value strong,body.fdg-ux-stats .stats-club-goals-value strong{font-size:clamp(24px,2.6vw,32px);white-space:nowrap;font-variant-numeric:tabular-nums}
+body.fdg-ux-stats .stats-player-value span,body.fdg-ux-stats .stats-club-goals-value span,body.fdg-ux-stats .stats-total-chip{font-size:12px;letter-spacing:0}
+body.fdg-ux-stats .stats-match-stat-row strong,body.fdg-ux-stats .stats-performance-metric strong,body.fdg-ux-stats .stats-compare-metric>strong,body.fdg-ux-stats .stats-attendance-row strong{font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+body.fdg-ux-stats .stats-compare-metric>span,body.fdg-ux-stats .stats-attendance-ranking-head span,body.fdg-ux-stats .stats-attendance-ranking-head small{font-size:12px}
+body.fdg-ux-stats .stats-live-delta,body.fdg-ux-stats .stats-live-inline{font-size:12px}
+body.fdg-ux-accuracy .accuracy-range-card>strong{font-size:clamp(24px,3vw,32px);font-variant-numeric:tabular-nums;white-space:nowrap}
+@media(max-width:700px){body.fdg-ux-stats .stats-tabs-panel{margin:6px 0 8px}body.fdg-ux-stats .stats-view>.panel>.panel-inner{padding:10px}body.fdg-ux-stats .stats-data-status,body.fdg-ux-accuracy .accuracy-update-status{font-size:12px}body.fdg-ux-stats .probability-comparison-table{font-size:14px}body.fdg-ux-stats .probability-comparison-table td,body.fdg-ux-stats .probability-comparison-table th{padding-inline:7px}body.fdg-ux-stats .probability-table-number strong,body.fdg-ux-stats .probability-table-projection strong{font-size:14px}}
+@media(max-width:360px){body.fdg-ux-stats .probability-comparison-table{font-size:13px}}
+@media print{.fdg-pulse-temporal time>strong,.fdg-pulse-temporal time>small{color:#111!important}}

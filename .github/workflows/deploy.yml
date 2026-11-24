@@ -59,6 +59,7 @@ on:
       - 'js/br-data-manifest.js'
       - 'js/br-data-refresh.js'
       - 'tests/test-br-data-pulse-final.mjs'
+      - 'tests/test-br-data-pulse-ux.mjs'
       - 'scripts/gerar_fdg_data_manifest.py'
       - 'tests/test-br-data-manifest.mjs'
       - 'css/br-data-pulse.css'
@@ -181,14 +182,15 @@ jobs:
           node tests/test-br-data-pulse-integration.mjs
           node tests/test-br-data-manifest.mjs
           node tests/test-br-data-pulse-final.mjs
-          grep -q 'br-data-pulse.js?v=20261124-r36r5d' index.html
-          grep -q 'br-data-pulse.js?v=20261124-r36r5d' estatisticas.html
-          grep -q 'br-data-pulse.js?v=20261124-r36r5d' acuracia.html
+          node tests/test-br-data-pulse-ux.mjs
+          grep -q 'br-data-pulse.js?v=20261124-r36r6final' index.html
+          grep -q 'br-data-pulse.js?v=20261124-r36r6final' estatisticas.html
+          grep -q 'br-data-pulse.js?v=20261124-r36r6final' acuracia.html
           node cloudflare/push-worker/tests/test-resultados-freshness.mjs
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' index.html
           grep -q 'br-resultados-freshness.js?v=20261004-r10r9' index.html
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' estatisticas.html
-          grep -q 'br-estatisticas.js?v=20261124-r36r5final' estatisticas.html
+          grep -q 'br-estatisticas.js?v=20261124-r36r6final' estatisticas.html
           grep -q 'br-aovivo.js?v=20261123-r36r3-scorer' aovivo.html
           grep -q 'br-live-goal-sync.js?v=20261014-r10r17-2' aovivo.html
           echo 'OK: LiveState v7 + Live Facts v2 + R10R17.3 Goal Event Integrity + R10R17.2 ID documental.'
@@ -1032,7 +1034,7 @@ jobs:
           node --check _site/js/br-final-canonical-bridge.js
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' _site/index.html
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' _site/estatisticas.html
-          grep -q 'br-estatisticas.js?v=20261124-r36r5final' _site/estatisticas.html
+          grep -q 'br-estatisticas.js?v=20261124-r36r6final' _site/estatisticas.html
           grep -q 'br-aovivo.js?v=20261123-r36r3-scorer' _site/aovivo.html
           grep -q 'const LIVE_STATE_VERSION = "7"' _site/js/br-classificacao-live.js
           echo 'OK: pacote público contém LiveState v6 / Live Facts v2 e cache-bust correto.'
@@ -1926,11 +1928,15 @@ jobs:
               (HOST + "/estatisticas.html", "br-classificacao-live.js?v=20260920-monitor-facts-v7"),
               (HOST + "/aovivo.html", "br-aovivo.js?v=20261123-r36r3-scorer"),
               (HOST + "/js/br-classificacao-live.js", 'const LIVE_STATE_VERSION = "7"'),
-              (HOST + "/", "br-data-pulse.js?v=20261124-r36r5d"),
-              (HOST + "/estatisticas.html", "br-data-pulse.js?v=20261124-r36r5d"),
+              (HOST + "/", "br-data-pulse.js?v=20261124-r36r6final"),
+              (HOST + "/estatisticas.html", "br-data-pulse.js?v=20261124-r36r6final"),
               (HOST + "/acuracia.html", "br-acuracia.js?v=20261124-r36r5d"),
-              (HOST + "/js/br-data-pulse.js?v=20261124-r36r5d", "function accuracyProof("),
-              (HOST + "/js/br-estatisticas.js?v=20261124-r36r5final", "pulse.reconcile(r,t)"),
+              (HOST + "/js/br-data-pulse.js?v=20261124-r36r6final", "function accuracyProof("),
+              (HOST + "/js/br-data-pulse.js?v=20261124-r36r6final", "function freshness("),
+              (HOST + "/css/br-data-pulse.css?v=20261124-r36r6final", "#probabilidades-ranking>.probability-ranking-section"),
+              (HOST + "/", "fdg-ux-main"),
+              (HOST + "/estatisticas.html", "fdg-ux-stats"),
+              (HOST + "/js/br-estatisticas.js?v=20261124-r36r6final", "pulse.reconcile(r,t)"),
               (HOST + "/estatisticas.html", "br-data-manifest.js?v=20261124-r36r5e"),
               (HOST + "/js/br-data-manifest.js?v=20261124-r36r5e", "superseded revision"),
               (HOST + "/js/br-data-refresh.js?v=20261124-r36r5final", "ACTIVE_MS=12000"),

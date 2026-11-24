@@ -11,7 +11,7 @@
     const d=new Date(v);
     if(!Number.isFinite(d.getTime()))return null;
     const opts={timeZone:'America/Sao_Paulo'};
-    return {date:d.toLocaleDateString('pt-BR',opts),time:d.toLocaleTimeString('pt-BR',{...opts,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})};
+    return {date:d.toLocaleDateString('pt-BR',opts),shortDate:d.toLocaleDateString('pt-BR',{...opts,day:'2-digit',month:'2-digit'}),time:d.toLocaleTimeString('pt-BR',{...opts,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})};
   }
   function model(input={}){
     const processed=count(input.processed),expected=count(input.expected),season=count(input.seasonTotal);
@@ -28,12 +28,54 @@
     return {status,stamp,processed,expected,coverage,season,completed,complete,
       remaining:season!==null&&completed!==null&&completed<=season?season-completed:null};
   }
+  // Date-first display; complete timestamp remains available to assistive technology.
+  function timeMetric(label,stamp,raw,tone=''){
+    const full=stamp?stamp.date+' · '+stamp.time+' BRT':'Horário não confirmado';
+    return '<div class="fdg-pulse-metric fdg-pulse-temporal"><span>'+esc(label)+'</span>'+
+      (stamp?'<time datetime="'+esc(raw)+'" title="'+esc(full)+'" aria-label="'+esc(full)+'"><strong class="'+tone+'">'+esc(stamp.shortDate)+'</strong><small>'+esc(stamp.time)+' BRT</small></time>':'<strong>—</strong><small>Horário não confirmado</small>')+'</div>';
+  }
+  function freshness(raw,options={}){
+    const stamp=timestamp(raw),status=options.live?'live':options.pending?'pending':'unknown';
+    const label=options.label||'Última atualização';
+    const title=stamp?stamp.date+' · '+stamp.time+' BRT':'Horário não confirmado';
+    const state=options.live?'AO VIVO':options.pending?'AGENDA EM ATUALIZAÇÃO':stamp?'AGENDA PUBLICADA':'SEM HORÁRIO CONFIRMADO';
+    return '<div class="fdg-freshness fdg-freshness--'+status+'" aria-label="'+esc(label)+'"><span class="fdg-freshness-label">'+esc(label)+'</span>'+
+      (stamp?'<time datetime="'+esc(raw)+'" title="'+esc(title)+'" aria-label="'+esc(title)+'"><strong>'+esc(stamp.shortDate)+'</strong><span>'+esc(stamp.time.slice(0,5))+' BRT</span></time>':'<strong>—</strong>')+
+      '<span class="fdg-freshness-state">'+esc(state)+'</span></div>';
+  }
+  // Retain interaction state across data-driven DOM replacements, not by row index.
+  function capture(target){
+    if(!target?.querySelectorAll)return null;
+    const key=e=>e.id||e.getAttribute('data-game-id')||e.getAttribute('data-event-id')||e.getAttribute('data-fdg-key');
+    const details=new Set([...target.querySelectorAll('details[open]')].map(key).filter(Boolean));
+    const scroll=new Map();
+    for(const e of target.querySelectorAll('.probability-table-shell,.probability-history-scroll,.probability-points-scroll,.tabela-scroll,.accuracy-table-scroll')){
+      const parent=e.closest('[id]'),k=(parent?.id||'')+'|'+e.className;
+      if(e.scrollLeft)scroll.set(k,e.scrollLeft);
+    }
+    return {details,scroll};
+  }
+  function restore(target,snapshot){
+    if(!snapshot||!target?.querySelectorAll)return;
+    const key=e=>e.id||e.getAttribute('data-game-id')||e.getAttribute('data-event-id')||e.getAttribute('data-fdg-key');
+    for(const e of target.querySelectorAll('details'))if(snapshot.details.has(key(e)))e.open=true;
+    for(const e of target.querySelectorAll('.probability-table-shell,.probability-history-scroll,.probability-points-scroll,.tabela-scroll,.accuracy-table-scroll')){
+      const k=(e.closest('[id]')?.id||'')+'|'+e.className;
+      if(snapshot.scroll.has(k))e.scrollLeft=snapshot.scroll.get(k);
+    }
+  }
+  function replaceView(target,html){
+    const snapshot=capture(target);
+    target.innerHTML=html;
+    restore(target,snapshot);
+  }
+  const mounted=new WeakMap();
   function render(input={}){
     const m=model(input);
     const metric=(label,value,detail='',tone='')=>'<div class="fdg-pulse-metric"><span>'+esc(label)+'</span><strong class="'+tone+'">'+esc(value)+'</strong><small>'+esc(detail)+'</small></div>';
     const tone=m.status==='synced'?'fdg-pulse-positive':'';
     const cards=[
-      metric(input.timeLabel||'Última atualização',m.stamp?.time||'—',m.stamp?m.stamp.date+' · BRT':'Horário não confirmado',tone),
+      timeMetric(input.timeLabel||'Última atualização',m.stamp,input.updatedAt,tone),
       metric(input.coverageLabel||'Jogos processados',m.expected===null?fmt(m.processed):fmt(m.processed)+'/'+fmt(m.expected),m.coverage===null?'Cobertura não confirmada':m.coverage.toLocaleString('pt-BR',{maximumFractionDigits:1})+'% da base',tone)
     ];
     if(m.season!==null&&m.completed!==null)cards.push(metric('Brasileirão '+String(input.year||2026),fmt(m.completed)+'/'+fmt(m.season),m.remaining===null?'':fmt(m.remaining)+' jogos restantes','fdg-pulse-season'));
@@ -44,7 +86,7 @@
   function mount(target,input){
     if(!target||typeof target.innerHTML!=='string')return false;
     const html=render(input);
-    if(target.innerHTML!==html)target.innerHTML=html;
+    if(mounted.get(target)!==html||!target.innerHTML){target.innerHTML=html;mounted.set(target,html);}
     return true;
   }
 
@@ -114,5 +156,5 @@
     valid=valid&&audited===reference.expected&&summary.resultados_auditados===audited&&summary.previsoes_certificadas===eligible.size&&summary.sem_snapshot_certificado===excluded&&summary.quarentena_por_conflito===0&&scope.em_quarentena===0&&scope.resultados_finais_auditados===audited&&scope.sem_prova_historica===excluded&&scope.jogos_com_previsao_certificada===eligible.size&&matches.size===eligible.size&&e4.jogos.length===matches.size;
     return {certified:valid,processed:matches.size,expected:reference.certified&&audited===reference.expected?eligible.size:null,audited,excluded};
   }
-  root.FDGDataPulse=Object.freeze({model,render,mount,reconcile,compareGames,after,accuracyProof});
+  root.FDGDataPulse=Object.freeze({model,render,mount,reconcile,compareGames,after,accuracyProof,freshness,capture,restore,replaceView});
 })(typeof window!=='undefined'?window:globalThis);

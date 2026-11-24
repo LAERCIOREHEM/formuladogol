@@ -32,6 +32,6 @@ fail=true;assert.equal(await api.refresh(true),null);assert.equal((await api.get
 assert.equal((await api.get('tabela.json',fallback)).v,0);assert.equal(api.isCore('tabela.json'),true);
 const html=readFileSync('estatisticas.html','utf8'),stats=readFileSync('js/br-estatisticas.js','utf8');
 assert.ok(html.includes('br-data-manifest.js?v=20261124-r36r5e'));
-assert.ok(html.indexOf('br-data-manifest.js?v=20261124-r36r5e')<html.indexOf('br-estatisticas.js?v=20261124-r36r5final'));
+assert.ok(html.indexOf('br-data-manifest.js?v=20261124-r36r5e')<html.indexOf('br-estatisticas.js?v=20261124-r36r6final'));
 assert.ok(stats.includes('manifest.refresh(true)'));assert.ok(stats.includes('manifest.changed(FILES[k])'));
 console.log('PASS Data Manifest E: 25 bases, single flight, hash, selective refresh, fallback, core and integration');

@@ -853,7 +853,7 @@
       const unknown = Number(club.gols_nao_individualizados || 0);
       const expectedGames = expectedClubGamesWithLive(club.time);
       const gamesDenominator = expectedGames === null ? Number(club.jogos) : expectedGames;
-      return `<details class="stats-club-goals-card">
+      return `<details class="stats-club-goals-card" data-fdg-key="club-${escapeAttr(key)}">
         <summary>
           <span class="stats-rank">${integer(club.posicao || index + 1)}</span>
           <a class="stats-club-shield-link" href="${escapeAttr(clubHref(club.time))}" title="Abrir página de ${escapeAttr(club.time)}" aria-label="Abrir página de ${escapeAttr(club.time)}" onclick="event.stopPropagation()">${shield(club, "stats-club-shield")}</a>
@@ -1813,7 +1813,7 @@
   function rankingPerformanceHistoryDetails(clubName) {
     const history = performanceHistoryClubHtml(clubName);
     if (!history) return "";
-    return `<details class="ranking-history-details">
+    return `<details class="ranking-history-details" data-fdg-key="ranking-history-details">
       <summary><span class="ranking-history-label is-closed">Ver evolução do ranking</span><span class="ranking-history-label is-open">Recolher evolução do ranking</span><i aria-hidden="true"></i></summary>
       <div class="ranking-history-content">${history}</div>
     </details>`;
@@ -1904,14 +1904,14 @@
       const reference = clubRound > 0 ? `Após jogo · R${integer(clubRound)}` : "Após jogo";
       return `<tr><th scope="row"><span>${escapeHtml(reference)}</span><small>${escapeHtml(dateBR(snapshot?.gerado_em))}</small></th><td>${position ? `${integer(position)}º` : "—"}</td><td>${points ?? "—"}</td><td>${escapeHtml(probabilityDisplayText(null, Number(row?.campeao_pct)))}</td><td>${escapeHtml(probabilityDisplayText(null, probabilityHistoryValue(row, "libertadores_pct")))}</td><td>${escapeHtml(probabilityDisplayText(null, probabilityHistoryValue(row, "sul_americana_pct")))}</td><td>${escapeHtml(probabilityDisplayText(null, Number(row?.rebaixamento_pct)))}</td></tr>`;
     }).join("");
-    const gameHistory = gameHistoryRows.length ? `<details class="probability-game-history-details"><summary>Ver histórico após cada jogo do clube <span>${integer(gameHistoryRows.length)} registros recentes</span></summary><div class="probability-history-scroll"><table><thead><tr><th>Referência</th><th>Pos.</th><th>Pts</th><th>Título</th><th>Libertadores</th><th>Sul-Americana</th><th>Queda</th></tr></thead><tbody>${gameBody}</tbody></table></div><p>Esta camada registra a fotografia imediatamente após partidas do próprio clube. Ela é informativa e não substitui os marcos globais usados pelos editoriais.</p></details>` : (state.probabilitiesHistory === null ? `<div class="probability-game-history-details"><button type="button" data-load-probability-history>Carregar histórico técnico após cada jogo</button><p>Arquivo detalhado carregado somente sob demanda para manter a página rápida.</p></div>` : "");
+    const gameHistory = gameHistoryRows.length ? `<details class="probability-game-history-details" data-fdg-key="probability-game-history-details"><summary>Ver histórico após cada jogo do clube <span>${integer(gameHistoryRows.length)} registros recentes</span></summary><div class="probability-history-scroll"><table><thead><tr><th>Referência</th><th>Pos.</th><th>Pts</th><th>Título</th><th>Libertadores</th><th>Sul-Americana</th><th>Queda</th></tr></thead><tbody>${gameBody}</tbody></table></div><p>Esta camada registra a fotografia imediatamente após partidas do próprio clube. Ela é informativa e não substitui os marcos globais usados pelos editoriais.</p></details>` : (state.probabilitiesHistory === null ? `<div class="probability-game-history-details"><button type="button" data-load-probability-history>Carregar histórico técnico após cada jogo</button><p>Arquivo detalhado carregado somente sob demanda para manter a página rápida.</p></div>` : "");
     const forecastHistory = displayRows.length ? `<section class="club-forecast-history">
       <div class="club-evolution-head"><div><span>AF-Previsão ${probabilityClubContext(club?.clube)}</span><strong>Evolução da previsão</strong></div><small>${integer(historyRows.length)} ${historyRows.length === 1 ? "marco fechado" : "marcos fechados"} + cálculo atual</small></div>
       <div class="probability-history-scroll"><table><thead><tr><th>Referência</th><th>Pos.</th><th>Pts</th><th>Título</th><th>Libertadores</th><th>Sul-Americana</th><th>Queda</th></tr></thead><tbody>${body}</tbody></table></div>
       <p>Rxx representa o fechamento global imutável da rodada usado pelos editoriais. Rodadas sem fechamento editorial elegível não geram um marco Rxx; seus efeitos continuam preservados no histórico após cada jogo. Marcos CB/CONT registram fechamentos continentais auditados. A linha ATUAL é dinâmica e pode mudar a qualquer novo fato esportivo.</p>
       ${gameHistory}
     </section>` : "";
-    return `<details class="probability-history-details">
+    return `<details class="probability-history-details" data-fdg-key="probability-history-details">
       <summary>Evolução do clube <span>AF-Score + AF-Previsão ${probabilityClubContext(club?.clube)}</span></summary>
       <div class="club-evolution-content">${performanceHistory}${forecastHistory}</div>
     </details>`;
@@ -2069,13 +2069,13 @@
     const cupTarget = libDisplays.via_copa_do_brasil || probabilityDisplayText(libRoutes.via_copa_do_brasil, Number(libRoutes.via_copa_do_brasil?.percentual_estimado));
     const cupDisplays = probabilityBreakdownDisplays(cupSubroutes, cupTarget);
     const cupRows = Object.entries(cupSubroutes).map(([key, detail]) => probabilityRouteRow(key, detail, "cup", cupDisplays[key])).join("");
-    return `<details class="probability-route-details">
+    return `<details class="probability-route-details" data-fdg-key="probability-route-details">
       <summary>Como se formam as chances continentais? <span>vias exclusivas e auditáveis ${probabilityClubContext(club?.clube)}</span></summary>
       <div class="probability-route-columns">
         <section>
           <div class="probability-route-head"><span>Libertadores consolidada</span><strong>${escapeHtml(continental.libertadores)}</strong></div>
           <div class="probability-route-list">${Object.entries(libRoutes).map(([key, detail]) => probabilityRouteRow(key, detail, "libertadores", libDisplays[key])).join("")}</div>
-          ${cupRows ? `<details class="probability-cup-subroutes"><summary>Detalhar a via Copa do Brasil</summary><div>${cupRows}</div></details>` : ""}
+          ${cupRows ? `<details class="probability-cup-subroutes" data-fdg-key="probability-cup-subroutes"><summary>Detalhar a via Copa do Brasil</summary><div>${cupRows}</div></details>` : ""}
         </section>
         <section>
           <div class="probability-route-head"><span>Sul-Americana consolidada</span><strong>${escapeHtml(continental.sul_americana)}</strong></div>
@@ -2133,7 +2133,7 @@
       </div>
       ${probabilityTrendNote(club)}
       ${probabilityQualificationRoutes(club)}
-      <details class="probability-position-details">
+      <details class="probability-position-details" data-fdg-key="probability-position-details">
         <summary>Distribuição das 20 posições <span>projeção: ${position ? `${integer(position)}º` : "—"} · mediana: ${integer(club?.posicao_projetada_mediana)}º ${probabilityClubContext(club?.clube)}</span></summary>
         ${probabilityPositionDistribution(club)}
       </details>
@@ -2220,7 +2220,7 @@
     target.innerHTML = `<div class="probability-points-scroll" tabindex="0" aria-label="Tabela de pontos necessários por objetivo">
       <table class="probability-points-table">${tableHead}<tbody>${pointsThresholdRows(mainRows)}</tbody></table>
     </div>
-    ${extraRows.length ? `<details class="probability-points-more"><summary>Ver níveis detalhados <span>60%, 97%, 99,5% e 100% simulados</span></summary><div class="probability-points-scroll" tabindex="0"><table class="probability-points-table probability-points-table-extra">${tableHead}<tbody>${pointsThresholdRows(extraRows)}</tbody></table></div></details>` : ""}
+    ${extraRows.length ? `<details class="probability-points-more" data-fdg-key="probability-points-more"><summary>Ver níveis detalhados <span>60%, 97%, 99,5% e 100% simulados</span></summary><div class="probability-points-scroll" tabindex="0"><table class="probability-points-table probability-points-table-extra">${tableHead}<tbody>${pointsThresholdRows(extraRows)}</tbody></table></div></details>` : ""}
     <div class="probability-points-notes">
       <p><strong>Sul-Americana+:</strong> significa alcançar ao menos uma vaga continental, seja na Sul-Americana ou na Libertadores.</p>
       <p><strong>100% nos cenários:</strong> ocorreu em todos os universos simulados daquela faixa; não representa impossibilidade matemática do cenário contrário.</p>
@@ -2488,7 +2488,7 @@
         <article><span>Erro médio de pontos</span><strong>${number(points.mae_pontos, 2)}</strong><small>pontos por clube e snapshot</small></article>
         <article><span>RPS das posições</span><strong>${number(position.rps_posicao, 4)}</strong><small>menor é melhor</small></article>
       </div>
-      <details class="probability-final-evaluation-details"><summary>Ver métricas probabilísticas <span>Brier e Log Loss</span></summary><div class="probability-final-evaluation-events">${eventCards}</div><p>O Brier Score mede a distância entre a probabilidade publicada e o desfecho observado. O Log Loss pune previsões excessivamente confiantes que terminam erradas. Em ambos, valores menores indicam melhor desempenho.</p></details>
+      <details class="probability-final-evaluation-details" data-fdg-key="probability-final-evaluation-details"><summary>Ver métricas probabilísticas <span>Brier e Log Loss</span></summary><div class="probability-final-evaluation-events">${eventCards}</div><p>O Brier Score mede a distância entre a probabilidade publicada e o desfecho observado. O Log Loss pune previsões excessivamente confiantes que terminam erradas. Em ambos, valores menores indicam melhor desempenho.</p></details>
     </section>`;
   }
 
@@ -2759,6 +2759,7 @@
   }
 
   function renderCurrentTab() {
+    const view=$("view-"+state.tab), snapshot=window.FDGDataPulse?.capture(view);
     if (state.tab === "artilheiros") renderPlayers("artilheiros");
     else if (state.tab === "assistencias") renderPlayers("assistencias");
     else if (state.tab === "gols-clube") renderClubGoals();
@@ -2767,6 +2768,7 @@
     else if (state.tab === "probabilidades") renderProbabilities();
     else if (state.tab === "desempenho") renderRanking();
     renderDataPulse();
+    window.FDGDataPulse?.restore(view,snapshot);
   }
 
   function renderAll() { renderCurrentTab(); }
@@ -2870,11 +2872,13 @@
   }
 
   function renderLiveAffected() {
+    const view=$("view-"+state.tab), snapshot=window.FDGDataPulse?.capture(view);
     if (state.tab === "artilheiros") renderPlayers("artilheiros");
     else if (state.tab === "assistencias") renderPlayers("assistencias");
     else if (state.tab === "gols-clube") renderClubGoals();
     else if (state.tab === "probabilidades") { renderProbabilityRanking(); renderProbabilityDetails(); }
     renderDataPulse();
+    window.FDGDataPulse?.restore(view,snapshot);
   }
 
   function hasIncompleteLiveFacts() {

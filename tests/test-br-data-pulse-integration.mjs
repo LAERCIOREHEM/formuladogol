@@ -8,8 +8,8 @@ for(const tab of ['probabilidades','artilheiros','assistencias','jogos','gols-cl
  assert.ok(source.includes('"'+tab+'"'),tab);
 }
 for(const page of ['index.html','estatisticas.html','acuracia.html']){
- assert.match(read(page),/br-data-pulse\.css\?v=20261124-r36r5c/);
- assert.match(read(page),/br-data-pulse\.js\?v=20261124-r36r5d/);
+ assert.match(read(page),/br-data-pulse\.css\?v=20261124-r36r6final/);
+ assert.match(read(page),/br-data-pulse\.js\?v=20261124-r36r6final/);
 }
 assert.match(read('index.html'),/coverageLabel:"Resultados consolidados"/);
 assert.match(read('index.html'),/updatedAt:state\._atualizadoEmServidor,processed:jogosTabela/);

@@ -7,7 +7,7 @@ const states=[{}, {pending:true,processed:356}, {live:true}, {late:true}, {certi
 const base={updatedAt:'2026-11-23T22:20:03-03:00',processed:358,expected:358,seasonCompleted:358,seasonTotal:380,certified:true};
 mkdirSync('artifacts/data-pulse',{recursive:true});
 try{
- for(const width of [320,360,390,430,768,1024,1440]){
+ for(const width of [320,360,375,390,414,430,480,600,768,820,1024,1280,1366,1440,1920,2560]){
   const page=await browser.newPage({viewport:{width,height:900}});
   await page.setContent('<meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:8px;font:16px Arial;background:#061016}'+css+'</style><main id="slot"></main>');
   await page.addScriptTag({content:js});
@@ -21,10 +21,13 @@ try{
         panelOverflow:panel.scrollWidth>panel.clientWidth+1,
         columns:getComputedStyle(grid).gridTemplateColumns.split(' ').length,
         clipped:[...panel.querySelectorAll('.fdg-pulse-metric,.fdg-pulse-status')].some(e=>e.scrollWidth>e.clientWidth+1||e.getBoundingClientRect().right>bounds.right+1),
-        font:parseFloat(getComputedStyle(panel.querySelector('.fdg-pulse-metric strong')).fontSize)};
+        font:parseFloat(getComputedStyle(panel.querySelector('.fdg-pulse-metric strong')).fontSize),
+        date:panel.querySelector('.fdg-pulse-temporal time>strong').textContent,
+        time:panel.querySelector('.fdg-pulse-temporal time>small').textContent,
+        numbers:[...panel.querySelectorAll('.fdg-pulse-metric strong')].every(e=>{const r=document.createRange();r.selectNodeContents(e);return r.getBoundingClientRect().width<=e.clientWidth+1&&r.getClientRects().length===1&&parseFloat(getComputedStyle(e).fontSize)>=22})};
     });
     assert.ok(check.width<=check.viewport+1&&!check.panelOverflow&&!check.clipped,JSON.stringify({width,count,state,check}));
-    assert.ok(check.font>=18);
+    assert.ok(check.font>=22&&check.numbers,JSON.stringify({width,count,state,check}));assert.equal(check.date,'23/11');assert.equal(check.time,'22:20:03 BRT');
     if(width<=430)assert.equal(check.columns,2);
    }
   }
@@ -35,4 +38,4 @@ try{
   await page.close();
  }
 }finally{await browser.close()}
-console.log('PASS Responsive Intelligence: 175 combinations and nested narrow containers');
+console.log('PASS Responsive Intelligence: 400 combinations and nested narrow containers');

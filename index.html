@@ -2912,9 +2912,9 @@ body > .container > section.hero > img {
   <link rel="stylesheet" href="/css/br-alertas.css?v=20260901-alertas-v1">
   <link rel="stylesheet" href="/css/br-af-scorecards.css?v=20261110-ux-r1">
 <link rel="stylesheet" href="/css/br-af-resultados.css?v=20261110-ux-r1">
-<link rel="stylesheet" href="css/br-data-pulse.css?v=20261124-r36r5c">
+<link rel="stylesheet" href="css/br-data-pulse.css?v=20261124-r36r6final">
 </head>
-<body>
+<body class="fdg-ux-main">
 <div class="container">
   <header>
     <h1 class="sr-only">Brasileirão 2026: jogos, tabela e probabilidades — Fórmula do Gol</h1>
@@ -2967,7 +2967,7 @@ body > .container > section.hero > img {
 <script src="js/br-final-canonical-bridge.js?v=20261119-fast-final-r1"></script>
 <script src="js/br-af-core-snapshot.js?v=20261124-r36r5final"></script>
 <script src="js/br-data-refresh.js?v=20261124-r36r5final"></script>
-<script src="js/br-data-pulse.js?v=20261124-r36r5d"></script>
+<script src="js/br-data-pulse.js?v=20261124-r36r6final"></script>
 <script src="js/br-af-scorecards.js?v=20261110-ux-r1"></script>
 <script src="js/br-af-resultados.js?v=20261119-r35"></script>
 <script>
@@ -5253,7 +5253,7 @@ function renderTabela() {
   html += '<div class="legenda"><div class="legenda-item"><div class="legenda-dot" style="background:#22c55e;"></div>Fase de grupos (1º–' + vagas.direct + 'º)</div><div class="legenda-item"><div class="legenda-dot" style="background:#a3e635;"></div>Pré-Libertadores (' + (vagas.direct+1) + 'º–' + vagas.guarantee + 'º)</div><div class="legenda-item"><div class="legenda-dot" style="background:#86efac;"></div>Condicional (' + (vagas.guarantee+1) + 'º–9º)</div><div class="legenda-item"><div class="legenda-dot" style="background:#e11d48;"></div>Rebaixamento (Z4)</div><div class="legenda-item"><span class="seta-mov seta-up">▲</span>Subiu</div><div class="legenda-item"><span class="seta-mov seta-down">▼</span>Caiu</div></div>';
   html += htmlObjetivosTimeBase();
   html += htmlTabelaReturno();
-  document.getElementById('view-tabela').innerHTML = html;
+  if(window.FDGDataPulse)window.FDGDataPulse.replaceView(document.getElementById('view-tabela'),html);else document.getElementById('view-tabela').innerHTML=html;
   requestAnimationFrame(() => { ativarTabelaCongeladaMobile(); renderObjetivosTime(); });
 }
 
@@ -6003,13 +6003,10 @@ function renderJogos() {
   const temLive = jogosVisiveis.some(j => estadoVisualJogo(j).estado === 'live');
 
   let html = '<div class="section-title-row br-games-heading">';
-  html += '<div><div class="br-kicker">Agenda, probabilidades e transmissão</div><h2>Jogos</h2></div>';
-  if (temLive) {
-    html += `<span class="live-info-bar"><span class="badge-aovivo">AO VIVO</span> acompanhamento em tempo real</span>`;
-  } else {
-    const atualizado = (state.jogosMeta || {}).atualizado_em_br || (meta.gerado_em ? new Date(meta.gerado_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '');
-    html += `<span class="br-games-heading-note">Brasileirão · Copa do Brasil · Libertadores · Sul-Americana${atualizado ? ' · atualizado ' + brEscapeHtml(atualizado) : ''}<span class="br-update-status-dot" role="img" aria-label="Status da atualização" title="Status da atualização"></span></span>`;
-  }
+  html += '<div class="fdg-games-title-copy"><div class="br-kicker">Agenda, probabilidades e transmissão</div><h2>Jogos</h2><div class="fdg-games-competitions">Brasileirão · Copa do Brasil · Libertadores · Sul-Americana</div></div>';
+  const agendaStamp=state.agendaMeta?.gerado_em||state.jogosMeta?.atualizado_em;
+  if(window.FDGDataPulse)html+=window.FDGDataPulse.freshness(agendaStamp,{live:temLive,pending:!!state.agendaErro||!!state.jogosErro,label:"Última atualização da agenda"});
+  else html+='<span class="br-games-heading-note">Atualizado '+brEscapeHtml(formatarDataHoraBrCompleta(agendaStamp))+'</span>';
   html += '</div>';
   html += '<div class="br-games-archive-strip"><span>Quer consultar qualquer rodada?</span><a class="br-game-action" href="/brasileirao-jogos.html">🗂️ Arquivo completo do Brasileirão</a></div>';
 
@@ -6043,7 +6040,7 @@ function renderJogos() {
 
   if (!jogosVisiveis.length) {
     html += '<div class="card empty br-games-empty">Nenhum jogo encontrado com estes filtros. Tente outro período, competição ou clube.</div>';
-    container.innerHTML = html;
+    if(window.FDGDataPulse)window.FDGDataPulse.replaceView(container,html);else container.innerHTML=html;
     return;
   }
 
@@ -6117,7 +6114,7 @@ function renderJogos() {
     }
     html += '</div>';
   }
-  container.innerHTML = html;
+  if(window.FDGDataPulse)window.FDGDataPulse.replaceView(container,html);else container.innerHTML=html;
 }
 
 function setFiltroJogos(time) {
@@ -6607,7 +6604,7 @@ function renderResultados() {
     html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">👥 ${brEscapeHtml(coberturaJogosBr(comPublico, totalDetalhes))} jogos com público${pendentesPublico ? ` · ${pendentesPublico} ${pendentesPublico === 1 ? 'pendente' : 'pendentes'}` : ''}</span></div>`;
   }
 
-  container.innerHTML = html;
+  if(window.FDGDataPulse)window.FDGDataPulse.replaceView(container,html);else container.innerHTML=html;
 }
 
 function renderParticipantes() {
