@@ -47,5 +47,41 @@
     if(target.innerHTML!==html)target.innerHTML=html;
     return true;
   }
-  root.FDGDataPulse=Object.freeze({model,render,mount});
+
+  // R36-R5 D: independent score ledger, fail closed on duplicates or inconsistent standings.
+  const name=v=>String(typeof v==='object'&&v?v.nome:v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const id=g=>String(g?.event_id??g?.id??'').trim();
+  const score=g=>[name(g?.mandante),name(g?.visitante),count(g?.placar_mandante),count(g?.placar_visitante)];
+  function ledger(rows){
+    const matches=new Map(),clubs=new Map(),pairs=new Set();let valid=Array.isArray(rows)&&rows.length>0&&rows.length<=380;
+    for(const g of rows||[]){
+      const key=id(g),[h,a,x,y]=score(g),pair=h+'/'+a;
+      if(!key||!h||!a||h===a||x===null||y===null||matches.has(key)||pairs.has(pair)){valid=false;continue;}
+      pairs.add(pair);matches.set(key,JSON.stringify([h,a,x,y]));
+      for(const [club,gf,ga] of [[h,x,y],[a,y,x]]){
+        const c=clubs.get(club)||{jogos:0,gp:0,gc:0,pontos:0,vitorias:0,empates:0,derrotas:0};
+        c.jogos++;c.gp+=gf;c.gc+=ga;c.pontos+=gf>ga?3:gf===ga?1:0;c.vitorias+=+(gf>ga);c.empates+=+(gf===ga);c.derrotas+=+(gf<ga);clubs.set(club,c);
+      }
+    }
+    return {matches,clubs,valid};
+  }
+  function reconcile(rows,table){
+    const l=ledger(rows),seen=new Set();
+    const tableValid=Array.isArray(table)&&table.length===20&&table.every(t=>{
+      const k=name(t.time),c=l.clubs.get(k);if(!c||seen.has(k))return false;seen.add(k);
+      return Object.keys(c).every(field=>count(t[field])===c[field]);
+    });
+    return {...l,expected:l.valid?l.matches.size:null,certified:l.valid&&tableValid&&l.clubs.size===20};
+  }
+  function compareGames(reference,rows,predicate=()=>true){
+    const other=ledger(rows);let matched=0;
+    const seen=new Set();
+    for(const g of rows||[]){const k=id(g);if(!seen.has(k)&&reference.matches.get(k)===JSON.stringify(score(g))&&predicate(g)){matched++;seen.add(k);}}
+    return {matched,certified:reference.certified&&other.valid&&other.matches.size===reference.expected&&matched===reference.expected};
+  }
+  function after(candidate,reference){
+    const a=Date.parse(candidate),b=Date.parse(reference);
+    return Number.isFinite(a)&&Number.isFinite(b)&&a>=b;
+  }
+  root.FDGDataPulse=Object.freeze({model,render,mount,reconcile,compareGames,after});
 })(typeof window!=='undefined'?window:globalThis);
