@@ -9,6 +9,7 @@ on:
     paths:
       - '.github/workflows/af-previsao-fastlane-pos-final.yml'
       - 'scripts/af_fastlane_sync_gate.py'
+      - 'scripts/af_ultra_fastlane_r36.py'
   workflow_dispatch:
     inputs:
       event_id:
@@ -52,7 +53,7 @@ jobs:
         with:
           ref: main
           persist-credentials: true
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Python 3.12
         uses: actions/setup-python@v5
@@ -77,7 +78,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m py_compile \
+          python -m py_compile scripts/af_ultra_fastlane_r36.py \
             atualizar_espn.py \
             fontes_brasileirao.py \
             scripts/gerar_agenda_clubes_brasileirao.py \
@@ -116,25 +117,24 @@ jobs:
           print(f"referencia_af={p.get('referencia_esportiva_em','')}")
           PY
 
-      - name: Atualizar somente a base canônica ESPN
+      - name: R36-R4 — coletar somente FINAL novo em janela curta
         id: espn
         env:
-          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
-          API_FOOTBALL_LEAGUE_ID: ${{ secrets.API_FOOTBALL_LEAGUE_ID }}
-        run: python atualizar_espn.py
+          EVENT_ID: ${{ inputs.event_id }}
+        run: python scripts/af_ultra_fastlane_r36.py --event-id "$EVENT_ID"
 
-      - name: Fail closed se a base não sincronizou
+      - name: Enfileirar recuperação somente se delta não certificado
         if: steps.espn.outputs.sincronizado != 'true'
-        shell: bash
-        run: |
-          echo "::error title=AF Fastlane preservado::A ESPN não entregou uma transação canônica sincronizada. Nenhum AF rápido será publicado."
-          echo "motivo=${{ steps.espn.outputs.motivo }}"
-          exit 1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run atualizar-brasileirao.yml --ref main -f trace_id="$FDG_TRACE_ID"
 
       - name: Atualizar agenda mínima para fechar o gatilho do FINAL
-        run: python scripts/gerar_agenda_clubes_brasileirao.py
+        if: steps.espn.outputs.sincronizado == 'true'
+        run: python scripts/gerar_agenda_clubes_brasileirao.py --local-only
 
       - name: Detectar FINAL novo ou AF antigo pendente
+        if: steps.espn.outputs.sincronizado == 'true'
         id: delta
         shell: bash
         env:
@@ -168,7 +168,7 @@ jobs:
           # R10R22: o updater ESPN às vezes aceita uma transação antes do
           # standings representar o FINAL. O guard do AF é a autoridade real.
           # Somente dessincronia ESPNs previsível pode ser adiada/retentada.
-          python scripts/af_fastlane_sync_gate.py --max-retries 2 --wait-seconds 25
+          python scripts/af_fastlane_sync_gate.py --max-retries 0 --wait-seconds 0
 
       - name: Registrar pendência transitória e enfileirar recuperação completa
         if: steps.delta.outputs.af_requested == 'true' && steps.af_ready.outputs.deferred == 'true'
@@ -189,7 +189,7 @@ jobs:
           set -euo pipefail
           # O reconciliador valida os três snapshots continentais e a auditoria
           # antes de permitir o novo AF. Se houver contradição, falha fechado.
-          python scripts/reconciliar_af_continental.py --force --max-attempts 2
+          python scripts/reconciliar_af_continental.py --max-attempts 1
 
       - name: Sporting Snapshot Integrity Guard
         if: steps.delta.outputs.af_requested == 'true' && steps.af_ready.outputs.ready == 'true'
@@ -204,8 +204,17 @@ jobs:
             --report artifacts/reliability/sporting-integrity-fastlane.json
 
       - name: Registrar SLO FINAL → AF
-        if: steps.delta.outputs.new_final == 'true' && steps.af_ready.outputs.ready == 'true' && inputs.event_id != ''
-        run: python scripts/registrar_slo_confiabilidade.py --event-id "${{ inputs.event_id }}" --trace-id "$FDG_TRACE_ID"
+        if: steps.delta.outputs.af_requested == 'true' && steps.af_ready.outputs.ready == 'true'
+        env:
+          NEW_IDS: ${{ steps.espn.outputs.new_ids }}
+          EVENT_ID: ${{ inputs.event_id }}
+        run: |
+          set -euo pipefail
+          IFS=',' read -ra IDS <<< "$NEW_IDS"
+          for event in "${IDS[@]}" "$EVENT_ID"; do
+            [[ -n "$event" ]] || continue
+            python scripts/registrar_slo_confiabilidade.py --event-id "$event" --trace-id "fdg-$event"
+          done
 
       - name: Atualizar estado CORE / ENRICHMENT
         if: steps.delta.outputs.af_requested == 'true' && steps.af_ready.outputs.ready == 'true'
