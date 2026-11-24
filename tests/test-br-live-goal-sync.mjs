@@ -33,6 +33,40 @@ const earlyFactsIndex = page.indexOf('renderMain(currentSelectedGame(), data, al
 const statsRetryIndex = page.indexOf('await waitWithSignal(PARTIAL_STATS_RETRY_DELAY_MS', firstSummaryIndex);
 assert.ok(firstSummaryIndex >= 0 && earlyFactsIndex > firstSummaryIndex && statsRetryIndex > earlyFactsIndex,
   'R10R17.3 deve exibir o autor assim que o gateway entrega facts, antes do retry das estatísticas');
-assert.match(fs.readFileSync('aovivo.html','utf8'), /br-aovivo\.js\?v=20261110-ux-r1/);
+assert.match(fs.readFileSync('aovivo.html','utf8'), /br-aovivo\.js\?v=20261123-r36r3-scorer/);
+
+// R36-R3: um placar 0x1 SEM facts mostra pendência no lado certo.
+{
+  const start=page.indexOf('  function goalsBySide(g, summary) {');
+  const end=page.indexOf('  function renderGoalsUnderTeams(g, summary)',start);
+  assert.ok(start>0&&end>start,'renderizador de gols está presente');
+  const scope={numericScore:(v)=>Number(v),compactPlayerName:(v)=>String(v||'').trim()};
+  vm.runInNewContext(page.slice(start,end)+'\nthis.goalsBySide=goalsBySide;',scope);
+  const game={home:{id:'bot',nome:'Botafogo',score:0},away:{id:'sp',nome:'São Paulo',score:1}};
+  const blank=scope.goalsBySide(game,null);
+  assert.equal(blank.home.length,0);
+  assert.equal(blank.away.length,1);
+  assert.equal(blank.away[0].athlete,'Autor sendo confirmado');
+  const found=scope.goalsBySide(game,{__fdgLiveFacts:{
+    integrity:{expectedHome:0,expectedAway:1,mathematicallyValid:true},
+    goals:[{scorer:'Pedro Lima',minute:"28'",teamId:'sp',side:'away',scoreAfter:{home:0,away:1}}]
+  }});
+  assert.equal(found.away[0].athlete,'Pedro Lima');
+  assert.equal(found.away[0].min,"28'");
+  const wrong=scope.goalsBySide(game,{__fdgLiveFacts:{
+    integrity:{expectedHome:1,expectedAway:0,mathematicallyValid:true},
+    goals:[{scorer:'Nome de outro jogo',teamId:'bot',side:'home',scoreAfter:{home:1,away:0}}]
+  }});
+  assert.equal(wrong.away[0].athlete,'Autor sendo confirmado','proibir marcador de outro placar');
+  const two=scope.goalsBySide({...game,away:{...game.away,score:2}},{__fdgLiveFacts:{
+    integrity:{expectedHome:0,expectedAway:2,mathematicallyValid:true},
+    goals:[{scorer:'Pedro Lima',minute:"28'",teamId:'sp',side:'away',scoreAfter:{home:0,away:1}}]
+  }});
+  assert.equal(two.away.length,2,'não ocultar segundo gol sem autor');
+  assert.equal(two.away[0].athlete,'Pedro Lima');
+  assert.equal(two.away[1].athlete,'Autor sendo confirmado');
+  assert.match(page,/direct\.__fdgLiveFacts = envelope\.data\.__fdgLiveFacts/,
+    'troca para estatísticas ESPN diretas não pode apagar autor validado');
+}
 
 console.log('br-live-goal-sync R10R17.2: PASS');
