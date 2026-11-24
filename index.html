@@ -2819,7 +2819,7 @@ body > .container > section.hero > img {
   }
 
 </style>
-<link rel="stylesheet" href="css/br-global.css?v=20260801-footer-institucional-v1">
+<link rel="stylesheet" href="css/br-global.css?v=20261124-r37r1final">
 <link rel="stylesheet" href="css/br-jogos.css?v=20260909-push-r10-cta-v1">
 <!-- Dados estruturados: raiz do grafo (Organization, Person, WebSite, WebPage).
      As demais páginas referenciam #website e #organization definidos aqui. -->
@@ -2965,7 +2965,7 @@ body > .container > section.hero > img {
 <script src="js/br-classificacao-live.js?v=20260920-monitor-facts-v7"></script>
 <script src="js/br-resultados-freshness.js?v=20261004-r10r9"></script>
 <script src="js/br-final-canonical-bridge.js?v=20261119-fast-final-r1"></script>
-<script src="js/br-af-core-snapshot.js?v=20261124-r36r5final"></script>
+<script src="js/br-af-core-snapshot.js?v=20261124-r37r1final"></script>
 <script src="js/br-data-refresh.js?v=20261124-r36r5final"></script>
 <script src="js/br-data-pulse.js?v=20261124-r36r6final"></script>
 <script src="js/br-af-scorecards.js?v=20261110-ux-r1"></script>
@@ -5059,12 +5059,12 @@ function htmlTabelaReturno() {
   } else {
     const atualizadoReturno = state.resultadosMeta && state.resultadosMeta.atualizado_em ? formatarDataHoraBrCompleta(state.resultadosMeta.atualizado_em) : '—';
     html += `<p class="returno-note"><strong>${brEscapeHtml(coberturaJogosBr(jogos, disputados || jogos))} jogos disputados computados</strong> · atualizado ${brEscapeHtml(atualizadoReturno)}. Somente partidas finalizadas entram no cálculo. Jogos atrasados conservam a rodada oficial; partidas de rodadas anteriores à 20 não entram mesmo quando disputadas depois. Critérios: pontos, vitórias, saldo de gols e gols pró.</p>`;
-    html += '<div class="returno-scroll" tabindex="0" aria-label="Tabela do returno com rolagem horizontal"><table class="returno-table"><thead><tr>' +
+    html += '<div class="returno-scroll" tabindex="0" aria-label="Tabela do returno com rolagem horizontal"><table class="returno-table"><colgroup><col class="fdg-col-pos"><col class="fdg-col-team"><col class="fdg-col-pts"><col class="fdg-col-j"><col span="3" class="fdg-col-small"><col span="3" class="fdg-col-score"><col class="fdg-col-pct"></colgroup><thead><tr>' +
       '<th>Pos</th><th>Time</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>%</th>' +
       '</tr></thead><tbody>';
     for (const clube of calculo.tabela) {
       const escudo = escudoDe(clube.time);
-      const identidade = `<span class="returno-team">${brEscudoImg(escudo?.escudo || '', clube.time, 'tabela-escudo')}<span>${brEscapeHtml(clube.time)}</span></span>`;
+      const identidade = `<span class="returno-team">${brEscudoImg(escudo?.escudo || '', clube.time, 'tabela-escudo')}<span class="fdg-club-name">${brEscapeHtml(clube.time)}</span></span>`;
       html += `<tr><td><span class="returno-position">${clube.pos}</span></td>` +
         `<td>${linkClubeBrasileirao(clube.time, identidade, 'returno-team-link br-club-link')}</td>` +
         `<td><span class="returno-points">${clube.pontos}</span></td><td>${clube.jogos}</td>` +
@@ -5203,8 +5203,8 @@ function renderTabela() {
   html += '<div class="mobile-table-hint">↔ Arraste a tabela para os lados no celular para ver pontos, jogos, vitórias, empates, derrotas, gols, saldo, aproveitamento e forma.</div>';
   html += '<div class="tabela-vagas-dinamicas" id="fdg-vagas-libertadores-r35r1"><strong>Libertadores 2027: G' + vagas.guarantee + ' assegurado</strong> · ' + vagas.direct + ' vagas de grupos + ' + vagas.preliminary + ' preliminares.' +
     '<small>Faixa pontilhada: vagas adicionais condicionais (até G9). ' + brEscapeHtml(vagas.pending.join('; ') || 'Sem repasses pendentes conhecidos') + '. Classificação matemática de um clube é indicada por ✓, separadamente da faixa de sua posição atual.</small></div>';
-  html += '<div class="tabela-shell"><div class="tabela-scroll" tabindex="0" aria-label="Tabela completa com rolagem horizontal"><table class="tabela-br"><thead><tr>' +
-    '<th style="width:86px;">Pos</th><th>Time</th>' +
+  html += '<div class="tabela-shell"><div class="tabela-scroll" tabindex="0" aria-label="Tabela completa com rolagem horizontal"><table class="tabela-br"><colgroup><col class="fdg-col-pos"><col class="fdg-col-team"><col class="fdg-col-pts"><col class="fdg-col-j"><col span="3" class="fdg-col-small"><col span="3" class="fdg-col-score"><col class="fdg-col-pct">'+(forma?'<col class="fdg-col-form">':'')+'</colgroup><thead><tr>' +
+    '<th scope="col">Pos</th><th scope="col">Time</th>' +
     '<th style="text-align:center;">P</th>' +
     '<th style="text-align:center;">J</th>' +
     '<th style="text-align:center;" class="col-oculta-mobile">V</th>' +
@@ -5226,9 +5226,11 @@ function renderTabela() {
     const seta = projecaoAoVivo.jogos.length ? htmlSetaMovimento(posBase[t.time], t.pos, true) : '';
     const esc = escudoDe(t.time);
     const cert = !temTabelaAoVivo && !temFinalPendente && metasObjetivosProbClube(t.time)?.probabilidades_detalhes?.libertadores?.certeza_estrutural === true
-      ? '<span class="tabela-vaga-badge" title="Classificação à Libertadores comprovada matematicamente">✓ LIBERTADORES</span>' : '';
-    const campeaoBadge = campeaoMatematico?.clube === t.time ? '<span class="tabela-vaga-badge" title="Campeão brasileiro 2026 matematicamente confirmado">🏆 CAMPEÃO 2026</span>' : '';
-    const identidade = `<div class="tabela-time-cel">${brEscudoImg(esc?.escudo || '', t.time, 'tabela-escudo')}<span>${brEscapeHtml(t.time)}</span>${campeaoBadge}${cert}${t._aoVivo ? '<small style="color:#fb7185;font-size:8px;font-weight:900;letter-spacing:.08em;">AO VIVO</small>' : (t._provisorioFinal ? '<small style="color:var(--accent);font-size:8px;font-weight:900;letter-spacing:.08em;">FINAL</small>' : '')}</div>`;
+      ? '<span class="tabela-vaga-badge" title="Classificação à Libertadores comprovada matematicamente" aria-label="Libertadores garantida">✓<span class="fdg-badge-text"> LIBERTADORES</span></span>' : '';
+    const campeaoBadge = campeaoMatematico?.clube === t.time ? '<span class="tabela-vaga-badge" title="Campeão brasileiro 2026 matematicamente confirmado" aria-label="Campeão brasileiro 2026">🏆<span class="fdg-badge-text"> CAMPEÃO 2026</span></span>' : '';
+    const statusBadge = t._aoVivo ? '<small class="fdg-table-live" title="Ao vivo" aria-label="Ao vivo">●<span class="fdg-badge-text"> AO VIVO</span></small>' : t._provisorioFinal ? '<small class="fdg-table-final" title="Final aguardando consolidação" aria-label="Final aguardando consolidação">✓<span class="fdg-badge-text"> FINAL</span></small>' : '';
+    const badges=campeaoBadge+cert+statusBadge;
+    const identidade = `<div class="tabela-time-cel">${brEscudoImg(esc?.escudo || '', t.time, 'tabela-escudo')}<span class="fdg-club-copy"><span class="fdg-club-name">${brEscapeHtml(t.time)}</span>${badges?'<span class="fdg-club-status">'+badges+'</span>':''}</span></div>`;
     const celTime = linkClubeBrasileirao(t.time, identidade, 'tabela-time-link br-club-link');
     let celForma = '';
     if (forma) {
@@ -5253,7 +5255,9 @@ function renderTabela() {
   html += '<div class="legenda"><div class="legenda-item"><div class="legenda-dot" style="background:#22c55e;"></div>Fase de grupos (1º–' + vagas.direct + 'º)</div><div class="legenda-item"><div class="legenda-dot" style="background:#a3e635;"></div>Pré-Libertadores (' + (vagas.direct+1) + 'º–' + vagas.guarantee + 'º)</div><div class="legenda-item"><div class="legenda-dot" style="background:#86efac;"></div>Condicional (' + (vagas.guarantee+1) + 'º–9º)</div><div class="legenda-item"><div class="legenda-dot" style="background:#e11d48;"></div>Rebaixamento (Z4)</div><div class="legenda-item"><span class="seta-mov seta-up">▲</span>Subiu</div><div class="legenda-item"><span class="seta-mov seta-down">▼</span>Caiu</div></div>';
   html += htmlObjetivosTimeBase();
   html += htmlTabelaReturno();
-  if(window.FDGDataPulse)window.FDGDataPulse.replaceView(document.getElementById('view-tabela'),html);else document.getElementById('view-tabela').innerHTML=html;
+  const tableView=document.getElementById('view-tabela'), returnoLeft=tableView.querySelector('.returno-scroll')?.scrollLeft||0;
+  if(window.FDGDataPulse)window.FDGDataPulse.replaceView(tableView,html);else tableView.innerHTML=html;
+  const returnoScroll=tableView.querySelector('.returno-scroll');if(returnoScroll)returnoScroll.scrollLeft=returnoLeft;
   requestAnimationFrame(() => { ativarTabelaCongeladaMobile(); renderObjetivosTime(); });
 }
 
@@ -5287,6 +5291,8 @@ function ativarTabelaCongeladaMobile() {
 
   const tabelaClone = document.createElement('table');
   tabelaClone.className = 'tabela-br tabela-br-frozen-head-table';
+  const columns=tabela.querySelector('colgroup');
+  if(columns)tabelaClone.appendChild(columns.cloneNode(true));
   tabelaClone.appendChild(cabecalho.cloneNode(true));
   viewport.appendChild(tabelaClone);
   flutuante.appendChild(viewport);

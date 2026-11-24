@@ -205,6 +205,7 @@ jobs:
       - name: Conferir 20 jogos oficiais das rodadas finais (CBF)
         run: |
           python -m py_compile atualizar_espn.py scripts/gerar_agenda_clubes_brasileirao.py
+          python scripts/gerar_auditoria_calendario.py
           python tests/test_calendario_finais_cbf_2026.py
           python tests/test_botafogo_sao_paulo_kickoff_20261123.py
 
@@ -471,6 +472,7 @@ jobs:
             dados-br/acuracia-placares-af-2026.json
             dados-br/clubes.json
             dados-br/calendario-completo.json
+            dados-br/af-core-manifest.json
             dados-br/elencos.json
             dados-br/estatisticas-competicao.json
             dados-br/historico-probabilidades.json
@@ -1941,7 +1943,7 @@ jobs:
               (HOST + "/estatisticas.html", "br-data-manifest.js?v=20261124-r36r5e"),
               (HOST + "/js/br-data-manifest.js?v=20261124-r36r5e", "superseded revision"),
               (HOST + "/js/br-data-refresh.js?v=20261124-r36r5final", "ACTIVE_MS=12000"),
-              (HOST + "/js/br-af-core-snapshot.js?v=20261124-r36r5final", "urgent?12000:45000"),
+              (HOST + "/js/br-af-core-snapshot.js?v=20261124-r37r1final", "urgent?12000:45000"),
               (HOST + "/dados-br/fdg-data-pulse.json", '"schema_version":1'),
               (HOST + "/js/br-acuracia-placares-e4.js?v=20261124-r36r5d", "fdg:accuracy-proof"),
           ]
@@ -1995,6 +1997,10 @@ jobs:
 
           print(f"ORG-7R PUBLIC SMOKE PASS: {len(criticas)} URLs críticas + LiveState v6")
           PY
+
+      - name: R37-R1 — validar entrega pública do núcleo AF
+        if: success()
+        run: python scripts/verificar_af_pages_r37.py --site-root _site
 
       - name: R36-R7 — certificar estatísticas recuperadas em produção
         if: success()

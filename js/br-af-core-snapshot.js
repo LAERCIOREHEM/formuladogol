@@ -44,8 +44,9 @@
       return res.ok?await res.json():null;
     }catch(_){return null}finally{clearTimeout(timer)}
   }
-  async function choose(){
-    const [remote,local]=await Promise.all([get(raw+manifestPath),get('/'+manifestPath)]);
+  async function choose(urgent=false){
+    const key=urgent?'?check='+Math.floor(Date.now()/12000):'';
+    const [remote,local]=await Promise.all([get(raw+manifestPath+key),get('/'+manifestPath+key)]);
     if(validMeta(local)&&(!pagesMeta||newer(local,pagesMeta)||local.revision===pagesMeta.revision))pagesMeta=local;
     let best=lastBundle&&newer(lastBundle.manifest,local)?lastBundle:null;
     if(newer(remote,local)&&(!best||newer(remote,best.manifest))){
@@ -66,7 +67,7 @@
   async function snapshot(urgent=false){
     if(inFlight)return inFlight;
     if(Date.now()-checkedAt<(urgent?12000:45000))return selected;
-    inFlight=choose().then(b=>{selected=b;checkedAt=Date.now();return b})
+    inFlight=choose(urgent).then(b=>{selected=b;checkedAt=Date.now();return b})
       .catch(()=>selected).finally(()=>{inFlight=null});
     return inFlight;
   }

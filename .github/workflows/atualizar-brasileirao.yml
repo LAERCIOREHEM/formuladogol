@@ -14,6 +14,7 @@ on:
       - 'dados-br/correcoes/agenda-continentais-oficial.json'
       - 'scripts/gerar_auditoria_calendario.py'
       - 'tests/test_recuperacao_estatistica_r36r7.py'
+      - 'tests/test_calendario_finais_cbf_2026.py'
   workflow_dispatch:
     inputs:
       forcar_af:

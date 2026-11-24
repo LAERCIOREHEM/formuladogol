@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - 'css/br-data-pulse.css'
+      - 'css/br-global.css'
+      - 'tests/test-br-table-r37.mjs'
       - 'js/br-data-pulse.js'
       - 'js/br-data-refresh.js'
       - 'js/br-af-core-snapshot.js'
@@ -30,6 +32,7 @@ jobs:
       - run: npm install --no-save --package-lock=false playwright@1.56.1
       - run: npx playwright install --with-deps chromium
       - run: node tests/test-br-data-pulse-responsive.mjs
+      - run: node tests/test-br-table-r37.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

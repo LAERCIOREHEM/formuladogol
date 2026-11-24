@@ -33,36 +33,61 @@ sources = {
     "agenda": [x for x in load("dados-br/agenda-clubes-br.json")["jogos"]
                if x.get("competicao_chave") == "brasileirao"],
 }
-for r in (37, 38):
-    rows = [x for x in fixes if x["rodada"] == r]
-    assert len(rows) == 10
-    assert len({t for x in rows for t in (x["mandante"], x["visitante"])}) == 20
-    for key, matches in sources.items():
-        assert len([x for x in matches if x.get("rodada") == r]) == 10, (key, r)
-
 def name(value):
     return value.get("nome") if isinstance(value, dict) else value
 
+def identity(row):
+    return (int(row.get("rodada") or 0), name(row.get("mandante")), name(row.get("visitante")))
+
+def final(row):
+    return row.get("estado") == "post" or row.get("concluido") is True
+
+from scripts.gerar_auditoria_calendario import normalizar_estadio_cbf
+results = [x for x in load("resultados.json")["resultados"] if x.get("rodada") in (37,38)]
+by_final = {identity(x): x for x in results}
+assert len(by_final) == len(results)
+assert all(final(x) and all(type(x.get(k)) is int and x[k]>=0 for k in ("placar_mandante","placar_visitante")) for x in results)
+for r in (37,38):
+    expected = {identity(x) for x in fixes if x["rodada"]==r}
+    assert len(expected)==10
+    assert len({t for x in fixes if x["rodada"]==r for t in (x["mandante"],x["visitante"])})==20
+    completed = {k for k in by_final if k[0]==r}
+    assert completed <= expected
+    for key, matches in sources.items():
+        arr=[x for x in matches if x.get("rodada")==r]
+        actual={identity(x) for x in arr}
+        assert len(actual)==len(arr), (key,r,"duplicates")
+        target=expected-completed if key in ("jogos","agenda") else expected
+        assert actual==target, (key,r,"missing",target-actual,"extra",actual-target)
+
 for fix in fixes:
-    expected = fix["data_iso"]
-    assert 24 <= int(expected[8:10]) <= 29 if fix["rodada"] == 37 else expected == "2026-12-02T21:30"
+    expected=fix["data_iso"]
+    assert (24 <= int(expected[8:10]) <= 29) if fix["rodada"] == 37 else expected == "2026-12-02T21:30"
     assert fix["origem_calendario"].endswith(".pdf")
     assert fix["fonte_calendario"].startswith("CBF oficial — tabela detalhada")
-    if fix["rodada"] == 38:
-        assert fix["event_id"] == f"cbf-2026-{fix['referencia_cbf']}"
+    if fix["rodada"]==38:
+        assert fix["event_id"]==f"cbf-2026-{fix['referencia_cbf']}"
     else:
         assert fix["event_id"].isdigit()
-    for key, matches in sources.items():
-        found = [x for x in matches if x.get("rodada") == fix["rodada"]
-                 and name(x.get("mandante")) == fix["mandante"]
-                 and name(x.get("visitante")) == fix["visitante"]]
-        assert len(found) == 1, (key, fix["mandante"], fix["visitante"])
-        row = found[0]
-        assert str(row.get("data_iso")).startswith(expected), (key, fix["event_id"], row.get("data_iso"))
-        assert row.get("estadio") == fix["estadio"], (key, fix["event_id"])
-        assert row.get("data_definir") is False
-        assert row.get("event_id") == fix["event_id"], (key, fix["event_id"])
-        assert "CBF oficial — tabela detalhada" in row.get("fonte_calendario", ""), key
+    ident=identity(fix)
+    completed=by_final.get(ident)
+    canonical=next(x for x in sources["eventos"] if identity(x)==ident)
+    canonical_id=str(canonical["event_id"])
+    assert canonical_id==str(fix["event_id"]) or (fix["rodada"]==38 and canonical_id.isdigit())
+    rows=[("resultados",completed)] if completed else []
+    rows.extend((key,x) for key,matches in sources.items() for x in matches if identity(x)==ident)
+    for key,row in rows:
+        assert str(row.get("data_iso")).startswith(expected), (key,ident,row.get("data_iso"))
+        assert normalizar_estadio_cbf(row.get("estadio"))==normalizar_estadio_cbf(fix["estadio"]), (key,ident,row.get("estadio"))
+        assert row.get("data_definir") is not True
+        assert str(row.get("event_id"))==canonical_id, (key,ident,"ID mismatch")
+        if completed:
+            assert final(row), (key,ident,"FINAL regressed")
+            if key in ("resultados","eventos"):
+                assert all(row.get(k)==completed.get(k) for k in ("placar_mandante","placar_visitante"))
+        else:
+            assert not final(row)
+            assert "CBF oficial — tabela detalhada" in row.get("fonte_calendario",""), (key,ident)
 
 assert len(load("dados-br/calendario-completo.json")["jogos"]) == 380
 assert not any(str(x.get("event_id", "")).startswith("cbf-2026-")
@@ -184,11 +209,16 @@ stale = SimpleNamespace(
     data_iso="2026-11-28T17:00", origem="https://credencial.cbf.com.br/competicoes/listar/42/1/"
 )
 cards = list(brasileirao_games(ROOT, set(), [stale]))
-card = next(x for x in cards if x["rodada"] == 37
+matching_cards = [x for x in cards if x["rodada"] == 37
             and x["mandante"]["nome"] == base["mandante"]
-            and x["visitante"]["nome"] == base["visitante"])
-assert card["data_iso"].startswith(base["data_iso"]), card
-assert "tabela detalhada" in card["fonte_calendario"], card
+            and x["visitante"]["nome"] == base["visitante"]]
+if identity(base) in by_final:
+    assert not matching_cards, "FINAL cannot return to future agenda"
+else:
+    assert len(matching_cards)==1
+    card=matching_cards[0]
+    assert card["data_iso"].startswith(base["data_iso"]), card
+    assert "tabela detalhada" in card["fonte_calendario"], card
 
 print("PASS CBF 2026: R37/R38 20/20 datas oficiais; R35 Grêmio x Bahia 21h30,"
       " ESPN deduplicado; FINAL protegido; credenciamento antigo sem precedência")
