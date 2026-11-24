@@ -1996,6 +1996,11 @@ jobs:
           print(f"ORG-7R PUBLIC SMOKE PASS: {len(criticas)} URLs críticas + LiveState v6")
           PY
 
+      - name: R36-R7 — certificar estatísticas recuperadas em produção
+        if: success()
+        shell: bash
+        run: python scripts/verificar_estatisticas_publicas_r36r7.py --site-root _site
+
       - name: Confirmar e avisar publicação editorial
         if: success()
         # A publicação já foi concluída pelo passo anterior. Confirmação pública
