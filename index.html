@@ -4008,6 +4008,21 @@ async function carregarMetasObjetivosTabela({ silencioso = false } = {}) {
   if (state.view === 'tabela') renderTabela();
 }
 
+// Light polling: only refresh the active core when a new atomic revision exists.
+let afCoreRefreshing=false;
+setInterval(async()=>{
+  if(document.hidden||afCoreRefreshing||!window.FDGCoreSnapshot||!['tabela','jogos','resultados'].includes(state.view))return;
+  afCoreRefreshing=true;
+  try{
+    const m=await window.FDGCoreSnapshot.current();
+    const p=state.probabilidadesBrasileirao;
+    if(m&&(p?.hash_entrada!==m.hash_entrada||p?.calculado_em!==m.calculado_em)){
+      await Promise.allSettled([refresh(true),carregarJogos({silencioso:true}),
+        carregarResultados({silencioso:true}),carregarMetasObjetivosTabela({silencioso:true})]);
+    }
+  }catch(_){/* keep last certified state */}finally{afCoreRefreshing=false}
+},45000);
+
 async function atualizarDadosDoServidor(silencioso = false) {
   const tarefas = [refresh(silencioso)];
 

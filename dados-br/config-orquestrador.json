@@ -12,7 +12,7 @@
       "versao": 1,
       "workflow": "af-previsao-fastlane-pos-final.yml",
       "simulacoes": 2000000,
-      "politica": "FINAL confirmado aciona caminho crítico mínimo ESPN canônica -> agenda mínima -> AF auditado -> commit -> deploy; reconciliação completa é enfileirada depois e não bloqueia a publicação inicial das probabilidades."
+      "politica": "R36-R4: FINAL explícito ESPN em janela curta, classificação determinística, AF auditado 2M, commit e bundle público atômico. CBF certificada localmente; coleta anual, enriquecimentos e Pages fora do caminho rápido. Cron existente mantido para limitar custos; 3 min é objetivo de engenharia, não SLA certificado."
     }
   },
   "melhores_momentos": {

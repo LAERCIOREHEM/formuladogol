@@ -24,9 +24,12 @@ test('AF Fastlane usa lock exclusivo prioritário, 2M simulações e reconcilia�
   assert.match(yml, /name: AF-Previsão Fastlane pós-FINAL/);
   assert.match(yml, /group: fdg-urgent-final-core/);
   assert.match(yml, /guard_stale_full_snapshot\.py/);
-  assert.match(yml, /python atualizar_espn\.py/);
+  assert.match(yml, /python scripts\/af_ultra_fastlane_r36\.py --event-id/);
+  assert.match(yml, /gerar_agenda_clubes_brasileirao\.py --local-only/);
+  assert.match(yml, /publicar_af_core_r36\.py/);
   assert.match(yml, /gerar_agenda_clubes_brasileirao\.py/);
-  assert.match(yml, /reconciliar_af_continental\.py --force --max-attempts 2/);
+  assert.match(yml, /reconciliar_af_continental\.py --max-attempts 1/);
+  assert.doesNotMatch(yml, /reconciliar_af_continental\.py --force/);
   assert.match(yml, /validar_snapshot_esportivo\.py/);
   assert.match(yml, /registrar_slo_confiabilidade\.py/);
   assert.match(yml, /trace_id/);

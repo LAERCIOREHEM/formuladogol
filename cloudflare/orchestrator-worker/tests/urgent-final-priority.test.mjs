@@ -20,5 +20,9 @@ test('final prioritizes Fastlane over slow full ESPN and Pages deployments',asyn
       item('AF-Previsão Fastlane pós-FINAL','completed')
     ]})});
     assert.equal(await activeWriter(env,{urgentFinal:true}),null);
+    globalThis.fetch=async()=>({ok:true,json:async()=>({workflow_runs:[
+      {name:'AF Fastlane · 401841323',status:'pending',path:'.github/workflows/af-previsao-fastlane-pos-final.yml'}
+    ]})});
+    assert.equal((await activeWriter(env,{urgentFinal:true}))?.name,'AF Fastlane · 401841323');
   } finally {globalThis.fetch=original}
 });

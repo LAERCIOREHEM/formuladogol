@@ -61,7 +61,7 @@ def publish():
     old=ROOT/MANIFEST
     if old.exists() and read(ROOT,MANIFEST)==meta and (ROOT/BUNDLE).exists():
         previous=read(ROOT,BUNDLE)
-        if previous.get("manifest")==meta and previous.get("files")==datasets:
+        if previous.get("manifest")==meta and all(p in previous.get("files",{}) for p in CORE):
             print("R36-R4 atomic bundle already current")
             return
     write(ROOT,BUNDLE,{"manifest":meta,"files":datasets})

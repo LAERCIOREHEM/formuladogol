@@ -847,6 +847,14 @@ jobs:
               echo "Outro run já publicou os mesmos artefatos."
               exit 0
             fi
+            # Publica o bundle somente quando o AF vigente é certificado.
+            # Enriquecimento sem AF novo continua permitido; nunca publica um
+            # bundle parcial, nem substitui dados do Fastlane com AF obsoleto.
+            if python scripts/publicar_af_core_r36.py; then
+              git add dados-br/af-core-manifest.json dados-br/af-core-snapshot.json
+            else
+              echo "::warning::Snapshot rápido anterior preservado (base ainda não certificada)."
+            fi
             git add -- "${FILES[@]}"
             git commit -m "Atualizar copas e AF-Previsão - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
             if git push origin HEAD:main; then
@@ -995,6 +1003,14 @@ jobs:
               exit 0
             fi
 
+            # Publica o bundle somente quando o AF vigente é certificado.
+            # Enriquecimento sem AF novo continua permitido; nunca publica um
+            # bundle parcial, nem substitui dados do Fastlane com AF obsoleto.
+            if python scripts/publicar_af_core_r36.py; then
+              git add dados-br/af-core-manifest.json dados-br/af-core-snapshot.json
+            else
+              echo "::warning::Snapshot rápido anterior preservado (base ainda não certificada)."
+            fi
             git add -- "${FILES[@]}"
             git commit -m "Atualizar dados auditados do Brasileirao - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
 

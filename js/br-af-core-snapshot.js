@@ -83,5 +83,6 @@
       status:200,headers:{'Content-Type':'application/json','X-FDG-Core-Revision':b.manifest.revision}});
     return nativeFetch(url,options);
   }
-  root.FDGCoreSnapshot={fetch:fetchCore,validMeta,validBundle,newer};
+  root.FDGCoreSnapshot={fetch:fetchCore,validMeta,validBundle,newer,
+    async current(){const b=await snapshot();return b?.manifest||null}};
 })(window);

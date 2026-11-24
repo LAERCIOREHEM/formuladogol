@@ -46,7 +46,8 @@ test('Fastlane e full updater compartilham Sporting Snapshot Integrity Guard', a
   assert.match(validator, /validate_snapshot\(profile="full"/);
   assert.match(full, /validar_publicacao_brasileirao\.py/);
   assert.doesNotMatch(full, /cobertura das probabilidades por jogo diverge do calendário restante/);
-  assert.match(fast, /2\.000\.000|reconciliar_af_continental\.py --force/);
+  assert.match(fast, /reconciliar_af_continental\.py --max-attempts 1/);
+  assert.match(fast, /validar_snapshot_esportivo\.py/);
 });
 
 test('falhas produzem diagnóstico anexável e trace é propagado', async () => {

@@ -74,7 +74,9 @@ def query_window(now):
         result.extend(events)
     return result
 
+DETECTED_AT=""
 def collect(event_id):
+    global DETECTED_AT
     prior_ok,reason=espn.snapshot_local_sincronizado()
     if not prior_ok: raise RuntimeError(reason)
     old=load("resultados.json")
@@ -96,7 +98,10 @@ def collect(event_id):
     if len(known)!=len(previous): raise RuntimeError("event_id duplicado")
     calendar=espn.carregar_calendario_canonico_por_mando()
     new={}
-    for raw in query_window(now):
+    raw_events=query_window(now)
+    if not raw_events and not event_id:
+        raise RuntimeError("janela ESPN vazia; recuperação externa necessária")
+    for raw in raw_events:
         eid=str(raw.get("id") or "")
         candidate=final_candidate(raw,known,now)
         if not candidate: continue
@@ -120,6 +125,7 @@ def collect(event_id):
     if not new:
         print("R36-R4: janela sem FINAL novo; mantendo base local")
         return []
+    DETECTED_AT=espn.iso_agora_brt()
     merged=[new.get(x["event_id"],x) for x in previous]
     # Never let elapsed time alone promote an old IN to FINAL in this path.
     for item in merged:
@@ -160,7 +166,9 @@ def main():
     args=ap.parse_args()
     try:
         ids=collect(args.event_id)
-        output({"sincronizado":"true","new_ids":",".join(ids),"motivo":"delta certificado"})
+        output({"sincronizado":"true","new_ids":",".join(ids),"motivo":"delta certificado",
+                "detected_at":DETECTED_AT if ids else "",
+                "results_ready_at":espn.iso_agora_brt() if ids else ""})
     except (ValueError,RuntimeError,OSError,TypeError,KeyError) as e:
         print(f"::warning::R36-R4 deferido: {e}")
         output({"sincronizado":"false","new_ids":"","motivo":"reconciliacao completa necessaria"})

@@ -5,6 +5,8 @@ const REPOSITORY_AUTHORITATIVE_PATHS = new Set([
   // FINAL publication is a GitHub main commit; Pages may be stale for minutes
   // or fail entirely, so Closure R2 never reads results from old public cache.
   'resultados.json',
+  // PRE/FINAL must be read from the same committed repository authority.
+  'dados-br/agenda-clubes-br.json',
   'dados-br/estado-editorial-continentais.json',
   'dados-br/status-atualizacao.json',
   'dados-br/auditoria-competicoes-af-previsao.json',

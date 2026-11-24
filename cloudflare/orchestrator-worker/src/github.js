@@ -52,7 +52,12 @@ export async function activeWriter(env, { urgentFinal = false, urgentEditorial =
   // A closed round cannot wait 45 minutes for unrelated ESPN enrichment.
   // Editorial writes use optimistic Git retries and a dedicated concurrency
   // group; only the SAME editorial or delivery run blocks urgent dispatch.
-  return (payload?.workflow_runs || []).find((run) => names.has(String(run?.name || '')) &&
+  // GitHub exposes run-name ("AF Fastlane · <event_id>") in some responses,
+  // rather than workflow name. The workflow path is the stable identity.
+  const isFastlane=run=>/^(?:AF Fastlane ·|AF-Previsão Fastlane pós-FINAL)/.test(String(run?.name||'')) ||
+    /(?:^|\/)af-previsao-fastlane-pos-final\.yml(?:@.*)?$/.test(String(run?.path||''));
+  return (payload?.workflow_runs || []).find((run) =>
+    (names.has(String(run?.name || '')) || (names.has('AF-Previsão Fastlane pós-FINAL') && isFastlane(run))) &&
     ['queued', 'in_progress', 'waiting', 'pending', 'requested'].includes(String(run?.status || ''))) || null;
 }
 
