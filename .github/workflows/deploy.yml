@@ -54,6 +54,8 @@ on:
       - 'css/br-alertas.css'
       - 'js/br-aovivo.js'
       - 'js/br-af-scorecards.js'
+      - 'js/br-af-core-snapshot.js'
+      - 'scripts/publicar_af_core_r36.py'
       - 'js/br-af-resultados.js'
       - 'tests/test-af-e3-resultados.mjs'
       - 'scripts/gerar_resultados_af_e3.py'
@@ -407,6 +409,7 @@ jobs:
             js/br-af-scorecards.js
             js/br-af-resultados.js
             js/br-final-canonical-bridge.js
+            js/br-af-core-snapshot.js
             js/br-agenda.js
             js/br-analises.js
             js/br-clube-retorno.js
@@ -661,6 +664,9 @@ jobs:
       - name: ORG-4 — 20 páginas completas de clubes
         run: |
           python scripts/gerar_paginas_clubes.py --site-root _site --check
+
+      - name: R36-R4 — gerar manifesto local do pacote público
+        run: python scripts/publicar_af_core_r36.py --site-manifest _site
 
       - name: R36-R1 — certificar final continental, probabilidades e 20 páginas
         shell: bash

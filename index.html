@@ -2964,6 +2964,7 @@ body > .container > section.hero > img {
 <script src="js/br-classificacao-live.js?v=20260920-monitor-facts-v7"></script>
 <script src="js/br-resultados-freshness.js?v=20261004-r10r9"></script>
 <script src="js/br-final-canonical-bridge.js?v=20261119-fast-final-r1"></script>
+<script src="js/br-af-core-snapshot.js?v=20261123-r36r4"></script>
 <script src="js/br-af-scorecards.js?v=20261110-ux-r1"></script>
 <script src="js/br-af-resultados.js?v=20261119-r35"></script>
 <script>
@@ -3806,10 +3807,11 @@ function carregarCache() {
 // ========================================================================
 // FETCH DA TABELA — lê o tabela.json gerado pelo GitHub Actions
 // ========================================================================
+const fetchAFCore=(url,options)=>window.FDGCoreSnapshot?.fetch(url,options)??fetch(url,options);
 async function buscarTabelaTerra() {
   // Anti-cache forte: evita o navegador/CDN reutilizar tabela.json antigo.
   const url = `${URL_TABELA_LOCAL}?nocache=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  const resp = await fetch(url, {
+  const resp = await fetchAFCore(url, {
     cache: 'no-store',
     headers: {
       'Cache-Control': 'no-cache',
@@ -3980,9 +3982,9 @@ async function carregarMetasObjetivosTabela({ silencioso = false } = {}) {
     // R35-R1: Pages publishes a verified compact snapshot, not raw private AF
     // continental files. All three cup branches share the same response.
     const [rProb, rPts, rVagas] = await Promise.all([
-      fetch('dados-br/probabilidades-brasileirao.json?t=' + stamp, { cache: 'no-store' }),
-      fetch('dados-br/probabilidades-por-pontuacao.json?t=' + stamp, { cache: 'no-store' }),
-      fetch('dados-br/vagas-libertadores-2027.json?t=' + stamp, { cache: 'no-store' })
+      fetchAFCore('dados-br/probabilidades-brasileirao.json?t=' + stamp, { cache: 'no-store' }),
+      fetchAFCore('dados-br/probabilidades-por-pontuacao.json?t=' + stamp, { cache: 'no-store' }),
+      fetchAFCore('dados-br/vagas-libertadores-2027.json?t=' + stamp, { cache: 'no-store' })
     ]);
     if (!rProb.ok) throw new Error('probabilidades-brasileirao HTTP ' + rProb.status);
     if (!rPts.ok) throw new Error('probabilidades-por-pontuacao HTTP ' + rPts.status);
@@ -5401,7 +5403,7 @@ function aplicarCorrecoesKickoffOficial(jogos, ajustes) {
 async function carregarJogos(opcoes = {}) {
   try {
     const url = 'jogos.json?t=' + Date.now();
-    const resp = await fetch(url);
+    const resp = await fetchAFCore(url);
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
     state.jogos = jogosCanônicosPorRodada(Array.isArray(data.jogos) ? data.jogos : []);
@@ -5430,7 +5432,7 @@ async function carregarJogos(opcoes = {}) {
   // da Série A. Mantemos jogos.json em state.jogos porque ele continua sendo
   // a fonte canônica do live browser-side do Brasileirão.
   try {
-    const r = await fetch('dados-br/agenda-clubes-br.json?t=' + Date.now(), { cache: 'no-store' });
+    const r = await fetchAFCore('dados-br/agenda-clubes-br.json?t=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
     if (!d || !Array.isArray(d.jogos)) throw new Error('agenda-clubes-br.json inválido');
@@ -5482,7 +5484,7 @@ async function carregarJogos(opcoes = {}) {
   // dados-br/transmissoes-aovivo*.json   -> links oficiais de YouTube CazéTV/GE TV
   // dados-br/transmissoes-tv.json        -> TV/streaming fechado com minicards no Ao vivo
   try {
-    const r = await fetch('espn_eventos.json?t=' + Date.now());
+    const r = await fetchAFCore('espn_eventos.json?t=' + Date.now());
     if (r.ok) {
       const d = await r.json();
       state.espnEventos = Array.isArray(d.eventos) ? d.eventos : [];
@@ -5517,7 +5519,7 @@ async function carregarJogos(opcoes = {}) {
     }
   } catch (e) { /* opcional */ }
   try {
-    const r = await fetch('dados-br/probabilidades-jogos.json?t=' + Date.now(), { cache: 'no-store' });
+    const r = await fetchAFCore('dados-br/probabilidades-jogos.json?t=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
     if (d && d.status === 'ok' && Array.isArray(d.jogos)) {
@@ -6305,7 +6307,7 @@ function filtrarResultadosValidos(lista) {
 async function carregarResultados(opcoes = {}) {
   try {
     const url = 'resultados.json?t=' + Date.now();
-    const resp = await fetch(url);
+    const resp = await fetchAFCore(url);
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
     await carregarResultadosManuais();

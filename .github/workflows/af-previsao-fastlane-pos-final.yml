@@ -10,6 +10,7 @@ on:
       - '.github/workflows/af-previsao-fastlane-pos-final.yml'
       - 'scripts/af_fastlane_sync_gate.py'
       - 'scripts/af_ultra_fastlane_r36.py'
+      - 'scripts/publicar_af_core_r36.py'
   workflow_dispatch:
     inputs:
       event_id:
@@ -157,11 +158,18 @@ jobs:
           required=after > before or freshness.get('atualizado') is not True
           print(f"af_requested={'true' if required else 'false'}")
           print(f"af_stale={'true' if freshness.get('atualizado') is not True else 'false'}")
+          from scripts.publicar_af_core_r36 import manifest
+          m=Path('dados-br/af-core-manifest.json')
+          try:
+              bundle_ready=m.exists() and json.loads(m.read_text())==manifest(json.loads(Path('dados-br/probabilidades-brasileirao.json').read_text())) and Path('dados-br/af-core-snapshot.json').exists()
+          except (KeyError,ValueError,OSError):
+              bundle_ready=False
+          print(f"publication_requested={'true' if required or not bundle_ready else 'false'}")
           PY
 
       - name: Confirmar e recuperar sincronização ESPN para o AF
         id: af_ready
-        if: steps.delta.outputs.af_requested == 'true'
+        if: steps.delta.outputs.publication_requested == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -192,7 +200,7 @@ jobs:
           python scripts/reconciliar_af_continental.py --max-attempts 1
 
       - name: Sporting Snapshot Integrity Guard
-        if: steps.delta.outputs.af_requested == 'true' && steps.af_ready.outputs.ready == 'true'
+        if: steps.delta.outputs.publication_requested == 'true' && steps.af_ready.outputs.ready == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -220,9 +228,13 @@ jobs:
         if: steps.delta.outputs.af_requested == 'true' && steps.af_ready.outputs.ready == 'true'
         run: python scripts/gerar_estado_confiabilidade.py --profile fastlane
 
+      - name: Gerar snapshot público atômico R36-R4
+        if: steps.delta.outputs.publication_requested == 'true' && steps.af_ready.outputs.ready == 'true'
+        run: python scripts/publicar_af_core_r36.py
+
       - name: Preparar artefatos atômicos
         id: material
-        if: steps.delta.outputs.af_requested == 'true' && steps.af_ready.outputs.ready == 'true'
+        if: steps.delta.outputs.publication_requested == 'true' && steps.af_ready.outputs.ready == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -242,6 +254,8 @@ jobs:
             dados-br/avaliacao-af-previsao.json
             dados-br/slo-confiabilidade.json
             dados-br/estado-confiabilidade.json
+            dados-br/af-core-manifest.json
+            dados-br/af-core-snapshot.json
           )
           EXISTING=()
           for f in "${FILES[@]}"; do [[ -e "$f" ]] && EXISTING+=("$f"); done
@@ -253,7 +267,7 @@ jobs:
 
       - name: Publicar transação rápida no main
         id: publish
-        if: steps.delta.outputs.af_requested == 'true' && steps.af_ready.outputs.ready == 'true' && steps.material.outputs.changed == 'true'
+        if: steps.delta.outputs.publication_requested == 'true' && steps.af_ready.outputs.ready == 'true' && steps.material.outputs.changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -277,6 +291,8 @@ jobs:
             dados-br/avaliacao-af-previsao.json
             dados-br/slo-confiabilidade.json
             dados-br/estado-confiabilidade.json
+            dados-br/af-core-manifest.json
+            dados-br/af-core-snapshot.json
           )
           EXISTING=()
           for f in "${FILES[@]}"; do [[ -e "$f" ]] && EXISTING+=("$f"); done
@@ -305,6 +321,14 @@ jobs:
               cp -a "$TMP_DIR/$f" "$f"
             done
 
+            # Revalida o AF contra copas/configuração atuais depois do fetch/reset.
+            # Um resultado continental publicado durante a simulação não pode
+            # ser substituído por um bundle calculado com entradas antigas.
+            if ! python scripts/validar_snapshot_esportivo.py --profile fastlane --trace-id "$FDG_TRACE_ID"; then
+              echo "::warning::Snapshot mudou durante o cálculo; preservar main e aguardar recuperação."
+              exit 0
+            fi
+            python scripts/publicar_af_core_r36.py
             if [[ -z "$(git status --porcelain -- "${EXISTING[@]}")" ]]; then
               echo "Outro writer já publicou exatamente o mesmo estado."
               exit 0

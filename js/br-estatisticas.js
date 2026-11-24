@@ -274,7 +274,8 @@
 
   async function fetchJson(path, fallback) {
     try {
-      const response = await fetch(`${path}${path.includes("?") ? "&" : "?"}t=${Date.now()}`, { cache: "no-store" });
+      const get=window.FDGCoreSnapshot?.fetch||fetch;
+      const response = await get(`${path}${path.includes("?") ? "&" : "?"}t=${Date.now()}`, { cache: "no-store" });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return await response.json();
     } catch (error) {
