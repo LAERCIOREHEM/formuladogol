@@ -238,6 +238,15 @@
         state.payload = validate(json);
         setupFilters();
         renderAll();
+        // Reuse the validated E4 payload; compare it once with independent official results and E3.
+        const get=async path=>{const r=await fetch(path,{cache:"no-store",headers:{Accept:"application/json"}});if(!r.ok)throw new Error("HTTP "+r.status);return r.json();};
+        Promise.all([get("resultados.json"),get("tabela.json"),get("dados-br/resultados-af-placares-2026.json")]).then(([results,table,e3])=>{
+          const pulse=window.FDGDataPulse;
+          if(!pulse?.accuracyProof)return;
+          const reference=pulse.reconcile(results.resultados,table.tabela);
+          const proof=pulse.accuracyProof(reference,e3,state.payload);
+          document.dispatchEvent(new CustomEvent("fdg:accuracy-proof",{detail:{...proof,seasonCompleted:reference.expected,updatedAt:e3.origem?.data_fonte_resultados,referenceAt:results.atualizado_em}}));
+        }).catch(error=>console.warn("FDG Data Pulse: Acurácia sem certificação",error));
         if (status) status.textContent = "Aferição histórica certificada · temporada 2026";
       })
       .catch(function(error) {
