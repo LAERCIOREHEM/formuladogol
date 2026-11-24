@@ -54,7 +54,7 @@
   const score=g=>[name(g?.mandante),name(g?.visitante),count(g?.placar_mandante),count(g?.placar_visitante)];
   function ledger(rows){
     const matches=new Map(),clubs=new Map(),pairs=new Set();let valid=Array.isArray(rows)&&rows.length>0&&rows.length<=380;
-    for(const g of rows||[]){
+    for(const g of Array.isArray(rows)?rows:[]){
       const key=id(g),[h,a,x,y]=score(g),pair=h+'/'+a;
       if(!key||!h||!a||h===a||x===null||y===null||matches.has(key)||pairs.has(pair)){valid=false;continue;}
       pairs.add(pair);matches.set(key,JSON.stringify([h,a,x,y]));
@@ -76,12 +76,42 @@
   function compareGames(reference,rows,predicate=()=>true){
     const other=ledger(rows);let matched=0;
     const seen=new Set();
-    for(const g of rows||[]){const k=id(g);if(!seen.has(k)&&reference.matches.get(k)===JSON.stringify(score(g))&&predicate(g)){matched++;seen.add(k);}}
+    for(const g of Array.isArray(rows)?rows:[]){const k=id(g);if(!seen.has(k)&&reference.matches.get(k)===JSON.stringify(score(g))&&predicate(g)){matched++;seen.add(k);}}
     return {matched,certified:reference.certified&&other.valid&&other.matches.size===reference.expected&&matched===reference.expected};
   }
   function after(candidate,reference){
     const a=Date.parse(candidate),b=Date.parse(reference);
     return Number.isFinite(a)&&Number.isFinite(b)&&a>=b;
   }
-  root.FDGDataPulse=Object.freeze({model,render,mount,reconcile,compareGames,after});
+
+  // E3 audits every official final; E4 contains only historically eligible forecasts.
+  function accuracyProof(reference,e3,e4){
+    const rows=e3?.jogos,eligible=new Map(),seen=new Set();
+    const scope=e4?.escopo||{}, summary=e3?.resumo||{};
+    let valid=reference.certified&&e3?.status==='ok'&&e4?.status==='ok'&&Array.isArray(rows)&&Array.isArray(e4?.jogos);
+    let audited=0,excluded=0;
+    for(const g of Array.isArray(rows)?rows:[]){
+      const keys=Array.isArray(g.event_ids)?g.event_ids.map(String):[];
+      const value=JSON.stringify(score({...g,placar_mandante:g.placar_final_auditado?.mandante,placar_visitante:g.placar_final_auditado?.visitante}));
+      const matching=keys.filter(k=>reference.matches.get(k)===value);
+      if(matching.length!==1||seen.has(matching[0])){valid=false;continue;}
+      const k=matching[0];seen.add(k);audited++;
+      if(g.situacao==='comprovado'){
+        const commit=g.prova?.commit,pre=Date.parse(g.prova?.gerado_em),start=Date.parse(g.inicio_factual);
+        if(!/^[a-f0-9]{40}$/.test(commit||'')||!Number.isFinite(pre)||!Number.isFinite(start)||pre>=start){valid=false;continue;}
+        eligible.set(k,{value,commit});
+      }else if(g.situacao==='sem_snapshot_prejogo_comprovavel')excluded++;
+      else valid=false;
+    }
+    const matches=new Set();
+    for(const g of Array.isArray(e4?.jogos)?e4.jogos:[]){
+      const k=id(g),proof=eligible.get(k);
+      const value=JSON.stringify(score({...g,placar_mandante:g.placar_final?.mandante,placar_visitante:g.placar_final?.visitante}));
+      if(!proof||matches.has(k)||proof.value!==value||proof.commit!==g.commit_prova){valid=false;continue;}
+      matches.add(k);
+    }
+    valid=valid&&audited===reference.expected&&summary.resultados_auditados===audited&&summary.previsoes_certificadas===eligible.size&&summary.sem_snapshot_certificado===excluded&&summary.quarentena_por_conflito===0&&scope.em_quarentena===0&&scope.resultados_finais_auditados===audited&&scope.sem_prova_historica===excluded&&scope.jogos_com_previsao_certificada===eligible.size&&matches.size===eligible.size&&e4.jogos.length===matches.size;
+    return {certified:valid,processed:matches.size,expected:reference.certified&&audited===reference.expected?eligible.size:null,audited,excluded};
+  }
+  root.FDGDataPulse=Object.freeze({model,render,mount,reconcile,compareGames,after,accuracyProof});
 })(typeof window!=='undefined'?window:globalThis);
