@@ -5162,9 +5162,10 @@ function renderTabela() {
       ? `✓ Classificação provisória · ${baseTabela} · resultado final aguardando tabela ESPN`
       : (dataTabela ? `Atualizada ${formatarDataHoraBrCompleta(dataTabela)} · ${baseTabela}` : `Base: ${baseTabela}`));
   if(window.FDGDataPulse){
+    const proof=window.FDGDataPulse.reconcile(state.resultadosCarregados?state.resultados:[],state.tabela);
     html += '</div>'+window.FDGDataPulse.render({updatedAt:state._atualizadoEmServidor,processed:jogosTabela,
       expected:state.resultadosCarregados?Math.max(jogosFinalizados,jogosTabela)+projecaoAoVivo.jogos.filter(j=>j.estado==="post").length:null,
-      seasonTotal:380,seasonCompleted:Math.max(jogosFinalizados,jogosTabela),live:temTabelaAoVivo,pending:temFinalPendente,certified:false,
+      seasonTotal:380,seasonCompleted:Math.max(jogosFinalizados,jogosTabela),live:temTabelaAoVivo,pending:temFinalPendente,certified:proof.certified&&!temFinalPendente,
       metrics:[{label:"Clubes",value:state.tabela.length,detail:"Classificação oficial"}],note:statusTabela});
   }else{
   html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">${statusTabela}</span></div>`;
@@ -6489,12 +6490,13 @@ function renderResultados() {
   html += '</div>';
   html += '</div>';
   if(window.FDGDataPulse){
-    const consolidated=state.resultados.length;
+    const proof=window.FDGDataPulse.reconcile(state.resultados,state.tabela);
+    const consolidated=proof.matches.size;
     const provisional=resultadosDisponiveis.filter(r=>r&&r._provisorioESPN).length;
     const tableCount=state.tabela.length===20?totalJogosTabelaOficialBr():null;
     html+=window.FDGDataPulse.render({updatedAt:meta.atualizado_em,processed:consolidated,
       expected:tableCount===null?null:Math.max(tableCount,consolidated+provisional),
-      seasonTotal:380,seasonCompleted:consolidated+provisional,pending:provisional>0,certified:false,
+      seasonTotal:380,seasonCompleted:consolidated+provisional,pending:provisional>0,certified:proof.certified&&provisional===0,
       coverageLabel:"Resultados consolidados",metrics:[{label:"Recém-finalizados",value:provisional,detail:"Aguardando consolidação"}],
       note:"Cobertura global; filtros não alteram a base de atualização."});
   }
