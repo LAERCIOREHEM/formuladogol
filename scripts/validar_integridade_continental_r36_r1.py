@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+from html import unescape
 import sys
 import unicodedata
 from pathlib import Path
@@ -65,7 +66,7 @@ def validate(root: Path, site: Path) -> dict:
     checked = 0
     for name, data in teams.items():
         page = site / "clube" / slugify(name) / "index.html"
-        html = page.read_text(encoding="utf-8")
+        html = unescape(page.read_text(encoding="utf-8"))
         display = data["probabilidades_detalhes"]["libertadores"]["exibicao"]
         if f"a de Libertadores é {display}" not in html:
             raise AssertionError(f"{name}: chance de Libertadores diverge do AF ({display})")
@@ -113,7 +114,7 @@ def validate_live(root: Path, url: str) -> dict:
             raise AssertionError("campeão divergente no snapshot público")
     for item in canonical.get("clubes", []):
         name = item["clube"]
-        html = get(f"/clube/{slugify(name)}/").decode("utf-8")
+        html = unescape(get(f"/clube/{slugify(name)}/").decode("utf-8"))
         expected = item["probabilidades_detalhes"]["libertadores"]["exibicao"]
         if f"a de Libertadores é {expected}" not in html:
             raise AssertionError(f"página pública desatualizada: {name} ({expected})")
