@@ -2705,7 +2705,7 @@
         note:live?"Classificação ao vivo; percentuais do último cálculo.":"Cobertura comparada aos resultados conhecidos."};
     }
     if(tab==="artilheiros"||tab==="assistencias"){
-      const c=state.leaders?.completude?.[tab]||{};
+      const c=state.leaders?.completude?.[tab==="artilheiros"?"artilharia":"assistencias"]||{};
       const missing=liveApplicableGames().reduce((a,g)=>a+Number(state.liveFacts?.[String(g.eventId)]?.integrity?.missingScorers||0),0);
       return {...base,updatedAt:state.leaders?.atualizado_em,processed:n(c.jogos_lidos),
         metrics:[metric("Escalações",n(c.jogos_com_escalacoes)),metric(tab==="artilheiros"?"Gols de jogadores":"Assistências",n(c.total_eventos_contabilizados))],

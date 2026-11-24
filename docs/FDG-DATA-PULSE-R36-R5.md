@@ -10,3 +10,6 @@ Etapa A inclui assets, contrato, testes e inclusão no pacote Pages. Etapa B int
 
 ## Etapa B
 Integração nos sete submenus, Tabela, Resultados e Acurácia. Horários próprios, amostra histórica sem denominador inventado. Verde apenas com certificação explícita; a certificação integral de versões permanece na Etapa D. Sem polling adicional.
+
+## Etapa C
+Container queries, mobile 2 colunas (1 abaixo de 260 px úteis), tablet 3, desktop 4–6 conforme métricas. Fonte adaptável 18–24 px, sem rolagem horizontal própria, impressão e contraste forçado. Teste de navegador separado do deploy, sem dependências no cliente. Correção do mapeamento artilheiros → artilharia. Nenhuma alteração de polling.

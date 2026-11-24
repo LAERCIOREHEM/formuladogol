@@ -39,7 +39,7 @@
     if(m.season!==null&&m.completed!==null)cards.push(metric('Brasileirão '+String(input.year||2026),fmt(m.completed)+'/'+fmt(m.season),m.remaining===null?'':fmt(m.remaining)+' jogos restantes','fdg-pulse-season'));
     for(const item of (Array.isArray(input.metrics)?input.metrics:[]).slice(0,4))if(item&&typeof item==='object')cards.push(metric(item.label,item.value,item.detail));
     const bar=m.coverage===null?'':'<div class="fdg-pulse-track" role="progressbar" aria-label="Cobertura dos dados" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+m.coverage.toFixed(2)+'"><span style="width:'+m.coverage+'%"></span></div>';
-    return '<section class="fdg-pulse fdg-pulse--'+m.status+'" aria-label="FDG Data Pulse"><header class="fdg-pulse-header"><span class="fdg-pulse-brand">FDG DATA PULSE</span><strong class="fdg-pulse-status"><span aria-hidden="true">'+symbols[m.status]+'</span> '+labels[m.status]+'</strong></header><div class="fdg-pulse-grid">'+cards.join('')+'</div>'+bar+'<footer class="fdg-pulse-footer">'+esc(input.note||(m.complete?'Base certificada':'Última base disponível'))+'</footer></section>';
+    return '<section class="fdg-pulse fdg-pulse--'+m.status+'" aria-label="FDG Data Pulse"><header class="fdg-pulse-header"><span class="fdg-pulse-brand">FDG DATA PULSE</span><strong class="fdg-pulse-status"><span aria-hidden="true">'+symbols[m.status]+'</span> '+labels[m.status]+'</strong></header><div class="fdg-pulse-grid" data-count="'+cards.length+'">'+cards.join('')+'</div>'+bar+'<footer class="fdg-pulse-footer">'+esc(input.note||(m.complete?'Base certificada':'Última base disponível'))+'</footer></section>';
   }
   function mount(target,input){
     if(!target||typeof target.innerHTML!=='string')return false;
