@@ -408,4 +408,20 @@ console.log('espn-source live-state legacy regressions: PASS');
   assert.equal(result.data.events[0].competitions[0].status.type.state, 'in');
 }
 
+// R36-R3: no site ESPN o scorer pode estar só em details, mesmo sem PBP.
+{
+  const detail={id:'g28',type:{text:'Goal'},homeScore:0,awayScore:1,
+    team:{id:'sp'},clock:{displayValue:"28'"},
+    athletesInvolved:[{id:'pedro',displayName:'Pedro Lima'}]};
+  const noPbP={header:{competitions:[{details:[
+    {id:'not-a-goal',type:{text:'Shot on Goal'},team:{id:'bot'}},
+    detail
+  ]}]}};
+  assert.equal(summaryGoalCount(noPbP),1);
+  assert.equal(summaryNamedScorerHintCount(noPbP),1);
+  assert.ok(unwrapSummary({gamepackageJSON:noPbP})===noPbP);
+  assert.equal(summaryGoalCount({details:[{type:{text:'Goalkeeper save'}}]}),0);
+  assert.equal(summaryGoalCount({details:[{type:{text:'Goal disallowed'}}]}),0);
+}
+
 console.log('espn-source live-state-v6 anti-regression: PASS');
