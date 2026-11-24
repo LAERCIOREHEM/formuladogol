@@ -1,0 +1,22 @@
+/* FDG Data Pulse R36-R5 A: scoped, mobile-first, no external assets. */
+.fdg-pulse{--pulse-tone:#a8bdca;box-sizing:border-box;min-width:0;width:100%;margin:0 0 14px;padding:14px 16px;border:1px solid #344b50;border-radius:16px;background:#102129;color:#eef7ff;font-family:inherit;line-height:1.35}
+.fdg-pulse *{box-sizing:border-box}
+.fdg-pulse--synced{--pulse-tone:#4ade80}
+.fdg-pulse--pending{--pulse-tone:#facc15}
+.fdg-pulse--live{--pulse-tone:#60a5fa}
+.fdg-pulse--late{--pulse-tone:#fb7185}
+.fdg-pulse-header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid #344b50}
+.fdg-pulse-brand{font-size:13px;font-weight:850;letter-spacing:.06em;color:#a3e635}
+.fdg-pulse-status{font-size:13px;font-weight:850;color:var(--pulse-tone);overflow-wrap:anywhere}
+.fdg-pulse-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px 16px;margin:12px 0}
+.fdg-pulse-metric{display:grid;align-content:start;gap:3px;min-width:0}
+.fdg-pulse-metric>span{font-size:13px;font-weight:600;color:#b6c7d3}
+.fdg-pulse-metric>strong{font-size:22px;font-weight:850;color:#eef7ff;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.fdg-pulse-metric>strong.fdg-pulse-positive{color:#4ade80}
+.fdg-pulse-metric>strong.fdg-pulse-season{color:#facc15}
+.fdg-pulse-metric>small,.fdg-pulse-footer{font-size:12px;color:#b6c7d3;overflow-wrap:anywhere}
+.fdg-pulse-track{height:5px;border-radius:8px;background:#2b4049;overflow:hidden;margin:4px 0 9px}
+.fdg-pulse-track>span{display:block;height:100%;background:var(--pulse-tone);border-radius:inherit}
+@media(max-width:640px){.fdg-pulse{padding:12px;margin-bottom:10px}.fdg-pulse-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.fdg-pulse-metric>strong{font-size:20px}.fdg-pulse-brand,.fdg-pulse-status{font-size:12px}}
+@media(max-width:340px){.fdg-pulse{padding:10px}.fdg-pulse-grid{gap:10px 8px}.fdg-pulse-metric>strong{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.fdg-pulse *{animation:none!important;transition:none!important}}
