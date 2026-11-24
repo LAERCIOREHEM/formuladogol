@@ -2965,7 +2965,8 @@ body > .container > section.hero > img {
 <script src="js/br-classificacao-live.js?v=20260920-monitor-facts-v7"></script>
 <script src="js/br-resultados-freshness.js?v=20261004-r10r9"></script>
 <script src="js/br-final-canonical-bridge.js?v=20261119-fast-final-r1"></script>
-<script src="js/br-af-core-snapshot.js?v=20261123-r36r4"></script>
+<script src="js/br-af-core-snapshot.js?v=20261124-r36r5final"></script>
+<script src="js/br-data-refresh.js?v=20261124-r36r5final"></script>
 <script src="js/br-data-pulse.js?v=20261124-r36r5d"></script>
 <script src="js/br-af-scorecards.js?v=20261110-ux-r1"></script>
 <script src="js/br-af-resultados.js?v=20261119-r35"></script>
@@ -4010,20 +4011,26 @@ async function carregarMetasObjetivosTabela({ silencioso = false } = {}) {
   if (state.view === 'tabela') renderTabela();
 }
 
-// Light polling: only refresh the active core when a new atomic revision exists.
-let afCoreRefreshing=false;
-setInterval(async()=>{
-  if(document.hidden||afCoreRefreshing||!window.FDGCoreSnapshot||!['tabela','jogos','resultados'].includes(state.view))return;
-  afCoreRefreshing=true;
-  try{
-    const m=await window.FDGCoreSnapshot.current();
-    const p=state.probabilidadesBrasileirao;
-    if(m&&(p?.hash_entrada!==m.hash_entrada||p?.calculado_em!==m.calculado_em)){
-      await Promise.allSettled([refresh(true),carregarJogos({silencioso:true}),
-        carregarResultados({silencioso:true}),carregarMetasObjetivosTabela({silencioso:true})]);
-    }
-  }catch(_){/* keep last certified state */}finally{afCoreRefreshing=false}
-},45000);
+// R36-R5 FINAL: reuses the former core poll, accelerates on actual FINAL.
+let afCoreRefreshing=false,afCoreFinalKey='';
+const fdgCoreActive=()=>espnJanelaAtiva()||!!afCoreFinalKey;
+const fdgCoreScheduler=window.FDGRefreshScheduler.create({
+  active:fdgCoreActive,visible:()=>!document.hidden,
+  run:async()=>{
+    if(afCoreRefreshing||!window.FDGCoreSnapshot||!['tabela','jogos','resultados'].includes(state.view))return;
+    afCoreRefreshing=true;
+    try{
+      const m=await window.FDGCoreSnapshot.current({urgent:fdgCoreActive()});
+      const p=state.probabilidadesBrasileirao;
+      if(m&&(p?.hash_entrada!==m.hash_entrada||p?.calculado_em!==m.calculado_em||state.resultados.length!==m.concluidos)){
+        await Promise.allSettled([refresh(true),carregarJogos({silencioso:true}),carregarResultados({silencioso:true}),carregarMetasObjetivosTabela({silencioso:true})]);
+      }
+      afCoreFinalKey=window.FDGRefreshScheduler.finalKey(Object.values(state.espnLive||{}),state.resultados||[],espnLiveEhFinalReal);
+    }finally{afCoreRefreshing=false}
+  }
+});
+document.addEventListener('visibilitychange',()=>document.hidden?fdgCoreScheduler.pause():fdgCoreScheduler.wake());
+window.addEventListener('online',()=>fdgCoreScheduler.wake());
 
 async function atualizarDadosDoServidor(silencioso = false) {
   const tarefas = [refresh(silencioso)];
@@ -4077,6 +4084,7 @@ async function inicializar() {
 
   await atualizarDadosDoServidor(false);
   agendarProximaAtualizacao();
+  fdgCoreScheduler.start();
 }
 
 async function refresh(silencioso = false) {
@@ -6246,6 +6254,9 @@ async function espnLiveTick() {
   }
   try {
     await espnLiveBuscar();
+    const finals=window.FDGRefreshScheduler.finalKey(Object.values(state.espnLive||{}),state.resultados||[],espnLiveEhFinalReal);
+    if(finals&&finals!==afCoreFinalKey)fdgCoreScheduler.wake();
+    afCoreFinalKey=finals;
     // Após FINAL real ESPN, buscar CORE+AF canônicos sem esperar o Pages.
     // Só aceita snapshots com ID/equipes/placar e contagens idênticas.
     if (state.view === 'resultados' && window.BRFinalCanonicalBridge) {

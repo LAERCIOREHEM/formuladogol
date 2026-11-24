@@ -30,7 +30,7 @@
   const LIVE_FACTS_REFRESH_MS = 30000;
   const LIVE_FACTS_RETRY_MS = 5000;
 
-  const refreshState = { timer: null, ocupado: false, assinatura: null };
+  const refreshState = { timer: null, ocupado: false, assinatura: null, scheduler:null, finalKey:'' };
   const liveRefreshState = { timer: null, ocupado: false, assinatura: null, lastFactsAt: 0 };
   const loadedDatasets = new Set();
   const loadingDatasets = new Map();
@@ -2820,7 +2820,8 @@
     refreshState.ocupado = true;
     try {
       const manifest=window.FDGDataManifest;
-      const revision=manifest?await manifest.refresh(true):null;
+      const urgent=liveWindowActive()||probabilitySportsState()==='pending';
+      const [revision,afMeta]=await Promise.all([manifest?manifest.refresh(true):null,window.FDGCoreSnapshot?.current({urgent})]);
       const [statusPartidas,auditoriaProbabilidades,auditoriaContinental]=await Promise.all([
         fetchJson(FILES.updateStatus,null),
         fetchJson(FILES.probabilitiesAudit,null),
@@ -2828,7 +2829,7 @@
       ]);
       const nova=assinaturaDados(statusPartidas||state.updateStatus,auditoriaProbabilidades||state.probabilitiesAudit,auditoriaContinental||state.continentalAudit);
       const coreRevision=revision&&Object.keys(revision.files).filter(p=>manifest.isCore(p)).sort().map(p=>revision.files[p].sha256).join("|");
-      const coreChanged=nova!==refreshState.assinatura||(coreRevision&&coreRevision!==refreshState.coreRevision);
+      const coreChanged=nova!==refreshState.assinatura||(coreRevision&&coreRevision!==refreshState.coreRevision)||(afMeta&&afMeta.revision!==refreshState.afRevision);
       const keys=[...loadedDatasets];
       const before=new Map(keys.map(k=>[k,state[k]]));
       const selected=manifest&&revision?keys.filter(k=>manifest.isCore(FILES[k])?coreChanged:manifest.changed(FILES[k])):coreChanged?keys:[];
@@ -2837,7 +2838,10 @@
       const rolagem=window.scrollY;
       await Promise.all(selected.map(k=>loadDataset(k,true)));
       refreshState.assinatura=assinaturaDados(state.updateStatus,state.probabilitiesAudit,state.continentalAudit);
-      if(coreRevision&&(!coreChanged||selected.filter(k=>manifest.isCore(FILES[k])).every(k=>state[k]!==before.get(k))))refreshState.coreRevision=coreRevision;
+      const coreLoaded=selected.filter(k=>manifest?.isCore(FILES[k]));
+      const applied=(!coreChanged||coreLoaded.every(k=>state[k]!==before.get(k)))&&(!afMeta||state.results?.resultados?.length===afMeta.concluidos)&&(!afMeta||!loadedDatasets.has('probabilities')||(state.probabilities?.hash_entrada===afMeta.hash_entrada&&state.probabilities?.calculado_em===afMeta.calculado_em));
+      if(coreRevision&&applied)refreshState.coreRevision=coreRevision;
+      if(afMeta&&applied)refreshState.afRevision=afMeta.revision;
       if(selected.some(k=>state[k]!==before.get(k))){
         standingsCache={table:null,results:null,live:null,projection:null,mapa:new Map()};
         renderCurrentTab();window.scrollTo(0,rolagem);
@@ -2846,19 +2850,15 @@
       console.warn("Estatísticas: atualização automática indisponível agora:", error);
     } finally {
       refreshState.ocupado = false;
-      clearTimeout(refreshState.timer);
-      refreshState.timer = setTimeout(verificarAtualizacao, STATIC_REFRESH_MS);
     }
   }
 
   function armarAtualizacaoAutomatica() {
-    clearTimeout(refreshState.timer);
-    refreshState.timer = setTimeout(verificarAtualizacao, STATIC_REFRESH_MS);
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) return;
-      clearTimeout(refreshState.timer);
-      verificarAtualizacao();
-    });
+    const api=window.FDGRefreshScheduler;
+    refreshState.scheduler=api.create({run:verificarAtualizacao,active:()=>liveWindowActive()||probabilitySportsState()==="pending",visible:()=>!document.hidden});
+    refreshState.scheduler.start();
+    document.addEventListener("visibilitychange",()=>document.hidden?refreshState.scheduler.pause():refreshState.scheduler.wake());
+    window.addEventListener("online",()=>refreshState.scheduler.wake());
   }
 
   function liveFactsSignature(factsMap) {
@@ -2931,6 +2931,9 @@
       const snapshot=await engine.fetchLiveState({canonicalize:canonicalLiveTeam,forceFresh:options.forceFresh===true});
       const live=snapshot.liveMap||{}, signature=liveSignature(live), changed=signature!==previousSignature;
       state.espnLive=live; state.espnLiveMeta=snapshot.meta||null; state.espnLiveFetchedAt=new Date(Number(snapshot.meta?.fetchedAt||Date.now())); state.espnLiveError=null; liveRefreshState.assinatura=signature; standingsCache.live=null;
+      const finals=window.FDGRefreshScheduler.finalKey(currentStandingsProjection().jogos,resultsRows());
+      if(finals&&finals!==refreshState.finalKey)refreshState.scheduler?.wake();
+      refreshState.finalKey=finals;
       if(changed&&options.render!==false)renderLiveAffected();
       return {changed,scoreChanged:changed,signature};
     } catch(error) {
@@ -2940,7 +2943,7 @@
 
   function armLiveRefresh() {
     clearTimeout(liveRefreshState.timer);
-    const schedule = (delay) => { clearTimeout(liveRefreshState.timer); liveRefreshState.timer=setTimeout(tick,delay); };
+    const schedule = (delay) => { clearTimeout(liveRefreshState.timer); liveRefreshState.timer=null; if(!document.hidden)liveRefreshState.timer=setTimeout(tick,delay); };
     const tick = async () => {
       const started=Date.now();
       if(!document.hidden&&liveWindowActive()) {
@@ -2953,7 +2956,7 @@
       } else schedule(STATIC_REFRESH_MS);
     };
     schedule(0);
-    document.addEventListener("visibilitychange",()=>{if(document.hidden)return; schedule(0);});
+    document.addEventListener("visibilitychange",()=>{if(document.hidden){clearTimeout(liveRefreshState.timer);liveRefreshState.timer=null;return;} schedule(0);});
   }
 
   async function load() {

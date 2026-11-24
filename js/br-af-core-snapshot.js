@@ -13,7 +13,7 @@
     'dados-br/probabilidades-por-pontuacao.json','dados-br/probabilidades-jogos.json',
     'dados-br/auditoria-probabilidades.json','dados-br/auditoria-competicoes-af-previsao.json',
     'dados-br/vagas-libertadores-2027.json']);
-  let lastBundle=null, selected=null, inFlight=null, checkedAt=0;
+  let lastBundle=null, selected=null, inFlight=null, checkedAt=0, pagesMeta=null;
   const validMeta=m=>m&&m.schema_version===1&&/^[a-f0-9]{64}$/.test(m.revision||'')&&
     /^[a-f0-9]{64}$/.test(m.hash_entrada||'')&&Number.isFinite(Date.parse(m.calculado_em))&&
     Number.isInteger(m.concluidos)&&Number.isInteger(m.restantes)&&m.concluidos>=0&&
@@ -46,6 +46,7 @@
   }
   async function choose(){
     const [remote,local]=await Promise.all([get(raw+manifestPath),get('/'+manifestPath)]);
+    if(validMeta(local)&&(!pagesMeta||newer(local,pagesMeta)||local.revision===pagesMeta.revision))pagesMeta=local;
     let best=lastBundle&&newer(lastBundle.manifest,local)?lastBundle:null;
     if(newer(remote,local)&&(!best||newer(remote,best.manifest))){
       const candidate=await get(raw+bundlePath+'?revision='+encodeURIComponent(remote.revision),6000);
@@ -62,9 +63,9 @@
     }
     return best;
   }
-  async function snapshot(){
+  async function snapshot(urgent=false){
     if(inFlight)return inFlight;
-    if(Date.now()-checkedAt<45000)return selected;
+    if(Date.now()-checkedAt<(urgent?12000:45000))return selected;
     inFlight=choose().then(b=>{selected=b;checkedAt=Date.now();return b})
       .catch(()=>selected).finally(()=>{inFlight=null});
     return inFlight;
@@ -84,5 +85,5 @@
     return nativeFetch(url,options);
   }
   root.FDGCoreSnapshot={fetch:fetchCore,validMeta,validBundle,newer,
-    async current(){const b=await snapshot();return b?.manifest||null}};
+    async current(options={}){const b=await snapshot(options.urgent===true);return b?.manifest||pagesMeta||null}};
 })(window);
