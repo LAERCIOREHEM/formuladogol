@@ -282,10 +282,48 @@ function rawScore(item, key) {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
 }
 
+// R36-R3: a ESPN às vezes registra o gol somente em details (inclusive
+// header.competitions[0].details), sem scoringPlays/plays completos.
+// Consumir exclusivamente entradas explicitamente identificadas como gol;
+// 'shot on goal', 'goalkeeper save' e 'expected goals' não são gols.
+export function confirmedGoalDetails(summary) {
+  const sources=[
+    summary?.details,
+    summary?.competitions?.[0]?.details,
+    summary?.header?.competitions?.[0]?.details,
+    summary?.header?.competitions?.[0]?.scoringPlays
+  ];
+  const out=[],seen=new Set();
+  for (const source of sources) {
+    if (!Array.isArray(source)) continue;
+    for (const item of source) {
+      if (!item || typeof item!=='object') continue;
+      const category=normalized([
+        item?.type?.text,item?.type?.name,item?.type?.description
+      ].filter(Boolean).join(' '));
+      const description=normalized([item?.text,item?.description,item?.shortText].filter(Boolean).join(' '));
+      const explicit=item.scoringPlay===true ||
+        /^(?:goal|gol|own goal|penalty goal|gol contra)(?: |$)/.test(category) ||
+        /^(?:goal scored by|goal by|gol de|gol do|gol da)(?: |$)/.test(description);
+      const disallowed=/shot on goal|shots on goal|goalkeeper|goal kick|expected goals|attempt saved|shot saved|goal disallowed|goal overturned|anulado/.test(category+' '+description);
+      if(!explicit||disallowed||item.scoringPlay===false&&item.type?.text==='Shot')continue;
+      const key=JSON.stringify([item.id||item.playId||'',item.homeScore??'',item.awayScore??'',
+        item.team?.id||item.teamId||'',eventMinute(item),item.athlete?.id||'']);
+      if(seen.has(key))continue;
+      seen.add(key);
+      out.push(item);
+    }
+  }
+  return out;
+}
+
 export function extractScoringPlays(summary, match, sourceName = '') {
   const primary = Array.isArray(summary?.scoringPlays) ? summary.scoringPlays : [];
   const fallback = Array.isArray(summary?.plays) ? summary.plays : [];
-  const source = primary.length ? primary : fallback.filter(isGoalItem);
+  // Os detalhes fornecem autoria mesmo que o PBP publicado ainda não tenha
+  // recebido os athletesInvolved. A reconciliação de placar rejeita duplicatas.
+  const source = [...(primary.length ? primary : fallback.filter(isGoalItem)),
+    ...confirmedGoalDetails(summary)];
   const roster = rosterNameMap(summary || {});
   const homeId = text(match?.home?.id);
   const awayId = text(match?.away?.id);
