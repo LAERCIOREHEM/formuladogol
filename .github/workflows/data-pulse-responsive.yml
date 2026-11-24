@@ -25,6 +25,16 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Reconciliar auditoria documental com o ledger atual (local, sem publicação)
+        run: |
+          python scripts/auditar_historico_placares_af.py
+          python scripts/gerar_resultados_af_e3.py
+          python scripts/gerar_acuracia_placares_e4.py
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

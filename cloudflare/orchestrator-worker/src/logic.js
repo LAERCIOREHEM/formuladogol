@@ -264,6 +264,25 @@ export function relevantSportsGames(games, now, beforeMinutes = POLICY.sports.be
   });
 }
 
+// R37-R1: optional sub-cron only around the expected final whistle.
+// The five-minute canonical cron is unchanged. No idle or pre-game alarms.
+export function r37FinalWindow(games, now) {
+  const t=parseDate(now)?.getTime() ?? Date.now();
+  return (games||[]).filter(g=>{
+    const kickoff=parseDate(g.kickoff)?.getTime();
+    return g.league==='bra.1'&&!g.concluded&&Number.isFinite(kickoff)&&
+      t>=kickoff+100*60000&&t<=kickoff+145*60000;
+  });
+}
+export function r37NextFinalProbe(games, now) {
+  const t=parseDate(now)?.getTime() ?? Date.now();
+  const next=(games||[]).filter(g=>g.league==='bra.1'&&!g.concluded)
+    .map(g=>parseDate(g.kickoff)?.getTime())
+    .filter(k=>Number.isFinite(k)&&t+60000<=k+145*60000)
+    .map(k=>Math.max(t+60000,k+100*60000)).filter(at=>at<=t+5*60000);
+  return next.length?Math.min(...next):null;
+}
+
 export function localFinalIds(results, cup, lib, sula) {
   const out = new Set();
   for (const row of results?.resultados || []) {

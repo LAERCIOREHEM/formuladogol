@@ -1016,7 +1016,7 @@ body.fdg-ux-main .tabela-pos-wrap{display:inline-flex;flex-direction:column;alig
 body.fdg-ux-main .tabela-pos-wrap .seta-mov{font-size:9px!important;line-height:1;padding:0!important}
 body.fdg-ux-main :is(.tabela-pontos,.returno-points){font-size:17px!important;font-weight:900}
 @media(max-width:820px){
- body.fdg-ux-main :is(.tabela-br,.returno-table){--br-pos-col-width:42px;--fdg-team:174px;--fdg-pts:44px;--fdg-j:36px;--fdg-small:36px;--fdg-score:40px;--fdg-pct:48px;--fdg-form:104px;width:max-content!important}
+ body.fdg-ux-main :is(.tabela-br,.returno-table){--br-pos-col-width:42px;--fdg-team:174px;--fdg-pts:44px;--fdg-j:36px;--fdg-small:36px;--fdg-score:40px;--fdg-pct:48px;--fdg-form:104px;width:calc(var(--br-pos-col-width) + var(--fdg-team) + var(--fdg-pts) + var(--fdg-j) + 3 * var(--fdg-small) + 3 * var(--fdg-score) + var(--fdg-pct))!important}
  body.fdg-ux-main .tabela-br .col-oculta-mobile{display:table-cell!important}
  body.fdg-ux-main :is(.tabela-br,.returno-table) :is(th,td){font-size:13px!important;height:46px}
  body.fdg-ux-main :is(.tabela-br,.returno-table) th{font-size:12px!important;height:38px}
@@ -1034,3 +1034,5 @@ body.fdg-ux-main :is(.tabela-pontos,.returno-points){font-size:17px!important;fo
  body.fdg-ux-main :is(.tabela-scroll,.returno-scroll){overflow-x:auto;overscroll-behavior-x:contain}
 }
 @media(max-width:360px){body.fdg-ux-main :is(.tabela-br,.returno-table){--fdg-team:160px;--fdg-pts:40px;--fdg-j:32px}body.fdg-ux-main .fdg-club-name{font-size:13px!important}body.fdg-ux-main :is(.tabela-escudo,.returno-team img){width:23px!important;height:23px!important;flex-basis:23px!important}}
+
+@media(max-width:820px){body.fdg-ux-main .tabela-br:has(.fdg-col-form){width:calc(var(--br-pos-col-width) + var(--fdg-team) + var(--fdg-pts) + var(--fdg-j) + 3 * var(--fdg-small) + 3 * var(--fdg-score) + var(--fdg-pct) + var(--fdg-form))!important}}

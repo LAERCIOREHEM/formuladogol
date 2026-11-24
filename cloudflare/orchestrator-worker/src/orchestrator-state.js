@@ -23,6 +23,8 @@ import {
   pendingPublicsFromAudit,
   publicPendingFingerprint,
   relevantSportsGames,
+  r37FinalWindow,
+  r37NextFinalProbe,
   resultFinalTime,
   espnDay,
   tvCoverage,
@@ -529,6 +531,73 @@ export class OrchestratorState {
     }};
   }
 
+  // A single Durable Object alarm reuses the existing ESPN batch and writer gate.
+  // Active only between kickoff+100 and +145 minutes; never runs enrichment.
+  async armFinalProbe(games, now, source, governance) {
+    const storage=this.state.storage;
+    if(typeof storage.setAlarm!=='function'||typeof storage.getAlarm!=='function')return;
+    const enabled=String(this.env.ORCHESTRATOR_MODE||'shadow').toLowerCase()==='active'&&
+      !source.externalOpen&&!source.blocked&&governance.secondaryAllowed!==false;
+    const pending=[];
+    if(enabled)for(const g of games){
+      if(g.league!=='bra.1'||g.concluded||r37NextFinalProbe([g],now)===null)continue;
+      const candidate={action:'atualizar_brasileirao',eventId:g.eventId,retryMinutes:POLICY.sports.finalRetryMinutes};
+      if((await this.candidateAllowedByRetry(candidate,now)).allowed)pending.push({...g,kickoff:g.kickoff.toISOString()});
+    }
+    const next=r37NextFinalProbe(pending,now);
+    if(next===null){
+      if(await storage.getAlarm()!==null){await storage.deleteAlarm();await storage.delete('r37:finalProbe');}
+      return;
+    }
+    await storage.put('r37:finalProbe',{games:pending,refreshedAt:now.getTime(),governance});
+    const scheduled=await storage.getAlarm();
+    if(scheduled===null||scheduled>next)await storage.setAlarm(next);
+  }
+
+  async alarm() {
+    const storage=this.state.storage;
+    const now=new Date();
+    if(this.busy){await storage.setAlarm(now.getTime()+60000);return;}
+    this.busy=true;
+    try{
+      const plan=await storage.get('r37:finalProbe');
+      // Regular cron refreshes source/cost gates; expired plan cannot query or dispatch.
+      if(!plan||now.getTime()-plan.refreshedAt>6*60000||plan.governance?.secondaryAllowed===false||
+          String(this.env.ORCHESTRATOR_MODE||'shadow').toLowerCase()!=='active'){
+        await storage.delete('r37:finalProbe');return;
+      }
+      const source=(await storage.get('br:sourceBreaker'))||{};
+      if(source.externalOpen===true||source.state==='open'||source.state==='half_open'){await storage.delete('r37:finalProbe');return;}
+      const games=plan.games.map(g=>({...g,kickoff:parseDate(g.kickoff)})).filter(g=>g.kickoff);
+      const eligible=[];
+      for(const g of r37FinalWindow(games,now)){
+        if((await this.candidateAllowedByRetry({action:'atualizar_brasileirao',eventId:g.eventId,retryMinutes:POLICY.sports.finalRetryMinutes},now)).allowed)eligible.push(g);
+      }
+      if(eligible.length){
+        const espn=await probeEspn(eligible);
+        for(const game of eligible){
+          if(espn.states.get(game.eventId)?.state!=='post')continue;
+          const traceId=correlationIdForEvent(game.eventId);
+          const candidate={action:'atualizar_brasileirao',eventId:game.eventId,traceId,
+            reason:'R37 final-window: ESPN FINAL '+gameLabel(game),
+            retryMinutes:POLICY.sports.finalRetryMinutes,brSourceSensitive:true,
+            stateUpdates:{'reliability:lastTrace':{traceId,eventId:game.eventId,detectedAt:now.toISOString(),stage:'final_detected'}}};
+          const result=await this.dispatchCandidate(candidate,now,plan.governance||{});
+          const previous=(await storage.get('status'))||{};
+          await this.record({...previous,fastFinalProbe:{at:now.toISOString(),eventId:game.eventId,result:result.result}},
+            {at:now.toISOString(),action:candidate.action,eventId:game.eventId,traceId,reason:candidate.reason,result:result.result});
+          if(result.result==='dispatched')plan.games=plan.games.filter(g=>g.eventId!==game.eventId);
+          break;
+        }
+      }
+      const next=r37NextFinalProbe(plan.games,now);
+      if(next!==null){await storage.put('r37:finalProbe',plan);await storage.setAlarm(next);}
+      else await storage.delete('r37:finalProbe');
+    }catch(error){
+      console.warn('R37 scoped FINAL probe failed; canonical cron remains authoritative',String(error));
+    }finally{this.busy=false;}
+  }
+
   async tick(governance={}) {
     if (this.busy) return { ok: true, skipped: 'busy' };
     this.busy = true;
@@ -748,6 +817,7 @@ export class OrchestratorState {
         checkpoint: candidate.checkpoint ?? null, reason: candidate.reason, result: dispatchResult.result,
       } : (errors.length ? { at: now.toISOString(), action: 'none', reason: errors[0], result: 'degraded' } : null);
       await this.record(status, historyItem);
+      try{await this.armFinalProbe(games,now,brSource,governance);}catch(error){console.warn('R37 final-window alarm unavailable',String(error));}
       return { ok: true, ...status };
     } catch (error) {
       const message = `${error?.name || 'Error'}: ${error?.message || error}`;
