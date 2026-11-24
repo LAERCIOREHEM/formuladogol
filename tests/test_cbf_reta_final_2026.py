@@ -85,12 +85,26 @@ for home, away, dt, stadium, rd, ref in OFFICIAL:
     assert fix["data_iso"] == dt and fix["estadio"] == stadium, (home, away, fix)
     assert fix["referencia_cbf"] == ref
     assert fix["fonte_calendario"].startswith("CBF oficial — tabela detalhada")
+    completed = match(read("resultados.json")["resultados"], home, away, rd)
+    assert len(completed)<=1,("FINAL duplicado",home,away)
+    if completed:
+        result=completed[0]
+        assert result.get("estado")=="post",("histórico sem FINAL",home,away)
+        assert same_kickoff(str(result.get("data_iso") or ""),dt),(home,away,"horário FINAL")
+        assert all(isinstance(result.get(k),int) and result[k]>=0 for k in ("placar_mandante","placar_visitante"))
     for source_name, rows in sources.items():
         games = match(rows, home, away, rd)
+        if completed and source_name=="jogos":
+            assert not games,("FINAL na lista futura",home,away)
+            continue
+        if completed and source_name=="agenda" and not games:
+            continue
         assert len(games) == 1, (source_name, home, away, len(games))
         game = games[0]
-        if game.get("estado") != "post" and game.get("concluido") is not True:
-            assert same_kickoff(str(game.get("data_iso") or ""), dt), (source_name, home, away, game.get("data_iso"))
+        assert same_kickoff(str(game.get("data_iso") or ""), dt), (source_name, home, away, game.get("data_iso"))
+        if completed and source_name in {"eventos","agenda"}:
+            assert game.get("estado")=="post" or game.get("concluido") is True,("FINAL regrediu",source_name,home,away)
+        if not completed or source_name=="calendario":
             assert game.get("estadio") == stadium, (source_name, home, away, game.get("estadio"))
             assert game.get("data_definir") is not True, (source_name, home, away)
 

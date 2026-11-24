@@ -214,6 +214,17 @@ def brasileirao_games(
     seen_ids: set[str] = set()
     seen_matchups: set[tuple[str, str]] = set()
     round_counts: dict[int, int] = {}
+    # FINAL é monotônico: o calendário documental não pode ressuscitar uma
+    # partida já retirada de jogos.json.
+    final_rows=load_json(root / "resultados.json", {"resultados":[]}).get("resultados") or []
+    for result in final_rows:
+        if result.get("estado")!="post":
+            continue
+        if result.get("event_id"):
+            seen_ids.add(str(result["event_id"]))
+        h=team_from_brasileirao(result.get("mandante"))
+        a=team_from_brasileirao(result.get("visitante"))
+        seen_matchups.add((norm(h.get("nome")),norm(a.get("nome"))))
     raw_rows = list(data.get("jogos") or [])
     for raw in raw_rows:
         if isinstance(raw, Mapping):
@@ -228,6 +239,8 @@ def brasileirao_games(
         event_id = str(raw.get("event_id") or "").strip()
         home = team_from_brasileirao(raw.get("mandante"))
         away = team_from_brasileirao(raw.get("visitante"))
+        if event_id in seen_ids or (norm(home.get("nome")),norm(away.get("nome"))) in seen_matchups:
+            continue
         if event_id:
             seen_ids.add(event_id)
         seen_matchups.add((norm(home.get("nome")), norm(away.get("nome"))))
@@ -794,6 +807,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--now", help="Data/hora ISO para execução determinística")
     parser.add_argument("--output", default=str(OUTPUT))
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--local-only", action="store_true", help="Reutilizar calendário certificado sem consultar CBF")
     return parser.parse_args(argv)
 
 
@@ -807,8 +821,9 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("--now inválido")
     official_schedule: list[CBFAgendaPartida] = []
     try:
-        official_schedule = buscar_agenda_cbf(resolver=para_canonico)
-        print(f"Agenda oficial CBF: {len(official_schedule)} kickoffs disponíveis para reconciliação.")
+        if not args.local_only:
+            official_schedule = buscar_agenda_cbf(resolver=para_canonico)
+        print(f"Agenda oficial CBF: {len(official_schedule)} kickoffs remotos; calendário local preservado.")
     except Exception as exc:  # noqa: BLE001
         # A agenda pública nunca deixa de ser gerada por indisponibilidade da
         # fonte complementar. Nesse cenário, conserva o fluxo ESPN/canônico.

@@ -31,6 +31,9 @@ def main() -> int:
     final_at = row.get("finalizado_em") or row.get("data_iso")
     af_at = probs.get("calculado_em") or probs.get("gerado_em")
     value = minutes_between(final_at, af_at)
+    if value is None or value < 0 or not row.get("finalizado_em"):
+        print("::warning::SLO sem timestamps comprovados; observação descartada")
+        return 0
     trace = args.trace_id or correlation_id(args.event_id)
     previous = load_json(OUTPUT, default={}) if OUTPUT.exists() else {}
     observations = list(previous.get("observacoes") or [])
@@ -45,7 +48,15 @@ def main() -> int:
         "registrado_em": iso_brt(),
         "run_id": str(os.environ.get("GITHUB_RUN_ID") or ""),
     }
-    observations = [x for x in observations if x.get("trace_id") != trace]
+    # A primeira execução válida por event_id é a métrica. Reexecuções
+    # posteriores não devem sobrescrever a latência original.
+    known = [x for x in observations if str(x.get("event_id")) == str(args.event_id)
+             and isinstance(x.get("final_para_af_minutos"),(int,float))
+             and x["final_para_af_minutos"]>=0]
+    if known:
+        print(f"SLO preservado: {args.event_id} já possui primeira observação válida")
+        return 0
+    observations = [x for x in observations if str(x.get("event_id")) != str(args.event_id)]
     observations.append(observation)
     observations = observations[-100:]
     values = [float(x["final_para_af_minutos"]) for x in observations if x.get("final_para_af_minutos") is not None]
