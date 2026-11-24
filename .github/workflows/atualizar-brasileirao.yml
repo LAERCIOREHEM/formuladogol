@@ -986,6 +986,8 @@ jobs:
               exit 0
             fi
 
+            # R36-R7: nunca regredir fichas ou público/renda já publicados por outro escritor.
+            git show HEAD:dados-br/estatisticas-competicao.json > "$TMP_DIR/r36r7-baseline.json"
             for f in "${FILES[@]}"; do
               if [[ -e "$TMP_DIR/$f" ]]; then
                 rm -rf "$f"
@@ -993,6 +995,8 @@ jobs:
                 cp -a "$TMP_DIR/$f" "$f"
               fi
             done
+
+            python scripts/validar_recuperacao_estatistica_r36r7.py --protect-only --baseline "$TMP_DIR/r36r7-baseline.json"
 
             # Impedir que snapshots AF antigos sobrescrevam um título já
             # certificado durante fetch/reset de commits concorrentes.

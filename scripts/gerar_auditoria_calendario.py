@@ -526,6 +526,32 @@ def executar_self_test() -> None:
     print("Self-test do calendário: OK")
 
 
+def normalizar_estadio_cbf(value: str) -> str:
+    """Equivalência nominal, não equivalência entre estádios diferentes."""
+    import unicodedata
+    import re
+    text = unicodedata.normalize("NFKD", str(value or "")).encode("ascii", "ignore").decode().lower()
+    text = re.sub(r"[^a-z0-9]+", " ", text).strip()
+    return re.sub(r"^(estadio|stadium) +", "", text)
+
+
+def preservar_estadios_cbf_finais(calendario, ajustes):
+    """O FINAL mantém o estado ESPN; a identidade cadastral segue o ajuste CBF."""
+    oficiais = {chave_evento(a): a for a in ajustes
+                if str(a.get("fonte_calendario") or "").startswith("CBF oficial — tabela detalhada")}
+    for jogo in calendario:
+        fix = oficiais.get(chave_evento(jogo))
+        if not fix or not (jogo.get("estado") == "post" or jogo.get("concluido") is True):
+            continue
+        esperado = str(fix.get("estadio") or "")
+        atual = str(jogo.get("estadio") or "")
+        if esperado and atual and normalizar_estadio_cbf(atual) == normalizar_estadio_cbf(esperado):
+            jogo["estadio"] = esperado
+            jogo["fonte_calendario"] = fix["fonte_calendario"]
+            jogo["origem_calendario"] = str(fix.get("origem_calendario") or "")
+        # Um estádio efetivamente diferente continua sujeito à validação CBF.
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--self-test", action="store_true")
@@ -549,6 +575,7 @@ def main() -> None:
     calendario, falhas_montagem, avisos = montar_calendario_completo(
         eventos, clubes_esperados, anterior
     )
+    preservar_estadios_cbf_finais(calendario, ajustes)
     agora = datetime.now(FUSO_BRASILIA)
     avisos.extend(marcar_kickoffs_herdados_provisorios(calendario, agora))
     if falhas_montagem:

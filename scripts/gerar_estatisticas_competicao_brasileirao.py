@@ -358,6 +358,29 @@ def merge_documented_attendance(
     return output
 
 
+def preservar_publico_publicado(details, previous, results):
+    """Usa o último valor público validado somente quando a nova coleta o omite."""
+    old = {str(g.get("event_id") or ""): g for g in previous.get("jogos", [])}
+    output = dict(details)
+    for result in results:
+        eid = str(result.get("event_id") or "")
+        prior = old.get(eid, {})
+        if not prior or any(prior.get(k) != result.get(k) for k in ("placar_mandante", "placar_visitante")):
+            continue
+        if team_name(result.get("mandante")) != team_name(prior.get("mandante")) or team_name(result.get("visitante")) != team_name(prior.get("visitante")):
+            continue
+        row = dict(output.get(eid) or {})
+        for field in ("publico", "publico_pagante", "renda"):
+            value = prior.get(field)
+            if row.get(field) in (None, "", 0, "0") and isinstance(value, (int, float)) and not isinstance(value, bool) and value > 0:
+                row[field] = value
+        if row.get("publico_pagante") is not None and row.get("publico") is not None and row["publico_pagante"] > row["publico"]:
+            raise ValueError(f"pagantes acima do público: {eid}")
+        if row:
+            output[eid] = row
+    return output
+
+
 def main() -> None:
     table_data = read_json(ROOT / "tabela.json", {})
     results_data = read_json(ROOT / "resultados.json", {})
@@ -373,6 +396,8 @@ def main() -> None:
     complements = read_json(ROOT / "dados-br" / "publicos-complementares.json", {})
     verified = read_json(ROOT / "dados-br" / "correcoes" / "publicos-verificados.json", {})
     details = merge_documented_attendance(details, complements, verified, results)
+    # Preserva a cobertura documental anteriormente publicada, por ID e placar.
+    details = preservar_publico_publicado(details, read_json(OUT, {}), results)
     if len(table) != 20:
         raise RuntimeError(f"tabela.json deve ter 20 clubes; recebido {len(table)}")
     if not results:

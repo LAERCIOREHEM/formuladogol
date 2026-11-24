@@ -1,0 +1,83 @@
+name: FDG R36-R7 — Statistical Recovery & Independent Publication
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/recuperar-estatisticas-r36r7.yml'
+      - 'scripts/validar_recuperacao_estatistica_r36r7.py'
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Atualizar Brasileirao (ESPN)']
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: fdg-statistical-recovery
+  cancel-in-progress: false
+  queue: max
+jobs:
+  recover:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar dependências já utilizadas pelo coletor
+        run: python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
+      - name: Regressões R36-R7 e parsers
+        run: |
+          python tests/test_recuperacao_estatistica_r36r7.py
+          python scripts/buscar_detalhes_jogos_brasileirao.py --self-test
+          python scripts/buscar_lideres_jogadores_espn.py --self-test
+      - name: Recuperar somente fichas ausentes ou inválidas e publicar conjunto atômico
+        id: publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "published=false" >> "$GITHUB_OUTPUT"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BASELINE="$(mktemp)"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            if python scripts/validar_recuperacao_estatistica_r36r7.py; then
+              echo "Base já íntegra: nenhuma consulta ESPN, nenhum commit."
+              exit 0
+            fi
+            cp dados-br/estatisticas-competicao.json "$BASELINE"
+            python scripts/buscar_detalhes_jogos_brasileirao.py --refresh-hours 0
+            python scripts/buscar_lideres_jogadores_espn.py --reconstruir-local
+            python scripts/gerar_estatisticas_brasileirao.py
+            python scripts/gerar_estatisticas_competicao_brasileirao.py
+            python scripts/gerar_auditoria_estatisticas_brasileirao.py
+            python scripts/gerar_auditoria_cobertura_resultados.py
+            python scripts/validar_recuperacao_estatistica_r36r7.py --baseline "$BASELINE"
+            git add dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json \
+              dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json \
+              dados-br/estatisticas.json dados-br/jogadores.json \
+              dados-br/ranking-desempenho.json dados-br/historico-ranking-desempenho.json \
+              dados-br/auditoria-ranking-desempenho.json dados-br/estatisticas-competicao.json \
+              dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m "R36-R7: publicar estatísticas reconciliadas com FINAL oficial"
+            if git push origin HEAD:main; then
+              echo "published=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "::warning::Main avançou; recalculando sobre o novo ledger."
+          done
+          exit 1
+      - name: Disparar Pages e verificar publicação por meio do smoke existente
+        if: steps.publish.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main

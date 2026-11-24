@@ -341,6 +341,7 @@ jobs:
         run: |
           set -euo pipefail
           python tests/test_cbf_reta_final_2026.py
+          python tests/test_recuperacao_estatistica_r36r7.py
 
       - name: R35-R1 — Gerar zonas dinâmicas públicas da Libertadores
         shell: bash

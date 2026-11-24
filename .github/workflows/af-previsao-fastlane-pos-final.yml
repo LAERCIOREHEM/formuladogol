@@ -386,6 +386,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          gh workflow run recuperar-estatisticas-r36r7.yml --ref main
           gh workflow run atualizar-brasileirao.yml --ref main -f trace_id="$FDG_TRACE_ID"
           echo "Workflow completo enfileirado; estatísticas, líderes, auditorias e demais derivados continuam fora do caminho crítico do AF."
 
