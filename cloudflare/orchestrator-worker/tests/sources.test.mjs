@@ -19,20 +19,32 @@ function jsonResponse(value, status = 200) {
   });
 }
 
-test('site source wins and GitHub is not touched when public artifact exists', async (t) => {
-  const originalFetch = globalThis.fetch;
-  const calls = [];
-  globalThis.fetch = async (url) => {
-    calls.push(String(url));
-    return jsonResponse({ origem: 'site' });
-  };
-  t.after(() => { globalThis.fetch = originalFetch; });
+test('site source wins for non-authoritative enrichment datasets', async (t) => {
+  const originalFetch=globalThis.fetch,calls=[];
+  globalThis.fetch=async(url)=>{calls.push(String(url));return jsonResponse({origem:'site'})};
+  t.after(()=>{globalThis.fetch=originalFetch});
+  const path='dados-br/config-analises.json';
+  const bundle=await fetchSiteBundle(env(),[path]);
+  assert.equal(bundle[path].origin,'site');
+  assert.deepEqual(bundle[path].data,{origem:'site'});
+  assert.equal(calls.length,1);
+  assert.ok(calls[0].startsWith('https://formuladogol.com.br/'));
+});
 
-  const bundle = await fetchSiteBundle(env(), ['dados-br/agenda-clubes-br.json']);
-  assert.equal(bundle['dados-br/agenda-clubes-br.json'].origin, 'site');
-  assert.deepEqual(bundle['dados-br/agenda-clubes-br.json'].data, { origem: 'site' });
-  assert.equal(calls.length, 1);
-  assert.match(calls[0], /^https:\/\/formuladogol\.com\.br\//);
+test('R36-R4 agenda is repository-authoritative; stale Pages cannot resurrect FINAL', async(t)=>{
+  const originalFetch=globalThis.fetch,calls=[];
+  globalThis.fetch=async(url,options)=>{
+    calls.push(String(url));
+    assert.ok(String(url).startsWith('https://api.github.com/'));
+    assert.equal(options.headers.Authorization,'Bearer test-token');
+    return jsonResponse({jogos:[]});
+  };
+  t.after(()=>{globalThis.fetch=originalFetch});
+  const path='dados-br/agenda-clubes-br.json';
+  const bundle=await fetchSiteBundle(env(),[path]);
+  assert.equal(bundle[path].origin,'github_authoritative');
+  assert.deepEqual(bundle[path].data,{jogos:[]});
+  assert.equal(calls.length,1);
 });
 
 test('404 on Pages transparently falls back to authenticated GitHub repository content', async (t) => {
