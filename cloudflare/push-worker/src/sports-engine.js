@@ -290,6 +290,7 @@ export function confirmedGoalDetails(summary) {
   const sources=[
     summary?.details,
     summary?.competitions?.[0]?.details,
+    summary?.competitions?.[0]?.scoringPlays,
     summary?.header?.competitions?.[0]?.details,
     summary?.header?.competitions?.[0]?.scoringPlays
   ];
