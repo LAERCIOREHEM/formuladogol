@@ -34,7 +34,7 @@
     const tone=m.status==='synced'?'fdg-pulse-positive':'';
     const cards=[
       metric(input.timeLabel||'Última atualização',m.stamp?.time||'—',m.stamp?m.stamp.date+' · BRT':'Horário não confirmado',tone),
-      metric(input.coverageLabel||'Jogos processados',fmt(m.processed)+'/'+fmt(m.expected),m.coverage===null?'Cobertura não confirmada':m.coverage.toLocaleString('pt-BR',{maximumFractionDigits:1})+'% da base',tone)
+      metric(input.coverageLabel||'Jogos processados',m.expected===null?fmt(m.processed):fmt(m.processed)+'/'+fmt(m.expected),m.coverage===null?'Cobertura não confirmada':m.coverage.toLocaleString('pt-BR',{maximumFractionDigits:1})+'% da base',tone)
     ];
     if(m.season!==null&&m.completed!==null)cards.push(metric('Brasileirão '+String(input.year||2026),fmt(m.completed)+'/'+fmt(m.season),m.remaining===null?'':fmt(m.remaining)+' jogos restantes','fdg-pulse-season'));
     for(const item of (Array.isArray(input.metrics)?input.metrics:[]).slice(0,4))if(item&&typeof item==='object')cards.push(metric(item.label,item.value,item.detail));

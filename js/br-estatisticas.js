@@ -580,7 +580,7 @@
     const shown = expanded ? list : list.slice(0, 5);
     const completenessKey = type === "artilheiros" ? "artilharia" : "assistencias";
     const completeness = state.leaders?.completude?.[completenessKey] || {};
-    const totalGames = Number(completeness.total_jogos_declarado) || totalFinishedGames();
+    const totalGames = Math.max(Number(completeness.total_jogos_declarado)||0,totalFinishedGames());
     const gamesRead = Number(completeness.jogos_lidos) || 0;
     const lineupGames = Number(completeness.jogos_com_escalacoes) || 0;
     const liveGames = liveApplicableGames();
@@ -693,6 +693,7 @@
       state.gamesLimit = 10;
       renderGameFilter();
       renderGames();
+      renderDataPulse("jogos");
     });
     $("filtro-jogos").querySelector("[data-clear-game-filter]")?.addEventListener("click", () => {
       state.clubFilter = "";
@@ -2339,7 +2340,7 @@
     target.innerHTML = `<section class="probability-ranking-section probability-comparison-section" aria-label="Probabilidades">
       <div class="probability-section-head">
         <div><div class="kicker">Probabilidades</div></div>
-        <div class="probability-head-aside"><small>${escapeHtml(probabilityCalculationLabel())}</small></div>
+        ${window.FDGDataPulse ? "" : `<div class="probability-head-aside"><small>${escapeHtml(probabilityCalculationLabel())}</small></div>`}
       </div>
       ${probabilitySyncNotice()}
       <p class="probability-table-hint">↔ No celular, arraste a tabela para ver todas as probabilidades e projeções.</p>
@@ -2683,6 +2684,59 @@
     });
   }
 
+  // R36-R5 B: timestamps and counts belong to each dataset.
+  function dataPulseInput(tab) {
+    const n=v=>typeof v==="number"&&Number.isSafeInteger(v)&&v>=0?v:null;
+    const r=resultsRows(),t=tableRows();
+    const tc=t.length===20?n(t.reduce((a,x)=>a+Number(x.jogos),0)/2):null;
+    const projection=currentStandingsProjection();
+    const live=projection.jogos.some(g=>g.estado==="in");
+    const pendingFinals=projection.jogos.filter(g=>g.estado==="post").length;
+    const expected=r.length||tc!==null?Math.max(r.length,tc??0)+pendingFinals:null;
+    const comp=state.competition||{},s=comp.resumo||{};
+    const base={expected,seasonTotal:380,seasonCompleted:expected,live,certified:false,pending:pendingFinals>0};
+    const metric=(label,value,detail="")=>({label,value:value===null||value===undefined?"—":integer(value),detail});
+    if(tab==="probabilidades"){
+      const p=state.probabilities||{},a=state.probabilitiesAudit||{},sport=probabilitySportsState();
+      return {...base,updatedAt:p.calculado_em,processed:n(p.base_corrente?.partidas_concluidas),timeLabel:"Último cálculo",
+        certified:p.status==="ok"&&Boolean(p.hash_entrada)&&p.hash_entrada===a.hash_entrada&&sport==="synced"&&r.length>0&&tc===r.length,
+        pending:pendingFinals>0||sport==="pending",
+        metrics:[metric("Simulações",n(p.simulacao?.quantidade),"AF-Previsão")],
+        note:live?"Classificação ao vivo; percentuais do último cálculo.":"Cobertura comparada aos resultados conhecidos."};
+    }
+    if(tab==="artilheiros"||tab==="assistencias"){
+      const c=state.leaders?.completude?.[tab]||{};
+      const missing=liveApplicableGames().reduce((a,g)=>a+Number(state.liveFacts?.[String(g.eventId)]?.integrity?.missingScorers||0),0);
+      return {...base,updatedAt:state.leaders?.atualizado_em,processed:n(c.jogos_lidos),
+        metrics:[metric("Escalações",n(c.jogos_com_escalacoes)),metric(tab==="artilheiros"?"Gols de jogadores":"Assistências",n(c.total_eventos_contabilizados))],
+        pending:pendingFinals>0||(expected!==null&&n(c.jogos_com_escalacoes)!==expected)||(tab==="artilheiros"&&missing>0),
+        note:missing&&tab==="artilheiros"?missing+" autoria(s) ao vivo pendente(s).":"Base consolidada; dados ao vivo são provisórios."};
+    }
+    if(tab==="jogos"){
+      const games=filteredGames(),filtered=Boolean(state.clubFilter);
+      return {...base,expected:filtered?expectedClubGames(state.clubFilter):expected,updatedAt:state.details?.gerado_em,
+        processed:state.details?.jogos?statsCountForGames(games):null,coverageLabel:"Jogos com estatísticas",
+        metrics:[metric("Jogos listados",games.length)],note:filtered?"Cobertura do clube selecionado.":"Estatísticas detalhadas dos jogos encerrados."};
+    }
+    if(tab==="gols-clube")return {...base,updatedAt:comp.atualizado_em,processed:n(s.jogos_finalizados),
+      metrics:[metric("Clubes",n(s.clubes)),metric("Gols contra",n(s.gols_contra))],note:"Base de gols por clube; autoria individual pode ter cobertura diferente."};
+    if(tab==="campeonato")return {...base,updatedAt:comp.atualizado_em,processed:n(s.jogos_finalizados),
+      metrics:[metric("Com estatísticas",n(s.jogos_com_estatisticas)),metric("Com público",n(s.jogos_com_publico)),metric("Com renda",n(s.jogos_com_renda))],
+      pending:pendingFinals>0||(expected!==null&&[s.jogos_com_estatisticas,s.jogos_com_publico,s.jogos_com_renda].some(v=>n(v)!==expected)),
+      note:"Público, renda e estatísticas têm coberturas independentes."};
+    if(tab==="desempenho"){
+      const ranking=Array.isArray(state.ranking?.ranking)?state.ranking.ranking:[];
+      const boxscores=ranking.length===20?n(ranking.reduce((a,x)=>a+Number(x.metricas?.jogos_com_boxscore),0)/2):null;
+      return {...base,updatedAt:state.ranking?.atualizado_em,processed:boxscores,coverageLabel:"Jogos com boxscore",
+        metrics:[metric("Clubes avaliados",ranking.length)],note:"Cobertura do próprio AF-Score."};
+    }
+    return base;
+  }
+  function renderDataPulse(tab=state.tab){
+    const target=$("data-pulse-"+tab);
+    if(target&&window.FDGDataPulse)window.FDGDataPulse.mount(target,dataPulseInput(tab));
+  }
+
   function renderCurrentTab() {
     if (state.tab === "artilheiros") renderPlayers("artilheiros");
     else if (state.tab === "assistencias") renderPlayers("assistencias");
@@ -2691,6 +2745,7 @@
     else if (state.tab === "campeonato") renderChampionship();
     else if (state.tab === "probabilidades") renderProbabilities();
     else if (state.tab === "desempenho") renderRanking();
+    renderDataPulse();
   }
 
   function renderAll() { renderCurrentTab(); }
@@ -2793,6 +2848,7 @@
     else if (state.tab === "assistencias") renderPlayers("assistencias");
     else if (state.tab === "gols-clube") renderClubGoals();
     else if (state.tab === "probabilidades") { renderProbabilityRanking(); renderProbabilityDetails(); }
+    renderDataPulse();
   }
 
   function hasIncompleteLiveFacts() {

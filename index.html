@@ -2912,6 +2912,7 @@ body > .container > section.hero > img {
   <link rel="stylesheet" href="/css/br-alertas.css?v=20260901-alertas-v1">
   <link rel="stylesheet" href="/css/br-af-scorecards.css?v=20261110-ux-r1">
 <link rel="stylesheet" href="/css/br-af-resultados.css?v=20261110-ux-r1">
+<link rel="stylesheet" href="css/br-data-pulse.css?v=20261124-r36r5b">
 </head>
 <body>
 <div class="container">
@@ -2965,6 +2966,7 @@ body > .container > section.hero > img {
 <script src="js/br-resultados-freshness.js?v=20261004-r10r9"></script>
 <script src="js/br-final-canonical-bridge.js?v=20261119-fast-final-r1"></script>
 <script src="js/br-af-core-snapshot.js?v=20261123-r36r4"></script>
+<script src="js/br-data-pulse.js?v=20261124-r36r5b"></script>
 <script src="js/br-af-scorecards.js?v=20261110-ux-r1"></script>
 <script src="js/br-af-resultados.js?v=20261119-r35"></script>
 <script>
@@ -5159,7 +5161,14 @@ function renderTabela() {
     : (temFinalPendente
       ? `✓ Classificação provisória · ${baseTabela} · resultado final aguardando tabela ESPN`
       : (dataTabela ? `Atualizada ${formatarDataHoraBrCompleta(dataTabela)} · ${baseTabela}` : `Base: ${baseTabela}`));
+  if(window.FDGDataPulse){
+    html += '</div>'+window.FDGDataPulse.render({updatedAt:state._atualizadoEmServidor,processed:jogosTabela,
+      expected:state.resultadosCarregados?Math.max(jogosFinalizados,jogosTabela)+projecaoAoVivo.jogos.filter(j=>j.estado==="post").length:null,
+      seasonTotal:380,seasonCompleted:Math.max(jogosFinalizados,jogosTabela),live:temTabelaAoVivo,pending:temFinalPendente,certified:false,
+      metrics:[{label:"Clubes",value:state.tabela.length,detail:"Classificação oficial"}],note:statusTabela});
+  }else{
   html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">${statusTabela}</span></div>`;
+  }
   // Independente do AF: uma coleta antiga não pode retirar a taça já
   // garantida por pontos + primeiro desempate (número de vitórias).
   const proofCandidates = (state.tabela || []).filter(clube => {
@@ -6455,7 +6464,7 @@ function renderResultados() {
   const freshnessResultados = window.BRResultadosFreshness
     ? window.BRResultadosFreshness.effectiveUpdate(state)
     : { br: meta.atualizado_em_br || '', source: 'resultado-br-fallback' };
-  if (freshnessResultados.br) {
+  if (freshnessResultados.br && !window.FDGDataPulse) {
     const consolidados = Array.isArray(state.resultados) ? state.resultados.length : 0;
     const esperadoResultados = Number(meta.total_resultados) || consolidados;
     const provisoriosEspn = resultadosDisponiveis.filter(r => r && r._provisorioESPN).length;
@@ -6479,6 +6488,16 @@ function renderResultados() {
   }
   html += '</div>';
   html += '</div>';
+  if(window.FDGDataPulse){
+    const consolidated=state.resultados.length;
+    const provisional=resultadosDisponiveis.filter(r=>r&&r._provisorioESPN).length;
+    const tableCount=state.tabela.length===20?totalJogosTabelaOficialBr():null;
+    html+=window.FDGDataPulse.render({updatedAt:meta.atualizado_em,processed:consolidated,
+      expected:tableCount===null?null:Math.max(tableCount,consolidated+provisional),
+      seasonTotal:380,seasonCompleted:consolidated+provisional,pending:provisional>0,certified:false,
+      coverageLabel:"Resultados consolidados",metrics:[{label:"Recém-finalizados",value:provisional,detail:"Aguardando consolidação"}],
+      note:"Cobertura global; filtros não alteram a base de atualização."});
+  }
   html += '<div class="br-games-archive-strip br-results-archive-strip"><span>Todos os jogos e rodadas do Brasileirão</span><a class="br-game-action" href="/brasileirao-jogos.html">🗂️ Abrir arquivo completo</a></div>';
   if (state.afE3Resultados) {
     const resumoE3 = state.afE3Resultados.resumo;

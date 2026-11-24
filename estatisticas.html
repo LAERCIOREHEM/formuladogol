@@ -180,6 +180,7 @@
   </script>
   <link rel="stylesheet" href="/css/br-social-footer.css?v=20260811-social-v2-tiktok">
   <link rel="stylesheet" href="/css/br-pwa.css?v=20260923-pwa-home-install-v5">
+<link rel="stylesheet" href="css/br-data-pulse.css?v=20261124-r36r5b">
 </head>
 <body>
   <div class="container">
@@ -215,6 +216,7 @@
 
       <section class="stats-content">
         <article class="stats-view" id="view-artilheiros" data-view="artilheiros" role="tabpanel" hidden>
+          <div id="data-pulse-artilheiros" class="fdg-pulse-slot"></div>
           <div class="panel"><div class="panel-inner">
             <div class="section-head">
               <div><div class="kicker">⚽ Gols</div><h2>Artilheiros</h2></div>
@@ -228,6 +230,7 @@
         </article>
 
         <article class="stats-view" id="view-jogos" data-view="jogos" role="tabpanel" hidden>
+          <div id="data-pulse-jogos" class="fdg-pulse-slot"></div>
           <div class="panel"><div class="panel-inner">
             <div class="section-head stats-game-head">
               <div><div class="kicker">📋 Partida por partida</div><h2>Raio-x dos jogos</h2></div>
@@ -239,6 +242,7 @@
         </article>
 
         <article class="stats-view" id="view-assistencias" data-view="assistencias" role="tabpanel" hidden>
+          <div id="data-pulse-assistencias" class="fdg-pulse-slot"></div>
           <div class="panel"><div class="panel-inner">
             <div class="section-head">
               <div><div class="kicker">🎯 Passes para gol</div><h2>Garçons</h2></div>
@@ -249,6 +253,7 @@
         </article>
 
         <article class="stats-view" id="view-gols-clube" data-view="gols-clube" role="tabpanel" hidden>
+          <div id="data-pulse-gols-clube" class="fdg-pulse-slot"></div>
           <div class="panel"><div class="panel-inner">
             <div class="section-head">
               <div><div class="kicker">🥅 Produção ofensiva</div><h2>Gols por clube</h2></div>
@@ -262,10 +267,12 @@
         </article>
 
         <article class="stats-view" id="view-campeonato" data-view="campeonato" role="tabpanel" hidden>
+          <div id="data-pulse-campeonato" class="fdg-pulse-slot"></div>
           <div id="campeonato-conteudo"></div>
         </article>
 
         <article class="stats-view active" id="view-probabilidades" data-view="probabilidades" role="tabpanel">
+          <div id="data-pulse-probabilidades" class="fdg-pulse-slot"></div>
           <div class="panel probability-panel"><div class="panel-inner">
             <div id="probabilidades-controles" hidden></div>
             <div id="probabilidades-ranking"></div>
@@ -402,6 +409,7 @@
         </article>
 
         <article class="stats-view" id="view-desempenho" data-view="desempenho" role="tabpanel" hidden>
+          <div id="data-pulse-desempenho" class="fdg-pulse-slot"></div>
           <div class="panel"><div class="panel-inner">
             <div class="section-head">
               <div><div class="kicker">⚡ Índice próprio</div><h2>Ranking de Desempenho</h2></div>
@@ -472,7 +480,8 @@
   <script src="js/br-estatisticas-ordem.js?v=20260816-ordem-canonica-v1"></script>
   <script src="js/br-classificacao-live.js?v=20260920-monitor-facts-v7"></script>
   <script src="js/br-af-core-snapshot.js?v=20261123-r36r4"></script>
-  <script src="js/br-estatisticas.js?v=20260920-live-facts-v6"></script>
+  <script src="js/br-data-pulse.js?v=20261124-r36r5b"></script>
+  <script src="js/br-estatisticas.js?v=20261124-r36r5b"></script>
   <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
   <script src="js/br-menu.js?v=20260901-alertas-v1"></script>
   <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>

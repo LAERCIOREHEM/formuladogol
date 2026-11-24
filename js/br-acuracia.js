@@ -130,6 +130,16 @@
     var rounds = Array.isArray(games.por_rodada) ? games.por_rodada : [];
     var firstRound = rounds.length ? Number(rounds[0].rodada) : null;
     var evaluated = Number(games.jogos_avaliados) || 0;
+    var pulse=el("data-pulse-acuracia");
+    if(pulse && window.FDGDataPulse){
+      var sample=Number.isSafeInteger(games.jogos_avaliados)?games.jogos_avaliados:null;
+      window.FDGDataPulse.mount(pulse,{updatedAt:data.gerado_em,processed:sample,expected:null,
+        certified:false,timeLabel:"Última aferição",coverageLabel:"Jogos avaliados",
+        metrics:[{label:"Histórico pré-jogo",value:firstRound?"R"+firstRound:"—",detail:"Início da amostra"}],
+        note:"Amostra histórica de previsões válidas. Não equivale ao total de jogos disputados."});
+      target.hidden=true;
+      return;
+    }
     target.textContent = "Última aferição: " + dateTimeLabel(data.gerado_em) +
       " · " + evaluated.toLocaleString("pt-BR") + " jogos avaliados" +
       (firstRound ? " · histórico pré-jogo desde a R" + firstRound : "");
