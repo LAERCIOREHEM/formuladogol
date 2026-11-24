@@ -1908,6 +1908,12 @@ jobs:
               (HOST + "/estatisticas.html", "br-classificacao-live.js?v=20260920-monitor-facts-v7"),
               (HOST + "/aovivo.html", "br-aovivo.js?v=20261123-r36r3-scorer"),
               (HOST + "/js/br-classificacao-live.js", 'const LIVE_STATE_VERSION = "7"'),
+              (HOST + "/", "br-data-pulse.js?v=20261124-r36r5d"),
+              (HOST + "/estatisticas.html", "br-data-pulse.js?v=20261124-r36r5d"),
+              (HOST + "/acuracia.html", "br-acuracia.js?v=20261124-r36r5d"),
+              (HOST + "/js/br-data-pulse.js?v=20261124-r36r5d", "function accuracyProof("),
+              (HOST + "/js/br-estatisticas.js?v=20261124-r36r5d", "pulse.reconcile(r,t)"),
+              (HOST + "/js/br-acuracia-placares-e4.js?v=20261124-r36r5d", "fdg:accuracy-proof"),
           ]
 
           def check(url):
