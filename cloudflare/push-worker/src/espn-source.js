@@ -1,3 +1,4 @@
+import { confirmedGoalDetails } from './sports-engine.js';
 const SITE_ROOT = 'https://site.api.espn.com/apis/site/v2/sports/soccer';
 const SITE_V3_ROOT = 'https://site.api.espn.com/apis/site/v3/sports/soccer';
 const SITE_WEB_ROOT = 'https://site.web.api.espn.com/apis/site/v2/sports/soccer';
@@ -87,12 +88,12 @@ export function unwrapSummary(payload) {
     payload
   ].filter(Boolean);
   for (const candidate of candidates) {
-    if (Array.isArray(candidate?.scoringPlays) || Array.isArray(candidate?.plays)) return candidate;
+    if (Array.isArray(candidate?.scoringPlays) || Array.isArray(candidate?.plays) || confirmedGoalDetails(candidate).length) return candidate;
   }
   for (const candidate of walkObjects(payload, 6)) {
-    if (Array.isArray(candidate?.scoringPlays) || Array.isArray(candidate?.plays)) return candidate;
+    if (Array.isArray(candidate?.scoringPlays) || Array.isArray(candidate?.plays) || confirmedGoalDetails(candidate).length) return candidate;
   }
-  throw new Error('payload de jogo sem plays/scoringPlays');
+  throw new Error('payload de jogo sem plays/scoringPlays/details de gol confirmado');
 }
 
 function goalDescriptor(item) {
@@ -111,9 +112,9 @@ function looksLikeGoal(item) {
 export function summaryGoalCount(summary) {
   if (!summary || typeof summary !== 'object') return 0;
   const primary = Array.isArray(summary.scoringPlays) ? summary.scoringPlays : [];
-  if (primary.length) return primary.filter(looksLikeGoal).length;
   const plays = Array.isArray(summary.plays) ? summary.plays : [];
-  return plays.filter(looksLikeGoal).length;
+  return Math.max(primary.filter(looksLikeGoal).length,
+    plays.filter(looksLikeGoal).length, confirmedGoalDetails(summary).length);
 }
 
 function scorerNameHint(item) {
@@ -134,7 +135,9 @@ export function summaryNamedScorerHintCount(summary) {
   if (!summary || typeof summary !== 'object') return 0;
   const primary = Array.isArray(summary.scoringPlays) ? summary.scoringPlays : [];
   const source = primary.length ? primary : (Array.isArray(summary.plays) ? summary.plays.filter(looksLikeGoal) : []);
-  return source.filter((item) => looksLikeGoal(item) && scorerNameHint(item)).length;
+  const details = confirmedGoalDetails(summary);
+  return Math.max(source.filter((item) => looksLikeGoal(item) && scorerNameHint(item)).length,
+    details.filter((item) => scorerNameHint(item)).length);
 }
 
 function withBust(url) {
