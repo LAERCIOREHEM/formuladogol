@@ -789,8 +789,10 @@
             const directRows = extractStatsRows(game, direct);
             const directScore = statsRowsFreshnessScore(directRows);
             if (directScore > gatewayScore) {
-              direct.__fdgLiveFacts = envelope.facts || null;
-              direct.__fdgLiveFactsIntegrity = envelope.factsIntegrity || (envelope.facts && envelope.facts.integrity) || null;
+              // Nunca apagar fatos conciliados no navegador porque o fallback
+              // ESPN ganhou apenas na qualidade das estatísticas.
+              direct.__fdgLiveFacts = envelope.data.__fdgLiveFacts || null;
+              direct.__fdgLiveFactsIntegrity = direct.__fdgLiveFacts?.integrity || null;
               direct.__fdgLiveMeta = {
                 statsProvider: "espn-direct-fresh",
                 statsCoverage: { minPerTeam: directRows.length, maxPerTeam: directRows.length },
@@ -2528,24 +2530,32 @@
   }
 
   function goalsBySide(g, summary) {
-    // Live Facts v6: autoria/assistência nunca é reconstruída a partir do JSON
-    // bruto no navegador. O scoreboard define QUANTOS gols existem; o Worker
-    // canônico define QUEM marcou. Na ausência do contrato canônico mostramos
-    // o placar sem inventar marcadores.
-    const canonical = summary && summary.__fdgLiveFacts;
-    const home=[], away=[];
-    // Sem Live Facts canônicos, o navegador não reconstrói nem fabrica
-    // linhas de gol a partir do placar ou dos eventos brutos.
-    if (!canonical || !Array.isArray(canonical.goals)) return {home,away};
+    // R36-R3: o placar determina APENAS a quantidade por equipe. O autor e o
+    // minuto continuam exclusivos dos Live Facts validados pelo Worker.
+    // Nunca deixar uma partida com gols sem sequer uma indicação de autoria
+    // pendente — mesmo se o gateway cair, o fallback perder facts ou houver VAR.
     const expectedHome=Math.max(0,Number(numericScore(g.home&&g.home.score)||0));
     const expectedAway=Math.max(0,Number(numericScore(g.away&&g.away.score)||0));
+    const home=[], away=[];
+    const completeWithPending=(items,total)=>{
+      const safe=items.slice(0,total);
+      while(safe.length<total) safe.push({min:"⚽",athlete:"Autor sendo confirmado"});
+      return safe;
+    };
+    const unresolved=()=>({
+      home:completeWithPending([],expectedHome),
+      away:completeWithPending([],expectedAway)
+    });
+    const canonical=summary&&summary.__fdgLiveFacts;
+    if (!canonical || !Array.isArray(canonical.goals)) return unresolved();
     const integrity=canonical.integrity||{};
-    if (Number(integrity.expectedHome)!==expectedHome || Number(integrity.expectedAway)!==expectedAway || integrity.mathematicallyValid===false) return {home,away};
-    const homeId=String(g.home.id||""), awayId=String(g.away.id||"");
+    if (Number(integrity.expectedHome)!==expectedHome ||
+        Number(integrity.expectedAway)!==expectedAway ||
+        integrity.mathematicallyValid===false) return unresolved();
+    const homeId=String(g.home.id||""),awayId=String(g.away.id||"");
     for (const goal of canonical.goals) {
       const item={min:String(goal.minute||""),athlete:compactPlayerName(goal.scorer||"")||(goal.ownGoal?"Gol contra":"Autor sendo confirmado")};
       const teamId=String(goal.teamId||"");
-      // Identidade ESPN tem precedência absoluta sobre o side textual.
       if (teamId && teamId===homeId) home.push(item);
       else if (teamId && teamId===awayId) away.push(item);
       else if (goal.team===g.home.nome) home.push(item);
@@ -2553,9 +2563,9 @@
       else if (goal.side==="home") home.push(item);
       else if (goal.side==="away") away.push(item);
     }
-    // Só renderiza identidades efetivamente entregues pelo contrato canônico.
-    // O placar continua independente e não é usado para fabricar autores.
-    return {home:home.slice(0,expectedHome),away:away.slice(0,expectedAway)};
+    // Sem o identificador do atleta, nunca inferir quem marcou a partir do
+    // placar. As linhas restantes avisam que a reconciliação está em andamento.
+    return {home:completeWithPending(home,expectedHome),away:completeWithPending(away,expectedAway)};
   }
 
   function renderGoalsUnderTeams(g, summary) {
