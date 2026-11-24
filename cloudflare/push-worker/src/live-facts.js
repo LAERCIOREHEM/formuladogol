@@ -1,4 +1,4 @@
-import { extractScoringPlays, mergeScoringPlayVariants, reconcileScoringPlays } from './sports-engine.js';
+import { confirmedGoalDetails, extractScoringPlays, mergeScoringPlayVariants, reconcileScoringPlays } from './sports-engine.js';
 
 const LIVE_FACTS_CONTRACT_VERSION = 3;
 const text = (value) => String(value == null ? '' : value).trim();
@@ -14,7 +14,7 @@ function matchFromSummary(summary, eventId = '') { const competition = competiti
 function eventMinute(item) { for (const key of ['clock','time','displayClock','timeDisplayValue','minute','minuto']) { const value=item?.[key]; if (value && typeof value==='object') { const v=value.displayValue??value.displayClock??value.text??value.value; if (v!=null && String(v).trim()) return text(v); } else if (value!=null && String(value).trim()) return text(value); } return ''; }
 function rawScore(item,key) { const value=item?.[key]??item?.score?.[key]??item?.score?.[key==='homeScore'?'home':'away']; const n=Number(value); return Number.isFinite(n)&&n>=0?n:null; }
 function isGoalLike(item) { if (!item||typeof item!=='object') return false; if (item.scoringPlay===true) return true; const descriptor=[item?.type?.text,item?.type?.name,item?.type?.description,item?.text,item?.description].filter(Boolean).join(' '); const n=normalized(descriptor); if (/attempt saved|shot saved|save made|shots on goal|shots on target|expected goals|goalkeeper|missed|blocked/.test(n) && !/goal!|gol!/.test(n)) return false; return /(^| )(goal|gol|own goal|gol contra)( |$)/.test(n); }
-function goalNodes(summary) { const primary=Array.isArray(summary?.scoringPlays)?summary.scoringPlays:[]; if (primary.length) return primary.filter(isGoalLike); return (Array.isArray(summary?.plays)?summary.plays:[]).filter(isGoalLike); }
+function goalNodes(summary) { const primary=Array.isArray(summary?.scoringPlays)?summary.scoringPlays:[]; const plays=primary.length?primary:(Array.isArray(summary?.plays)?summary.plays:[]); return [...plays.filter(isGoalLike),...confirmedGoalDetails(summary)]; }
 const eventId = (item) => text(item?.id || item?.playId || item?.uid);
 function nodeTeamId(item) { return text(item?.team?.id || item?.teamId || item?.team_id || item?.competitor?.id || item?.competitorId || item?.club?.id || item?.clubId); }
 function assistNamesFromText(value) { const source=text(value); if(!source) return []; const candidates=[]; const patterns=[/assisted by\s+([^.;]+?)(?=\s+(?:with|following|after|from)\b|[.;]|$)/ig,/assist(?:ência|encia)\s+(?:de|por)\s+([^.;]+?)(?=[.;]|$)/ig]; for(const regex of patterns){let match; while((match=regex.exec(source))){const name=compactName(match[1]); if(name)candidates.push(name);}} return [...new Map(candidates.map((name)=>[normalized(name),name])).values()]; }
