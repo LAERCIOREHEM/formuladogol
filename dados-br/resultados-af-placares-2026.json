@@ -5,13 +5,13 @@
   "status": "ok",
   "origem": {
     "arquivo": "dados-br/auditoria-historica-placares-af-2026.json",
-    "sha256_arquivo": "cc4ba62f5e11d76baa95412377ad114946398dcf3968ca35775b9e9d9421bd93",
-    "hash_jogos_e1": "165fa448d75c238fac1d58d46606391859165e54fe6b0ea8faad17f456e8a301",
-    "data_fonte_resultados": "2026-11-23T21:41:23.248789-03:00"
+    "sha256_arquivo": "8c3f06f2f10f68cb4e10dcf2ece1dc1cdeedcd5f59caceaa3546d398887712cb",
+    "hash_jogos_e1": "7072e61bc9a5890c38d97be333f0670422087edc08f0b16dc899be37f5b35c43",
+    "data_fonte_resultados": "2026-11-23T22:14:08.737034-03:00"
   },
   "resumo": {
-    "resultados_auditados": 357,
-    "previsoes_certificadas": 175,
+    "resultados_auditados": 358,
+    "previsoes_certificadas": 176,
     "sem_snapshot_certificado": 182,
     "quarentena_por_conflito": 0,
     "sem_horario_factual": 0
@@ -11847,10 +11847,62 @@
         "versao_modelo": "AF-Previsão 1.3",
         "top3_origem": "nativo_documentado"
       }
+    },
+    {
+      "identidade_partida": "botafogo|sao paulo",
+      "event_ids": [
+        "401841326"
+      ],
+      "rodada_auditada": 36,
+      "mandante": "Botafogo",
+      "visitante": "São Paulo",
+      "inicio_factual": "2026-11-23T23:00:00+00:00",
+      "placar_final_auditado": {
+        "mandante": 1,
+        "visitante": 1
+      },
+      "situacao": "comprovado",
+      "placar_previsto": {
+        "mandante": 1,
+        "visitante": 0
+      },
+      "gols_projetados": {
+        "mandante": 1.4067,
+        "visitante": 0.9342
+      },
+      "probabilidades_ved_pct": {
+        "mandante": 47.9246,
+        "empate": 27.0859,
+        "visitante": 24.9895
+      },
+      "palpite_resultado_top1": "mandante",
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 13.5382
+        },
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 12.6474
+        },
+        {
+          "mandante": 0,
+          "visitante": 0,
+          "probabilidade_pct": 9.6241
+        }
+      ],
+      "prova": {
+        "commit": "80c2a8519aa928fb452cf0d4c406a0927571078b",
+        "gerado_em": "2026-11-23T00:27:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "top3_origem": "nativo_documentado"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "4a1d7ef9d8bb3690b6f62f1c6031fcce580c28350112fae51c9be0818d67096c"
+    "hash_jogos": "b2ea6823c5e09ab62c1f83599bd04153a79c3891579dfe5fb6e198eba0736a31"
   }
 }
