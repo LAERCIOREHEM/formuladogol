@@ -238,7 +238,9 @@ const workerPayload = {
   // Somente consultas ESPN DIRETAS dependem de um eventId numérico.
   assert.match(liveSource, /if \(league === "bra\.1" && game\.state === "in" && \/\^\\d\{5,15\}\$\/\.test\(eventId\)\) \{/,
     'fallback ESPN direto deve continuar restrito a IDs ESPN numéricos');
-  assert.match(liveSource, /if \(!canonical \|\| !Array\.isArray\(canonical\.goals\)\) return \{home,away\};/, 'Ao Vivo não pode cair para parser bruto de gols');
+  assert.match(liveSource, /if \(!canonical \|\| !Array\.isArray\(canonical\.goals\)\) return unresolved\(\);/, 'Ao Vivo deve preservar placeholder quando Live Facts indisponível, sem parser bruto');
+  assert.match(liveSource, /while\(safe\.length<total\) safe\.push\(\{min:"⚽",athlete:"Autor sendo confirmado"\}\)/,
+    'scoreboard com gol sem autor não pode ficar visualmente vazio');
   assert.ok(!liveSource.includes('eventRows(g,summary).filter(r=>r.type.key==="goal")'), 'parser bruto de gols deve estar eliminado do render');
   assert.ok(liveSource.indexOf('if (teamId && teamId===homeId)') < liveSource.indexOf('else if (goal.side==="home")'), 'teamId precisa ter precedência sobre side');
   assert.match(liveSource, /isRejectedTransmissionTitle/);
