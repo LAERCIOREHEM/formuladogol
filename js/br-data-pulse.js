@@ -67,11 +67,12 @@
   }
   function reconcile(rows,table){
     const l=ledger(rows),seen=new Set();
+    const finals=Array.isArray(rows)&&rows.every(g=>g?.estado==='post'&&timestamp(g.finalizado_em)!==null);
     const tableValid=Array.isArray(table)&&table.length===20&&table.every(t=>{
       const k=name(t.time),c=l.clubs.get(k);if(!c||seen.has(k))return false;seen.add(k);
       return Object.keys(c).every(field=>count(t[field])===c[field]);
     });
-    return {...l,expected:l.valid?l.matches.size:null,certified:l.valid&&tableValid&&l.clubs.size===20};
+    return {...l,expected:l.valid?l.matches.size:null,certified:l.valid&&finals&&tableValid&&l.clubs.size===20};
   }
   function compareGames(reference,rows,predicate=()=>true){
     const other=ledger(rows);let matched=0;
