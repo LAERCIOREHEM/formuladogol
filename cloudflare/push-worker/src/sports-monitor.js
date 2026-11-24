@@ -1,5 +1,6 @@
 import {
   applyObservation,
+  confirmedGoalDetails,
   extractScoringPlays,
   initialMatchState,
   matchNeedsFastPolling,
@@ -306,10 +307,12 @@ function eventMap(payload) {
 }
 
 function scoreboardScoringDetails(raw) {
-  const competition = raw?.competitions?.[0] || raw?.competition || {};
-  const candidates = [competition?.details, raw?.details, competition?.scoringPlays, raw?.scoringPlays];
-  for (const value of candidates) if (Array.isArray(value) && value.length) return value;
-  return [];
+  // A primeira lista pode conter apenas cartões e faltas. Nunca descartar
+  // um gol com autor numa segunda superfície ESPN mais completa.
+  const competition=raw?.competitions?.[0]||raw?.competition||{};
+  const primary=[...(Array.isArray(competition?.scoringPlays)?competition.scoringPlays:[]),
+    ...(Array.isArray(raw?.scoringPlays)?raw.scoringPlays:[])];
+  return [...primary,...confirmedGoalDetails(raw)];
 }
 
 function regulationPlays(plays) {
