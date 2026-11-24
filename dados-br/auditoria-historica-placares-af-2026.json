@@ -5,19 +5,19 @@
   "temporada": 2026,
   "status": "auditado_com_lacunas",
   "resumo": {
-    "total_resultados_unicos": 358,
-    "jogos_com_placar_prejogo_comprovado": 176,
+    "total_resultados_unicos": 359,
+    "jogos_com_placar_prejogo_comprovado": 177,
     "jogos_sem_prova_prejogo": 182,
     "jogos_com_conflito": 0,
     "jogos_sem_inicio_factual": 0,
-    "jogos_com_top3_original": 176,
+    "jogos_com_top3_original": 177,
     "jogos_sem_top3_original": 0,
     "partidas_sem_previsao_nao_foram_reconstituidas": true
   },
   "fontes_resultados": {
     "caminho": "resultados.json",
-    "arquivo_sha256": "7487957b5b1a075089f786bf3915da6da557f2ae240a265078c724534a8baf33",
-    "atualizado_em": "2026-11-23T22:14:08.737034-03:00"
+    "arquivo_sha256": "728f3f5f8563f8d3105b1acd2a5d9e85679603143c9df7eb2b5cb65178ed3141",
+    "atualizado_em": "2026-11-23T23:11:23.157129-03:00"
   },
   "historico_ved_preexistente": {
     "caminho": "dados-br/historico-probabilidades-jogos.json",
@@ -41,18 +41,18 @@
   "varredura_git": {
     "fontes": {
       "dados-br/probabilidades-jogos.json": {
-        "commits_localizados": 165,
-        "snapshots_validos": 165,
-        "linhas_prejogo_elegiveis": 13849
+        "commits_localizados": 166,
+        "snapshots_validos": 166,
+        "linhas_prejogo_elegiveis": 14012
       },
       "dados-br/probabilidades-brasileirao.json": {
-        "commits_localizados": 307,
-        "snapshots_validos": 307,
-        "linhas_prejogo_elegiveis": 30210
+        "commits_localizados": 308,
+        "snapshots_validos": 308,
+        "linhas_prejogo_elegiveis": 30515
       }
     },
     "linhas_rejeitadas": {
-      "apos_inicio_factual": 188
+      "apos_inicio_factual": 192
     }
   },
   "jogos": [
@@ -13672,11 +13672,72 @@
         "hash_entrada_modelo": "2ea30dc651e571f90c0ee17c6604aac264b0d64f89febf0c23ddfcf3c3f7fd88",
         "calculado_em": "2026-11-23T20:39:06+00:00"
       }
+    },
+    {
+      "event_id": "401841320",
+      "rodada": 36,
+      "mandante": "Santos",
+      "visitante": "Grêmio",
+      "inicio_factual": "2026-11-24T00:00:00+00:00",
+      "placar_final": {
+        "mandante": 0,
+        "visitante": 2
+      },
+      "identidade_partida": "santos|gremio",
+      "ids_resultado": [
+        "401841320"
+      ],
+      "situacao": "comprovado",
+      "event_id_previsao": "401841320",
+      "previsao": {
+        "gols_esperados": {
+          "mandante": 1.5907,
+          "visitante": 1.0037
+        },
+        "placar_modal": {
+          "mandante": 1,
+          "visitante": 1
+        },
+        "probabilidades_ved_pct": {
+          "mandante": 51.0211,
+          "empate": 25.0878,
+          "visitante": 23.8911
+        }
+      },
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 11.9249
+        },
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 11.8806
+        },
+        {
+          "mandante": 2,
+          "visitante": 1,
+          "probabilidade_pct": 9.4846
+        }
+      ],
+      "top3_situacao": "nativo_documentado",
+      "proveniencia": {
+        "origem": "dados-br/probabilidades-brasileirao.json",
+        "commit": "80c2a8519aa928fb452cf0d4c406a0927571078b",
+        "commit_em": "2026-11-23T20:39:27+00:00",
+        "arquivo_sha256": "c50fb4a1244bce0cb4469832bd881bd3404d8126168012ea00db4495f0bd8fe6",
+        "linha_sha256": "37d2d4fb23c9e9e6e9e347d1276724f3e3df23d0ec1db4329342feb3665a003b",
+        "gerado_em_modelo": "2026-11-23T00:27:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_entrada_modelo": "2ea30dc651e571f90c0ee17c6604aac264b0d64f89febf0c23ddfcf3c3f7fd88",
+        "calculado_em": "2026-11-23T20:39:06+00:00"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "7072e61bc9a5890c38d97be333f0670422087edc08f0b16dc899be37f5b35c43",
-    "hash_resumo": "7cc17dd753d8bf826514376ac5147b5303161ac5b1edf5c193076ea18e5e2a5b"
+    "hash_jogos": "7c198ee6657848c894de6cc3dbd34c4cfd72c689c8fb3e20322b0349e2a89256",
+    "hash_resumo": "6492e1cedba9d1ef3f58a29532de85451b7b3470ace5d4c56d2a9961a8a8d164"
   }
 }
