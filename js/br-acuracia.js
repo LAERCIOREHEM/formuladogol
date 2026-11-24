@@ -133,10 +133,13 @@
     var pulse=el("data-pulse-acuracia");
     if(pulse && window.FDGDataPulse){
       var sample=Number.isSafeInteger(games.jogos_avaliados)?games.jogos_avaliados:null;
-      window.FDGDataPulse.mount(pulse,{updatedAt:data.gerado_em,processed:sample,expected:null,
-        certified:false,timeLabel:"Última aferição",coverageLabel:"Jogos avaliados",
-        metrics:[{label:"Histórico pré-jogo",value:firstRound?"R"+firstRound:"—",detail:"Início da amostra"}],
-        note:"Amostra histórica de previsões válidas. Não equivale ao total de jogos disputados."});
+      var proof=state.pulseProof;
+      var verified=proof&&proof.certified===true&&window.FDGDataPulse.after(proof.updatedAt,proof.referenceAt);
+      window.FDGDataPulse.mount(pulse,{updatedAt:proof?.updatedAt||data.gerado_em,processed:proof?proof.processed:sample,expected:proof?proof.expected:null,
+        certified:!!verified,pending:!!proof&&proof.expected!==null&&proof.processed<proof.expected,
+        seasonTotal:380,seasonCompleted:proof?.seasonCompleted,timeLabel:"Base esportiva da aferição",coverageLabel:proof?"Placares certificados":"Jogos avaliados",
+        metrics:[{label:"V/E/D avaliados",value:sample??"—",detail:"Amostra de probabilidades"},{label:"Sem prova pré-jogo",value:proof?.excluded??"—",detail:"Fora da aferição de placares"}],
+        note:verified?"Aferição de placares conciliada com resultados oficiais e provas E3/E4.":"Amostras históricas preservadas; certificação independente ainda não confirmada."});
       target.hidden=true;
       return;
     }
@@ -581,5 +584,6 @@
       el("accuracy-app").insertAdjacentHTML("afterbegin", '<div class="accuracy-error"><strong>Não foi possível carregar a acurácia agora.</strong><br>' + esc(error && error.message ? error.message : "Falha desconhecida") + "</div>");
     }
   }
+  document.addEventListener("fdg:accuracy-proof",function(event){state.pulseProof=event.detail;renderUpdateStatus();});
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })(window, document);
