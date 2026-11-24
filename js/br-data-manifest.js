@@ -44,6 +44,6 @@
     }catch(e){if(previous)return previous.data;throw e;}finally{inflight.delete(token);}})();
     inflight.set(token,task);return task;
   }
-  function changed(path,m=manifest){const key=keyOf(path);return !!m&&paths.has(key)&&!core.has(key)&&cache.get(key)?.hash!==m.files[key]?.sha256;}
+  function changed(path,m=manifest){const key=keyOf(path);return !!root.crypto?.subtle&&!!m&&paths.has(key)&&!core.has(key)&&cache.get(key)?.hash!==m.files[key]?.sha256;}
   root.FDGDataManifest=Object.freeze({refresh,get,changed,valid,isCore:path=>core.has(keyOf(path))});
 })(window);

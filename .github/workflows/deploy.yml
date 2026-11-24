@@ -56,6 +56,9 @@ on:
       - 'js/br-af-scorecards.js'
       - 'js/br-af-core-snapshot.js' 
       - 'js/br-data-pulse.js'
+      - 'js/br-data-manifest.js'
+      - 'scripts/gerar_fdg_data_manifest.py'
+      - 'tests/test-br-data-manifest.mjs'
       - 'css/br-data-pulse.css'
       - 'tests/test-br-data-pulse.mjs'
       - 'tests/test-br-data-pulse-integration.mjs'
@@ -174,6 +177,7 @@ jobs:
           node tests/test-br-classificacao-live.mjs
           node tests/test-br-data-pulse.mjs
           node tests/test-br-data-pulse-integration.mjs
+          node tests/test-br-data-manifest.mjs
           grep -q 'br-data-pulse.js?v=20261124-r36r5d' index.html
           grep -q 'br-data-pulse.js?v=20261124-r36r5d' estatisticas.html
           grep -q 'br-data-pulse.js?v=20261124-r36r5d' acuracia.html
@@ -181,7 +185,7 @@ jobs:
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' index.html
           grep -q 'br-resultados-freshness.js?v=20261004-r10r9' index.html
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' estatisticas.html
-          grep -q 'br-estatisticas.js?v=20261124-r36r5d' estatisticas.html
+          grep -q 'br-estatisticas.js?v=20261124-r36r5e' estatisticas.html
           grep -q 'br-aovivo.js?v=20261123-r36r3-scorer' aovivo.html
           grep -q 'br-live-goal-sync.js?v=20261014-r10r17-2' aovivo.html
           echo 'OK: LiveState v7 + Live Facts v2 + R10R17.3 Goal Event Integrity + R10R17.2 ID documental.'
@@ -422,6 +426,7 @@ jobs:
             js/br-final-canonical-bridge.js
             js/br-af-core-snapshot.js
             js/br-data-pulse.js
+            js/br-data-manifest.js
             css/br-data-pulse.css
             js/br-agenda.js
             js/br-analises.js
@@ -453,6 +458,7 @@ jobs:
             dados-br/auditoria-publicos-identidade.json
             dados-br/auditoria-modelos-af-previsao.json
             dados-br/auditoria-probabilidades.json
+            dados-br/auditoria-competicoes-af-previsao.json
             dados-br/avaliacao-af-previsao.json
             dados-br/acuracia-af-previsao.json
             dados-br/acuracia-placares-af-2026.json
@@ -1022,7 +1028,7 @@ jobs:
           node --check _site/js/br-final-canonical-bridge.js
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' _site/index.html
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' _site/estatisticas.html
-          grep -q 'br-estatisticas.js?v=20261124-r36r5d' _site/estatisticas.html
+          grep -q 'br-estatisticas.js?v=20261124-r36r5e' _site/estatisticas.html
           grep -q 'br-aovivo.js?v=20261123-r36r3-scorer' _site/aovivo.html
           grep -q 'const LIVE_STATE_VERSION = "7"' _site/js/br-classificacao-live.js
           echo 'OK: pacote público contém LiveState v6 / Live Facts v2 e cache-bust correto.'
@@ -1735,6 +1741,14 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
+      - name: FDG Data Pulse E — manifesto atômico dos bytes finais
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/gerar_fdg_data_manifest.py --site-root _site
+          python scripts/gerar_fdg_data_manifest.py --site-root _site --check
+          node --check _site/js/br-data-manifest.js
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
@@ -1912,7 +1926,10 @@ jobs:
               (HOST + "/estatisticas.html", "br-data-pulse.js?v=20261124-r36r5d"),
               (HOST + "/acuracia.html", "br-acuracia.js?v=20261124-r36r5d"),
               (HOST + "/js/br-data-pulse.js?v=20261124-r36r5d", "function accuracyProof("),
-              (HOST + "/js/br-estatisticas.js?v=20261124-r36r5d", "pulse.reconcile(r,t)"),
+              (HOST + "/js/br-estatisticas.js?v=20261124-r36r5e", "pulse.reconcile(r,t)"),
+              (HOST + "/estatisticas.html", "br-data-manifest.js?v=20261124-r36r5e"),
+              (HOST + "/js/br-data-manifest.js?v=20261124-r36r5e", "superseded revision"),
+              (HOST + "/dados-br/fdg-data-pulse.json", '"schema_version":1'),
               (HOST + "/js/br-acuracia-placares-e4.js?v=20261124-r36r5d", "fdg:accuracy-proof"),
           ]
 

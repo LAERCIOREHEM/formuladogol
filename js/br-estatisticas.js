@@ -275,9 +275,12 @@
   async function fetchJson(path, fallback) {
     try {
       const get=window.FDGCoreSnapshot?.fetch||fetch;
-      const response = await get(`${path}${path.includes("?") ? "&" : "?"}t=${Date.now()}`, { cache: "no-store" });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return await response.json();
+      const direct=async()=>{
+        const response=await get(`${path}${path.includes("?") ? "&" : "?"}t=${Date.now()}`,{cache:"no-store"});
+        if(!response.ok)throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      };
+      return window.FDGDataManifest?await window.FDGDataManifest.get(path,direct):await direct();
     } catch (error) {
       console.warn(`Falha ao carregar ${path}:`, error);
       return fallback;
@@ -2745,7 +2748,14 @@
   }
   function renderDataPulse(tab=state.tab){
     const target=$("data-pulse-"+tab);
-    if(target&&window.FDGDataPulse)window.FDGDataPulse.mount(target,dataPulseInput(tab));
+    if(target&&window.FDGDataPulse){
+      const input=dataPulseInput(tab), manifest=window.FDGDataManifest;
+      const dependencies={probabilidades:["probabilityMilestones","probabilityModelsAudit","probabilityEvaluation"],artilheiros:["leaders","audit"],assistencias:["leaders","audit"],jogos:["details","audit","competition"],"gols-clube":["competition"],campeonato:["competition","audit"],desempenho:["ranking","audit"]};
+      if(manifest&&(dependencies[tab]||[]).some(k=>loadedDatasets.has(k)&&manifest.changed(FILES[k]))){
+        input.certified=false;input.pending=true;input.note="Nova revisão disponível; preservando a última base válida.";
+      }
+      window.FDGDataPulse.mount(target,input);
+    }
   }
 
   function renderCurrentTab() {
@@ -2777,8 +2787,8 @@
   async function loadDataset(key, force = false) {
     if (!FILES[key]) throw new Error(`dataset desconhecido: ${key}`);
     if (!force && loadedDatasets.has(key)) return state[key];
-    if (!force && loadingDatasets.has(key)) return loadingDatasets.get(key);
-    const promise = fetchJson(FILES[key], DATASET_FALLBACKS[key]).then((data) => {
+    if (loadingDatasets.has(key)) return loadingDatasets.get(key);
+    const promise = fetchJson(FILES[key], state[key] ?? DATASET_FALLBACKS[key]).then((data) => {
       state[key] = data; loadedDatasets.add(key); loadingDatasets.delete(key); return data;
     }).catch((error) => { loadingDatasets.delete(key); throw error; });
     loadingDatasets.set(key, promise);
@@ -2809,24 +2819,29 @@
     if (refreshState.ocupado || document.hidden) return;
     refreshState.ocupado = true;
     try {
-      const [statusPartidas, auditoriaProbabilidades, auditoriaContinental] = await Promise.all([
-        fetchJson(FILES.updateStatus, null),
-        fetchJson(FILES.probabilitiesAudit, null),
-        fetchJson(FILES.continentalAudit, null),
+      const manifest=window.FDGDataManifest;
+      const revision=manifest?await manifest.refresh(true):null;
+      const [statusPartidas,auditoriaProbabilidades,auditoriaContinental]=await Promise.all([
+        fetchJson(FILES.updateStatus,null),
+        fetchJson(FILES.probabilitiesAudit,null),
+        fetchJson(FILES.continentalAudit,null),
       ]);
-      // Falha de rede devolve null nas sentinelas: nada a comparar, tenta de novo depois.
-      if (!statusPartidas && !auditoriaProbabilidades && !auditoriaContinental) return;
-
-      const nova = assinaturaDados(statusPartidas, auditoriaProbabilidades, auditoriaContinental);
-      if (!refreshState.assinatura || nova === refreshState.assinatura) return;
-
-      // Dados mudaram de fato. Preserva a rolagem porque renderAll() reescreve
-      // o conteúdo dos painéis e a altura da página pode variar.
-      const rolagem = window.scrollY;
-      await carregarDadosEssenciais(true);
-      await ensureTabData(state.tab, { force: true });
-      renderCurrentTab();
-      window.scrollTo(0, rolagem);
+      const nova=assinaturaDados(statusPartidas||state.updateStatus,auditoriaProbabilidades||state.probabilitiesAudit,auditoriaContinental||state.continentalAudit);
+      const coreRevision=revision&&Object.keys(revision.files).filter(p=>manifest.isCore(p)).sort().map(p=>revision.files[p].sha256).join("|");
+      const coreChanged=nova!==refreshState.assinatura||(coreRevision&&coreRevision!==refreshState.coreRevision);
+      const keys=[...loadedDatasets];
+      const before=new Map(keys.map(k=>[k,state[k]]));
+      const selected=manifest&&revision?keys.filter(k=>manifest.isCore(FILES[k])?coreChanged:manifest.changed(FILES[k])):coreChanged?keys:[];
+      // A sentinela também pode ter acabado de entrar no cache; sincronizar o estado.
+      if(statusPartidas&&statusPartidas!==state.updateStatus&&!selected.includes("updateStatus"))selected.push("updateStatus");
+      const rolagem=window.scrollY;
+      await Promise.all(selected.map(k=>loadDataset(k,true)));
+      refreshState.assinatura=assinaturaDados(state.updateStatus,state.probabilitiesAudit,state.continentalAudit);
+      if(coreRevision&&(!coreChanged||selected.filter(k=>manifest.isCore(FILES[k])).every(k=>state[k]!==before.get(k))))refreshState.coreRevision=coreRevision;
+      if(selected.some(k=>state[k]!==before.get(k))){
+        standingsCache={table:null,results:null,live:null,projection:null,mapa:new Map()};
+        renderCurrentTab();window.scrollTo(0,rolagem);
+      }else renderDataPulse();
     } catch (error) {
       console.warn("Estatísticas: atualização automática indisponível agora:", error);
     } finally {
