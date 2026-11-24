@@ -80,4 +80,33 @@ const vit={id:'3456',displayName:'Vitória'},cru={id:'2022',displayName:'Cruzeir
   assert.equal(afterVar.facts.goals.length,0);
 }
 
+// R36-R3 / Botafogo x São Paulo: placar 0x1, scorer em competition.details
+// sem plays/scoringPlays. Nunca confundir tentativa ao gol com gol.
+{
+  const data = {
+    header: {
+      id: '401841326',
+      competitions: [{
+        competitors: [
+          {homeAway:'home',score:'0',team:{id:'bot',displayName:'Botafogo'}},
+          {homeAway:'away',score:'1',team:{id:'sp',displayName:'São Paulo'}}
+        ],
+        details: [
+          {id:'shot',type:{text:'Shot on Goal'},team:{id:'bot'},clock:{displayValue:"12'"}},
+          {id:'gol-pedro-lima',type:{text:'Goal'},team:{id:'sp'},homeScore:0,awayScore:1,
+            clock:{displayValue:"28'"},athletesInvolved:[{id:'pedro-28',displayName:'Pedro Lima'}]}
+        ]
+      }]
+    }
+  };
+  const facts=normalizeLiveFacts(data,{eventId:'401841326',expectedHome:0,expectedAway:1,
+    variants:[{source:'espn_site_api_summary',data}]});
+  assert.equal(facts.integrity.scoreComplete,true);
+  assert.equal(facts.integrity.missingScorers,0);
+  assert.equal(facts.goals.length,1);
+  assert.equal(facts.goals[0].side,'away');
+  assert.equal(facts.goals[0].scorer,'Pedro Lima');
+  assert.equal(facts.goals[0].minute,"28'");
+}
+
 console.log('PASS live-facts v3 / Live Facts v7');
