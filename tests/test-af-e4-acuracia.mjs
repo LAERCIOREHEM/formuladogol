@@ -75,7 +75,9 @@ for(const id of ['af-e4-title','af-e4-club','af-e4-round','af-e4-summary',
 assert.ok(html.indexOf('id="af-e4-title"') > html.indexOf('id="accuracy-games-title"'));
 assert.ok(html.indexOf('id="af-e4-title"') < html.indexOf('id="accuracy-timeline-title"'));
 assert.ok(html.includes('br-acuracia-placares-e4.css?v=20261110-e4'));
-assert.ok(html.includes('br-acuracia-placares-e4.js?v=20261110-e4'));
+assert.ok(html.includes('br-acuracia-placares-e4.js?v=20261124-r36r5d'));
+assert.ok(html.indexOf('br-data-pulse.js?v=20261124-r36r5d') < html.indexOf('br-acuracia-placares-e4.js?v=20261124-r36r5d'));
+assert.ok(apiSource.includes('fdg:accuracy-proof'));
 assert.ok(!html.includes('Top-3: 100% de acerto'));
 console.log('AF E4 TESTS PASS:', doc.metricas.jogos, 'jogos,',
   doc.metricas.placares_exatos, 'exatos,',doc.metricas.top3_confirmados,
