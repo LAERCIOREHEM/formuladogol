@@ -30,7 +30,7 @@
   // Repeated ESPN FINALs are not new events. A score correction is a new signature.
   function finalKey(rows,published=[],isFinal=g=>g?.estado==='post'){
     const ids=new Set(published.map(g=>String(g?.event_id??g?.eventId??'')));
-    return [...new Set(rows.filter(isFinal).map(g=>{
+    return [...new Set(rows.filter(g=>isFinal(g)).map(g=>{
       const id=String(g?.eventId??g?.event_id??'');
       return id&&!ids.has(id)?[id,g.placarMandante??g.placar_mandante??'',g.placarVisitante??g.placar_visitante??''].join(':'):'';
     }).filter(Boolean))].sort().join('|');

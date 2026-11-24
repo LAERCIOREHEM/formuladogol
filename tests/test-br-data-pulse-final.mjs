@@ -19,7 +19,7 @@ visible=false;scheduler.pause();assert.equal(timers.size,0);scheduler.wake();ass
 visible=true;scheduler.wake();({task}=await fire());await finish(task);assert.equal(runs,3);
 scheduler.stop();assert.equal(timers.size,0);
 const rows=[{eventId:'1',estado:'post',placarMandante:2,placarVisitante:1},{eventId:'2',estado:'in'}];
-assert.equal(api.finalKey(rows),'1:2:1');assert.equal(api.finalKey([...rows,rows[0]]),'1:2:1');
+assert.equal(api.finalKey(rows),'1:2:1');assert.equal(api.finalKey(rows,[],(g,ref=new Date())=>ref instanceof Date&&g.estado==='post'),'1:2:1');assert.equal(api.finalKey([...rows,rows[0]]),'1:2:1');
 assert.equal(api.finalKey(rows,[{event_id:'1'}]),'');assert.equal(api.finalKey([{...rows[0],placarMandante:3}]),'1:3:1');
 for(const file of ['js/br-estatisticas.js','js/br-af-core-snapshot.js','js/br-data-refresh.js'])new vm.Script(read(file));
 const index=read('index.html'),stats=read('js/br-estatisticas.js'),html=read('estatisticas.html');
