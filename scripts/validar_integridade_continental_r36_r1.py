@@ -66,15 +66,15 @@ def validate(root: Path, site: Path) -> dict:
     checked = 0
     for name, data in teams.items():
         page = site / "clube" / slugify(name) / "index.html"
-        html = unescape(page.read_text(encoding="utf-8"))
+        html = page.read_text(encoding="utf-8")
         display = data["probabilidades_detalhes"]["libertadores"]["exibicao"]
-        if f"a de Libertadores é {display}" not in html:
+        if f"a de Libertadores é {display}" not in unescape(html):
             raise AssertionError(f"{name}: chance de Libertadores diverge do AF ({display})")
         route = data["decomposicao_chances"]["libertadores"]["vias"]["via_titulo_sul_americana"]
         expected = route.get("exibicao")
         pattern = r'<div class="club-route-card(?: is-off)?"><small>Via título da Sul-Americana</small><strong>([^<]+)</strong><span>([^<]+)</span>'
         match = re.search(pattern, html)
-        if not match or match.group(1) != expected:
+        if not match or unescape(match.group(1)) != expected:
             raise AssertionError(f"{name}: probabilidade de título da Sul-Americana divergente")
         if route.get("impossivel_estruturalmente") is True and match.group(2) == "via disponível":
             raise AssertionError(f"{name}: via matematicamente impossível exibida como disponível")
