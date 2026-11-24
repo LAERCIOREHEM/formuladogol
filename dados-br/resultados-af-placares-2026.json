@@ -5,13 +5,13 @@
   "status": "ok",
   "origem": {
     "arquivo": "dados-br/auditoria-historica-placares-af-2026.json",
-    "sha256_arquivo": "1a4cec178bdc27edebec8b9fb132b1c0ff2a696df9e748ddedbd04cc8b9d9b75",
-    "hash_jogos_e1": "7c198ee6657848c894de6cc3dbd34c4cfd72c689c8fb3e20322b0349e2a89256",
-    "data_fonte_resultados": "2026-11-24T16:18:31.424883-03:00"
+    "sha256_arquivo": "c68301992a397867a176c1d6b5e631de0458033ab5936f5e47cfb903eed07b2e",
+    "hash_jogos_e1": "94b53aa5019eb699f90644588dd1ff693d4f26f153533fcfc9c81468e1af0bf0",
+    "data_fonte_resultados": "2026-11-24T20:18:29.696581-03:00"
   },
   "resumo": {
-    "resultados_auditados": 359,
-    "previsoes_certificadas": 177,
+    "resultados_auditados": 360,
+    "previsoes_certificadas": 178,
     "sem_snapshot_certificado": 182,
     "quarentena_por_conflito": 0,
     "sem_horario_factual": 0
@@ -11951,10 +11951,62 @@
         "versao_modelo": "AF-Previsão 1.3",
         "top3_origem": "nativo_documentado"
       }
+    },
+    {
+      "identidade_partida": "chapecoense|palmeiras",
+      "event_ids": [
+        "401841335"
+      ],
+      "rodada_auditada": 37,
+      "mandante": "Chapecoense",
+      "visitante": "Palmeiras",
+      "inicio_factual": "2026-11-24T21:00:00+00:00",
+      "placar_final_auditado": {
+        "mandante": 3,
+        "visitante": 0
+      },
+      "situacao": "comprovado",
+      "placar_previsto": {
+        "mandante": 0,
+        "visitante": 2
+      },
+      "gols_projetados": {
+        "mandante": 0.7145,
+        "visitante": 2.1627
+      },
+      "probabilidades_ved_pct": {
+        "mandante": 10.9701,
+        "empate": 18.3253,
+        "visitante": 70.7047
+      },
+      "palpite_resultado_top1": "visitante",
+      "top3_placares": [
+        {
+          "mandante": 0,
+          "visitante": 2,
+          "probabilidade_pct": 13.1646
+        },
+        {
+          "mandante": 0,
+          "visitante": 1,
+          "probabilidade_pct": 12.1745
+        },
+        {
+          "mandante": 0,
+          "visitante": 3,
+          "probabilidade_pct": 9.4902
+        }
+      ],
+      "prova": {
+        "commit": "d41337295341b708991d4339c824c975988dfda0",
+        "gerado_em": "2026-11-24T01:56:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "top3_origem": "nativo_documentado"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "10686b7b2578a7637c9a7408eac48ecce8ca730aad225891070325141714e9ff"
+    "hash_jogos": "3cbd5bfa8c09106bdbe34b1df8d33acd47cc590b40e3d0b1981b07b487329fac"
   }
 }
