@@ -8041,62 +8041,111 @@
       ],
       "overlay_alterado": true,
       "resumo": "Confirmado: Santos x Grêmio, Campeonato Brasileiro (36ª rodada), hoje, 23/11/2026, às 21h (horário de Brasília), no Morumbis. A transmissão integral no Brasil é de SporTV e Premiere. O link da GE TV no YouTube é de aquecimento/pré-jogo e não constitui transmissão da partida."
+    },
+    {
+      "event_id": "401841335",
+      "jogo": "Chapecoense x Palmeiras",
+      "data_iso": "2026-11-24T18:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-11-24T16:37:46-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "CazéTV",
+        "Premiere"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/21/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-36a-rodada.ghtml",
+        "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+        "https://ge.globo.com/futebol/times/corinthians/noticia/2026/10/30/cbf-define-datas-para-jogos-do-corinthians-contra-botafogo-e-atletico-mg-pelo-brasileirao.ghtml",
+        "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/10/27/dez-finais-palmeiras-abre-contagem-regressiva-para-manter-sonho-da-triplice-coroa.ghtml",
+        "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/11/12/o-que-vai-mudar-como-final-da-copa-do-brasil-impacta-planos-e-calendario-de-jogos-do-palmeiras.ghtml",
+        "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/11/14/palmeiras-divide-atencoes-e-estudiantes-so-pensa-na-final-veja-a-agenda-dos-clubes-ate-o-dia-28.ghtml",
+        "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/06/cbf-divulga-datas-e-horarios-das-duas-ultimas-rodadas-do-brasileirao-veja-detalhes.ghtml",
+        "https://ge.globo.com/sc/futebol/brasileirao-serie-a/jogo/24-11-2026/chapecoense-palmeiras.ghtml",
+        "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/11/24/chapecoense-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sc/futebol/times/chapecoense/noticia/2026/10/15/veja-sequencia-da-chapecoense-na-arena-conda-antes-do-fim-da-serie-a.ghtml",
+        "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/05/31/palmeiras-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://www.youtube.com/myfamily/static/pdfs/parentguide_uk.pdf"
+      ],
+      "canais_depois": [
+        "CazéTV",
+        "Premiere",
+        "Record"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/11/24/chapecoense-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/06/cbf-divulga-datas-e-horarios-das-duas-ultimas-rodadas-do-brasileirao-veja-detalhes.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=jUd5TAB29NQ",
+          "scope": "match",
+          "valid_for_match": true,
+          "reason": "O título informado identifica transmissão ao vivo de Chapecoense x Palmeiras pelo Brasileirão 2026; adicionalmente, a página do ge consultada lista oficialmente YouTube/CazéTV como transmissão da partida, junto de Premiere e Record."
+        }
+      ],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Chapecoense x Palmeiras, Brasileirão Série A 2026, 37ª rodada, nesta terça-feira (24/11/2026), às 18h (horário de Brasília), na Arena Condá. A transmissão integral é de Premiere, Record e YouTube/CazéTV. Não é exclusiva."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841320",
-    "jogo": "Santos x Grêmio",
-    "data_iso": "2026-11-23T21:00:00-03:00",
+    "event_id": "401841335",
+    "jogo": "Chapecoense x Palmeiras",
+    "data_iso": "2026-11-24T18:00:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-11-23T19:47:37-03:00",
+    "executado_em": "2026-11-24T16:37:46-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "GE TV",
-      "Premiere",
-      "SporTV"
+      "CazéTV",
+      "Premiere"
     ],
     "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/06/cbf-divulga-datas-e-horarios-das-duas-ultimas-rodadas-do-brasileirao-veja-detalhes.ghtml",
-      "https://ge.globo.com/google/amp/sp/santos-e-regiao/futebol/times/santos/noticia/2026/10/30/santos-x-gremio-cbf-confirma-jogo-no-morumbis-pelo-brasileirao.ghtml",
-      "https://ge.globo.com/rs/futebol/times/gremio/agenda-de-jogos-do-gremio",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/11/23/santos-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/jogo/23-11-2026/santos-gremio.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/times/santos/noticia/2026/11/13/santos-x-gremio-veja-precos-e-como-comprar-ingressos.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/times/santos/noticia/2026/11/23/trintoes-em-alta-como-santos-driblou-idade-de-veteranos-para-ascender-no-brasileirao.ghtml",
-      "https://ge.globo.com/sportv",
-      "https://globoplay.globo.com/v/14638182",
-      "https://globoplay.globo.com/v/14639187",
-      "https://globoplay.globo.com/v/15272634",
-      "https://globoplay.globo.com/v/15273728",
-      "https://www.youtube.com/watch?v=EkKykku4NNI",
-      "https://www.youtube.com/watch?v=QZeKnr-nIak"
+      "https://ge.globo.com/",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/21/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-36a-rodada.ghtml",
+      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
+      "https://ge.globo.com/futebol/times/corinthians/noticia/2026/10/30/cbf-define-datas-para-jogos-do-corinthians-contra-botafogo-e-atletico-mg-pelo-brasileirao.ghtml",
+      "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/10/27/dez-finais-palmeiras-abre-contagem-regressiva-para-manter-sonho-da-triplice-coroa.ghtml",
+      "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/11/12/o-que-vai-mudar-como-final-da-copa-do-brasil-impacta-planos-e-calendario-de-jogos-do-palmeiras.ghtml",
+      "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/11/14/palmeiras-divide-atencoes-e-estudiantes-so-pensa-na-final-veja-a-agenda-dos-clubes-ate-o-dia-28.ghtml",
+      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/06/cbf-divulga-datas-e-horarios-das-duas-ultimas-rodadas-do-brasileirao-veja-detalhes.ghtml",
+      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/jogo/24-11-2026/chapecoense-palmeiras.ghtml",
+      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/11/24/chapecoense-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sc/futebol/times/chapecoense/noticia/2026/10/15/veja-sequencia-da-chapecoense-na-arena-conda-antes-do-fim-da-serie-a.ghtml",
+      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/05/31/palmeiras-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://www.youtube.com/myfamily/static/pdfs/parentguide_uk.pdf"
     ],
     "canais_depois": [
+      "CazéTV",
       "Premiere",
-      "SporTV"
+      "Record"
     ],
     "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/11/23/santos-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/jogo/23-11-2026/santos-gremio.ghtml"
+      "https://ge.globo.com/sc/futebol/brasileirao-serie-a/noticia/2026/11/24/chapecoense-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/06/cbf-divulga-datas-e-horarios-das-duas-ultimas-rodadas-do-brasileirao-veja-detalhes.ghtml"
     ],
     "youtube": [
       {
-        "url": "https://www.youtube.com/watch?v=ZHpNObYBdXA",
-        "scope": "pre_game",
-        "valid_for_match": false,
-        "reason": "O título informado no dossiê identifica o conteúdo como “AQUECIMENTO AO VIVO”; portanto, é programação de pré-jogo, sem evidência de exibição integral de Santos x Grêmio."
+        "url": "https://www.youtube.com/watch?v=jUd5TAB29NQ",
+        "scope": "match",
+        "valid_for_match": true,
+        "reason": "O título informado identifica transmissão ao vivo de Chapecoense x Palmeiras pelo Brasileirão 2026; adicionalmente, a página do ge consultada lista oficialmente YouTube/CazéTV como transmissão da partida, junto de Premiere e Record."
       }
     ],
-    "youtube_removidos": [
-      "https://www.youtube.com/watch?v=ZHpNObYBdXA"
-    ],
+    "youtube_removidos": [],
     "overlay_alterado": true,
-    "resumo": "Confirmado: Santos x Grêmio, Campeonato Brasileiro (36ª rodada), hoje, 23/11/2026, às 21h (horário de Brasília), no Morumbis. A transmissão integral no Brasil é de SporTV e Premiere. O link da GE TV no YouTube é de aquecimento/pré-jogo e não constitui transmissão da partida."
+    "resumo": "Confirmado para o Brasil: Chapecoense x Palmeiras, Brasileirão Série A 2026, 37ª rodada, nesta terça-feira (24/11/2026), às 18h (horário de Brasília), na Arena Condá. A transmissão integral é de Premiere, Record e YouTube/CazéTV. Não é exclusiva."
   },
-  "atualizado_em": "2026-11-23T19:47:37-03:00"
+  "atualizado_em": "2026-11-24T16:37:46-03:00"
 }
