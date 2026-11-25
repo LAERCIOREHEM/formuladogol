@@ -67,7 +67,10 @@ class ResearchProbe(base.Probe):
             self.last_football=time.monotonic()
         ledger[key]=reserved+cost
         save(self.path,self.state)  # reserve before transport, never refund locally
+        before=self.remaining
         data=super().call(source,endpoint,params,cost)
+        if source=="football" and before is not None and self.remaining is not None:
+            self.remaining=min(self.remaining,max(0,before-cost))
         return data
 
     def verify_football(self):
@@ -153,12 +156,20 @@ def collect_history(probe,state,path):
         for i in range(0,len(pending),20):
             ids=pending[i:i+20]
             before=probe.used["football"]
+            batch_supported=state["provider_checks"].get("batch_supported",True)
+            if not batch_supported:
+                break
             data=probe.call("football","fixtures",{"ids":"-".join(ids)})
             if probe.used["football"]==before:
                 return
             if data is None:
-                # Transport/schema failure is not proof of a missing match; leave retryable.
+                # Fall back only on explicit plan restriction, not transport/quota errors.
+                if probe.calls and probe.calls[-1]["status"]=="plan_or_season_restriction":
+                    state["provider_checks"]["batch_supported"]=False
+                    save(path,state)
+                    break
                 return
+            state["provider_checks"]["batch_supported"]=True
             for fid in ids:
                 state["attempts"][fid]=1
             for f in base.arr(data.get("response")):
@@ -169,17 +180,19 @@ def collect_history(probe,state,path):
     # Targeted fallback only for records not validated by grouped endpoint.
     for year in YEARS:
         for fid,expected in state["catalog"][str(year)].items():
-            if fid in state["historical"] or state["attempts"].get(fid,0)!=1:
+            count=state["attempts"].get(fid,0)
+            if fid in state["historical"] or count>=2 or (count==0 and state["provider_checks"].get("batch_supported",True)):
                 continue
             before=probe.used["football"]
-            data=probe.call("football","fixtures/players",{"fixture":fid})
+            data=probe.call("football","fixtures",{"id":fid})
             if probe.used["football"]==before:
                 return
             if data is None:
                 return
             state["attempts"][fid]=2
-            f={**expected,"players":base.arr(data.get("response"))}
-            store_football(state,f,expected)
+            for f in base.arr(data.get("response")):
+                if football_id(f)==fid:
+                    store_football(state,f,expected)
             save(path,state)
 
 def clock_minute(value):
@@ -291,13 +304,13 @@ def recent_sample(probe,state,path):
         if y in state["recent"]:
             continue
         params={"season":year,"team":"Palmeiras","status":"final","limit":50}
-        if year==2026:
-            params={"season":2026,"date":"2026-11-24","status":"final","limit":50}
+        if probe.used["striker"]+7>base.LIMITS["striker"]:
+            break
         raw=probe.call("striker","list_games",params,2)
         chosen=base.select_striker(base.arr(base.obj(raw).get("games")),year)
         if not chosen:
             continue
-        if year==2026 and base.striker_key(chosen)[1:]!=("chapecoense","palmeiras"):
+        if year==2026 and (base.striker_key(chosen)[1:]!=("chapecoense","palmeiras") or base.striker_key(chosen)[0] not in ("2026-11-24","2026-11-25")):
             continue
         data=probe.call("striker","get_game",{"game_id":str(chosen.get("game_id"))},5)
         if not data or base.striker_key(base.obj(data.get("game")))!=base.striker_key(chosen):
@@ -316,21 +329,105 @@ def recent_sample(probe,state,path):
         state["recent"][y]={"data":safe,"analysis":striker_analysis(safe,football,espn)}
         save(path,state)
 
+def historical_timeline(f):
+    """Check event/lineup consistency; no model fitting or future-derived xG."""
+    teams={str(base.get(f,"teams",s,"id")) for s in ("home","away")}
+    active={}
+    starts={}
+    ends={}
+    if len(teams)!=2:
+        return {"candidate":False,"reason":"invalid_team"}
+    for g in base.arr(f.get("lineups")):
+        t=str(base.get(g,"team","id"))
+        ids=[str(base.get(x,"player","id") or "") for x in base.arr(g.get("startXI"))]
+        if t not in teams or t in active or len(ids)!=11 or len(set(ids))!=11 or "" in ids:
+            return {"candidate":False,"reason":"invalid_starting_xi"}
+        active[t]=set(ids)
+        starts.update({(t,p):0 for p in ids})
+    if set(active)!=teams:
+        return {"candidate":False,"reason":"missing_lineups"}
+    events=base.arr(f.get("events"))
+    valid=[]
+    for i,e in enumerate(events):
+        minute=clock_minute(base.get(e,"time","elapsed"))
+        if minute is None:
+            return {"candidate":False,"reason":"invalid_event_clock"}
+        valid.append((minute,i,e))
+    tally=collections.Counter()
+    boundaries={0,90}
+    for minute,_,e in sorted(valid):
+        t=str(base.get(e,"team","id"))
+        kind=base.norm(e.get("type"))
+        detail=base.norm(e.get("detail"))
+        pid=str(base.get(e,"player","id") or "")
+        if kind=="goal":
+            if t not in teams:
+                return {"candidate":False,"reason":"invalid_goal_team"}
+            tally[t]+=1
+        elif kind=="subst" or (kind=="card" and detail in ("red card","second yellow card","yellow red card")):
+            if t not in teams or pid not in active[t]:
+                return {"candidate":False,"reason":"unresolved_substitution_or_red"}
+            active[t].remove(pid); ends[(t,pid)]=minute; boundaries.add(minute)
+            if kind=="subst":
+                entering=str(base.get(e,"assist","id") or "")
+                if not entering or (t,entering) in starts:
+                    return {"candidate":False,"reason":"invalid_substitute"}
+                active[t].add(entering); starts[(t,entering)]=minute
+    if any(tally[str(base.get(f,"teams",side,"id"))]!=base.get(f,"goals",side) for side in ("home","away")):
+        return {"candidate":False,"reason":"goal_event_mismatch"}
+    intervals={k:(a,ends.get(k,90)) for k,a in starts.items()}
+    ordered=sorted(boundaries)
+    for a,b in zip(ordered,ordered[1:]):
+        count=collections.Counter(t for (t,_),(x,y) in intervals.items() if x<=a and y>=b)
+        if any(not 7<=count[t]<=11 for t in teams):
+            return {"candidate":False,"reason":"invalid_on_pitch_counts"}
+    errs=[]
+    missing=0
+    for group in base.arr(f.get("players")):
+        t=str(base.get(group,"team","id"))
+        for p in base.arr(group.get("players")):
+            pid=str(base.get(p,"player","id"))
+            stats=base.arr(p.get("statistics"))
+            m=base.get(stats[0],"games","minutes") if stats else None
+            if isinstance(m,(int,float)) and m>0:
+                if (t,pid) not in intervals:
+                    missing+=1
+                    continue
+                a,b=intervals[(t,pid)]
+                errs.append(abs((b-a)-m))
+    if missing or not errs or max(errs)>5:
+        return {"candidate":False,"reason":"minutes_mismatch","minute_comparisons":len(errs)}
+    return {"candidate":True,"reason":"regulation_timeline_candidate",
+            "segments":len(ordered)-1,"minute_comparisons":len(errs),
+            "minute_abs_error_sum":sum(errs)}
+
 def summary(state,probe):
     seasons={}
     for year in YEARS:
         cat=state["catalog"].get(str(year),{})
         valid=[state["historical"][fid] for fid in cat if fid in state["historical"]]
         counts=collections.Counter()
+        timeline_reasons=collections.Counter()
+        timeline_candidates=segments=minute_n=minute_error=0
         active=0
         for f in valid:
             rows=base.normalize_football({"response":f["players"]})
             cv=base.coverage(rows)
             active+=cv["active_rows"]
             counts.update(cv["filled_active"])
+            timeline=historical_timeline(f)
+            timeline_reasons[timeline["reason"]]+=1
+            if timeline["candidate"]:
+                timeline_candidates+=1
+                segments+=timeline["segments"]
+                minute_n+=timeline["minute_comparisons"]
+                minute_error+=timeline["minute_abs_error_sum"]
         seasons[str(year)]={"expected":EXPECTED,"catalogued":len(cat),"validated":len(valid),
             "first_pass_attempted":sum(fid in state["attempts"] for fid in cat),
             "active_rows":active,"filled_active":dict(counts),
+            "timeline_candidates":timeline_candidates,"candidate_segments":segments,
+            "timeline_reasons":dict(timeline_reasons),
+            "timeline_minute_mae":round(minute_error/minute_n,3) if minute_n else None,
             "unresolved_after_fallback":sum(state["attempts"].get(fid)==2 and fid not in state["historical"] for fid in cat)}
     complete=all(v["validated"]==EXPECTED for v in seasons.values())
     attempted=all(v["catalogued"]==EXPECTED and v["first_pass_attempted"]==EXPECTED for v in seasons.values())
@@ -359,6 +456,7 @@ def self_test():
         state=load(path); state["ledger"]["test"]=3; save(path,state)
         assert load(path)["ledger"]["test"]==3
     assert not validate_football({}, {})
+    assert not historical_timeline({})["candidate"]
     print("PASS: regulation minutes, red cards, unknowns, checkpoint and invalid fixture")
 
 def main():
@@ -393,6 +491,8 @@ def main():
            "|---|---:|---:|---:|---:|---:|"]
     for y,r in result["historical"].items():
         lines.append(f"| {y} | {r['expected']} | {r['catalogued']} | {r['validated']} | {r['first_pass_attempted']} | {r['active_rows']} |")
+    for y,r in result["historical"].items():
+        lines.append(f"- {y}: {r['timeline_candidates']} candidate timelines, {r['candidate_segments']} segments, reconstructed minute MAE={r['timeline_minute_mae']}")
     lines += ["","Complete historical dataset: "+str(result["historical_complete"]),
               "Historical first pass: "+str(result["historical_first_pass_complete"]),
               "Recent samples: "+", ".join(result["recent_samples"]),
