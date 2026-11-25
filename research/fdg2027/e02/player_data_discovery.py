@@ -212,7 +212,7 @@ def striker_key(g):
     return match_key(g.get("starts_at") or g.get("date"), get(g,"home","name"), get(g,"away","name"))
 
 def espn_event_key(e):
-    teams = arr(get(e,"competitions",0)) if False else arr(e.get("competitions"))
+    teams = arr(e.get("competitions"))
     if not teams:
         return ("","","")
     sides = {x.get("homeAway"): get(x,"team","displayName") for x in arr(teams[0].get("competitors"))}
@@ -250,11 +250,13 @@ def run(probe):
         row.update(striker_sample_list_count=len(sgames), football_final_list_count=len(fg),
                    football_advertised_coverage=advertised.get(str(year),{}),
                    sample_selected=bool(chosen), exact_match=False)
-        if not chosen:
+        fallback = next((g for g in fg if "palmeiras" in football_key(g)[1:]), None)
+        if not chosen and not fallback:
             continue
-        key = striker_key(chosen)
+        key = striker_key(chosen) if chosen else football_key(fallback)
+        row["sample_source"] = "striker" if chosen else "football_only"
         row["case_chapecoense_palmeiras"] = year == 2026 and key[0] in ("2026-11-24","2026-11-25") and key[1:] == ("chapecoense","palmeiras")
-        sr = probe.call("striker","get_game",{"game_id":str(chosen["game_id"])},5) if chosen.get("game_id") else None
+        sr = probe.call("striker","get_game",{"game_id":str(chosen["game_id"])},5) if chosen and chosen.get("game_id") else None
         # Validate identity before comparing. Never use odds or team_stats as player stats.
         sp = normalize_striker(sr) if striker_key(obj(obj(sr).get("game"))) == key else []
         row["striker"] = coverage(sp)
@@ -263,7 +265,7 @@ def run(probe):
         if fm and get(fm,"fixture","id"):
             fr = probe.call("football","fixtures/players",{"fixture":get(fm,"fixture","id")})
             fp = normalize_football(fr)
-            row["exact_match"] = True
+            row["exact_match"] = bool(chosen)
         row["football"] = coverage(fp)
         ep = []
         scoreboard = probe.call("espn","scoreboard",{"dates":key[0].replace("-",""),"limit":100})
@@ -273,12 +275,29 @@ def run(probe):
         row["espn"] = coverage(ep)
         row["identity_candidates"] = {"football_striker":unique_pairs(fp,sp),
             "espn_striker":unique_pairs(ep,sp), "espn_football":unique_pairs(ep,fp)}
-        if year in (2024,2026) and chosen.get("game_id"):
+        if year in (2024,2026) and chosen and chosen.get("game_id"):
             line = probe.call("striker","get_lineups",{"game_id":str(chosen["game_id"])},5)
             row["striker_lineup_endpoint_returned"] = bool(line)
     report["auth"] = probe.auth
     report["attempted_budget"] = {k:probe.used[k] for k in LIMITS}
     report["calls"] = probe.calls
+    report["aggregate_coverage"] = {}
+    for source in ("football","striker","espn"):
+        summaries = [r.get(source,{}) for r in report["years"].values()]
+        total = sum(r.get("rows",0) for r in summaries)
+        active = sum(r.get("active_rows",0) for r in summaries)
+        filled = {f:sum(r.get("filled_active",{}).get(f,0) for r in summaries) for f in FIELDS}
+        report["aggregate_coverage"][source] = {
+            "sampled_matches_with_rows":sum(r.get("rows",0)>0 for r in summaries),
+            "rows":total,"active_rows":active,"filled_active":filled,
+            "active_coverage_pct":{f:round(100*n/active,1) if active else None for f,n in filled.items()}
+        }
+    report["economic_scenario"] = {
+        "striker_credits_per_game_stats":5,"striker_free_monthly_credits":500,
+        "example_50_matches_stats_only_credits":250,
+        "football_free_daily_requests":100,"paid_plan_required":"undetermined",
+        "warning":"Estimates only; excludes retries, listings and additional endpoints. Check plan and rights."
+    }
     report["production_ready"] = False
     report["decision"] = "review_coverage_and_rights_before_E03"
     return report
