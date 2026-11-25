@@ -62,7 +62,7 @@ from af_previsao_backtest import (  # noqa: E402
     score_matrix,
 )
 from af_matematica_libertadores import (  # noqa: E402
-    certify_top_k, apply_g6_continental_certainty,
+    certify_top_k, apply_g6_continental_certainty, certify_cup_finalist_exclusion,
 )
 from af_previsao_continental import (  # noqa: E402
     ContinentalDataNotReady,
@@ -306,6 +306,7 @@ def build_model_state_hash(
     winner = (audit_models.get("selecao_modelo") or {}).get("vencedor") or {}
     payload = {
         "schema": 3,
+        "certificacao_continental": "r37-finalistas-copa-v1",
         "versao_modelo": config.get("versao_modelo"),
         "execucao_2": config.get("execucao_2"),
         "execucao_2_5": config.get("execucao_2_5"),
@@ -2788,6 +2789,11 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
     if certified_g6:
         print("HOTFIX R35-R1 — classificados matematicamente pelo G6:",
               ", ".join(certified_g6))
+    excluded_cup = certify_cup_finalist_exclusion(
+        teams, load_json(ROOT / "dados-br" / "competicoes-af-previsao" / "copa-do-brasil.json"), execution_25
+    )
+    if excluded_cup:
+        print("R37 — Sul-Americana matematicamente impossível para finalistas:", ", ".join(excluded_cup))
     total_sul_integrada = sum(item["probabilidades_pct"]["sul_americana"] for item in teams)
     if abs(total_sul_integrada - 600.0) > 0.02:
         raise ValueError(f"soma integrada da Sul-Americana inválida: {total_sul_integrada:.6f}")

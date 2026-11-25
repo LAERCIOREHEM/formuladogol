@@ -185,6 +185,61 @@ def apply_g6_continental_certainty(teams, structural, cup_snapshot, certifier):
     return certified
 
 
+def certify_cup_finalist_exclusion(teams, cup_snapshot, config):
+    """Prova de exclusão da Sula para finalistas elegíveis à Copa 2026.
+
+    REC da Copa aplicado pelo alocador continental: se permanece na Série A,
+    finalista recebe Libertadores (ou já está classificado); se rebaixado,
+    sua vaga da Copa retorna e a posição não alcança a faixa continental.
+    Não depende do número de ocorrências observadas, nem altera o Monte Carlo.
+    """
+    if cup_snapshot.get("status") != "ok" or cup_snapshot.get("temporada") != 2026:
+        return []
+    finals = [e for e in cup_snapshot.get("eventos", []) if int(e.get("fase_ordem") or 0) == 900]
+    if len(finals) != 1:
+        return []
+    final = finals[0]
+    names = {str((final.get(side) or {}).get("nome") or "") for side in ("mandante", "visitante")}
+    if len(names) != 2 or "" in names or not names <= {t["clube"] for t in teams}:
+        return []
+    # Quatro vagas adicionais no máximo: dois finalistas e dois campeões
+    # continentais. Repasses redistribuem, não criam vagas.
+    max_rank = int(config.get("brasileirao_vagas_diretas", 4)) + int(config.get("brasileirao_vagas_preliminares", 1)) + 4 + int(config.get("sul_americana_vagas", 6))
+    if int(config.get("rebaixamento_a_partir_da_posicao", 17)) <= max_rank:
+        return []
+    certified = []
+    for item in teams:
+        if item["clube"] not in names:
+            continue
+        p = item["probabilidades_pct"]
+        detail = item["probabilidades_detalhes"]["sul_americana"]
+        breakdown = item["decomposicao_chances"]["sul_americana"]
+        targets = [detail, breakdown["total"], *breakdown["vias"].values()]
+        if float(p["sul_americana"]) != 0 or any(int(d["ocorrencias"]) != 0 or float(d["percentual_estimado"]) != 0 for d in targets):
+            raise ValueError(f"Prova de exclusão da Sul-Americana contradiz Monte Carlo: {item['clube']}")
+        reason = (
+            "Finalista da Copa do Brasil 2026: permanecendo na Série A 2027, "
+            "tem direito à Libertadores ou já está classificado por outra via. "
+            f"Se rebaixado, não pode exercer a vaga da Copa e termina fora do limite máximo de {max_rank} classificados continentais pelo campeonato. "
+            "Em nenhum cenário a Sul-Americana é seu destino."
+        )
+        # Preserve stronger independent proofs already established for G5/G6.
+        for d in targets:
+            if d.get("impossivel_estruturalmente") is True and d.get("motivo_impossibilidade"):
+                continue
+            d.update(exibicao="0%", possivel_estruturalmente=False,
+                     impossivel_estruturalmente=True, certeza_estrutural=False,
+                     motivo_certeza=None, motivo_impossibilidade=reason,
+                     limite_superior_95_regra_dos_tres_pct=None)
+        item["situacao_matematica"] = {
+            **item.get("situacao_matematica", {}),
+            "sul_americana_impossivel_final_copa": True,
+            "fundamento_sul_americana": reason,
+        }
+        certified.append(item["clube"])
+    return certified
+
+
 def self_test():
     data={
         "Flamengo":{"pontos":79,"vitorias":24},

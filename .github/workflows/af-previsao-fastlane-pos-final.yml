@@ -11,6 +11,8 @@ on:
       - 'scripts/af_fastlane_sync_gate.py'
       - 'scripts/af_ultra_fastlane_r36.py'
       - 'scripts/publicar_af_core_r36.py'
+      - 'scripts/af_matematica_libertadores.py'
+      - 'tests/test_r37_cup_finalist_exclusion.py'
   workflow_dispatch:
     inputs:
       event_id:
@@ -96,6 +98,7 @@ jobs:
           python scripts/gerar_agenda_clubes_brasileirao.py --self-test
           python scripts/af_previsao_continental.py --self-test
           python scripts/gerar_probabilidades_brasileirao.py --self-test
+          python tests/test_r37_cup_finalist_exclusion.py
           python scripts/gerar_probabilidades_jogos.py --self-test
           python scripts/af_fastlane_sync_gate.py --self-test
           python -m unittest discover -s tests -p 'test_r36_r4_ultra_fastlane.py' -v
@@ -199,6 +202,23 @@ jobs:
           # O reconciliador valida os três snapshots continentais e a auditoria
           # antes de permitir o novo AF. Se houver contradição, falha fechado.
           python scripts/reconciliar_af_continental.py --max-attempts 1
+
+      - name: Certificar prova estrutural publicada
+        if: steps.delta.outputs.publication_requested == 'true' && steps.af_ready.outputs.ready == 'true'
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('dados-br/probabilidades-brasileirao.json').read_text())
+          import copy
+          from scripts.af_matematica_libertadores import certify_cup_finalist_exclusion
+          cup=json.loads(Path('dados-br/competicoes-af-previsao/copa-do-brasil.json').read_text())
+          config=json.loads(Path('dados-br/config-af-previsao.json').read_text())['execucao_2_5']
+          replay=copy.deepcopy(p['clubes'])
+          names=certify_cup_finalist_exclusion(replay,cup,config)
+          assert replay==p['clubes'], 'certificação estrutural ausente do AF publicado'
+          print('PASS R37: Sul-Americana 0% matemático:', names)
+          PY
 
       - name: Sporting Snapshot Integrity Guard
         if: steps.delta.outputs.publication_requested == 'true' && steps.af_ready.outputs.ready == 'true'
