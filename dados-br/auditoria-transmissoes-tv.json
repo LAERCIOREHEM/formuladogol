@@ -1,51 +1,45 @@
 {
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
-    "jogos_na_janela": 22,
+    "jogos_na_janela": 23,
     "jogos_com_transmissao": 21,
-    "jogos_sem_transmissao_na_janela": 1,
-    "jogos_sem_transmissao_14d": 1,
+    "jogos_sem_transmissao_na_janela": 2,
+    "jogos_sem_transmissao_14d": 2,
     "jogos_sem_transmissao_fora_14d": 0,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 14,
-    "jogos_guardiao_ia": 0,
-    "jogos_estaveis_sem_reconsulta_editorial": 1,
-    "fontes_com_falha": 2
+    "registros_preservados": 18,
+    "jogos_guardiao_ia": 1,
+    "jogos_estaveis_sem_reconsulta_editorial": 2,
+    "fontes_com_falha": 0
   },
   "fontes": {
     "guardiao_ia": {
       "ok": true,
-      "jogos_com_canal": 0
+      "jogos_com_canal": 1
     },
     "cbf": {
-      "ok": false,
-      "competicoes_ok": [],
+      "ok": true,
+      "competicoes_ok": [
+        "brasileirao"
+      ],
       "registros": 0,
       "erros": [
-        "Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada :: curl_cffi=HTTPError: HTTP Error 500: Internal Server Error | urllib=HTTPError: HTTP Error 500: Internal Server Error | urllib-cbf-fallback=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)>",
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=SSLError: Failed to perform, curl: (35) TLS connect error: error:00000000:invalid library (0):OPENSSL_internal:invalid library (0). See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)> | urllib-cbf-fallback=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)>",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=SSLError: Failed to perform, curl: (35) TLS connect error: error:00000000:invalid library (0):OPENSSL_internal:invalid library (0). See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)> | urllib-cbf-fallback=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)>"
       ],
-      "duracao_ms": 18909
-    },
-    "ge_agenda": {
-      "ok": true,
-      "jogos_com_canal": 5,
-      "duracao_ms": 7339
-    },
-    "ge_artigos": {
-      "ok": true,
-      "artigos_consultados": 4,
-      "jogos_com_canal": 0,
-      "duracao_ms": 39859
+      "duracao_ms": 9156
     },
     "espn": {
-      "ok": false,
-      "erro": "RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261123-20270126&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
+      "ok": true,
+      "competicoes_consultadas": 3,
+      "eventos_na_janela": 0,
+      "scoreboard_com_canal": 0,
+      "summary_com_canal": 0,
+      "duracao_ms": 0
     },
     "youtube_oficial": {
       "ok": true,
-      "jogos_com_canal": 2
+      "jogos_com_canal": 3
     }
   },
   "sem_transmissao": [
@@ -54,7 +48,15 @@
       "rodada": 0,
       "jogo": "Palmeiras x Estudiantes de La Plata",
       "data_iso": "2026-11-28T17:00:00-03:00",
-      "faltam_horas": 77.7,
+      "faltam_horas": 96.4,
+      "nivel": "aviso"
+    },
+    {
+      "event_id": "cbf-2026-376",
+      "rodada": 38,
+      "jogo": "Cruzeiro x Internacional",
+      "data_iso": "2026-12-02T21:30:00-03:00",
+      "faltam_horas": 196.9,
       "nivel": "aviso"
     }
   ],
@@ -64,11 +66,41 @@
       "rodada": 0,
       "jogo": "Palmeiras x Estudiantes de La Plata",
       "data_iso": "2026-11-28T17:00:00-03:00",
-      "faltam_horas": 77.7,
+      "faltam_horas": 96.4,
+      "nivel": "aviso"
+    },
+    {
+      "event_id": "cbf-2026-376",
+      "rodada": 38,
+      "jogo": "Cruzeiro x Internacional",
+      "data_iso": "2026-12-02T21:30:00-03:00",
+      "faltam_horas": 196.9,
       "nivel": "aviso"
     }
   ],
   "preservados": [
+    {
+      "event_id": "401841319",
+      "jogo": "Atlético-MG x Corinthians",
+      "canais": [
+        "Premiere"
+      ]
+    },
+    {
+      "event_id": "401841329",
+      "jogo": "São Paulo x Remo",
+      "canais": [
+        "Premiere"
+      ]
+    },
+    {
+      "event_id": "401841337",
+      "jogo": "Fluminense x Cruzeiro",
+      "canais": [
+        "Premiere",
+        "SporTV"
+      ]
+    },
     {
       "event_id": "401841336",
       "jogo": "Botafogo x Bahia",
@@ -84,6 +116,15 @@
         "GE TV",
         "Premiere",
         "Globo"
+      ]
+    },
+    {
+      "event_id": "401841332",
+      "jogo": "Vitória x Santos",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Prime Video"
       ]
     },
     {
@@ -196,16 +237,9 @@
     }
   ],
   "erros": [
-    "CBF: Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada :: curl_cffi=HTTPError: HTTP Error 500: Internal Server Error | urllib=HTTPError: HTTP Error 500: Internal Server Error | urllib-cbf-fallback=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)>",
     "CBF: Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=SSLError: Failed to perform, curl: (35) TLS connect error: error:00000000:invalid library (0):OPENSSL_internal:invalid library (0). See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)> | urllib-cbf-fallback=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)>",
-    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=SSLError: Failed to perform, curl: (35) TLS connect error: error:00000000:invalid library (0):OPENSSL_internal:invalid library (0). See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)> | urllib-cbf-fallback=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)>",
-    "ESPN: RuntimeError: falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard?dates=20261123-20270126&limit=300: tentativa 1: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 2: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request | tentativa 3: curl_cffi=HTTPError: HTTP Error 400:  | urllib=HTTPError: HTTP Error 400: Bad Request"
+    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=SSLError: Failed to perform, curl: (35) TLS connect error: error:00000000:invalid library (0):OPENSSL_internal:invalid library (0). See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)> | urllib-cbf-fallback=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)>"
   ],
-  "artigos_ge_descobertos": [
-    "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/11/25/atletico-mg-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-    "https://ge.globo.com/cartola/craque-da-rodada/noticia/2026/11/24/cartola-2026-tarzia-do-vitoria-arrasa-o-internacional-e-e-o-craque-da-rodada-36.ghtml",
-    "https://ge.globo.com/gato-mestre/noticia/2026/11/24/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-37a-rodada-do-brasileirao.ghtml",
-    "https://ge.globo.com/gato-mestre/noticia/2026/11/23/santos-x-gremio-tem-o-maior-publico-da-36a-rodada-do-brasileiro-veja-a-lista.ghtml"
-  ],
-  "atualizado_em": "2026-11-25T11:16:21-03:00"
+  "artigos_ge_descobertos": [],
+  "atualizado_em": "2026-11-24T16:37:59-03:00"
 }
