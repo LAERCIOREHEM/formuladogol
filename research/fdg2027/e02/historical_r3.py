@@ -160,7 +160,11 @@ def homologate(probe,state,years):
     for fid in found: state["attempts"][fid]=max(1,state["attempts"].get(fid,0))
     r2.save(probe.path,state)
     print("Batch certification: "+json.dumps(diagnostic))
-    if not ids or len(found)!=len(ids) or not all(found.values()):
+    diagnostic["plan"]=probe.plan
+    diagnostic["certified"]=bool(len(ids)==20 and len(found)==20 and all(found.values()))
+    diagnostic["transport_verified"]=bool(ids and len(found)==len(ids) and any(found.values()))
+    r2.save(probe.path,state)
+    if not diagnostic["transport_verified"]:
         probe.halted="batch_not_certified"; return False
     return True
 
@@ -181,6 +185,10 @@ def recover(probe,state,years):
                 fid=r2.football_id(f)
                 if fid in ids: store(state,f,cat[fid])
             r2.save(probe.path,state)
+        # Complete the grouped first pass across all seasons before selective retries.
+    for year in years:
+        cat=state["catalog"][str(year)]
+        def complete(fid): return assess(state["historical"].get(fid,{}),cat[fid])[1]
         for fid in sorted(cat):
             if complete(fid) or state["attempts"].get(fid,0)>=3: continue
             data=probe.call("football","fixtures",{"id":fid})
@@ -221,7 +229,7 @@ def report(probe,state,years,mode):
             "detailed":counts["detailed"],"active_rows":active,"field_coverage_pct":{k:round(100*filled[k]/active,2) if active else None for k in base.FIELDS},
             "timeline_candidates":candidates,"candidate_segments":segments,"timeline_reasons":dict(reasons),
             "unresolved":len(cat)-counts["detailed"],"exhausted":sum(state["attempts"].get(fid,0)>=3 and not assess(state["historical"].get(fid,{}),e)[1] for fid,e in cat.items())}
-    return {"execution":"FDG-2027-E02-R3","mode":mode,"seasons":out,"plan":state["provider_checks"].get("r3_status"),
+    return {"execution":"FDG-2027-E02-R3","mode":mode,"utc":r2.now().isoformat(),"seasons":out,"plan":state["provider_checks"].get("r3_status"),
             "batch":state["provider_checks"].get("r3_batch"),"stop_reason":probe.halted,
             "attempts":dict(probe.used),"ledger":state["ledger"],"unique_provider_ids":len(identities),
             "ids_with_multiple_name_forms":sum(len(v)>1 for v in identities.values()),
@@ -269,7 +277,7 @@ def main():
         if a.mode=="probe":
             # verify_football already ran; homologate uses current verified account.
             ok=homologate_verified(probe,state,years)
-        elif state["provider_checks"].get("r3_batch",{}).get("detailed_validated")!=20:
+        elif not state["provider_checks"].get("r3_batch",{}).get("transport_verified") or state["provider_checks"]["r3_batch"].get("plan")!=probe.plan:
             probe.halted="run_probe_first"; ok=False
         else:
             recover(probe,state,years)
