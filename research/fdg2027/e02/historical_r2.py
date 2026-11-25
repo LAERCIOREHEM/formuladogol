@@ -79,11 +79,36 @@ class ResearchProbe(base.Probe):
         plan=base.get(account,"subscription","plan")
         limit=base.get(account,"requests","limit_day")
         current=base.get(account,"requests","current")
-        self.status_verified=(str(plan).lower()=="free" and limit==100 and isinstance(current,int))
+        def safe_int(value):
+            if isinstance(value,bool):
+                return None
+            if isinstance(value,int) and value>=0:
+                return value
+            if isinstance(value,str) and value.isdecimal() and len(value)<=9:
+                return int(value)
+            return None
+        limit=safe_int(limit)
+        current=safe_int(current)
+        free_label=isinstance(plan,str) and plan.strip().casefold()=="free"
+        active=base.get(account,"subscription","active")
+        call_status=self.calls[-1]["status"] if self.calls else "not_attempted"
+        self.status_verified=(free_label and limit==100 and current is not None and current<=100 and active is not False)
         if self.status_verified:
             self.remaining=min(self.remaining if self.remaining is not None else 100,100-current)
+            reason="verified"
         else:
             self.blocked.add("football")
+            reason=("endpoint_"+call_status if call_status!="ok" else
+                    "unexpected_subscription_label" if not free_label else
+                    "unexpected_daily_limit" if limit!=100 else
+                    "invalid_usage_counter" if current is None or current>100 else
+                    "inactive_subscription")
+        diagnostic={"call_status":call_status,"free_label_verified":free_label,
+                    "daily_limit":limit,"reported_usage":current,
+                    "subscription_active":active if isinstance(active,bool) else None,
+                    "remaining_header_or_quota":self.remaining,"reason":reason}
+        self.state["provider_checks"]["football_status_diagnostic"]=diagnostic
+        print("API-Football status (sanitized): "+json.dumps(diagnostic))
         self.state["provider_checks"]["football_free_verified"]=self.status_verified
         save(self.path,self.state)
         return self.status_verified
