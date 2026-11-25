@@ -1,0 +1,51 @@
+name: FDG 2027 E02 - Player Data Discovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      authorize_free_probe:
+        description: 'Confirmar saldo disponivel: ate 20 requisicoes API-Football e 50 creditos StrikerAPI'
+        type: boolean
+        default: false
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fdg2027-e02-research
+  cancel-in-progress: false
+
+jobs:
+  discovery:
+    if: inputs.authorize_free_probe == true && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout somente leitura
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          sparse-checkout: research/fdg2027/e02
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verificar sintaxe e testes offline (sem APIs)
+        run: |
+          python -m py_compile research/fdg2027/e02/player_data_discovery.py
+          python research/fdg2027/e02/player_data_discovery.py --self-test
+      - name: Executar amostra autenticada e limitada
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          STRIKER_API_KEY: ${{ secrets.STRIKER_API_KEY }}
+        run: |
+          python research/fdg2027/e02/player_data_discovery.py --output "${RUNNER_TEMP}/e02-report.json"
+      - name: Anexar somente diagnostico agregado
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-e02-diagnostic
+          path: ${{ runner.temp }}/e02-report.json
+          if-no-files-found: ignore
+          retention-days: 7
