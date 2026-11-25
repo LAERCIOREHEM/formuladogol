@@ -157,7 +157,23 @@ jobs:
         run: |
           set -euo pipefail
           npm run render-config
-          npx wrangler deploy --config wrangler.generated.jsonc
+          # A Cloudflare API 5xx/429 can occur after the upload. Retry only
+          # transient deployment errors; permanent validation/auth errors fail.
+          for attempt in 1 2 3; do
+            LOG="$(mktemp)"
+            if npx wrangler deploy --config wrangler.generated.jsonc 2>&1 | tee "$LOG"; then
+              rm -f "$LOG"
+              exit 0
+            fi
+            if ! grep -Eiq 'malformed response| -> (429|5[0-9][0-9])|HTTP (429|5[0-9][0-9])|ECONNRESET|ETIMEDOUT|fetch failed' "$LOG"; then
+              rm -f "$LOG"
+              exit 1
+            fi
+            rm -f "$LOG"
+            if [[ "$attempt" == 3 ]]; then exit 1; fi
+            echo "::warning::Cloudflare API transitória; repetindo ativação ($attempt/3)."
+            sleep "$((attempt * 10))"
+          done
 
       - name: Smoke test de health
         shell: bash
@@ -213,7 +229,7 @@ jobs:
           node -e '
             const fs=require("fs");
             const p=JSON.parse(fs.readFileSync("/tmp/orchestrator-status.json","utf8"));
-            if(!p.ok || p.engine!=="fdg-cloudflare-orchestrator") process.exit(1);
+            if(!p.ok || p.engine!=="fdg-cloudflare-orchestrator" || p.mode!==process.env.REQUESTED_MODE) process.exit(1);
             console.log(`Estado OK; mode=${p.mode}; lastTickAt=${p.lastTickAt||"ainda aguardando primeiro cron"}`);
           '
 

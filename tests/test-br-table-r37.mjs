@@ -28,7 +28,35 @@ try{
   });
   assert.equal(result.length,2);
   for(const x of result){assert.equal(x.rows,20);assert.ok(x.full,JSON.stringify({width,x}));if(width<=820){assert.ok(x.pos<=46&&Math.abs(x.gap)<=1,JSON.stringify({width,x}));}}
-  if(width<=820){for(const selector of ['.tabela-scroll','.returno-scroll']){const box=page.locator('#view-tabela '+selector);const v=await box.evaluate(e=>{e.scrollLeft=160;const cells=e.querySelector('tbody tr').cells;return {scroll:e.scrollLeft,gap:cells[1].getBoundingClientRect().left-cells[0].getBoundingClientRect().right};});assert.ok(v.scroll>0&&Math.abs(v.gap)<=1,JSON.stringify({width,selector,v}));await box.evaluate(e=>e.scrollLeft=0);}}
+  if(width<=820){
+   for(const selector of ['.tabela-scroll','.returno-scroll']){
+    const box=page.locator('#view-tabela '+selector);
+    const v=await box.evaluate(e=>{
+     e.scrollLeft=0;
+     const table=e.querySelector('table'),cells=table.tBodies[0].rows[0].cells;
+     const before=[...cells].map(c=>c.getBoundingClientRect().left);
+     const available=e.clientWidth,max=Math.max(0,e.scrollWidth-available);
+     const required=Math.max(0,table.getBoundingClientRect().right-e.getBoundingClientRect().left-e.clientLeft-available);
+     e.scrollLeft=Math.min(160,max);
+     const after=[...cells].map(c=>c.getBoundingClientRect().left);
+     const gap=cells[1].getBoundingClientRect().left-cells[0].getBoundingClientRect().right;
+     const actual=e.scrollLeft;
+     e.scrollLeft=max;
+     const last=table.tBodies[0].rows[0].cells[cells.length-1].getBoundingClientRect();
+     const edge=e.getBoundingClientRect().left+e.clientLeft+available;
+     const reached=last.right<=edge+2;
+     e.scrollLeft=0;
+     return {available,max,required,actual,gap,reached,sticky:Math.abs(after[0]-before[0])<=2&&Math.abs(after[1]-before[1])<=2,moving:Math.abs((before[2]-after[2])-actual)<=2};
+    });
+    const message=JSON.stringify({width,selector,v});
+    assert.ok(v.available>0&&v.required<=v.max+2&&v.reached,message);
+    assert.ok(Math.abs(v.gap)<=1,message);
+    if(width<=430)assert.ok(v.max>2,message);
+    if(v.max>2){assert.ok(v.actual>0&&v.sticky&&v.moving,message);}
+    else assert.ok(v.required<=2&&v.actual===0,message);
+    console.log('R37 geometry',message);
+   }
+  }
  }
  console.log('PASS R37-R1: 16 viewports x 2 actual tables; full names, compact POS, frozen column alignment');
 }finally{await browser.close();server.close();}
