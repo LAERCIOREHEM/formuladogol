@@ -1,0 +1,113 @@
+name: FDG 2027 E02-R2 - Historical Recovery and Player Feasibility
+
+on:
+  workflow_dispatch:
+    inputs:
+      authorize_free_probe:
+        description: 'Confirmar plano gratuito, saldo disponivel e uso interno dos dados'
+        type: boolean
+        required: true
+        default: false
+      football_limit:
+        description: 'Maximo de requisicoes API-Football nesta rodada (1-65)'
+        type: number
+        default: 65
+        required: true
+      striker_limit:
+        description: 'Maximo de creditos Striker nesta rodada (0-25)'
+        type: number
+        default: 25
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: fdg2027-e02-research
+  cancel-in-progress: false
+
+jobs:
+  research:
+    if: inputs.authorize_free_probe == true && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      WORK: ${{ runner.temp }}/fdg2027-r2-private
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          sparse-checkout: research/fdg2027/e02
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testes offline antes de usar creditos
+        run: |
+          set -euo pipefail
+          python -m py_compile research/fdg2027/e02/*.py
+          python research/fdg2027/e02/player_data_discovery.py --self-test
+          python research/fdg2027/e02/historical_r2.py --self-test
+      - name: Validar chave de arquivo e restaurar ultimo checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARCHIVE_KEY: ${{ secrets.FDG_RESEARCH_ARCHIVE_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$WORK"
+          if [ "${#ARCHIVE_KEY}" -lt 32 ]; then
+            echo 'BLOCKED: configure FDG_RESEARCH_ARCHIVE_KEY (random key, >=32 characters) before any API call.'
+            exit 1
+          fi
+          prev="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/fdg2027-e02-r2-historical.yml/runs?per_page=100" | jq -r --argjson n "$GITHUB_RUN_NUMBER" '[.workflow_runs[] | select(.run_number < $n and .status == "completed" and .conclusion != "skipped")] | sort_by(.run_number) | last | .id // empty')"
+          if [ -n "$prev" ]; then
+            gh run download "$prev" --repo "$GITHUB_REPOSITORY" --name fdg2027-r2-encrypted-checkpoint --dir "$WORK"
+            test -s "$WORK/state.json.gpg"
+            printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --output "$WORK/state.json" --decrypt "$WORK/state.json.gpg"
+            rm -f "$WORK/state.json.gpg"
+            echo "Checkpoint restored from run $prev."
+          else
+            echo 'First historical recovery run.'
+          fi
+          touch "$WORK/restore-ok"
+      - name: Recuperar historico e diagnosticar viabilidade
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          STRIKER_API_KEY: ${{ secrets.STRIKER_API_KEY }}
+          FOOTBALL_LIMIT: ${{ inputs.football_limit }}
+          STRIKER_LIMIT: ${{ inputs.striker_limit }}
+        run: |
+          set -euo pipefail
+          umask 077
+          python research/fdg2027/e02/historical_r2.py --state "$WORK/state.json" --report "$WORK/report.json" --football-limit "$FOOTBALL_LIMIT" --striker-limit "$STRIKER_LIMIT"
+      - name: Criptografar checkpoint mesmo em caso de falha
+        if: always()
+        env:
+          ARCHIVE_KEY: ${{ secrets.FDG_RESEARCH_ARCHIVE_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          if [ -f "$WORK/restore-ok" ] && [ -f "$WORK/state.json" ]; then
+            printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 --compress-algo zlib --output "$WORK/state.json.gpg" "$WORK/state.json"
+            test -s "$WORK/state.json.gpg"
+          fi
+      - name: Guardar somente checkpoint criptografado
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-r2-encrypted-checkpoint
+          path: ${{ runner.temp }}/fdg2027-r2-private/state.json.gpg
+          if-no-files-found: ignore
+          retention-days: 90
+      - name: Guardar diagnostico agregado (sem dados brutos)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-r2-diagnostic
+          path: ${{ runner.temp }}/fdg2027-r2-private/report.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Remover arquivos de pesquisa do runner
+        if: always()
+        run: rm -rf -- "$WORK"
