@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-24T20:29:37.029515-03:00",
+  "gerado_em": "2026-11-24T21:54:08.983273-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 360,
   "total_com_estatisticas": 360,
-  "total_com_publico": 359,
+  "total_com_publico": 360,
   "total_com_eventos": 360,
   "total_com_jogadores": 360,
   "total_eventos_validados": 360,
@@ -20,9 +20,9 @@
       "placar_mandante": 3,
       "placar_visitante": 0,
       "estadio": "Arena Condá",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 4791,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://esporte.ig.com.br/parceiros/jogada10/2026-11-24/com-time-misto--palmeiras-perde-para-a-lanterna-chapecoense.html",
       "arbitro": "",
       "stats": [
         {
@@ -577,7 +577,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-24T20:29:30.214007-03:00"
+      "atualizado_em": "2026-11-24T20:29:30.214007-03:00",
+      "renda": 340600,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841320": {
       "event_id": "401841320",
@@ -2911,7 +2913,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-11-24T16:18:40.498047-03:00",
-      "renda": 240280
+      "renda": 240280,
+      "publico_pagante": 4942,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841324": {
       "event_id": "401841324",
@@ -4086,7 +4090,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-11-23T17:33:23.135018-03:00",
-      "renda": 885210
+      "renda": 885210,
+      "publico_pagante": 21438,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841325": {
       "event_id": "401841325",
@@ -5774,7 +5780,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-11-22T22:07:08.548759-03:00",
-      "renda": 4446565.71
+      "renda": 4446565.71,
+      "publico_pagante": 38606,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841309": {
       "event_id": "401841309",
@@ -7506,7 +7514,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-11-21T19:11:25.442179-03:00",
-      "renda": 307118
+      "renda": 307118,
+      "publico_pagante": 14238,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841312": {
       "event_id": "401841312",
@@ -203778,5 +203788,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 323,
+  "total_com_renda": 360
 }

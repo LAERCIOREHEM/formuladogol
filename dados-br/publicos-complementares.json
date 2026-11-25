@@ -1,6 +1,6 @@
 {
   "_comentario": "Complemento documental de público presente, pagantes e renda. Correções verificadas por event_id são mescladas por campo antes da coleta; a busca automática prioriza ge/Gato Mestre. Público pagante nunca substitui público presente e fontes avulsas podem cobrir jogos remarcados.",
-  "atualizado_em": "2026-11-24T02:37:41.118981-03:00",
+  "atualizado_em": "2026-11-24T21:54:08-03:00",
   "jogos": {
     "401840808": {
       "tipo": "presente",
@@ -4500,7 +4500,11 @@
       "renda_status": "divulgado",
       "fonte_renda": "https://www.futebolinterior.com.br/vitoria-vence-red-bull-bragantino-brasi",
       "origem": "cloudflare-postgame-fastlane",
-      "verificado_em": "2026-11-19T23:52:43.396153-03:00"
+      "verificado_em": "2026-11-19T23:52:43.396153-03:00",
+      "pagantes": 14238,
+      "pagantes_status": "divulgado",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/11/19/flamengo-2-x-1-athletico-pr-tem-o-maior-publico-da-35a-rodada-do-brasileiro-veja-a-lista.ghtml"
     },
     "401841327": {
       "tipo": "presente",
@@ -4558,7 +4562,11 @@
       "renda_status": "divulgado",
       "fonte_renda": "https://www.gazetaesportiva.com/times/palmeiras/palmeiras-x-flamengo-36-rodada-brasileirao-21-11-2026",
       "origem": "cloudflare-postgame-fastlane",
-      "verificado_em": "2026-11-21T19:55:21.931078-03:00"
+      "verificado_em": "2026-11-21T19:55:21.931078-03:00",
+      "pagantes": 38606,
+      "pagantes_status": "divulgado",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/11/23/santos-x-gremio-tem-o-maior-publico-da-36a-rodada-do-brasileiro-veja-a-lista.ghtml"
     },
     "401841325": {
       "tipo": "presente",
@@ -4582,7 +4590,11 @@
       "renda_status": "divulgado",
       "fonte_renda": "https://www.futebolinterior.com.br/bragantino-1-x-0-vasco-brasileirao",
       "origem": "cloudflare-postgame-fastlane",
-      "verificado_em": "2026-11-23T01:21:46.998435Z"
+      "verificado_em": "2026-11-23T01:21:46.998435Z",
+      "pagantes": 4942,
+      "pagantes_status": "divulgado",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/11/23/santos-x-gremio-tem-o-maior-publico-da-36a-rodada-do-brasileiro-veja-a-lista.ghtml"
     },
     "401841324": {
       "tipo": "presente",
@@ -4610,7 +4622,11 @@
       "renda_status": "divulgado",
       "fonte_renda": "https://www.futebolinterior.com.br/athletico-pr-3-x-1-remo-brasileirao",
       "origem": "cloudflare-postgame-fastlane",
-      "verificado_em": "2026-11-22T22:21:47.460724-03:00"
+      "verificado_em": "2026-11-22T22:21:47.460724-03:00",
+      "pagantes": 21438,
+      "pagantes_status": "divulgado",
+      "fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "fonte_pagantes": "https://ge.globo.com/gato-mestre/noticia/2026/11/23/santos-x-gremio-tem-o-maior-publico-da-36a-rodada-do-brasileiro-veja-a-lista.ghtml"
     },
     "401841326": {
       "tipo": "presente",
@@ -4652,6 +4668,19 @@
       "fonte_renda": "https://www.tribunadoagreste.com.br/esportes/2026/11/23/1028548-internacional-e-goleado-pelo-vitoria-e-se-complica-no-brasileiro",
       "origem": "cloudflare-postgame-fastlane",
       "verificado_em": "2026-11-24T00:16:43.759979-03:00"
+    },
+    "401841335": {
+      "origem": "openai:web_search",
+      "fonte_adicional": "Camada de IA sobre reportagem do jogo",
+      "confianca": 0.95,
+      "tipo": "presente",
+      "fonte": "https://esporte.ig.com.br/parceiros/jogada10/2026-11-24/com-time-misto--palmeiras-perde-para-a-lanterna-chapecoense.html",
+      "publico_status": "divulgado",
+      "publico": 4791,
+      "renda": 340600,
+      "renda_status": "divulgado",
+      "fonte_renda": "https://terra.com.br/esportes/palmeiras/com-time-misto-palmeiras-perde-para-a-lanterna-chapecoense,e0044a19711c269e06d878f44f8906212191gaxp.html",
+      "fonte_preferida": false
     }
   },
   "fontes_rodadas": {

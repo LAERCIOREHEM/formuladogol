@@ -1,15 +1,25 @@
 {
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
-  "jogos_finalizados": 359,
-  "jogos_com_publico": 359,
+  "jogos_finalizados": 360,
+  "jogos_com_publico": 360,
   "jogos_sem_publico": 0,
-  "publico_total": 8985727,
-  "jogos_com_renda": 359,
+  "publico_total": 8990518,
+  "jogos_com_renda": 360,
   "aguardando_fonte": [],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
+    {
+      "event_id": "401841335",
+      "tipo_publico": "presente",
+      "publico_presente": 4791,
+      "publico_pagante": null,
+      "renda": 340600.0,
+      "fonte_publico": "https://esporte.ig.com.br/parceiros/jogada10/2026-11-24/com-time-misto--palmeiras-perde-para-a-lanterna-chapecoense.html",
+      "origem": "openai:web_search",
+      "estado": "CONFIRMADO"
+    },
     {
       "event_id": "401841320",
       "tipo_publico": "presente",
@@ -44,7 +54,7 @@
       "event_id": "401841321",
       "tipo_publico": "presente",
       "publico_presente": 5047,
-      "publico_pagante": null,
+      "publico_pagante": 4942,
       "renda": 240280.0,
       "fonte_publico": "https://www.futebolinterior.com.br/bragantino-1-x-0-vasco-brasileirao",
       "origem": "cloudflare-postgame-fastlane",
@@ -64,7 +74,7 @@
       "event_id": "401841318",
       "tipo_publico": "presente",
       "publico_presente": 21852,
-      "publico_pagante": null,
+      "publico_pagante": 21438,
       "renda": 885210.0,
       "fonte_publico": "https://www.futebolinterior.com.br/athletico-pr-3-x-1-remo-brasileirao",
       "origem": "cloudflare-postgame-fastlane",
@@ -94,7 +104,7 @@
       "event_id": "401841322",
       "tipo_publico": "presente",
       "publico_presente": 38631,
-      "publico_pagante": null,
+      "publico_pagante": 38606,
       "renda": 4446565.71,
       "fonte_publico": "https://www.gazetaesportiva.com/times/palmeiras/palmeiras-x-flamengo-36-rodada-brasileirao-21-11-2026",
       "origem": "cloudflare-postgame-fastlane",
@@ -124,7 +134,7 @@
       "event_id": "401841317",
       "tipo_publico": "presente",
       "publico_presente": 14419,
-      "publico_pagante": null,
+      "publico_pagante": 14238,
       "renda": 307118.0,
       "fonte_publico": "https://www.futebolinterior.com.br/vitoria-vence-red-bull-bragantino-brasi",
       "origem": "cloudflare-postgame-fastlane",
@@ -3601,5 +3611,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-11-24T02:37:42.277690-03:00"
+  "gerado_em": "2026-11-24T21:54:09.768407-03:00"
 }
