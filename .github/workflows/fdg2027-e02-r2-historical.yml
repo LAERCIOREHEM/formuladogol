@@ -32,9 +32,9 @@ jobs:
     if: inputs.authorize_free_probe == true && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    env:
-      WORK: ${{ runner.temp }}/fdg2027-r2-private
     steps:
+      - name: Preparar area privada temporaria
+        run: echo "WORK=$RUNNER_TEMP/fdg2027-r2-private" >> "$GITHUB_ENV"
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
