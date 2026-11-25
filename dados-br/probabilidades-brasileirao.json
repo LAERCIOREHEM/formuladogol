@@ -5,10 +5,10 @@
   "temporada": 2026,
   "gerado_em": "2026-11-24T19:55:00-03:00",
   "referencia_esportiva_em": "2026-11-24T19:55:00-03:00",
-  "calculado_em": "2026-11-24T20:02:47-03:00",
+  "calculado_em": "2026-11-25T11:14:05-03:00",
   "fonte_resultados_calendario": "ESPN",
   "status": "ok",
-  "hash_entrada": "00d10b6da9f7f481180968930e2384d593f14c009c3d0d4c514e2111a3d4a945",
+  "hash_entrada": "80f2704fb69045519d9fd109ceaf088f28b9e267adcfcdcbb0b56ba801bd9537",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -265,9 +265,7 @@
   "destaques": {
     "maior_chance_titulo": {
       "clube": "Flamengo",
-      "probabilidade_pct": 100,
-      "certeza_estrutural": true,
-      "situacao": "Campeão brasileiro de 2026"
+      "probabilidade_pct": 100.0
     },
     "maior_chance_libertadores": {
       "clube": "Flamengo",
@@ -309,7 +307,7 @@
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
           "certeza_estrutural": true,
-          "motivo_certeza": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_certeza": "Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
@@ -668,7 +666,7 @@
         "limite_posicao_pior": 1,
         "fundamento_vaga_continental": "No máximo 1º lugar pelos limites de pontuação. O modelo assegura vaga continental aos 11 primeiros (5 Libertadores-base e 6 Sul-Americana).",
         "titulo": "campeao_confirmado",
-        "fundamento_titulo": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes."
+        "fundamento_titulo": "Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão."
       }
     },
     {
@@ -698,7 +696,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -1054,7 +1052,9 @@
         "fundamento_continental": "Certificação combinatória: no máximo 2º lugar; todos os resultados restantes, confrontos diretos, pontos e vitórias considerados, com demais desempates tratados pessimisticamente.",
         "vaga_continental_garantida": true,
         "limite_posicao_pior": 2,
-        "fundamento_vaga_continental": "No máximo 2º lugar pelos limites de pontuação. O modelo assegura vaga continental aos 11 primeiros (5 Libertadores-base e 6 Sul-Americana)."
+        "fundamento_vaga_continental": "No máximo 2º lugar pelos limites de pontuação. O modelo assegura vaga continental aos 11 primeiros (5 Libertadores-base e 6 Sul-Americana).",
+        "sul_americana_impossivel_final_copa": true,
+        "fundamento_sul_americana": "Finalista da Copa do Brasil 2026: permanecendo na Série A 2027, tem direito à Libertadores ou já está classificado por outra via. Se rebaixado, não pode exercer a vaga da Copa e termina fora do limite máximo de 15 classificados continentais pelo campeonato. Em nenhum cenário a Sul-Americana é seu destino."
       }
     },
     {
@@ -1084,7 +1084,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -1470,7 +1470,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -1856,7 +1856,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -2240,7 +2240,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -2624,7 +2624,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -3003,7 +3003,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -3382,7 +3382,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -3761,7 +3761,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -4140,7 +4140,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -4519,7 +4519,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -4898,7 +4898,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -5277,7 +5277,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -5656,7 +5656,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -6035,7 +6035,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -6120,14 +6120,14 @@
           "ocorrencias": 0,
           "simulacoes": 2000000,
           "percentual_estimado": 0.0,
-          "exibicao": "<0,001%",
+          "exibicao": "0%",
           "zero_observado": true,
-          "possivel_estruturalmente": true,
-          "impossivel_estruturalmente": false,
+          "possivel_estruturalmente": false,
+          "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": null,
-          "limite_superior_95_regra_dos_tres_pct": 0.00015
+          "motivo_impossibilidade": "Finalista da Copa do Brasil 2026: permanecendo na Série A 2027, tem direito à Libertadores ou já está classificado por outra via. Se rebaixado, não pode exercer a vaga da Copa e termina fora do limite máximo de 15 classificados continentais pelo campeonato. Em nenhum cenário a Sul-Americana é seu destino.",
+          "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
           "ocorrencias": 724920,
@@ -6330,41 +6330,41 @@
             "ocorrencias": 0,
             "simulacoes": 2000000,
             "percentual_estimado": 0.0,
-            "exibicao": "<0,001%",
+            "exibicao": "0%",
             "zero_observado": true,
-            "possivel_estruturalmente": true,
-            "impossivel_estruturalmente": false,
+            "possivel_estruturalmente": false,
+            "impossivel_estruturalmente": true,
             "certeza_estrutural": false,
             "motivo_certeza": null,
-            "motivo_impossibilidade": null,
-            "limite_superior_95_regra_dos_tres_pct": 0.00015
+            "motivo_impossibilidade": "Finalista da Copa do Brasil 2026: permanecendo na Série A 2027, tem direito à Libertadores ou já está classificado por outra via. Se rebaixado, não pode exercer a vaga da Copa e termina fora do limite máximo de 15 classificados continentais pelo campeonato. Em nenhum cenário a Sul-Americana é seu destino.",
+            "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
             "via_brasileirao": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,001%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "possivel_estruturalmente": true,
-              "impossivel_estruturalmente": false,
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
               "certeza_estrutural": false,
               "motivo_certeza": null,
-              "motivo_impossibilidade": null,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "motivo_impossibilidade": "Finalista da Copa do Brasil 2026: permanecendo na Série A 2027, tem direito à Libertadores ou já está classificado por outra via. Se rebaixado, não pode exercer a vaga da Copa e termina fora do limite máximo de 15 classificados continentais pelo campeonato. Em nenhum cenário a Sul-Americana é seu destino.",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,001%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "possivel_estruturalmente": true,
-              "impossivel_estruturalmente": false,
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
               "certeza_estrutural": false,
               "motivo_certeza": null,
-              "motivo_impossibilidade": null,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "motivo_impossibilidade": "Finalista da Copa do Brasil 2026: permanecendo na Série A 2027, tem direito à Libertadores ou já está classificado por outra via. Se rebaixado, não pode exercer a vaga da Copa e termina fora do limite máximo de 15 classificados continentais pelo campeonato. Em nenhum cenário a Sul-Americana é seu destino.",
+              "limite_superior_95_regra_dos_tres_pct": null
             }
           },
           "soma_vias_pct": 0.0
@@ -6385,6 +6385,10 @@
           },
           "regra": "complemento exclusivo após Libertadores e Sul-Americana"
         }
+      },
+      "situacao_matematica": {
+        "sul_americana_impossivel_final_copa": true,
+        "fundamento_sul_americana": "Finalista da Copa do Brasil 2026: permanecendo na Série A 2027, tem direito à Libertadores ou já está classificado por outra via. Se rebaixado, não pode exercer a vaga da Copa e termina fora do limite máximo de 15 classificados continentais pelo campeonato. Em nenhum cenário a Sul-Americana é seu destino."
       }
     },
     {
@@ -6414,7 +6418,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -6793,7 +6797,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -7172,7 +7176,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -7557,7 +7561,7 @@
           "impossivel_estruturalmente": true,
           "certeza_estrutural": false,
           "motivo_certeza": null,
-          "motivo_impossibilidade": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes.",
+          "motivo_impossibilidade": "Impossível: Título matematicamente confirmado: Flamengo tem 80 pontos e 24 vitórias. Nenhum rival alcança pontos superiores ou iguala os pontos com vitórias suficientes; cálculo considera os 38 jogos por clube e o primeiro critério de desempate do Brasileirão.",
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -7932,7 +7936,7 @@
         {
           "chave": "copa_do_brasil",
           "nome": "Copa do Brasil",
-          "gerado_em": "2026-11-24T16:19:01-03:00",
+          "gerado_em": "2026-11-24T20:29:54-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -7947,7 +7951,7 @@
         {
           "chave": "libertadores",
           "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-11-24T16:19:01-03:00",
+          "gerado_em": "2026-11-24T20:29:55-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -7962,7 +7966,7 @@
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-11-24T16:19:02-03:00",
+          "gerado_em": "2026-11-24T20:29:55-03:00",
           "fase_atual": {
             "status": "encerrada",
             "ordem": 900,
@@ -7975,13 +7979,13 @@
           "modo_coleta": "incremental"
         }
       ],
-      "referencia_mais_antiga_em": "2026-11-24T16:19:01-03:00",
-      "referencia_mais_recente_em": "2026-11-24T16:19:02-03:00",
-      "snapshots_atualizados_em": "2026-11-24T16:19:02-03:00"
+      "referencia_mais_antiga_em": "2026-11-24T20:29:54-03:00",
+      "referencia_mais_recente_em": "2026-11-24T20:29:55-03:00",
+      "snapshots_atualizados_em": "2026-11-24T20:29:55-03:00"
     }
   },
   "cobertura_dados": {
-    "atualizado_em": "2026-11-24T20:02:47-03:00",
+    "atualizado_em": "2026-11-25T11:14:05-03:00",
     "brasileirao": {
       "fonte": "ESPN",
       "referencia_esportiva_em": "2026-11-24T19:55:00-03:00",
@@ -7994,7 +7998,7 @@
         {
           "chave": "copa_do_brasil",
           "nome": "Copa do Brasil",
-          "gerado_em": "2026-11-24T16:19:01-03:00",
+          "gerado_em": "2026-11-24T20:29:54-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -8009,7 +8013,7 @@
         {
           "chave": "libertadores",
           "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-11-24T16:19:01-03:00",
+          "gerado_em": "2026-11-24T20:29:55-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 900,
@@ -8024,7 +8028,7 @@
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-11-24T16:19:02-03:00",
+          "gerado_em": "2026-11-24T20:29:55-03:00",
           "fase_atual": {
             "status": "encerrada",
             "ordem": 900,
@@ -8037,9 +8041,9 @@
           "modo_coleta": "incremental"
         }
       ],
-      "referencia_mais_antiga_em": "2026-11-24T16:19:01-03:00",
-      "referencia_mais_recente_em": "2026-11-24T16:19:02-03:00",
-      "snapshots_atualizados_em": "2026-11-24T16:19:02-03:00"
+      "referencia_mais_antiga_em": "2026-11-24T20:29:54-03:00",
+      "referencia_mais_recente_em": "2026-11-24T20:29:55-03:00",
+      "snapshots_atualizados_em": "2026-11-24T20:29:55-03:00"
     }
   },
   "total_previsoes_partidas": 20,
@@ -9130,14 +9134,5 @@
     "Libertadores e Sul-Americana são probabilidades consolidadas e incluem os caminhos por copas e repasses regulamentares.",
     "Valores exibidos como <0,001% não significam impossibilidade matemática; indicam evento abaixo da resolução visual escolhida.",
     "O modelo não utiliza cotações de apostas."
-  ],
-  "titulo_matematico_2026": {
-    "campeao": "Flamengo",
-    "confirmado": true,
-    "probabilidade_pct": 100,
-    "rodada": 36,
-    "criterio": "pontos e vitórias",
-    "fonte": "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/flamengo-conquista-brasileirao-2026",
-    "fundamento": "Título matematicamente assegurado: Flamengo, 80 pontos e 24 vitórias. Nenhum adversário pode ultrapassar ou igualar esses pontos e vitórias, mesmo vencendo todas as partidas restantes."
-  }
+  ]
 }
