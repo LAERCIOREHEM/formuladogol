@@ -298,6 +298,32 @@ def striker_analysis(data, football=None, espn=None):
             "identity_espn":base.unique_pairs(ep,sp),"identity_football":base.unique_pairs(fp,sp),
             "coverage":base.coverage(sp)}
 
+def lineup_crosscheck(game_data,line_data):
+    if base.striker_key(base.obj(game_data.get("game")))!=base.striker_key(base.obj(line_data.get("game"))):
+        return {"identity_verified":False}
+    if str(base.get(game_data,"game","game_id"))!=str(base.get(line_data,"game","game_id")):
+        return {"identity_verified":False}
+    key=lambda p,t:(str(t),str(p.get("player_id") or ""))
+    raw=base.arr(game_data.get("players"))
+    matches={key(p,p.get("team_id")):p for p in raw}
+    groups=base.arr(line_data.get("lineups"))
+    counts=[]; comparisons=0; mismatches=0; missing=0
+    for g in groups:
+        t=g.get("team_id")
+        starters=base.arr(g.get("starting_xi"))
+        counts.append(len(starters))
+        for p in starters+base.arr(g.get("substitutes_used")):
+            other=matches.get(key(p,t))
+            if other is None:
+                missing+=1
+                continue
+            comparisons+=1
+            if any(p.get(f)!=other.get(f) for f in ("minute_on","minute_off")):
+                mismatches+=1
+    return {"identity_verified":True,"starters":sorted(counts),"minute_pairs_compared":comparisons,
+            "minute_pair_mismatches":mismatches,"players_missing":missing,
+            "same_provider_consistency_only":True}
+
 def recent_sample(probe,state,path):
     for year in (2026,2024,2025):
         y=str(year)
@@ -328,6 +354,11 @@ def recent_sample(probe,state,path):
         safe={k:data.get(k) for k in ("game","players","key_events")}
         state["recent"][y]={"data":safe,"analysis":striker_analysis(safe,football,espn)}
         save(path,state)
+        if year==2026 and probe.used["striker"]+5<=base.LIMITS["striker"]:
+            line=probe.call("striker","get_lineups",{"game_id":str(chosen.get("game_id"))},5)
+            if line:
+                state["recent"][y]["analysis"]["lineup_crosscheck"]=lineup_crosscheck(safe,line)
+                save(path,state)
 
 def historical_timeline(f):
     """Check event/lineup consistency; no model fitting or future-derived xG."""
@@ -435,6 +466,7 @@ def summary(state,probe):
     return {"execution":"FDG-2027-E02-R2","utc":now().isoformat(),"historical":seasons,
             "historical_complete":complete,"historical_first_pass_complete":attempted,
             "recent_samples":recent,"attempted_this_run":dict(probe.used),
+            "call_diagnostics":dict(collections.Counter(c["source"]+":"+c["endpoint"]+":"+c["status"] for c in probe.calls)),
             "reserved_cumulative":state["ledger"],"provider_checks":state["provider_checks"],
             "rights":{"striker":"internal storage/model training permitted; no bulk redistribution",
                       "football":"publication rights not granted; internal evaluation only pending rights review"},
@@ -457,6 +489,7 @@ def self_test():
         assert load(path)["ledger"]["test"]==3
     assert not validate_football({}, {})
     assert not historical_timeline({})["candidate"]
+    assert lineup_crosscheck({"game":{"game_id":"1"}},{"game":{"game_id":"2"}})["identity_verified"] is False
     print("PASS: regulation minutes, red cards, unknowns, checkpoint and invalid fixture")
 
 def main():
