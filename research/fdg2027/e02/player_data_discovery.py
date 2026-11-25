@@ -14,7 +14,7 @@ import urllib.request
 import uuid
 from pathlib import Path
 
-YEARS = (2022, 2023, 2024, 2025, 2026)
+YEARS = (2026, 2025, 2024, 2023, 2022)
 LIMITS = {"football": 20, "striker": 50, "espn": 12}
 FIELDS = ("id", "position", "starter", "minutes", "goals", "assists", "shots",
           "shots_on_target", "passes", "pass_accuracy", "tackles", "interceptions",
@@ -93,7 +93,8 @@ class Probe:
             url = "https://v3.football.api-sports.io/" + endpoint + "?" + urllib.parse.urlencode(params)
             req = urllib.request.Request(url, headers={"x-apisports-key": key})
         elif source == "striker":
-            url = "https://mcp.strikerapi.com/v1/brazil/" + endpoint
+            url = "https://mcp.strikerapi.com/v1/" + endpoint
+            params = {**params, "league": "brazil"}
             req = urllib.request.Request(url, data=json.dumps(params).encode(),
                 headers={"x-api-key": key, "Content-Type": "application/json",
                          "x-idempotency-key": str(uuid.uuid4())}, method="POST")
@@ -132,7 +133,17 @@ class Probe:
                 if not isinstance(data, dict) or data.get("error") or data.get("errors"):
                     record["status"] = "provider_or_schema_error"
                     return None
+                # REST wraps the result in data; support bare documented examples too.
+                payload = data.get("data", data)
+                required = {"list_games": "games", "get_game": "players", "get_lineups": "lineups"}.get(endpoint)
+                if not isinstance(payload, dict) or payload.get("error") or payload.get("errors") or (required and not isinstance(payload.get(required), list)):
+                    record["status"] = "schema_or_provider_error"
+                    return None
+                record["envelope"] = "data" if "data" in data else "bare"
+                if required:
+                    record["returned_count"] = len(payload[required])
                 self.auth[source] = True
+                data = payload
             record["status"] = "ok"
             return data
         except urllib.error.HTTPError as e:
@@ -260,6 +271,7 @@ def run(probe):
         # Validate identity before comparing. Never use odds or team_stats as player stats.
         sp = normalize_striker(sr) if striker_key(obj(obj(sr).get("game"))) == key else []
         row["striker"] = coverage(sp)
+        row["striker_game_identity_verified"] = bool(sr and striker_key(obj(obj(sr).get("game"))) == key)
         fm = unique_match(fg,football_key,key)
         fp = []
         if fm and get(fm,"fixture","id"):
@@ -277,7 +289,9 @@ def run(probe):
             "espn_striker":unique_pairs(ep,sp), "espn_football":unique_pairs(ep,fp)}
         if year in (2024,2026) and chosen and chosen.get("game_id"):
             line = probe.call("striker","get_lineups",{"game_id":str(chosen["game_id"])},5)
-            row["striker_lineup_endpoint_returned"] = bool(line)
+            verified = bool(line and striker_key(obj(line.get("game"))) == key)
+            row["striker_lineup_endpoint_returned"] = verified
+            row["striker_lineup_starter_counts"] = sorted(len(arr(g.get("starting_xi"))) for g in arr(obj(line).get("lineups"))) if verified else []
     report["auth"] = probe.auth
     report["attempted_budget"] = {k:probe.used[k] for k in LIMITS}
     report["calls"] = probe.calls
@@ -327,7 +341,46 @@ def self_test():
     p=Probe({"football":"fake"},lambda req:({"response":[]},{"x-ratelimit-requests-remaining":"0"}))
     p.call("football","fixtures")
     assert p.call("football","fixtures") is None and p.used["football"]==1
-    print("PASS: budget, missing secrets, quota, nulls, individual vs collective, exact/ambiguous identity")
+    from unittest.mock import patch as mock_patch
+    # Contract regression: exercise real REST envelope, route, league and end-to-end samples.
+    def fake_rest(req):
+        url = urllib.parse.urlparse(req.full_url)
+        if url.netloc == "mcp.strikerapi.com":
+            body = json.loads(req.data)
+            assert body["league"] == "brazil"
+            assert url.path in ("/v1/list_games", "/v1/get_game", "/v1/get_lineups")
+            year = body.get("season", 2026)
+            if "game_id" in body:
+                year = int(body["game_id"])
+            g = {"game_id":str(year),"season":year,"status":"final",
+                 "date":f"{year}-11-24","starts_at":f"{year}-11-24T22:00:00Z",
+                 "home":{"team_id":"1","name":"Chapecoense"},"away":{"team_id":"2","name":"Palmeiras"}}
+            if url.path.endswith("list_games"):
+                return {"data":{"games":[g],"count":1}}, {}
+            if url.path.endswith("get_game"):
+                return {"data":{"game":g,"players":[{"player_id":"9","name":"Test","team_id":"2","starter":True,"goals":0}]}}, {}
+            return {"data":{"game":g,"lineups":[{"starting_xi":[{}]*11},{"starting_xi":[{}]*11}]}}, {}
+        if url.netloc == "v3.football.api-sports.io":
+            params = urllib.parse.parse_qs(url.query)
+            year = params.get("season",["2024"])[0]
+            if url.path.endswith("fixtures") and int(year) <= 2024:
+                return {"response":[{"fixture":{"id":year,"date":f"{year}-11-24T22:00:00Z"},"teams":{"home":{"name":"Chapecoense"},"away":{"name":"Palmeiras"}}}]}, {}
+            if url.path.endswith("fixtures/players"):
+                return {"response":[{"team":{"name":"Palmeiras"},"players":[{"player":{"id":9,"name":"Test"},"statistics":[{"games":{"minutes":90,"substitute":False}}]}]}]}, {}
+            return {"response":[]}, {}
+        return {"events":[]}, {}
+    with mock_patch("time.sleep"):
+        p = Probe({"football":"fake","striker":"fake"},fake_rest)
+        result = run(p)
+        assert result["years"]["2026"]["case_chapecoense_palmeiras"]
+        assert result["years"]["2026"]["striker"]["rows"] == 1
+        assert result["years"]["2026"]["striker_lineup_starter_counts"] == [11,11]
+        assert result["years"]["2024"]["identity_candidates"]["football_striker"]["unique_exact_candidates"] == 1
+        assert result["attempted_budget"]["striker"] == 45
+        assert all(result["auth"].values())
+        p = Probe({"striker":"fake"},lambda req:({"data":{"unexpected":[]}},{}))
+        assert p.call("striker","list_games",cost=2) is None and not p.auth["striker"]
+    print("PASS: REST contract, wrapped payload, league, end-to-end sample, budget and prior regressions")
 
 def main():
     parser=argparse.ArgumentParser()
@@ -349,6 +402,11 @@ def main():
              "|---|---:|---:|---:|---|"]
     for y,r in result["years"].items():
         summary.append(f"| {y} | {r.get('football',{}).get('rows',0)} | {r.get('striker',{}).get('rows',0)} | {r.get('espn',{}).get('rows',0)} | {r['exact_match']} |")
+    summary.extend(["", "| Source | Active rows | ID | Position | Starter | Minutes | Goals | Shots | Rating |",
+                    "|---|---:|---:|---:|---:|---:|---:|---:|---:|"])
+    for source, a in result["aggregate_coverage"].items():
+        pcts = a["active_coverage_pct"]
+        summary.append("| "+source+" | "+str(a["active_rows"])+" | "+" | ".join(str(pcts[f])+"%" if pcts[f] is not None else "n/a" for f in ("id","position","starter","minutes","goals","shots","rating"))+" |")
     summary.extend(["", "Attempted budgets: "+json.dumps(result["attempted_budget"]),
                     "Authenticated: "+json.dumps(result["auth"]),
                     "2026 target found: "+str(result["years"]["2026"].get("case_chapecoense_palmeiras",False)),
