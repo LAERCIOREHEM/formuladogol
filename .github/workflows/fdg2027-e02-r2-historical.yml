@@ -60,7 +60,27 @@ jobs:
             echo 'BLOCKED: configure FDG_RESEARCH_ARCHIVE_KEY (random key, >=32 characters) before any API call.'
             exit 1
           fi
-          prev="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/fdg2027-e02-r2-historical.yml/runs?per_page=100" | jq -r --argjson n "$GITHUB_RUN_NUMBER" '[.workflow_runs[] | select(.run_number < $n and .status == "completed" and .conclusion != "skipped")] | sort_by(.run_number) | last | .id // empty')"
+          # A run that never reached collection cannot have consumed sporting API quota.
+          # Do not silently restart after collection began but its checkpoint was lost.
+          runs="$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/workflows/fdg2027-e02-r2-historical.yml/runs?per_page=100" | jq -s -r --argjson n "$GITHUB_RUN_NUMBER" '[.[].workflow_runs[] | select(.run_number < $n and .status == "completed" and .event == "workflow_dispatch")] | sort_by(.run_number) | reverse | .[].id')"
+          prev=""
+          for id in $runs; do
+            artifacts="$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$id/artifacts?per_page=100" | jq -s '[.[].artifacts[] | select(.name == "fdg2027-r2-encrypted-checkpoint")]')"
+            if jq -e 'any(.[]; .expired == false)' <<< "$artifacts" >/dev/null; then
+              prev="$id"
+              break
+            fi
+            jobs="$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$id/jobs?filter=all&per_page=100" | jq -s '[.[].jobs[] | .steps[]? | select(.name == "Recuperar historico e diagnosticar viabilidade")]')"
+            if jq -e 'any(.[]; .conclusion != "skipped" and .conclusion != null)' <<< "$jobs" >/dev/null; then
+              echo "BLOCKED: run $id reached collection but has no usable checkpoint; investigate before restarting."
+              exit 1
+            fi
+            if [ "$(jq length <<< "$artifacts")" -gt 0 ]; then
+              echo "BLOCKED: checkpoint expired or unavailable for run $id."
+              exit 1
+            fi
+            echo "Ignoring pre-collection run $id (no checkpoint expected)."
+          done
           if [ -n "$prev" ]; then
             gh run download "$prev" --repo "$GITHUB_REPOSITORY" --name fdg2027-r2-encrypted-checkpoint --dir "$WORK"
             test -s "$WORK/state.json.gpg"
