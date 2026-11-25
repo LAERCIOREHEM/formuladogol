@@ -13,40 +13,147 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "jogos": {
-    "401841335": {
-      "event_id": "401841335",
+    "401841337": {
+      "event_id": "401841337",
       "rodada": 37,
       "competicao_chave": "brasileirao",
       "competicao_nome": "Brasileirão",
       "espn_league": "bra.1",
-      "mandante": "Chapecoense",
-      "visitante": "Palmeiras",
-      "data_iso": "2026-11-24T18:00:00-03:00",
-      "estadio": "Arena Condá",
+      "mandante": "Fluminense",
+      "visitante": "Cruzeiro",
+      "data_iso": "2026-11-27T20:00:00-03:00",
+      "estadio": "Maracanã",
       "origem": "automático",
       "principal": {
-        "fonte": "cazetv",
-        "nome": "CazéTV",
-        "video_id": "jUd5TAB29NQ",
-        "url": "https://www.youtube.com/watch?v=jUd5TAB29NQ",
-        "status": "live",
-        "inicio_programado": "2026-11-24T16:30:00-03:00",
-        "inicio_real": "2026-11-24T16:30:22-03:00",
-        "titulo": "AO VIVO: CHAPECOENSE X PALMEIRAS | BRASILEIRÃO 2026 | 37ª RODADA",
-        "canal": "CazéTV",
-        "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
-        "thumbnail": "https://i.ytimg.com/vi/jUd5TAB29NQ/maxresdefault.jpg?v=6b05e2ed",
-        "confianca": 0.925,
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "MSajlBZ4TFA",
+        "url": "https://www.youtube.com/watch?v=MSajlBZ4TFA",
+        "status": "upcoming",
+        "inicio_programado": "2026-11-27T19:00:00-03:00",
+        "inicio_real": "",
+        "titulo": "FLUMINENSE X CRUZEIRO | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/MSajlBZ4TFA/maxresdefault.jpg?v=6b071d8c",
+        "confianca": 0.9,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
           "identifica transmissão ao vivo",
-          "transmissão já está ao vivo",
+          "horário compatível (60 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": true
+      },
+      "alternativas": []
+    },
+    "401841336": {
+      "event_id": "401841336",
+      "rodada": 37,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Botafogo",
+      "visitante": "Bahia",
+      "data_iso": "2026-11-28T21:00:00-03:00",
+      "estadio": "Nilton Santos",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "42GHbtbIH4k",
+        "url": "https://www.youtube.com/watch?v=42GHbtbIH4k",
+        "status": "upcoming",
+        "inicio_programado": "2026-11-28T20:15:00-03:00",
+        "inicio_real": "",
+        "titulo": "BOTAFOGO X BAHIA | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/42GHbtbIH4k/maxresdefault.jpg?v=6b072343",
+        "confianca": 0.9125,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (45 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": true
+      },
+      "alternativas": []
+    },
+    "401841332": {
+      "event_id": "401841332",
+      "rodada": 37,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Vitória",
+      "visitante": "Santos",
+      "data_iso": "2026-11-29T16:00:00-03:00",
+      "estadio": "Barradão",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "ItY99vTq4BM",
+        "url": "https://www.youtube.com/watch?v=ItY99vTq4BM",
+        "status": "upcoming",
+        "inicio_programado": "2026-11-29T14:30:00-03:00",
+        "inicio_real": "",
+        "titulo": "VITÓRIA X SANTOS | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/ItY99vTq4BM/maxresdefault.jpg?v=6b073d2e",
+        "confianca": 0.875,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
           "horário compatível (90 min de diferença)"
         ],
         "origem_busca": "uploads",
         "escopo": "partida",
-        "embeddable": false
+        "embeddable": true
+      },
+      "alternativas": []
+    },
+    "401841331": {
+      "event_id": "401841331",
+      "rodada": 37,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Internacional",
+      "visitante": "Bragantino",
+      "data_iso": "2026-11-29T18:30:00-03:00",
+      "estadio": "Beira-Rio",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "TtchwqtN58k",
+        "url": "https://www.youtube.com/watch?v=TtchwqtN58k",
+        "status": "upcoming",
+        "inicio_programado": "2026-11-29T17:30:00-03:00",
+        "inicio_real": "",
+        "titulo": "INTERNACIONAL X BRAGANTINO | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/TtchwqtN58k/maxresdefault.jpg?v=6b07288d",
+        "confianca": 0.9,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (60 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": true
       },
       "alternativas": []
     },
@@ -123,5 +230,5 @@
       "alternativas": []
     }
   },
-  "atualizado_em": "2026-11-24T16:36:17-03:00"
+  "atualizado_em": "2026-11-25T18:36:21-03:00"
 }
