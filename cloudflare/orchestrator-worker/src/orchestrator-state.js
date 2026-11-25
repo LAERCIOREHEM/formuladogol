@@ -232,11 +232,12 @@ export class OrchestratorState {
     const status = (await this.state.storage.get('status')) || {};
     const history = (await this.state.storage.get('history')) || [];
     return {
+      ...status,
       ok: true,
       engine: 'fdg-cloudflare-orchestrator',
       version: String(this.env.ORCHESTRATOR_VERSION || ORCHESTRATOR_CONTRACT.version),
-      mode: String(this.env.ORCHESTRATOR_MODE || 'shadow'),
-      ...status,
+      mode: String(this.env.ORCHESTRATOR_MODE || 'shadow').toLowerCase(),
+      lastTickMode: status.lastTickAt ? String(status.mode || '').toLowerCase() : null,
       recentDecisions: history.slice(-10).reverse(),
     };
   }

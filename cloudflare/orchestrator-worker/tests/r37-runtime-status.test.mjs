@@ -1,0 +1,24 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {OrchestratorState} from '../src/orchestrator-state.js';
+test('R37 status separates deployed mode from persisted last cycle without erasing history',async()=>{
+ const store=new Map([['status',{mode:'shadow',lastTickAt:'2026-11-25T13:51:00Z',result:'shadow',version:'old',engine:'old'}],['history',[{result:'shadow'}]]]);
+ const env={ORCHESTRATOR_MODE:'active',ORCHESTRATOR_VERSION:'2.6.0'};
+ const o=new OrchestratorState({storage:{get:async k=>store.get(k)}},env);
+ const status=await o.status();
+ assert.equal(status.mode,'active');
+ assert.equal(status.lastTickMode,'shadow');
+ assert.equal(status.lastTickAt,'2026-11-25T13:51:00Z');
+ assert.equal(status.result,'shadow');
+ assert.equal(status.version,'2.6.0');
+ assert.equal(status.engine,'fdg-cloudflare-orchestrator');
+ assert.equal(status.recentDecisions[0].result,'shadow');
+ assert.equal(store.get('status').mode,'shadow');
+ store.set('status',{mode:'active',lastTickAt:'2026-11-25T13:56:00Z',result:'none'});
+ assert.equal((await o.status()).lastTickMode,'active');
+ env.ORCHESTRATOR_MODE='shadow';
+ assert.equal((await o.status()).mode,'shadow');
+ assert.equal((await o.status()).lastTickMode,'active');
+ store.delete('status');
+ assert.equal((await o.status()).lastTickMode,null);
+});

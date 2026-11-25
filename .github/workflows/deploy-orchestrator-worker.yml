@@ -225,13 +225,35 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl -fsS --max-time 15 https://orchestrator.formuladogol.com.br/status | tee /tmp/orchestrator-status.json
-          node -e '
-            const fs=require("fs");
-            const p=JSON.parse(fs.readFileSync("/tmp/orchestrator-status.json","utf8"));
-            if(!p.ok || p.engine!=="fdg-cloudflare-orchestrator" || p.mode!==process.env.REQUESTED_MODE) process.exit(1);
-            console.log(`Estado OK; mode=${p.mode}; lastTickAt=${p.lastTickAt||"ainda aguardando primeiro cron"}`);
-          '
+          # A successful deployment does not rewrite the previous cron record.
+          # Require a real subsequent tick, never simulate or relabel its result.
+          export CONFIRM_AFTER="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          for attempt in $(seq 1 38); do
+            if curl -fsS --max-time 8 https://orchestrator.formuladogol.com.br/status -o /tmp/orchestrator-status.json && node -e '
+              const fs=require("fs");
+              const p=JSON.parse(fs.readFileSync("/tmp/orchestrator-status.json","utf8"));
+              const mode=process.env.REQUESTED_MODE, after=Date.parse(process.env.CONFIRM_AFTER);
+              const at=Date.parse(p.lastTickAt||"");
+              const ok=p.ok===true && p.engine==="fdg-cloudflare-orchestrator" &&
+                p.version===process.env.EXPECTED_ORCHESTRATOR_VERSION &&
+                p.mode===mode && p.lastTickMode===mode &&
+                Number.isFinite(at) && at>=after && at<=Date.now()+5000 &&
+                p.result!=="error" && p.result!=="shadow" && mode==="active";
+              const shadowOk=mode==="shadow" && p.ok===true &&
+                p.engine==="fdg-cloudflare-orchestrator" && p.version===process.env.EXPECTED_ORCHESTRATOR_VERSION &&
+                p.mode===mode && p.lastTickMode===mode && Number.isFinite(at) &&
+                at>=after && at<=Date.now()+5000 && p.result!=="error";
+              console.log(JSON.stringify({mode:p.mode,lastTickMode:p.lastTickMode,lastTickAt:p.lastTickAt,result:p.result,confirmed:ok||shadowOk}));
+              process.exit(ok||shadowOk?0:1);
+            '; then
+              echo "Estado persistente confirmado em ciclo real posterior à ativação."
+              exit 0
+            fi
+            if [[ "$attempt" == 38 ]]; then break; fi
+            sleep 10
+          done
+          echo "::error::Não foi observado ciclo saudável posterior à ativação no modo solicitado."
+          exit 1
 
       - name: Resumo
         shell: bash
