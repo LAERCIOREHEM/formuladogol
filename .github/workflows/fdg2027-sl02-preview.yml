@@ -1,0 +1,56 @@
+name: FDG 2027 SL02 - isolated functional preview
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/sl02/**'
+      - '.github/workflows/fdg2027-sl02-preview.yml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: fdg-sl02-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  preview:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'fdg2027/sl02-redesign'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify original public snapshot and build isolated preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/15110286620/zip" > "$RUNNER_TEMP/pages.zip"
+          python research/fdg2027/sl02/build.py "$RUNNER_TEMP/pages.zip" "$RUNNER_TEMP/fdg-sl02"
+          node --check research/fdg2027/sl02/app.js
+      - name: Install isolated browser dependency
+        run: |
+          python -m pip install playwright==1.52.0
+          python -m playwright install --with-deps chromium
+      - name: Test preview, capture screenshots and verify contracts
+        run: |
+          python research/fdg2027/sl02/qa.py "$RUNNER_TEMP/fdg-sl02" "$RUNNER_TEMP/sl02-qa"
+      - name: Artifact - local functional preview only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-sl02-navigable-preview
+          path: ${{ runner.temp }}/fdg-sl02/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Artifact - QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-sl02-qa
+          path: ${{ runner.temp }}/sl02-qa/
+          if-no-files-found: warn
+          retention-days: 30
