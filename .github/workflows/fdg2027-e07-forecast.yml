@@ -1,0 +1,136 @@
+name: FDG 2027 E07 - AF-Previsao 2.0 Shadow
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/e07/**'
+      - '.github/workflows/fdg2027-e07-forecast.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/e07/**'
+      - '.github/workflows/fdg2027-e07-forecast.yml'
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [self-test, research]
+        default: self-test
+        required: true
+      authorize_private_build:
+        type: boolean
+        default: false
+        required: true
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: fdg2027-e07-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  synthetic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: E01 to E07 regression
+        run: |
+          set -euo pipefail
+          python research/fdg2027/e01/test_foundation.py
+          python research/fdg2027/e03/test_canonical.py
+          python research/fdg2027/e04/test_engine.py
+          python -m py_compile research/fdg2027/e06/*.py research/fdg2027/e07/*.py
+          python research/fdg2027/e05/test_lineup.py
+          python research/fdg2027/e06/test_context.py
+          python -m pip install numpy==2.3.5
+          python research/fdg2027/e07/test_forecast.py
+  research:
+    needs: synthetic
+    if: github.ref == 'refs/heads/main' && ((github.event_name == 'push' && contains(github.event.head_commit.message, '[E07-PRIVATE-45733296514]')) || (github.event_name == 'workflow_dispatch' && inputs.mode == 'research' && inputs.authorize_private_build == true))
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify exact E03 and E06 runs and four archive digests
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          umask 077
+          w="$(mktemp -d "$RUNNER_TEMP/fdg-e07.XXXXXXXX")"
+          echo "E07_WORK=$w" >> "$GITHUB_ENV"
+          lock=research/fdg2027/e07/source-lock.json
+          for stage in e03 e06; do
+            run="$(jq -r ".${stage}_run" "$lock")"; commit="$(jq -r ".${stage}_commit" "$lock")"
+            if [[ "$stage" == e03 ]]; then path=.github/workflows/fdg2027-e03-canonical.yml; else path=.github/workflows/fdg2027-e06-context.yml; fi
+            gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run" > "$w/$stage-run.json"
+            jq -e --arg repo "$GITHUB_REPOSITORY" --arg commit "$commit" --arg path "$path" '.head_repository.full_name==$repo and .head_branch=="main" and .head_sha==$commit and .status=="completed" and .conclusion=="success" and .path==$path' "$w/$stage-run.json" >/dev/null
+          done
+          while IFS=$'\t' read -r id run name digest; do
+            gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$id" > "$w/$id-meta.json"
+            jq -e --arg name "$name" --arg digest "sha256:$digest" --argjson run "$run" '.name==$name and .expired==false and .digest==$digest and .workflow_run.id==$run' "$w/$id-meta.json" >/dev/null
+            gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$id/zip" > "$w/$id.zip"
+            printf '%s  %s\n' "$digest" "$w/$id.zip" | sha256sum --check --status
+          done < <(jq -r '.artifacts[]|[.id,.run,.name,.sha256]|@tsv' "$lock")
+          WORK="$w" python - <<'PY'
+          import os,pathlib,zipfile,json
+          w=pathlib.Path(os.environ["WORK"])
+          for a in json.loads(pathlib.Path("research/fdg2027/e07/source-lock.json").read_text())["artifacts"]:
+              with zipfile.ZipFile(w/(str(a["id"])+".zip")) as z:
+                  m=a["member"]
+                  if z.namelist()!=[m] or not 0<z.getinfo(m).file_size<=a["limit"]:raise SystemExit("BLOCKED: archive layout")
+                  with (w/m).open("xb") as f:f.write(z.read(m))
+          PY
+          echo "PASS: four locked archive digests"
+      - name: Build and verify reproducible private forecast research
+        env:
+          ARCHIVE_KEY: ${{ secrets.FDG_RESEARCH_ARCHIVE_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ "$E07_WORK" == "$RUNNER_TEMP"/fdg-e07.* && ${#ARCHIVE_KEY} -ge 32 ]]
+          w="$E07_WORK"
+          export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+          python -m pip install numpy==2.3.5
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/source.tar" --decrypt "$w/e03-canonical.tar.gpg" 2>"$w/gpg.log"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/context.json" --decrypt "$w/e06-context.json.gpg" 2>>"$w/gpg.log"
+          for suffix in first second; do
+            python research/fdg2027/e07/forecast_engine.py --archive "$w/source.tar" --e03-report "$w/e03-report.json" --context "$w/context.json" --e06-report "$w/e06-report.json" --workspace "$w/input-$suffix" --output "$w/$suffix.json" --report "$w/$suffix-report.json"
+            rm -rf "$w/input-$suffix"
+          done
+          cmp "$w/first.json" "$w/second.json"
+          cmp "$w/first-report.json" "$w/second-report.json"
+          cp "$w/first-report.json" "$w/e07-report.json"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 --compress-algo zlib --output "$w/e07-forecast.json.gpg" "$w/first.json" 2>>"$w/gpg.log"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/roundtrip.json" --decrypt "$w/e07-forecast.json.gpg" 2>>"$w/gpg.log"
+          cmp "$w/first.json" "$w/roundtrip.json"
+          rm -f "$w/source.tar" "$w/context.json" "$w/first.json" "$w/second.json" "$w/roundtrip.json" "$w/gpg.log" "$w/first-report.json" "$w/second-report.json"
+          echo "PASS: deterministic private output and encrypted roundtrip"
+      - name: Upload aggregate
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-e07-aggregate
+          path: ${{ env.E07_WORK }}/e07-report.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload encrypted forecast research
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-e07-encrypted-forecast
+          path: ${{ env.E07_WORK }}/e07-forecast.json.gpg
+          if-no-files-found: error
+          retention-days: 90
+      - name: Cleanup
+        if: always()
+        run: |
+          if [[ -n "${E07_WORK:-}" && "$E07_WORK" == "$RUNNER_TEMP"/fdg-e07.* ]]; then rm -rf -- "$E07_WORK"; fi
