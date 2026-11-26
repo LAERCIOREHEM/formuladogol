@@ -63,6 +63,11 @@ def main():
     run("gerar_paginas_jogos.py","--site-root",out,"--check")
     run("gerar_hubs_competicoes.py","--site-root",out,"--repo-root",REPO,"--check")
     run("gerar_fechamento_organico.py","--site-root",out,"--check")
+    run("validar_org_final.py","--site-root",out,"--check")
+    run("otimizar_imagens.py","--raiz",out,"--pastas","img","copa2026/img")
+    run("validar_contrato_publicos_fastlane.py","--site-root",out)
+    for rel in array(src,"FORBIDDEN"):
+        assert not (out/rel.removeprefix("_site/")).exists(),"Private path in public staging: "+rel
     run("gerar_fdg_data_manifest.py","--site-root",out)
     run("gerar_fdg_data_manifest.py","--site-root",out,"--check")
     print("Independent staging assembled:",source_commit,meta,flush=True)

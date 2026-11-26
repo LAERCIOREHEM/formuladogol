@@ -26,7 +26,9 @@ jobs:
         run: |
           python -m pip install pillow==11.3.0 beautifulsoup4==4.13.4 playwright==1.52.0
           python -m playwright install --with-deps chromium
+          npm install --no-save --ignore-scripts --no-audit --no-fund playwright@1.52.0
       - name: Assemble from current checkout, no temporary artifact
+        id: assembly
         run: |
           set -euo pipefail
           python research/fdg2027/sl02-release/assemble.py "$RUNNER_TEMP/sl02-base"
@@ -48,6 +50,7 @@ jobs:
             node --test cloudflare/orchestrator-worker/tests/cost-governance.test.mjs cloudflare/orchestrator-worker/tests/editorial-closure.test.mjs
           ) 2>&1 | tee "$RUNNER_TEMP/sl02-evidence/original-regression.log"
       - name: Browser integration and frontend-only rollback
+        if: always() && steps.assembly.outcome == 'success'
         run: |
           set -euo pipefail
           python research/fdg2027/sl02-release/qa.py "$RUNNER_TEMP/sl02-base" "$RUNNER_TEMP/sl02-candidate" "$RUNNER_TEMP/sl02-rollback" "$RUNNER_TEMP/sl02-browser"
