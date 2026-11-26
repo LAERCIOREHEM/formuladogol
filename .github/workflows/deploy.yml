@@ -8,6 +8,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/deploy.yml'
+      - 'scripts/editorial_delivery.py'
       - 'index.html'
       - 'aovivo.html'
       - 'agenda.html'
@@ -2009,9 +2010,6 @@ jobs:
 
       - name: Confirmar e avisar publicação editorial
         if: success()
-        # A publicação já foi concluída pelo passo anterior. Confirmação pública
-        # e e-mail são pós-deploy e jamais devem transformar uma publicação
-        # válida em falha por ausência de secrets ou indisponibilidade externa.
         continue-on-error: true
         env:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
@@ -2019,144 +2017,8 @@ jobs:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO_SUGESTOES }}
-          NOTIFICACOES_ANALISE: dados-br/analises-notificacoes.json
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import html
-          import json
-          import os
-          import smtplib
-          import ssl
-          import time
-          import urllib.error
-          import urllib.request
-          from datetime import datetime, timedelta, timezone
-          from email.message import EmailMessage
-          from email.utils import formataddr
-          from pathlib import Path
-
-          obrigatorios = ('SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'EMAIL_DESTINO')
-          ausentes = [nome for nome in obrigatorios if not os.environ.get(nome, '').strip()]
-          if ausentes:
-              print('::warning title=E-mail editorial não enviado::Configure os secrets ' + ', '.join(ausentes) + '. A página foi publicada normalmente.')
-              raise SystemExit(0)
-
-          dados = json.loads(Path('dados-br/analises.json').read_text(encoding='utf-8'))
-          artigos = dados.get('artigos') or []
-          caminho_notificacoes = Path(os.environ['NOTIFICACOES_ANALISE'])
-          notificacoes = json.loads(caminho_notificacoes.read_text(encoding='utf-8'))
-
-          def id_editorial(item):
-              valor = str(item.get('id_editorial') or '').strip()
-              if valor:
-                  return valor
-              numero = int(item.get('rodada') or 0)
-              return f'brasileirao-2026-rodada-{numero}' if numero else ''
-
-          ids_notificados = {id_editorial(item) for item in notificacoes.get('notificacoes') or []}
-          pendentes = [item for item in artigos if id_editorial(item) and id_editorial(item) not in ids_notificados]
-          pendentes.sort(key=lambda item: (str(item.get('publicado_em') or ''), str(item.get('modificado_em') or '')))
-          if not pendentes:
-              print('Nenhum editorial novo aguardando e-mail.')
-              raise SystemExit(0)
-
-          porta = int(os.environ['SMTP_PORT'])
-          contexto = ssl.create_default_context()
-          enviados = 0
-          for artigo in pendentes:
-              editorial_id = id_editorial(artigo)
-              rodada = int(artigo.get('rodada') or 0)
-              url, titulo = artigo['url'], artigo['titulo']
-              assunto = str(artigo.get('email_assunto') or (f'Fórmula do Gol: análise da rodada {rodada} publicada' if rodada else 'Fórmula do Gol: nova análise publicada'))
-              chamada = str(artigo.get('email_chamada') or 'Uma nova análise do Fórmula do Gol está no ar.')
-              marcador = f'data-fdg-editorial-id="{editorial_id}"'
-              confirmado = False
-              for tentativa in range(1, 31):
-                  try:
-                      req = urllib.request.Request(f'{url}?deploy={os.environ.get("GITHUB_RUN_ID", "")}', headers={'Cache-Control': 'no-cache'})
-                      with urllib.request.urlopen(req, timeout=15) as resposta:
-                          confirmado = marcador in resposta.read().decode('utf-8', errors='replace')
-                  except urllib.error.URLError as erro:
-                      print(f'Verificação pública de {editorial_id} {tentativa}/30: {erro}')
-                  if confirmado:
-                      break
-                  time.sleep(15)
-              if not confirmado:
-                  print(f'::warning title=Página ainda não confirmada::O marcador {editorial_id} ainda não apareceu em {url}; este e-mail ficou pendente.')
-                  continue
-
-              mensagem = EmailMessage()
-              mensagem['From'] = formataddr(('Fórmula do Gol', os.environ['SMTP_USER']))
-              mensagem['To'] = os.environ['EMAIL_DESTINO']
-              mensagem['Subject'] = assunto
-              mensagem.set_content(f'{chamada}\n\n{titulo}\n\n{url}')
-              mensagem.add_alternative(
-                  f'<p>{html.escape(chamada)}</p><p><strong>{html.escape(titulo)}</strong></p><p><a href="{html.escape(url, quote=True)}">Abrir página publicada</a></p>',
-                  subtype='html',
-              )
-              try:
-                  if porta == 465:
-                      with smtplib.SMTP_SSL(os.environ['SMTP_HOST'], porta, context=contexto, timeout=30) as servidor:
-                          servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
-                          servidor.send_message(mensagem)
-                  else:
-                      with smtplib.SMTP(os.environ['SMTP_HOST'], porta, timeout=30) as servidor:
-                          servidor.ehlo()
-                          servidor.starttls(context=contexto)
-                          servidor.ehlo()
-                          servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
-                          servidor.send_message(mensagem)
-              except (OSError, ValueError, smtplib.SMTPException) as erro:
-                  print(f'::warning title=E-mail editorial não enviado::{editorial_id}: {erro}. A página foi publicada normalmente.')
-                  continue
-
-              registro = {
-                  'id_editorial': editorial_id,
-                  'tipo': str(artigo.get('tipo') or 'editorial'),
-                  'slug': artigo['slug'],
-                  'url': url,
-                  'notificado_em': datetime.now(timezone(timedelta(hours=-3))).replace(microsecond=0).isoformat(),
-              }
-              if rodada:
-                  registro['rodada'] = rodada
-              notificacoes.setdefault('notificacoes', []).append(registro)
-              ids_notificados.add(editorial_id)
-              enviados += 1
-              print(f'Página confirmada e e-mail enviado: {url}')
-
-          if not enviados:
-              raise SystemExit(0)
-          notificacoes['notificacoes'].sort(key=lambda item: str(item.get('notificado_em') or ''))
-          notificacoes['schema_version'] = 2
-          notificacoes['total_notificacoes'] = len(notificacoes['notificacoes'])
-          caminho_temporario = caminho_notificacoes.with_suffix('.tmp')
-          caminho_temporario.write_text(json.dumps(notificacoes, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-          caminho_temporario.replace(caminho_notificacoes)
-          PY
-
-          if git diff --quiet -- "$NOTIFICACOES_ANALISE"; then
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "$NOTIFICACOES_ANALISE"
-          git commit -m "Registrar notificação editorial por e-mail [skip ci]"
-
-          publicado=false
-          for tentativa in 1 2 3; do
-            git pull --rebase origin main
-            if git push origin HEAD:main; then
-              publicado=true
-              break
-            fi
-            echo "Tentativa $tentativa/3 de registrar a notificação não concluiu; tentando novamente."
-          done
-          if [[ "$publicado" != "true" ]]; then
-            echo "::warning title=Registro da notificação pendente::O e-mail foi enviado, mas o registro de deduplicação não pôde ser publicado."
-          fi
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/editorial_delivery.py
 
       - name: Reliability SLO — medir FINAL → AF → deploy
         if: success()
