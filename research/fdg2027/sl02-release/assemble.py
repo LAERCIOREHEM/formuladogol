@@ -14,10 +14,9 @@ def run(name,*args):
     print("Offline generator:",name,*args,flush=True)
     subprocess.run([sys.executable,str(REPO/"scripts"/name),*map(str,args)],cwd=REPO,check=True)
 def array(source,name):
-    m=re.search(r"(?m)^\s*"+re.escape(name)+r"=\(\s*\n(.*?)^\s*\)",source,re.S|re.M)
+    m=re.search(r"(?m)^\s*"+re.escape(name)+r"=\(([^)]*)\)",source)
     if not m:raise RuntimeError("Deploy allowlist absent: "+name)
-    items=[s.split("#",1)[0].strip() for s in m[1].splitlines()]
-    items=[x for x in items if x]
+    items=" ".join(s.split("#",1)[0].strip() for s in m[1].splitlines()).split()
     if not all(re.fullmatch(r"[A-Za-z0-9_./-]+",x) and ".." not in Path(x).parts for x in items):raise RuntimeError("Unsafe allowlist item")
     return items
 def copy_file(out,rel):
