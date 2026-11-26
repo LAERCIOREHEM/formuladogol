@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "competition": "bra.1",
+  "default_season": 2026,
+  "public_switch_enabled": false,
+  "production_write_enabled": false,
+  "seasons": {
+    "2022": {
+      "status": "research",
+      "public_read": false,
+      "continental_rules": "unverified"
+    },
+    "2023": {
+      "status": "research",
+      "public_read": false,
+      "continental_rules": "unverified"
+    },
+    "2024": {
+      "status": "research",
+      "public_read": false,
+      "continental_rules": "unverified"
+    },
+    "2025": {
+      "status": "research",
+      "public_read": false,
+      "continental_rules": "unverified"
+    },
+    "2026": {
+      "status": "legacy_live",
+      "public_read": true,
+      "continental_rules": "legacy_2026"
+    },
+    "2027": {
+      "status": "planned",
+      "public_read": false,
+      "continental_rules": "unverified"
+    }
+  },
+  "legacy_assets": {
+    "fixtures": "jogos.json",
+    "results": "resultados.json",
+    "standings": "tabela.json",
+    "events": "espn_eventos.json",
+    "players": "dados-br/jogadores.json",
+    "rosters": "dados-br/elencos.json",
+    "calendar": "dados-br/calendario-completo.json",
+    "forecast": "dados-br/probabilidades-jogos.json",
+    "manifest": "dados-br/af-core-manifest.json",
+    "snapshot": "dados-br/af-core-snapshot.json",
+    "continental_audit": "dados-br/auditoria-competicoes-af-previsao.json",
+    "accuracy": "dados-br/acuracia-af-previsao.json"
+  },
+  "private_assets": [
+    "player_matches",
+    "identity_map",
+    "fixtures",
+    "coverage",
+    "manifest",
+    "snapshot",
+    "continental_rules",
+    "forecast",
+    "lineups",
+    "recovery_ledger"
+  ],
+  "providers": [
+    "espn",
+    "api-football",
+    "strikerapi",
+    "fdg"
+  ],
+  "identity_kinds": [
+    "club",
+    "player",
+    "fixture"
+  ],
+  "namespace_domains": [
+    "cache",
+    "d1",
+    "do",
+    "supabase",
+    "notification",
+    "snapshot",
+    "workflow"
+  ]
+}
