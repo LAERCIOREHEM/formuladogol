@@ -1,0 +1,132 @@
+name: FDG 2027 E03 - Historical Player Recovery and Canonical Dataset
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/e03/**'
+      - '.github/workflows/fdg2027-e03-canonical.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/e03/**'
+      - '.github/workflows/fdg2027-e03-canonical.yml'
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [self-test, canonical]
+        default: self-test
+        required: true
+      authorize_private_build:
+        type: boolean
+        default: false
+        required: true
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: fdg2027-e03-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  synthetic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: E01 and E02 compatibility
+        run: |
+          set -euo pipefail
+          python research/fdg2027/e01/test_foundation.py
+          python research/fdg2027/e02/historical_r4.py --self-test
+      - name: E03 synthetic regressions
+        run: |
+          set -euo pipefail
+          python -m py_compile research/fdg2027/e03/*.py
+          python research/fdg2027/e03/test_canonical.py
+  canonical:
+    needs: synthetic
+    if: github.ref == 'refs/heads/main' && ((github.event_name == 'push' && contains(github.event.head_commit.message, '[E03-PRIVATE-45726372657]')) || (github.event_name == 'workflow_dispatch' && inputs.mode == 'canonical' && inputs.authorize_private_build == true))
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify locked source and audit archives
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          umask 077
+          w="$(mktemp -d "$RUNNER_TEMP/fdg-e03.XXXXXXXX")"
+          echo "E03_WORK=$w" >> "$GITHUB_ENV"
+          lock=research/fdg2027/e03/source-lock.json
+          src="$(jq -r .source_run_id "$lock")"; audit="$(jq -r .r4_run_id "$lock")"
+          for spec in "source:$src:.source_commit:.checkpoint_artifact_id:.checkpoint_zip_sha256:fdg2027-r2-encrypted-checkpoint:.github/workflows/fdg2027-e02-r2-historical.yml" "audit:$audit:.r4_commit:.r4_artifact_id:.r4_zip_sha256:fdg2027-r4-aggregate:.github/workflows/fdg2027-e02-r4-audit.yml"; do
+            IFS=: read -r label run ck ak hk name path <<< "$spec"
+            commit="$(jq -r "$ck" "$lock")"; aid="$(jq -r "$ak" "$lock")"; digest="$(jq -r "$hk" "$lock")"
+            gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run" > "$w/$label-run.json"
+            jq -e --arg repo "$GITHUB_REPOSITORY" --arg commit "$commit" --arg path "$path" '.head_repository.full_name==$repo and .head_branch=="main" and .event=="workflow_dispatch" and .status=="completed" and .conclusion=="success" and .head_sha==$commit and .path==$path' "$w/$label-run.json" >/dev/null
+            gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$aid" > "$w/$label-meta.json"
+            jq -e --arg name "$name" --arg digest "sha256:$digest" --argjson run "$run" '.name==$name and .expired==false and .digest==$digest and .workflow_run.id==$run' "$w/$label-meta.json" >/dev/null
+            gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$aid/zip" > "$w/$label.zip"
+            printf '%s  %s\n' "$digest" "$w/$label.zip" | sha256sum --check --status
+          done
+          WORK="$w" python - <<'PY'
+          import os,pathlib,zipfile
+          w=pathlib.Path(os.environ["WORK"])
+          for label,member,limit in (("source","state.json.gpg",100_000_000),("audit","r4-report.json",10_000_000)):
+              with zipfile.ZipFile(w/(label+".zip")) as z:
+                  if z.namelist()!=[member] or not 0<z.getinfo(member).file_size<=limit:raise SystemExit("BLOCKED: unexpected archive")
+                  with (w/member).open("xb") as f:f.write(z.read(member))
+          PY
+          echo "PASS: exact source and R4 archives verified."
+      - name: Build twice and verify encrypted roundtrip
+        env:
+          ARCHIVE_KEY: ${{ secrets.FDG_RESEARCH_ARCHIVE_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ "$E03_WORK" == "$RUNNER_TEMP"/fdg-e03.* && ${#ARCHIVE_KEY} -ge 32 ]]
+          w="$E03_WORK"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/state.json" --decrypt "$w/state.json.gpg" 2>"$w/gpg.log"
+          observed="$(jq -er .updated_at "$w/source-run.json")"
+          for suffix in first second; do
+            python research/fdg2027/e03/canonical.py --state "$w/state.json" --r4-report "$w/r4-report.json" --roster dados-br/elencos.json --observed-by "$observed" --output "$w/$suffix" --report "$w/$suffix-report.json"
+          done
+          cmp "$w/first/manifest.json" "$w/second/manifest.json"
+          cmp "$w/first-report.json" "$w/second-report.json"
+          echo "PASS: deterministic manifests and reports."
+          cp "$w/first-report.json" "$w/e03-report.json"
+          tar -C "$w/first" --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -cf "$w/e03-canonical.tar" .
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 --compress-algo zlib --output "$w/e03-canonical.tar.gpg" "$w/e03-canonical.tar" 2>>"$w/gpg.log"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/roundtrip.tar" --decrypt "$w/e03-canonical.tar.gpg" 2>>"$w/gpg.log"
+          cmp "$w/e03-canonical.tar" "$w/roundtrip.tar"
+          rm -rf "$w/first" "$w/second" "$w/state.json" "$w/e03-canonical.tar" "$w/roundtrip.tar" "$w/gpg.log" "$w/first-report.json" "$w/second-report.json"
+          echo "PASS: encrypted canonical dataset roundtrip."
+      - name: Upload aggregate only
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-e03-aggregate
+          path: ${{ env.E03_WORK }}/e03-report.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload encrypted dataset only
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-e03-encrypted-canonical
+          path: ${{ env.E03_WORK }}/e03-canonical.tar.gpg
+          if-no-files-found: error
+          retention-days: 90
+      - name: Cleanup private workspace
+        if: always()
+        run: |
+          if [[ -n "${E03_WORK:-}" && "$E03_WORK" == "$RUNNER_TEMP"/fdg-e03.* ]]; then rm -rf -- "$E03_WORK"; fi
