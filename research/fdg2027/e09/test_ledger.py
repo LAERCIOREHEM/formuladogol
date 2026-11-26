@@ -28,6 +28,8 @@ class Test(unittest.TestCase):
         self.confirm();self.t=stamp(self.ko);self.assertEqual(self.send("c")["status"],"frozen");self.t+=1000;self.assertEqual(self.send("d")["status"],"frozen");r,s=self.l.state(self.k);self.assertEqual(r[-1]["payload"]["latest"],s[-1]["hash"])
     def test_early_actual_kickoff(self):
         self.assertEqual(self.send("ko",{},kind="kickoff")["status"],"frozen");self.assertEqual(self.send("a")["status"],"frozen")
+    def test_delayed_actual_kickoff(self):
+        self.t+=1000;actual=self.t;self.t+=1000;self.send("a");self.t+=21000;self.send("b");self.t+=1000;self.send("ko",{},kind="kickoff",src=actual);r,s=self.l.state(self.k);self.assertEqual(r[-1]["payload"]["latest"],s[0]["hash"]);self.assertEqual(r[-1]["payload"]["excluded_late_snapshots"],1)
     def test_identity_and_missing_source(self):
         with self.assertRaises(ValueError):self.l.event(self.k,"a",2026,"espn","1","lineup",iso(self.t),self.x)
         with self.assertRaises(ValueError):self.l.event(self.k,"a",2027,"espn","1","lineup",None,self.x)

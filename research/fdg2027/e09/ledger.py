@@ -126,8 +126,10 @@ class Ledger:
             if frozen:return done("frozen")
             # Freeze at earliest observed kickoff or scheduled kickoff. Never change snapshots afterward.
             if kind=="kickoff" or now>=m["kickoff_ms"]:
-                if kind=="kickoff" and src<rows[0]["received_ms"]:return done("stale_kickoff")
-                rec=self.add(k,"frozen",now,src,{"original":snaps[0]["hash"],"latest":last["hash"],"cutoff_ms":min(m["kickoff_ms"],src) if kind=="kickoff" else m["kickoff_ms"]})
+                if kind=="kickoff" and src<rows[0]["source_ms"]:return done("stale_kickoff")
+                cut=min(m["kickoff_ms"],src) if kind=="kickoff" else m["kickoff_ms"]
+                valid=[x for x in snaps if x["received_ms"]<cut and x["source_ms"]<cut]
+                rec=self.add(k,"frozen",now,src,{"original":snaps[0]["hash"],"latest":valid[-1]["hash"] if valid else None,"cutoff_ms":cut,"excluded_late_snapshots":len(snaps)-len(valid)})
                 return done("frozen",rec)
             if src>=m["kickoff_ms"]:return done("late")
             if any(x["kind"]=="rollback" for x in rows):return done("rolled_back")
@@ -147,7 +149,7 @@ class Ledger:
             if obs and src==obs[-1]["source_ms"] and h!=obs[-1]["payload"]["lineup_hash"]:return done("source_conflict")
             if h==last["payload"]["lineup_hash"]:
                 # A return to the confirmed XI cancels a pending different candidate.
-                if obs and obs[-1]["payload"]["lineup_hash"]!=h:self.add(k,"xi_observed",now,src,{"lineup_hash":h,"first_seen":now,"count":1,"xi":xi})
+                if not obs or obs[-1]["payload"]["lineup_hash"]!=h or src>obs[-1]["source_ms"]:self.add(k,"xi_observed",now,src,{"lineup_hash":h,"first_seen":now,"count":1,"xi":xi})
                 return done("duplicate_signature")
             previous=obs[-1] if obs else None
             same=previous and previous["payload"]["lineup_hash"]==h and not any(x["kind"]=="source_loss" and x["seq"]>previous["seq"] for x in rows)
