@@ -110,6 +110,8 @@ async def run(site,out,origin):
         alias_page=await alias_ctx.new_page()
         for uri,expected in aliases:
             try:
+                # Direct navigation must be a new document; same-document hash changes have no HTTP response.
+                await alias_page.goto('about:blank')
                 res=await alias_page.goto(origin+uri)
                 await alias_page.locator("#fdg-main[aria-busy=false]").wait_for(timeout=12000)
                 head=await alias_page.locator("#fdg-main h1").text_content()
@@ -118,6 +120,13 @@ async def run(site,out,origin):
                 if "probabilidade-resumo-bahia" in uri and not await alias_page.get_by_text("Raio-X completo",exact=True).count():fail.append("probability club deep link")
                 if "gr-mio" in uri and not await alias_page.get_by_role("link",name="Perfil original").count():fail.append("club alias")
             except Exception as e:fail.append("alias:"+uri+":"+str(e)[:160])
+        # Separately certify same-document hash transitions without requiring an HTTP response.
+        await alias_page.goto('about:blank')
+        await alias_page.goto(origin+'/estatisticas.html#artilheiros')
+        await alias_page.locator('#fdg-main[aria-busy=false]').wait_for()
+        await alias_page.evaluate("location.hash='assistencias'")
+        await alias_page.get_by_role('button',name='Assistências',exact=True).wait_for()
+        await alias_page.wait_for_function("document.querySelector('[data-action=playerMode][data-value=assistencias]')?.getAttribute('aria-pressed')==='true'")
         # Simulated outcomes remain local and can be reset.
         await alias_page.goto(origin+"/index.html#more/sim")
         await alias_page.locator("#fdg-main[aria-busy=false]").wait_for()
