@@ -22,19 +22,33 @@ def main():
     for path in sorted(out.rglob("*.html")):
         rel=path.relative_to(out);s=path.read_text(encoding="utf-8")
         nav=re.search(r'<nav\b[^>]*class=["\'][^"\']*\bnav\b[^"\']*["\'][^>]*>.*?</nav>',s,re.S|re.I)
+        prefix=relative(rel)
+        section=routes.get(rel.as_posix(),"clubs" if rel.parts[0]=="clube" else "games" if rel.parts[0]=="jogo" else "articles" if rel.parts[0]=="analises" else "more")
+        shell='<div data-fdg-shell data-prefix="'+prefix+'"></div>'
         if nav:
-            prefix=relative(rel)
-            # One common component; retain original app scripts and data as local inspection only.
-            section=routes.get(rel.as_posix(),"clubs" if rel.parts[0]=="clube" else "games" if rel.parts[0]=="jogo" else "articles" if rel.parts[0]=="analises" else "more")
-            # Base applies to new navigation and assets; legacy relative links continue with original path.
-            # The shell script uses explicit root based on a data attribute for legacy paths.
-            s=s[:nav.start()]+'<div data-fdg-shell data-prefix="'+prefix+'"></div>'+s[nav.end():]
-            s=re.sub(r'(<body\b[^>]*)(>)',lambda m:m[1]+' data-legacy="1" data-initial="'+section+'">'+m[2][1:],s,count=1,flags=re.I)
-            s=re.sub(r'</head>',safe+'<link rel="stylesheet" href="'+prefix+'sl02/design.css"><script defer src="'+prefix+'sl02/app.js"></script></head>',s,count=1,flags=re.I)
-        else:s=re.sub(r'</head>',safe+'</head>',s,count=1,flags=re.I)
+            old=nav.group()
+            old=re.sub(r'<nav\b','<nav data-fdg-oldnav hidden aria-hidden="true" inert',old,count=1,flags=re.I)
+            s=s[:nav.start()]+shell+old+s[nav.end():]
+        else:
+            s=re.sub(r'(<body\b[^>]*>)',lambda m:m[1]+shell,s,count=1,flags=re.I)
+        # Keep original DOM and IDs, but hide the duplicate brand on legacy pages.
+        s=re.sub(r'<header\b[^>]*>(?:(?!</header>).)*?header-formula-do-gol[^<]*?(?:(?!</header>).)*?</header>',lambda m:re.sub(r'<header\b','<header data-fdg-oldbrand hidden',m[0],count=1,flags=re.I),s,count=1,flags=re.S|re.I)
+        s=re.sub(r'(<body\b[^>]*)(>)',lambda m:m[1]+' data-legacy="1" data-initial="'+section+'">',s,count=1,flags=re.I)
+        s=re.sub(r'</head>',safe+'<link rel="stylesheet" href="'+prefix+'sl02/design.css"><script defer src="'+prefix+'sl02/app.js"></script></head>',s,count=1,flags=re.I)
         path.write_text(s,encoding="utf-8")
     assets=out/"sl02";assets.mkdir()
     for f in ("design.css","app.js"):shutil.copy2(SRC/f,assets/f)
+    # A derived, strictly lossless projection of the public probability fields used in charts.
+    # The original 40MB source stays byte-for-byte unchanged.
+    hpath=out/"dados-br/historico-probabilidades.json"
+    history=json.loads(hpath.read_text())
+    slim={"source_sha256":digest(hpath),"source_path":"dados-br/historico-probabilidades.json","snapshots":[]}
+    for x in history["snapshots"]:
+        entry={k:x[k] for k in ("gerado_em","rodada_referencia","versao_modelo","hash_snapshot","hash_entrada") if k in x}
+        entry["clubes"]=[{k:v for k,v in c.items() if k=="clube" or k.endswith("_pct") and isinstance(v,(int,float,type(None)))} for c in x["clubes"]]
+        slim["snapshots"].append(entry)
+    (assets/"history-slim.json").write_text(json.dumps(slim,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
+    assert len(slim["snapshots"])==len(history["snapshots"])
     for name,section in routes.items():
         p=out/name
         if p.exists():

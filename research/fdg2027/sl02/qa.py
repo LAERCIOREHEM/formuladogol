@@ -5,7 +5,7 @@ from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from playwright.async_api import async_playwright
 WIDTHS=(320,360,390,430,768,1024,1440)
 LABELS=["Estatísticas","Jogos","Ao vivo","Análises","Clubes","Mais"]
-ROUTES=["stats/prob","stats/table","stats/performance","stats/players","stats/accuracy","games/next","games/results","live","articles","clubs","more","more/museum","more/sim"]
+ROUTES=["more/method","stats/prob","stats/table","stats/performance","stats/players","stats/accuracy","games/next","games/results","live","articles","clubs","more","more/museum","more/sim"]
 class Quiet(SimpleHTTPRequestHandler):
     def log_message(self,*a):pass
 
@@ -65,14 +65,26 @@ async def run(site,out,origin):
                         await page.get_by_role("button",name=recorte,exact=True).click()
                         await page.locator("#fdg-main[aria-busy=false]").wait_for()
                         if await page.locator("tbody tr[data-club]").count()!=20:fail.append("recorte:"+recorte)
+                    await page.screenshot(path=str(out/"classificacao-recorte-geral-mobile.png"))
                     await page.get_by_role("button",name="Série B · Em breve").click()
                     await page.locator("#fdg-main[aria-busy=false]").wait_for()
                     if await page.get_by_role("tab").count()!=1:fail.append("B gating")
+                    await page.screenshot(path=str(out/"serie-b-indisponivel.png"))
             if route=="stats/prob" and w==390 and theme=="dark" and zoom==100:
                 await page.get_by_role("button",name="Comparativa",exact=True).click();await page.locator("#fdg-main[aria-busy=false]").wait_for()
-                if await page.locator(".heat").count()!=180:fail.append("all indicators")
-                await page.locator(".rank-button").first.click();await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                if await page.locator(".heat:visible").count()!=180:fail.append("all indicators")
+                await page.locator(".rank-button:visible").first.click();await page.locator("#fdg-main[aria-busy=false]").wait_for()
                 if not await page.get_by_text("Raio-X completo",exact=True).count():fail.append("club detail")
+                await page.screenshot(path=str(out/"comparativa-mobile-detail.png"))
+            if route=="stats/prob" and w==1440 and theme=="dark" and zoom==100:
+                await page.get_by_role("button",name="Comparativa",exact=True).click();await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                if await page.locator(".heat-cell:visible").count()!=180:fail.append("desktop matrix")
+                await page.screenshot(path=str(out/"comparativa-desktop.png"))
+            if route=="clubs" and w==390 and theme=="dark" and zoom==100:
+                await page.get_by_role("button",name="Bahia",exact=False).first.click();await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                await page.get_by_role("button",name="Definir Meu Clube",exact=False).click();await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                if await page.evaluate("localStorage.getItem('fdg-sl02:club')")!="Bahia":fail.append("Meu Clube preference")
+                await page.screenshot(path=str(out/"meu-clube-bahia.png"))
             await ctx.close()
         for route in ROUTES:
             for w in (390,1440):await test(route,w)
