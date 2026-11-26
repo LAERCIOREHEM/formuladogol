@@ -60,7 +60,29 @@ def main():
     # Remove the deploy marker from this isolated archive. Legacy SW code is retained but cannot register.
     (out/"CNAME").unlink(missing_ok=True)
     (out/"robots.txt").write_text("User-agent: *\nDisallow: /\n")
-    (out/"ABRIR_PREVIA.txt").write_text("FDG SL02 — prévia local, não publicada.\nExtraia o pacote. Abra um terminal nesta pasta e execute: python -m http.server 8765 --bind 127.0.0.1\nAbra http://127.0.0.1:8765/ no navegador. Feche o terminal para encerrar.\nDados reais de 26/11/2026; sem live/push operacional, sem alterar produção. Acesso a escudos originais depende da rede; fallback de siglas. Não enviar a uma hospedagem.\n",encoding="utf-8")
+    (out/"ABRIR_PREVIA.txt").write_text("FDG SL02 — prévia local, não publicada.\nExtraia o pacote. No Windows, clique duas vezes em ABRIR_PREVIA.cmd (requer Python 3). Alternativamente, abra um terminal nesta pasta e execute: python -m http.server 8765 --bind 127.0.0.1\nAbra http://127.0.0.1:8765/ no navegador. Feche o terminal para encerrar.\nDados reais de 26/11/2026; sem live/push operacional, sem alterar produção. Acesso a escudos originais depende da rede; fallback de siglas. Não enviar a uma hospedagem.\n",encoding="utf-8")
+
+    # Loopback-only launcher; no PowerShell and no public hosting.
+    launcher='''from pathlib import Path
+from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
+from functools import partial
+import threading, webbrowser
+class LocalHandler(SimpleHTTPRequestHandler):
+    def end_headers(self):
+        self.send_header("X-Robots-Tag", "noindex, nofollow")
+        super().end_headers()
+root=Path(__file__).resolve().parent
+server=ThreadingHTTPServer(("127.0.0.1",0),partial(LocalHandler,directory=str(root)))
+url="http://127.0.0.1:"+str(server.server_port)+"/"
+print("FDG SL02 - Previa local:",url,flush=True)
+print("Feche esta janela para encerrar.",flush=True)
+threading.Timer(.4,lambda:webbrowser.open(url)).start()
+try:server.serve_forever()
+except KeyboardInterrupt:pass
+finally:server.server_close()
+'''
+    (out/"abrir_previa.py").write_text(launcher,encoding="utf-8")
+    (out/"ABRIR_PREVIA.cmd").write_text('@echo off\r\ncd /d "%~dp0"\r\nwhere py >nul 2>&1\r\nif %errorlevel%==0 (py -3 abrir_previa.py) else (python abrir_previa.py)\r\npause\r\n',encoding="ascii")
     public_data={p.relative_to(out).as_posix():digest(p) for p in sorted(out.rglob("*.json")) if p.is_file()}
     (out/"SL02-manifest.json").write_text(json.dumps({"stage":"SL02","base":BASE,"source_run":45806559507,"source_artifact":15110286620,"source_zip_sha256":SHA,"season":2026,"snapshot_at":"2026-11-26T08:00:00-03:00","publication":False,"data_sha256":public_data},indent=2))
 if __name__=="__main__":main()

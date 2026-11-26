@@ -19,3 +19,22 @@
 @media(max-width:190px){.heading h1{font-size:1.1rem;overflow-wrap:anywhere}.heading p,h2,h3{overflow-wrap:anywhere}.fdg-nav .nav-label{white-space:nowrap;word-break:normal;overflow-wrap:normal}.controls>*{max-width:100%}.metric strong{overflow-wrap:anywhere}}
 /* Legacy-only safety; preserve original DOM IDs for legacy scripts, never show two global menus. */
 [data-fdg-oldnav]{display:none!important}[data-fdg-oldbrand]{display:none!important}
+
+/* Exceptional 160 CSS-pixel layout: content can wrap; the six global labels cannot. */
+@media(max-width:190px){
+  .wrap{padding-inline:8px;min-width:0}
+  #fdg-main,#fdg-main .panel,#fdg-main .split,#fdg-main .cards,#fdg-main .controls,#fdg-main .tabs{min-width:0;max-width:100%}
+  #fdg-main .split,#fdg-main .cards{grid-template-columns:minmax(0,1fr)}
+  #fdg-main :where(h1,h2,h3,p,small,span,strong,summary,button,a,label,pre){min-width:0;max-width:100%;overflow-wrap:anywhere;white-space:normal}
+  #fdg-main :where(.field,select){width:100%;min-width:0;max-width:100%}
+  #fdg-main .rank-button{display:flex;flex-direction:column;align-items:stretch;text-align:left}
+  #fdg-main .rank-button>.team{flex-wrap:wrap;align-items:center}
+  #fdg-main .rank-button>.pct{text-align:right}
+  #fdg-main .rank-button>.bar{width:100%}
+  #fdg-main .rank-button>.team .crest{flex-basis:24px}
+  #fdg-main .fact-list{grid-template-columns:minmax(0,1fr)}
+  #fdg-main .fact-list>span:nth-child(even){text-align:left}
+  #fdg-main .scoreline{grid-template-columns:minmax(0,1fr);text-align:center}
+  #fdg-main .sim-match{grid-template-columns:minmax(0,1fr) 30px 30px minmax(0,1fr)}
+  .footer{overflow-wrap:anywhere}
+}
