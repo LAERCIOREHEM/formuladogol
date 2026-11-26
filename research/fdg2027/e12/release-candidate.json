@@ -1,0 +1,29 @@
+{
+  "version": "E12.1",
+  "release_type": "research-certification-only",
+  "season_default": 2026,
+  "active_model": "AF-Previsão 1.3",
+  "candidate": "AF-Previsão 2.0",
+  "candidate_mode": "shadow-only",
+  "flags": {
+    "public_switch": false,
+    "production_write": false,
+    "lineup_enabled": false,
+    "rapm_required": false,
+    "live_adapter_enabled": false,
+    "report_delivery_enabled": false
+  },
+  "decision": "NO_GO",
+  "activation_authorized": false,
+  "promotion_authorized": false,
+  "rollback": "restore exact previous flags and validated immutable artifact; actual deployment rollback requires separate authorization and proof",
+  "prospective": {
+    "minimum_pairs": 100,
+    "minimum_week_clusters": 10,
+    "minimum_coverage": 0.9,
+    "minimum_relative_improvement": 0.01,
+    "horizon_hours": 24,
+    "cohort_started": false
+  },
+  "archive": "not frozen until official 2026 closure; do not overwrite histories"
+}

@@ -1,0 +1,256 @@
+{
+  "schema": 1,
+  "base": "4c60824d93c8aaf4a21f0f1286cc46e99ceba770",
+  "runs": [
+    {
+      "stage": "E01",
+      "id": 45730776305,
+      "commit": "9fad32d7969e0b10f2423f3a8f543086e11c0582",
+      "path": ".github/workflows/fdg2027-e01-foundation.yml"
+    },
+    {
+      "stage": "E02-R3",
+      "id": 45726372657,
+      "commit": "9e62d8ede2961ea8dd3018066ad7495f05096b14",
+      "path": ".github/workflows/fdg2027-e02-r2-historical.yml"
+    },
+    {
+      "stage": "E02-R4",
+      "id": 45729192657,
+      "commit": "3e4adc7229701b24f288a6011fbf1ac1720e5b4b",
+      "path": ".github/workflows/fdg2027-e02-r4-audit.yml"
+    },
+    {
+      "stage": "E03",
+      "id": 45731660540,
+      "commit": "1c6dce76633c34233b1e94e767b0febb6f6166d5",
+      "path": ".github/workflows/fdg2027-e03-canonical.yml"
+    },
+    {
+      "stage": "E04",
+      "id": 45732281429,
+      "commit": "95f53441f932d996c9c1e238a7be9b5e9f07d9d1",
+      "path": ".github/workflows/fdg2027-e04-player.yml"
+    },
+    {
+      "stage": "E05",
+      "id": 45732803182,
+      "commit": "f911a99ff4482dfbe81426c5411c888d6e9ea388",
+      "path": ".github/workflows/fdg2027-e05-lineup.yml"
+    },
+    {
+      "stage": "E06",
+      "id": 45733296514,
+      "commit": "66a0dc2d25308c5f0d24cd4c08960684778ec3c2",
+      "path": ".github/workflows/fdg2027-e06-context.yml"
+    },
+    {
+      "stage": "E07",
+      "id": 45734920045,
+      "commit": "83b55abd032100d6a6485119e49796af43d26689",
+      "path": ".github/workflows/fdg2027-e07-forecast.yml"
+    },
+    {
+      "stage": "E08",
+      "id": 45737093639,
+      "commit": "9590ebdb417186a58e9609a05aea93f5284288d1",
+      "path": ".github/workflows/fdg2027-e08-backtest.yml"
+    },
+    {
+      "stage": "E09",
+      "id": 45738073052,
+      "commit": "c2ccf4f781a994b90c85e44550e31f4d5ed93a02",
+      "path": ".github/workflows/fdg2027-e09-dynamic.yml"
+    },
+    {
+      "stage": "E10",
+      "id": 45738908104,
+      "commit": "73d4f94376cc98b0d2e0349813bdb91083d3e503",
+      "path": ".github/workflows/fdg2027-e10-ux.yml"
+    },
+    {
+      "stage": "E11",
+      "id": 45739792441,
+      "commit": "c0362194390423dc6867a21e93907d4624ec1c11",
+      "path": ".github/workflows/fdg2027-e11-governance.yml"
+    }
+  ],
+  "artifacts": [
+    {
+      "stage": "E01",
+      "run": 45730776305,
+      "id": 15075854618,
+      "name": "fdg2027-e01-inventory",
+      "sha256": "77571304d95d4bb4ea6c5cb321807de921e3f42056c1f33cb400c6de05c1efef"
+    },
+    {
+      "stage": "E02-R3",
+      "run": 45726372657,
+      "id": 15075341181,
+      "name": "fdg2027-r2-encrypted-checkpoint",
+      "sha256": "3ed5cfe9b4adadb3201d0e2d4875d627ee0523cc2b6a54c8164e2ee65a2e22a1"
+    },
+    {
+      "stage": "E02-R3",
+      "run": 45726372657,
+      "id": 15074099595,
+      "name": "fdg2027-r2-diagnostic",
+      "sha256": "6651d4249586d471ee9978e13ca41738e74611a5e3724c95507d363c168ac640"
+    },
+    {
+      "stage": "E02-R4",
+      "run": 45729192657,
+      "id": 15076390358,
+      "name": "fdg2027-r4-aggregate",
+      "sha256": "708ee5e7ccdb183ca3cbc1c90be73bbbc6d3628cd04750d5feec746871cec03e"
+    },
+    {
+      "stage": "E02-R4",
+      "run": 45729192657,
+      "id": 15075527521,
+      "name": "fdg2027-r4-private-audit",
+      "sha256": "5f623ccc38028ea092da042dfe525391184fe9f32e5c58c1d10c38cf758e0630"
+    },
+    {
+      "stage": "E03",
+      "run": 45731660540,
+      "id": 15077275866,
+      "name": "fdg2027-e03-aggregate",
+      "sha256": "2110a83f401149e3b21fdc05eab4d2a0e37a4580a73c871742db4c7a4c7851ce"
+    },
+    {
+      "stage": "E03",
+      "run": 45731660540,
+      "id": 15076074222,
+      "name": "fdg2027-e03-encrypted-canonical",
+      "sha256": "e6bf3d57e6605d3857d4b73732312cef4f4653f28b94ebd1a61b2fc618a0afd3"
+    },
+    {
+      "stage": "E04",
+      "run": 45732281429,
+      "id": 15077690594,
+      "name": "fdg2027-e04-encrypted-player",
+      "sha256": "bc815117c7bf7e5f2bad2257981fad23ec50e94ea7d596bfe2a00c62e53ba1fd"
+    },
+    {
+      "stage": "E04",
+      "run": 45732281429,
+      "id": 15077091959,
+      "name": "fdg2027-e04-aggregate",
+      "sha256": "fc4a8eeee0231956eb6b0ba3e7ccb199f0658b88880b5e652acead90fba5dc27"
+    },
+    {
+      "stage": "E05",
+      "run": 45732803182,
+      "id": 15077507289,
+      "name": "fdg2027-e05-aggregate",
+      "sha256": "b19196296c37586c1359b1b09f4421ec46bf178fc155c5bcf37fd1f4abcb424f"
+    },
+    {
+      "stage": "E05",
+      "run": 45732803182,
+      "id": 15076918664,
+      "name": "fdg2027-e05-encrypted-lineup",
+      "sha256": "79426a737b61e85ffe6f5e3691a55a0e0f312f5c8602d4f298545b0afcd03c78"
+    },
+    {
+      "stage": "E06",
+      "run": 45733296514,
+      "id": 15078425153,
+      "name": "fdg2027-e06-encrypted-context",
+      "sha256": "b3ad6dea0c199c9e6956a273ce5a20a3793f8c938de27f9b1640becddbedb800"
+    },
+    {
+      "stage": "E06",
+      "run": 45733296514,
+      "id": 15077209660,
+      "name": "fdg2027-e06-aggregate",
+      "sha256": "1d5f80d082d45985377e043696d387bb04ee6659e7c86980e2604e54f5139b9f"
+    },
+    {
+      "stage": "E07",
+      "run": 45734920045,
+      "id": 15079065263,
+      "name": "fdg2027-e07-encrypted-forecast",
+      "sha256": "07248068e5ca8e09b35dfe04b489f84fafd64e1fdd4182483ae1415c5e968d44"
+    },
+    {
+      "stage": "E07",
+      "run": 45734920045,
+      "id": 15077884737,
+      "name": "fdg2027-e07-aggregate",
+      "sha256": "7b8464b5ea54b0babf19df757bdac8084a397e9bbd34537602d259cc31c73d81"
+    },
+    {
+      "stage": "E08",
+      "run": 45737093639,
+      "id": 15079975455,
+      "name": "fdg2027-e08-aggregate",
+      "sha256": "59bcd500459da3059244eb451e488a4a14e304caa2f47811f9a6ea72b3196c9a",
+      "member": "e08-report.json"
+    },
+    {
+      "stage": "E08",
+      "run": 45737093639,
+      "id": 15079850949,
+      "name": "fdg2027-e08-encrypted-backtest",
+      "sha256": "26d623e81ebb1e4d4fc9997e55cbfabf8edb4f4a312bab64a5833d7b5506582a",
+      "member": "e08-backtest.json.gpg"
+    },
+    {
+      "stage": "E09",
+      "run": 45738073052,
+      "id": 15079527441,
+      "name": "fdg2027-e09-encrypted-certification",
+      "sha256": "4724008ebc45b12dc06dcbf02b9d5315d7086f735bff353b851ee1f6ae6a9000",
+      "member": "e09-certification.json.gpg"
+    },
+    {
+      "stage": "E09",
+      "run": 45738073052,
+      "id": 15079143592,
+      "name": "fdg2027-e09-aggregate",
+      "sha256": "c17bc8e2a59253b7ec75aecd4e3f47dd160b9d22812556c1197bc38bd272eee4",
+      "member": "e09-report.json"
+    },
+    {
+      "stage": "E10",
+      "run": 45738908104,
+      "id": 15080556516,
+      "name": "fdg2027-e10-encrypted-certification",
+      "sha256": "c6431243549d1fe09e21fed173bdd1701c202403d96ae77f754055223fcea008",
+      "member": "e10-certification.json.gpg"
+    },
+    {
+      "stage": "E10",
+      "run": 45738908104,
+      "id": 15080247710,
+      "name": "fdg2027-e10-aggregate",
+      "sha256": "a7f52b3c84da06e39c76390203334dc43883256e4ee4e7a69976d801215d1c2e",
+      "member": "e10-report.json"
+    },
+    {
+      "stage": "E10",
+      "run": 45738908104,
+      "id": 15079898832,
+      "name": "fdg2027-e10-preview",
+      "sha256": "d4195b19056be84d0fea81df91f972a9ba735ade747de85437cb27fea14250d6"
+    },
+    {
+      "stage": "E11",
+      "run": 45739792441,
+      "id": 15080258831,
+      "name": "fdg2027-e11-encrypted-certification",
+      "sha256": "252bc177c265f922b20c64bc9afde648b6523c8c70e4596c1841c7ed028b0081",
+      "member": "e11-certification.json.gpg"
+    },
+    {
+      "stage": "E11",
+      "run": 45739792441,
+      "id": 15080089345,
+      "name": "fdg2027-e11-aggregate",
+      "sha256": "03135d96f864136e7002359931e2cefa593f5d6979d8d5df4889189f0390c20a",
+      "member": "e11-report.json"
+    }
+  ]
+}
