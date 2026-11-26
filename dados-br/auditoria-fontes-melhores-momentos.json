@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-11-25T22:23:04-03:00",
+  "atualizado_em": "2026-11-25T23:26:41-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
     "regra": "GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video e CazéTV são prioritários. UOL Esporte é aceito como fallback após 48 horas ou por vínculo manual conferido.",
@@ -14,26 +14,17 @@
   },
   "resumo": {
     "jogos_resultados": 361,
-    "jogos_com_video": 360,
-    "ge_globo": 342,
+    "jogos_com_video": 361,
+    "ge_globo": 343,
     "amazon_prime_video": 5,
     "cazetv": 10,
     "uol_esporte": 3,
     "outros": 0,
-    "sem_video": 1,
+    "sem_video": 0,
     "percentual_fontes_preferidas": 100.0
   },
   "outros_sites_ainda_em_uso": [],
-  "sem_video": [
-    {
-      "event_id": "401841319",
-      "rodada": 36,
-      "mandante": "Atlético-MG",
-      "visitante": "Corinthians",
-      "placar_mandante": 1,
-      "placar_visitante": 1
-    }
-  ],
+  "sem_video": [],
   "detalhamento": {
     "ge_globo": [
       {
@@ -5378,6 +5369,22 @@
         "channel_title": "GE TV",
         "titulo": "ATHLETICO-PR 4 X 2 REMO | MELHORES MOMENTOS | 36ª RODADA | BRASILEIRÃO 2026 | ge.globo",
         "url": "https://www.youtube.com/watch?v=voWbg-1Mpbs",
+        "confianca": 1.0
+      },
+      {
+        "event_id": "401841319",
+        "rodada": 36,
+        "mandante": "Atlético-MG",
+        "visitante": "Corinthians",
+        "placar_mandante": 1,
+        "placar_visitante": 1,
+        "categoria_fonte": "ge_globo",
+        "origem_vinculo": "automatico",
+        "fonte": "GE TV / YouTube",
+        "fonte_busca": "cloudflare-fastlane-youtube-uploads",
+        "channel_title": "GE TV",
+        "titulo": "ATLÉTICO-MG 1 X 1 CORINTHIANS | MELHORES MOMENTOS | 37ª RODADA | BRASILEIRÃO 2026 | ge.globo",
+        "url": "https://www.youtube.com/watch?v=0ybYGYCez1A",
         "confianca": 1.0
       },
       {
