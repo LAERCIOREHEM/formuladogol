@@ -41,6 +41,8 @@ jobs:
           node --check research/fdg2027/sl02-release/shell.js
           node scripts/validar_pwa_instalacao.mjs
           node tests/test-sula-final-navigation.mjs
+          python research/fdg2027/sl02-release/sula_smoke.py --self-test
+          python tests/test_sula_final_2026.py
       - name: Offline original domain contract regression suite
         run: |
           set -euo pipefail

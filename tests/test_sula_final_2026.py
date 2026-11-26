@@ -3,7 +3,7 @@
 from __future__ import annotations
 import copy
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,7 +32,11 @@ def test():
     assert len(matches) == 1
     event = matches[0]
     assert event["data_iso"] == DATE
-    assert event["fase"] == "Final" and event["concluido"] is False
+    assert event["fase"].split(",")[-1].strip() == "Final"
+    if event["concluido"]:
+        assert event["estado"] == "post" and all(isinstance(event[k]["placar"], int) for k in ("mandante", "visitante"))
+    else:
+        assert event["estado"] in ("pre", "in")
     assert event["mandante"]["nome"] == "Atlético-MG"
     assert event["visitante"]["nome"] == "Boca Juniors"
     assert event["estadio"] == "Metropolitano Roberto Meléndez"
@@ -59,16 +63,21 @@ def test():
 
     saved = load("dados-br/agenda-clubes-br.json")
     saved_final = [x for x in saved["jogos"] if x.get("event_id") == ID]
-    assert len(saved_final) == 1
-    assert saved_final[0]["data_iso"] == DATE
+    start = datetime.fromisoformat(saved["periodo"]["inicio"])
+    end = datetime.fromisoformat(saved["periodo"]["fim"])
+    kickoff = datetime.fromisoformat(DATE)
+    assert len(saved_final) == int(start <= kickoff <= end)
+    if saved_final: assert saved_final[0]["data_iso"] == DATE
+    elif kickoff < start: assert event["concluido"] is True
+    fixture = final[0]
 
     manual = load("transmissoes.json")
-    policy = manual_policy_for_game(manual, saved_final[0])
+    policy = manual_policy_for_game(manual, fixture)
     assert policy["modo"] == "fixo"
     assert policy["exibicao_confirmada"] == "Disney+ Premium"
     disney = "https://www.disneyplus.com/pt-br/explore/articles/semifinais-libertadores-2026"
     selection = consolidate_game(
-        saved_final[0],
+        fixture,
         [Evidence("override editorial — transmissoes.json", ["Disney+ / ESPN"], disney, "2026-10-31T08:14:00-03:00", 1000)],
         automatic_sources_responded=False,
         manual_policy=policy,
@@ -76,10 +85,17 @@ def test():
     assert selection is not None
     assert selection["exibicao_confirmada"] == "Disney+ Premium"
     assert selection["canais"] == ["Disney+ / ESPN"]
-    published_tv = load("dados-br/transmissoes-tv.json")["jogos"][ID]
-    assert published_tv["data_iso"] == DATE
-    assert published_tv["exibicao_confirmada"] == "Disney+ Premium"
-    assert published_tv["acessos"][0]["url"].startswith("https://www.disneyplus.com/")
+    tv = load("dados-br/transmissoes-tv.json")
+    tv_now = datetime.fromisoformat(tv["atualizado_em"])
+    cfg = load("dados-br/config-transmissoes-tv.json")
+    required = tv_now - timedelta(days=cfg["janela_passado_dias"]) <= kickoff <= tv_now + timedelta(days=cfg["janela_futuro_dias"])
+    published_tv = tv["jogos"].get(ID)
+    if required or published_tv is not None:
+        assert published_tv is not None
+        assert published_tv["data_iso"] == DATE
+        assert published_tv["exibicao_confirmada"] == "Disney+ Premium"
+        assert any(x["url"].startswith("https://www.disneyplus.com/") for x in published_tv["acessos"])
+    elif kickoff < tv_now: assert event["concluido"] is True
     print("SULA FINAL 2026: 10/10 editorial, ESPN-ID, schedule, dedupe, transmission PASS")
 
 if __name__ == "__main__":
