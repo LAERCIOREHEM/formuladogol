@@ -1,0 +1,144 @@
+name: FDG 2027 E12 - Production Certification NO-GO
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/e12/**'
+      - '.github/workflows/fdg2027-e12-certification.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/e12/**'
+      - '.github/workflows/fdg2027-e12-certification.yml'
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [self-test, research]
+        default: self-test
+        required: true
+      authorize_private_build:
+        type: boolean
+        default: false
+        required: true
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: fdg2027-e12-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  synthetic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: E01 to E12 regression
+        run: |
+          set -euo pipefail
+          python research/fdg2027/e01/test_foundation.py
+          python research/fdg2027/e03/test_canonical.py
+          python research/fdg2027/e04/test_engine.py
+          python -m py_compile research/fdg2027/e06/*.py research/fdg2027/e07/*.py research/fdg2027/e08/*.py research/fdg2027/e09/*.py research/fdg2027/e10/*.py research/fdg2027/e11/*.py research/fdg2027/e12/*.py
+          python research/fdg2027/e05/test_lineup.py
+          python research/fdg2027/e06/test_context.py
+          python -m pip install numpy==2.3.5
+          python research/fdg2027/e07/test_forecast.py
+          python research/fdg2027/e08/test_backtest.py
+          python research/fdg2027/e09/test_ledger.py
+          python research/fdg2027/e11/test_governance.py
+          python research/fdg2027/e12/test_certification.py
+          python tests/test_af_titulo_matematico_2026.py
+          python tests/test_af_continental_math_certainty.py
+          node tests/test-af-continental-math-ui.mjs
+          node tests/test-br-data-pulse-certification.mjs
+          node tests/test-br-data-manifest.mjs
+          node tests/test-br-classificacao-live.mjs
+          node tests/test-br-live-goal-sync.mjs
+          node tests/test-af-e4-acuracia.mjs
+          node research/fdg2027/e01/test-foundation.mjs
+          npm install --prefix cloudflare/push-worker --omit=dev --ignore-scripts --no-package-lock --no-audit --no-fund
+          node cloudflare/push-worker/tests/test-readiness-guardian.mjs
+          node cloudflare/push-worker/tests/test-readiness-reschedule.mjs
+          node cloudflare/push-worker/tests/test-cost-shield.mjs
+          node cloudflare/push-worker/tests/test-cloudflare-billing-audit.mjs
+          node cloudflare/push-worker/tests/test-workers-graphql-reconciliation.mjs
+          node cloudflare/push-worker/tests/test-health-monitor.mjs
+          node cloudflare/push-worker/tests/test-api-football-source.mjs
+          node cloudflare/orchestrator-worker/tests/cost-governance.test.mjs
+  research:
+    needs: synthetic
+    if: github.ref == 'refs/heads/main' && ((github.event_name == 'push' && contains(github.event.head_commit.message, '[E12-PRIVATE-45739792441]')) || (github.event_name == 'workflow_dispatch' && inputs.mode == 'research' && inputs.authorize_private_build == true))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify all 12 prior runs and 24 original artifact archives
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          umask 077
+          w="$(mktemp -d "$RUNNER_TEMP/fdg-e12.XXXXXXXX")"
+          echo "E12_WORK=$w" >> "$GITHUB_ENV"
+          python research/fdg2027/e12/verify_chain.py "$w"
+      - name: Read-only public domain audit (no deploy)
+        run: |
+          set -euo pipefail
+          python research/fdg2027/e12/public_probe.py "$E12_WORK/public.json"
+      - name: Verify evidence and deterministic certification NO-GO
+        env:
+          ARCHIVE_KEY: ${{ secrets.FDG_RESEARCH_ARCHIVE_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ "$E12_WORK" == "$RUNNER_TEMP"/fdg-e12.* && ${#ARCHIVE_KEY} -ge 32 ]]
+          w="$E12_WORK"
+          for stage in e08 e09 e10 e11; do
+            name="$stage-certification.json.gpg"
+            [[ "$stage" != e08 ]] || name=e08-backtest.json.gpg
+            printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/$stage-private.json" --decrypt "$w/$name" 2>>"$w/gpg.log"
+          done
+          for suffix in first second; do
+            python research/fdg2027/e12/certify.py "$w" "$w/$suffix.json" "$w/$suffix-report.json"
+          done
+          cmp "$w/first.json" "$w/second.json"
+          cmp "$w/first-report.json" "$w/second-report.json"
+          cp "$w/first-report.json" "$w/e12-report.json"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 --compress-algo zlib --output "$w/e12-certification.json.gpg" "$w/first.json" 2>>"$w/gpg.log"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/roundtrip.json" --decrypt "$w/e12-certification.json.gpg" 2>>"$w/gpg.log"
+          cmp "$w/first.json" "$w/roundtrip.json"
+          rm -f "$w/"*-private.json "$w/first.json" "$w/second.json" "$w/roundtrip.json" "$w/gpg.log" "$w/first-report.json" "$w/second-report.json"
+          echo "PASS: deterministic private certification and encrypted roundtrip"
+      - name: Upload aggregate
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-e12-aggregate
+          path: ${{ env.E12_WORK }}/e12-report.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload encrypted certification
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-e12-encrypted-certification
+          path: ${{ env.E12_WORK }}/e12-certification.json.gpg
+          if-no-files-found: error
+          retention-days: 90
+      - name: Cleanup
+        if: always()
+        run: |
+          if [[ -n "${E12_WORK:-}" && "$E12_WORK" == "$RUNNER_TEMP"/fdg-e12.* ]]; then rm -rf -- "$E12_WORK"; fi
