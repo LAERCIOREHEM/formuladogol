@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "baseline_inspected_commit": "eb39f6a6e4b2f970d189658dc88707e11381dee5",
+  "e03_run": 45731660540,
+  "e03_commit": "1c6dce76633c34233b1e94e767b0febb6f6166d5",
+  "e06_run": 45733296514,
+  "e06_commit": "66a0dc2d25308c5f0d24cd4c08960684778ec3c2",
+  "artifacts": [
+    {
+      "run": 45731660540,
+      "id": 15077275866,
+      "name": "fdg2027-e03-aggregate",
+      "sha256": "2110a83f401149e3b21fdc05eab4d2a0e37a4580a73c871742db4c7a4c7851ce",
+      "member": "e03-report.json",
+      "limit": 10000000
+    },
+    {
+      "run": 45731660540,
+      "id": 15076074222,
+      "name": "fdg2027-e03-encrypted-canonical",
+      "sha256": "e6bf3d57e6605d3857d4b73732312cef4f4653f28b94ebd1a61b2fc618a0afd3",
+      "member": "e03-canonical.tar.gpg",
+      "limit": 100000000
+    },
+    {
+      "run": 45733296514,
+      "id": 15077209660,
+      "name": "fdg2027-e06-aggregate",
+      "sha256": "1d5f80d082d45985377e043696d387bb04ee6659e7c86980e2604e54f5139b9f",
+      "member": "e06-report.json",
+      "limit": 10000000
+    },
+    {
+      "run": 45733296514,
+      "id": 15078425153,
+      "name": "fdg2027-e06-encrypted-context",
+      "sha256": "b3ad6dea0c199c9e6956a273ce5a20a3793f8c938de27f9b1640becddbedb800",
+      "member": "e06-context.json.gpg",
+      "limit": 100000000
+    }
+  ]
+}
