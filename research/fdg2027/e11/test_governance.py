@@ -63,6 +63,11 @@ class Test(unittest.TestCase):
         self.assertEqual(self.call(provider="strikerapi")["status"],"striker_live_disabled")
     def test_checkpoint(self):
         self.assertTrue(self.g.checkpoint(2027,"job",0,"page1"));self.assertFalse(self.g.checkpoint(2027,"job",0,"page2"));self.assertTrue(self.g.checkpoint(2027,"job",1,"page2",True));self.assertFalse(self.g.checkpoint(2027,"job",2,"page3"))
+    def test_checkpoint_rewind(self):
+        self.assertTrue(self.g.checkpoint(2027,"job",0,"page1"));self.assertTrue(self.g.checkpoint(2027,"job",1,"page2"));self.assertFalse(self.g.checkpoint(2027,"job",2,"page1"))
+    def test_cross_midnight_quota(self):
+        self.t=int(dt.datetime(2027,3,2,0,0,tzinfo=dt.timezone.utc).timestamp());h={"x-ratelimit-requests-limit":"7500","x-ratelimit-requests-remaining":"7000","x-ratelimit-limit":"300","x-ratelimit-remaining":"300"}
+        with self.assertRaises(ValueError):self.g.observe_quota("api-football",h,self.t-1,True)
     def test_cost_modes(self):
         for v,m in [(1,"normal"),(2,"observe"),(5,"optional_paused"),(10,"secondary_paused")]:
             self.g.observe_cost(self.t,daily_usd=v);self.assertEqual(self.g.cost()["mode"],m);self.tick()

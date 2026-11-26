@@ -32,6 +32,7 @@ class Governance:
         CREATE TABLE IF NOT EXISTS circuits(provider TEXT PRIMARY KEY, reason TEXT NOT NULL, until_t INT NOT NULL);
         CREATE TABLE IF NOT EXISTS cache(key TEXT PRIMARY KEY, body BLOB NOT NULL, hash TEXT NOT NULL, expiry INT NOT NULL);
         CREATE TABLE IF NOT EXISTS checkpoints(key TEXT PRIMARY KEY, cursor TEXT NOT NULL, version INT NOT NULL, done INT NOT NULL);
+        CREATE TABLE IF NOT EXISTS checkpoint_history(key TEXT NOT NULL,cursor TEXT NOT NULL,PRIMARY KEY(key,cursor));
         CREATE TABLE IF NOT EXISTS cost(id INTEGER PRIMARY KEY CHECK(id=1),body BLOB NOT NULL);
         CREATE TABLE IF NOT EXISTS outbox(id TEXT PRIMARY KEY,body BLOB NOT NULL);
         """)
@@ -49,7 +50,7 @@ class Governance:
         # Trusted adapter required; never infer missing header values or query provider automatically.
         if provider not in ("api-football","strikerapi") or verified is not True:raise ValueError("quota evidence")
         now=self.clock()
-        if not integer(source_at) or not 0<=now-source_at<=P["quota_fresh_seconds"]:raise ValueError("quota stale")
+        if not integer(source_at) or not 0<=now-source_at<=P["quota_fresh_seconds"] or (day(source_at)!=day(now) if provider=="api-football" else month(source_at)!=month(now)):raise ValueError("quota stale")
         h={str(k).lower():v for k,v in headers.items()}
         def parse(k):
             v=h.get(k)
@@ -149,7 +150,7 @@ class Governance:
                 self.db.execute("INSERT INTO cache VALUES(?,?,?,?) ON CONFLICT DO UPDATE SET body=excluded.body,hash=excluded.hash,expiry=excluded.expiry",(k,raw(data),sha(data),now+ttl))
             if status in ("429","quota","suspended","auth"):
                 if status=="429":
-                    delay=retry_after if integer(retry_after) else 60;until=now+max(60,delay)
+                    delay=retry_after if integer(retry_after) else 60;until=min(253402300799,now+max(60,delay))
                 else:until=253402300799 # explicit reconciliation, never automatic reopen
                 self.db.execute("INSERT INTO circuits VALUES(?,?,?) ON CONFLICT DO UPDATE SET reason=excluded.reason,until_t=MAX(circuits.until_t,excluded.until_t)",(p,status,until))
                 self.alert("provider:"+p+":"+day(now)+":"+status,{"kind":"provider","provider":p,"reason":status})
@@ -170,6 +171,8 @@ class Governance:
             old=self.db.execute("SELECT cursor,version,done FROM checkpoints WHERE key=?",(k,)).fetchone()
             if old and (old[1]!=expected or old[2] or old[0]==cursor):return False
             if not old and expected!=0:return False
+            if self.db.execute("SELECT 1 FROM checkpoint_history WHERE key=? AND cursor=?",(k,cursor)).fetchone():return False
+            self.db.execute("INSERT INTO checkpoint_history VALUES(?,?)",(k,cursor))
             self.db.execute("INSERT INTO checkpoints VALUES(?,?,?,?) ON CONFLICT DO UPDATE SET cursor=excluded.cursor,version=excluded.version,done=excluded.done",(k,cursor,expected+1,int(done)))
             return True
     def digest(self,coverage=None,pending=None,health=None):
