@@ -63,8 +63,10 @@ def event_kind(e):
         return "ambiguous_goal"
     if typ == "var" and ("goal" in detail or "card" in detail or "penalty" in detail):
         return "var_review"
-    if typ in ("card", "var"):
+    if typ == "card" and detail == "yellow card":
         return "other"
+    if typ == "var" and detail in ("goal confirmed", "penalty confirmed"):
+        return "var_review"
     return "unknown"
 
 def timeline(f):
@@ -134,15 +136,23 @@ def timeline(f):
             issues["added_time_lineup_exposure_unknown"] += 1
         if minute in (0, 90) and any(x[2] != "goal" for x in rows):
             issues["boundary_lineup_exposure_unknown"] += 1
-        if minute in (0, 90) and any(x[2] == "goal" for x in rows):
+        if minute == 0 and any(x[2] == "goal" for x in rows):
             issues["boundary_goal_exposure_unknown"] += 1
+        if minute == 90 and any(x[2] == "goal" for x in rows):
+            flags["final_minute_goal_regulation_proxy"] += 1
     if issues:
         return {"candidate": False, "issues": dict(issues), "flags": dict(flags), "segments": []}
     boundaries = {0, 90}
     goal_at = collections.defaultdict(collections.Counter)
-    for c, _, k, t, p, q in sorted(events):
+    for c, event_index, k, t, p, q in sorted(events):
         m = c[0]
         if k == "goal":
+            detail = base.norm(f["events"][event_index].get("detail"))
+            if detail == "own goal":
+                if not any(p in on_pitch for on_pitch in active.values()):
+                    return fail("goal_player_not_on_pitch")
+            elif p not in active[t]:
+                return fail("goal_player_not_on_pitch")
             goals[t] += 1
             goal_at[m][t] += 1
             boundaries.add(m)
@@ -175,6 +185,10 @@ def timeline(f):
             if t not in teams or pid is None or (t, pid) in observed:
                 return fail("player_box_identity")
             observed[(t, pid)] = number(m)
+            if (t, pid) in intervals:
+                sub = base.get(stats[0], "games", "substitute") if stats else None
+                if not isinstance(sub, bool) or sub == (starts[(t, pid)] == 0):
+                    return fail("starter_box_conflict")
     if any(key not in observed or observed[key] is None for key in intervals):
         return fail("missing_active_minutes")
     if any(m is not None and m > 0 and key not in intervals for key, m in observed.items()):
@@ -224,6 +238,7 @@ def audit(state):
         if not cat or len(cat) > 380 or (year != "2026" and len(cat) != 380):
             raise ValueError("catalogue size")
         counts, reasons, old_reasons, flag_totals = (collections.Counter() for _ in range(4))
+        counts.update({k:0 for k in ("catalogued","r3_valid_players","r3_detailed","r3_candidates","r3_segments","r4_candidates","r4_segments","r3_to_r4_retained","r3_to_r4_gained","r3_to_r4_lost","A","B","C","D")})
         coverage = collections.defaultdict(collections.Counter)
         private_clubs = collections.defaultdict(collections.Counter)
         for fid, expected in sorted(cat.items()):
@@ -244,9 +259,12 @@ def audit(state):
             counts["r3_candidates"] += int(old["candidate"])
             counts["r3_segments"] += old.get("segments", 0)
             result = timeline(f)
-            candidate = detailed and result["candidate"]
             rows = list(metric_rows(f))
-            complete_core = bool(rows) and all(valid_field(k,p.get(k)) for _,p in rows for k in ("id","position","starter","minutes"))
+            ids = [ident(p.get("id")) for _,p in rows]
+            complete_core = bool(rows) and len(ids)==len(set(ids)) and all(valid_field(k,p.get(k)) for _,p in rows for k in ("id","position","starter","minutes"))
+            candidate = detailed and result["candidate"] and complete_core
+            if not complete_core:
+                result["issues"]["individual_core_conflict"] = 1
             cls = "A" if candidate and complete_core else "B" if detailed and complete_core else "C"
             counts[cls] += 1
             counts["r4_candidates"] += int(candidate)
@@ -304,6 +322,12 @@ def self_test():
     g=fixture(); g["events"]=[event("Goal","Normal Goal",55,100)]; g["goals"]["home"]=1
     assert timeline(g)["candidate"] and sum(sum(x["goals"].values()) for x in timeline(g)["segments"])==1
     g["goals"]["home"]=0; assert "score_mismatch" in timeline(g)["issues"]
+    g=fixture(); g["events"]=[event("Goal","Normal Goal",90,100,extra=4)]; g["goals"]["home"]=1
+    assert timeline(g)["candidate"] and timeline(g)["flags"]["final_minute_goal_regulation_proxy"]==1
+    g=fixture(); g["events"]=[event("Goal","Normal Goal",55,999)]; g["goals"]["home"]=1
+    assert "goal_player_not_on_pitch" in timeline(g)["issues"]
+    g=fixture(); g["players"][0]["players"][0]["statistics"][0]["games"]["substitute"]=True
+    assert "starter_box_conflict" in timeline(g)["issues"]
     g=fixture(); g["events"]=[event("Card","Yellow Card",None,100)]
     assert timeline(g)["candidate"] and timeline(g)["flags"]["noncritical_clock_missing"]==1
     g["events"]=[event("subst","Substitution 1",45,100,199,2)]
