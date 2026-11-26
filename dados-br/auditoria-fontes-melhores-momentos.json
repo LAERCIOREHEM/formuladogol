@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-11-24T20:06:48-03:00",
+  "atualizado_em": "2026-11-25T22:11:37-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
     "regra": "GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video e CazéTV são prioritários. UOL Esporte é aceito como fallback após 48 horas ou por vínculo manual conferido.",
@@ -13,18 +13,27 @@
     "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais."
   },
   "resumo": {
-    "jogos_resultados": 360,
+    "jogos_resultados": 361,
     "jogos_com_video": 360,
-    "ge_globo": 340,
-    "amazon_prime_video": 6,
-    "cazetv": 11,
+    "ge_globo": 342,
+    "amazon_prime_video": 5,
+    "cazetv": 10,
     "uol_esporte": 3,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 1,
     "percentual_fontes_preferidas": 100.0
   },
   "outros_sites_ainda_em_uso": [],
-  "sem_video": [],
+  "sem_video": [
+    {
+      "event_id": "401841319",
+      "rodada": 36,
+      "mandante": "Atlético-MG",
+      "visitante": "Corinthians",
+      "placar_mandante": 1,
+      "placar_visitante": 1
+    }
+  ],
   "detalhamento": {
     "ge_globo": [
       {
@@ -5381,10 +5390,26 @@
         "categoria_fonte": "ge_globo",
         "origem_vinculo": "automatico",
         "fonte": "GE TV / YouTube",
-        "fonte_busca": "cloudflare-fastlane-youtube-uploads",
-        "channel_title": "GE TV",
+        "fonte_busca": "",
+        "channel_title": "",
         "titulo": "BAHIA 0 X 1 CORITIBA | MELHORES MOMENTOS | 36ª RODADA | BRASILEIRÃO 2026 | ge.globo",
         "url": "https://www.youtube.com/watch?v=rmm_YAlYp9k",
+        "confianca": 1.0
+      },
+      {
+        "event_id": "401841326",
+        "rodada": 36,
+        "mandante": "Botafogo",
+        "visitante": "São Paulo",
+        "placar_mandante": 1,
+        "placar_visitante": 1,
+        "categoria_fonte": "ge_globo",
+        "origem_vinculo": "automatico",
+        "fonte": "GE TV / YouTube",
+        "fonte_busca": "playlistItems",
+        "channel_title": "ge tv",
+        "titulo": "BOTAFOGO 1 X 1 SÃO PAULO | MELHORES MOMENTOS | 36ª RODADA BRASILEIRÃO 2026 | ge.globo",
+        "url": "https://www.youtube.com/watch?v=FQw4gMtYh3A",
         "confianca": 1.0
       },
       {
@@ -5413,10 +5438,26 @@
         "categoria_fonte": "ge_globo",
         "origem_vinculo": "automatico",
         "fonte": "GE TV / YouTube",
-        "fonte_busca": "cloudflare-fastlane-youtube-uploads",
-        "channel_title": "GE TV",
+        "fonte_busca": "",
+        "channel_title": "",
         "titulo": "CHAPECOENSE 1 X 2 CRUZEIRO | MELHORES MOMENTOS | 36ª RODADA | BRASILEIRÃO 2026 | ge.globo",
         "url": "https://www.youtube.com/watch?v=BanMqKCVBfo",
+        "confianca": 1.0
+      },
+      {
+        "event_id": "401841324",
+        "rodada": 36,
+        "mandante": "Fluminense",
+        "visitante": "Mirassol",
+        "placar_mandante": 1,
+        "placar_visitante": 0,
+        "categoria_fonte": "ge_globo",
+        "origem_vinculo": "automatico",
+        "fonte": "GE TV / YouTube",
+        "fonte_busca": "",
+        "channel_title": "",
+        "titulo": "FLUMINENSE 1 X 0 MIRASSOL | MELHORES MOMENTOS | 36ª RODADA | BRASILEIRÃO 2026 | ge.globo",
+        "url": "https://www.youtube.com/watch?v=SlCIfR3XhlA",
         "confianca": 1.0
       },
       {
@@ -5429,8 +5470,8 @@
         "categoria_fonte": "ge_globo",
         "origem_vinculo": "automatico",
         "fonte": "GE TV / YouTube",
-        "fonte_busca": "cloudflare-fastlane-youtube-uploads",
-        "channel_title": "GE TV",
+        "fonte_busca": "",
+        "channel_title": "",
         "titulo": "INTERNACIONAL 2 X 5 VITÓRIA | MELHORES MOMENTOS | 36ª RODADA | BRASILEIRÃO 2026 | ge.globo",
         "url": "https://www.youtube.com/watch?v=efxlGe8hzbo",
         "confianca": 1.0
@@ -5445,10 +5486,10 @@
         "categoria_fonte": "ge_globo",
         "origem_vinculo": "automatico",
         "fonte": "GE TV / YouTube",
-        "fonte_busca": "cloudflare-fastlane-youtube-uploads",
-        "channel_title": "GE TV",
-        "titulo": "PALMEIRAS 1 X 1 FLAMENGO | MELHORES MOMENTOS | 36ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-        "url": "https://www.youtube.com/watch?v=nnXrY4FzQxY",
+        "fonte_busca": "",
+        "channel_title": "",
+        "titulo": "PALMEIRAS 1 X 1 FLAMENGO | MELHORES MOMENTOS | 36ª RODADA | BRASILEIRÃO 2026 | ge tv",
+        "url": "https://www.youtube.com/watch?v=i9m0Ix-iqE4",
         "confianca": 1.0
       },
       {
@@ -5461,8 +5502,8 @@
         "categoria_fonte": "ge_globo",
         "origem_vinculo": "automatico",
         "fonte": "GE TV / YouTube",
-        "fonte_busca": "cloudflare-fastlane-youtube-uploads",
-        "channel_title": "GE TV",
+        "fonte_busca": "",
+        "channel_title": "",
         "titulo": "SANTOS 0 X 2 GRÊMIO | MELHORES MOMENTOS | 36ª RODADA | BRASILEIRÃO 2026 | ge.globo",
         "url": "https://www.youtube.com/watch?v=FWvDyLObdP8",
         "confianca": 1.0
@@ -5547,22 +5588,6 @@
         "channel_title": "Prime Video Sport Brasil",
         "titulo": "CRUZEIRO 3 X 2 BAHIA | MELHORES MOMENTOS | CAMPEONATO BRASILEIRO",
         "url": "https://www.youtube.com/watch?v=EC6oMDpx1Kc",
-        "confianca": 1.0
-      },
-      {
-        "event_id": "401841326",
-        "rodada": 36,
-        "mandante": "Botafogo",
-        "visitante": "São Paulo",
-        "placar_mandante": 1,
-        "placar_visitante": 1,
-        "categoria_fonte": "amazon_prime_video",
-        "origem_vinculo": "automatico",
-        "fonte": "Prime Video Sport Brasil / YouTube",
-        "fonte_busca": "cloudflare-fastlane-youtube-uploads",
-        "channel_title": "Prime Video Sport Brasil",
-        "titulo": "BOTAFOGO 1 X 1 SÃO PAULO | MELHORES MOMENTOS | CAMPEONATO BRASILEIRO 2026",
-        "url": "https://www.youtube.com/watch?v=FPNFOcjgvlE",
         "confianca": 1.0
       }
     ],
@@ -5709,22 +5734,6 @@
         "channel_title": "CazéTV",
         "titulo": "MELHORES MOMENTOS: CORITIBA 0 X 1 SANTOS | BRASILEIRÃO 2026 | 35ª RODADA",
         "url": "https://www.youtube.com/watch?v=53D8QKfas6g",
-        "confianca": 1.0
-      },
-      {
-        "event_id": "401841324",
-        "rodada": 36,
-        "mandante": "Fluminense",
-        "visitante": "Mirassol",
-        "placar_mandante": 1,
-        "placar_visitante": 0,
-        "categoria_fonte": "cazetv",
-        "origem_vinculo": "automatico",
-        "fonte": "CazéTV / YouTube",
-        "fonte_busca": "cloudflare-fastlane-youtube-uploads",
-        "channel_title": "CazéTV",
-        "titulo": "MELHORES MOMENTOS: FLUMINENSE 1 X 0 MIRASSOL | BRASILEIRÃO 2026 | 35ª RODADA",
-        "url": "https://www.youtube.com/watch?v=PWC0ztgWJ7Y",
         "confianca": 1.0
       },
       {
