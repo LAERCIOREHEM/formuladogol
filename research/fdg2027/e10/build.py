@@ -52,7 +52,7 @@ def build(out):
             b=raw(body);rel=f"data/{y}/{k}.json";write(out/rel,b)
             entries[k]={"path":rel,"sha256":sha(b),"bytes":len(b),"namespace":f.namespace(y,"cache",k)}
         m={"competition":"bra.1","season":y,"entries":entries,"public":False,"source_commit":LOCK["e09_commit"] if y=="2026" else None}
-        b=raw(m);write(out/f"data/{y}/manifest.json",b);manifests[y]=sha(b)
+        b=raw(m);write(out/f"data/{y}/_manifest.json",b);manifests[y]=sha(b)
     write(out/"manifest-lock.json",raw(manifests))
     return {**audit,"assets_per_season":len(ASSETS),"documentary_assets":len(ASSETS),"unavailable_2027_assets":len(ASSETS),"forecast_rows":len(data["forecast"]["rows"]),"player_rows":len(data["players"]["rows"]),"standings_rows":len(data["standings"]["rows"]),"result_rows":data["results"]["count"],"highlights":data["highlights"]["count"],"manifest_sha256":manifests,"production_ready":False,"public_switch":False}
 def main():

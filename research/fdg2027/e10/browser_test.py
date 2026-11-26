@@ -37,6 +37,8 @@ def main():
             count=page.locator("tbody tr").count();page.locator("#club").select_option(index=1)
             ok(f"filter-{width}",0<page.locator("tbody tr").count()<=count and page.locator("#position").is_disabled() and page.locator("#minutes").is_disabled())
             page.screenshot(path=str(a.out/f"players-{width}.png"),full_page=False)
+            go("?temporada=2026&view=rosters");ok(f"roster-{width}",page.locator(".slot").count()==22 and page.evaluate("document.documentElement.scrollWidth<=innerWidth"));page.screenshot(path=str(a.out/f"roster-{width}.png"),full_page=False)
+            go("?temporada=2026&view=manifest");ok(f"manifest-{width}","SHA-256" in page.locator("#content").inner_text())
             page.locator("#season").select_option("2027");page.wait_for_function("document.getElementById('content').innerText.includes('ainda não ativada')")
             ok(f"2027-empty-{width}",page.locator("tbody tr").count()==0 and "2027" in page.url)
             page.screenshot(path=str(a.out/f"2027-{width}.png"),full_page=False)
