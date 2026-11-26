@@ -98,7 +98,32 @@ async def run_browser(site,out,origin):
                 if not native:
                     if await page.locator("#fdg-main h1").text_content()=="Dados indisponíveis":fail.append("data:"+label)
                     if route=="stats/table" and await page.locator("tbody tr[data-club]").count()!=20:fail.append("20 clubs:"+label)
-                    if route=="stats/prob" and not await page.locator("#sl02-pulse .fdg-pulse").count():fail.append("Data Pulse:"+label)
+                    if route=="stats/prob":
+                        if not await page.locator("#sl02-pulse .fdg-pulse").count():fail.append("Data Pulse:"+label)
+                        if await page.locator(".prob-metrics").count():fail.append("duplicated metrics:"+label)
+                        if await page.get_by_role("button",name="Comparativa",exact=True).get_attribute("aria-pressed")!="true":fail.append("default comparativa:"+label)
+                        if await page.locator(".hf-view button").first.inner_text()!="Comparativa":fail.append("mode order:"+label)
+                        if await page.locator(".hf-matrix .heat-cell").count()!=140:fail.append("seven indicators:"+label)
+                        if await page.locator(".hf-matrix th[data-indicator]").count()!=7:fail.append("indicator columns:"+label)
+                        if await page.locator(".hf-matrix th[data-indicator$='_base']").count():fail.append("base exposed:"+label)
+                        if not await page.locator(".heat-cell[data-level=certain]").count() or not await page.locator(".heat-cell[data-level=zero]").count():fail.append("structural semantics:"+label)
+                        palette=await page.locator(".hf-matrix tbody tr").first.locator(".heat-cell").evaluate_all("(els)=>els.map(e=>getComputedStyle(e).getPropertyValue('--rgb').trim())")
+                        if len(set(palette))!=7:fail.append("semantic palette:"+label)
+                        # Verify every displayed value against the unchanged published AF output.
+                        expected=readj(site,"dados-br/probabilidades-brasileirao.json")["clubes"]
+                        rendered=await page.locator(".hf-matrix tbody tr").evaluate_all("(rows)=>Object.fromEntries(rows.map(r=>[r.dataset.probClub,Object.fromEntries([...r.querySelectorAll('.heat-cell')].map(e=>[e.dataset.indicator,e.textContent]))]))")
+                        if any(rendered.get(c["clube"],{}).get(k)!=c["probabilidades_detalhes"][k]["exibicao"] for c in expected for k in rendered.get(c["clube"],{})) or len(rendered)!=20:fail.append("AF values:"+label)
+                    if route=="stats/table":
+                        if await page.locator(".hf-standings thead th").count()!=10:fail.append("full classification:"+label)
+                        if await page.locator(".hf-standings .wide-only").count():fail.append("hidden classification:"+label)
+                        # Both ends of the internal scroll must remain usable; sticky identity stays visible.
+                        sc=page.locator(".hf-table-scroll")
+                        x=await sc.evaluate("(e)=>{const a=e.querySelector('tbody .hf-sticky');const b=a.getBoundingClientRect().left;e.scrollLeft=e.scrollWidth;return {before:b,after:a.getBoundingClientRect().left,max:e.scrollWidth-e.clientWidth,left:e.scrollLeft}}")
+                        if abs(x["before"]-x["after"])>2 or abs(x["max"]-x["left"])>2:fail.append("classification sticky/scroll:"+label)
+                        await sc.evaluate("(e)=>e.scrollLeft=0")
+                    if w>=320:
+                        brand=await page.locator(".brandline").evaluate("(e)=>{const a=e.querySelector('a').getBoundingClientRect(),b=e.querySelector('button').getBoundingClientRect();return {gap:b.left-a.right,width:a.width}}")
+                        if brand["gap"]>15 or brand["gap"]<0 or brand["width"]<100:fail.append("banner width:"+label)
                 m.update(route=route,width=w,theme=theme,native=native,url=page.url)
                 rows.append(m)
                 await page.screenshot(path=str(out/(label+".png")),animations="disabled")
@@ -113,14 +138,17 @@ async def run_browser(site,out,origin):
                 if route=="stats/prob" and w==390 and theme=="dark" and not native:
                     await page.get_by_role("button",name="Comparativa",exact=True).click()
                     await page.locator("#fdg-main[aria-busy=false]").wait_for()
-                    if await page.locator(".heat:visible").count()!=180:fail.append("compare mobile")
-                    await page.locator(".rank-button:visible").first.click()
+                    if await page.locator(".heat-cell:visible").count()!=140:fail.append("compare mobile")
+                    await page.locator(".hf-matrix .hf-club-button").first.click()
                     await page.locator("#fdg-main[aria-busy=false]").wait_for()
                     if not await page.get_by_text("Raio-X completo",exact=True).count():fail.append("detail")
+                    await page.get_by_role("button",name="Visão rápida",exact=True).click()
+                    await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                    if await page.locator(".rank-button:visible").count()!=20:fail.append("quick mode")
                 if route=="stats/prob" and w==1440 and theme=="dark" and not native:
                     await page.get_by_role("button",name="Comparativa",exact=True).click()
                     await page.locator("#fdg-main[aria-busy=false]").wait_for()
-                    if await page.locator(".heat-cell:visible").count()!=180:fail.append("compare desktop")
+                    if await page.locator(".heat-cell:visible").count()!=140:fail.append("compare desktop")
                     await page.screenshot(path=str(out/"comparativa-integrada.png"))
                 if route=="clubs" and w==390 and not native:
                     await page.get_by_role("button",name="Bahia",exact=False).first.click()
@@ -180,7 +208,7 @@ async def run_browser(site,out,origin):
         await page.evaluate("window.dispatchEvent(new Event('online'))")
         try:
             await page.get_by_text("Sem certificação da revisão atual",exact=False).wait_for(timeout=12000)
-            if not await page.locator(".rank-button").count():fail.append("last-good missing")
+            if await page.locator(".hf-matrix tbody tr").count()!=20:fail.append("last-good missing")
         except Exception as e:fail.append("last-good status:"+str(e)[:100])
         await ctx.close()
         await browser.close()

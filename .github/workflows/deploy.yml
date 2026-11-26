@@ -170,10 +170,11 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: SL02 — identificar primeira ativação visual
+      - name: SL02 — identificar alteração visual
         id: sl02_activation
         env:
           EVENT_BEFORE: ${{ github.event.before }}
+          EVENT_SHA: ${{ github.sha }}
         shell: bash
         run: |
           set -euo pipefail
@@ -183,9 +184,24 @@ jobs:
             old="$(git show "$EVENT_BEFORE:research/fdg2027/sl02-release/release-mode.json" 2>/dev/null || true)"
             if [ -n "$old" ]; then previous="$(printf '%s' "$old" | python -c 'import sys,json; print(json.load(sys.stdin)["mode"])')"; fi
           fi
-          if [ "$current" = sl02 ] && [ "$previous" != sl02 ]; then
+          visual_change=false
+          if [ -n "${EVENT_BEFORE:-}" ] && git cat-file -e "$EVENT_BEFORE^{commit}" 2>/dev/null; then
+            if ! git diff --quiet "$EVENT_BEFORE" HEAD -- research/fdg2027/sl02-release/app.js research/fdg2027/sl02-release/design.css research/fdg2027/sl02-release/shell.css research/fdg2027/sl02-release/shell.js research/fdg2027/sl02-release/overlay.py; then visual_change=true; fi
+          fi
+          visual_only=false
+          if [ "$current" = sl02 ] && [ "$previous" = sl02 ] && [ "$visual_change" = true ]; then
+            visual_only="$(python research/fdg2027/sl02-release/visual_guard.py classify --before "$EVENT_BEFORE" --after "$EVENT_SHA")"
+            # A later visual commit at checkout is not covered by this exception.
+            if ! git diff --quiet "$EVENT_SHA" HEAD -- research/fdg2027/sl02-release .github/workflows/deploy.yml; then visual_only=false; fi
+          fi
+          echo "visual_only=$visual_only" >> "$GITHUB_OUTPUT"
+          if [ "$current" = sl02 ] && { [ "$previous" != sl02 ] || [ "$visual_change" = true ]; }; then
             echo 'active=true' >> "$GITHUB_OUTPUT"
-            python research/fdg2027/sl02-release/public_browser.py preflight
+            if [ "$visual_only" = true ]; then
+              echo 'HF1: visual-only path set certified; live services are not paused.'
+            else
+              python research/fdg2027/sl02-release/public_browser.py preflight
+            fi
           else echo 'active=false' >> "$GITHUB_OUTPUT"; fi
 
       - name: Node para validações LiveState
@@ -1799,8 +1815,12 @@ jobs:
           python scripts/gerar_fdg_data_manifest.py --site-root _site --check
 
       - name: SL02 — revalidar janela antes do envio
-        if: steps.sl02_activation.outputs.active == 'true'
+        if: steps.sl02_activation.outputs.active == 'true' && steps.sl02_activation.outputs.visual_only != 'true'
         run: python research/fdg2027/sl02-release/public_browser.py preflight
+
+      - name: HF1 — preservar resultados públicos e fonte esportiva atual
+        if: steps.sl02_activation.outputs.visual_only == 'true'
+        run: python research/fdg2027/sl02-release/visual_guard.py preupload --site-root _site
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4

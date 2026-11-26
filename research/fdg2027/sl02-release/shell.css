@@ -29,3 +29,10 @@
 @media(max-width:290px){.fdg-release-shell .fdg-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.fdg-release-shell .brandline{flex-wrap:wrap}.fdg-release-shell .brandline a{width:100%}}
 @media(max-width:190px){.fdg-release-shell .fdg-nav{grid-template-columns:1fr}.fdg-release-shell .season-line>*{flex-basis:100%}.fdg-release-shell .snapshot>*{max-width:100%;overflow-wrap:anywhere}}
 @media(prefers-reduced-motion:reduce){.fdg-release-shell *, .fdg-release-shell *::before,.fdg-release-shell *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* HF1: original banner fills the available space, with no distortion or crop. */
+.fdg-release-shell .brandline{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px}
+.fdg-release-shell .brandline a{width:100%;max-width:none;min-width:0}
+.fdg-release-shell .brandline img{width:100%;height:auto;max-height:none;object-fit:contain}
+@media(max-width:600px){.fdg-release-shell .brandline{gap:6px}.fdg-release-shell .theme-toggle{min-width:54px;padding-inline:6px}}
+@media(max-width:290px){.fdg-release-shell .brandline{grid-template-columns:minmax(0,1fr)}.fdg-release-shell .theme-toggle{justify-self:end}}

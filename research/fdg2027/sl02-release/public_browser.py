@@ -77,11 +77,15 @@ async def browser(out):
             assert all(x["inside"] and x["above"] for x in m["labels"])
             assert await page.get_by_text("2026 · Vigente",exact=True).count()==1
             assert await page.get_by_text("2027 · Em breve",exact=True).count()==1
-            assert await page.locator(".rank-button:visible").count()==20
+            assert await page.locator(".hf-matrix tbody tr").count()==20
+            assert await page.locator(".hf-matrix .heat-cell").count()==140
+            assert await page.get_by_role("button",name="Comparativa",exact=True).get_attribute("aria-pressed")=="true"
+            assert not await page.locator(".prob-metrics").count()
             assert await page.get_by_role("tab").count()==5
             await page.screenshot(path=str(out/f"producao-{width}-probabilidades.png"))
             await page.get_by_role("tab",name="Classificação",exact=True).click()
             await page.wait_for_function("location.hash==='#stats/table'&&document.querySelectorAll('tbody tr[data-club]').length===20&&document.querySelector('#fdg-main[aria-busy=false]')")
+            assert await page.locator(".hf-standings thead th").count()==10
             await page.screenshot(path=str(out/f"producao-{width}-classificacao.png"))
             assert not errors,errors
             evidence.append({"viewport":width,"mobile_emulation":mobile,"url":page.url,"menu":m,"classificacao_clubes":20,"errors":errors})

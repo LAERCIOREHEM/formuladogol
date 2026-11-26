@@ -13,13 +13,14 @@ concurrency:
   cancel-in-progress: true
 jobs:
   readiness:
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'fdg2027/sl02-integration'
+    if: github.event.pull_request.head.repo.full_name == github.repository && (github.head_ref == 'fdg2027/sl02-integration' || github.head_ref == 'fdg2027/sl02-hf1')
     runs-on: ubuntu-24.04
     timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -41,7 +42,11 @@ jobs:
           node --check research/fdg2027/sl02-release/app.js
           node --check research/fdg2027/sl02-release/shell.js
           python research/fdg2027/sl02-release/public_browser.py self-test
-          python research/fdg2027/sl02-release/public_browser.py preflight
+          python research/fdg2027/sl02-release/visual_guard.py self-test
+          if [ "$GITHUB_HEAD_REF" = fdg2027/sl02-hf1 ]; then
+            test "$(python research/fdg2027/sl02-release/visual_guard.py classify --before '${{ github.event.pull_request.base.sha }}' --after '${{ github.event.pull_request.head.sha }}')" = true
+          fi
+          # Window preflight is a release gate, not a PR test; fixtures above certify the guard.
           node scripts/validar_pwa_instalacao.mjs
           node tests/test-sula-final-navigation.mjs
           python research/fdg2027/sl02-release/sula_smoke.py --self-test
