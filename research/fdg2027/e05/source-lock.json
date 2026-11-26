@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "e03_run": 45731660540,
+  "e03_commit": "1c6dce76633c34233b1e94e767b0febb6f6166d5",
+  "e04_run": 45732281429,
+  "e04_commit": "95f53441f932d996c9c1e238a7be9b5e9f07d9d1",
+  "artifacts": [
+    {
+      "run": 45731660540,
+      "id": 15077275866,
+      "name": "fdg2027-e03-aggregate",
+      "sha256": "2110a83f401149e3b21fdc05eab4d2a0e37a4580a73c871742db4c7a4c7851ce",
+      "member": "e03-report.json",
+      "limit": 10000000
+    },
+    {
+      "run": 45731660540,
+      "id": 15076074222,
+      "name": "fdg2027-e03-encrypted-canonical",
+      "sha256": "e6bf3d57e6605d3857d4b73732312cef4f4653f28b94ebd1a61b2fc618a0afd3",
+      "member": "e03-canonical.tar.gpg",
+      "limit": 100000000
+    },
+    {
+      "run": 45732281429,
+      "id": 15077091959,
+      "name": "fdg2027-e04-aggregate",
+      "sha256": "fc4a8eeee0231956eb6b0ba3e7ccb199f0658b88880b5e652acead90fba5dc27",
+      "member": "e04-report.json",
+      "limit": 10000000
+    },
+    {
+      "run": 45732281429,
+      "id": 15077690594,
+      "name": "fdg2027-e04-encrypted-player",
+      "sha256": "bc815117c7bf7e5f2bad2257981fad23ec50e94ea7d596bfe2a00c62e53ba1fd",
+      "member": "e04-af-player.json.gpg",
+      "limit": 100000000
+    }
+  ]
+}
