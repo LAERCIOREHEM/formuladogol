@@ -115,7 +115,9 @@ def xi_experiment(rows):
             p,why,_=f.apply(r,m)
             # No fabricated additions: candidate reverts to competitive if not eligible.
             reasons[why or "adjusted"]+=1
-            pp.append((r,r["baseline"],p))
+            original=r["variants"]["competitive"]["forecast"]
+            if why:p=original
+            pp.append((r,original,p))
             if r["xi_supported"]:supp.append(pp[-1])
         allpairs+=pp;supportedpairs+=supp
         result[str(y)]={"train_supported":len(tr),"test_supported":len(supp),"model_fitted":m is not None,"fallback":dict(reasons),"all":summary(pp),"supported":summary(supp)}
