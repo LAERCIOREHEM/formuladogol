@@ -229,6 +229,7 @@ def add_coverage(bucket, p):
 
 def audit(state):
     catalog, history = state["catalog"], state["historical"]
+    attempts = state["attempts"]
     if set(catalog) != set(YEARS) or any(not isinstance(v, dict) for v in catalog.values()):
         raise ValueError("catalogue seasons")
     seen = set()
@@ -238,6 +239,7 @@ def audit(state):
         if not cat or len(cat) > 380 or (year != "2026" and len(cat) != 380):
             raise ValueError("catalogue size")
         counts, reasons, old_reasons, flag_totals = (collections.Counter() for _ in range(4))
+        pending_reasons, pending_attempts, minute_error_bands = (collections.Counter() for _ in range(3))
         counts.update({k:0 for k in ("catalogued","r3_valid_players","r3_detailed","r3_candidates","r3_segments","r4_candidates","r4_segments","r3_to_r4_retained","r3_to_r4_gained","r3_to_r4_lost","A","B","C","D")})
         coverage = collections.defaultdict(collections.Counter)
         private_clubs = collections.defaultdict(collections.Counter)
@@ -250,9 +252,20 @@ def audit(state):
             valid, detailed = r3.assess(f, expected)
             counts["r3_valid_players"] += int(valid)
             counts["r3_detailed"] += int(detailed)
+            attempt = attempts.get(fid, 0)
+            if not isinstance(attempt, int) or isinstance(attempt, bool) or attempt < 0:
+                raise ValueError("invalid attempt count")
+            if not detailed:
+                counts["r3_unresolved"] += 1
+                counts["r3_exhausted"] += int(attempt >= 3)
+                pending_attempts[str(attempt)] += 1
+                if not valid:
+                    pending_reasons["no_stored_fixture" if fid not in history else "stored_fixture_fails_r3_player_validation"] += 1
+                else:
+                    pending_reasons["valid_players_but_detail_incomplete"] += 1
             if not valid:
                 counts["D"] += 1
-                private[fid] = {"year": year, "class": "D", "issues": {"invalid_or_missing_players": 1}}
+                private[fid] = {"year": year, "class": "D", "attempts":attempt, "stored_fixture":fid in history, "issues": {"invalid_or_missing_players": 1}}
                 continue
             old = r2.historical_timeline(f)
             old_reasons[old["reason"]] += 1
@@ -274,6 +287,9 @@ def audit(state):
             counts["r3_to_r4_lost"] += int(old["candidate"] and not candidate)
             reasons.update(result["issues"])
             flag_totals.update({k:v for k,v in result["flags"].items() if k != "max_abs_minute_error"})
+            error = result["flags"].get("max_abs_minute_error")
+            if error is not None:
+                minute_error_bands["0" if error == 0 else "0_to_1" if error <= 1 else "1_to_5" if error <= 5 else "over_5"] += 1
             for t,p in rows:
                 pos = p.get("position") if valid_field("position",p.get("position")) else "unknown"
                 add_coverage(coverage["all"], p)
@@ -281,13 +297,22 @@ def audit(state):
                 add_coverage(private_clubs[str(t) + ":" + pos], p)
                 if ident(p.get("id")) and base.norm(p.get("name")):
                     identities[ident(p["id"])].add(base.norm(p["name"]))
-            private[fid] = {"year":year,"class":cls,"r3_candidate":old["candidate"],
+            private[fid] = {"year":year,"class":cls,"attempts":attempt,"r3_candidate":old["candidate"],
                             "r4_candidate":candidate,"issues":result["issues"],"flags":result["flags"],
                             "segments":result["segments"] if candidate else []}
-        if sum(counts[k] for k in "ABCD") != counts["catalogued"]:
+        counts["r3_unresolved"] += 0
+        counts["r3_exhausted"] += 0
+        if (sum(counts[k] for k in "ABCD") != counts["catalogued"] or
+                counts["r3_unresolved"] != counts["catalogued"] - counts["r3_detailed"] or
+                sum(pending_attempts.values()) != counts["r3_unresolved"] or
+                counts["r4_candidates"] != counts["A"] or
+                counts["r3_to_r4_retained"] + counts["r3_to_r4_gained"] != counts["r4_candidates"] or
+                counts["r3_to_r4_retained"] + counts["r3_to_r4_lost"] != counts["r3_candidates"]):
             raise ValueError("classification accounting")
         out[year] = {"counts":dict(counts),"r3_reasons":dict(old_reasons),"r4_issues_nonexclusive":dict(reasons),
-                     "flags":dict(flag_totals),"field_counts_by_position":{k:dict(v) for k,v in sorted(coverage.items())}}
+                     "flags":dict(flag_totals),"field_counts_by_position":{k:dict(v) for k,v in sorted(coverage.items())},
+                     "r3_pending_reasons":dict(pending_reasons),"r3_pending_attempt_histogram":dict(pending_attempts),
+                     "r4_max_abs_minute_error_bands":dict(minute_error_bands)}
         private["club_coverage:" + year] = {k:dict(v) for k,v in sorted(private_clubs.items())}
     aggregate = {"schema":1,"version":VERSION,"clock":"regulation minute; exact box-minute agreement; not elapsed-time proof",
                  "seasons":out,"unique_provider_ids":len(identities),
@@ -339,7 +364,18 @@ def self_test():
     assert not valid_field("goals",None) and valid_field("goals",0) and not valid_field("goals",True)
     assert clock(event("Goal","Normal Goal",45,100,extra=3))==(45,3)
     assert clock(event("Goal","Normal Goal",91,100)) is None
-    print("PASS: R4 synthetic timeline, goals, substitutions, cards, clocks, missingness and fail-closed checks")
+    from unittest.mock import patch
+    f=fixture(); f["fixture"].update({"id":101,"date":"2026-01-01T00:00:00Z"}); f["league"]={"id":71,"season":2026}
+    f["teams"]["home"]["name"]="Home"; f["teams"]["away"]["name"]="Away"
+    missing=deepcopy(f); missing["fixture"]["id"]=102
+    state={"catalog":{"2026":{"101":f,"102":missing}},"historical":{"101":f},"attempts":{"101":1,"102":3}}
+    with patch.object(sys.modules[__name__],"YEARS",("2026",)):
+        agg, priv=audit(state)
+    c=agg["seasons"]["2026"]["counts"]
+    assert c["A"]==1 and c["D"]==1 and c["r3_unresolved"]==1 and c["r3_exhausted"]==1
+    assert agg["seasons"]["2026"]["r3_pending_reasons"]=={"no_stored_fixture":1}
+    assert priv["fixtures_and_club_coverage"]["102"]["attempts"]==3
+    print("PASS: R4 synthetic timeline, goals, substitutions, cards, clocks, missingness, pending accounting and fail-closed checks")
 
 def main():
     p=argparse.ArgumentParser()
@@ -368,10 +404,10 @@ def main():
             with dest.open("x",encoding="utf-8") as f:
                 json.dump(data,f,sort_keys=True,separators=(",",":"),allow_nan=False)
         lines=["## FDG 2027 E02-R4 — offline audit","",
-               "| Season | Catalogued | Detailed R3 | R3 candidates | R4 strict candidates |",
-               "|---|---:|---:|---:|---:|"]
+               "| Season | Catalogued | Detailed R3 | Pending | Exhausted | R3 candidates | R4 strict candidates |",
+               "|---|---:|---:|---:|---:|---:|---:|"]
         for year,s in aggregate["seasons"].items():
-            c=s["counts"]; lines.append("| "+" | ".join(map(str,[year,c["catalogued"],c["r3_detailed"],c["r3_candidates"],c["r4_candidates"]]))+" |")
+            c=s["counts"]; lines.append("| "+" | ".join(map(str,[year,c["catalogued"],c["r3_detailed"],c["r3_unresolved"],c["r3_exhausted"],c["r3_candidates"],c["r4_candidates"]]))+" |")
         lines+=["","Regulation-clock candidates only. No RAPM trained. No production certification."]
         print("\n".join(lines))
         if os.getenv("GITHUB_STEP_SUMMARY"):
