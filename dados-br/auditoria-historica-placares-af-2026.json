@@ -5,23 +5,23 @@
   "temporada": 2026,
   "status": "auditado_com_lacunas",
   "resumo": {
-    "total_resultados_unicos": 360,
-    "jogos_com_placar_prejogo_comprovado": 178,
+    "total_resultados_unicos": 361,
+    "jogos_com_placar_prejogo_comprovado": 179,
     "jogos_sem_prova_prejogo": 182,
     "jogos_com_conflito": 0,
     "jogos_sem_inicio_factual": 0,
-    "jogos_com_top3_original": 178,
+    "jogos_com_top3_original": 179,
     "jogos_sem_top3_original": 0,
     "partidas_sem_previsao_nao_foram_reconstituidas": true
   },
   "fontes_resultados": {
     "caminho": "resultados.json",
-    "arquivo_sha256": "d0c1e510faf1b2b495bea3f3e2268f0b9bb4a5e84b2d502c26c3caaf83f978b8",
-    "atualizado_em": "2026-11-25T11:19:55.467476-03:00"
+    "arquivo_sha256": "6ba2befda62d880401c937bd56ec58b982a78d5fe68c45a2c411f46a99773169",
+    "atualizado_em": "2026-11-25T22:14:23.385130-03:00"
   },
   "historico_ved_preexistente": {
     "caminho": "dados-br/historico-probabilidades-jogos.json",
-    "arquivo_sha256_antes_da_auditoria": "1b7c0f04f8cb193682fa4fa04469dced30890203b29e05e2b7dd21988c63e5b6",
+    "arquivo_sha256_antes_da_auditoria": "6b2f0bc5711d6030aeb33ab7ceb6cf0bd574f0dd3a585e321cb70dec1a54dfa2",
     "alterado_pela_e1": false
   },
   "metodologia": {
@@ -41,14 +41,14 @@
   "varredura_git": {
     "fontes": {
       "dados-br/probabilidades-jogos.json": {
-        "commits_localizados": 168,
-        "snapshots_validos": 168,
-        "linhas_prejogo_elegiveis": 14178
+        "commits_localizados": 169,
+        "snapshots_validos": 169,
+        "linhas_prejogo_elegiveis": 14346
       },
       "dados-br/probabilidades-brasileirao.json": {
-        "commits_localizados": 313,
-        "snapshots_validos": 313,
-        "linhas_prejogo_elegiveis": 30824
+        "commits_localizados": 315,
+        "snapshots_validos": 315,
+        "linhas_prejogo_elegiveis": 31137
       }
     },
     "linhas_rejeitadas": {
@@ -13794,11 +13794,72 @@
         "hash_entrada_modelo": "f44f6072c66e438b25365937d23c1330197f8a69d7c433a642448706b860a1e7",
         "calculado_em": "2026-11-24T02:12:44+00:00"
       }
+    },
+    {
+      "event_id": "401841319",
+      "rodada": 36,
+      "mandante": "Atlético-MG",
+      "visitante": "Corinthians",
+      "inicio_factual": "2026-11-25T23:00:00+00:00",
+      "placar_final": {
+        "mandante": 1,
+        "visitante": 1
+      },
+      "identidade_partida": "atletico mg|corinthians",
+      "ids_resultado": [
+        "401841319"
+      ],
+      "situacao": "comprovado",
+      "event_id_previsao": "401841319",
+      "previsao": {
+        "gols_esperados": {
+          "mandante": 1.3011,
+          "visitante": 0.8966
+        },
+        "placar_modal": {
+          "mandante": 1,
+          "visitante": 0
+        },
+        "probabilidades_ved_pct": {
+          "mandante": 45.9249,
+          "empate": 28.3674,
+          "visitante": 25.7077
+        }
+      },
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 14.4502
+        },
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 12.9557
+        },
+        {
+          "mandante": 0,
+          "visitante": 0,
+          "probabilidade_pct": 11.1063
+        }
+      ],
+      "top3_situacao": "nativo_documentado",
+      "proveniencia": {
+        "origem": "dados-br/probabilidades-brasileirao.json",
+        "commit": "c834dd55e4d77aa9a6f00bc7b95b0c2fe6f68b97",
+        "commit_em": "2026-11-25T14:25:14+00:00",
+        "arquivo_sha256": "21eec850a272d284daba39dd8223a3dbaed22a09775f96ef54f54e915f60e6b5",
+        "linha_sha256": "d195780cd53d9a4dfbcbf284094102259860bf09c2f13bdc3e24fbd142e0c9d1",
+        "gerado_em_modelo": "2026-11-24T22:55:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "hash_entrada_modelo": "80f2704fb69045519d9fd109ceaf088f28b9e267adcfcdcbb0b56ba801bd9537",
+        "calculado_em": "2026-11-25T14:14:05+00:00"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "94b53aa5019eb699f90644588dd1ff693d4f26f153533fcfc9c81468e1af0bf0",
-    "hash_resumo": "6c36ba7e89f0e9d71ee755c03ba748897b96d778b0c6f42a2d3b384078c612be"
+    "hash_jogos": "e7155692fb9637a8cdb8af2400ff6d82c63936906e7babb0d27b99b76670f1b8",
+    "hash_resumo": "e68763888910ed08121eb52d30025cd4bcae34a3f3df3c74891d0b3da4955d22"
   }
 }
