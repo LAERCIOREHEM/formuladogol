@@ -156,6 +156,8 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    outputs:
+      sl02_activation: ${{ steps.sl02_activation.outputs.active }}
 
     environment:
       name: github-pages
@@ -167,6 +169,24 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+
+      - name: SL02 — identificar primeira ativação visual
+        id: sl02_activation
+        env:
+          EVENT_BEFORE: ${{ github.event.before }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          current="$(python -c 'import json; print(json.load(open("research/fdg2027/sl02-release/release-mode.json"))["mode"])')"
+          previous=legacy
+          if [ -n "${EVENT_BEFORE:-}" ]; then
+            old="$(git show "$EVENT_BEFORE:research/fdg2027/sl02-release/release-mode.json" 2>/dev/null || true)"
+            if [ -n "$old" ]; then previous="$(printf '%s' "$old" | python -c 'import sys,json; print(json.load(sys.stdin)["mode"])')"; fi
+          fi
+          if [ "$current" = sl02 ] && [ "$previous" != sl02 ]; then
+            echo 'active=true' >> "$GITHUB_OUTPUT"
+            python research/fdg2027/sl02-release/public_browser.py preflight
+          else echo 'active=false' >> "$GITHUB_OUTPUT"; fi
 
       - name: Node para validações LiveState
         uses: actions/setup-node@v4
@@ -1778,6 +1798,10 @@ jobs:
           python research/fdg2027/sl02-release/release.py stage --site-root _site --backup "$RUNNER_TEMP/fdg-sl02-rollback"
           python scripts/gerar_fdg_data_manifest.py --site-root _site --check
 
+      - name: SL02 — revalidar janela antes do envio
+        if: steps.sl02_activation.outputs.active == 'true'
+        run: python research/fdg2027/sl02-release/public_browser.py preflight
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
@@ -2171,3 +2195,30 @@ jobs:
       # Suprimir SMTP por execução: incidentes de disponibilidade são notificados
       # exclusivamente pelo Health Monitor (duas sondagens + digest das 08h).
       # Ações/erros continuam registrados no GitHub Actions.
+
+  sl02_public_browser:
+    name: SL02 — navegador público desktop e mobile
+    needs: deploy
+    if: needs.deploy.outputs.sl02_activation == 'true' && success()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          python -m pip install beautifulsoup4==4.13.4 playwright==1.52.0
+          python -m playwright install --with-deps chromium
+      - run: python research/fdg2027/sl02-release/public_browser.py browser --output "$RUNNER_TEMP/sl02-public"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fdg-sl02-public-browser
+          path: ${{ runner.temp }}/sl02-public/
+          if-no-files-found: warn
+          retention-days: 30

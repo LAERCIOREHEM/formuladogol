@@ -40,6 +40,8 @@ jobs:
           python research/fdg2027/sl02-release/release.py verify --site-root "$RUNNER_TEMP/sl02-candidate"
           node --check research/fdg2027/sl02-release/app.js
           node --check research/fdg2027/sl02-release/shell.js
+          python research/fdg2027/sl02-release/public_browser.py self-test
+          python research/fdg2027/sl02-release/public_browser.py preflight
           node scripts/validar_pwa_instalacao.mjs
           node tests/test-sula-final-navigation.mjs
           python research/fdg2027/sl02-release/sula_smoke.py --self-test
