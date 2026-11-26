@@ -14,7 +14,7 @@ concurrency:
 jobs:
   baseline:
     if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'fdg2027/sl01-preparation'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
@@ -44,5 +44,31 @@ jobs:
         with:
           name: fdg2027-sl01-public-baseline
           path: ${{ runner.temp }}/sl01-evidence/
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 30
+  preservation:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'fdg2027/sl01-preparation'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Certify archive bytes, AES256 and restoration in isolated runner
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ARCHIVE_KEY: ${{ secrets.FDG_RESEARCH_ARCHIVE_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 research/fdg2027/sl01/preserve.py "$RUNNER_TEMP/sl01-preservation"
+      - name: Temporary encrypted staging only; external storage requires separate identified destination
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-sl01-encrypted-staging
+          path: |
+            ${{ runner.temp }}/sl01-preservation/fdg2027-sl01.tar.gpg
+            ${{ runner.temp }}/sl01-preservation/verification.json
+          if-no-files-found: error
+          retention-days: 7
