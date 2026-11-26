@@ -7,3 +7,6 @@
 @media(max-width:290px){.fdg-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.brandline{flex-wrap:wrap}.brandline a{width:100%}.table .crest{display:none}.table th,.table td{padding:4px 2px}.table{font-size:.74rem}}
 @media(max-width:190px){.fdg-nav{grid-template-columns:1fr}.season-line>*{flex-basis:100%}.table{font-size:.7rem}.table th,.table td{padding:2px 1px}.table .club-cell button{font-size:.7rem}.controls select{width:100%}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+/* At exceptionally small effective widths, wrap content controls, never menu labels. */
+@media(max-width:290px){.metric strong{overflow-wrap:anywhere}.field{max-width:100%}.field select{width:100%;min-width:0}.tabs button{white-space:normal;overflow-wrap:anywhere}.controls{max-width:100%}.controls button{white-space:normal;overflow-wrap:anywhere}.rank-button{grid-template-columns:minmax(0,1fr) auto}.team>span:last-child{overflow-wrap:break-word}.table .club-cell{min-width:0;overflow-wrap:anywhere}.sim-match{grid-template-columns:1fr 34px 34px 1fr}}

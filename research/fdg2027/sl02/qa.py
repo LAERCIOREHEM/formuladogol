@@ -8,6 +8,34 @@ LABELS=["Estatísticas","Jogos","Ao vivo","Análises","Clubes","Mais"]
 ROUTES=["stats/prob","stats/table","stats/performance","stats/players","stats/accuracy","games/next","games/results","live","articles","clubs","more","more/museum","more/sim"]
 class Quiet(SimpleHTTPRequestHandler):
     def log_message(self,*a):pass
+
+async def native_zoom(p, out, origin):
+    # Chromium tabs.setZoom changes actual browser page zoom, not deviceScaleFactor
+    # or the CSS viewport. Headless persistent Chromium supports MV3 extensions.
+    with tempfile.TemporaryDirectory() as t:
+        root=Path(t);ext=root/"ext";ext.mkdir()
+        (ext/"manifest.json").write_text(json.dumps({"manifest_version":3,"name":"SL02 Zoom QA","version":"1.0","permissions":["tabs"],"background":{"service_worker":"bg.js"}}))
+        (ext/"bg.js").write_text("chrome.runtime.onInstalled.addListener(()=>{});")
+        ctx=await p.chromium.launch_persistent_context(str(root/"profile"),headless=True,channel="chromium",
+            args=["--disable-extensions-except="+str(ext),"--load-extension="+str(ext)],
+            viewport={"width":640,"height":900},service_workers="allow")
+        try:
+            worker=ctx.service_workers[0] if ctx.service_workers else await ctx.wait_for_event("serviceworker",timeout=12000)
+            async def handle(r):
+                if r.request.url.startswith(origin+"/") and r.request.method in ("GET","HEAD"):await r.continue_()
+                else:await r.abort()
+            await ctx.route("**/*",handle)
+            page=ctx.pages[0] if ctx.pages else await ctx.new_page()
+            await page.goto(origin+"/index.html#stats/prob")
+            await page.locator("#fdg-main[aria-busy=false]").wait_for(timeout=15000)
+            before=await page.evaluate("window.innerWidth")
+            zoom=await worker.evaluate("""async url=>{const tabs=await chrome.tabs.query({});const tab=tabs.find(t=>t.url===url);if(!tab)throw Error('preview tab absent');await chrome.tabs.setZoom(tab.id,2);return await chrome.tabs.getZoom(tab.id)}""",page.url)
+            await page.wait_for_timeout(400)
+            m=await page.evaluate("""()=>{const n=document.querySelector('.fdg-nav');return {width:innerWidth,scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth,navScroll:n.scrollWidth,navClient:n.clientWidth,labels:[...n.querySelectorAll('.nav-label')].map(x=>{let r=document.createRange();r.selectNodeContents(x);let a=r.getBoundingClientRect(),b=x.parentElement.getBoundingClientRect();return {text:x.textContent,inside:a.left>=b.left-1&&a.right<=b.right+1}})}}""")
+            await page.screenshot(path=str(out/"native-browser-zoom-200.png"))
+            return {"zoom":zoom,"before_css_width":before,**m,"certified":zoom==2 and m["width"]<=before*.55 and m["scroll"]<=m["client"]+1 and m["navScroll"]<=m["navClient"]+1 and all(x["inside"] for x in m["labels"]) and [x["text"] for x in m["labels"]]==LABELS}
+        finally:await ctx.close()
+
 async def run(site,out,origin):
     findings=[];errors=[];requests=set();fail=[]
     async with async_playwright() as p:
@@ -54,7 +82,10 @@ async def run(site,out,origin):
         await test("stats/prob",390,"light");await test("stats/table",1440,"light")
         for w in (320,768,1440):await test("stats/prob",w,zoom=200)
         await browser.close()
-    report={"captures":len(findings),"measurements":findings,"page_errors":errors,"blocked_hosts":sorted(requests),"failures":fail,"native_zoom_200_certified":False,"zoom_note":"200% equivalent CSS viewport only; native zoom remains a separate acceptance gate.","publication":False}
+        try: zoom_native=await native_zoom(p,out,origin)
+        except Exception as e:zoom_native={"certified":False,"error":str(e)[:500]}
+        if not zoom_native["certified"]:fail.append("native browser zoom")
+    report={"captures":len(findings),"measurements":findings,"page_errors":errors,"blocked_hosts":sorted(requests),"failures":fail,"native_zoom_200_certified":zoom_native["certified"],"native_zoom_evidence":zoom_native,"publication":False}
     (out/"qa.json").write_text(json.dumps(report,ensure_ascii=False,indent=2))
     print(json.dumps({k:v for k,v in report.items() if k!="measurements"},ensure_ascii=False))
     assert not fail,fail
