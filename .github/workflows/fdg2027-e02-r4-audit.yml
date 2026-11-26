@@ -1,0 +1,111 @@
+name: FDG 2027 E02-R4 - Offline Historical Integrity Audit
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'self-test: synthetic only; audit: inspect explicitly selected R3 checkpoint'
+        type: choice
+        options: [self-test, audit]
+        default: self-test
+        required: true
+      source_run_id:
+        description: 'Completed successful E02-R3 main run ID (required for audit)'
+        type: string
+        required: false
+      authorize_private_audit:
+        description: 'Authorize decrypting checkpoint inside ephemeral runner for private audit'
+        type: boolean
+        default: false
+        required: true
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: fdg2027-e02-r4-offline
+  cancel-in-progress: false
+jobs:
+  audit:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          sparse-checkout: research/fdg2027/e02
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline synthetic regressions
+        run: |
+          set -euo pipefail
+          python -m py_compile research/fdg2027/e02/*.py
+          for s in player_data_discovery historical_r2 historical_r3 historical_r4; do
+            python research/fdg2027/e02/$s.py --self-test
+          done
+      - name: Validate authorization and exact source run
+        if: inputs.mode == 'audit'
+        env:
+          SOURCE_RUN: ${{ inputs.source_run_id }}
+          AUTHORIZED: ${{ inputs.authorize_private_audit }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ "$AUTHORIZED" == true && "$SOURCE_RUN" =~ ^[1-9][0-9]*$ ]] || { echo 'BLOCKED: authorization or run ID missing'; exit 1; }
+          work="$(mktemp -d "$RUNNER_TEMP/fdg-r4.XXXXXXXX")"
+          echo "R4_WORK=$work" >> "$GITHUB_ENV"
+          run="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN")"
+          jq -e --arg repo "$GITHUB_REPOSITORY" '.head_repository.full_name == $repo and .head_branch == "main" and .event == "workflow_dispatch" and .status == "completed" and .conclusion == "success" and .path == ".github/workflows/fdg2027-e02-r2-historical.yml" and (.name | contains("E02-R3"))' <<< "$run" >/dev/null
+          gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN/artifacts?per_page=100" | jq -s '[.[].artifacts[] | select(.name == "fdg2027-r2-encrypted-checkpoint" and .expired == false)]' > "$work/meta.json"
+          jq -e 'length == 1 and (.[0].digest | test("^sha256:[0-9a-f]{64}$"))' "$work/meta.json" >/dev/null
+          id="$(jq -r '.[0].id' "$work/meta.json")"
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$id/zip" > "$work/checkpoint.zip"
+          expected="$(jq -r '.[0].digest' "$work/meta.json" | cut -d: -f2)"
+          printf '%s  %s\n' "$expected" "$work/checkpoint.zip" | sha256sum --check --status
+          WORK="$work" python - <<'PY'
+          import os, pathlib, zipfile
+          w=pathlib.Path(os.environ['WORK'])
+          with zipfile.ZipFile(w/'checkpoint.zip') as z:
+              if z.namelist() != ['state.json.gpg'] or not 0 < z.getinfo('state.json.gpg').file_size <= 100_000_000:
+                  raise SystemExit('BLOCKED: unexpected checkpoint archive layout')
+              with (w/'state.json.gpg').open('xb') as f:
+                  f.write(z.read('state.json.gpg'))
+          PY
+          echo "Verified encrypted checkpoint archive from run $SOURCE_RUN."
+      - name: Decrypt and audit locally (no sporting API keys)
+        if: inputs.mode == 'audit'
+        env:
+          ARCHIVE_KEY: ${{ secrets.FDG_RESEARCH_ARCHIVE_KEY }}
+          SOURCE_RUN: ${{ inputs.source_run_id }}
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ ${#ARCHIVE_KEY} -ge 32 && -n "$R4_WORK" ]]
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$R4_WORK/state.json" --decrypt "$R4_WORK/state.json.gpg" 2>"$R4_WORK/gpg.log"
+          python research/fdg2027/e02/historical_r4.py --state "$R4_WORK/state.json" --report "$R4_WORK/r4-report.json" --private "$R4_WORK/r4-private.json" --source-run "$SOURCE_RUN"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 --compress-algo zlib --output "$R4_WORK/r4-private.json.gpg" "$R4_WORK/r4-private.json" 2>>"$R4_WORK/gpg.log"
+          test -s "$R4_WORK/r4-private.json.gpg"
+          rm -f "$R4_WORK/state.json" "$R4_WORK/r4-private.json" "$R4_WORK/gpg.log"
+      - name: Upload aggregate report only
+        if: inputs.mode == 'audit'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-r4-aggregate
+          path: ${{ env.R4_WORK }}/r4-report.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload encrypted private audit only (not an R3 checkpoint)
+        if: inputs.mode == 'audit'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-r4-private-audit
+          path: ${{ env.R4_WORK }}/r4-private.json.gpg
+          if-no-files-found: error
+          retention-days: 90
+      - name: Remove private runner workspace
+        if: always()
+        run: |
+          if [[ -n "${R4_WORK:-}" && "$R4_WORK" == "$RUNNER_TEMP"/fdg-r4.* ]]; then
+            rm -rf -- "$R4_WORK"
+          fi
