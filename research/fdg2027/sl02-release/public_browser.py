@@ -50,7 +50,7 @@ def selftest():
     print("SL02 schedule guard fixture PASS")
 async def browser(out):
     from playwright.async_api import async_playwright
-    from qa import MEASURE
+    from qa import MEASURE,live_layout
     out.mkdir(parents=True,exist_ok=True)
     evidence=[]
     async with async_playwright() as p:
@@ -87,8 +87,13 @@ async def browser(out):
             await page.wait_for_function("location.hash==='#stats/table'&&document.querySelectorAll('tbody tr[data-club]').length===20&&document.querySelector('#fdg-main[aria-busy=false]')")
             assert await page.locator(".hf-standings thead th").count()==10
             await page.screenshot(path=str(out/f"producao-{width}-classificacao.png"))
+            await page.goto(HOST+"/aovivo.html?sl02_hf2="+str(int(time.time())),wait_until="domcontentloaded",timeout=35000)
+            await page.locator(".fdg-nav").wait_for(timeout=20000)
+            await page.wait_for_timeout(350)
+            live=await live_layout(page,width)
+            await page.screenshot(path=str(out/f"producao-{width}-ao-vivo.png"))
             assert not errors,errors
-            evidence.append({"viewport":width,"mobile_emulation":mobile,"url":page.url,"menu":m,"classificacao_clubes":20,"errors":errors})
+            evidence.append({"viewport":width,"mobile_emulation":mobile,"url":page.url,"menu":m,"classificacao_clubes":20,"live_layout":live,"errors":errors})
             await ctx.close()
         await b.close()
     (out/"public-browser.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2),encoding="utf-8")

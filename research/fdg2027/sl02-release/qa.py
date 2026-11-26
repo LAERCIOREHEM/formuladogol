@@ -64,6 +64,38 @@ def verify_static(base,site,backup):
         assert set(after)==set(b)
     return {"public_files_before":len(b),"public_files_after":len(c),"protected_unchanged":ledger["protected_count"],"html_original_paths":sum(k.endswith(".html") for k in b),"canonical_preserved":True,"native_script_lists_preserved":True,"finals":len(r),"remaining":m["restantes"],"probability_indicators":sum(len(x["probabilidades_detalhes"]) for x in p["clubes"]),"structural_extremes":extremes,"data_manifest_entries":len(manifest["files"]),"rollback_newer_data_preserved":True,"source_revision":m["revision"]}
 MEASURE="""()=>{const n=document.querySelector('.fdg-nav');if(!n)return null;const labels=[...n.querySelectorAll('.nav-label')].map(x=>{const t=document.createRange();t.selectNodeContents(x);const a=t.getBoundingClientRect(),b=x.parentElement.getBoundingClientRect();return{text:x.textContent,icon:x.previousElementSibling.textContent,inside:a.left>=b.left-1&&a.right<=b.right+1&&a.top>=b.top-1&&a.bottom<=b.bottom+1,above:x.previousElementSibling.getBoundingClientRect().bottom<=x.getBoundingClientRect().top+1}});return{client:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,navClient:n.clientWidth,navScroll:n.scrollWidth,columns:getComputedStyle(n).gridTemplateColumns.split(' ').length,labels,active:n.querySelectorAll('[aria-current=page]').length,visibleMenus:[...document.querySelectorAll('.fdg-nav,nav.nav,nav.menu')].filter(e=>e.getClientRects().length&&getComputedStyle(e).display!=='none').length}}"""
+
+async def live_layout(page,width,fixture=False):
+    """Measure the rendered live header, including actual runtime selection.
+    The optional synthetic fixture tests state transitions without live APIs."""
+    await page.locator(".fdg-nav").wait_for(timeout=20000)
+    measure="""()=>{const visible=e=>!!(e&&e.getClientRects().length&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'),rect=e=>e?.getBoundingClientRect(),s=document.querySelector('.fdg-release-shell'),r=document.querySelector('.live-freshness-row'),a=document.querySelector('#fdg-live-alert-action'),g=document.querySelector('.live-score-grid'),c=document.querySelector('#hf2-live-context'),source=document.querySelector('#live-app .live-round-row'),b=document.querySelector('#live-update-badge'),score=document.querySelector('.live-score,.live-vs'),nav=document.querySelector('.fdg-nav');return {logos:[...document.querySelectorAll('img[src*="header-formula-do-gol-v2.png"]')].filter(visible).length,legacy:document.querySelectorAll('.container>header.hero').length,contextVisible:visible(c),contextText:c?.textContent,sourceText:source?.textContent,sourceVisible:visible(source),sourcePresent:!!source,badgeCount:document.querySelectorAll('#live-update-badge').length,badgeInside:r?.contains(b),badgeBorder:getComputedStyle(b).borderTopWidth,badgeBackground:getComputedStyle(b).backgroundColor,badgeText:b?.textContent,headerBottom:rect(s)?.bottom,contextTop:rect(r)?.top,contextBottom:rect(r)?.bottom,alertVisible:visible(a),alertTop:rect(a)?.top,scoreTop:rect(score)?.top??rect(g)?.top??null,scoreBottom:rect(score)?.bottom??null,viewport:innerHeight,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,columns:getComputedStyle(nav).gridTemplateColumns.split(' ').length}}"""
+    m=await page.evaluate(measure)
+    def check(v):
+        assert v["logos"]==1 and v["legacy"]==0,v
+        assert v["badgeCount"]==1 and v["badgeInside"] and v["badgeBorder"]=="0px",v
+        assert v["contextTop"]-v["headerBottom"]<=16 and v["contextTop"]>=v["headerBottom"]-1,v
+        assert v["overflow"]<=1 and v["columns"]==(6 if width>=900 else 3 if width>=291 else 2 if width>=191 else 1),v
+        if v["sourcePresent"]:
+            assert v["contextVisible"] and not v["sourceVisible"],v
+            assert v["contextText"]==v["sourceText"],v
+        if v["scoreTop"] is not None:
+            assert v["scoreTop"]<=520 and v["scoreBottom"]<=v["viewport"],v
+        if v["alertVisible"]:
+            assert v["alertTop"]>=v["contextBottom"]-1,v
+    check(m)
+    if not fixture:return m
+    # Exercise the presentation event with a controlled scorecard, using the
+    # real page CSS and the same selectors as the original runtime.
+    fixture_html='<section class="live-main-card"><div class="live-card-inner"><div class="live-round-row"><span class="live-round-badge">Rodada 37</span><span class="live-state-badge live">Ao vivo</span></div><div class="live-score-grid"><div class="live-team"><div class="live-team-name">Clube A</div></div><div class="live-score-center"><div class="live-score">1 × 0</div><div class="live-clock">23′</div></div><div class="live-team"><div class="live-team-name">Clube B</div></div></div></div></section>'
+    # Synchronous DOM exercise and measurement prevents an async real render
+    # from racing the fixture. Restore the exact original markup afterwards.
+    states=await page.evaluate("""({html,measure})=>{const inspect=eval('('+measure+')'),app=document.getElementById('live-app'),badge=document.getElementById('live-update-badge'),original=app.innerHTML,oldBadge=badge.textContent,oldClass=badge.className;const slot=document.getElementById('fdg-live-alert-action'),oldSlot=slot.innerHTML,oldHidden=slot.hidden;const emit=()=>document.dispatchEvent(new CustomEvent('fdg:live-game-changed',{detail:{eventId:''}}));try{app.innerHTML=html;emit();slot.hidden=false;slot.innerHTML='<div class="fdg-live-goal-status is-warning">Você não selecionou alertas para esta partida. <button type="button" class="fdg-alert-button">Receber alertas</button></div>';badge.textContent='ESPN · 20:19:16 · 10s';badge.classList.add('is-live');const live=inspect();app.querySelector('.live-state-badge').className='live-state-badge post';app.querySelector('.live-state-badge').textContent='Finalizado';emit();const post=inspect();app.innerHTML='<div class="live-empty">Sem partida</div>';emit();const empty=inspect();return {live,post,empty}}finally{app.innerHTML=original;badge.textContent=oldBadge;badge.className=oldClass;emit();slot.innerHTML=oldSlot;slot.hidden=oldHidden}}""",{"html":fixture_html,"measure":measure})
+    check(states["live"]);check(states["post"]);check(states["empty"])
+    assert states["live"]["contextText"]=="Rodada 37Ao vivo" and states["post"]["contextText"]=="Rodada 37Finalizado"
+    assert not states["empty"]["contextVisible"] and states["empty"]["badgeInside"]
+    return {"actual":m,"fixture":states}
+
 async def run_browser(site,out,origin):
     rows=[];errors=[];fail=[];blocked=set();local_requests={}
     def validate(m,label,w=None,doc=True):
@@ -95,6 +127,8 @@ async def run_browser(site,out,origin):
                 m=await page.evaluate(MEASURE)
                 label=("native-" if native else "")+route.strip("/").replace("/","-").replace(".","-")+"-"+str(w)+"-"+theme
                 validate(m,label,w,doc=not native)
+                if native and route=='/aovivo.html':
+                    m['hf2_live']=await live_layout(page,w,fixture=True)
                 if not native:
                     if await page.locator("#fdg-main h1").text_content()=="Dados indisponíveis":fail.append("data:"+label)
                     if route=="stats/table" and await page.locator("tbody tr[data-club]").count()!=20:fail.append("20 clubs:"+label)
@@ -169,6 +203,8 @@ async def run_browser(site,out,origin):
         await one("stats/prob",160);await one("stats/prob",384);await one("stats/prob",720)
         for route in NATIVE:
             for w in (390,1440):await one(route,w,native=True)
+        for w in WIDTHS:
+            if w not in (390,1440):await one("/aovivo.html",w,native=True)
         # Representative generated club, match, article pages must retain native scripts and global shell.
         for rel in ("clube","jogo","analises"):
             candidates=sorted((site/rel).rglob("*.html"))
