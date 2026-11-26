@@ -36,3 +36,59 @@
 .fdg-release-shell .brandline img{width:100%;height:auto;max-height:none;object-fit:contain}
 @media(max-width:600px){.fdg-release-shell .brandline{gap:6px}.fdg-release-shell .theme-toggle{min-width:54px;padding-inline:6px}}
 @media(max-width:290px){.fdg-release-shell .brandline{grid-template-columns:minmax(0,1fr)}.fdg-release-shell .theme-toggle{justify-self:end}}
+
+/* SL02-HF2 — one compact live masthead; only /aovivo.html is affected. */
+body[data-fdg-live-hf2] .container{padding-top:8px!important}
+body[data-fdg-live-hf2] .fdg-release-shell{max-width:none;width:100%;margin:0 0 7px!important;padding:8px 10px 7px!important;border-radius:12px}
+body[data-fdg-live-hf2] .fdg-release-shell .brandline{max-width:760px;margin:0 auto 6px!important;gap:8px;grid-template-columns:minmax(0,1fr) auto}
+body[data-fdg-live-hf2] .fdg-release-shell .brandline a{width:100%;max-width:none;min-width:0}
+body[data-fdg-live-hf2] .fdg-release-shell .brandline img{width:100%;height:auto;max-height:none;object-fit:contain}
+body[data-fdg-live-hf2] .fdg-release-shell .season-line{margin-bottom:6px;gap:5px}
+body[data-fdg-live-hf2] .fdg-release-shell .season-line>*{min-height:30px;padding:5px 7px}
+body[data-fdg-live-hf2] .fdg-release-shell .fdg-nav{gap:5px}
+body[data-fdg-live-hf2] .fdg-release-shell .fdg-nav a{min-height:53px;padding:5px 3px!important;gap:2px}
+body[data-fdg-live-hf2] .fdg-release-shell .nav-icon{font-size:22px}
+body[data-fdg-live-hf2] .fdg-release-shell .snapshot{display:none}
+body[data-fdg-live-hf2] .container>main{margin:0!important;padding:0!important;min-width:0}
+body[data-fdg-live-hf2] main .live-freshness-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 12px;min-height:0;margin:0 0 6px;padding:5px 8px;border:1px solid rgba(148,163,184,.22);border-radius:9px;background:rgba(14,27,38,.85)}
+body[data-fdg-live-hf2] .hf2-live-context{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px 8px;min-width:0}
+body[data-fdg-live-hf2] .hf2-live-context[hidden]{display:none!important}
+body[data-fdg-live-hf2] .hf2-live-context :is(.live-round-badge,.live-state-badge){min-height:23px;padding:4px 8px;font-size:10px;line-height:1.2;letter-spacing:.04em}
+body[data-fdg-live-hf2] .live-freshness-row .live-update-badge{flex:0 1 auto;min-height:22px;max-width:100%;padding:2px 0;border:0;border-radius:0;background:none;box-shadow:none;white-space:normal;overflow-wrap:anywhere;font-size:11px;line-height:1.35;color:#c7d2de;text-align:center}
+body[data-fdg-live-hf2] .live-freshness-row .live-update-badge.is-stale{color:#fde68a}
+body[data-fdg-live-hf2] .live-freshness-row .live-update-badge.is-error{color:#fecdd3}
+body[data-fdg-live-hf2] main[data-hf2-context-ready] #live-app .live-round-row{display:none!important}
+body[data-fdg-live-hf2] main .live-alert{margin:0 0 6px;padding:7px 9px;line-height:1.35;border-radius:9px}
+body[data-fdg-live-hf2] main .live-switcher{margin:0 0 4px;padding:0 0 4px;gap:6px}
+body[data-fdg-live-hf2] main .live-switcher[hidden]{display:none!important}
+body[data-fdg-live-hf2] main .fdg-live-alert-action{margin:0 0 6px!important}
+body[data-fdg-live-hf2] main .fdg-live-alert-action[hidden]{display:none!important}
+body[data-fdg-live-hf2] .fdg-live-goal-status{max-width:100%;gap:5px 8px;padding:5px 9px;line-height:1.3;font-size:.79rem;border-radius:9px}
+body[data-fdg-live-hf2] .fdg-live-goal-status .fdg-alert-button{width:auto;min-height:36px;padding:5px 9px}
+body[data-fdg-live-hf2] .live-main-card{border-radius:16px}
+body[data-fdg-live-hf2] .live-main-card .live-card-inner{padding:12px clamp(10px,2vw,22px) 18px}
+body[data-fdg-live-hf2] .live-main-card .live-round-row{margin-bottom:8px}
+body[data-fdg-live-hf2] .live-main-card .live-prob-kicker{margin:0 0 6px}
+body[data-fdg-live-hf2] .live-main-card .live-prob-badge{margin-bottom:6px}
+body[data-fdg-live-hf2] .live-main-card .live-team-name{margin-top:6px}
+body[data-fdg-live-hf2] .live-main-card .live-meta{margin-top:12px}
+@media(max-width:600px){
+ body[data-fdg-live-hf2] .container{padding-top:4px!important}
+ body[data-fdg-live-hf2] .fdg-release-shell{padding:6px 6px 5px!important;margin-bottom:5px!important}
+ body[data-fdg-live-hf2] .fdg-release-shell .brandline{gap:5px;margin-bottom:5px!important}
+ body[data-fdg-live-hf2] .fdg-release-shell .fdg-nav a{min-height:48px;padding:4px 2px!important}
+ body[data-fdg-live-hf2] .fdg-release-shell .nav-icon{font-size:20px}
+ body[data-fdg-live-hf2] .fdg-release-shell .nav-label{font-size:12px}
+ body[data-fdg-live-hf2] .live-freshness-row{gap:3px 8px;padding:4px 5px!important}
+ body[data-fdg-live-hf2] .fdg-live-goal-status{font-size:.74rem;gap:4px 6px}
+ body[data-fdg-live-hf2] .fdg-live-goal-status .fdg-alert-button{min-height:44px}
+ body[data-fdg-live-hf2] .live-main-card .live-card-inner{padding:9px 8px 14px}
+}
+@media(max-width:290px){body[data-fdg-live-hf2] .fdg-release-shell .brandline{grid-template-columns:1fr}}
+
+@media(min-width:601px) and (max-width:899px){
+ body[data-fdg-live-hf2] .fdg-release-shell .brandline{max-width:540px;margin-bottom:4px!important}
+ body[data-fdg-live-hf2] .fdg-release-shell .fdg-nav a{min-height:48px;padding:4px 2px!important}
+ body[data-fdg-live-hf2] .fdg-release-shell .nav-icon{font-size:20px}
+ body[data-fdg-live-hf2] .live-main-card .live-card-inner{padding-top:9px}
+}
