@@ -1,0 +1,92 @@
+name: FDG 2027 SL02 - integrated release readiness
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/sl02-release/**'
+      - '.github/workflows/fdg2027-sl02-release.yml'
+      - '.github/workflows/deploy.yml'
+permissions:
+  contents: read
+concurrency:
+  group: fdg-sl02-release-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  readiness:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'fdg2027/sl02-integration'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Dependencies - no sports provider
+        run: |
+          python -m pip install pillow==11.3.0 beautifulsoup4==4.13.4 playwright==1.52.0
+          python -m pip install -r requirements-af-previsao.txt
+          python -m playwright install --with-deps chromium
+          npm install --no-save --ignore-scripts --no-audit --no-fund playwright@1.52.0
+      - name: Assemble from current checkout, no temporary artifact
+        id: assembly
+        run: |
+          set -euo pipefail
+          python research/fdg2027/sl02-release/assemble.py "$RUNNER_TEMP/sl02-base"
+          cp -a "$RUNNER_TEMP/sl02-base" "$RUNNER_TEMP/sl02-candidate"
+          python research/fdg2027/sl02-release/release.py stage --site-root "$RUNNER_TEMP/sl02-base" --backup "$RUNNER_TEMP/sl02-legacy-unused" --mode legacy
+          python research/fdg2027/sl02-release/release.py stage --site-root "$RUNNER_TEMP/sl02-candidate" --backup "$RUNNER_TEMP/sl02-rollback" --mode sl02
+          python research/fdg2027/sl02-release/release.py verify --site-root "$RUNNER_TEMP/sl02-candidate"
+          node --check research/fdg2027/sl02-release/app.js
+          node --check research/fdg2027/sl02-release/shell.js
+          python research/fdg2027/sl02-release/public_browser.py self-test
+          python research/fdg2027/sl02-release/public_browser.py preflight
+          node scripts/validar_pwa_instalacao.mjs
+          node tests/test-sula-final-navigation.mjs
+          python research/fdg2027/sl02-release/sula_smoke.py --self-test
+          python tests/test_sula_final_2026.py
+      - name: Offline original domain contract regression suite
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/sl02-evidence"
+          (
+            python -m unittest discover -s tests -p 'test_editorial_delivery.py'
+            python -m unittest discover -s tests -p 'test_deploy_notifications.py'
+            python tests/test_cbf_reta_final_2026.py
+            python tests/test_recuperacao_estatistica_r36r7.py
+            for t in test-br-classificacao-live test-br-data-manifest test-br-data-pulse-certification test-br-data-pulse-final test-br-data-pulse-integration test-br-data-pulse test-br-live-goal-sync test-af-e2-scorecards test-af-e4-acuracia test-af-continental-math-ui test-br-table-r37 test-fdg-live-goal-scope; do node "tests/$t.mjs"; done
+            for t in test-cost-shield test-espn-source test-pwa-goal-dedupe test-live-goal-identity; do node "cloudflare/push-worker/tests/$t.mjs"; done
+            node --test cloudflare/orchestrator-worker/tests/cost-governance.test.mjs cloudflare/orchestrator-worker/tests/editorial-closure.test.mjs
+          ) 2>&1 | tee "$RUNNER_TEMP/sl02-evidence/original-regression.log"
+      - name: Browser integration and frontend-only rollback
+        if: always() && steps.assembly.outcome == 'success'
+        run: |
+          set -euo pipefail
+          python research/fdg2027/sl02-release/qa.py "$RUNNER_TEMP/sl02-base" "$RUNNER_TEMP/sl02-candidate" "$RUNNER_TEMP/sl02-rollback" "$RUNNER_TEMP/sl02-browser"
+      - name: Package loopback preview (never upload to Pages)
+        if: always()
+        run: |
+          test -d "$RUNNER_TEMP/sl02-candidate" || exit 1
+          cp research/fdg2027/sl02-release/abrir_previa.py "$RUNNER_TEMP/sl02-candidate/"
+          printf '@echo off\r\ncd /d "%%~dp0"\r\nwhere py >nul 2>&1\r\nif %%errorlevel%%==0 (py -3 abrir_previa.py) else (python abrir_previa.py)\r\npause\r\n' > "$RUNNER_TEMP/sl02-candidate/ABRIR_PREVIA.cmd"
+          printf 'Previa SL02 integrada. Extraia o ZIP e execute ABRIR_PREVIA.cmd (Python 3), ou python abrir_previa.py. Somente loopback. Nao hospedar. Nenhum envio/push real.\n' > "$RUNNER_TEMP/sl02-candidate/ABRIR_PREVIA.txt"
+          rm -f "$RUNNER_TEMP/sl02-candidate/CNAME"
+          printf 'User-agent: *\nDisallow: /\n' > "$RUNNER_TEMP/sl02-candidate/robots.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fdg-sl02-integrated-preview
+          path: ${{ runner.temp }}/sl02-candidate/
+          if-no-files-found: warn
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fdg-sl02-integrated-evidence
+          path: |
+            ${{ runner.temp }}/sl02-browser/
+            ${{ runner.temp }}/sl02-evidence/
+            ${{ runner.temp }}/sl02-rollback/rollback.json
+          if-no-files-found: warn
+          retention-days: 30
