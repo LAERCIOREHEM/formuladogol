@@ -1,0 +1,43 @@
+name: FDG 2027 E01 - Multi-Season Foundation CI
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/e01/**'
+      - '.github/workflows/fdg2027-e01-foundation.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/e01/**'
+      - '.github/workflows/fdg2027-e01-foundation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Python contract and private workspace isolation
+        run: python research/fdg2027/e01/test_foundation.py
+      - name: JavaScript parity
+        run: node research/fdg2027/e01/test-foundation.mjs
+      - name: Migration inventory (no source lines)
+        run: |
+          python research/fdg2027/e01/inventory.py > "$RUNNER_TEMP/e01-inventory.json"
+          python -c 'import json,sys; r=json.load(open(sys.argv[1])); print("Scanned:",r["scanned"],"Matched files:",r["matched_files"])' "$RUNNER_TEMP/e01-inventory.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-e01-inventory
+          path: ${{ runner.temp }}/e01-inventory.json
+          if-no-files-found: error
+          retention-days: 30
