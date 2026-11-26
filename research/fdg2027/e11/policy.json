@@ -1,0 +1,52 @@
+{
+  "version": "E11.1",
+  "scope": "isolated reference only",
+  "public_sources": {
+    "football": "https://www.api-football.com/news/post/how-to-optimize-api-sports-calls-and-quota-usage",
+    "football_terms": "https://www.api-football.com/terms",
+    "striker": "https://strikerapi.com/docs",
+    "cloudflare": "https://developers.cloudflare.com/billing/manage/spend-management/"
+  },
+  "football": {
+    "advertised_pro_day": 7500,
+    "advertised_pro_minute": 300,
+    "advertised_pro_second": 5,
+    "local_shared_day": 150,
+    "local_research_day": 150,
+    "local_operational_day": 100,
+    "local_minute": 5,
+    "local_second": 1,
+    "remaining_reserve": 10
+  },
+  "striker": {
+    "advertised_free_month": 500,
+    "get_game_units": 5,
+    "local_month": 500,
+    "local_minute": 1,
+    "live_enabled": false
+  },
+  "cost": {
+    "observe_usd": 2,
+    "optional_pause_usd": 5,
+    "secondary_pause_usd": 10,
+    "monthly_projection_warning": 50,
+    "stale_seconds": 3600,
+    "d1_reads_warning": 5000000000,
+    "d1_writes_warning": 10000000
+  },
+  "quota_fresh_seconds": 120,
+  "max_attempts": 2,
+  "backoff_seconds": 30,
+  "cache_max_seconds": 86400,
+  "report_timezone": "America/Sao_Paulo",
+  "report_hour": 8,
+  "report_recovery_end": 12,
+  "essential": [
+    "espn",
+    "results",
+    "table",
+    "push",
+    "health"
+  ],
+  "production_ready": false
+}

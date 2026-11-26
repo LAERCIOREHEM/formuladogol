@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "e10_run": 45738908104,
+  "e10_commit": "73d4f94376cc98b0d2e0349813bdb91083d3e503",
+  "e09_run": 45738073052,
+  "e09_commit": "c2ccf4f781a994b90c85e44550e31f4d5ed93a02",
+  "artifacts": [
+    {
+      "run": 45738908104,
+      "id": 15080247710,
+      "name": "fdg2027-e10-aggregate",
+      "sha256": "a7f52b3c84da06e39c76390203334dc43883256e4ee4e7a69976d801215d1c2e",
+      "member": "e10-report.json",
+      "limit": 10000000
+    },
+    {
+      "run": 45738908104,
+      "id": 15080556516,
+      "name": "fdg2027-e10-encrypted-certification",
+      "sha256": "c6431243549d1fe09e21fed173bdd1701c202403d96ae77f754055223fcea008",
+      "member": "e10-certification.json.gpg",
+      "limit": 100000000
+    },
+    {
+      "run": 45738073052,
+      "id": 15079143592,
+      "name": "fdg2027-e09-aggregate",
+      "sha256": "c17bc8e2a59253b7ec75aecd4e3f47dd160b9d22812556c1197bc38bd272eee4",
+      "member": "e09-report.json",
+      "limit": 10000000
+    },
+    {
+      "run": 45738073052,
+      "id": 15079527441,
+      "name": "fdg2027-e09-encrypted-certification",
+      "sha256": "4724008ebc45b12dc06dcbf02b9d5315d7086f735bff353b851ee1f6ae6a9000",
+      "member": "e09-certification.json.gpg",
+      "limit": 100000000
+    }
+  ]
+}

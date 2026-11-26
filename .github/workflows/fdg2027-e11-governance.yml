@@ -1,0 +1,153 @@
+name: FDG 2027 E11 - Reliability Cost Governance Shadow
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/e11/**'
+      - '.github/workflows/fdg2027-e11-governance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/e11/**'
+      - '.github/workflows/fdg2027-e11-governance.yml'
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [self-test, research]
+        default: self-test
+        required: true
+      authorize_private_build:
+        type: boolean
+        default: false
+        required: true
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: fdg2027-e11-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  synthetic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: E01 to E11 regression
+        run: |
+          set -euo pipefail
+          python research/fdg2027/e01/test_foundation.py
+          python research/fdg2027/e03/test_canonical.py
+          python research/fdg2027/e04/test_engine.py
+          python -m py_compile research/fdg2027/e06/*.py research/fdg2027/e07/*.py research/fdg2027/e08/*.py research/fdg2027/e09/*.py research/fdg2027/e10/*.py research/fdg2027/e11/*.py
+          python research/fdg2027/e05/test_lineup.py
+          python research/fdg2027/e06/test_context.py
+          python -m pip install numpy==2.3.5
+          python research/fdg2027/e07/test_forecast.py
+          python research/fdg2027/e08/test_backtest.py
+          python research/fdg2027/e09/test_ledger.py
+          python research/fdg2027/e11/test_governance.py
+          node research/fdg2027/e01/test-foundation.mjs
+          npm install --prefix cloudflare/push-worker --omit=dev --ignore-scripts --no-package-lock --no-audit --no-fund
+          node cloudflare/push-worker/tests/test-readiness-guardian.mjs
+          node cloudflare/push-worker/tests/test-readiness-reschedule.mjs
+          node cloudflare/push-worker/tests/test-cost-shield.mjs
+          node cloudflare/push-worker/tests/test-cloudflare-billing-audit.mjs
+          node cloudflare/push-worker/tests/test-workers-graphql-reconciliation.mjs
+          node cloudflare/push-worker/tests/test-health-monitor.mjs
+          node cloudflare/push-worker/tests/test-api-football-source.mjs
+          node cloudflare/orchestrator-worker/tests/cost-governance.test.mjs
+  research:
+    needs: synthetic
+    if: github.ref == 'refs/heads/main' && ((github.event_name == 'push' && contains(github.event.head_commit.message, '[E11-PRIVATE-45738908104]')) || (github.event_name == 'workflow_dispatch' && inputs.mode == 'research' && inputs.authorize_private_build == true))
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify exact E09 and E10 runs and four archive digests
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          umask 077
+          w="$(mktemp -d "$RUNNER_TEMP/fdg-e11.XXXXXXXX")"
+          echo "E11_WORK=$w" >> "$GITHUB_ENV"
+          lock=research/fdg2027/e11/source-lock.json
+          for stage in e09 e10; do
+            run="$(jq -r ".${stage}_run" "$lock")"; commit="$(jq -r ".${stage}_commit" "$lock")"
+            if [[ "$stage" == e09 ]]; then path=.github/workflows/fdg2027-e09-dynamic.yml; else path=.github/workflows/fdg2027-e10-ux.yml; fi
+            gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run" > "$w/$stage-run.json"
+            jq -e --arg repo "$GITHUB_REPOSITORY" --arg commit "$commit" --arg path "$path" '.head_repository.full_name==$repo and .head_branch=="main" and .head_sha==$commit and .status=="completed" and .conclusion=="success" and .path==$path' "$w/$stage-run.json" >/dev/null
+          done
+          while IFS=$'\t' read -r id run name digest; do
+            gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$id" > "$w/$id-meta.json"
+            jq -e --arg name "$name" --arg digest "sha256:$digest" --argjson run "$run" '.name==$name and .expired==false and .digest==$digest and .workflow_run.id==$run' "$w/$id-meta.json" >/dev/null
+            gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$id/zip" > "$w/$id.zip"
+            printf '%s  %s\n' "$digest" "$w/$id.zip" | sha256sum --check --status
+          done < <(jq -r '.artifacts[]|[.id,.run,.name,.sha256]|@tsv' "$lock")
+          WORK="$w" python - <<'PY'
+          import os,pathlib,zipfile,json
+          w=pathlib.Path(os.environ["WORK"])
+          for a in json.loads(pathlib.Path("research/fdg2027/e11/source-lock.json").read_text())["artifacts"]:
+              with zipfile.ZipFile(w/(str(a["id"])+".zip")) as z:
+                  m=a["member"]
+                  if z.namelist()!=[m] or not 0<z.getinfo(m).file_size<=a["limit"]:raise SystemExit("BLOCKED: archive layout")
+                  with (w/m).open("xb") as f:f.write(z.read(m))
+          PY
+          echo "PASS: four locked archive digests"
+      - name: Verify prior decision and immutable governance audit
+        env:
+          ARCHIVE_KEY: ${{ secrets.FDG_RESEARCH_ARCHIVE_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ "$E11_WORK" == "$RUNNER_TEMP"/fdg-e11.* && ${#ARCHIVE_KEY} -ge 32 ]]
+          w="$E11_WORK"
+          export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+          python -m pip install numpy==2.3.5
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/e10-private.json" --decrypt "$w/e10-certification.json.gpg" 2>"$w/gpg.log"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/e09-private.json" --decrypt "$w/e09-certification.json.gpg" 2>>"$w/gpg.log"
+          for suffix in first second; do
+            python research/fdg2027/e11/certify.py --e10-private "$w/e10-private.json" --e10-report "$w/e10-report.json" --e09-private "$w/e09-private.json" --e09-report "$w/e09-report.json" --output "$w/$suffix.json" --report "$w/$suffix-report.json"
+            rm -rf "$w/input-$suffix"
+          done
+          cmp "$w/first.json" "$w/second.json"
+          cmp "$w/first-report.json" "$w/second-report.json"
+          cp "$w/first-report.json" "$w/e11-report.json"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 --compress-algo zlib --output "$w/e11-certification.json.gpg" "$w/first.json" 2>>"$w/gpg.log"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/roundtrip.json" --decrypt "$w/e11-certification.json.gpg" 2>>"$w/gpg.log"
+          cmp "$w/first.json" "$w/roundtrip.json"
+          rm -f "$w/e10-private.json" "$w/e09-private.json" "$w/first.json" "$w/second.json" "$w/roundtrip.json" "$w/gpg.log" "$w/first-report.json" "$w/second-report.json"
+          echo "PASS: deterministic private output and encrypted roundtrip"
+      - name: Upload aggregate
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-e11-aggregate
+          path: ${{ env.E11_WORK }}/e11-report.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload encrypted certification
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-e11-encrypted-certification
+          path: ${{ env.E11_WORK }}/e11-certification.json.gpg
+          if-no-files-found: error
+          retention-days: 90
+      - name: Cleanup
+        if: always()
+        run: |
+          if [[ -n "${E11_WORK:-}" && "$E11_WORK" == "$RUNNER_TEMP"/fdg-e11.* ]]; then rm -rf -- "$E11_WORK"; fi
