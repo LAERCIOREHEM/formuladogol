@@ -96,11 +96,56 @@ async def run(site,out,origin):
                 for r in ("stats/prob","stats/table"):await test(r,w)
         await test("stats/prob",390,"light");await test("stats/table",1440,"light")
         for w in (320,768,1440):await test("stats/prob",w,zoom=200)
+
+        aliases=[("/jogos/","Jogos do Brasileirão"),("/resultados/","Jogos do Brasileirão"),("/tabela/","Inteligência do campeonato"),
+                 ("/index.html?view=tabela","Inteligência do campeonato"),("/index.html?view=resultados","Jogos do Brasileirão"),
+                 ("/estatisticas.html#artilheiros","Inteligência do campeonato"),("/estatisticas.html#assistencias","Inteligência do campeonato"),
+                 ("/estatisticas.html#metodologia-probabilidades","Acervo e ferramentas"),("/estatisticas.html#probabilidade-resumo-bahia","Inteligência do campeonato"),
+                 ("/clubes.html#gr-mio","Meu Clube & Raio-X"),("/acuracia.html","Inteligência do campeonato"),("/analises/","Análises")]
+        alias_ctx=await browser.new_context(viewport={"width":390,"height":900},service_workers="block",accept_downloads=True)
+        async def alias_handle(r):
+            if r.request.url.startswith(origin+"/") and r.request.method in ("GET","HEAD"):await r.continue_()
+            else:await r.abort()
+        await alias_ctx.route("**/*",alias_handle)
+        alias_page=await alias_ctx.new_page()
+        for uri,expected in aliases:
+            try:
+                res=await alias_page.goto(origin+uri)
+                await alias_page.locator("#fdg-main[aria-busy=false]").wait_for(timeout=12000)
+                head=await alias_page.locator("#fdg-main h1").text_content()
+                if not res or res.status!=200 or head!=expected:fail.append("alias:"+uri)
+                if "assistencias" in uri and await alias_page.get_by_role("button",name="Assistências",exact=True).get_attribute("aria-pressed")!="true":fail.append("assistências deep link")
+                if "probabilidade-resumo-bahia" in uri and not await alias_page.get_by_text("Raio-X completo",exact=True).count():fail.append("probability club deep link")
+                if "gr-mio" in uri and not await alias_page.get_by_role("link",name="Perfil original").count():fail.append("club alias")
+            except Exception as e:fail.append("alias:"+uri+":"+str(e)[:160])
+        # Simulated outcomes remain local and can be reset.
+        await alias_page.goto(origin+"/index.html#more/sim")
+        await alias_page.locator("#fdg-main[aria-busy=false]").wait_for()
+        await alias_page.locator("[data-sim]").nth(0).fill("1")
+        await alias_page.locator("[data-sim]").nth(1).fill("0")
+        await alias_page.get_by_role("button",name="Simular",exact=True).click()
+        await alias_page.locator("#fdg-main[aria-busy=false]").wait_for()
+        if await alias_page.locator("tbody tr[data-club]").count()!=20:fail.append("simulator table")
+        await alias_page.get_by_role("button",name="Limpar hipóteses").click()
+        await alias_page.locator("#fdg-main[aria-busy=false]").wait_for()
+        if await alias_page.locator("[data-sim]").first.input_value()!="":fail.append("simulator reset")
+        # Shareable card: download actual generated PNG.
+        await alias_page.goto(origin+"/index.html#clubs/Bahia")
+        await alias_page.locator("#fdg-main[aria-busy=false]").wait_for()
+        try:
+            async with alias_page.expect_download(timeout=12000) as down:
+                await alias_page.get_by_role("button",name="Compartilhar card").first.click()
+            file=await down.value
+            await file.save_as(str(out/"card-compartilhavel-bahia.png"))
+            if not (out/"card-compartilhavel-bahia.png").read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):fail.append("share PNG")
+        except Exception as e:fail.append("share:"+str(e)[:160])
+        await alias_ctx.close()
+
         await browser.close()
         try: zoom_native=await native_zoom(p,out,origin)
         except Exception as e:zoom_native={"certified":False,"error":str(e)[:500]}
         if not zoom_native["certified"]:fail.append("native browser zoom")
-    report={"captures":len(findings),"measurements":findings,"page_errors":errors,"blocked_hosts":sorted(requests),"failures":fail,"native_zoom_200_certified":zoom_native["certified"],"native_zoom_evidence":zoom_native,"publication":False}
+    report={"captures":len(findings),"alias_checks":len(aliases),"share_card_png_verified":(out/"card-compartilhavel-bahia.png").is_file(),"measurements":findings,"page_errors":errors,"blocked_hosts":sorted(requests),"failures":fail,"native_zoom_200_certified":zoom_native["certified"],"native_zoom_evidence":zoom_native,"publication":False}
     (out/"qa.json").write_text(json.dumps(report,ensure_ascii=False,indent=2))
     print(json.dumps({k:v for k,v in report.items() if k!="measurements"},ensure_ascii=False))
     assert not fail,fail

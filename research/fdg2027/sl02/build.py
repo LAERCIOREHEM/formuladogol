@@ -21,6 +21,7 @@ def main():
     safe='<meta name="robots" content="noindex,nofollow">'+csp
     for path in sorted(out.rglob("*.html")):
         rel=path.relative_to(out);s=path.read_text(encoding="utf-8")
+        s=re.sub(r'<meta\b[^>]*name=["\']robots["\'][^>]*>\s*',"",s,flags=re.I)
         nav=re.search(r'<nav\b[^>]*class=["\'][^"\']*\bnav\b[^"\']*["\'][^>]*>.*?</nav>',s,re.S|re.I)
         prefix=relative(rel)
         section=routes.get(rel.as_posix(),"clubs" if rel.parts[0]=="clube" else "games" if rel.parts[0]=="jogo" else "articles" if rel.parts[0]=="analises" else "more")
