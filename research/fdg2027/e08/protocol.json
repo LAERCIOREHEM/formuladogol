@@ -1,0 +1,66 @@
+{
+  "version": "E08.1",
+  "registered_before_private_run": true,
+  "primary": "competitive",
+  "replay_years": [
+    2025,
+    2026
+  ],
+  "warmup_year": 2024,
+  "metrics": {
+    "brier": "sum of three squared errors, range 0–2",
+    "log_loss": "natural log, floor 1e-12",
+    "ved_ties": "first in H,D,A order",
+    "score": "native modal and native top3; no inferred archived predictions",
+    "calibration": "10 fixed equal width bins, classwise and macro ECE"
+  },
+  "uncertainty": {
+    "method": "paired season × ISO-week cluster bootstrap, stratified by season; exploratory, not independent-match inference",
+    "seed": 20261126,
+    "replicates": 2000,
+    "confidence": 0.95,
+    "min_clusters": 10
+  },
+  "retrospective_gate": {
+    "require_brier_relative_improvement": 0.01,
+    "require_logloss_relative_improvement": 0.01,
+    "require_upper_ci_both_below_zero": true,
+    "max_season_relative_loss": 0.01,
+    "require_both_years": true,
+    "decision": "descriptive gate only; no promotion even if passed"
+  },
+  "prospective": {
+    "season": 2027,
+    "horizon": "24h before scheduled kickoff; common immutable cutoff; reject late/missing timestamps; report missing coverage and fallback",
+    "candidate": "competitive only, same versioned algorithm and feature contract; freeze coefficients/config/hashes before first enrolled kickoff, training strictly earlier",
+    "minimum_paired_matches": 100,
+    "minimum_week_clusters": 10,
+    "minimum_coverage": 0.9,
+    "primary_metrics": [
+      "brier",
+      "log_loss"
+    ],
+    "relative_improvement_min": 0.01,
+    "paired_ci_upper_below_zero": true,
+    "max_relative_degradation_by_prespecified_stratum": 0.02,
+    "minimum_stratum_n": 30,
+    "require_calibration_no_material_degradation_macro_ece": 0.02,
+    "monitor_ved_exact_top3": true,
+    "stop_rule": "Single confirmatory decision after the first completed round that reaches at least 100 paired matches and 10 week clusters; if inconclusive, retain AF1.3 and collect descriptive data only; no second confirmatory look without a new pre-registered independent cohort.",
+    "promotion": "separate express authorization, E12 certification, rights, operations, rollback, no activation on retrospective evidence",
+    "current_status": "not started; E09/E12 integration and real timestamps pending"
+  },
+  "lineup": {
+    "min_training": 100,
+    "unchanged_e05_gate": true,
+    "retrospective_observed_xi_only": true,
+    "operational": false,
+    "compare_incremental_to": "competitive",
+    "no_imputed_delta": true
+  },
+  "ablation": {
+    "isolated_groups": true,
+    "combined_leave_one_group_out": "same complete-case training and testing cohort; no lowering minimum n=100"
+  },
+  "production_ready": false
+}

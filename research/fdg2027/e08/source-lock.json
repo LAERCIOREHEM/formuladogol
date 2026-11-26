@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "e07_run": 45734920045,
+  "e07_commit": "83b55abd032100d6a6485119e49796af43d26689",
+  "e05_run": 45732803182,
+  "e05_commit": "f911a99ff4482dfbe81426c5411c888d6e9ea388",
+  "archive_commit": "83b55abd032100d6a6485119e49796af43d26689",
+  "artifacts": [
+    {
+      "run": 45734920045,
+      "id": 15077884737,
+      "name": "fdg2027-e07-aggregate",
+      "sha256": "7b8464b5ea54b0babf19df757bdac8084a397e9bbd34537602d259cc31c73d81",
+      "member": "e07-report.json",
+      "limit": 10000000
+    },
+    {
+      "run": 45734920045,
+      "id": 15079065263,
+      "name": "fdg2027-e07-encrypted-forecast",
+      "sha256": "07248068e5ca8e09b35dfe04b489f84fafd64e1fdd4182483ae1415c5e968d44",
+      "member": "e07-forecast.json.gpg",
+      "limit": 100000000
+    },
+    {
+      "run": 45732803182,
+      "id": 15077507289,
+      "name": "fdg2027-e05-aggregate",
+      "sha256": "b19196296c37586c1359b1b09f4421ec46bf178fc155c5bcf37fd1f4abcb424f",
+      "member": "e05-report.json",
+      "limit": 10000000
+    },
+    {
+      "run": 45732803182,
+      "id": 15076918664,
+      "name": "fdg2027-e05-encrypted-lineup",
+      "sha256": "79426a737b61e85ffe6f5e3691a55a0e0f312f5c8602d4f298545b0afcd03c78",
+      "member": "e05-lineup.json.gpg",
+      "limit": 100000000
+    }
+  ]
+}
