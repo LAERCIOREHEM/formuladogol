@@ -122,7 +122,7 @@ def fit(rows,cut):
             obs=[]
             for r in rr:
                 a=yrs[r["year"]];a[0]+=1;a[2]+=r["m"]
-                v=r["features"][k]
+                v=r["features"].get(k)
                 if v is not None:a[1]+=1;a[3]+=r["m"];obs.append((v,r["x"],r["m"]))
                 # Explicit null/absence are not zero; assess exposure-stratified missingness.
                 if r["m"]>=45:a[4]+=1;a[5]+=int(v is not None)
