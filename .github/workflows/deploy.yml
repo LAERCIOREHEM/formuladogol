@@ -8,6 +8,13 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/deploy.yml'
+      - 'research/fdg2027/sl02-release/release-mode.json'
+      - 'research/fdg2027/sl02-release/release.py'
+      - 'research/fdg2027/sl02-release/overlay.py'
+      - 'research/fdg2027/sl02-release/app.js'
+      - 'research/fdg2027/sl02-release/design.css'
+      - 'research/fdg2027/sl02-release/shell.js'
+      - 'research/fdg2027/sl02-release/shell.css'
       - 'scripts/editorial_delivery.py'
       - 'index.html'
       - 'aovivo.html'
@@ -146,6 +153,7 @@ concurrency:
 jobs:
   deploy:
     name: Publicar GitHub Pages
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -1759,6 +1767,17 @@ jobs:
           python scripts/gerar_fdg_data_manifest.py --site-root _site --check
           node --check _site/js/br-data-manifest.js
 
+      # The normal build and sports contracts above remain authoritative.
+      # Versioned switch controls presentation only. Legacy = rebuild current
+      # data without overlay, not a Git reset. No branch or PR deployment.
+      - name: SL02 — aplicar camada visual versionada e verificar contrato
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check beautifulsoup4==4.13.4
+          python research/fdg2027/sl02-release/release.py stage --site-root _site --backup "$RUNNER_TEMP/fdg-sl02-rollback"
+          python scripts/gerar_fdg_data_manifest.py --site-root _site --check
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
@@ -1927,21 +1946,25 @@ jobs:
                   criticas.extend([grupo[0], grupo[len(grupo)//2], grupo[-1]])
           criticas = list(dict.fromkeys(criticas))
 
+          from pathlib import Path
+          # Old runtime checks still target the full operational view when SL02 is active.
+          sl02 = (Path("_site") / "sl02/app.js").is_file()
+          stats_path = "/estatisticas-completas.html" if sl02 else "/estatisticas.html"
           ativos_live = [
               (HOST + "/", "br-classificacao-live.js?v=20260920-monitor-facts-v7"),
-              (HOST + "/estatisticas.html", "br-classificacao-live.js?v=20260920-monitor-facts-v7"),
+              (HOST + stats_path, "br-classificacao-live.js?v=20260920-monitor-facts-v7"),
               (HOST + "/aovivo.html", "br-aovivo.js?v=20261123-r36r3-scorer"),
               (HOST + "/js/br-classificacao-live.js", 'const LIVE_STATE_VERSION = "7"'),
               (HOST + "/", "br-data-pulse.js?v=20261124-r36r6final"),
-              (HOST + "/estatisticas.html", "br-data-pulse.js?v=20261124-r36r6final"),
+              (HOST + stats_path, "br-data-pulse.js?v=20261124-r36r6final"),
               (HOST + "/acuracia.html", "br-acuracia.js?v=20261124-r36r5d"),
               (HOST + "/js/br-data-pulse.js?v=20261124-r36r6final", "function accuracyProof("),
               (HOST + "/js/br-data-pulse.js?v=20261124-r36r6final", "function freshness("),
               (HOST + "/css/br-data-pulse.css?v=20261124-r36r6final", "#probabilidades-ranking>.probability-ranking-section"),
               (HOST + "/", "fdg-ux-main"),
-              (HOST + "/estatisticas.html", "fdg-ux-stats"),
+              (HOST + stats_path, "fdg-ux-stats"),
               (HOST + "/js/br-estatisticas.js?v=20261124-r36r6final", "pulse.reconcile(r,t)"),
-              (HOST + "/estatisticas.html", "br-data-manifest.js?v=20261124-r36r5e"),
+              (HOST + stats_path, "br-data-manifest.js?v=20261124-r36r5e"),
               (HOST + "/js/br-data-manifest.js?v=20261124-r36r5e", "superseded revision"),
               (HOST + "/js/br-data-refresh.js?v=20261124-r36r5final", "ACTIVE_MS=12000"),
               (HOST + "/js/br-af-core-snapshot.js?v=20261124-r37r1final", "urgent?12000:45000"),
@@ -1998,6 +2021,11 @@ jobs:
 
           print(f"ORG-7R PUBLIC SMOKE PASS: {len(criticas)} URLs críticas + LiveState v6")
           PY
+
+      - name: SL02 — certificar hashes da apresentação no domínio
+        if: success()
+        shell: bash
+        run: python research/fdg2027/sl02-release/release.py smoke --site-root _site
 
       - name: R37-R1 — validar entrega pública do núcleo AF
         if: success()

@@ -5,6 +5,7 @@ on:
     paths:
       - 'research/fdg2027/sl02-release/**'
       - '.github/workflows/fdg2027-sl02-release.yml'
+      - '.github/workflows/deploy.yml'
 permissions:
   contents: read
 concurrency:
@@ -33,9 +34,13 @@ jobs:
           set -euo pipefail
           python research/fdg2027/sl02-release/assemble.py "$RUNNER_TEMP/sl02-base"
           cp -a "$RUNNER_TEMP/sl02-base" "$RUNNER_TEMP/sl02-candidate"
-          python research/fdg2027/sl02-release/overlay.py apply "$RUNNER_TEMP/sl02-candidate" "$RUNNER_TEMP/sl02-rollback"
+          python research/fdg2027/sl02-release/release.py stage --site-root "$RUNNER_TEMP/sl02-base" --backup "$RUNNER_TEMP/sl02-legacy-unused" --mode legacy
+          python research/fdg2027/sl02-release/release.py stage --site-root "$RUNNER_TEMP/sl02-candidate" --backup "$RUNNER_TEMP/sl02-rollback" --mode sl02
+          python research/fdg2027/sl02-release/release.py verify --site-root "$RUNNER_TEMP/sl02-candidate"
           node --check research/fdg2027/sl02-release/app.js
           node --check research/fdg2027/sl02-release/shell.js
+          node scripts/validar_pwa_instalacao.mjs
+          node tests/test-sula-final-navigation.mjs
       - name: Offline original domain contract regression suite
         run: |
           set -euo pipefail

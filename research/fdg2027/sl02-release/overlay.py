@@ -6,7 +6,7 @@ with the complete original operational statistics at a noindex canonical alias.
 Rollback restores only frontend paths, never data or an old commit.
 """
 from __future__ import annotations
-import hashlib,json,re,shutil,sys
+import hashlib,html,json,re,shutil,sys
 from pathlib import Path
 from bs4 import BeautifulSoup
 SRC=Path(__file__).resolve().parent
@@ -61,7 +61,7 @@ def native(s,rel):
         s=s.replace(SHELL,SHELL+'<div class="fdg-native-subnav"><a href="/copa2026/">Acervo da Copa 2026</a></div>',1)
     s=re.sub(r'</head>',CSS+JS+'</head>',s,count=1,flags=re.I)
     return s
-def approved(original):
+def approved(original,site):
     # Preserve original SEO metadata, canonical, JSON-LD, original GA setup,
     # manifest, favicons and PWA dependencies. No duplicate analytics.
     doc=BeautifulSoup(original,"html.parser")
@@ -77,7 +77,21 @@ def approved(original):
         head.append(BeautifulSoup('<link rel="stylesheet" href="'+rel+'?v=sl02-release-1">',"html.parser"))
     for rel in ("/js/br-config.js","/js/br-menu.js","/js/br-af-core-snapshot.js","/js/br-data-manifest.js","/js/br-data-refresh.js","/js/br-data-pulse.js","/sl02/shell.js","/sl02/app.js","/js/br-pwa.js","/js/br-push.js"):
         head.append(BeautifulSoup('<script defer src="'+rel+'?v=sl02-release-1"></script>',"html.parser"))
-    body='<body class="fdg-release-app" data-fdg-release-app="1" data-initial="stats/prob"><a class="skip" href="#fdg-main">Ir para conteúdo</a><header data-fdg-shell></header><main id="fdg-main" class="wrap" tabindex="-1" aria-live="polite" aria-busy="true"></main><footer class="wrap site-footer fdg-release-footer"><div class="footer">Fórmula do Gol — site independente. Dados esportivos, resultados e projeções conforme suas fontes e datas. <a href="/sobre.html">Sobre e metodologia</a> · <a href="/alertas.html">Alertas</a> · <a href="/privacidade.html">Privacidade</a></div></footer></body>'
+    # Keep PWA version contract and a truthful, indexable initial content
+    # snapshot. JS replaces this fallback on successful hydration.
+    for tag in head.select('script[src],link[href]'):
+        attr="src" if tag.name=="script" else "href"
+        if tag[attr].startswith(("/js/br-pwa.js?","/css/br-pwa.css?")):
+            tag[attr]=tag[attr].split("?")[0]+"?v=20260923-pwa-home-install-v5"
+    prob=json.loads(read(site/"dados-br/probabilidades-brasileirao.json"))
+    rows=[]
+    for club in prob["clubes"]:
+        values=club["probabilidades_detalhes"]
+        name=html.escape(str(club["clube"]))
+        cells="".join("<td>"+html.escape(str(values[k]["exibicao"]))+"</td>" for k in ("campeao","libertadores","rebaixamento"))
+        rows.append("<tr><th scope='row'>"+name+"</th>"+cells+"</tr>")
+    fallback='<section class="panel" aria-label="Resumo publicado"><h1>Probabilidades do Brasileirão 2026</h1><p>AF-Previsão 1.3 · 2.000.000 de simulações · '+html.escape(str(prob["calculado_em"]))+'</p><p><a href="/estatisticas-completas.html">Estatísticas completas</a> · <a href="/tabela">Classificação</a> · <a href="/jogos">Jogos</a></p><div style="overflow-x:auto"><table class="table"><thead><tr><th>Clube</th><th>Título</th><th>Libertadores</th><th>Rebaixamento</th></tr></thead><tbody>'+''.join(rows)+'</tbody></table></div></section>'
+    body='<body class="fdg-release-app" data-fdg-release-app="1" data-initial="stats/prob"><a class="skip" href="#fdg-main">Ir para conteúdo</a><header data-fdg-shell></header><main id="fdg-main" class="wrap" tabindex="-1" aria-live="polite" aria-busy="true">'+fallback+'</main><footer class="wrap site-footer fdg-release-footer"><div class="footer">Fórmula do Gol — site independente. Dados esportivos, resultados e projeções conforme suas fontes e datas. <a href="/sobre.html">Sobre e metodologia</a> · <a href="/alertas.html">Alertas</a> · <a href="/privacidade.html">Privacidade</a></div></footer></body>'
     return '<!doctype html><html lang="pt-BR" data-theme="dark">'+str(head)+body+'</html>'
 def apply(site,backup):
     assert not (site/"sl02").exists() and not backup.exists()
@@ -93,7 +107,7 @@ def apply(site,backup):
     for p in sorted(site.rglob("*.html")):
         rel=p.relative_to(site).as_posix()
         s=read(p)
-        changed=approved(original) if rel=="estatisticas.html" else native(s,rel)
+        changed=approved(original,site) if rel=="estatisticas.html" else native(s,rel)
         if changed!=s:
             if rel in before:
                 dest=backup/"original"/rel;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,dest)
