@@ -2,15 +2,15 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-11-25T11:20:23-03:00",
+  "gerado_em": "2026-11-25T22:14:40-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "af_snapshot_seguro": true,
   "agenda_operacional_fresca": true,
   "snapshots_preservados": 0,
-  "mudanca_esportiva": false,
+  "mudanca_esportiva": true,
   "hash_estado_antes": "c730d9e797545e72883a70fd41fc7e7b4312bef8cff1b2136d8e624344cd7aea",
-  "hash_estado_depois": "c730d9e797545e72883a70fd41fc7e7b4312bef8cff1b2136d8e624344cd7aea",
+  "hash_estado_depois": "93a008a3c4db8a8df71803378cabf26aa764f17f3677735c5a54c4d1c2a8cefc",
   "fonte": "ESPN + API-Football contingencial",
   "temporada": 2026,
   "competicoes": [
@@ -18,7 +18,7 @@
       "competicao": "copa_do_brasil",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-11-25T11:20:22-03:00",
+      "gerado_em": "2026-11-25T22:14:39-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 155,
       "finalizados": 154,
@@ -65,7 +65,7 @@
       "competicao": "libertadores",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-11-25T11:20:23-03:00",
+      "gerado_em": "2026-11-25T22:14:40-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 155,
       "finalizados": 154,
@@ -95,14 +95,16 @@
       },
       "api_football_auditoria_penaltis": {
         "consultados": 1,
-        "corrigidos": [],
-        "datas_consultadas": [],
+        "corrigidos": [
+          "401842648"
+        ],
+        "datas_consultadas": [
+          "2026-02-26"
+        ],
         "requisicoes": 1,
-        "remaining": null,
+        "remaining": 7041,
         "reserva": 12,
-        "erros": [
-          "401842648: RuntimeError: API-Football retornou errors={'plan': 'Free plans do not have access to this date, try from 2026-11-24 to 2026-11-26.'}"
-        ]
+        "erros": []
       },
       "coleta": {
         "modo": "incremental",
@@ -110,14 +112,27 @@
         "janela_fim": "2027-03-25T23:59:59-03:00",
         "requisicoes": 2,
         "ultima_completa_em": "2026-11-18T22:55:16-03:00",
-        "ajustes_editoriais_aplicados": 0
+        "ajustes_editoriais_aplicados": 0,
+        "api_football_auditoria_penaltis": {
+          "consultados": 1,
+          "corrigidos": [
+            "401842648"
+          ],
+          "datas_consultadas": [
+            "2026-02-26"
+          ],
+          "requisicoes": 1,
+          "remaining": 7041,
+          "reserva": 12,
+          "erros": []
+        }
       }
     },
     {
       "competicao": "sul_americana",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-11-25T11:20:23-03:00",
+      "gerado_em": "2026-11-25T22:14:40-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 157,
       "finalizados": 157,

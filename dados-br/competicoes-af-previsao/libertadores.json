@@ -9,8 +9,8 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-11-25T11:20:23-03:00",
-  "fonte": "ESPN",
+  "gerado_em": "2026-11-25T22:14:40-03:00",
+  "fonte": "ESPN + API-Football",
   "status": "ok",
   "fase_atual": {
     "status": "em_andamento",
@@ -32,7 +32,20 @@
     "janela_fim": "2027-03-25T23:59:59-03:00",
     "requisicoes": 2,
     "ultima_completa_em": "2026-11-18T22:55:16-03:00",
-    "ajustes_editoriais_aplicados": 0
+    "ajustes_editoriais_aplicados": 0,
+    "api_football_auditoria_penaltis": {
+      "consultados": 1,
+      "corrigidos": [
+        "401842648"
+      ],
+      "datas_consultadas": [
+        "2026-02-26"
+      ],
+      "requisicoes": 1,
+      "remaining": 7041,
+      "reserva": 12,
+      "erros": []
+    }
   },
   "equipes": [
     {
@@ -1257,7 +1270,7 @@
       "data_iso": "2026-02-26T21:30:00-03:00",
       "estado": "post",
       "concluido": true,
-      "status": "PF - Pen",
+      "status": "Final",
       "fase": "Volta - empatado no agregado - Deportes Tolima avança 3-0 na disputa de pênaltis",
       "fase_ordem": 100,
       "semana": null,
@@ -1271,7 +1284,7 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": true,
-        "vencedor": true,
+        "vencedor": false,
         "placar": 0
       },
       "visitante": {
@@ -1282,12 +1295,20 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": false,
-        "vencedor": false,
+        "vencedor": true,
         "placar": 1
       },
-      "vencedor": "Deportes Tolima",
-      "penaltis": true,
-      "vencedor_penaltis": null
+      "vencedor": "Deportivo Táchira",
+      "penaltis": {
+        "mandante": 3,
+        "visitante": 0
+      },
+      "vencedor_penaltis": "Deportes Tolima",
+      "fonte_resultado_fallback": {
+        "fonte": "API-Football",
+        "fixture_id": 1521523,
+        "capturado_em": "2026-11-25T22:14:40-03:00"
+      }
     },
     {
       "event_id": "401862714",
