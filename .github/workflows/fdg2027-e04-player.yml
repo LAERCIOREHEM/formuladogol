@@ -1,0 +1,129 @@
+name: FDG 2027 E04 - AF-Player Engine
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/e04/**'
+      - '.github/workflows/fdg2027-e04-player.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/e04/**'
+      - '.github/workflows/fdg2027-e04-player.yml'
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [self-test, research]
+        default: self-test
+        required: true
+      authorize_private_build:
+        type: boolean
+        default: false
+        required: true
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: fdg2027-e04-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  synthetic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: E01 and E03 regression
+        run: |
+          set -euo pipefail
+          python research/fdg2027/e01/test_foundation.py
+          python research/fdg2027/e03/test_canonical.py
+      - name: E04 chronological and semantic tests
+        run: |
+          python -m py_compile research/fdg2027/e04/*.py
+          python research/fdg2027/e04/test_engine.py
+  research:
+    needs: synthetic
+    if: github.ref == 'refs/heads/main' && ((github.event_name == 'push' && contains(github.event.head_commit.message, '[E04-PRIVATE-45731660540]')) || (github.event_name == 'workflow_dispatch' && inputs.mode == 'research' && inputs.authorize_private_build == true))
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Lock and verify exact E03 artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          umask 077
+          w="$(mktemp -d "$RUNNER_TEMP/fdg-e04.XXXXXXXX")"
+          echo "E04_WORK=$w" >> "$GITHUB_ENV"
+          lock=research/fdg2027/e04/source-lock.json
+          run="$(jq -r .source_run "$lock")"; commit="$(jq -r .source_commit "$lock")"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run" > "$w/run.json"
+          jq -e --arg repo "$GITHUB_REPOSITORY" --arg commit "$commit" '.head_repository.full_name==$repo and .head_branch=="main" and .head_sha==$commit and .status=="completed" and .conclusion=="success" and .path==".github/workflows/fdg2027-e03-canonical.yml"' "$w/run.json" >/dev/null
+          for spec in "aggregate:.aggregate_id:.aggregate_sha256:fdg2027-e03-aggregate" "canonical:.canonical_id:.canonical_sha256:fdg2027-e03-encrypted-canonical"; do
+            IFS=: read -r label ak hk name <<< "$spec"
+            aid="$(jq -r "$ak" "$lock")"; digest="$(jq -r "$hk" "$lock")"
+            gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$aid" > "$w/$label-meta.json"
+            jq -e --arg name "$name" --arg digest "sha256:$digest" --argjson run "$run" '.name==$name and .expired==false and .digest==$digest and .workflow_run.id==$run' "$w/$label-meta.json" >/dev/null
+            gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$aid/zip" > "$w/$label.zip"
+            printf '%s  %s\n' "$digest" "$w/$label.zip" | sha256sum --check --status
+          done
+          WORK="$w" python - <<'PY'
+          import os,pathlib,zipfile
+          w=pathlib.Path(os.environ["WORK"])
+          for label,member,limit in (("aggregate","e03-report.json",10_000_000),("canonical","e03-canonical.tar.gpg",100_000_000)):
+              with zipfile.ZipFile(w/(label+".zip")) as z:
+                  if z.namelist()!=[member] or not 0<z.getinfo(member).file_size<=limit:raise SystemExit("BLOCKED: archive layout")
+                  with (w/member).open("xb") as f:f.write(z.read(member))
+          PY
+          echo "PASS: exact E03 artifact hashes"
+      - name: Private model, chronological holdouts and reproducibility
+        env:
+          ARCHIVE_KEY: ${{ secrets.FDG_RESEARCH_ARCHIVE_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ "$E04_WORK" == "$RUNNER_TEMP"/fdg-e04.* && ${#ARCHIVE_KEY} -ge 32 ]]
+          w="$E04_WORK"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/source.tar" --decrypt "$w/e03-canonical.tar.gpg" 2>"$w/gpg.log"
+          for suffix in first second; do
+            python research/fdg2027/e04/engine.py --archive "$w/source.tar" --aggregate "$w/e03-report.json" --workspace "$w/input-$suffix" --output "$w/$suffix" --report "$w/$suffix-report.json"
+            rm -rf "$w/input-$suffix"
+          done
+          cmp "$w/first/af-player.json" "$w/second/af-player.json"
+          cmp "$w/first-report.json" "$w/second-report.json"
+          cp "$w/first-report.json" "$w/e04-report.json"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 --compress-algo zlib --output "$w/e04-af-player.json.gpg" "$w/first/af-player.json" 2>>"$w/gpg.log"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/roundtrip.json" --decrypt "$w/e04-af-player.json.gpg" 2>>"$w/gpg.log"
+          cmp "$w/first/af-player.json" "$w/roundtrip.json"
+          rm -rf "$w/first" "$w/second" "$w/source.tar" "$w/roundtrip.json" "$w/gpg.log" "$w/first-report.json" "$w/second-report.json"
+          echo "PASS: deterministic output and encrypted roundtrip"
+      - name: Upload aggregate report
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-e04-aggregate
+          path: ${{ env.E04_WORK }}/e04-report.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload encrypted research profiles
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdg2027-e04-encrypted-player
+          path: ${{ env.E04_WORK }}/e04-af-player.json.gpg
+          if-no-files-found: error
+          retention-days: 90
+      - name: Cleanup
+        if: always()
+        run: |
+          if [[ -n "${E04_WORK:-}" && "$E04_WORK" == "$RUNNER_TEMP"/fdg-e04.* ]]; then rm -rf -- "$E04_WORK"; fi
