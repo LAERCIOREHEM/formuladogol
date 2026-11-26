@@ -47,6 +47,10 @@ def native(s,rel):
         s=s[:m.start()]+(replacement if m is matches[0] else "")+old+local+s[m.end():]
     if not matches:
         s=re.sub(r'(<body\b[^>]*>)',lambda m:m[1]+replacement,s,count=1,flags=re.I)
+    # Archive articles keep their narrow body; the shared menu uses the full viewport.
+    if rel.startswith("copa2026/"):
+        s=s.replace(SHELL,"",1)
+        s=re.sub(r'(<body\b[^>]*>)',lambda m:m[1]+SHELL,s,count=1,flags=re.I)
     # The old Copa-specific logo stays inside the archive, while the FDG logo
     # is reused exactly once in the new global header.
     s=IMG.sub(lambda m:m[0].replace("<img","<img data-fdg-oldbrand hidden",1),s)
