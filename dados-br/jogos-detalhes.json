@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-25T22:14:27.942598-03:00",
+  "gerado_em": "2026-11-25T23:16:37.188677-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 361,
   "total_com_estatisticas": 361,
-  "total_com_publico": 360,
+  "total_com_publico": 361,
   "total_com_eventos": 361,
   "total_com_jogadores": 361,
   "total_eventos_validados": 361,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Arena MRV",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 20588,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/11/23/santos-x-gremio-tem-o-maior-publico-da-36a-rodada-do-brasileiro-veja-a-lista.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -553,7 +553,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-25T22:14:25.810300-03:00"
+      "atualizado_em": "2026-11-25T22:14:25.810300-03:00",
+      "renda": 960650
     },
     "401841335": {
       "event_id": "401841335",
@@ -204333,5 +204334,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 323,
+  "total_com_renda": 361
 }
