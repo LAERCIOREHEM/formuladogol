@@ -190,7 +190,7 @@ async def run_browser(site,out,origin):
                     await page.get_by_role("button",name="Definir Meu Clube",exact=False).click()
                     await page.locator("#fdg-main[aria-busy=false]").wait_for()
                     if await page.evaluate("localStorage.getItem('fdg-sl02:club')")!="Bahia":fail.append("Meu Clube")
-            except Exception as e:fail.append(route+":"+str(e)[:240])
+            except Exception as e:fail.append(route+"@"+str(w)+":"+str(e)[:1800 if route=="/aovivo.html" else 240])
             finally:await ctx.close()
         # All approved viewports; native shell measured separately from legacy
         # content layout (whose existing horizontal scroll remains visible in report).
