@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "site": "Fórmula do Gol",
-  "descricao": "Registro das análises que já tiveram o e-mail de publicação enviado.",
+  "descricao": "Registro das análises com envio confirmado e reservas persistentes para prevenir duplicação.",
   "notificacoes": [
     {
       "rodada": 20,
@@ -164,7 +164,24 @@
       "url": "https://formuladogol.com.br/analises/brasileirao-2026-rodada-35.html",
       "notificado_em": "2026-11-20T04:51:38-03:00",
       "rodada": 35
+    },
+    {
+      "id_editorial": "brasileirao-2026-rodada-36",
+      "tipo": "brasileirao_rodada",
+      "slug": "brasileirao-2026-rodada-36.html",
+      "url": "https://formuladogol.com.br/analises/brasileirao-2026-rodada-36.html",
+      "notificado_em": "2026-11-25T22:14:35-03:00",
+      "rodada": 36,
+      "status": "confirmed_reconciled",
+      "reconciliacao": {
+        "origem": "Gmail delivery and deploy job logs",
+        "total_envios_confirmados": 8,
+        "first_run": 45733831282,
+        "last_run": 45742462367,
+        "incidente": "FDG-EDITORIAL-MAIL-R36"
+      }
     }
   ],
-  "total_notificacoes": 21
+  "total_notificacoes": 22,
+  "reservas": []
 }

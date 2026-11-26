@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'scripts/deploy_notifications.py'
+      - 'scripts/editorial_delivery.py'
+      - 'tests/test_editorial_delivery.py'
       - 'tests/test_deploy_notifications.py'
       - '.github/workflows/deploy.yml'
       - '.github/workflows/deploy-notifications-ci.yml'
@@ -11,6 +13,8 @@ on:
     branches: [main]
     paths:
       - 'scripts/deploy_notifications.py'
+      - 'scripts/editorial_delivery.py'
+      - 'tests/test_editorial_delivery.py'
       - 'tests/test_deploy_notifications.py'
       - '.github/workflows/deploy-notifications-ci.yml'
   workflow_dispatch:
@@ -33,6 +37,7 @@ jobs:
           set -euo pipefail
           python -m py_compile scripts/deploy_notifications.py tests/test_deploy_notifications.py
           python -m unittest discover -s tests -p 'test_deploy_notifications.py' -v
+          python -m unittest discover -s tests -p 'test_editorial_delivery.py' -v
       - name: Verificar contrato de notificação no workflow
         run: |
           python - <<'PY'
@@ -48,5 +53,7 @@ jobs:
           assert 'concurrency:\n  group: fdg-pages-publication\n  cancel-in-progress: false\n  queue: max' in text
           assert "- 'scripts/gerar_acuracia_af_previsao.py'" in text
           assert "- 'scripts/validar_publicacao_brasileirao.py'" in text
+          assert 'run: python scripts/editorial_delivery.py' in text
+          assert 'Registrar notificação editorial por e-mail [skip ci]' not in text
           print('PASS: notification only for real site incidents via Health Monitor, no per-deploy SMTP')
           PY
