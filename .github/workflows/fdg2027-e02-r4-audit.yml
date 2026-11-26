@@ -1,5 +1,10 @@
 name: FDG 2027 E02-R4 - Offline Historical Integrity Audit
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/e02/historical_r4.py'
+      - '.github/workflows/fdg2027-e02-r4-audit.yml'
   workflow_dispatch:
     inputs:
       mode:
@@ -44,7 +49,7 @@ jobs:
             python research/fdg2027/e02/$s.py --self-test
           done
       - name: Validate authorization and exact source run
-        if: inputs.mode == 'audit'
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'audit'
         env:
           SOURCE_RUN: ${{ inputs.source_run_id }}
           AUTHORIZED: ${{ inputs.authorize_private_audit }}
@@ -74,7 +79,7 @@ jobs:
           PY
           echo "Verified encrypted checkpoint archive from run $SOURCE_RUN."
       - name: Decrypt and audit locally (no sporting API keys)
-        if: inputs.mode == 'audit'
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'audit'
         env:
           ARCHIVE_KEY: ${{ secrets.FDG_RESEARCH_ARCHIVE_KEY }}
           SOURCE_RUN: ${{ inputs.source_run_id }}
@@ -88,7 +93,7 @@ jobs:
           test -s "$R4_WORK/r4-private.json.gpg"
           rm -f "$R4_WORK/state.json" "$R4_WORK/r4-private.json" "$R4_WORK/gpg.log"
       - name: Upload aggregate report only
-        if: inputs.mode == 'audit'
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'audit'
         uses: actions/upload-artifact@v4
         with:
           name: fdg2027-r4-aggregate
@@ -96,7 +101,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
       - name: Upload encrypted private audit only (not an R3 checkpoint)
-        if: inputs.mode == 'audit'
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'audit'
         uses: actions/upload-artifact@v4
         with:
           name: fdg2027-r4-private-audit
