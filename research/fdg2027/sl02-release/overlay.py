@@ -89,9 +89,9 @@ def native(s,rel,matches=None,details=None,highlights=None):
     # navigation from accessibility tree, layout and br-menu's floating clones.
     if rel in ("jogos/index.html","tabela/index.html","resultados/index.html"):
         return s
-    matches=[m for m in NAV.finditer(s) if navkind(m)]
+    nav_matches=[m for m in NAV.finditer(s) if navkind(m)]
     replacement=SHELL
-    for m in reversed(matches):
+    for m in reversed(nav_matches):
         old=m.group();kind=navkind(m)
         old=re.sub(r'\sdata-br-auth-menu(?:=["\'][^"\']*["\'])?', '',old,count=1)
         old=re.sub(r'<nav\b','<nav data-fdg-oldnav hidden aria-hidden="true" inert',old,count=1,flags=re.I)
@@ -100,8 +100,8 @@ def native(s,rel,matches=None,details=None,highlights=None):
             doc=BeautifulSoup(m.group(),"html.parser")
             a=[x for x in doc.select("a[href]") if x.get("href") not in ("/","../","../index.html")]
             local='<details class="fdg-archive-links"><summary>Navegação do acervo Copa 2026</summary><div>'+''.join(str(x) for x in a)+'</div></details>'
-        s=s[:m.start()]+(replacement if m is matches[0] else "")+old+local+s[m.end():]
-    if not matches:
+        s=s[:m.start()]+(replacement if m is nav_matches[0] else "")+old+local+s[m.end():]
+    if not nav_matches:
         s=re.sub(r'(<body\b[^>]*>)',lambda m:m[1]+replacement,s,count=1,flags=re.I)
     # Archive articles keep their narrow body; the shared menu uses the full viewport.
     if rel.startswith("copa2026/"):
