@@ -135,8 +135,23 @@ async def run_browser(site,out,origin):
                     if route=="stats/prob":
                         if not await page.locator("#sl02-pulse .fdg-pulse").count():fail.append("Data Pulse:"+label)
                         if await page.locator(".prob-metrics").count():fail.append("duplicated metrics:"+label)
-                        if await page.get_by_role("button",name="Comparativa",exact=True).get_attribute("aria-pressed")!="true":fail.append("default comparativa:"+label)
-                        if await page.locator(".hf-view button").first.inner_text()!="Comparativa":fail.append("mode order:"+label)
+                        default="Comparativa" if w>=900 else "Compacta"
+                        if await page.get_by_role("button",name=default,exact=True).get_attribute("aria-pressed")!="true":fail.append("responsive default:"+label)
+                        if await page.locator("#sl02-pulse-details").get_attribute("open") is not None:fail.append("pulse default:"+label)
+                        if await page.locator("#sl02-freshness").is_visible():fail.append("duplicate freshness:"+label)
+                        if await page.locator(".r1-prob-legend").get_attribute("open") is not None:fail.append("legend default:"+label)
+                        if w<900:
+                            compact=page.locator(".r1-compact")
+                            if await compact.locator("tbody tr[data-prob-club]").count()!=20:fail.append("compact rows:"+label)
+                            bounds=await page.locator(".r1-compact-scroll").evaluate("(e)=>({width:e.clientWidth,scroll:e.scrollWidth,top:e.getBoundingClientRect().top,first:e.querySelector('tbody tr').getBoundingClientRect().bottom,viewport:innerHeight,pulse:document.querySelector('#sl02-pulse').getBoundingClientRect().height})")
+                            m["r1_density"]=bounds
+                            if bounds["scroll"]>bounds["width"]+1:fail.append("compact horizontal overflow:"+label)
+                            if w>=320 and bounds["first"]>bounds["viewport"]:fail.append("first row below fold:"+label)
+                            await page.locator("#sl02-pulse-details summary").click()
+                            if not await page.locator("#sl02-pulse .fdg-pulse-grid").is_visible():fail.append("expand pulse:"+label)
+                            await page.locator("#sl02-pulse-details summary").click()
+                            await page.get_by_role("button",name="Comparativa",exact=True).click()
+                            await page.locator("#fdg-main[aria-busy=false]").wait_for()
                         if await page.locator(".hf-matrix .heat-cell").count()!=140:fail.append("seven indicators:"+label)
                         if await page.locator(".hf-matrix th[data-indicator]").count()!=7:fail.append("indicator columns:"+label)
                         if await page.locator(".hf-matrix th[data-indicator$='_base']").count():fail.append("base exposed:"+label)
@@ -160,6 +175,9 @@ async def run_browser(site,out,origin):
                         if brand["gap"]>15 or brand["gap"]<0 or brand["width"]<100:fail.append("banner width:"+label)
                 m.update(route=route,width=w,theme=theme,native=native,url=page.url)
                 rows.append(m)
+                if route=="stats/prob" and w<900 and not native:
+                    await page.get_by_role("button",name="Compacta",exact=True).click()
+                    await page.locator("#fdg-main[aria-busy=false]").wait_for()
                 await page.screenshot(path=str(out/(label+".png")),animations="disabled")
                 if route=="stats/table" and w==390 and theme=="dark" and not native:
                     for key in ("Turno","Returno","Mandante","Visitante","Últimos 5","Últimos 10","Geral"):
@@ -199,7 +217,8 @@ async def run_browser(site,out,origin):
         for w in WIDTHS:
             if w not in (390,1440):
                 for route in ("stats/prob","stats/table"):await one(route,w)
-        await one("stats/prob",390,"light");await one("stats/table",1440,"light")
+        for w in WIDTHS:
+            for route in ("stats/prob","stats/table"):await one(route,w,"light")
         await one("stats/prob",160);await one("stats/prob",384);await one("stats/prob",720)
         for route in NATIVE:
             for w in (390,1440):await one(route,w,native=True)

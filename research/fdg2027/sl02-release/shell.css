@@ -92,3 +92,8 @@ body[data-fdg-live-hf2] .live-main-card .live-meta{margin-top:12px}
  body[data-fdg-live-hf2] .fdg-release-shell .nav-icon{font-size:20px}
  body[data-fdg-live-hf2] .live-main-card .live-card-inner{padding-top:9px}
 }
+
+/* SL02-R1: compact shared masthead, retain HF2 live and labels. */
+.fdg-release-shell .fdg-nav a{min-height:54px;gap:2px;padding:4px 3px!important;border-radius:9px}.fdg-release-shell .nav-icon{font-size:22px;line-height:1.1}.fdg-release-shell .season-line{margin-bottom:5px}.fdg-release-shell .season-line>*{padding:4px 6px;min-height:28px}.fdg-release-shell .brandline{margin-bottom:5px}.fdg-release-shell .snapshot{margin:6px 0 8px}.fdg-release-app .fdg-release-shell .snapshot{display:none}.fdg-release-app .fdg-release-shell{padding-top:6px;padding-bottom:7px}.fdg-release-app .fdg-release-shell .brandline{grid-template-columns:minmax(0,1fr) auto}.fdg-release-app .fdg-release-shell .brandline img{max-height:82px;object-fit:contain;object-position:left center}.fdg-release-app .fdg-release-shell .theme-toggle{min-width:44px;min-height:44px}
+@media(max-width:899px){.fdg-release-shell .fdg-nav a{min-height:50px;gap:2px}.fdg-release-shell .nav-icon{font-size:20px}.fdg-release-shell .fdg-nav{gap:4px}.fdg-release-app .fdg-release-shell .brandline img{max-height:58px}}
+@media(max-width:290px){.fdg-release-app .fdg-release-shell .brandline{grid-template-columns:minmax(0,1fr)}.fdg-release-app .fdg-release-shell .brandline img{max-height:60px}}

@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   readiness:
-    if: github.event.pull_request.head.repo.full_name == github.repository && (github.head_ref == 'fdg2027/sl02-integration' || github.head_ref == 'fdg2027/sl02-hf1' || github.head_ref == 'fdg2027/sl02-hf2')
+    if: github.event.pull_request.head.repo.full_name == github.repository && (github.head_ref == 'fdg2027/sl02-integration' || github.head_ref == 'fdg2027/sl02-hf1' || github.head_ref == 'fdg2027/sl02-hf2' || github.head_ref == 'fdg2027/sl02-r1-density')
     runs-on: ubuntu-24.04
     timeout-minutes: 18
     steps:
