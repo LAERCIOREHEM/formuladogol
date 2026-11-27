@@ -1,0 +1,106 @@
+name: FDG AFP-R1 - private ranking and release audit
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/afp-r1/**'
+      - '.github/workflows/fdg-afp-r1.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/fdg2027/afp-r1/**'
+      - '.github/workflows/fdg-afp-r1.yml'
+  workflow_dispatch:
+    inputs:
+      authorize_private_audit:
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: fdg-afp-r1-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  synthetic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Existing engine and AFP contracts
+        run: |
+          python research/fdg2027/e04/test_engine.py
+          python -m py_compile research/fdg2027/afp-r1/*.py
+          python research/fdg2027/afp-r1/test_build.py
+          node --check research/fdg2027/afp-r1/app.js
+  private:
+    needs: synthetic
+    if: github.ref == 'refs/heads/main' && ((github.event_name == 'push' && contains(github.event.head_commit.message, '[AFP-R1-PRIVATE]')) || (github.event_name == 'workflow_dispatch' && inputs.authorize_private_audit == true))
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recover exact encrypted sources
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          umask 077
+          w="$(mktemp -d "$RUNNER_TEMP/fdg-afp.XXXXXXXX")"
+          echo "AFP_WORK=$w" >> "$GITHUB_ENV"
+          python research/fdg2027/afp-r1/recover.py "$w"
+      - name: Reproduce profiles and build private ranking
+        env:
+          ARCHIVE_KEY: ${{ secrets.FDG_RESEARCH_ARCHIVE_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          w="$AFP_WORK"
+          [[ "$w" == "$RUNNER_TEMP"/fdg-afp.* && ${#ARCHIVE_KEY} -ge 32 ]]
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/source.tar" --decrypt "$w/e03-canonical.tar.gpg" 2>"$w/gpg.log"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/af-player.json" --decrypt "$w/e04-af-player.json.gpg" 2>>"$w/gpg.log"
+          python research/fdg2027/afp-r1/build.py "$w" "$w/preview"
+      - name: Browser certification of private preview
+        run: |
+          python -m pip install playwright==1.51.0
+          python -m playwright install --with-deps chromium
+          python research/fdg2027/afp-r1/browser_test.py "$AFP_WORK/preview"
+      - name: Encrypt preview and verify roundtrip
+        env:
+          ARCHIVE_KEY: ${{ secrets.FDG_RESEARCH_ARCHIVE_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          w="$AFP_WORK"
+          tar -C "$w/preview" -cf "$w/preview.tar" .
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 --output "$w/afp-preview.tar.gpg" "$w/preview.tar" 2>>"$w/gpg.log"
+          printf '%s\n' "$ARCHIVE_KEY" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output "$w/roundtrip.tar" --decrypt "$w/afp-preview.tar.gpg" 2>>"$w/gpg.log"
+          cmp "$w/preview.tar" "$w/roundtrip.tar"
+          rm -rf "$w/preview" "$w/canonical" "$w/source.tar" "$w/af-player.json" "$w/preview.tar" "$w/roundtrip.tar"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fdg-afp-r1-aggregate
+          path: ${{ env.AFP_WORK }}/afp-report.json
+          retention-days: 30
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fdg-afp-r1-encrypted-preview
+          path: ${{ env.AFP_WORK }}/afp-preview.tar.gpg
+          retention-days: 90
+          if-no-files-found: error
+      - name: Cleanup
+        if: always()
+        run: |
+          if [[ -n "${AFP_WORK:-}" && "$AFP_WORK" == "$RUNNER_TEMP"/fdg-afp.* ]]; then rm -rf -- "$AFP_WORK"; fi
