@@ -50,7 +50,7 @@ def selftest():
     print("SL02 schedule guard fixture PASS")
 async def browser(out):
     from playwright.async_api import async_playwright
-    from qa import MEASURE,live_layout,display_probability,player_totals,player_key,match_header,normalize_space,desktop_probability_density
+    from qa import MEASURE,live_layout,display_probability,player_totals,player_key,match_header,normalize_space,desktop_probability_density,single_masthead
     from overlay import fact_value,valid_highlight
     out.mkdir(parents=True,exist_ok=True)
     evidence=[]
@@ -82,7 +82,7 @@ async def browser(out):
             assert await page.get_by_text("2026 · Vigente",exact=True).count()==1
             assert await page.get_by_text("2027 · Em breve",exact=True).count()==1
             # R1: confirm the actual public revision, responsive default and original AF values.
-            assert await page.locator('script[src*="/sl02/app.js?v=sl02-afp-ready-1"]').count()==1
+            assert await page.locator('script[src*="/sl02/app.js?v=sl02-hf3-single-masthead-1"]').count()==1
             assert await page.locator("#sl02-pulse-details").count()==1
             assert not await page.locator("#sl02-pulse-details").evaluate("(e)=>e.open")
             assert not await page.locator("#sl02-freshness").is_visible()
@@ -177,6 +177,23 @@ async def browser(out):
             assert await page.locator(".ux-native-facts [data-match-fact]").count()==2
             assert await page.locator(".ux-native-video").count()==1
             await page.screenshot(path=str(out/f"producao-{width}-partida.png"))
+            await single_masthead(page,"games")
+            for side in (0,1):
+                await page.locator(".game-side[href^='/clube/']").nth(side).click()
+                await page.wait_for_url("**/clube/**")
+                await single_masthead(page,"clubs")
+                assert await page.locator(".club-hero-card").count()==1
+                assert await page.locator(".club-nav").count()==1
+                await page.screenshot(path=str(out/f"producao-{width}-clube-{side}.png"))
+                await page.go_back(wait_until="domcontentloaded")
+                await single_masthead(page,"games")
+            await page.goto(HOST+"/clube/fluminense/",wait_until="domcontentloaded",timeout=35000)
+            await single_masthead(page,"clubs")
+            await page.screenshot(path=str(out/f"producao-{width}-fluminense.png"))
+            await page.get_by_role("button",name="Alternar tema").click()
+            await single_masthead(page,"clubs")
+            await page.screenshot(path=str(out/f"producao-{width}-fluminense-tema-alternativo.png"))
+            await page.get_by_role("button",name="Alternar tema").click()
             await page.goto(HOST+"/agenda.html",wait_until="domcontentloaded",timeout=35000)
             await match_header(page,width)
             await page.locator(".agenda-game").first.wait_for(timeout=25000)

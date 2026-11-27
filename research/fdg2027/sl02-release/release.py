@@ -9,7 +9,7 @@ import argparse,hashlib,json,os,time
 from pathlib import Path
 from urllib.request import Request,urlopen
 from bs4 import BeautifulSoup
-from overlay import apply,snapshot,sha
+from overlay import apply,snapshot,sha,verify_global_headers
 ROOT=Path(__file__).resolve().parent
 MODE=ROOT/"release-mode.json"
 HOST="https://formuladogol.com.br"
@@ -42,6 +42,7 @@ def verify(site,active):
     assert not any("noindex" in x.get("content","").lower() for x in stats.select('meta[name=robots]'))
     assert stats.select('script[type="application/ld+json"]')
     if active:
+        verify_global_headers(site)
         assert len(stats.select("[data-fdg-shell]"))==1
         assert len(stats.select("#fdg-main tbody tr"))==20
         assert stats.select_one('script[src^="/sl02/app.js"]')
@@ -76,6 +77,7 @@ def smoke(site):
     verify(site,active)
     paths=FRONTEND if active else ("estatisticas.html","index.html","aovivo.html","manifest.webmanifest","sw.js")
     if active and (site/"sl02/af-player.json").is_file():paths=(*paths,"sl02/af-player.json")
+    if active:paths=(*paths,"clube/fluminense/index.html")
     for path in paths:
         expected=sha(site/path)
         last=""
