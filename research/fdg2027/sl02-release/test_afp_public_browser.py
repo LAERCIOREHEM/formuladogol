@@ -15,7 +15,7 @@ async def run(site):
     validate(payload,cert)
     digest=cert["data_sha256"]
     original=(site/"estatisticas.html").read_text()
-    assert "data-fdg-afp-sha256" not in original and not (site/"sl02/af-player.json").exists()
+    actual_present=(site/"sl02/af-player.json").exists()
     server=ThreadingHTTPServer(("127.0.0.1",0),functools.partial(Handler,directory=str(site)))
     threading.Thread(target=server.serve_forever,daemon=True).start()
     host=f"http://127.0.0.1:{server.server_port}"
@@ -29,8 +29,12 @@ async def run(site):
                     async def intercept(route):
                         u=route.request.url
                         if not u.startswith(host+"/"):await route.abort();return
-                        if "/estatisticas.html" in u and mode!="absent":
-                            html=original.replace("<body class=",'<body data-fdg-afp-sha256="'+digest+'" class=',1)
+                        if "/estatisticas.html" in u:
+                            import re
+                            clean=re.sub(r' data-fdg-afp-sha256="[0-9a-f]{64}"', "", original)
+                            if mode=="absent":
+                                await route.fulfill(status=200,content_type="text/html",body=clean);return
+                            html=clean.replace("<body class=",'<body data-fdg-afp-sha256="'+digest+'" class=',1)
                             await route.fulfill(status=200,content_type="text/html",body=html);return
                         if "/sl02/af-player.json" in u:
                             afp_requests.append(u)
