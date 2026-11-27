@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "atualizado_em": "2026-11-25T22:08:25-03:00",
+  "atualizado_em": "2026-11-26T22:07:09-03:00",
   "targets_minutos": {
     "final_to_detection": 5,
     "final_to_results": 7,
@@ -8,23 +8,23 @@
     "commit_to_site": 5
   },
   "ultima_observacao": {
-    "trace_id": "fdg-401841319",
-    "event_id": "401841319",
-    "finalizado_em": "2026-11-25T21:56:00-03:00",
+    "trace_id": "fdg-401841329",
+    "event_id": "401841329",
+    "finalizado_em": "2026-11-26T21:55:00-03:00",
     "final_timestamp_method": "estimado_pelo_feed_ESPN",
-    "final_detectado_fastlane_em": "2026-11-25T22:07:27.382749-03:00",
-    "resultados_prontos_em": "2026-11-25T22:07:27.865672-03:00",
-    "af_calculado_em": "2026-11-25T22:08:23-03:00",
-    "final_para_af_minutos": 12.383,
+    "final_detectado_fastlane_em": "2026-11-26T22:06:20.806189-03:00",
+    "resultados_prontos_em": "2026-11-26T22:06:21.262128-03:00",
+    "af_calculado_em": "2026-11-26T22:07:06-03:00",
+    "final_para_af_minutos": 12.1,
     "alvo_minutos": 10,
     "dentro_slo": false,
-    "registrado_em": "2026-11-25T22:08:25-03:00",
-    "run_id": "45733513803"
+    "registrado_em": "2026-11-26T22:07:09-03:00",
+    "run_id": "45920601787"
   },
   "resumo": {
-    "amostra_final_para_af": 47,
-    "media_final_para_af_minutos": 21.386,
-    "violacoes_final_para_af": 42
+    "amostra_final_para_af": 48,
+    "media_final_para_af_minutos": 21.192,
+    "violacoes_final_para_af": 43
   },
   "observacoes": [
     {
@@ -552,6 +552,20 @@
       "dentro_slo": false,
       "registrado_em": "2026-11-25T22:08:25-03:00",
       "run_id": "45733513803"
+    },
+    {
+      "trace_id": "fdg-401841329",
+      "event_id": "401841329",
+      "finalizado_em": "2026-11-26T21:55:00-03:00",
+      "final_timestamp_method": "estimado_pelo_feed_ESPN",
+      "final_detectado_fastlane_em": "2026-11-26T22:06:20.806189-03:00",
+      "resultados_prontos_em": "2026-11-26T22:06:21.262128-03:00",
+      "af_calculado_em": "2026-11-26T22:07:06-03:00",
+      "final_para_af_minutos": 12.1,
+      "alvo_minutos": 10,
+      "dentro_slo": false,
+      "registrado_em": "2026-11-26T22:07:09-03:00",
+      "run_id": "45920601787"
     }
   ]
 }
