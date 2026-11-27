@@ -71,6 +71,7 @@ jobs:
           set -euo pipefail
           python research/fdg2027/sl02-release/qa.py "$RUNNER_TEMP/sl02-base" "$RUNNER_TEMP/sl02-candidate" "$RUNNER_TEMP/sl02-rollback" "$RUNNER_TEMP/sl02-browser"
           python research/fdg2027/sl02-release/test_afp_public_browser.py "$RUNNER_TEMP/sl02-candidate"
+          python research/fdg2027/sl02-release/test_afp_real_browser.py "$RUNNER_TEMP/sl02-candidate"
       - name: Package loopback preview (never upload to Pages)
         if: always()
         run: |
