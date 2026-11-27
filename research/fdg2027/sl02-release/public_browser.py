@@ -50,7 +50,7 @@ def selftest():
     print("SL02 schedule guard fixture PASS")
 async def browser(out):
     from playwright.async_api import async_playwright
-    from qa import MEASURE,live_layout,display_probability
+    from qa import MEASURE,live_layout,display_probability,player_totals,player_key
     out.mkdir(parents=True,exist_ok=True)
     evidence=[]
     async with async_playwright() as p:
@@ -121,6 +121,16 @@ async def browser(out):
             await page.wait_for_function("location.hash==='#stats/table'&&document.querySelectorAll('tbody tr[data-club]').length===20&&document.querySelector('#fdg-main[aria-busy=false]')")
             assert await page.locator(".hf-standings thead th").count()==10
             await page.screenshot(path=str(out/f"producao-{width}-classificacao.png"))
+            await page.get_by_role("tab",name="Jogadores",exact=True).click()
+            await page.locator("#fdg-main[aria-busy=false]").wait_for()
+            leaders=await page.evaluate("async()=>{const r=await fetch('/dados-br/lideres-jogadores.json',{cache:'no-cache'});if(!r.ok)throw Error('public players '+r.status);return r.json()}")
+            assert await page.locator(".ux-player-table tbody tr").count()==len(leaders["artilharia"])
+            await page.get_by_role("button",name="Participações em gols",exact=True).click()
+            await page.locator("#fdg-main[aria-busy=false]").wait_for()
+            player_rows=await page.locator(".ux-player-table tbody tr").evaluate_all("(rows)=>rows.map(r=>({name:r.querySelector('.ux-player-name>strong').textContent,club:r.querySelector('.ux-player-name .team>span:last-child').textContent,values:[...r.querySelectorAll('td')].slice(1).map(t=>Number(t.textContent))}))")
+            assert len(player_rows)==len(player_totals(leaders))
+            assert {player_key(p["name"],p["club"]):tuple(p["values"]) for p in player_rows}==player_totals(leaders)
+            await page.screenshot(path=str(out/f"producao-{width}-participacoes.png"))
             await page.goto(HOST+"/aovivo.html?sl02_hf2="+str(int(time.time())),wait_until="domcontentloaded",timeout=35000)
             await page.locator(".fdg-nav").wait_for(timeout=20000)
             await page.wait_for_timeout(350)

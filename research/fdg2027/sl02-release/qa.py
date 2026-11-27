@@ -26,6 +26,34 @@ def display_probability(d):
     return s.replace(".",",")+"%"
 
 def readj(site,rel):return json.loads((site/rel).read_text())
+def player_key(name,club):
+    import unicodedata
+    def norm(s):
+        return " ".join("".join(c for c in unicodedata.normalize("NFD",s) if not unicodedata.combining(c)).lower().split())
+    return norm(name),norm(club)
+
+def player_totals(leaders):
+    assert leaders["status"]=="valido" and leaders["temporada"]==2026
+    rows={}
+    for group,field,idx in (("artilharia","gols",0),("assistencias","assistencias",1)):
+        seen=set()
+        for p in leaders[group]:
+            k=player_key(p["nome"],p["time"])
+            assert k not in seen and type(p[field]) is int and p[field]>=0,("invalid player identity",group,k)
+            seen.add(k)
+            rows.setdefault(k,[0,0])[idx]=p[field]
+    return {k:(v[0],v[1],sum(v)) for k,v in rows.items()}
+
+def verify_player_archive(site):
+    leaders=readj(site,"dados-br/lideres-jogadores.json")
+    archive=readj(Path(__file__).resolve().parents[3],"dados-br/jogadores.json")
+    assert archive["temporada"]==leaders["temporada"]
+    assert archive["artilharia"]==leaders["artilharia"] and archive["assistencias"]==leaders["assistencias"],"Player archive/public leaders out of sync"
+    expected={player_key(p["nome"],p["time"]):(p["gols"],p["assistencias"],p["participacoes"]) for p in archive["participacoes_gol"]}
+    assert len(expected)==len(archive["participacoes_gol"])
+    assert player_totals(leaders)==expected,"G+A public source must match the internal validated archive"
+    print("UX-HF1 PLAYER SOURCE PASS:",len(expected),"records; no new public dependency",flush=True)
+    return expected
 def verify_static(base,site,backup):
     b=snapshot(base);c=snapshot(site);ledger=readj(backup,"rollback.json")
     assert all(c[k]==v for k,v in b.items() if not k.endswith(".html"))
@@ -45,6 +73,7 @@ def verify_static(base,site,backup):
             assert len(new.select("[data-fdg-release-shell], [data-fdg-shell]"))==1,("one global shell",rel)
             for nav in new.select("nav.nav,nav.menu"):
                 assert nav.has_attr("data-fdg-oldnav"),("legacy global menu visible",rel)
+    verify_player_archive(site)
     p=readj(site,"dados-br/probabilidades-brasileirao.json")
     audit=readj(site,"dados-br/auditoria-probabilidades.json")
     m=readj(site,"dados-br/af-core-manifest.json")
@@ -143,7 +172,7 @@ async def run_browser(site,out,origin):
                 if native and route=='/aovivo.html':
                     m['hf2_live']=await live_layout(page,w,fixture=True)
                 if not native:
-                    if await page.locator("#fdg-main h1").text_content()=="Dados indisponíveis":fail.append("data:"+label)
+                    if await page.locator("#fdg-main h1").text_content()=="Dados indisponíveis":fail.append("data:"+label+":"+await page.locator("#fdg-main").inner_text())
                     if route=="stats/table" and await page.locator("tbody tr[data-club]").count()!=20:fail.append("20 clubs:"+label)
                     if route=="stats/prob":
                         if not await page.locator("#sl02-pulse .fdg-pulse").count():fail.append("Data Pulse:"+label)
@@ -246,12 +275,27 @@ async def run_browser(site,out,origin):
                     assert (await page.locator(".ux-chart-svg").bounding_box())["height"]<=211
                     await page.screenshot(path=str(out/"ux-hf1-club-expanded-desktop.png"))
                 if route=="stats/players" and w in (390,1440) and theme=="dark" and not native:
+                    leaders=readj(site,"dados-br/lideres-jogadores.json")
+                    expected=player_totals(leaders)
+                    for label_mode,group,field in (("Artilharia","artilharia","gols"),("Assistências","assistencias","assistencias")):
+                        await page.get_by_role("button",name=label_mode,exact=True).click()
+                        await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                        assert await page.locator(".ux-player-table tbody tr").count()==len(leaders[group])
+                        assert await page.locator(".ux-player-primary").all_text_contents()==[str(p[field]) for p in leaders[group]]
                     await page.get_by_role("button",name="Participações em gols",exact=True).click()
                     await page.locator("#fdg-main[aria-busy=false]").wait_for()
-                    source=readj(site,"dados-br/jogadores.json")["participacoes_gol"]
-                    assert await page.locator(".ux-player-table tbody tr").count()==len(source)
-                    assert (await page.locator(".ux-player-primary").first.inner_text())==str(source[0]["participacoes"])
+                    rendered=await page.locator(".ux-player-table tbody tr").evaluate_all("(rows)=>rows.map(r=>({name:r.querySelector('.ux-player-name>strong').textContent,club:r.querySelector('.ux-player-name .team>span:last-child').textContent,values:[...r.querySelectorAll('td')].slice(1).map(t=>Number(t.textContent))}))")
+                    actual={player_key(p["name"],p["club"]):tuple(p["values"]) for p in rendered}
+                    assert len(rendered)==len(actual)==len(expected) and actual==expected
+                    assert [p["values"][2] for p in rendered]==sorted([p["values"][2] for p in rendered],reverse=True)
+                    assert await page.locator(".ux-player-podium .ux-player-leader").count()==3
                     await page.screenshot(path=str(out/f"ux-hf1-participacoes-{w}.png"))
+                    club=rendered[0]["club"]
+                    await page.locator("select[data-change=playerFilter]").select_option(club)
+                    await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                    assert await page.locator(".ux-player-table tbody tr").count()==sum(p["club"]==club for p in rendered)
+                    await page.locator("select[data-change=playerFilter]").select_option("")
+                    await page.locator("#fdg-main[aria-busy=false]").wait_for()
                 if route=="clubs" and w==390 and not native:
                     await page.get_by_role("button",name="Bahia",exact=False).first.click()
                     await page.locator("#fdg-main[aria-busy=false]").wait_for()

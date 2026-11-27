@@ -1,3 +1,6 @@
 # FDG-UX-HF1 — Statistical Clarity, Probability Density & Club Intelligence Redesign
 
 Desktop masthead, timestamp hierarchy, compact heat cells, larger club column, complete inline club intelligence and Raio-X, bounded historical charts, standings typography and player leaders with published G+A. AF inputs, raw probabilities, structural certainties, 2026 season, workers and deploy controls remain untouched. Presentation only: <0.001% nonstructural ~0%, under 1% two decimals, otherwise one decimal; exact structural 0/100 preserved; nonstructural rounded 100 ~100%. Raw label and numeric estimate retained in chip tooltip; CI compares both original and formatted display. Overall AF-Player not certified; G+A is not a rating. Preview only until production authorization. Agenda and match redesign belong to UX-HF2.
+
+## CI correction
+Run 45925492396 exposed HTTP 404: jogadores.json is repository-internal and excluded from the public allowlist. G+A is now reconstructed exclusively from the existing manifested lideres-jogadores.json using normalized player name and club. Static QA compares every record to the internal archive; browser QA verifies all three lists, exact values and club filter; production smoke includes G+A. No public allowlist/manifest expansion, no new calls to external providers.
