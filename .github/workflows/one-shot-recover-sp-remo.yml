@@ -1,0 +1,18 @@
+name: One-shot official highlights recovery 401841329
+on:
+  push:
+    branches: [ops/ux-hf2-recover-401841329]
+    paths: [.github/workflows/one-shot-recover-sp-remo.yml]
+permissions:
+  contents: read
+  actions: write
+jobs:
+  dispatch:
+    if: github.ref == 'refs/heads/ops/ux-hf2-recover-401841329'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Invoke existing official API workflow, unchanged rules and default quota
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run buscar-melhores-momentos-getv.yml --repo LAERCIOREHEM/formuladogol --ref main -f modo=incremental -f event_id=401841329
