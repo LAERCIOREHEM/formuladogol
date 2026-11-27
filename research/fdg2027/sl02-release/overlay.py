@@ -17,8 +17,8 @@ def snapshot(site):
     return {p.relative_to(site).as_posix():sha(p) for p in sorted(site.rglob("*")) if p.is_file()}
 def read(p):return p.read_text(encoding="utf-8")
 def write(p,s):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s,encoding="utf-8")
-CSS='<link rel="stylesheet" href="/sl02/shell.css?v=sl02-r1-density-1">'
-JS='<script defer src="/sl02/shell.js?v=sl02-r1-density-1"></script>'
+CSS='<link rel="stylesheet" href="/sl02/shell.css?v=sl02-ux-hf1-1">'
+JS='<script defer src="/sl02/shell.js?v=sl02-ux-hf1-1"></script>'
 SHELL='<div data-fdg-release-shell></div>'
 NAV=re.compile(r'<nav\b(?P<attrs>[^>]*class=["\'][^"\']*["\'][^>]*)>.*?</nav\s*>',re.S|re.I)
 IMG=re.compile(r'<img\b[^>]*src=["\'][^"\']*header-formula-do-gol-v2\.png[^"\']*["\'][^>]*>',re.I)
@@ -84,9 +84,9 @@ def approved(original,site):
         if x.get("type")=="application/ld+json" or "googletagmanager.com/gtag/js" in src or ("gtag(" in txt and "dataLayer" in txt):continue
         x.decompose()
     for rel in ("/css/br-pwa.css","/css/br-data-pulse.css","/sl02/design.css","/sl02/shell.css"):
-        head.append(BeautifulSoup('<link rel="stylesheet" href="'+rel+'?v=sl02-r1-density-1">',"html.parser"))
+        head.append(BeautifulSoup('<link rel="stylesheet" href="'+rel+'?v=sl02-ux-hf1-1">',"html.parser"))
     for rel in ("/js/br-config.js","/js/br-menu.js","/js/br-af-core-snapshot.js","/js/br-data-manifest.js","/js/br-data-refresh.js","/js/br-data-pulse.js","/sl02/shell.js","/sl02/app.js","/js/br-pwa.js","/js/br-push.js"):
-        head.append(BeautifulSoup('<script defer src="'+rel+'?v=sl02-r1-density-1"></script>',"html.parser"))
+        head.append(BeautifulSoup('<script defer src="'+rel+'?v=sl02-ux-hf1-1"></script>',"html.parser"))
     # Keep PWA version contract and a truthful, indexable initial content
     # snapshot. JS replaces this fallback on successful hydration.
     for tag in head.select('script[src],link[href]'):

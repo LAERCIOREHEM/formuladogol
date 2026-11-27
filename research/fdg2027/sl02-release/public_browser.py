@@ -50,7 +50,7 @@ def selftest():
     print("SL02 schedule guard fixture PASS")
 async def browser(out):
     from playwright.async_api import async_playwright
-    from qa import MEASURE,live_layout
+    from qa import MEASURE,live_layout,display_probability
     out.mkdir(parents=True,exist_ok=True)
     evidence=[]
     async with async_playwright() as p:
@@ -78,7 +78,7 @@ async def browser(out):
             assert await page.get_by_text("2026 · Vigente",exact=True).count()==1
             assert await page.get_by_text("2027 · Em breve",exact=True).count()==1
             # R1: confirm the actual public revision, responsive default and original AF values.
-            assert await page.locator('script[src*="/sl02/app.js?v=sl02-r1-density-1"]').count()==1
+            assert await page.locator('script[src*="/sl02/app.js?v=sl02-ux-hf1-1"]').count()==1
             assert await page.locator("#sl02-pulse-details").count()==1
             assert not await page.locator("#sl02-pulse-details").evaluate("(e)=>e.open")
             assert not await page.locator("#sl02-freshness").is_visible()
@@ -88,7 +88,7 @@ async def browser(out):
             source=await page.evaluate("""async()=>{const r=await fetch('/dados-br/probabilidades-brasileirao.json',{cache:'no-cache'});if(!r.ok)throw Error('AF public '+r.status);return r.json()}""")
             assert source["temporada"]==2026 and "1.3" in source["versao_modelo"] and source["simulacao"]["quantidade"]==2000000
             indicators=["campeao","g4","g6","libertadores","sul_americana","sem_competicao_continental","rebaixamento"]
-            expected={c["clube"]:{k:c["probabilidades_detalhes"][k]["exibicao"] for k in indicators} for c in source["clubes"]}
+            expected={c["clube"]:{k:display_probability(c["probabilidades_detalhes"][k]) for k in indicators} for c in source["clubes"]}
             assert len(expected)==20
             default="Compacta" if mobile else "Comparativa"
             assert await page.get_by_role("button",name=default,exact=True).get_attribute("aria-pressed")=="true"

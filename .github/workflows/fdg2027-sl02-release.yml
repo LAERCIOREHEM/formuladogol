@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   readiness:
-    if: github.event.pull_request.head.repo.full_name == github.repository && (github.head_ref == 'fdg2027/sl02-integration' || github.head_ref == 'fdg2027/sl02-hf1' || github.head_ref == 'fdg2027/sl02-hf2' || github.head_ref == 'fdg2027/sl02-r1-density')
+    if: github.event.pull_request.head.repo.full_name == github.repository && (github.head_ref == 'fdg2027/sl02-integration' || github.head_ref == 'fdg2027/sl02-hf1' || github.head_ref == 'fdg2027/sl02-hf2' || github.head_ref == 'fdg2027/sl02-r1-density' || github.head_ref == 'fdg2027/ux-hf1-statistical-clarity')
     runs-on: ubuntu-24.04
     timeout-minutes: 18
     steps:
@@ -43,7 +43,7 @@ jobs:
           node --check research/fdg2027/sl02-release/shell.js
           python research/fdg2027/sl02-release/public_browser.py self-test
           python research/fdg2027/sl02-release/visual_guard.py self-test
-          if [ "$GITHUB_HEAD_REF" = fdg2027/sl02-hf1 ] || [ "$GITHUB_HEAD_REF" = fdg2027/sl02-hf2 ] || [ "$GITHUB_HEAD_REF" = fdg2027/sl02-r1-density ]; then
+          if [ "$GITHUB_HEAD_REF" = fdg2027/sl02-hf1 ] || [ "$GITHUB_HEAD_REF" = fdg2027/sl02-hf2 ] || [ "$GITHUB_HEAD_REF" = fdg2027/sl02-r1-density ] || [ "$GITHUB_HEAD_REF" = fdg2027/ux-hf1-statistical-clarity ]; then
             test "$(python research/fdg2027/sl02-release/visual_guard.py classify --before '${{ github.event.pull_request.base.sha }}' --after '${{ github.event.pull_request.head.sha }}')" = true
           fi
           # Window preflight is a release gate, not a PR test; fixtures above certify the guard.

@@ -12,6 +12,19 @@ ICONS=["📊","⚽","🔴","📰","🛡️","☰"]
 WIDTHS=(320,360,390,430,768,1024,1440)
 ROUTES=["stats/prob","stats/table","stats/performance","stats/players","stats/accuracy","games/next","games/results","articles","clubs","more","more/museum","more/sim","more/method"]
 NATIVE=["/jogos","/resultados","/tabela","/aovivo.html","/acuracia.html","/clubes.html","/analises/","/museu.html","/agenda.html","/alertas.html","/sobre.html","/copa2026/","/estatisticas-completas.html"]
+def display_probability(d):
+    from decimal import Decimal, ROUND_HALF_UP
+    n=d.get("percentual_estimado")
+    if not isinstance(n,(int,float)) or not 0<=n<=100:return d.get("exibicao","—")
+    if d.get("impossivel_estruturalmente") and n==0:return "0%"
+    if d.get("certeza_estrutural") and n==100:return "100%"
+    if n<0.001:return "~0%"
+    v=Decimal(str(n)).quantize(Decimal("0.01" if n<1 else "0.1"),rounding=ROUND_HALF_UP)
+    if v>=100:return "~100%"
+    s=format(v,".2f" if n<1 else ".1f")
+    if n>=1:s=s.rstrip("0").rstrip(".")
+    return s.replace(".",",")+"%"
+
 def readj(site,rel):return json.loads((site/rel).read_text())
 def verify_static(base,site,backup):
     b=snapshot(base);c=snapshot(site);ledger=readj(backup,"rollback.json")
@@ -148,13 +161,13 @@ async def run_browser(site,out,origin):
                             if await compact.locator("tbody tr[data-prob-club]").count()!=20:fail.append("compact rows:"+label)
                             source=readj(site,"dados-br/probabilidades-brasileirao.json")["clubes"]
                             rendered_compact=await compact.locator("tbody tr[data-prob-club]").evaluate_all("(rows)=>Object.fromEntries(rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell').textContent]))")
-                            if len(rendered_compact)!=20 or any(rendered_compact.get(c["clube"])!=c["probabilidades_detalhes"]["libertadores"]["exibicao"] for c in source):fail.append("compact exact values:"+label)
+                            if len(rendered_compact)!=20 or any(rendered_compact.get(c["clube"])!=display_probability(c["probabilidades_detalhes"]["libertadores"]) for c in source):fail.append("compact exact values:"+label)
                             if w==390 and theme=="dark":
                                 for indicator in ("campeao","g4","g6","sul_americana","sem_competicao_continental","rebaixamento","libertadores"):
                                     await page.locator("select[data-change=indicator]").select_option(indicator)
                                     await page.locator("#fdg-main[aria-busy=false]").wait_for()
                                     cells=await page.locator(".r1-compact tbody tr[data-prob-club]").evaluate_all("(rows)=>Object.fromEntries(rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell').textContent]))")
-                                    if len(cells)!=20 or any(cells.get(c["clube"])!=c["probabilidades_detalhes"][indicator]["exibicao"] for c in source):fail.append("compact indicator:"+indicator)
+                                    if len(cells)!=20 or any(cells.get(c["clube"])!=display_probability(c["probabilidades_detalhes"][indicator]) for c in source):fail.append("compact indicator:"+indicator)
                                 await page.locator(".r1-compact .hf-club-button").first.click()
                                 await page.locator("#fdg-main[aria-busy=false]").wait_for()
                                 if not await page.locator(".r1-detail-row").is_visible():fail.append("compact club detail")
@@ -180,10 +193,12 @@ async def run_browser(site,out,origin):
                         if not await page.locator(".heat-cell[data-level=certain]").count() or not await page.locator(".heat-cell[data-level=zero]").count():fail.append("structural semantics:"+label)
                         palette=await page.locator(".hf-matrix tbody tr").first.locator(".heat-cell").evaluate_all("(els)=>els.map(e=>getComputedStyle(e).getPropertyValue('--rgb').trim())")
                         if len(set(palette))!=7:fail.append("semantic palette:"+label)
-                        # Verify every displayed value against the unchanged published AF output.
+                        # Verify rendered rounding and exact original published labels separately.
                         expected=readj(site,"dados-br/probabilidades-brasileirao.json")["clubes"]
                         rendered=await page.locator(".hf-matrix tbody tr").evaluate_all("(rows)=>Object.fromEntries(rows.map(r=>[r.dataset.probClub,Object.fromEntries([...r.querySelectorAll('.heat-cell')].map(e=>[e.dataset.indicator,e.textContent]))]))")
-                        if any(rendered.get(c["clube"],{}).get(k)!=c["probabilidades_detalhes"][k]["exibicao"] for c in expected for k in rendered.get(c["clube"],{})) or len(rendered)!=20:fail.append("AF values:"+label)
+                        if any(rendered.get(c["clube"],{}).get(k)!=display_probability(c["probabilidades_detalhes"][k]) for c in expected for k in rendered.get(c["clube"],{})) or len(rendered)!=20:fail.append("AF values:"+label)
+                        original=await page.locator(".hf-matrix tbody tr[data-prob-club]").evaluate_all("(rows)=>Object.fromEntries(rows.map(r=>[r.dataset.probClub,Object.fromEntries([...r.querySelectorAll(\'.heat-cell\')].map(e=>[e.dataset.indicator,e.dataset.source]))]))")
+                        if any(original.get(c["clube"],{}).get(k)!=c["probabilidades_detalhes"][k]["exibicao"] for c in expected for k in original.get(c["clube"],{})) or len(original)!=20:fail.append("original AF labels:"+label)
                     if route=="stats/table":
                         if await page.locator(".hf-standings thead th").count()!=10:fail.append("full classification:"+label)
                         if await page.locator(".hf-standings .wide-only").count():fail.append("hidden classification:"+label)
@@ -224,6 +239,19 @@ async def run_browser(site,out,origin):
                     await page.locator("#fdg-main[aria-busy=false]").wait_for()
                     if await page.locator(".heat-cell:visible").count()!=140:fail.append("compare desktop")
                     await page.screenshot(path=str(out/"comparativa-integrada.png"))
+                    await page.locator(".hf-matrix .hf-club-button").first.click()
+                    await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                    assert await page.locator(".ux-comparative-detail .ux-club-intel").count()==1
+                    assert await page.locator(".ux-comparative-detail .ux-chart-svg").count()==1
+                    assert (await page.locator(".ux-chart-svg").bounding_box())["height"]<=211
+                    await page.screenshot(path=str(out/"ux-hf1-club-expanded-desktop.png"))
+                if route=="stats/players" and w in (390,1440) and theme=="dark" and not native:
+                    await page.get_by_role("button",name="Participações em gols",exact=True).click()
+                    await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                    source=readj(site,"dados-br/jogadores.json")["participacoes_gol"]
+                    assert await page.locator(".ux-player-table tbody tr").count()==len(source)
+                    assert (await page.locator(".ux-player-primary").first.inner_text())==str(source[0]["participacoes"])
+                    await page.screenshot(path=str(out/f"ux-hf1-participacoes-{w}.png"))
                 if route=="clubs" and w==390 and not native:
                     await page.get_by_role("button",name="Bahia",exact=False).first.click()
                     await page.locator("#fdg-main[aria-busy=false]").wait_for()
@@ -285,7 +313,7 @@ async def run_browser(site,out,origin):
         selector=".r1-compact tbody tr[data-prob-club]"
         before=await page.locator(selector).evaluate_all("(rows)=>rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell').textContent])")
         source=readj(site,"dados-br/probabilidades-brasileirao.json")["clubes"]
-        expected={c["clube"]:c["probabilidades_detalhes"]["libertadores"]["exibicao"] for c in source}
+        expected={c["clube"]:display_probability(c["probabilidades_detalhes"]["libertadores"]) for c in source}
         if len(before)!=20 or dict(before)!=expected:fail.append("last-good initial values")
         await page.locator("#sl02-pulse-details summary").click()
         await page.wait_for_timeout(300);toggle["failed"]=True
