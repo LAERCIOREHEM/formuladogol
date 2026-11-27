@@ -71,6 +71,9 @@ async def browser(out):
             assert await page.locator("#fdg-main h1").text_content()!="Dados indisponíveis"
             assert await page.locator(".fdg-nav").count()==1
             m=await page.evaluate(MEASURE)
+            if not mobile:
+                artwork=await page.locator(".brandline").evaluate("(e)=>({ratio:e.querySelector(\'img\').getBoundingClientRect().width/e.getBoundingClientRect().width,fit:getComputedStyle(e.querySelector(\'img\')).objectFit})")
+                assert artwork["ratio"]>=.80 and artwork["fit"]=="fill",artwork
             assert m["columns"]==(3 if mobile else 6)
             assert m["client"]==width and m["scroll"]<=m["client"]+1 and m["navScroll"]<=m["navClient"]+1
             assert m["active"]==1 and m["visibleMenus"]==1
@@ -79,7 +82,7 @@ async def browser(out):
             assert await page.get_by_text("2026 · Vigente",exact=True).count()==1
             assert await page.get_by_text("2027 · Em breve",exact=True).count()==1
             # R1: confirm the actual public revision, responsive default and original AF values.
-            assert await page.locator('script[src*="/sl02/app.js?v=sl02-ux-hf2-1"]').count()==1
+            assert await page.locator('script[src*="/sl02/app.js?v=sl02-ux-hf2-r1-1"]').count()==1
             assert await page.locator("#sl02-pulse-details").count()==1
             assert not await page.locator("#sl02-pulse-details").evaluate("(e)=>e.open")
             assert not await page.locator("#sl02-freshness").is_visible()
@@ -145,7 +148,7 @@ async def browser(out):
                 assert card["score"]==f'{g["placar_mandante"]} × {g["placar_visitante"]}'
                 for k in ("publico","renda"):assert normalize_space(card["facts"][k])==normalize_space(fact_value(d.get(k),k=="renda"))
                 if h:assert card["video"]==h["url"] and card.get("play")== (h["video_id"] if h.get("embeddable") is True else None)
-                else:assert card["video"].startswith("https://www.youtube.com/results?search_query=") and not card.get("play")
+                else:assert not card.get("video") and not card.get("play")
             assert not await page.locator(".ux-match iframe").count()
             await page.screenshot(path=str(out/f"producao-{width}-resultados.png"))
             detail=next(c["details"] for c in cards if c.get("details"))

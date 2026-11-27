@@ -69,9 +69,8 @@ def verify_native_media(soup,g,detail,highlight):
     assert box and not box.select("iframe"),("native eager video",g["event_id"])
     h=valid_highlight(g,highlight)
     a=box.select_one(".ux-video-actions a[href]")
-    assert a
-    if h:assert a["href"]==h["url"],("native highlight",g["event_id"])
-    else:assert a["href"].startswith("https://www.youtube.com/results?search_query=")
+    if h:assert a and a["href"]==h["url"] and box.get("data-media-state")=="official",("native highlight",g["event_id"])
+    else:assert a is None and box.get("data-media-state")=="pending" and "Aguardando vídeo oficial" in box.get_text()
     play=box.select_one("[data-fdg-play]")
     if h and h.get("embeddable") is True:assert play and play["data-fdg-play"]==h["video_id"]
     else:assert play is None
@@ -181,9 +180,10 @@ async def live_layout(page,width,fixture=False):
 
 async def match_header(page,w):
     await page.locator(".fdg-nav").wait_for(timeout=15000)
-    v=await page.evaluate("""()=>{const visible=e=>!!(e.getClientRects().length&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'),header=document.querySelector('.fdg-release-shell'),main=document.querySelector('main'),img=header.querySelector('.brandline img');return {logos:[...document.querySelectorAll('img[src*="header-formula-do-gol-v2.png"]')].filter(visible).length,legacy:document.querySelectorAll('header.hero img[src*="header-formula-do-gol-v2.png"]').length,active:header.querySelector('[aria-current=page]')?.dataset.section,headerHeight:header.getBoundingClientRect().height,logoHeight:img.getBoundingClientRect().height,mainTop:main.getBoundingClientRect().top,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth}}""")
+    v=await page.evaluate("""()=>{const visible=e=>!!(e.getClientRects().length&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'),header=document.querySelector('.fdg-release-shell'),main=document.querySelector('main'),img=header.querySelector('.brandline img');return {logos:[...document.querySelectorAll('img[src*="header-formula-do-gol-v2.png"]')].filter(visible).length,legacy:document.querySelectorAll('header.hero img[src*="header-formula-do-gol-v2.png"]').length,active:header.querySelector('[aria-current=page]')?.dataset.section,headerHeight:header.getBoundingClientRect().height,logoHeight:img.getBoundingClientRect().height,logoWidth:img.getBoundingClientRect().width,brandWidth:header.querySelector(".brandline").getBoundingClientRect().width,logoFit:getComputedStyle(img).objectFit,mainTop:main.getBoundingClientRect().top,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth}}""")
     assert v["logos"]==1 and v["legacy"]==0 and v["active"]=="games",v
-    assert v["overflow"]<=1 and v["logoHeight"]<=(109 if w>=900 else 59),v
+    assert v["overflow"]<=1 and v["logoHeight"]<=(133 if w>=900 else 59),v
+    if w>=900:assert v["logoWidth"]/v["brandWidth"]>=.80 and v["logoFit"]=="fill",v
     return v
 
 async def match_cards(page,site,final,w):
@@ -207,11 +207,12 @@ async def match_cards(page,site,final,w):
                 for k in ("publico","renda"):assert normalize_space(row["facts"][k])==normalize_space(fact_value(details.get(eid,{}).get(k),k=="renda")),(eid,k,row["facts"])
                 h=valid_highlight(g,highlights.get(eid))
                 if h:assert row["video"]==h["url"] and row.get("play")== (h["video_id"] if h.get("embeddable") is True else None),(eid,row)
-                else:assert row["video"].startswith("https://www.youtube.com/results?search_query=") and not row.get("play"),(eid,row)
+                else:assert not row.get("video") and not row.get("play"),(eid,row)
             else:
                 assert not row["facts"] and not row.get("video"),(eid,row)
                 if eid in pred:assert row["prob"]=={k:pred[eid]["exibicao"][k] for k in ("mandante","empate","visitante")},(eid,row)
         assert await page.locator(".ux-match iframe").count()==0
+        assert not await page.locator('.ux-match a[href*="youtube.com/results"]').count()
         return actual
     await check(ordered[:12])
     assert await page.locator(".ux-agenda-link").get_attribute("href")=="/agenda.html"
@@ -363,8 +364,9 @@ async def run_browser(site,out,origin):
                         if abs(x["before"]-x["after"])>2 or abs(x["max"]-x["left"])>2:fail.append("classification sticky/scroll:"+label)
                         await sc.evaluate("(e)=>e.scrollLeft=0")
                     if w>=320:
-                        brand=await page.locator(".brandline").evaluate("(e)=>{const a=e.querySelector('a').getBoundingClientRect(),b=e.querySelector('button').getBoundingClientRect();return {gap:b.left-a.right,width:a.width}}")
+                        brand=await page.locator(".brandline").evaluate("(e)=>{const a=e.querySelector('a').getBoundingClientRect(),b=e.querySelector('button').getBoundingClientRect();const i=e.querySelector('img'),r=i.getBoundingClientRect();return {gap:b.left-a.right,width:a.width,artWidth:r.width,brandWidth:e.getBoundingClientRect().width,artFit:getComputedStyle(i).objectFit}}")
                         if brand["gap"]>15 or brand["gap"]<0 or brand["width"]<100:fail.append("banner width:"+label)
+                        if w>=900 and (brand["artFit"]!="fill" or brand["artWidth"]/brand["brandWidth"]<.80):fail.append("desktop artwork not stretched:"+label+str(brand))
                 m.update(route=route,width=w,theme=theme,native=native,url=page.url)
                 rows.append(m)
                 if route=="stats/prob" and w<900 and not native:
@@ -461,14 +463,14 @@ async def run_browser(site,out,origin):
             eid=str(slot["data-event-id"])
             g=games.get(eid)
             h=valid_highlight(g,highlights.get(eid)) if g else None
-            kind="pre" if g is None else "embed" if h and h.get("embeddable") is True else "external" if h else "search"
+            kind="pre" if g is None else "embed" if h and h.get("embeddable") is True else "external" if h else "pending"
             pages.setdefault(kind,"/"+candidate.relative_to(site).as_posix())
             if len(pages)==4:break
-        assert set(pages)=={"embed","external","search","pre"},pages
+        assert set(pages)=={"embed","external","pending","pre"},pages
         for w in WIDTHS:
             for theme in ("dark","light"):
                 await one(pages["embed"],w,theme,native=True)
-        for kind in ("external","search","pre"):
+        for kind in ("external","pending","pre"):
             for w in (390,1440):
                 await one(pages[kind],w,native=True)
         # Representative generated club, match, article pages must retain native scripts and global shell.

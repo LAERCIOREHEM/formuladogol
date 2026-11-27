@@ -8,7 +8,6 @@ Rollback restores only frontend paths, never data or an old commit.
 from __future__ import annotations
 import hashlib,html,json,re,shutil,sys
 from pathlib import Path
-from urllib.parse import urlencode
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from math import isfinite
 from bs4 import BeautifulSoup
@@ -20,8 +19,8 @@ def snapshot(site):
     return {p.relative_to(site).as_posix():sha(p) for p in sorted(site.rglob("*")) if p.is_file()}
 def read(p):return p.read_text(encoding="utf-8")
 def write(p,s):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s,encoding="utf-8")
-CSS='<link rel="stylesheet" href="/sl02/shell.css?v=sl02-ux-hf2-1">'
-JS='<script defer src="/sl02/shell.js?v=sl02-ux-hf2-1"></script>'
+CSS='<link rel="stylesheet" href="/sl02/shell.css?v=sl02-ux-hf2-r1-1">'
+JS='<script defer src="/sl02/shell.js?v=sl02-ux-hf2-r1-1"></script>'
 SHELL='<div data-fdg-release-shell></div>'
 NAV=re.compile(r'<nav\b(?P<attrs>[^>]*class=["\'][^"\']*["\'][^>]*)>.*?</nav\s*>',re.S|re.I)
 IMG=re.compile(r'<img\b[^>]*src=["\'][^"\']*header-formula-do-gol-v2\.png[^"\']*["\'][^>]*>',re.I)
@@ -78,9 +77,11 @@ def enrich_native_match(s,rel,matches,details,highlights):
     anchor=hero.select_one(".game-answer")
     if anchor:anchor.insert_after(BeautifulSoup(facts,"html.parser"))
     else:hero.append(BeautifulSoup(facts,"html.parser"))
-    query="https://www.youtube.com/results?"+urlencode({"search_query":a+" "+b+" melhores momentos Brasileirão 2026 "+str(game.get("data_iso") or "")[:10]})
     play=('<button type="button" data-fdg-play="'+esc(h["video_id"])+'" aria-label="'+esc("Reproduzir melhores momentos: "+a+" x "+b)+'">Reproduzir aqui</button>') if h and h.get("embeddable") is True else ""
-    video='<section class="ux-native-video" data-fdg-video aria-label="Melhores momentos"><div class="ux-video-label"><span class="ux-video-icon" aria-hidden="true">▶</span><div><strong>Melhores momentos</strong><small>'+esc((h.get("fonte") or "YouTube") if h else "Vídeo ainda não vinculado")+'</small></div></div><div class="ux-video-actions">'+play+'<a href="'+esc(h["url"] if h else query)+'" target="_blank" rel="noopener noreferrer">'+("Abrir no YouTube" if h else "Buscar no YouTube")+'</a></div><div data-fdg-video-slot></div></section>'
+    if h:
+        video='<section class="ux-native-video" data-fdg-video data-media-state="official" aria-label="Melhores momentos"><div class="ux-video-label"><span class="ux-video-icon" aria-hidden="true">▶</span><div><strong>Melhores momentos</strong><small>'+esc(h.get("fonte") or "YouTube")+'</small></div></div><div class="ux-video-actions">'+play+'<a href="'+esc(h["url"])+'" target="_blank" rel="noopener noreferrer">Abrir no YouTube</a></div><div data-fdg-video-slot></div></section>'
+    else:
+        video='<section class="ux-native-video" data-fdg-video data-media-state="pending" aria-label="Melhores momentos"><div class="ux-video-label"><span class="ux-video-icon" aria-hidden="true">▶</span><div><strong>Melhores momentos</strong><small>Aguardando vídeo oficial</small></div></div></section>'
     hero.insert_after(BeautifulSoup(video,"html.parser"))
     return str(soup)
 
@@ -142,9 +143,9 @@ def approved(original,site):
         if x.get("type")=="application/ld+json" or "googletagmanager.com/gtag/js" in src or ("gtag(" in txt and "dataLayer" in txt):continue
         x.decompose()
     for rel in ("/css/br-pwa.css","/css/br-data-pulse.css","/sl02/design.css","/sl02/shell.css"):
-        head.append(BeautifulSoup('<link rel="stylesheet" href="'+rel+'?v=sl02-ux-hf2-1">',"html.parser"))
+        head.append(BeautifulSoup('<link rel="stylesheet" href="'+rel+'?v=sl02-ux-hf2-r1-1">',"html.parser"))
     for rel in ("/js/br-config.js","/js/br-menu.js","/js/br-af-core-snapshot.js","/js/br-data-manifest.js","/js/br-data-refresh.js","/js/br-data-pulse.js","/sl02/shell.js","/sl02/app.js","/js/br-pwa.js","/js/br-push.js"):
-        head.append(BeautifulSoup('<script defer src="'+rel+'?v=sl02-ux-hf2-1"></script>',"html.parser"))
+        head.append(BeautifulSoup('<script defer src="'+rel+'?v=sl02-ux-hf2-r1-1"></script>',"html.parser"))
     # Keep PWA version contract and a truthful, indexable initial content
     # snapshot. JS replaces this fallback on successful hydration.
     for tag in head.select('script[src],link[href]'):
