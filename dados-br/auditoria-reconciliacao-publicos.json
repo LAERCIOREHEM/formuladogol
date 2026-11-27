@@ -2,30 +2,23 @@
   "schema_version": 1,
   "contrato": "publico_presente_ou_total",
   "jogos_finalizados": 362,
-  "jogos_com_publico": 361,
-  "jogos_sem_publico": 1,
-  "publico_total": 9011106,
-  "jogos_com_renda": 361,
-  "aguardando_fonte": [
-    {
-      "event_id": "401841329",
-      "mandante": "São Paulo",
-      "visitante": "Remo",
-      "estado": "AGUARDANDO_FONTE"
-    }
-  ],
+  "jogos_com_publico": 362,
+  "jogos_sem_publico": 0,
+  "publico_total": 9027478,
+  "jogos_com_renda": 362,
+  "aguardando_fonte": [],
   "divergencias": [],
   "total_divergencias": 0,
   "por_partida": [
     {
       "event_id": "401841329",
-      "tipo_publico": "",
-      "publico_presente": null,
+      "tipo_publico": "presente",
+      "publico_presente": 16372,
       "publico_pagante": null,
-      "renda": null,
-      "fonte_publico": "",
-      "origem": "",
-      "estado": "AGUARDANDO_FONTE"
+      "renda": 574545.0,
+      "fonte_publico": "https://esportes.r7.com/jogada-10/sao-paulo-sob-vaias-vence-o-remo-com-gols-no-fim-27112026",
+      "origem": "cloudflare-postgame-fastlane",
+      "estado": "CONFIRMADO"
     },
     {
       "event_id": "401841319",
@@ -3638,5 +3631,5 @@
       "estado": "CONFIRMADO"
     }
   ],
-  "gerado_em": "2026-11-26T23:38:32.864266-03:00"
+  "gerado_em": "2026-11-27T00:11:37.824732-03:00"
 }

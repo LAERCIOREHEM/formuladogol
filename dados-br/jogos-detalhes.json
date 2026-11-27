@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-11-26T22:12:39.541862-03:00",
+  "gerado_em": "2026-11-27T00:11:37.156410-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 362,
   "total_com_estatisticas": 362,
-  "total_com_publico": 361,
+  "total_com_publico": 362,
   "total_com_eventos": 362,
   "total_com_jogadores": 362,
   "total_eventos_validados": 362,
@@ -20,9 +20,9 @@
       "placar_mandante": 3,
       "placar_visitante": 1,
       "estadio": "Estádio Cícero Pompeu de Toledo",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 16372,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://esportes.r7.com/jogada-10/sao-paulo-sob-vaias-vence-o-remo-com-gols-no-fim-27112026",
       "arbitro": "",
       "stats": [
         {
@@ -584,7 +584,8 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-11-26T22:12:36.625297-03:00"
+      "atualizado_em": "2026-11-26T22:12:36.625297-03:00",
+      "renda": 574545
     },
     "401841319": {
       "event_id": "401841319",
@@ -204912,5 +204913,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 324,
+  "total_com_renda": 362
 }
