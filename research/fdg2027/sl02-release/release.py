@@ -77,7 +77,7 @@ def smoke(site):
     verify(site,active)
     paths=FRONTEND if active else ("estatisticas.html","index.html","aovivo.html","manifest.webmanifest","sw.js")
     if active and (site/"sl02/af-player.json").is_file():paths=(*paths,"sl02/af-player.json")
-    if active:paths=(*paths,"clube/fluminense/index.html")
+    if active:paths=(*paths,"clube/fluminense/index.html","sobre.html","alertas.html","privacidade.html")
     for path in paths:
         expected=sha(site/path)
         last=""

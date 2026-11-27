@@ -12,7 +12,7 @@ LABELS=["Estatísticas","Jogos","Ao vivo","Análises","Clubes","Mais"]
 ICONS=["📊","⚽","🔴","📰","🛡️","☰"]
 WIDTHS=(320,360,390,430,768,1024,1440)
 ROUTES=["stats/prob","stats/table","stats/performance","stats/players","stats/accuracy","games/next","games/results","articles","clubs","more","more/museum","more/sim","more/method"]
-NATIVE=["/jogos","/resultados","/tabela","/aovivo.html","/acuracia.html","/clubes.html","/analises/","/museu.html","/agenda.html","/alertas.html","/sobre.html","/copa2026/","/estatisticas-completas.html"]
+NATIVE=["/jogos","/resultados","/tabela","/aovivo.html","/acuracia.html","/clubes.html","/analises/","/museu.html","/agenda.html","/alertas.html","/sobre.html","/privacidade.html","/copa2026/","/estatisticas-completas.html"]
 def display_probability(d):
     from decimal import Decimal, ROUND_HALF_UP
     n=d.get("percentual_estimado")
@@ -211,6 +211,31 @@ async def single_masthead(page,active=None):
     assert value["shells"]==value["logos"]==value["menus"]==value["themeButtons"]==1 and value["legacy"]==0,(page.url,value)
     if active:assert value["active"]==active,(page.url,value)
     return value
+async def footer_journey(page,origin,out=None,width=None):
+    """Click all institutional footer links, preserve the main content and return."""
+    await page.goto(origin+"/estatisticas.html#stats/prob",wait_until="domcontentloaded")
+    await page.locator("#fdg-main[aria-busy=false]").wait_for(timeout=25000)
+    await single_masthead(page,"stats")
+    evidence=[]
+    for dest in ("sobre","alertas","privacidade"):
+        link=page.locator('.fdg-release-footer a[href="/'+dest+'.html"]')
+        assert await link.count()==1,(dest,"footer link")
+        await link.click()
+        await page.wait_for_url("**/"+dest+".html")
+        v=await single_masthead(page,"more")
+        assert await page.locator("main").count()>=1 or await page.locator("h1").count()>=1,(dest,"content absent")
+        assert await page.evaluate("document.documentElement.scrollWidth<=document.documentElement.clientWidth+1"),(dest,"document overflow")
+        if out is not None:await page.screenshot(path=str(out/f"rodape-{width}-{dest}.png"))
+        evidence.append({"destination":dest,**v})
+        await page.get_by_role("button",name="Alternar tema").click()
+        await single_masthead(page,"more")
+        if out is not None:await page.screenshot(path=str(out/f"rodape-{width}-{dest}-tema-alternativo.png"))
+        await page.get_by_role("button",name="Alternar tema").click()
+        await page.go_back(wait_until="domcontentloaded")
+        await page.locator("#fdg-main[aria-busy=false]").wait_for(timeout=25000)
+        await single_masthead(page,"stats")
+    print("SINGLE MASTHEAD FOOTER PASS",width,json.dumps(evidence,ensure_ascii=False),flush=True)
+    return evidence
 async def match_header(page,w):
     await page.locator(".fdg-nav").wait_for(timeout=15000)
     v=await page.evaluate("""()=>{const visible=e=>!!(e.getClientRects().length&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'),header=document.querySelector('.fdg-release-shell'),main=document.querySelector('main'),img=header.querySelector('.brandline img');return {logos:[...document.querySelectorAll('img[src*="header-formula-do-gol-v2.png"]')].filter(visible).length,legacy:document.querySelectorAll('header.hero img[src*="header-formula-do-gol-v2.png"]').length,active:header.querySelector('[aria-current=page]')?.dataset.section,headerHeight:header.getBoundingClientRect().height,logoHeight:img.getBoundingClientRect().height,logoWidth:img.getBoundingClientRect().width,brandWidth:header.querySelector(".brandline").getBoundingClientRect().width,logoFit:getComputedStyle(img).objectFit,mainTop:main.getBoundingClientRect().top,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth}}""")
@@ -561,6 +586,15 @@ async def run_browser(site,out,origin):
                     await page.go_back(wait_until="domcontentloaded")
                     await single_masthead(page,"games")
             except Exception as exc:fail.append("match-to-club journey @"+str(w)+":"+str(exc))
+            finally:await ctx.close()
+        for w in (320,390,1440):
+            ctx=await browser.new_context(viewport={"width":w,"height":920},service_workers="block")
+            await ctx.route("**/*",handle);page=await ctx.new_page()
+            footer_errors=[];page.on("pageerror",lambda e:footer_errors.append(str(e)))
+            try:
+                await footer_journey(page,origin,out,w)
+                assert not footer_errors,footer_errors
+            except Exception as exc:fail.append("institutional footer journey @"+str(w)+":"+str(exc))
             finally:await ctx.close()
         # Representative generated club, match, article pages must retain native scripts and global shell.
         for rel in ("clube","jogo","analises"):

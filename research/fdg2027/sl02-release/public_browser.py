@@ -50,7 +50,7 @@ def selftest():
     print("SL02 schedule guard fixture PASS")
 async def browser(out):
     from playwright.async_api import async_playwright
-    from qa import MEASURE,live_layout,display_probability,player_totals,player_key,match_header,normalize_space,desktop_probability_density,single_masthead
+    from qa import MEASURE,live_layout,display_probability,player_totals,player_key,match_header,normalize_space,desktop_probability_density,single_masthead,footer_journey
     from overlay import fact_value,valid_highlight
     out.mkdir(parents=True,exist_ok=True)
     evidence=[]
@@ -194,6 +194,7 @@ async def browser(out):
             await single_masthead(page,"clubs")
             await page.screenshot(path=str(out/f"producao-{width}-fluminense-tema-alternativo.png"))
             await page.get_by_role("button",name="Alternar tema").click()
+            footer=await footer_journey(page,HOST,out,width)
             await page.goto(HOST+"/agenda.html",wait_until="domcontentloaded",timeout=35000)
             await match_header(page,width)
             await page.locator(".agenda-game").first.wait_for(timeout=25000)
@@ -205,7 +206,7 @@ async def browser(out):
             live=await live_layout(page,width)
             await page.screenshot(path=str(out/f"producao-{width}-ao-vivo.png"))
             assert not errors,errors
-            evidence.append({"viewport":width,"mobile_emulation":mobile,"url":page.url,"menu":m,"classificacao_clubes":20,"live_layout":live,"default_view":default,"density":density,"af_values_verified":140,"season":source["temporada"],"model":source["versao_modelo"],"finals":source["base_corrente"]["partidas_concluidas"],"errors":errors})
+            evidence.append({"viewport":width,"mobile_emulation":mobile,"url":page.url,"menu":m,"classificacao_clubes":20,"live_layout":live,"footer_masthead":footer,"default_view":default,"density":density,"af_values_verified":140,"season":source["temporada"],"model":source["versao_modelo"],"finals":source["base_corrente"]["partidas_concluidas"],"errors":errors})
             await ctx.close()
         await b.close()
     (out/"public-browser.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2),encoding="utf-8")
