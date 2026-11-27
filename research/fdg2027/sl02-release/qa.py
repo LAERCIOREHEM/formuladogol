@@ -249,6 +249,14 @@ async def match_cards(page,site,final,w):
             assert await page.locator(".ux-match iframe").count()==0
     return {"final":final,"total":len(ordered),"cards":await cards.count()}
 
+async def desktop_probability_density(page):
+    m=await page.locator(".hf-matrix").evaluate("""t=>{const rect=e=>e.getBoundingClientRect(),rows=[...t.querySelectorAll('tbody tr[data-prob-club]')],chips=rows.flatMap(r=>[...r.querySelectorAll('.heat-cell')]),clubs=rows.map(r=>{const b=r.querySelector('.hf-club-button'),n=b.querySelector('.team>span:last-child'),range=document.createRange();range.selectNodeContents(n);const a=range.getBoundingClientRect(),c=rect(b),chev=rect(b.querySelector('.hf-chevron'));return {name:n.textContent,lines:range.getClientRects().length,inside:a.left>=c.left-1&&a.right<=chev.left+1&&a.top>=c.top-1&&a.bottom<=c.bottom+1}});return {table:rect(t).width,clubWidth:rect(rows[0].cells[0]).width,maxChipWidth:Math.max(...chips.map(c=>rect(c).width)),maxChipHeight:Math.max(...chips.map(c=>rect(c).height)),maxRowHeight:Math.max(...rows.map(r=>rect(r).height)),chipCount:chips.length,labelsFit:chips.every(c=>c.scrollWidth<=c.clientWidth+1),clubs,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth}}""")
+    assert 245<=m["clubWidth"] and m["table"]<=1281,m
+    assert m["maxChipWidth"]<=73 and m["maxChipHeight"]<=29 and m["maxRowHeight"]<=45,m
+    assert m["chipCount"]==140 and m["labelsFit"] and m["overflow"]<=1,m
+    assert len(m["clubs"])==20 and all(c["inside"] and c["lines"]==1 for c in m["clubs"]),m
+    return m
+
 async def run_browser(site,out,origin):
     rows=[];errors=[];fail=[];blocked=set();local_requests={}
     def validate(m,label,w=None,doc=True):
@@ -352,6 +360,8 @@ async def run_browser(site,out,origin):
                             await page.get_by_role("button",name="Comparativa",exact=True).click()
                             await page.locator("#fdg-main[aria-busy=false]").wait_for()
                         if await page.locator(".hf-matrix .heat-cell").count()!=140:fail.append("seven indicators:"+label)
+                        if w>=900:
+                            m["desktop_probability_density"]=await desktop_probability_density(page)
                         if await page.locator(".hf-matrix th[data-indicator]").count()!=7:fail.append("indicator columns:"+label)
                         if await page.locator(".hf-matrix th[data-indicator$='_base']").count():fail.append("base exposed:"+label)
                         if not await page.locator(".heat-cell[data-level=certain]").count() or not await page.locator(".heat-cell[data-level=zero]").count():fail.append("structural semantics:"+label)
@@ -454,6 +464,10 @@ async def run_browser(site,out,origin):
             for w in (390,1440):await one(route,w,native=True)
         for w in WIDTHS:
             if w not in (390,1440):await one("/aovivo.html",w,native=True)
+        # Explicit wide desktop evidence including the user's large-screen layout.
+        for w in (1280,1600,1920):
+            for theme in ("dark","light"):
+                await one("stats/prob",w,theme)
         # HF2 responsive matrix extends the complete HF1 suite, rather than replacing it.
         for w in WIDTHS:
             for theme in ("dark","light"):

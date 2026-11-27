@@ -13,3 +13,5 @@ Stacked on certified HF1 (5931985f). PR targeting main includes HF1 until #75 me
 Desktop artwork fills the available masthead width; mobile and live density retained. Missing official highlights now show a neutral pending state, never generic YouTube search. Existing API workflow, source policy, quotas and data files untouched. Only exact archived URLs and explicit embedding permission are presented.
 
 Restore the original manual-over-automatic highlights precedence, including exact archived URLs with timestamps. Test pending state with a local fixture even if all real finals have media.
+
+Desktop probability density: explicitly override the earlier more-specific club column, size chips at 72px with 3px vertical padding, limit comparative scroll region to 1280px, and assert 20 unbroken club names, 140 fitting chips, measured row/chip dimensions, and no document overflow at 1024, 1280, 1440, 1600 and 1920px in both themes. Mobile unchanged.

@@ -50,7 +50,7 @@ def selftest():
     print("SL02 schedule guard fixture PASS")
 async def browser(out):
     from playwright.async_api import async_playwright
-    from qa import MEASURE,live_layout,display_probability,player_totals,player_key,match_header,normalize_space
+    from qa import MEASURE,live_layout,display_probability,player_totals,player_key,match_header,normalize_space,desktop_probability_density
     from overlay import fact_value,valid_highlight
     out.mkdir(parents=True,exist_ok=True)
     evidence=[]
@@ -82,7 +82,7 @@ async def browser(out):
             assert await page.get_by_text("2026 · Vigente",exact=True).count()==1
             assert await page.get_by_text("2027 · Em breve",exact=True).count()==1
             # R1: confirm the actual public revision, responsive default and original AF values.
-            assert await page.locator('script[src*="/sl02/app.js?v=sl02-ux-hf2-r1-1"]').count()==1
+            assert await page.locator('script[src*="/sl02/app.js?v=sl02-ux-hf2-r1-2"]').count()==1
             assert await page.locator("#sl02-pulse-details").count()==1
             assert not await page.locator("#sl02-pulse-details").evaluate("(e)=>e.open")
             assert not await page.locator("#sl02-freshness").is_visible()
@@ -111,6 +111,7 @@ async def browser(out):
             await page.locator("#fdg-main[aria-busy=false]").wait_for()
             assert await page.locator(".hf-matrix tbody tr").count()==20
             assert await page.locator(".hf-matrix .heat-cell").count()==140
+            if not mobile:await desktop_probability_density(page)
             actual=await page.locator(".hf-matrix tbody tr").evaluate_all("(rows)=>Object.fromEntries(rows.map(r=>[r.dataset.probClub,Object.fromEntries([...r.querySelectorAll('.heat-cell')].map(c=>[c.dataset.indicator,c.textContent]))]))")
             assert actual==expected,"Public AF comparison values differ from source"
             if mobile:
