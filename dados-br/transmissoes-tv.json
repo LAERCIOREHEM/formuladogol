@@ -95,7 +95,7 @@
             "GE TV"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -146,7 +146,7 @@
             "Premiere"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -197,7 +197,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -228,13 +228,11 @@
       "data_iso": "2026-11-29T16:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "GE TV",
-        "Premiere",
-        "Globo"
+        "GE TV"
       ],
-      "origem": "GE Agenda + YouTube oficial validado",
+      "origem": "YouTube oficial validado",
       "confianca": "confirmado",
-      "estavel": true,
+      "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
@@ -243,21 +241,9 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=ItY99vTq4BM",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
-        },
-        {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Premiere",
-            "Globo",
-            "GE TV"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -265,21 +251,6 @@
           "nome": "Assistir na GE TV",
           "url": "https://www.youtube.com/watch?v=ItY99vTq4BM",
           "tipo": "player_oficial"
-        },
-        {
-          "nome": "Premiere no Globoplay",
-          "url": "https://globoplay.globo.com/canais/premiere/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "TV Globo no Globoplay",
-          "url": "https://globoplay.globo.com/",
-          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -304,7 +275,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -325,13 +296,11 @@
       "data_iso": "2026-11-29T18:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "GE TV",
-        "Premiere",
-        "SporTV"
+        "GE TV"
       ],
-      "origem": "GE Agenda + YouTube oficial validado",
+      "origem": "YouTube oficial validado",
       "confianca": "confirmado",
-      "estavel": true,
+      "estavel": false,
       "exclusivo": false,
       "fontes": [
         {
@@ -340,20 +309,9 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=TtchwqtN58k",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
-        },
-        {
-          "fonte": "GE Agenda",
-          "canais": [
-            "SporTV",
-            "Premiere"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ],
       "acessos": [
@@ -361,26 +319,6 @@
           "nome": "Assistir na GE TV",
           "url": "https://www.youtube.com/watch?v=TtchwqtN58k",
           "tipo": "player_oficial"
-        },
-        {
-          "nome": "Premiere no Globoplay",
-          "url": "https://globoplay.globo.com/canais/premiere/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "SporTV no Globoplay",
-          "url": "https://globoplay.globo.com/canais/sportv-us/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "SporTV na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -405,7 +343,7 @@
             "Premiere"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -444,7 +382,7 @@
             "Premiere"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -483,7 +421,7 @@
             "CazéTV"
           ],
           "referencia": "https://www.youtube.com/watch?v=djYK6lMheNs",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -529,7 +467,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -603,7 +541,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/pr/futebol/times/coritiba/noticia/2026/11/27/coritiba-pode-se-classificar-para-a-sul-americana-nesta-rodada-veja-as-contas.ghtml",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -641,7 +579,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -699,7 +637,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -756,7 +694,7 @@
             "SporTV"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -824,7 +762,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -875,7 +813,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -924,7 +862,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -966,7 +904,7 @@
             "SporTV"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -1030,7 +968,7 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=QE3W-jo8a5E",
-          "capturado_em": "2026-11-27T19:21:05-03:00",
+          "capturado_em": "2026-11-27T19:41:17-03:00",
           "autoridade": 120,
           "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
@@ -1044,5 +982,5 @@
       ]
     }
   },
-  "atualizado_em": "2026-11-27T19:21:05-03:00"
+  "atualizado_em": "2026-11-27T19:41:17-03:00"
 }

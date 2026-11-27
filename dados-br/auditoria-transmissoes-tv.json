@@ -9,7 +9,7 @@
     "jogos_criticos_sem_transmissao_72h": 0,
     "registros_preservados": 6,
     "jogos_guardiao_ia": 1,
-    "jogos_estaveis_sem_reconsulta_editorial": 3,
+    "jogos_estaveis_sem_reconsulta_editorial": 5,
     "fontes_com_falha": 2
   },
   "fontes": {
@@ -26,18 +26,18 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=SSLError: Failed to perform, curl: (35) TLS connect error: error:00000000:invalid library (0):OPENSSL_internal:invalid library (0). See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)> | urllib-cbf-fallback=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)>",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=SSLError: Failed to perform, curl: (35) TLS connect error: error:00000000:invalid library (0):OPENSSL_internal:invalid library (0). See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)> | urllib-cbf-fallback=URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1011)>"
       ],
-      "duracao_ms": 21114
+      "duracao_ms": 19905
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 10,
-      "duracao_ms": 4325
+      "jogos_com_canal": 8,
+      "duracao_ms": 4826
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 7,
       "jogos_com_canal": 1,
-      "duracao_ms": 29031
+      "duracao_ms": 32614
     },
     "espn": {
       "ok": false,
@@ -120,5 +120,5 @@
     "https://ge.globo.com/gato-mestre/dicas/noticia/2026/11/26/veja-a-expectativa-de-gols-xg-e-as-dicas-de-sg-para-a-rodada-37-do-cartola-2026.ghtml",
     "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/11/26/sao-paulo-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
   ],
-  "atualizado_em": "2026-11-27T19:21:05-03:00"
+  "atualizado_em": "2026-11-27T19:41:17-03:00"
 }
