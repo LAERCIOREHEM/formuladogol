@@ -15,3 +15,5 @@ Desktop artwork fills the available masthead width; mobile and live density reta
 Restore the original manual-over-automatic highlights precedence, including exact archived URLs with timestamps. Test pending state with a local fixture even if all real finals have media.
 
 Desktop probability density: explicitly override the earlier more-specific club column, size chips at 72px with 3px vertical padding, limit comparative scroll region to 1280px, and assert 20 unbroken club names, 140 fitting chips, measured row/chip dimensions, and no document overflow at 1024, 1280, 1440, 1600 and 1920px in both themes. Mobile unchanged.
+
+R1-3: default Comparative on every viewport, including mobile; Compact and Quick remain optional. Verify default matrix and sticky horizontal navigation before explicitly testing Compact. Previous CI measured 51.15625px rows despite 72px chips: enforce actual desktop button height and cell padding; keep the 45px row threshold and original data checks. Cache-bust all visual assets.

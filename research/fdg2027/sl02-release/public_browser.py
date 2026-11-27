@@ -82,7 +82,7 @@ async def browser(out):
             assert await page.get_by_text("2026 · Vigente",exact=True).count()==1
             assert await page.get_by_text("2027 · Em breve",exact=True).count()==1
             # R1: confirm the actual public revision, responsive default and original AF values.
-            assert await page.locator('script[src*="/sl02/app.js?v=sl02-ux-hf2-r1-2"]').count()==1
+            assert await page.locator('script[src*="/sl02/app.js?v=sl02-ux-hf2-r1-3"]').count()==1
             assert await page.locator("#sl02-pulse-details").count()==1
             assert not await page.locator("#sl02-pulse-details").evaluate("(e)=>e.open")
             assert not await page.locator("#sl02-freshness").is_visible()
@@ -94,12 +94,18 @@ async def browser(out):
             indicators=["campeao","g4","g6","libertadores","sul_americana","sem_competicao_continental","rebaixamento"]
             expected={c["clube"]:{k:display_probability(c["probabilidades_detalhes"][k]) for k in indicators} for c in source["clubes"]}
             assert len(expected)==20
-            default="Compacta" if mobile else "Comparativa"
+            default="Comparativa"
             assert await page.get_by_role("button",name=default,exact=True).get_attribute("aria-pressed")=="true"
-            density=await page.locator(".r1-compact-scroll" if mobile else ".hf-table-scroll").first.evaluate("(e)=>({top:e.getBoundingClientRect().top,first:e.querySelector('tbody tr').getBoundingClientRect().bottom,viewport:innerHeight,width:e.clientWidth,scroll:e.scrollWidth,pulse:document.querySelector('#sl02-pulse').getBoundingClientRect().height})")
+            density=await page.locator(".hf-table-scroll").first.evaluate("(e)=>({top:e.getBoundingClientRect().top,first:e.querySelector('tbody tr').getBoundingClientRect().bottom,viewport:innerHeight,width:e.clientWidth,scroll:e.scrollWidth,pulse:document.querySelector('#sl02-pulse').getBoundingClientRect().height})")
             assert density["first"]<=density["viewport"],density
             if mobile:
-                assert density["scroll"]<=density["width"]+1,density
+                assert density["scroll"]>density["width"],density
+                assert await page.locator(".hf-matrix .heat-cell").count()==140
+                await page.screenshot(path=str(out/f"producao-{width}-comparativa-padrao.png"))
+                await page.get_by_role("button",name="Compacta",exact=True).click()
+                await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                compact_bounds=await page.locator(".r1-compact-scroll").evaluate("(e)=>({width:e.clientWidth,scroll:e.scrollWidth})")
+                assert compact_bounds["scroll"]<=compact_bounds["width"]+1,compact_bounds
                 compact=await page.locator(".r1-compact tbody tr[data-prob-club]").evaluate_all("(rows)=>Object.fromEntries(rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell').textContent]))")
                 selected=await page.locator("select[data-change=indicator]").input_value()
                 assert compact=={k:v[selected] for k,v in expected.items()}

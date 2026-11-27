@@ -7,7 +7,7 @@ const paths={table:'tabela.json',results:'resultados.json',games:'jogos.json',pr
 const getStore=(key,def='')=>{try{return localStorage.getItem('fdg-sl02:'+key)||def}catch{return def}}, setStore=(key,val)=>{try{localStorage.setItem('fdg-sl02:'+key,val)}catch{}};
 const navRoot=document.querySelector('[data-fdg-shell]');if(!navRoot)return;
 const initial=document.body.dataset.initial||'stats/prob', legacy=false, prefix='';
-const state={indicator:'libertadores',view:matchMedia('(min-width:900px)').matches?'compare':'compact',sort:'position',recorte:'geral',division:'A',club:getStore('club'),detail:'',playerMode:'artilharia',playerFilter:'',matchClub:'',round:'',matchLimit:12,histClub:'',articleFilter:'all',theme:getStore('theme','dark'),sim:{},perfMode:'indice_final'};
+const state={indicator:'libertadores',view:'compare',sort:'position',recorte:'geral',division:'A',club:getStore('club'),detail:'',playerMode:'artilharia',playerFilter:'',matchClub:'',round:'',matchLimit:12,histClub:'',articleFilter:'all',theme:getStore('theme','dark'),sim:{},perfMode:'indice_final'};
 let data={},seq=0,route='',lastRevision='',lastGoodRoute='',stale=false,refreshing=false;
 const promises=new Map();
 paths.audit='dados-br/auditoria-probabilidades.json';

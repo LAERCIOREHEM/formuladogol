@@ -320,15 +320,23 @@ async def run_browser(site,out,origin):
                     if route=="stats/prob":
                         if not await page.locator("#sl02-pulse .fdg-pulse").count():fail.append("Data Pulse:"+label)
                         if await page.locator(".prob-metrics").count():fail.append("duplicated metrics:"+label)
-                        default="Comparativa" if w>=900 else "Compacta"
+                        default="Comparativa"
                         if await page.get_by_role("button",name=default,exact=True).get_attribute("aria-pressed")!="true":fail.append("responsive default:"+label)
                         if await page.locator("#sl02-pulse-details").get_attribute("open") is not None:fail.append("pulse default:"+label)
                         if await page.locator("#sl02-freshness").is_visible():fail.append("duplicate freshness:"+label)
                         if await page.locator(".r1-prob-legend").get_attribute("open") is not None:fail.append("legend default:"+label)
                         labels=await page.locator(".r1-stats-tabs button,.r1-prob-mode button").evaluate_all("(els)=>els.map(e=>{let t=document.createRange();t.selectNodeContents(e);let a=t.getBoundingClientRect(),b=e.getBoundingClientRect();return {label:e.textContent,inside:a.left>=b.left+1&&a.right<=b.right-1&&a.top>=b.top&&a.bottom<=b.bottom}})")
                         if w>=320 and any(not x["inside"] for x in labels):fail.append("clipped secondary navigation:"+label+str(labels))
-                        if w<900 and w>=320 and await page.locator(".r1-compact thead th:last-child").inner_text()!="Chance":fail.append("compact heading:"+label)
                         if w<900:
+                            # Comparative is the requested default on all devices.
+                            default_matrix=await page.locator(".hf-matrix tbody tr[data-prob-club]").count()
+                            if default_matrix!=20 or await page.locator(".hf-matrix .heat-cell").count()!=140:fail.append("mobile default matrix:"+label)
+                            sc=page.locator(".hf-table-scroll").first
+                            scroll=await sc.evaluate("(e)=>{const a=e.querySelector('tbody .hf-sticky'),x=a.getBoundingClientRect().left;e.scrollLeft=e.scrollWidth;const result={before:x,after:a.getBoundingClientRect().left,max:e.scrollWidth-e.clientWidth,left:e.scrollLeft};e.scrollLeft=0;return result}")
+                            if scroll["max"]<=0 or abs(scroll["before"]-scroll["after"])>2 or abs(scroll["max"]-scroll["left"])>2:fail.append("mobile default matrix scroll:"+label+str(scroll))
+                            await page.get_by_role("button",name="Compacta",exact=True).click()
+                            await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                            if w>=320 and await page.locator(".r1-compact thead th:last-child").inner_text()!="Chance":fail.append("compact heading:"+label)
                             compact=page.locator(".r1-compact")
                             if await compact.locator("tbody tr[data-prob-club]").count()!=20:fail.append("compact rows:"+label)
                             source=readj(site,"dados-br/probabilidades-brasileirao.json")["clubes"]
@@ -531,9 +539,10 @@ async def run_browser(site,out,origin):
         page=await ctx.new_page()
         await page.goto(origin+"/estatisticas.html#stats/prob")
         await page.locator("#fdg-main[aria-busy=false]").wait_for()
-        await page.locator(".r1-compact tbody tr[data-prob-club]").first.wait_for()
-        selector=".r1-compact tbody tr[data-prob-club]"
-        before=await page.locator(selector).evaluate_all("(rows)=>rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell').textContent])")
+        await page.locator(".hf-matrix tbody tr[data-prob-club]").first.wait_for()
+        selector=".hf-matrix tbody tr[data-prob-club]"
+        assert await page.get_by_role("button",name="Comparativa",exact=True).get_attribute("aria-pressed")=="true"
+        before=await page.locator(selector).evaluate_all("(rows)=>rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell[data-indicator=libertadores]').textContent])")
         source=readj(site,"dados-br/probabilidades-brasileirao.json")["clubes"]
         expected={c["clube"]:display_probability(c["probabilidades_detalhes"]["libertadores"]) for c in source}
         if len(before)!=20 or dict(before)!=expected:fail.append("last-good initial values")
@@ -542,11 +551,11 @@ async def run_browser(site,out,origin):
         await page.evaluate("window.dispatchEvent(new Event('online'))")
         try:
             await page.get_by_text("Sem certificação da revisão atual",exact=False).wait_for(timeout=12000)
-            after=await page.locator(selector).evaluate_all("(rows)=>rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell').textContent])")
-            if len(after)!=20 or after!=before:fail.append("last-good compact values changed")
+            after=await page.locator(selector).evaluate_all("(rows)=>rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell[data-indicator=libertadores]').textContent])")
+            if len(after)!=20 or after!=before:fail.append("last-good comparative values changed")
             if not await page.locator("#sl02-pulse-details").evaluate("(e)=>e.open"):fail.append("last-good pulse disclosure lost")
             if await page.locator("#sl02-pulse-details").evaluate("(e)=>e.classList.contains('fdg-pulse--synced')"):fail.append("last-good false freshness")
-            await page.screenshot(path=str(out/"last-good-compact-stale.png"),animations="disabled")
+            await page.screenshot(path=str(out/"last-good-comparative-stale.png"),animations="disabled")
         except Exception as e:fail.append("last-good status:"+str(e)[:100])
         await ctx.close()
         await browser.close()

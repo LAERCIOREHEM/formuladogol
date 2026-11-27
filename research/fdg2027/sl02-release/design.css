@@ -117,3 +117,11 @@
   .fdg-release-app .hf-table-scroll .hf-matrix .hf-club-button .team{flex:1 1 auto;min-width:0}
   .fdg-release-app .hf-table-scroll .hf-matrix .hf-club-button .team>span:last-child{white-space:nowrap;overflow-wrap:normal;word-break:normal}
 }
+
+/* Resolve the measured 51.16px row regression without changing the type scale.
+   Explicitly size the actual interactive control and both cells. */
+@media(min-width:900px) {
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] > :is(th,td) {height:43px;box-sizing:border-box;padding-block:2px!important}
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] .hf-club-button {box-sizing:border-box;height:36px!important;min-height:36px!important;max-height:36px!important;padding:0!important;line-height:1.2!important;align-items:center}
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] .hf-club-button .team {align-items:center;line-height:1.2;min-height:0;max-height:36px}
+}
