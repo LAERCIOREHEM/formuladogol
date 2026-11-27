@@ -58,7 +58,7 @@ def normalize_space(v):return " ".join(str(v).split())
 def match_source(site):
     results={str(g["event_id"]):g for g in readj(site,"resultados.json")["resultados"]}
     details=readj(site,"sl02/match-summary.json")["jogos"]
-    highlights=readj(site,"dados-br/melhores-momentos.json").get("jogos",{})
+    highlights={**readj(site,"dados-br/melhores-momentos.json").get("jogos",{}),**readj(site,"dados-br/melhores-momentos-manual.json").get("jogos",{})}
     return results,details,highlights
 def verify_native_media(soup,g,detail,highlight):
     assert soup.select_one(".game-hero-card .ux-native-facts")
@@ -112,6 +112,14 @@ def verify_static(base,site,backup):
                     checked_finals.add(eid)
                 elif slot:assert not new.select(".ux-native-video,.ux-native-facts"),("premature final UI",rel)
     assert checked_finals==set(matches),("missing final detail routes",sorted(set(matches)-checked_finals))
+    # Pending is tested even when every real match has official media.
+    from overlay import enrich_native_match
+    sample_id=next(iter(checked_finals))
+    sample_game=matches[sample_id]
+    fixture='<html><body><section class="game-hero-card"><p class="game-answer">Final</p><span data-fdg-game-alert-slot data-event-id="'+sample_id+'"></span></section></body></html>'
+    pending=BeautifulSoup(enrich_native_match(fixture,"jogo/fixture/index.html",matches,details,{}),"html.parser")
+    verify_native_media(pending,sample_game,details.get(sample_id,{}),None)
+    assert not pending.select('a[href*="youtube.com/results"]')
     print("UX-HF2 NATIVE MATCH PASS",len(checked_finals),"FINAL pages; source-projected facts and safe media",flush=True)
     verify_player_archive(site)
     p=readj(site,"dados-br/probabilidades-brasileirao.json")
@@ -466,11 +474,12 @@ async def run_browser(site,out,origin):
             kind="pre" if g is None else "embed" if h and h.get("embeddable") is True else "external" if h else "pending"
             pages.setdefault(kind,"/"+candidate.relative_to(site).as_posix())
             if len(pages)==4:break
-        assert set(pages)=={"embed","external","pending","pre"},pages
+        assert {"embed","external","pre"}<=set(pages),pages
         for w in WIDTHS:
             for theme in ("dark","light"):
                 await one(pages["embed"],w,theme,native=True)
         for kind in ("external","pending","pre"):
+            if kind not in pages:continue
             for w in (390,1440):
                 await one(pages[kind],w,native=True)
         # Representative generated club, match, article pages must retain native scripts and global shell.

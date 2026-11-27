@@ -11,3 +11,5 @@ Stacked on certified HF1 (5931985f). PR targeting main includes HF1 until #75 me
 
 ## HF2-R1 — desktop artwork and official media only
 Desktop artwork fills the available masthead width; mobile and live density retained. Missing official highlights now show a neutral pending state, never generic YouTube search. Existing API workflow, source policy, quotas and data files untouched. Only exact archived URLs and explicit embedding permission are presented.
+
+Restore the original manual-over-automatic highlights precedence, including exact archived URLs with timestamps. Test pending state with a local fixture even if all real finals have media.

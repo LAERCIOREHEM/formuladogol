@@ -8,6 +8,7 @@ Rollback restores only frontend paths, never data or an old commit.
 from __future__ import annotations
 import hashlib,html,json,re,shutil,sys
 from pathlib import Path
+from urllib.parse import urlparse, parse_qs
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from math import isfinite
 from bs4 import BeautifulSoup
@@ -50,7 +51,14 @@ def fact_value(v,currency=False):
 def valid_highlight(game,h):
     if not isinstance(h,dict):return None
     video=h.get("video_id") or ""
-    if (str(h.get("event_id"))!=str(game.get("event_id")) or h.get("placar_mandante")!=game.get("placar_mandante") or h.get("placar_visitante")!=game.get("placar_visitante") or not re.fullmatch(r"[A-Za-z0-9_-]{11}",video) or h.get("url")!="https://www.youtube.com/watch?v="+video):return None
+    if (str(h.get("event_id"))!=str(game.get("event_id")) or h.get("placar_mandante")!=game.get("placar_mandante") or h.get("placar_visitante")!=game.get("placar_visitante") or not re.fullmatch(r"[A-Za-z0-9_-]{11}",video)):return None
+    try:
+        u=urlparse(h.get("url") or "")
+        if u.scheme!="https" or u.hostname not in ("youtube.com","www.youtube.com","m.youtube.com","youtu.be","www.youtu.be") or u.username or u.password or u.port:return None
+        parts=u.path.strip("/").split("/")
+        exact=parts[0] if u.hostname.endswith("youtu.be") else (parse_qs(u.query).get("v") or [None])[0] if u.path=="/watch" else parts[1] if len(parts)>1 and parts[0] in ("embed","shorts","live") else None
+        if exact!=video:return None
+    except (ValueError,TypeError):return None
     return h
 
 def enrich_native_match(s,rel,matches,details,highlights):
@@ -176,7 +184,7 @@ def apply(site,backup):
     projection=match_projection(json.loads(read(details_path)),sha(details_path))
     details=projection["jogos"]
     matches={str(g["event_id"]):g for g in json.loads(read(site/"resultados.json"))["resultados"]}
-    highlights=json.loads(read(site/"dados-br/melhores-momentos.json")).get("jogos",{})
+    highlights={**json.loads(read(site/"dados-br/melhores-momentos.json")).get("jogos",{}),**json.loads(read(site/"dados-br/melhores-momentos-manual.json")).get("jogos",{})}
     native_count=0
     for p in sorted(site.rglob("*.html")):
         rel=p.relative_to(site).as_posix()
