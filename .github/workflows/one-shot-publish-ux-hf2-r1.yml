@@ -1,0 +1,32 @@
+name: One-shot certified desktop UX publication
+on:
+  push:
+    branches: [ops/publish-ux-hf2-r1-91599a36]
+    paths: [.github/workflows/one-shot-publish-ux-hf2-r1.yml]
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/ops/publish-ux-hf2-r1-91599a36'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: LAERCIOREHEM/formuladogol
+      EXPECTED: 91599a36dee7773834f87570ab1e0aee20c78584
+    steps:
+      - name: Require successful exact readiness run before publishing
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run watch 46015204804 --repo "$REPO" --exit-status --interval 15
+          test "$(gh run view 46015204804 --repo "$REPO" --json headSha --jq .headSha)" = "$EXPECTED"
+          test "$(gh run view 46015204804 --repo "$REPO" --json conclusion --jq .conclusion)" = success
+          test "$(gh pr view 77 --repo "$REPO" --json headRefOid --jq .headRefOid)" = "$EXPECTED"
+          test "$(gh pr view 77 --repo "$REPO" --json baseRefName --jq .baseRefName)" = main
+          test "$(gh pr view 77 --repo "$REPO" --json state --jq .state)" = OPEN
+          gh pr merge 77 --repo "$REPO" --merge --match-head-commit "$EXPECTED"
+          test "$(gh pr view 77 --repo "$REPO" --json state --jq .state)" = MERGED
+          gh workflow run deploy.yml --repo "$REPO" --ref main
