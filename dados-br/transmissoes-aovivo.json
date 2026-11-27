@@ -13,6 +13,43 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "jogos": {
+    "401841337": {
+      "event_id": "401841337",
+      "rodada": 37,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Fluminense",
+      "visitante": "Cruzeiro",
+      "data_iso": "2026-11-27T20:00:00-03:00",
+      "estadio": "Maracanã",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "MSajlBZ4TFA",
+        "url": "https://www.youtube.com/watch?v=MSajlBZ4TFA",
+        "status": "live",
+        "inicio_programado": "2026-11-27T19:00:00-03:00",
+        "inicio_real": "2026-11-27T18:53:49-03:00",
+        "titulo": "FLUMINENSE X CRUZEIRO | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/MSajlBZ4TFA/maxresdefault.jpg?v=6b071d8c",
+        "confianca": 0.95,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "transmissão já está ao vivo",
+          "horário compatível (60 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": true
+      },
+      "alternativas": []
+    },
     "401841332": {
       "event_id": "401841332",
       "rodada": 37,
@@ -158,5 +195,5 @@
       "alternativas": []
     }
   },
-  "atualizado_em": "2026-11-27T18:56:14-03:00"
+  "atualizado_em": "2026-11-27T19:51:18-03:00"
 }

@@ -17,10 +17,10 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 4,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 45,
+    "candidatos_oficiais_encontrados": 47,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
     "transmissoes_publicadas": 5,
     "sem_transmissao": 0,
     "erros": 0
@@ -254,6 +254,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "IRtVELLTaFE",
+      "url": "https://www.youtube.com/watch?v=IRtVELLTaFE",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "QUIZ DO PALMEIRAS: LEMBRA DE TUDO DO VERDÃO NA LIBERTADORES? Relembre a campanha | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-27T21:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "JrmF0InMV04",
       "url": "https://www.youtube.com/watch?v=JrmF0InMV04",
       "fonte": "getv",
@@ -384,6 +394,26 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "RFeJRW05anQ",
+      "url": "https://www.youtube.com/watch?v=RFeJRW05anQ",
+      "fonte": "sbt",
+      "canal": "SBT",
+      "titulo": "🚨EXCLUSIVO: REVELAMOS COMO É FEITO O THE VOICE BRASIL | GIRO SBT",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-28T11:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "RlecmHHZ92M",
+      "url": "https://www.youtube.com/watch?v=RlecmHHZ92M",
+      "fonte": "sbt",
+      "canal": "SBT",
+      "titulo": "Especial Drag Queens | Viva A Noite (28/11/26)",
+      "status": "upcoming",
+      "inicio_programado": "2026-11-29T00:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "3QimXz6KVYg",
       "url": "https://www.youtube.com/watch?v=3QimXz6KVYg",
       "fonte": "cazetv",
@@ -469,7 +499,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: BRASIL X ESTADOS UNIDOS | ELIMINATÓRIAS DA COPA DO MUNDO DE BASQUETE",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-11-27T19:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -574,16 +604,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "u3RYKn-E09A",
-      "url": "https://www.youtube.com/watch?v=u3RYKn-E09A",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: LEVANTE X RACING CLUB | LALIGA 26/27 | 14ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-27T16:55:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "vxTJ_F6zw_I",
       "url": "https://www.youtube.com/watch?v=vxTJ_F6zw_I",
       "fonte": "cazetv",
@@ -624,7 +644,13 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401841337",
+      "jogo": "Fluminense x Cruzeiro",
+      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
+    }
+  ],
   "sem_transmissao": [],
   "erros": [],
   "quota_estimada_youtube": {
@@ -636,5 +662,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-11-27T18:56:14-03:00"
+  "atualizado_em": "2026-11-27T19:51:18-03:00"
 }
