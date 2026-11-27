@@ -77,12 +77,46 @@ async def browser(out):
             assert all(x["inside"] and x["above"] for x in m["labels"])
             assert await page.get_by_text("2026 · Vigente",exact=True).count()==1
             assert await page.get_by_text("2027 · Em breve",exact=True).count()==1
-            assert await page.locator(".hf-matrix tbody tr").count()==20
-            assert await page.locator(".hf-matrix .heat-cell").count()==140
-            assert await page.get_by_role("button",name="Comparativa",exact=True).get_attribute("aria-pressed")=="true"
+            # R1: confirm the actual public revision, responsive default and original AF values.
+            assert await page.locator('script[src*="/sl02/app.js?v=sl02-r1-density-1"]').count()==1
+            assert await page.locator("#sl02-pulse-details").count()==1
+            assert not await page.locator("#sl02-pulse-details").evaluate("(e)=>e.open")
+            assert not await page.locator("#sl02-freshness").is_visible()
+            assert not await page.locator("#r1-prob-legend").evaluate("(e)=>e.open")
             assert not await page.locator(".prob-metrics").count()
             assert await page.get_by_role("tab").count()==5
+            source=await page.evaluate("""async()=>{const r=await fetch('/dados-br/probabilidades-brasileirao.json',{cache:'no-cache'});if(!r.ok)throw Error('AF public '+r.status);return r.json()}""")
+            assert source["temporada"]==2026 and "1.3" in source["versao_modelo"] and source["simulacao"]["quantidade"]==2000000
+            indicators=["campeao","g4","g6","libertadores","sul_americana","sem_competicao_continental","rebaixamento"]
+            expected={c["clube"]:{k:c["probabilidades_detalhes"][k]["exibicao"] for k in indicators} for c in source["clubes"]}
+            assert len(expected)==20
+            default="Compacta" if mobile else "Comparativa"
+            assert await page.get_by_role("button",name=default,exact=True).get_attribute("aria-pressed")=="true"
+            density=await page.locator(".r1-compact-scroll" if mobile else ".hf-table-scroll").first.evaluate("(e)=>({top:e.getBoundingClientRect().top,first:e.querySelector('tbody tr').getBoundingClientRect().bottom,viewport:innerHeight,width:e.clientWidth,scroll:e.scrollWidth,pulse:document.querySelector('#sl02-pulse').getBoundingClientRect().height})")
+            assert density["first"]<=density["viewport"],density
+            if mobile:
+                assert density["scroll"]<=density["width"]+1,density
+                compact=await page.locator(".r1-compact tbody tr[data-prob-club]").evaluate_all("(rows)=>Object.fromEntries(rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell').textContent]))")
+                selected=await page.locator("select[data-change=indicator]").input_value()
+                assert compact=={k:v[selected] for k,v in expected.items()}
             await page.screenshot(path=str(out/f"producao-{width}-probabilidades.png"))
+            await page.locator("#sl02-pulse-details summary").click()
+            assert await page.locator("#sl02-pulse .fdg-pulse-grid").is_visible()
+            await page.locator("#sl02-pulse-details summary").click()
+            await page.get_by_role("button",name="Comparativa",exact=True).click()
+            await page.locator("#fdg-main[aria-busy=false]").wait_for()
+            assert await page.locator(".hf-matrix tbody tr").count()==20
+            assert await page.locator(".hf-matrix .heat-cell").count()==140
+            actual=await page.locator(".hf-matrix tbody tr").evaluate_all("(rows)=>Object.fromEntries(rows.map(r=>[r.dataset.probClub,Object.fromEntries([...r.querySelectorAll('.heat-cell')].map(c=>[c.dataset.indicator,c.textContent]))]))")
+            assert actual==expected,"Public AF comparison values differ from source"
+            if mobile:
+                await page.get_by_role("button",name="Compacta",exact=True).click()
+                await page.locator("#fdg-main[aria-busy=false]").wait_for()
+            await page.get_by_role("button",name="Alternar tema").click()
+            assert await page.locator("html").get_attribute("data-theme")=="light"
+            await page.evaluate("scrollTo(0,0)")
+            await page.screenshot(path=str(out/f"producao-{width}-probabilidades-claro.png"))
+            await page.get_by_role("button",name="Alternar tema").click()
             await page.get_by_role("tab",name="Classificação",exact=True).click()
             await page.wait_for_function("location.hash==='#stats/table'&&document.querySelectorAll('tbody tr[data-club]').length===20&&document.querySelector('#fdg-main[aria-busy=false]')")
             assert await page.locator(".hf-standings thead th").count()==10
@@ -93,7 +127,7 @@ async def browser(out):
             live=await live_layout(page,width)
             await page.screenshot(path=str(out/f"producao-{width}-ao-vivo.png"))
             assert not errors,errors
-            evidence.append({"viewport":width,"mobile_emulation":mobile,"url":page.url,"menu":m,"classificacao_clubes":20,"live_layout":live,"errors":errors})
+            evidence.append({"viewport":width,"mobile_emulation":mobile,"url":page.url,"menu":m,"classificacao_clubes":20,"live_layout":live,"default_view":default,"density":density,"af_values_verified":140,"season":source["temporada"],"model":source["versao_modelo"],"finals":source["base_corrente"]["partidas_concluidas"],"errors":errors})
             await ctx.close()
         await b.close()
     (out/"public-browser.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2),encoding="utf-8")
