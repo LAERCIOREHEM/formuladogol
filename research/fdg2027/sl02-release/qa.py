@@ -278,11 +278,22 @@ async def run_browser(site,out,origin):
         page=await ctx.new_page()
         await page.goto(origin+"/estatisticas.html#stats/prob")
         await page.locator("#fdg-main[aria-busy=false]").wait_for()
+        await page.locator(".r1-compact tbody tr[data-prob-club]").first.wait_for()
+        selector=".r1-compact tbody tr[data-prob-club]"
+        before=await page.locator(selector).evaluate_all("(rows)=>rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell').textContent])")
+        source=readj(site,"dados-br/probabilidades-brasileirao.json")["clubes"]
+        expected={c["clube"]:c["probabilidades_detalhes"]["libertadores"]["exibicao"] for c in source}
+        if len(before)!=20 or dict(before)!=expected:fail.append("last-good initial values")
+        await page.locator("#sl02-pulse-details summary").click()
         await page.wait_for_timeout(300);toggle["failed"]=True
         await page.evaluate("window.dispatchEvent(new Event('online'))")
         try:
             await page.get_by_text("Sem certificação da revisão atual",exact=False).wait_for(timeout=12000)
-            if await page.locator(".hf-matrix tbody tr").count()!=20:fail.append("last-good missing")
+            after=await page.locator(selector).evaluate_all("(rows)=>rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell').textContent])")
+            if len(after)!=20 or after!=before:fail.append("last-good compact values changed")
+            if not await page.locator("#sl02-pulse-details").evaluate("(e)=>e.open"):fail.append("last-good pulse disclosure lost")
+            if await page.locator("#sl02-pulse-details").evaluate("(e)=>e.classList.contains('fdg-pulse--synced')"):fail.append("last-good false freshness")
+            await page.screenshot(path=str(out/"last-good-compact-stale.png"),animations="disabled")
         except Exception as e:fail.append("last-good status:"+str(e)[:100])
         await ctx.close()
         await browser.close()
