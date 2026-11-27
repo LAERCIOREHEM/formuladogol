@@ -9,7 +9,7 @@ from __future__ import annotations
 import hashlib,html,json,re,shutil,sys
 from pathlib import Path
 from urllib.parse import urlencode
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from math import isfinite
 from bs4 import BeautifulSoup
 SRC=Path(__file__).resolve().parent
@@ -44,6 +44,7 @@ def fact_value(v,currency=False):
     try:n=Decimal(str(v))
     except (ValueError,InvalidOperation):return "Não publicado"
     if not n.is_finite() or n<0:return "Não publicado"
+    n=n.quantize(Decimal('0.01' if currency else '1'),rounding=ROUND_HALF_UP)
     s=format(n,",.2f" if currency else ",.0f").replace(",","@").replace(".",",").replace("@",".")
     return ("R$ "+s) if currency else s
 

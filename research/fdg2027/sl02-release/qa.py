@@ -6,7 +6,7 @@ from http.server import ThreadingHTTPServer
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
 from abrir_previa import Handler
-from overlay import snapshot,rollback,sha
+from overlay import snapshot,rollback,sha,match_projection,fact_value,valid_highlight
 LABELS=["Estatísticas","Jogos","Ao vivo","Análises","Clubes","Mais"]
 ICONS=["📊","⚽","🔴","📰","🛡️","☰"]
 WIDTHS=(320,360,390,430,768,1024,1440)
@@ -54,11 +54,38 @@ def verify_player_archive(site):
     assert player_totals(leaders)==expected,"G+A public source must match the internal validated archive"
     print("UX-HF1 PLAYER SOURCE PASS:",len(expected),"records; no new public dependency",flush=True)
     return expected
+def normalize_space(v):return " ".join(str(v).split())
+def match_source(site):
+    results={str(g["event_id"]):g for g in readj(site,"resultados.json")["resultados"]}
+    details=readj(site,"sl02/match-summary.json")["jogos"]
+    highlights=readj(site,"dados-br/melhores-momentos.json").get("jogos",{})
+    return results,details,highlights
+def verify_native_media(soup,g,detail,highlight):
+    assert soup.select_one(".game-hero-card .ux-native-facts")
+    for k in ("publico","renda"):
+        elem=soup.select_one('.ux-native-facts [data-match-fact="'+k+'"]')
+        assert elem and normalize_space(elem.get_text())==normalize_space(fact_value(detail.get(k),k=="renda")),("native fact",g["event_id"],k)
+    box=soup.select_one(".ux-native-video[data-fdg-video]")
+    assert box and not box.select("iframe"),("native eager video",g["event_id"])
+    h=valid_highlight(g,highlight)
+    a=box.select_one(".ux-video-actions a[href]")
+    assert a
+    if h:assert a["href"]==h["url"],("native highlight",g["event_id"])
+    else:assert a["href"].startswith("https://www.youtube.com/results?search_query=")
+    play=box.select_one("[data-fdg-play]")
+    if h and h.get("embeddable") is True:assert play and play["data-fdg-play"]==h["video_id"]
+    else:assert play is None
 def verify_static(base,site,backup):
     b=snapshot(base);c=snapshot(site);ledger=readj(backup,"rollback.json")
     assert all(c[k]==v for k,v in b.items() if not k.endswith(".html"))
     assert set(b)<=set(c)
     for rel in ["manifest.webmanifest","sw.js","robots.txt","sitemap.xml","news-sitemap.xml","CNAME","js/br-data-pulse.js","js/br-data-refresh.js","js/br-af-core-snapshot.js","js/br-data-manifest.js","js/br-pwa.js","js/br-push.js","js/br-aovivo.js","js/br-estatisticas.js","js/br-acuracia.js","dados-br/af-core-manifest.json"]:assert b[rel]==c[rel],rel
+    original_details=readj(site,"dados-br/jogos-detalhes.json")
+    projection=readj(site,"sl02/match-summary.json")
+    assert projection==match_projection(original_details,sha(site/"dados-br/jogos-detalhes.json"))
+    assert (site/"sl02/match-summary.json").stat().st_size<(site/"dados-br/jogos-detalhes.json").stat().st_size
+    matches,details,highlights=match_source(site)
+    checked_finals=set()
     for rel in [k for k in b if k.endswith(".html")]:
         old=BeautifulSoup((base/rel).read_text(),"html.parser")
         new=BeautifulSoup((site/rel).read_text(),"html.parser")
@@ -73,6 +100,20 @@ def verify_static(base,site,backup):
             assert len(new.select("[data-fdg-release-shell], [data-fdg-shell]"))==1,("one global shell",rel)
             for nav in new.select("nav.nav,nav.menu"):
                 assert nav.has_attr("data-fdg-oldnav"),("legacy global menu visible",rel)
+        if rel=="agenda.html" or rel.startswith("jogo/"):
+            assert new.body.has_attr("data-fdg-match-hf2"),rel
+            assert not new.select('header.hero img[src*="header-formula-do-gol-v2.png"]'),("duplicate native logo",rel)
+            if rel=="agenda.html":
+                for selector in ("#agenda-competition-filters","#agenda-month-filters","#agenda-app"):assert new.select_one(selector),selector
+            else:
+                slot=new.select_one("[data-fdg-game-alert-slot][data-event-id]")
+                if slot and str(slot["data-event-id"]) in matches:
+                    eid=str(slot["data-event-id"])
+                    verify_native_media(new,matches[eid],details.get(eid,{ }),highlights.get(eid))
+                    checked_finals.add(eid)
+                elif slot:assert not new.select(".ux-native-video,.ux-native-facts"),("premature final UI",rel)
+    assert checked_finals==set(matches),("missing final detail routes",sorted(set(matches)-checked_finals))
+    print("UX-HF2 NATIVE MATCH PASS",len(checked_finals),"FINAL pages; source-projected facts and safe media",flush=True)
     verify_player_archive(site)
     p=readj(site,"dados-br/probabilidades-brasileirao.json")
     audit=readj(site,"dados-br/auditoria-probabilidades.json")
@@ -104,7 +145,7 @@ def verify_static(base,site,backup):
         assert sha(fixture)==new_hash
         assert all(after[k]==v for k,v in b.items() if k!="dados-br/status-atualizacao.json")
         assert set(after)==set(b)
-    return {"public_files_before":len(b),"public_files_after":len(c),"protected_unchanged":ledger["protected_count"],"html_original_paths":sum(k.endswith(".html") for k in b),"canonical_preserved":True,"native_script_lists_preserved":True,"finals":len(r),"remaining":m["restantes"],"probability_indicators":sum(len(x["probabilidades_detalhes"]) for x in p["clubes"]),"structural_extremes":extremes,"data_manifest_entries":len(manifest["files"]),"rollback_newer_data_preserved":True,"source_revision":m["revision"]}
+    return {"public_files_before":len(b),"public_files_after":len(c),"protected_unchanged":ledger["protected_count"],"html_original_paths":sum(k.endswith(".html") for k in b),"canonical_preserved":True,"native_script_lists_preserved":True,"finals":len(r),"remaining":m["restantes"],"probability_indicators":sum(len(x["probabilidades_detalhes"]) for x in p["clubes"]),"structural_extremes":extremes,"data_manifest_entries":len(manifest["files"]),"rollback_newer_data_preserved":True,"source_revision":m["revision"],"hf2_final_pages":len(checked_finals),"hf2_projected_bytes":(site/"sl02/match-summary.json").stat().st_size,"hf2_full_detail_bytes":(site/"dados-br/jogos-detalhes.json").stat().st_size}
 MEASURE="""()=>{const n=document.querySelector('.fdg-nav');if(!n)return null;const labels=[...n.querySelectorAll('.nav-label')].map(x=>{const t=document.createRange();t.selectNodeContents(x);const a=t.getBoundingClientRect(),b=x.parentElement.getBoundingClientRect();return{text:x.textContent,icon:x.previousElementSibling.textContent,inside:a.left>=b.left-1&&a.right<=b.right+1&&a.top>=b.top-1&&a.bottom<=b.bottom+1,above:x.previousElementSibling.getBoundingClientRect().bottom<=x.getBoundingClientRect().top+1}});return{client:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,navClient:n.clientWidth,navScroll:n.scrollWidth,columns:getComputedStyle(n).gridTemplateColumns.split(' ').length,labels,active:n.querySelectorAll('[aria-current=page]').length,visibleMenus:[...document.querySelectorAll('.fdg-nav,nav.nav,nav.menu')].filter(e=>e.getClientRects().length&&getComputedStyle(e).display!=='none').length}}"""
 
 async def live_layout(page,width,fixture=False):
@@ -137,6 +178,67 @@ async def live_layout(page,width,fixture=False):
     assert states["live"]["contextText"]=="Rodada 37Ao vivo" and states["post"]["contextText"]=="Rodada 37Finalizado"
     assert not states["empty"]["contextVisible"] and states["empty"]["badgeInside"]
     return {"actual":m,"fixture":states}
+
+async def match_header(page,w):
+    await page.locator(".fdg-nav").wait_for(timeout=15000)
+    v=await page.evaluate("""()=>{const visible=e=>!!(e.getClientRects().length&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'),header=document.querySelector('.fdg-release-shell'),main=document.querySelector('main'),img=header.querySelector('.brandline img');return {logos:[...document.querySelectorAll('img[src*="header-formula-do-gol-v2.png"]')].filter(visible).length,legacy:document.querySelectorAll('header.hero img[src*="header-formula-do-gol-v2.png"]').length,active:header.querySelector('[aria-current=page]')?.dataset.section,headerHeight:header.getBoundingClientRect().height,logoHeight:img.getBoundingClientRect().height,mainTop:main.getBoundingClientRect().top,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth}}""")
+    assert v["logos"]==1 and v["legacy"]==0 and v["active"]=="games",v
+    assert v["overflow"]<=1 and v["logoHeight"]<=(109 if w>=900 else 59),v
+    return v
+
+async def match_cards(page,site,final,w):
+    all_games=readj(site,"resultados.json" if final else "jogos.json")["resultados" if final else "jogos"]
+    pred={str(x["event_id"]):x for x in readj(site,"dados-br/probabilidades-jogos.json")["jogos"]}
+    matches,details,highlights=match_source(site)
+    if final:ordered=sorted(all_games,key=lambda g:str(g.get("finalizado_em") or g.get("data_iso") or ""),reverse=True)
+    else:ordered=sorted(all_games,key=lambda g:str(g.get("data_iso") or "9999"))
+    cards=page.locator(".ux-match[data-match-id]")
+    await cards.first.wait_for(timeout=15000)
+    async def check(expected):
+        assert await cards.count()==len(expected)
+        actual=await cards.evaluate_all("""cards=>cards.map(c=>({id:c.dataset.matchId,score:c.querySelector('.score').textContent,facts:Object.fromEntries([...c.querySelectorAll('[data-match-fact]')].map(e=>[e.dataset.matchFact,e.textContent])),prob:Object.fromEntries([...c.querySelectorAll('[data-match-prob]')].map(e=>[e.dataset.matchProb,e.querySelector('strong').textContent])),video:c.querySelector('.ux-video-actions a')?.getAttribute('href'),play:c.querySelector('[data-fdg-play]')?.dataset.fdgPlay,details:c.querySelector('.ux-match-primary')?.getAttribute('href'),crests:[...c.querySelectorAll('.crest')].map(e=>e.getBoundingClientRect().width)}))""")
+        assert [r["id"] for r in actual]==[str(g["event_id"]) for g in expected]
+        for row,g in zip(actual,expected):
+            eid=row["id"]
+            assert len(row["crests"])==2 and min(row["crests"])>=46,(eid,row["crests"])
+            if not g.get("data_definir") and g.get("data_iso"):assert row["details"] and (site/row["details"].strip("/")/"index.html").is_file(),(eid,row.get("details"))
+            if final:
+                assert row["score"]==f'{g["placar_mandante"]} × {g["placar_visitante"]}',(eid,row)
+                for k in ("publico","renda"):assert normalize_space(row["facts"][k])==normalize_space(fact_value(details.get(eid,{}).get(k),k=="renda")),(eid,k,row["facts"])
+                h=valid_highlight(g,highlights.get(eid))
+                if h:assert row["video"]==h["url"] and row.get("play")== (h["video_id"] if h.get("embeddable") is True else None),(eid,row)
+                else:assert row["video"].startswith("https://www.youtube.com/results?search_query=") and not row.get("play"),(eid,row)
+            else:
+                assert not row["facts"] and not row.get("video"),(eid,row)
+                if eid in pred:assert row["prob"]=={k:pred[eid]["exibicao"][k] for k in ("mandante","empate","visitante")},(eid,row)
+        assert await page.locator(".ux-match iframe").count()==0
+        return actual
+    await check(ordered[:12])
+    assert await page.locator(".ux-agenda-link").get_attribute("href")=="/agenda.html"
+    if final and w in (390,1440):
+        more=page.get_by_role("button",name="Mostrar mais partidas")
+        if len(ordered)>12:
+            await more.click()
+            await page.locator("#fdg-main[aria-busy=false]").wait_for()
+            await check(ordered[:24])
+        # Exact round filter retains all matching records and resets pagination.
+        selected=str(ordered[0]["rodada"])
+        await page.locator("select[data-change=round]").select_option(selected)
+        await page.locator("#fdg-main[aria-busy=false]").wait_for()
+        await check([g for g in ordered if str(g["rodada"])==selected][:12])
+        await page.locator("select[data-change=round]").select_option("")
+        await page.locator("#fdg-main[aria-busy=false]").wait_for()
+        # Explicit embed mounts only after a user click, and closes cleanly.
+        # Loopback CSP blocks all frames; this asserts integration, not playback.
+        button=page.locator(".ux-match [data-fdg-play]").first
+        if await button.count():
+            video=await button.get_attribute("data-fdg-play")
+            await button.click()
+            await page.locator(".ux-match iframe").wait_for()
+            assert await page.locator(".ux-match iframe").get_attribute("src")==f"https://www.youtube-nocookie.com/embed/{video}?autoplay=1&rel=0"
+            await page.locator("[data-fdg-video-close]").click()
+            assert await page.locator(".ux-match iframe").count()==0
+    return {"final":final,"total":len(ordered),"cards":await cards.count()}
 
 async def run_browser(site,out,origin):
     rows=[];errors=[];fail=[];blocked=set();local_requests={}
@@ -171,7 +273,31 @@ async def run_browser(site,out,origin):
                 validate(m,label,w,doc=not native)
                 if native and route=='/aovivo.html':
                     m['hf2_live']=await live_layout(page,w,fixture=True)
+                if native and (route=="/agenda.html" or route.startswith("/jogo/")):
+                    m["hf2_native"]=await match_header(page,w)
+                    if route=="/agenda.html":
+                        await page.locator(".agenda-game").first.wait_for(timeout=15000)
+                        assert await page.locator("#agenda-competition-filters button").count()>=1
+                        assert await page.locator("#agenda-month-filters button").count()>=1
+                        assert await page.locator(".agenda-team img").first.is_visible()
+                        chips=page.locator("#agenda-competition-filters button")
+                        if await chips.count()>1:
+                            await chips.nth(1).click()
+                            assert await chips.nth(1).get_attribute("aria-pressed")=="true"
+                            await chips.first.click()
+                    elif await page.locator(".ux-native-video").count():
+                        assert await page.locator(".ux-native-facts [data-match-fact]").count()==2
+                        assert not await page.locator(".ux-native-video iframe").count()
+                        play=page.locator(".ux-native-video [data-fdg-play]")
+                        if await play.count():
+                            vid=await play.get_attribute("data-fdg-play")
+                            await play.click()
+                            assert await page.locator(".ux-native-video iframe").get_attribute("src")==f"https://www.youtube-nocookie.com/embed/{vid}?autoplay=1&rel=0"
+                            await page.locator("[data-fdg-video-close]").click()
+                            assert not await page.locator(".ux-native-video iframe").count()
                 if not native:
+                    if route in ("games/next","games/results"):
+                        m["hf2_cards"]=await match_cards(page,site,route=="games/results",w)
                     if await page.locator("#fdg-main h1").text_content()=="Dados indisponíveis":fail.append("data:"+label+":"+await page.locator("#fdg-main").inner_text())
                     if route=="stats/table" and await page.locator("tbody tr[data-club]").count()!=20:fail.append("20 clubs:"+label)
                     if route=="stats/prob":
@@ -302,7 +428,7 @@ async def run_browser(site,out,origin):
                     await page.get_by_role("button",name="Definir Meu Clube",exact=False).click()
                     await page.locator("#fdg-main[aria-busy=false]").wait_for()
                     if await page.evaluate("localStorage.getItem('fdg-sl02:club')")!="Bahia":fail.append("Meu Clube")
-            except Exception as e:fail.append(route+"@"+str(w)+":"+str(e)[:1800 if route=="/aovivo.html" else 240])
+            except Exception as e:fail.append(route+"@"+str(w)+":"+str(e)[:1800 if route=="/aovivo.html" or route.startswith("/jogo/") or route.startswith("games/") or route=="/agenda.html" else 240])
             finally:await ctx.close()
         # All approved viewports; native shell measured separately from legacy
         # content layout (whose existing horizontal scroll remains visible in report).
@@ -318,6 +444,33 @@ async def run_browser(site,out,origin):
             for w in (390,1440):await one(route,w,native=True)
         for w in WIDTHS:
             if w not in (390,1440):await one("/aovivo.html",w,native=True)
+        # HF2 responsive matrix extends the complete HF1 suite, rather than replacing it.
+        for w in WIDTHS:
+            for theme in ("dark","light"):
+                if w not in (390,1440) or theme=="light":
+                    await one("games/next",w,theme)
+                    await one("games/results",w,theme)
+                    await one("/agenda.html",w,theme,native=True)
+        # Pick real final pages for each media state and an upcoming match.
+        games,_,highlights=match_source(site)
+        pages={}
+        for candidate in sorted((site/"jogo").rglob("index.html")):
+            soup=BeautifulSoup(candidate.read_text(),"html.parser")
+            slot=soup.select_one("[data-fdg-game-alert-slot][data-event-id]")
+            if not slot:continue
+            eid=str(slot["data-event-id"])
+            g=games.get(eid)
+            h=valid_highlight(g,highlights.get(eid)) if g else None
+            kind="pre" if g is None else "embed" if h and h.get("embeddable") is True else "external" if h else "search"
+            pages.setdefault(kind,"/"+candidate.relative_to(site).as_posix())
+            if len(pages)==4:break
+        assert set(pages)=={"embed","external","search","pre"},pages
+        for w in WIDTHS:
+            for theme in ("dark","light"):
+                await one(pages["embed"],w,theme,native=True)
+        for kind in ("external","search","pre"):
+            for w in (390,1440):
+                await one(pages[kind],w,native=True)
         # Representative generated club, match, article pages must retain native scripts and global shell.
         for rel in ("clube","jogo","analises"):
             candidates=sorted((site/rel).rglob("*.html"))

@@ -1,0 +1,10 @@
+# FDG-UX-HF2 — Match Experience, Agenda Unification & Editorial Game Cards
+
+Stacked on certified HF1 (5931985f). PR targeting main includes HF1 until #75 merges; no merge or public deploy without explicit authorization.
+
+## Contract
+- Games: responsive editorial cards with large crests, distinct score/fixture and AF 1.3 preview values, immediately visible attendance and gate receipts, summary of available scorers, verified highlights, original canonical details, 12-card pagination and existing filters. Missing data remain explicit; no estimated attendance or revenue.
+- Agenda and match detail: remove decorative legacy masthead, keep one global navigation, preserve original scripts, canonical/JSON-LD, match hero, operational statistics, alert slots, transmission actions and agenda filters; align responsive color and scale with the SL02 design.
+- Media: use the archived match identity and exact score; only valid canonical YouTube ID and URL accepted. Embed only on user click when embeddable is explicitly true. Otherwise show the archived external URL or an explicitly labeled YouTube search. Never autoplay before user action or issue provider API requests.
+- Match facts: generate a compact presentation-only projection from already-public jogos-detalhes.json with source SHA-256. If manifest has a newer digest, refresh from the existing hash-verified public source; missing optional media/stats never prevent displaying scores or forecasts. No new data source, changed worker, push, AF inputs or schedule.
+- Tests: full HF1 regression preserved; all final canonical pages validate exact source facts and media state; browser matrix covers 7 widths and 2 themes on next, results, agenda and representative canonical details; explicit embed/link/search and filters; preview CSP blocks external playback, so test asserts DOM/player URL, not third-party video availability. Production smoke reads only public FDG sources.
