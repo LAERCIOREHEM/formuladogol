@@ -140,6 +140,9 @@ async def run_browser(site,out,origin):
                         if await page.locator("#sl02-pulse-details").get_attribute("open") is not None:fail.append("pulse default:"+label)
                         if await page.locator("#sl02-freshness").is_visible():fail.append("duplicate freshness:"+label)
                         if await page.locator(".r1-prob-legend").get_attribute("open") is not None:fail.append("legend default:"+label)
+                        labels=await page.locator(".r1-stats-tabs button,.r1-prob-mode button").evaluate_all("(els)=>els.map(e=>{let t=document.createRange();t.selectNodeContents(e);let a=t.getBoundingClientRect(),b=e.getBoundingClientRect();return {label:e.textContent,inside:a.left>=b.left+1&&a.right<=b.right-1&&a.top>=b.top&&a.bottom<=b.bottom}})")
+                        if w>=320 and any(not x["inside"] for x in labels):fail.append("clipped secondary navigation:"+label+str(labels))
+                        if w<900 and w>=320 and await page.locator(".r1-compact thead th:last-child").inner_text()!="Chance":fail.append("compact heading:"+label)
                         if w<900:
                             compact=page.locator(".r1-compact")
                             if await compact.locator("tbody tr[data-prob-club]").count()!=20:fail.append("compact rows:"+label)

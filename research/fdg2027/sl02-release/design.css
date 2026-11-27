@@ -63,3 +63,7 @@
 @media(max-width:190px){.r1-stats-tabs{grid-template-columns:minmax(0,1fr)}.r1-compact .hf-club-button{display:block}.r1-compact .hf-pos{display:inline-grid}.r1-compact .hf-club-button .team>span:last-child{overflow-wrap:anywhere}.r1-prob-mode{display:grid;grid-template-columns:minmax(0,1fr)}.r1-prob-mode button{white-space:normal}}
 
 .r1-prob-filters .field>.muted{font-size:.69rem;line-height:1.15}.r1-compact-scroll .r1-compact .hf-club-button{white-space:normal}.r1-compact-scroll .r1-compact .team{max-width:100%}.r1-compact .r1-detail-row td{padding:5px;white-space:normal}.r1-compact-scroll .r1-compact .heat-cell{white-space:normal;overflow-wrap:anywhere}.r1-pulse.fdg-pulse--unknown .r1-pulse-top .fdg-pulse-status{color:var(--muted)}
+
+/* R1 visual QA: keep every tab label intact at 320 CSS px and avoid broken probability headings. */
+@media(min-width:291px) and (max-width:899px){.r1-stats-tabs{grid-template-columns:repeat(6,minmax(0,1fr))}.r1-stats-tabs button{grid-column:span 2}.r1-stats-tabs button:nth-child(-n+2){grid-column:span 3}.r1-stats-tabs button:only-child{grid-column:1/-1}.r1-prob-mode{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.r1-prob-mode button{min-width:0;padding-inline:3px;font-size:.72rem}.r1-prob-filters select{padding-inline:5px;font-size:.76rem}}
+.r1-compact-scroll .r1-compact thead th:last-child{white-space:nowrap;overflow-wrap:normal}
