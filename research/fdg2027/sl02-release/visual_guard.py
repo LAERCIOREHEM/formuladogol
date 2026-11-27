@@ -14,7 +14,7 @@ HOST="https://formuladogol.com.br"
 PREFIX="research/fdg2027/sl02-release/"
 MODE=PREFIX+"release-mode.json"
 VISUAL={PREFIX+x for x in ("app.js","design.css","shell.css","shell.js","overlay.py")}
-ALLOWED=VISUAL|{PREFIX+x for x in ("HF1.md","HF2.md","qa.py","public_browser.py","visual_guard.py")}|{".github/workflows/deploy.yml",".github/workflows/fdg2027-sl02-release.yml"}
+ALLOWED=VISUAL|{PREFIX+x for x in ("HF1.md","HF2.md","R1.md","qa.py","public_browser.py","visual_guard.py")}|{".github/workflows/deploy.yml",".github/workflows/fdg2027-sl02-release.yml"}
 def git(*args):return subprocess.check_output(["git",*args],text=True).strip()
 def is_visual(paths,before,after):
     return bool(paths&VISUAL) and paths<=ALLOWED and before==after=={"schema":1,"mode":"sl02","season":2026}
@@ -55,6 +55,7 @@ def selftest():
     mode={"schema":1,"mode":"sl02","season":2026}
     paths={PREFIX+"app.js",PREFIX+"visual_guard.py",".github/workflows/deploy.yml"}
     assert is_visual(paths,mode,mode)
+    assert is_visual(paths|{PREFIX+"R1.md",PREFIX+"public_browser.py",PREFIX+"qa.py",".github/workflows/fdg2027-sl02-release.yml"},mode,mode)
     for x in ("resultados.json","dados-br/probabilidades-brasileirao.json","cloudflare/push-worker/src/index.js",MODE,"sw.js"):
         assert not is_visual(paths|{x},mode,mode)
     assert not is_visual(paths,dict(mode,mode="legacy"),mode)
