@@ -58,7 +58,7 @@ def normalize_space(v):return " ".join(str(v).split())
 def match_source(site):
     results={str(g["event_id"]):g for g in readj(site,"resultados.json")["resultados"]}
     details=readj(site,"sl02/match-summary.json")["jogos"]
-    highlights=readj(site,"dados-br/melhores-momentos.json").get("jogos",{})
+    highlights={**readj(site,"dados-br/melhores-momentos.json").get("jogos",{}),**readj(site,"dados-br/melhores-momentos-manual.json").get("jogos",{})}
     return results,details,highlights
 def verify_native_media(soup,g,detail,highlight):
     assert soup.select_one(".game-hero-card .ux-native-facts")
@@ -69,9 +69,8 @@ def verify_native_media(soup,g,detail,highlight):
     assert box and not box.select("iframe"),("native eager video",g["event_id"])
     h=valid_highlight(g,highlight)
     a=box.select_one(".ux-video-actions a[href]")
-    assert a
-    if h:assert a["href"]==h["url"],("native highlight",g["event_id"])
-    else:assert a["href"].startswith("https://www.youtube.com/results?search_query=")
+    if h:assert a and a["href"]==h["url"] and box.get("data-media-state")=="official",("native highlight",g["event_id"])
+    else:assert a is None and box.get("data-media-state")=="pending" and "Aguardando vídeo oficial" in box.get_text()
     play=box.select_one("[data-fdg-play]")
     if h and h.get("embeddable") is True:assert play and play["data-fdg-play"]==h["video_id"]
     else:assert play is None
@@ -113,6 +112,14 @@ def verify_static(base,site,backup):
                     checked_finals.add(eid)
                 elif slot:assert not new.select(".ux-native-video,.ux-native-facts"),("premature final UI",rel)
     assert checked_finals==set(matches),("missing final detail routes",sorted(set(matches)-checked_finals))
+    # Pending is tested even when every real match has official media.
+    from overlay import enrich_native_match
+    sample_id=next(iter(checked_finals))
+    sample_game=matches[sample_id]
+    fixture='<html><body><section class="game-hero-card"><p class="game-answer">Final</p><span data-fdg-game-alert-slot data-event-id="'+sample_id+'"></span></section></body></html>'
+    pending=BeautifulSoup(enrich_native_match(fixture,"jogo/fixture/index.html",matches,details,{}),"html.parser")
+    verify_native_media(pending,sample_game,details.get(sample_id,{}),None)
+    assert not pending.select('a[href*="youtube.com/results"]')
     print("UX-HF2 NATIVE MATCH PASS",len(checked_finals),"FINAL pages; source-projected facts and safe media",flush=True)
     verify_player_archive(site)
     p=readj(site,"dados-br/probabilidades-brasileirao.json")
@@ -181,9 +188,10 @@ async def live_layout(page,width,fixture=False):
 
 async def match_header(page,w):
     await page.locator(".fdg-nav").wait_for(timeout=15000)
-    v=await page.evaluate("""()=>{const visible=e=>!!(e.getClientRects().length&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'),header=document.querySelector('.fdg-release-shell'),main=document.querySelector('main'),img=header.querySelector('.brandline img');return {logos:[...document.querySelectorAll('img[src*="header-formula-do-gol-v2.png"]')].filter(visible).length,legacy:document.querySelectorAll('header.hero img[src*="header-formula-do-gol-v2.png"]').length,active:header.querySelector('[aria-current=page]')?.dataset.section,headerHeight:header.getBoundingClientRect().height,logoHeight:img.getBoundingClientRect().height,mainTop:main.getBoundingClientRect().top,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth}}""")
+    v=await page.evaluate("""()=>{const visible=e=>!!(e.getClientRects().length&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'),header=document.querySelector('.fdg-release-shell'),main=document.querySelector('main'),img=header.querySelector('.brandline img');return {logos:[...document.querySelectorAll('img[src*="header-formula-do-gol-v2.png"]')].filter(visible).length,legacy:document.querySelectorAll('header.hero img[src*="header-formula-do-gol-v2.png"]').length,active:header.querySelector('[aria-current=page]')?.dataset.section,headerHeight:header.getBoundingClientRect().height,logoHeight:img.getBoundingClientRect().height,logoWidth:img.getBoundingClientRect().width,brandWidth:header.querySelector(".brandline").getBoundingClientRect().width,logoFit:getComputedStyle(img).objectFit,mainTop:main.getBoundingClientRect().top,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth}}""")
     assert v["logos"]==1 and v["legacy"]==0 and v["active"]=="games",v
-    assert v["overflow"]<=1 and v["logoHeight"]<=(109 if w>=900 else 59),v
+    assert v["overflow"]<=1 and v["logoHeight"]<=(133 if w>=900 else 59),v
+    if w>=900:assert v["logoWidth"]/v["brandWidth"]>=.80 and v["logoFit"]=="fill",v
     return v
 
 async def match_cards(page,site,final,w):
@@ -207,11 +215,12 @@ async def match_cards(page,site,final,w):
                 for k in ("publico","renda"):assert normalize_space(row["facts"][k])==normalize_space(fact_value(details.get(eid,{}).get(k),k=="renda")),(eid,k,row["facts"])
                 h=valid_highlight(g,highlights.get(eid))
                 if h:assert row["video"]==h["url"] and row.get("play")== (h["video_id"] if h.get("embeddable") is True else None),(eid,row)
-                else:assert row["video"].startswith("https://www.youtube.com/results?search_query=") and not row.get("play"),(eid,row)
+                else:assert not row.get("video") and not row.get("play"),(eid,row)
             else:
                 assert not row["facts"] and not row.get("video"),(eid,row)
                 if eid in pred:assert row["prob"]=={k:pred[eid]["exibicao"][k] for k in ("mandante","empate","visitante")},(eid,row)
         assert await page.locator(".ux-match iframe").count()==0
+        assert not await page.locator('.ux-match a[href*="youtube.com/results"]').count()
         return actual
     await check(ordered[:12])
     assert await page.locator(".ux-agenda-link").get_attribute("href")=="/agenda.html"
@@ -239,6 +248,16 @@ async def match_cards(page,site,final,w):
             await page.locator("[data-fdg-video-close]").click()
             assert await page.locator(".ux-match iframe").count()==0
     return {"final":final,"total":len(ordered),"cards":await cards.count()}
+
+async def desktop_probability_density(page):
+    m=await page.locator(".hf-matrix").evaluate("""t=>{const rect=e=>e.getBoundingClientRect(),rows=[...t.querySelectorAll('tbody tr[data-prob-club]')],chips=rows.flatMap(r=>[...r.querySelectorAll('.heat-cell')]),clubs=rows.map(r=>{const b=r.querySelector('.hf-club-button'),n=b.querySelector('.team>span:last-child'),range=document.createRange();range.selectNodeContents(n);const a=range.getBoundingClientRect(),c=rect(b),chev=rect(b.querySelector('.hf-chevron'));return {name:n.textContent,lines:range.getClientRects().length,inside:a.left>=c.left-1&&a.right<=chev.left+1&&a.top>=c.top-1&&a.bottom<=c.bottom+1}}),numeric=rows.flatMap(r=>[...r.querySelectorAll('td:not(:has(.heat-cell))')]),numFit=numeric.every(c=>{const a=rect(c),range=document.createRange();range.selectNodeContents(c);const b=range.getBoundingClientRect();return range.getClientRects().length===1&&b.left>=a.left-1&&b.right<=a.right+1}),worst=rows.reduce((a,b)=>rect(a).height>=rect(b).height?a:b),cellDetails=[...worst.cells].map(c=>{const s=getComputedStyle(c),child=c.firstElementChild;return {text:c.textContent.trim(),width:rect(c).width,height:rect(c).height,padding:s.padding,lineHeight:s.lineHeight,whiteSpace:s.whiteSpace,childHeight:child?rect(child).height:null}});return {table:rect(t).width,clubWidth:rect(rows[0].cells[0]).width,maxChipWidth:Math.max(...chips.map(c=>rect(c).width)),maxChipHeight:Math.max(...chips.map(c=>rect(c).height)),maxRowHeight:rect(worst).height,chipCount:chips.length,labelsFit:chips.every(c=>c.scrollWidth<=c.clientWidth+1),numericLabelsFit:numFit,clubs,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,worstClub:worst.dataset.probClub,worstCells:cellDetails}}""")
+    assert 245<=m["clubWidth"] and m["table"]<=1281,m
+    print("DESKTOP DENSITY:",json.dumps({k:v for k,v in m.items() if k!="clubs"},ensure_ascii=False),flush=True)
+    assert m["maxChipWidth"]<=73 and m["maxChipHeight"]<=29 and m["maxRowHeight"]<=45,m
+    assert m["numericLabelsFit"],m
+    assert m["chipCount"]==140 and m["labelsFit"] and m["overflow"]<=1,m
+    assert len(m["clubs"])==20 and all(c["inside"] and c["lines"]==1 for c in m["clubs"]),m
+    return m
 
 async def run_browser(site,out,origin):
     rows=[];errors=[];fail=[];blocked=set();local_requests={}
@@ -303,15 +322,23 @@ async def run_browser(site,out,origin):
                     if route=="stats/prob":
                         if not await page.locator("#sl02-pulse .fdg-pulse").count():fail.append("Data Pulse:"+label)
                         if await page.locator(".prob-metrics").count():fail.append("duplicated metrics:"+label)
-                        default="Comparativa" if w>=900 else "Compacta"
+                        default="Comparativa"
                         if await page.get_by_role("button",name=default,exact=True).get_attribute("aria-pressed")!="true":fail.append("responsive default:"+label)
                         if await page.locator("#sl02-pulse-details").get_attribute("open") is not None:fail.append("pulse default:"+label)
                         if await page.locator("#sl02-freshness").is_visible():fail.append("duplicate freshness:"+label)
                         if await page.locator(".r1-prob-legend").get_attribute("open") is not None:fail.append("legend default:"+label)
                         labels=await page.locator(".r1-stats-tabs button,.r1-prob-mode button").evaluate_all("(els)=>els.map(e=>{let t=document.createRange();t.selectNodeContents(e);let a=t.getBoundingClientRect(),b=e.getBoundingClientRect();return {label:e.textContent,inside:a.left>=b.left+1&&a.right<=b.right-1&&a.top>=b.top&&a.bottom<=b.bottom}})")
                         if w>=320 and any(not x["inside"] for x in labels):fail.append("clipped secondary navigation:"+label+str(labels))
-                        if w<900 and w>=320 and await page.locator(".r1-compact thead th:last-child").inner_text()!="Chance":fail.append("compact heading:"+label)
                         if w<900:
+                            # Comparative is the requested default on all devices.
+                            default_matrix=await page.locator(".hf-matrix tbody tr[data-prob-club]").count()
+                            if default_matrix!=20 or await page.locator(".hf-matrix .heat-cell").count()!=140:fail.append("mobile default matrix:"+label)
+                            sc=page.locator(".hf-table-scroll").first
+                            scroll=await sc.evaluate("(e)=>{const a=e.querySelector('tbody .hf-sticky'),x=a.getBoundingClientRect().left;e.scrollLeft=e.scrollWidth;const result={before:x,after:a.getBoundingClientRect().left,max:e.scrollWidth-e.clientWidth,left:e.scrollLeft};e.scrollLeft=0;return result}")
+                            if scroll["max"]<=0 or abs(scroll["before"]-scroll["after"])>2 or abs(scroll["max"]-scroll["left"])>2:fail.append("mobile default matrix scroll:"+label+str(scroll))
+                            await page.get_by_role("button",name="Compacta",exact=True).click()
+                            await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                            if w>=320 and await page.locator(".r1-compact thead th:last-child").inner_text()!="Chance":fail.append("compact heading:"+label)
                             compact=page.locator(".r1-compact")
                             if await compact.locator("tbody tr[data-prob-club]").count()!=20:fail.append("compact rows:"+label)
                             source=readj(site,"dados-br/probabilidades-brasileirao.json")["clubes"]
@@ -343,6 +370,8 @@ async def run_browser(site,out,origin):
                             await page.get_by_role("button",name="Comparativa",exact=True).click()
                             await page.locator("#fdg-main[aria-busy=false]").wait_for()
                         if await page.locator(".hf-matrix .heat-cell").count()!=140:fail.append("seven indicators:"+label)
+                        if w>=900:
+                            m["desktop_probability_density"]=await desktop_probability_density(page)
                         if await page.locator(".hf-matrix th[data-indicator]").count()!=7:fail.append("indicator columns:"+label)
                         if await page.locator(".hf-matrix th[data-indicator$='_base']").count():fail.append("base exposed:"+label)
                         if not await page.locator(".heat-cell[data-level=certain]").count() or not await page.locator(".heat-cell[data-level=zero]").count():fail.append("structural semantics:"+label)
@@ -363,8 +392,9 @@ async def run_browser(site,out,origin):
                         if abs(x["before"]-x["after"])>2 or abs(x["max"]-x["left"])>2:fail.append("classification sticky/scroll:"+label)
                         await sc.evaluate("(e)=>e.scrollLeft=0")
                     if w>=320:
-                        brand=await page.locator(".brandline").evaluate("(e)=>{const a=e.querySelector('a').getBoundingClientRect(),b=e.querySelector('button').getBoundingClientRect();return {gap:b.left-a.right,width:a.width}}")
+                        brand=await page.locator(".brandline").evaluate("(e)=>{const a=e.querySelector('a').getBoundingClientRect(),b=e.querySelector('button').getBoundingClientRect();const i=e.querySelector('img'),r=i.getBoundingClientRect();return {gap:b.left-a.right,width:a.width,artWidth:r.width,brandWidth:e.getBoundingClientRect().width,artFit:getComputedStyle(i).objectFit}}")
                         if brand["gap"]>15 or brand["gap"]<0 or brand["width"]<100:fail.append("banner width:"+label)
+                        if w>=900 and (brand["artFit"]!="fill" or brand["artWidth"]/brand["brandWidth"]<.80):fail.append("desktop artwork not stretched:"+label+str(brand))
                 m.update(route=route,width=w,theme=theme,native=native,url=page.url)
                 rows.append(m)
                 if route=="stats/prob" and w<900 and not native:
@@ -428,7 +458,7 @@ async def run_browser(site,out,origin):
                     await page.get_by_role("button",name="Definir Meu Clube",exact=False).click()
                     await page.locator("#fdg-main[aria-busy=false]").wait_for()
                     if await page.evaluate("localStorage.getItem('fdg-sl02:club')")!="Bahia":fail.append("Meu Clube")
-            except Exception as e:fail.append(route+"@"+str(w)+":"+str(e)[:1800 if route=="/aovivo.html" or route.startswith("/jogo/") or route.startswith("games/") or route=="/agenda.html" else 240])
+            except Exception as e:fail.append(route+"@"+str(w)+":"+str(e)[:1800 if route=="/aovivo.html" or route.startswith("/jogo/") or route.startswith("games/") or route=="/agenda.html" or route=="stats/prob" else 240])
             finally:await ctx.close()
         # All approved viewports; native shell measured separately from legacy
         # content layout (whose existing horizontal scroll remains visible in report).
@@ -444,6 +474,10 @@ async def run_browser(site,out,origin):
             for w in (390,1440):await one(route,w,native=True)
         for w in WIDTHS:
             if w not in (390,1440):await one("/aovivo.html",w,native=True)
+        # Explicit wide desktop evidence including the user's large-screen layout.
+        for w in (1280,1600,1920):
+            for theme in ("dark","light"):
+                await one("stats/prob",w,theme)
         # HF2 responsive matrix extends the complete HF1 suite, rather than replacing it.
         for w in WIDTHS:
             for theme in ("dark","light"):
@@ -461,14 +495,15 @@ async def run_browser(site,out,origin):
             eid=str(slot["data-event-id"])
             g=games.get(eid)
             h=valid_highlight(g,highlights.get(eid)) if g else None
-            kind="pre" if g is None else "embed" if h and h.get("embeddable") is True else "external" if h else "search"
+            kind="pre" if g is None else "embed" if h and h.get("embeddable") is True else "external" if h else "pending"
             pages.setdefault(kind,"/"+candidate.relative_to(site).as_posix())
             if len(pages)==4:break
-        assert set(pages)=={"embed","external","search","pre"},pages
+        assert {"embed","external","pre"}<=set(pages),pages
         for w in WIDTHS:
             for theme in ("dark","light"):
                 await one(pages["embed"],w,theme,native=True)
-        for kind in ("external","search","pre"):
+        for kind in ("external","pending","pre"):
+            if kind not in pages:continue
             for w in (390,1440):
                 await one(pages[kind],w,native=True)
         # Representative generated club, match, article pages must retain native scripts and global shell.
@@ -506,9 +541,10 @@ async def run_browser(site,out,origin):
         page=await ctx.new_page()
         await page.goto(origin+"/estatisticas.html#stats/prob")
         await page.locator("#fdg-main[aria-busy=false]").wait_for()
-        await page.locator(".r1-compact tbody tr[data-prob-club]").first.wait_for()
-        selector=".r1-compact tbody tr[data-prob-club]"
-        before=await page.locator(selector).evaluate_all("(rows)=>rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell').textContent])")
+        await page.locator(".hf-matrix tbody tr[data-prob-club]").first.wait_for()
+        selector=".hf-matrix tbody tr[data-prob-club]"
+        assert await page.get_by_role("button",name="Comparativa",exact=True).get_attribute("aria-pressed")=="true"
+        before=await page.locator(selector).evaluate_all("(rows)=>rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell[data-indicator=libertadores]').textContent])")
         source=readj(site,"dados-br/probabilidades-brasileirao.json")["clubes"]
         expected={c["clube"]:display_probability(c["probabilidades_detalhes"]["libertadores"]) for c in source}
         if len(before)!=20 or dict(before)!=expected:fail.append("last-good initial values")
@@ -517,11 +553,11 @@ async def run_browser(site,out,origin):
         await page.evaluate("window.dispatchEvent(new Event('online'))")
         try:
             await page.get_by_text("Sem certificação da revisão atual",exact=False).wait_for(timeout=12000)
-            after=await page.locator(selector).evaluate_all("(rows)=>rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell').textContent])")
-            if len(after)!=20 or after!=before:fail.append("last-good compact values changed")
+            after=await page.locator(selector).evaluate_all("(rows)=>rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell[data-indicator=libertadores]').textContent])")
+            if len(after)!=20 or after!=before:fail.append("last-good comparative values changed")
             if not await page.locator("#sl02-pulse-details").evaluate("(e)=>e.open"):fail.append("last-good pulse disclosure lost")
             if await page.locator("#sl02-pulse-details").evaluate("(e)=>e.classList.contains('fdg-pulse--synced')"):fail.append("last-good false freshness")
-            await page.screenshot(path=str(out/"last-good-compact-stale.png"),animations="disabled")
+            await page.screenshot(path=str(out/"last-good-comparative-stale.png"),animations="disabled")
         except Exception as e:fail.append("last-good status:"+str(e)[:100])
         await ctx.close()
         await browser.close()

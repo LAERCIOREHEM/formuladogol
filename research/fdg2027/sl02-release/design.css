@@ -99,3 +99,33 @@
 @media(max-width:899px){.ux-match-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ux-match{padding:12px;gap:10px}.ux-games-heading .heading{margin-bottom:0}.ux-games-heading{margin-bottom:12px}.ux-match-score .team{font-size:.9rem}.ux-match-score .crest{width:48px;height:48px;flex-basis:48px}.ux-match-score .crest img{width:38px;height:38px;inset:4px}}
 @media(max-width:600px){.ux-match-grid{grid-template-columns:minmax(0,1fr)}.ux-match-score .crest{width:52px;height:52px;flex-basis:52px}.ux-match-score .crest img{width:42px;height:42px}.ux-games-controls>.field{flex:1 1 100px}.ux-games-controls select{width:100%}.ux-match-score .team{font-size:.88rem}.ux-match-facts strong{font-size:.9rem}.ux-video-actions a,.ux-video-actions button{min-height:44px}.ux-match-actions a{min-height:44px}.ux-match-prob strong{font-size:1.02rem}}
 @media(max-width:290px){.ux-match-score{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:3px}.ux-match-score .team{font-size:.71rem}.ux-match-score .crest{width:36px;height:36px;flex-basis:36px}.ux-match-score .crest img{width:28px;height:28px;inset:3px}.ux-score-center .score{font-size:1.1rem}.ux-match-facts{grid-template-columns:minmax(0,1fr)}.ux-match-top{flex-wrap:wrap}.ux-match-prob{grid-template-columns:repeat(3,minmax(0,1fr))}.ux-match-prob>div{padding:4px 2px}.ux-match-prob strong{font-size:.8rem}}
+
+/* HF2-R1 desktop probability density. Override the earlier 184px club col
+   with the same selector specificity; size the actual chips, not merely cells.
+   The scroll region remains available on narrow desktop and mobile is untouched. */
+@media(min-width:900px){
+  .fdg-release-app .hf-table-scroll:has(>.hf-matrix){max-width:1280px;margin-inline:auto}
+  .fdg-release-app .hf-table-scroll .hf-matrix{min-width:1050px;width:100%}
+  .fdg-release-app .hf-table-scroll .hf-matrix .hf-club-col{width:252px}
+  .fdg-release-app .hf-table-scroll .hf-matrix .hf-num-col{width:42px}
+  .fdg-release-app .hf-table-scroll .hf-matrix .hf-proj-col{width:48px}
+  .fdg-release-app .hf-table-scroll .hf-matrix .hf-range-col{width:82px}
+  .fdg-release-app .hf-table-scroll .hf-matrix .heat-cell{width:72px;max-width:100%;min-width:0;padding:3px 2px;line-height:1.25;font-size:.89rem;border-radius:5px;box-sizing:border-box}
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club]>td,
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club]>th{padding-block:3px}
+  .fdg-release-app .hf-table-scroll .hf-matrix .hf-club-button{min-height:36px;gap:6px}
+  .fdg-release-app .hf-table-scroll .hf-matrix .hf-club-button .team{flex:1 1 auto;min-width:0}
+  .fdg-release-app .hf-table-scroll .hf-matrix .hf-club-button .team>span:last-child{white-space:nowrap;overflow-wrap:normal;word-break:normal}
+}
+
+/* Resolve the measured 51.16px row regression without changing the type scale.
+   Explicitly size the actual interactive control and both cells. */
+@media(min-width:900px) {
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] {height:42px}
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] > :is(th,td) {height:auto;box-sizing:border-box;padding-block:1px!important;line-height:1.2!important;vertical-align:middle!important}
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] > td {white-space:nowrap!important;overflow-wrap:normal!important;word-break:normal!important}
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] > td.hf-range {font-variant-numeric:tabular-nums}
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] .heat-cell {margin-block:0!important}
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] .hf-club-button {box-sizing:border-box;height:36px!important;min-height:36px!important;max-height:36px!important;padding:0!important;line-height:1.2!important;align-items:center}
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] .hf-club-button .team {align-items:center;line-height:1.2;min-height:0;max-height:36px}
+}

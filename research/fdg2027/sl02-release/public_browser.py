@@ -50,7 +50,7 @@ def selftest():
     print("SL02 schedule guard fixture PASS")
 async def browser(out):
     from playwright.async_api import async_playwright
-    from qa import MEASURE,live_layout,display_probability,player_totals,player_key,match_header,normalize_space
+    from qa import MEASURE,live_layout,display_probability,player_totals,player_key,match_header,normalize_space,desktop_probability_density
     from overlay import fact_value,valid_highlight
     out.mkdir(parents=True,exist_ok=True)
     evidence=[]
@@ -71,6 +71,9 @@ async def browser(out):
             assert await page.locator("#fdg-main h1").text_content()!="Dados indisponíveis"
             assert await page.locator(".fdg-nav").count()==1
             m=await page.evaluate(MEASURE)
+            if not mobile:
+                artwork=await page.locator(".brandline").evaluate("(e)=>({ratio:e.querySelector(\'img\').getBoundingClientRect().width/e.getBoundingClientRect().width,fit:getComputedStyle(e.querySelector(\'img\')).objectFit})")
+                assert artwork["ratio"]>=.80 and artwork["fit"]=="fill",artwork
             assert m["columns"]==(3 if mobile else 6)
             assert m["client"]==width and m["scroll"]<=m["client"]+1 and m["navScroll"]<=m["navClient"]+1
             assert m["active"]==1 and m["visibleMenus"]==1
@@ -79,7 +82,7 @@ async def browser(out):
             assert await page.get_by_text("2026 · Vigente",exact=True).count()==1
             assert await page.get_by_text("2027 · Em breve",exact=True).count()==1
             # R1: confirm the actual public revision, responsive default and original AF values.
-            assert await page.locator('script[src*="/sl02/app.js?v=sl02-ux-hf2-1"]').count()==1
+            assert await page.locator('script[src*="/sl02/app.js?v=sl02-ux-hf2-r1-4"]').count()==1
             assert await page.locator("#sl02-pulse-details").count()==1
             assert not await page.locator("#sl02-pulse-details").evaluate("(e)=>e.open")
             assert not await page.locator("#sl02-freshness").is_visible()
@@ -91,12 +94,18 @@ async def browser(out):
             indicators=["campeao","g4","g6","libertadores","sul_americana","sem_competicao_continental","rebaixamento"]
             expected={c["clube"]:{k:display_probability(c["probabilidades_detalhes"][k]) for k in indicators} for c in source["clubes"]}
             assert len(expected)==20
-            default="Compacta" if mobile else "Comparativa"
+            default="Comparativa"
             assert await page.get_by_role("button",name=default,exact=True).get_attribute("aria-pressed")=="true"
-            density=await page.locator(".r1-compact-scroll" if mobile else ".hf-table-scroll").first.evaluate("(e)=>({top:e.getBoundingClientRect().top,first:e.querySelector('tbody tr').getBoundingClientRect().bottom,viewport:innerHeight,width:e.clientWidth,scroll:e.scrollWidth,pulse:document.querySelector('#sl02-pulse').getBoundingClientRect().height})")
+            density=await page.locator(".hf-table-scroll").first.evaluate("(e)=>({top:e.getBoundingClientRect().top,first:e.querySelector('tbody tr').getBoundingClientRect().bottom,viewport:innerHeight,width:e.clientWidth,scroll:e.scrollWidth,pulse:document.querySelector('#sl02-pulse').getBoundingClientRect().height})")
             assert density["first"]<=density["viewport"],density
             if mobile:
-                assert density["scroll"]<=density["width"]+1,density
+                assert density["scroll"]>density["width"],density
+                assert await page.locator(".hf-matrix .heat-cell").count()==140
+                await page.screenshot(path=str(out/f"producao-{width}-comparativa-padrao.png"))
+                await page.get_by_role("button",name="Compacta",exact=True).click()
+                await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                compact_bounds=await page.locator(".r1-compact-scroll").evaluate("(e)=>({width:e.clientWidth,scroll:e.scrollWidth})")
+                assert compact_bounds["scroll"]<=compact_bounds["width"]+1,compact_bounds
                 compact=await page.locator(".r1-compact tbody tr[data-prob-club]").evaluate_all("(rows)=>Object.fromEntries(rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell').textContent]))")
                 selected=await page.locator("select[data-change=indicator]").input_value()
                 assert compact=={k:v[selected] for k,v in expected.items()}
@@ -108,6 +117,7 @@ async def browser(out):
             await page.locator("#fdg-main[aria-busy=false]").wait_for()
             assert await page.locator(".hf-matrix tbody tr").count()==20
             assert await page.locator(".hf-matrix .heat-cell").count()==140
+            if not mobile:await desktop_probability_density(page)
             actual=await page.locator(".hf-matrix tbody tr").evaluate_all("(rows)=>Object.fromEntries(rows.map(r=>[r.dataset.probClub,Object.fromEntries([...r.querySelectorAll('.heat-cell')].map(c=>[c.dataset.indicator,c.textContent]))]))")
             assert actual==expected,"Public AF comparison values differ from source"
             if mobile:
@@ -136,7 +146,7 @@ async def browser(out):
             await page.goto(HOST+"/estatisticas.html#games/results",wait_until="domcontentloaded",timeout=35000)
             await page.locator("#fdg-main[aria-busy=false]").wait_for(timeout=30000)
             await page.locator(".ux-match[data-match-id]").first.wait_for(timeout=25000)
-            source_data=await page.evaluate("""async()=>{const load=async p=>{const r=await fetch(p,{cache:'no-cache'});if(!r.ok)throw Error(p+' '+r.status);return r.json()};const [results,details,highlights]=await Promise.all(['/resultados.json','/dados-br/jogos-detalhes.json','/dados-br/melhores-momentos.json'].map(load));return {results:results.resultados,details:details.jogos,highlights:highlights.jogos}}""")
+            source_data=await page.evaluate("""async()=>{const load=async p=>{const r=await fetch(p,{cache:'no-cache'});if(!r.ok)throw Error(p+' '+r.status);return r.json()};const [results,details,highlights,manual]=await Promise.all(['/resultados.json','/dados-br/jogos-detalhes.json','/dados-br/melhores-momentos.json','/dados-br/melhores-momentos-manual.json'].map(load));return {results:results.resultados,details:details.jogos,highlights:{...highlights.jogos,...manual.jogos}}}""")
             games_by_id={str(g["event_id"]):g for g in source_data["results"]}
             cards=await page.locator(".ux-match[data-match-id]").evaluate_all("""cards=>cards.map(c=>({id:c.dataset.matchId,score:c.querySelector('.score').textContent,facts:Object.fromEntries([...c.querySelectorAll('[data-match-fact]')].map(e=>[e.dataset.matchFact,e.textContent])),video:c.querySelector('.ux-video-actions a')?.getAttribute('href'),play:c.querySelector('[data-fdg-play]')?.dataset.fdgPlay,details:c.querySelector('.ux-match-primary')?.getAttribute('href')}))""")
             assert len(cards)==min(12,len(games_by_id))
@@ -145,7 +155,7 @@ async def browser(out):
                 assert card["score"]==f'{g["placar_mandante"]} × {g["placar_visitante"]}'
                 for k in ("publico","renda"):assert normalize_space(card["facts"][k])==normalize_space(fact_value(d.get(k),k=="renda"))
                 if h:assert card["video"]==h["url"] and card.get("play")== (h["video_id"] if h.get("embeddable") is True else None)
-                else:assert card["video"].startswith("https://www.youtube.com/results?search_query=") and not card.get("play")
+                else:assert not card.get("video") and not card.get("play")
             assert not await page.locator(".ux-match iframe").count()
             await page.screenshot(path=str(out/f"producao-{width}-resultados.png"))
             detail=next(c["details"] for c in cards if c.get("details"))

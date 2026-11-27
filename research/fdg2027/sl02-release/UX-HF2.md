@@ -8,3 +8,14 @@ Stacked on certified HF1 (5931985f). PR targeting main includes HF1 until #75 me
 - Media: use the archived match identity and exact score; only valid canonical YouTube ID and URL accepted. Embed only on user click when embeddable is explicitly true. Otherwise show the archived external URL or an explicitly labeled YouTube search. Never autoplay before user action or issue provider API requests.
 - Match facts: generate a compact presentation-only projection from already-public jogos-detalhes.json with source SHA-256. If manifest has a newer digest, refresh from the existing hash-verified public source; missing optional media/stats never prevent displaying scores or forecasts. No new data source, changed worker, push, AF inputs or schedule.
 - Tests: full HF1 regression preserved; all final canonical pages validate exact source facts and media state; browser matrix covers 7 widths and 2 themes on next, results, agenda and representative canonical details; explicit embed/link/search and filters; preview CSP blocks external playback, so test asserts DOM/player URL, not third-party video availability. Production smoke reads only public FDG sources.
+
+## HF2-R1 — desktop artwork and official media only
+Desktop artwork fills the available masthead width; mobile and live density retained. Missing official highlights now show a neutral pending state, never generic YouTube search. Existing API workflow, source policy, quotas and data files untouched. Only exact archived URLs and explicit embedding permission are presented.
+
+Restore the original manual-over-automatic highlights precedence, including exact archived URLs with timestamps. Test pending state with a local fixture even if all real finals have media.
+
+Desktop probability density: explicitly override the earlier more-specific club column, size chips at 72px with 3px vertical padding, limit comparative scroll region to 1280px, and assert 20 unbroken club names, 140 fitting chips, measured row/chip dimensions, and no document overflow at 1024, 1280, 1440, 1600 and 1920px in both themes. Mobile unchanged.
+
+R1-3: default Comparative on every viewport, including mobile; Compact and Quick remain optional. Verify default matrix and sticky horizontal navigation before explicitly testing Compact. Previous CI measured 51.15625px rows despite 72px chips: enforce actual desktop button height and cell padding; keep the 45px row threshold and original data checks. Cache-bust all visual assets.
+
+R1-4: remove table-cell explicit height, prevent all numeric wrapping, widen projected range to 82px and enforce 42px row target with 1px block padding. Keep 45px strict maximum and add numeric text-fit verification and per-cell diagnostics. Comparative default remains universal.
