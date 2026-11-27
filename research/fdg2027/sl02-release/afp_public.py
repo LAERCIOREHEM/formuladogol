@@ -1,7 +1,7 @@
 """Fail-closed AFP delivery adapter. No public data exists until separately approved."""
 import hashlib,json,math,re
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[2]
+ROOT=Path(__file__).resolve().parents[3]
 AFP=ROOT/"research/fdg2027/afp-r1"
 HEX=re.compile(r"^[0-9a-f]{64}$")
 FIELDS={"name","club","position","rating","confidence","percentile","position_rank","season_minutes","season_games","offense","defense","partial_axes"}
