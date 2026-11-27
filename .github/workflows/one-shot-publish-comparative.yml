@@ -1,0 +1,44 @@
+name: One-shot verified comparative and desktop release
+on:
+  push:
+    branches: [ops/publish-ux-hf2-r1-8197bda2]
+    paths: [.github/workflows/one-shot-publish-comparative.yml]
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/ops/publish-ux-hf2-r1-8197bda2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: LAERCIOREHEM/formuladogol
+      EXPECTED: 8197bda22b93d970c5c669fbc08cc79d001ad950
+    steps:
+      - name: Certify exact head, merge, dispatch and check Pages deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run watch 46054275163 --repo "$REPO" --exit-status --interval 15
+          test "$(gh run view 46054275163 --repo "$REPO" --json headSha --jq .headSha)" = "$EXPECTED"
+          test "$(gh run view 46054275163 --repo "$REPO" --json conclusion --jq .conclusion)" = success
+          test "$(gh pr view 77 --repo "$REPO" --json headRefOid --jq .headRefOid)" = "$EXPECTED"
+          test "$(gh pr view 77 --repo "$REPO" --json baseRefName --jq .baseRefName)" = main
+          if [ "$(gh pr view 77 --repo "$REPO" --json state --jq .state)" = OPEN ]; then
+            gh pr merge 77 --repo "$REPO" --merge --match-head-commit "$EXPECTED"
+          fi
+          test "$(gh pr view 77 --repo "$REPO" --json state --jq .state)" = MERGED
+          merged="$(gh pr view 77 --repo "$REPO" --json mergeCommit --jq .mergeCommit.oid)"
+          echo "Merged: $merged"
+          gh workflow run deploy.yml --repo "$REPO" --ref main
+          run=""
+          for i in $(seq 1 20); do
+            run="$(gh run list --repo "$REPO" --workflow deploy.yml --commit "$merged" --json databaseId --jq '.[0].databaseId // empty')"
+            if [ -n "$run" ]; then break; fi
+            sleep 10
+          done
+          test -n "$run"
+          gh run watch "$run" --repo "$REPO" --exit-status --interval 15
+          echo "Pages workflow certified: $run"
