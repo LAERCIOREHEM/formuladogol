@@ -82,7 +82,7 @@ async def browser(out):
             assert await page.get_by_text("2026 · Vigente",exact=True).count()==1
             assert await page.get_by_text("2027 · Em breve",exact=True).count()==1
             # R1: confirm the actual public revision, responsive default and original AF values.
-            assert await page.locator('script[src*="/sl02/app.js?v=sl02-ux-hf2-r1-3"]').count()==1
+            assert await page.locator('script[src*="/sl02/app.js?v=sl02-ux-hf2-r1-4"]').count()==1
             assert await page.locator("#sl02-pulse-details").count()==1
             assert not await page.locator("#sl02-pulse-details").evaluate("(e)=>e.open")
             assert not await page.locator("#sl02-freshness").is_visible()

@@ -250,9 +250,11 @@ async def match_cards(page,site,final,w):
     return {"final":final,"total":len(ordered),"cards":await cards.count()}
 
 async def desktop_probability_density(page):
-    m=await page.locator(".hf-matrix").evaluate("""t=>{const rect=e=>e.getBoundingClientRect(),rows=[...t.querySelectorAll('tbody tr[data-prob-club]')],chips=rows.flatMap(r=>[...r.querySelectorAll('.heat-cell')]),clubs=rows.map(r=>{const b=r.querySelector('.hf-club-button'),n=b.querySelector('.team>span:last-child'),range=document.createRange();range.selectNodeContents(n);const a=range.getBoundingClientRect(),c=rect(b),chev=rect(b.querySelector('.hf-chevron'));return {name:n.textContent,lines:range.getClientRects().length,inside:a.left>=c.left-1&&a.right<=chev.left+1&&a.top>=c.top-1&&a.bottom<=c.bottom+1}});return {table:rect(t).width,clubWidth:rect(rows[0].cells[0]).width,maxChipWidth:Math.max(...chips.map(c=>rect(c).width)),maxChipHeight:Math.max(...chips.map(c=>rect(c).height)),maxRowHeight:Math.max(...rows.map(r=>rect(r).height)),chipCount:chips.length,labelsFit:chips.every(c=>c.scrollWidth<=c.clientWidth+1),clubs,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth}}""")
+    m=await page.locator(".hf-matrix").evaluate("""t=>{const rect=e=>e.getBoundingClientRect(),rows=[...t.querySelectorAll('tbody tr[data-prob-club]')],chips=rows.flatMap(r=>[...r.querySelectorAll('.heat-cell')]),clubs=rows.map(r=>{const b=r.querySelector('.hf-club-button'),n=b.querySelector('.team>span:last-child'),range=document.createRange();range.selectNodeContents(n);const a=range.getBoundingClientRect(),c=rect(b),chev=rect(b.querySelector('.hf-chevron'));return {name:n.textContent,lines:range.getClientRects().length,inside:a.left>=c.left-1&&a.right<=chev.left+1&&a.top>=c.top-1&&a.bottom<=c.bottom+1}}),numeric=rows.flatMap(r=>[...r.querySelectorAll('td:not(:has(.heat-cell))')]),numFit=numeric.every(c=>{const a=rect(c),range=document.createRange();range.selectNodeContents(c);const b=range.getBoundingClientRect();return range.getClientRects().length===1&&b.left>=a.left-1&&b.right<=a.right+1}),worst=rows.reduce((a,b)=>rect(a).height>=rect(b).height?a:b),cellDetails=[...worst.cells].map(c=>{const s=getComputedStyle(c),child=c.firstElementChild;return {text:c.textContent.trim(),width:rect(c).width,height:rect(c).height,padding:s.padding,lineHeight:s.lineHeight,whiteSpace:s.whiteSpace,childHeight:child?rect(child).height:null}});return {table:rect(t).width,clubWidth:rect(rows[0].cells[0]).width,maxChipWidth:Math.max(...chips.map(c=>rect(c).width)),maxChipHeight:Math.max(...chips.map(c=>rect(c).height)),maxRowHeight:rect(worst).height,chipCount:chips.length,labelsFit:chips.every(c=>c.scrollWidth<=c.clientWidth+1),numericLabelsFit:numFit,clubs,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,worstClub:worst.dataset.probClub,worstCells:cellDetails}}""")
     assert 245<=m["clubWidth"] and m["table"]<=1281,m
+    print("DESKTOP DENSITY:",json.dumps({k:v for k,v in m.items() if k!="clubs"},ensure_ascii=False),flush=True)
     assert m["maxChipWidth"]<=73 and m["maxChipHeight"]<=29 and m["maxRowHeight"]<=45,m
+    assert m["numericLabelsFit"],m
     assert m["chipCount"]==140 and m["labelsFit"] and m["overflow"]<=1,m
     assert len(m["clubs"])==20 and all(c["inside"] and c["lines"]==1 for c in m["clubs"]),m
     return m
@@ -456,7 +458,7 @@ async def run_browser(site,out,origin):
                     await page.get_by_role("button",name="Definir Meu Clube",exact=False).click()
                     await page.locator("#fdg-main[aria-busy=false]").wait_for()
                     if await page.evaluate("localStorage.getItem('fdg-sl02:club')")!="Bahia":fail.append("Meu Clube")
-            except Exception as e:fail.append(route+"@"+str(w)+":"+str(e)[:1800 if route=="/aovivo.html" or route.startswith("/jogo/") or route.startswith("games/") or route=="/agenda.html" else 240])
+            except Exception as e:fail.append(route+"@"+str(w)+":"+str(e)[:1800 if route=="/aovivo.html" or route.startswith("/jogo/") or route.startswith("games/") or route=="/agenda.html" or route=="stats/prob" else 240])
             finally:await ctx.close()
         # All approved viewports; native shell measured separately from legacy
         # content layout (whose existing horizontal scroll remains visible in report).

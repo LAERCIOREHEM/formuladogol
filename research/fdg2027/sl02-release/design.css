@@ -109,7 +109,7 @@
   .fdg-release-app .hf-table-scroll .hf-matrix .hf-club-col{width:252px}
   .fdg-release-app .hf-table-scroll .hf-matrix .hf-num-col{width:42px}
   .fdg-release-app .hf-table-scroll .hf-matrix .hf-proj-col{width:48px}
-  .fdg-release-app .hf-table-scroll .hf-matrix .hf-range-col{width:68px}
+  .fdg-release-app .hf-table-scroll .hf-matrix .hf-range-col{width:82px}
   .fdg-release-app .hf-table-scroll .hf-matrix .heat-cell{width:72px;max-width:100%;min-width:0;padding:3px 2px;line-height:1.25;font-size:.89rem;border-radius:5px;box-sizing:border-box}
   .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club]>td,
   .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club]>th{padding-block:3px}
@@ -121,7 +121,11 @@
 /* Resolve the measured 51.16px row regression without changing the type scale.
    Explicitly size the actual interactive control and both cells. */
 @media(min-width:900px) {
-  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] > :is(th,td) {height:43px;box-sizing:border-box;padding-block:2px!important}
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] {height:42px}
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] > :is(th,td) {height:auto;box-sizing:border-box;padding-block:1px!important;line-height:1.2!important;vertical-align:middle!important}
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] > td {white-space:nowrap!important;overflow-wrap:normal!important;word-break:normal!important}
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] > td.hf-range {font-variant-numeric:tabular-nums}
+  .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] .heat-cell {margin-block:0!important}
   .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] .hf-club-button {box-sizing:border-box;height:36px!important;min-height:36px!important;max-height:36px!important;padding:0!important;line-height:1.2!important;align-items:center}
   .fdg-release-app .hf-table-scroll .hf-matrix tbody tr[data-prob-club] .hf-club-button .team {align-items:center;line-height:1.2;min-height:0;max-height:36px}
 }
