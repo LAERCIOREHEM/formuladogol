@@ -143,6 +143,25 @@ async def run_browser(site,out,origin):
                         if w<900:
                             compact=page.locator(".r1-compact")
                             if await compact.locator("tbody tr[data-prob-club]").count()!=20:fail.append("compact rows:"+label)
+                            source=readj(site,"dados-br/probabilidades-brasileirao.json")["clubes"]
+                            rendered_compact=await compact.locator("tbody tr[data-prob-club]").evaluate_all("(rows)=>Object.fromEntries(rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell').textContent]))")
+                            if len(rendered_compact)!=20 or any(rendered_compact.get(c["clube"])!=c["probabilidades_detalhes"]["libertadores"]["exibicao"] for c in source):fail.append("compact exact values:"+label)
+                            if w==390 and theme=="dark":
+                                for indicator in ("campeao","g4","g6","sul_americana","sem_competicao_continental","rebaixamento","libertadores"):
+                                    await page.locator("select[data-change=indicator]").select_option(indicator)
+                                    await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                                    cells=await page.locator(".r1-compact tbody tr[data-prob-club]").evaluate_all("(rows)=>Object.fromEntries(rows.map(r=>[r.dataset.probClub,r.querySelector('.heat-cell').textContent]))")
+                                    if len(cells)!=20 or any(cells.get(c["clube"])!=c["probabilidades_detalhes"][indicator]["exibicao"] for c in source):fail.append("compact indicator:"+indicator)
+                                await page.locator(".r1-compact .hf-club-button").first.click()
+                                await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                                if not await page.locator(".r1-detail-row").is_visible():fail.append("compact club detail")
+                                await page.locator(".r1-compact .hf-club-button").first.click()
+                                await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                                await page.evaluate("scrollTo(0,0)")
+                                await page.locator("#r1-prob-legend summary").click()
+                                if not await page.locator("#r1-prob-legend .hf-legend").is_visible():fail.append("legend expand")
+                                await page.locator("#r1-prob-legend summary").click()
+                                await page.evaluate("scrollTo(0,0)")
                             bounds=await page.locator(".r1-compact-scroll").evaluate("(e)=>({width:e.clientWidth,scroll:e.scrollWidth,top:e.getBoundingClientRect().top,first:e.querySelector('tbody tr').getBoundingClientRect().bottom,viewport:innerHeight,pulse:document.querySelector('#sl02-pulse').getBoundingClientRect().height})")
                             m["r1_density"]=bounds
                             if bounds["scroll"]>bounds["width"]+1:fail.append("compact horizontal overflow:"+label)
