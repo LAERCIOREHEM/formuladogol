@@ -64,6 +64,10 @@ def stage(site,backup,selected):
     if selected=="sl02":
         ledger=apply(site,backup)
         assert ledger["protected_count"]>0 and ledger["publication"] is False
+        from afp_public import approved_payload
+        approved=approved_payload()
+        if approved is None:assert not (site/"sl02/af-player.json").exists()
+        else:assert (site/"sl02/af-player.json").read_bytes()==approved
     else:
         assert not backup.exists()
     verify(site,selected=="sl02")

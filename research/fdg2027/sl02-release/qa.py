@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
 from abrir_previa import Handler
 from overlay import snapshot,rollback,sha,match_projection,fact_value,valid_highlight
+from afp_public import approved_payload
 LABELS=["Estatísticas","Jogos","Ao vivo","Análises","Clubes","Mais"]
 ICONS=["📊","⚽","🔴","📰","🛡️","☰"]
 WIDTHS=(320,360,390,430,768,1024,1440)
@@ -79,6 +80,12 @@ def verify_static(base,site,backup):
     assert all(c[k]==v for k,v in b.items() if not k.endswith(".html"))
     assert set(b)<=set(c)
     for rel in ["manifest.webmanifest","sw.js","robots.txt","sitemap.xml","news-sitemap.xml","CNAME","js/br-data-pulse.js","js/br-data-refresh.js","js/br-af-core-snapshot.js","js/br-data-manifest.js","js/br-pwa.js","js/br-push.js","js/br-aovivo.js","js/br-estatisticas.js","js/br-acuracia.js","dados-br/af-core-manifest.json"]:assert b[rel]==c[rel],rel
+    approved_afp=approved_payload()
+    if approved_afp is None:
+        assert not (site/"sl02/af-player.json").exists()
+        assert "data-fdg-afp-sha256" not in (site/"estatisticas.html").read_text()
+    else:
+        assert (site/"sl02/af-player.json").read_bytes()==approved_afp
     original_details=readj(site,"dados-br/jogos-detalhes.json")
     projection=readj(site,"sl02/match-summary.json")
     assert projection==match_projection(original_details,sha(site/"dados-br/jogos-detalhes.json"))
