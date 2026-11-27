@@ -5,13 +5,13 @@
   "status": "ok",
   "origem": {
     "arquivo": "dados-br/auditoria-historica-placares-af-2026.json",
-    "sha256_arquivo": "49b5c6ed4f2243d1142c4e2d60fc6e71ef243d8dfb1792b6e0860968d2f5bb08",
-    "hash_jogos_e1": "e7155692fb9637a8cdb8af2400ff6d82c63936906e7babb0d27b99b76670f1b8",
-    "data_fonte_resultados": "2026-11-25T22:14:23.385130-03:00"
+    "sha256_arquivo": "c4cce43aa5104b6d9fa09111b2a2e52d46ce9fe70de04c804ac56cab5443ec08",
+    "hash_jogos_e1": "df539c3a130d9ad62b057b21c5c4c9e5f95c9d42a6766a45519d6c822d358e45",
+    "data_fonte_resultados": "2026-11-26T22:12:33.929665-03:00"
   },
   "resumo": {
-    "resultados_auditados": 361,
-    "previsoes_certificadas": 179,
+    "resultados_auditados": 362,
+    "previsoes_certificadas": 180,
     "sem_snapshot_certificado": 182,
     "quarentena_por_conflito": 0,
     "sem_horario_factual": 0
@@ -12055,10 +12055,62 @@
         "versao_modelo": "AF-Previsão 1.3",
         "top3_origem": "nativo_documentado"
       }
+    },
+    {
+      "identidade_partida": "sao paulo|remo",
+      "event_ids": [
+        "401841329"
+      ],
+      "rodada_auditada": 37,
+      "mandante": "São Paulo",
+      "visitante": "Remo",
+      "inicio_factual": "2026-11-26T23:00:00+00:00",
+      "placar_final_auditado": {
+        "mandante": 3,
+        "visitante": 1
+      },
+      "situacao": "comprovado",
+      "placar_previsto": {
+        "mandante": 1,
+        "visitante": 0
+      },
+      "gols_projetados": {
+        "mandante": 1.6392,
+        "visitante": 0.8635
+      },
+      "probabilidades_ved_pct": {
+        "mandante": 55.7126,
+        "empate": 24.5791,
+        "visitante": 19.7083
+      },
+      "palpite_resultado_top1": "mandante",
+      "top3_placares": [
+        {
+          "mandante": 1,
+          "visitante": 0,
+          "probabilidade_pct": 13.419
+        },
+        {
+          "mandante": 1,
+          "visitante": 1,
+          "probabilidade_pct": 11.5873
+        },
+        {
+          "mandante": 2,
+          "visitante": 0,
+          "probabilidade_pct": 10.9984
+        }
+      ],
+      "prova": {
+        "commit": "86b989faae09afcea51aea849d9f549b0914972f",
+        "gerado_em": "2026-11-26T00:56:00+00:00",
+        "versao_modelo": "AF-Previsão 1.3",
+        "top3_origem": "nativo_documentado"
+      }
     }
   ],
   "integridade": {
     "algoritmo": "SHA-256",
-    "hash_jogos": "f82e37f9ef9ddabe810ff81b2dd32f279c3f00cdd9dfea9926e2b399579a1335"
+    "hash_jogos": "766e1ad171d2d3481d0be3aa8e13d7c4749a807db0a3e3aff7f665d346d5fd11"
   }
 }
