@@ -13,7 +13,7 @@ from overlay import apply,snapshot,sha
 ROOT=Path(__file__).resolve().parent
 MODE=ROOT/"release-mode.json"
 HOST="https://formuladogol.com.br"
-FRONTEND=("estatisticas.html","estatisticas-completas.html","sl02/app.js","sl02/design.css","sl02/shell.js","sl02/shell.css","sl02/history-slim.json","index.html","aovivo.html","manifest.webmanifest","sw.js")
+FRONTEND=("estatisticas.html","estatisticas-completas.html","sl02/app.js","sl02/design.css","sl02/shell.js","sl02/shell.css","sl02/history-slim.json","sl02/match-summary.json","agenda.html","index.html","aovivo.html","manifest.webmanifest","sw.js")
 def readj(p):return json.loads(p.read_text(encoding="utf-8"))
 def mode():
     v=readj(MODE)
@@ -54,6 +54,7 @@ def verify(site,active):
             assert marker in str(full),marker
         assert all((site/f).is_file() for f in FRONTEND)
         assert readj(site/"sl02/history-slim.json")["source_sha256"]==sha(site/"dados-br/historico-probabilidades.json")
+        assert readj(site/"sl02/match-summary.json")["source_sha256"]==sha(site/"dados-br/jogos-detalhes.json")
         assert all((site/f).is_file() for f in ("copa2026/index.html","museu.html","jogos/index.html","resultados/index.html","tabela/index.html","alertas.html"))
     else:
         assert not (site/"estatisticas-completas.html").exists()

@@ -8,6 +8,9 @@ Rollback restores only frontend paths, never data or an old commit.
 from __future__ import annotations
 import hashlib,html,json,re,shutil,sys
 from pathlib import Path
+from urllib.parse import urlencode
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+from math import isfinite
 from bs4 import BeautifulSoup
 SRC=Path(__file__).resolve().parent
 ROOT=SRC.parents[2]
@@ -17,8 +20,8 @@ def snapshot(site):
     return {p.relative_to(site).as_posix():sha(p) for p in sorted(site.rglob("*")) if p.is_file()}
 def read(p):return p.read_text(encoding="utf-8")
 def write(p,s):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s,encoding="utf-8")
-CSS='<link rel="stylesheet" href="/sl02/shell.css?v=sl02-r1-density-1">'
-JS='<script defer src="/sl02/shell.js?v=sl02-r1-density-1"></script>'
+CSS='<link rel="stylesheet" href="/sl02/shell.css?v=sl02-ux-hf2-1">'
+JS='<script defer src="/sl02/shell.js?v=sl02-ux-hf2-1"></script>'
 SHELL='<div data-fdg-release-shell></div>'
 NAV=re.compile(r'<nav\b(?P<attrs>[^>]*class=["\'][^"\']*["\'][^>]*)>.*?</nav\s*>',re.S|re.I)
 IMG=re.compile(r'<img\b[^>]*src=["\'][^"\']*header-formula-do-gol-v2\.png[^"\']*["\'][^>]*>',re.I)
@@ -28,14 +31,67 @@ def navkind(m):
     if not n:return None
     c=n.get("class",[])
     return "main" if "nav" in c else "archive" if "menu" in c else None
-def native(s,rel):
+def match_projection(doc,digest):
+    games={}
+    for k,v in (doc.get("jogos") or {}).items():
+        if not isinstance(v,dict):continue
+        games[str(k)]={key:v.get(key) for key in ("publico","publico_pagante","renda","arbitro")}
+        games[str(k)]["gols"]=[{key:x.get(key) for key in ("jogador","time","minuto")} for x in (v.get("gols") or []) if isinstance(x,dict)]
+    return {"source_sha256":digest,"atualizado_em":doc.get("atualizado_em"),"jogos":games}
+
+def fact_value(v,currency=False):
+    if v is None or isinstance(v,bool) or v=="":return "Não publicado"
+    try:n=Decimal(str(v))
+    except (ValueError,InvalidOperation):return "Não publicado"
+    if not n.is_finite() or n<0:return "Não publicado"
+    n=n.quantize(Decimal('0.01' if currency else '1'),rounding=ROUND_HALF_UP)
+    s=format(n,",.2f" if currency else ",.0f").replace(",","@").replace(".",",").replace("@",".")
+    return ("R$ "+s) if currency else s
+
+def valid_highlight(game,h):
+    if not isinstance(h,dict):return None
+    video=h.get("video_id") or ""
+    if (str(h.get("event_id"))!=str(game.get("event_id")) or h.get("placar_mandante")!=game.get("placar_mandante") or h.get("placar_visitante")!=game.get("placar_visitante") or not re.fullmatch(r"[A-Za-z0-9_-]{11}",video) or h.get("url")!="https://www.youtube.com/watch?v="+video):return None
+    return h
+
+def enrich_native_match(s,rel,matches,details,highlights):
+    soup=BeautifulSoup(s,"html.parser")
+    if not soup.body:return s
+    agenda=rel=="agenda.html"
+    soup.body["data-fdg-match-hf2"]="agenda" if agenda else "game"
+    # These legacy headers contain only the duplicated global brand, not match content.
+    for header in soup.select("header.hero"):
+        if header.select_one('img[src*="header-formula-do-gol-v2.png"]') and not header.get_text(strip=True):header.decompose()
+    if agenda:return str(soup)
+    hero=soup.select_one(".game-hero-card")
+    slot=soup.select_one("[data-fdg-game-alert-slot][data-event-id]")
+    if not hero or not slot:return str(soup)
+    eid=str(slot.get("data-event-id"))
+    game=matches.get(eid)
+    if not game:return str(soup)
+    d=details.get(eid) or {}
+    h=valid_highlight(game,highlights.get(eid))
+    name=lambda side: str((game.get(side) or {}).get("nome") or "")
+    a,b=name("mandante"),name("visitante")
+    esc=lambda v:html.escape(str(v),quote=True)
+    facts='<div class="ux-native-facts" aria-label="Público e renda"><div><span>Público</span><strong data-match-fact="publico">'+esc(fact_value(d.get("publico")))+'</strong></div><div><span>Renda</span><strong data-match-fact="renda">'+esc(fact_value(d.get("renda"),True))+'</strong></div></div>'
+    anchor=hero.select_one(".game-answer")
+    if anchor:anchor.insert_after(BeautifulSoup(facts,"html.parser"))
+    else:hero.append(BeautifulSoup(facts,"html.parser"))
+    query="https://www.youtube.com/results?"+urlencode({"search_query":a+" "+b+" melhores momentos Brasileirão 2026 "+str(game.get("data_iso") or "")[:10]})
+    play=('<button type="button" data-fdg-play="'+esc(h["video_id"])+'" aria-label="'+esc("Reproduzir melhores momentos: "+a+" x "+b)+'">Reproduzir aqui</button>') if h and h.get("embeddable") is True else ""
+    video='<section class="ux-native-video" data-fdg-video aria-label="Melhores momentos"><div class="ux-video-label"><span class="ux-video-icon" aria-hidden="true">▶</span><div><strong>Melhores momentos</strong><small>'+esc((h.get("fonte") or "YouTube") if h else "Vídeo ainda não vinculado")+'</small></div></div><div class="ux-video-actions">'+play+'<a href="'+esc(h["url"] if h else query)+'" target="_blank" rel="noopener noreferrer">'+("Abrir no YouTube" if h else "Buscar no YouTube")+'</a></div><div data-fdg-video-slot></div></section>'
+    hero.insert_after(BeautifulSoup(video,"html.parser"))
+    return str(soup)
+
+def native(s,rel,matches=None,details=None,highlights=None):
     # Keep the original anchors and IDs for legacy handlers; exclude the old
     # navigation from accessibility tree, layout and br-menu's floating clones.
     if rel in ("jogos/index.html","tabela/index.html","resultados/index.html"):
         return s
-    matches=[m for m in NAV.finditer(s) if navkind(m)]
+    nav_matches=[m for m in NAV.finditer(s) if navkind(m)]
     replacement=SHELL
-    for m in reversed(matches):
+    for m in reversed(nav_matches):
         old=m.group();kind=navkind(m)
         old=re.sub(r'\sdata-br-auth-menu(?:=["\'][^"\']*["\'])?', '',old,count=1)
         old=re.sub(r'<nav\b','<nav data-fdg-oldnav hidden aria-hidden="true" inert',old,count=1,flags=re.I)
@@ -44,8 +100,8 @@ def native(s,rel):
             doc=BeautifulSoup(m.group(),"html.parser")
             a=[x for x in doc.select("a[href]") if x.get("href") not in ("/","../","../index.html")]
             local='<details class="fdg-archive-links"><summary>Navegação do acervo Copa 2026</summary><div>'+''.join(str(x) for x in a)+'</div></details>'
-        s=s[:m.start()]+(replacement if m is matches[0] else "")+old+local+s[m.end():]
-    if not matches:
+        s=s[:m.start()]+(replacement if m is nav_matches[0] else "")+old+local+s[m.end():]
+    if not nav_matches:
         s=re.sub(r'(<body\b[^>]*>)',lambda m:m[1]+replacement,s,count=1,flags=re.I)
     # Archive articles keep their narrow body; the shared menu uses the full viewport.
     if rel.startswith("copa2026/"):
@@ -53,6 +109,8 @@ def native(s,rel):
         s=re.sub(r'(<body\b[^>]*>)',lambda m:m[1]+SHELL,s,count=1,flags=re.I)
     # The old Copa-specific logo stays inside the archive, while the FDG logo
     # is reused exactly once in the new global header.
+    if rel=="agenda.html" or rel.startswith("jogo/"):
+        s=enrich_native_match(s,rel,matches or {},details or {},highlights or {})
     s=IMG.sub(lambda m:m[0].replace("<img","<img data-fdg-oldbrand hidden",1),s)
     if rel=="aovivo.html":
         # Replace the entire legacy hero, not only its image: legacy
@@ -84,9 +142,9 @@ def approved(original,site):
         if x.get("type")=="application/ld+json" or "googletagmanager.com/gtag/js" in src or ("gtag(" in txt and "dataLayer" in txt):continue
         x.decompose()
     for rel in ("/css/br-pwa.css","/css/br-data-pulse.css","/sl02/design.css","/sl02/shell.css"):
-        head.append(BeautifulSoup('<link rel="stylesheet" href="'+rel+'?v=sl02-r1-density-1">',"html.parser"))
+        head.append(BeautifulSoup('<link rel="stylesheet" href="'+rel+'?v=sl02-ux-hf2-1">',"html.parser"))
     for rel in ("/js/br-config.js","/js/br-menu.js","/js/br-af-core-snapshot.js","/js/br-data-manifest.js","/js/br-data-refresh.js","/js/br-data-pulse.js","/sl02/shell.js","/sl02/app.js","/js/br-pwa.js","/js/br-push.js"):
-        head.append(BeautifulSoup('<script defer src="'+rel+'?v=sl02-r1-density-1"></script>',"html.parser"))
+        head.append(BeautifulSoup('<script defer src="'+rel+'?v=sl02-ux-hf2-1"></script>',"html.parser"))
     # Keep PWA version contract and a truthful, indexable initial content
     # snapshot. JS replaces this fallback on successful hydration.
     for tag in head.select('script[src],link[href]'):
@@ -113,17 +171,23 @@ def apply(site,backup):
     if rob:rob["content"]="noindex,follow"
     else:full.head.append(BeautifulSoup('<meta name="robots" content="noindex,follow">',"html.parser"))
     write(site/"estatisticas-completas.html",str(full))
+    details_path=site/"dados-br/jogos-detalhes.json"
+    projection=match_projection(json.loads(read(details_path)),sha(details_path))
+    details=projection["jogos"]
+    matches={str(g["event_id"]):g for g in json.loads(read(site/"resultados.json"))["resultados"]}
+    highlights=json.loads(read(site/"dados-br/melhores-momentos.json")).get("jogos",{})
     native_count=0
     for p in sorted(site.rglob("*.html")):
         rel=p.relative_to(site).as_posix()
         s=read(p)
-        changed=approved(original,site) if rel=="estatisticas.html" else native(s,rel)
+        changed=approved(original,site) if rel=="estatisticas.html" else native(s,rel,matches,details,highlights)
         if changed!=s:
             if rel in before:
                 dest=backup/"original"/rel;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,dest)
             write(p,changed);native_count+=1
     assets=site/"sl02";assets.mkdir()
     for rel in ("app.js","design.css","shell.js","shell.css"):shutil.copy2(SRC/rel,assets/rel)
+    write(assets/"match-summary.json",json.dumps(projection,ensure_ascii=False,separators=(",",":")))
     hist=site/"dados-br/historico-probabilidades.json"
     h=json.loads(read(hist));slim={"source_sha256":sha(hist),"source_path":"dados-br/historico-probabilidades.json","snapshots":[]}
     for x in h["snapshots"]:

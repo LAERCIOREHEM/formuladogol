@@ -50,7 +50,8 @@ def selftest():
     print("SL02 schedule guard fixture PASS")
 async def browser(out):
     from playwright.async_api import async_playwright
-    from qa import MEASURE,live_layout
+    from qa import MEASURE,live_layout,display_probability,player_totals,player_key,match_header,normalize_space
+    from overlay import fact_value,valid_highlight
     out.mkdir(parents=True,exist_ok=True)
     evidence=[]
     async with async_playwright() as p:
@@ -78,7 +79,7 @@ async def browser(out):
             assert await page.get_by_text("2026 · Vigente",exact=True).count()==1
             assert await page.get_by_text("2027 · Em breve",exact=True).count()==1
             # R1: confirm the actual public revision, responsive default and original AF values.
-            assert await page.locator('script[src*="/sl02/app.js?v=sl02-r1-density-1"]').count()==1
+            assert await page.locator('script[src*="/sl02/app.js?v=sl02-ux-hf2-1"]').count()==1
             assert await page.locator("#sl02-pulse-details").count()==1
             assert not await page.locator("#sl02-pulse-details").evaluate("(e)=>e.open")
             assert not await page.locator("#sl02-freshness").is_visible()
@@ -88,7 +89,7 @@ async def browser(out):
             source=await page.evaluate("""async()=>{const r=await fetch('/dados-br/probabilidades-brasileirao.json',{cache:'no-cache'});if(!r.ok)throw Error('AF public '+r.status);return r.json()}""")
             assert source["temporada"]==2026 and "1.3" in source["versao_modelo"] and source["simulacao"]["quantidade"]==2000000
             indicators=["campeao","g4","g6","libertadores","sul_americana","sem_competicao_continental","rebaixamento"]
-            expected={c["clube"]:{k:c["probabilidades_detalhes"][k]["exibicao"] for k in indicators} for c in source["clubes"]}
+            expected={c["clube"]:{k:display_probability(c["probabilidades_detalhes"][k]) for k in indicators} for c in source["clubes"]}
             assert len(expected)==20
             default="Compacta" if mobile else "Comparativa"
             assert await page.get_by_role("button",name=default,exact=True).get_attribute("aria-pressed")=="true"
@@ -121,6 +122,43 @@ async def browser(out):
             await page.wait_for_function("location.hash==='#stats/table'&&document.querySelectorAll('tbody tr[data-club]').length===20&&document.querySelector('#fdg-main[aria-busy=false]')")
             assert await page.locator(".hf-standings thead th").count()==10
             await page.screenshot(path=str(out/f"producao-{width}-classificacao.png"))
+            await page.get_by_role("tab",name="Jogadores",exact=True).click()
+            await page.locator("#fdg-main[aria-busy=false]").wait_for()
+            leaders=await page.evaluate("async()=>{const r=await fetch('/dados-br/lideres-jogadores.json',{cache:'no-cache'});if(!r.ok)throw Error('public players '+r.status);return r.json()}")
+            assert await page.locator(".ux-player-table tbody tr").count()==len(leaders["artilharia"])
+            await page.get_by_role("button",name="Participações em gols",exact=True).click()
+            await page.locator("#fdg-main[aria-busy=false]").wait_for()
+            player_rows=await page.locator(".ux-player-table tbody tr").evaluate_all("(rows)=>rows.map(r=>({name:r.querySelector('.ux-player-name>strong').textContent,club:r.querySelector('.ux-player-name .team>span:last-child').textContent,values:[...r.querySelectorAll('td')].slice(1).map(t=>Number(t.textContent))}))")
+            assert len(player_rows)==len(player_totals(leaders))
+            assert {player_key(p["name"],p["club"]):tuple(p["values"]) for p in player_rows}==player_totals(leaders)
+            await page.screenshot(path=str(out/f"producao-{width}-participacoes.png"))
+            # Public game-center certification, using the current published data.
+            await page.goto(HOST+"/estatisticas.html#games/results",wait_until="domcontentloaded",timeout=35000)
+            await page.locator("#fdg-main[aria-busy=false]").wait_for(timeout=30000)
+            await page.locator(".ux-match[data-match-id]").first.wait_for(timeout=25000)
+            source_data=await page.evaluate("""async()=>{const load=async p=>{const r=await fetch(p,{cache:'no-cache'});if(!r.ok)throw Error(p+' '+r.status);return r.json()};const [results,details,highlights]=await Promise.all(['/resultados.json','/dados-br/jogos-detalhes.json','/dados-br/melhores-momentos.json'].map(load));return {results:results.resultados,details:details.jogos,highlights:highlights.jogos}}""")
+            games_by_id={str(g["event_id"]):g for g in source_data["results"]}
+            cards=await page.locator(".ux-match[data-match-id]").evaluate_all("""cards=>cards.map(c=>({id:c.dataset.matchId,score:c.querySelector('.score').textContent,facts:Object.fromEntries([...c.querySelectorAll('[data-match-fact]')].map(e=>[e.dataset.matchFact,e.textContent])),video:c.querySelector('.ux-video-actions a')?.getAttribute('href'),play:c.querySelector('[data-fdg-play]')?.dataset.fdgPlay,details:c.querySelector('.ux-match-primary')?.getAttribute('href')}))""")
+            assert len(cards)==min(12,len(games_by_id))
+            for card in cards:
+                g=games_by_id[card["id"]];d=source_data["details"].get(card["id"],{});h=valid_highlight(g,source_data["highlights"].get(card["id"]))
+                assert card["score"]==f'{g["placar_mandante"]} × {g["placar_visitante"]}'
+                for k in ("publico","renda"):assert normalize_space(card["facts"][k])==normalize_space(fact_value(d.get(k),k=="renda"))
+                if h:assert card["video"]==h["url"] and card.get("play")== (h["video_id"] if h.get("embeddable") is True else None)
+                else:assert card["video"].startswith("https://www.youtube.com/results?search_query=") and not card.get("play")
+            assert not await page.locator(".ux-match iframe").count()
+            await page.screenshot(path=str(out/f"producao-{width}-resultados.png"))
+            detail=next(c["details"] for c in cards if c.get("details"))
+            await page.goto(HOST+detail,wait_until="domcontentloaded",timeout=35000)
+            await match_header(page,width)
+            assert await page.locator(".ux-native-facts [data-match-fact]").count()==2
+            assert await page.locator(".ux-native-video").count()==1
+            await page.screenshot(path=str(out/f"producao-{width}-partida.png"))
+            await page.goto(HOST+"/agenda.html",wait_until="domcontentloaded",timeout=35000)
+            await match_header(page,width)
+            await page.locator(".agenda-game").first.wait_for(timeout=25000)
+            assert await page.locator("#agenda-competition-filters button").count()>=1
+            await page.screenshot(path=str(out/f"producao-{width}-agenda.png"))
             await page.goto(HOST+"/aovivo.html?sl02_hf2="+str(int(time.time())),wait_until="domcontentloaded",timeout=35000)
             await page.locator(".fdg-nav").wait_for(timeout=20000)
             await page.wait_for_timeout(350)
