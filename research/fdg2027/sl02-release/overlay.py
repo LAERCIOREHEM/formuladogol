@@ -8,6 +8,7 @@ Rollback restores only frontend paths, never data or an old commit.
 from __future__ import annotations
 import hashlib,html,json,re,shutil,sys
 from pathlib import Path
+from afp_public import approved_payload
 from urllib.parse import urlparse, parse_qs
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from math import isfinite
@@ -20,8 +21,8 @@ def snapshot(site):
     return {p.relative_to(site).as_posix():sha(p) for p in sorted(site.rglob("*")) if p.is_file()}
 def read(p):return p.read_text(encoding="utf-8")
 def write(p,s):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s,encoding="utf-8")
-CSS='<link rel="stylesheet" href="/sl02/shell.css?v=sl02-ux-hf2-r1-4">'
-JS='<script defer src="/sl02/shell.js?v=sl02-ux-hf2-r1-4"></script>'
+CSS='<link rel="stylesheet" href="/sl02/shell.css?v=sl02-afp-ready-1">'
+JS='<script defer src="/sl02/shell.js?v=sl02-afp-ready-1"></script>'
 SHELL='<div data-fdg-release-shell></div>'
 NAV=re.compile(r'<nav\b(?P<attrs>[^>]*class=["\'][^"\']*["\'][^>]*)>.*?</nav\s*>',re.S|re.I)
 IMG=re.compile(r'<img\b[^>]*src=["\'][^"\']*header-formula-do-gol-v2\.png[^"\']*["\'][^>]*>',re.I)
@@ -138,7 +139,7 @@ def native(s,rel,matches=None,details=None,highlights=None):
         s=s.replace(SHELL,SHELL+'<div class="fdg-native-subnav"><a href="/copa2026/">Acervo da Copa 2026</a></div>',1)
     s=re.sub(r'</head>',CSS+JS+'</head>',s,count=1,flags=re.I)
     return s
-def approved(original,site):
+def approved(original,site,afp_digest=None):
     # Preserve original SEO metadata, canonical, JSON-LD, original GA setup,
     # manifest, favicons and PWA dependencies. No duplicate analytics.
     doc=BeautifulSoup(original,"html.parser")
@@ -151,9 +152,9 @@ def approved(original,site):
         if x.get("type")=="application/ld+json" or "googletagmanager.com/gtag/js" in src or ("gtag(" in txt and "dataLayer" in txt):continue
         x.decompose()
     for rel in ("/css/br-pwa.css","/css/br-data-pulse.css","/sl02/design.css","/sl02/shell.css"):
-        head.append(BeautifulSoup('<link rel="stylesheet" href="'+rel+'?v=sl02-ux-hf2-r1-4">',"html.parser"))
+        head.append(BeautifulSoup('<link rel="stylesheet" href="'+rel+'?v=sl02-afp-ready-1">',"html.parser"))
     for rel in ("/js/br-config.js","/js/br-menu.js","/js/br-af-core-snapshot.js","/js/br-data-manifest.js","/js/br-data-refresh.js","/js/br-data-pulse.js","/sl02/shell.js","/sl02/app.js","/js/br-pwa.js","/js/br-push.js"):
-        head.append(BeautifulSoup('<script defer src="'+rel+'?v=sl02-ux-hf2-r1-4"></script>',"html.parser"))
+        head.append(BeautifulSoup('<script defer src="'+rel+'?v=sl02-afp-ready-1"></script>',"html.parser"))
     # Keep PWA version contract and a truthful, indexable initial content
     # snapshot. JS replaces this fallback on successful hydration.
     for tag in head.select('script[src],link[href]'):
@@ -169,11 +170,14 @@ def approved(original,site):
         rows.append("<tr><th scope='row'>"+name+"</th>"+cells+"</tr>")
     fallback='<section class="panel" aria-label="Resumo publicado"><h1>Probabilidades do Brasileirão 2026</h1><p>AF-Previsão 1.3 · 2.000.000 de simulações · '+html.escape(str(prob["calculado_em"]))+'</p><p><a href="/estatisticas-completas.html">Estatísticas completas</a> · <a href="/tabela">Classificação</a> · <a href="/jogos">Jogos</a></p><div style="overflow-x:auto"><table class="table"><thead><tr><th>Clube</th><th>Título</th><th>Libertadores</th><th>Rebaixamento</th></tr></thead><tbody>'+''.join(rows)+'</tbody></table></div></section>'
     body='<body class="fdg-release-app" data-fdg-release-app="1" data-initial="stats/prob"><a class="skip" href="#fdg-main">Ir para conteúdo</a><header data-fdg-shell></header><main id="fdg-main" class="wrap" tabindex="-1" aria-live="polite" aria-busy="true">'+fallback+'</main><footer class="wrap site-footer fdg-release-footer"><div class="footer">Fórmula do Gol — site independente. Dados esportivos, resultados e projeções conforme suas fontes e datas. <a href="/sobre.html">Sobre e metodologia</a> · <a href="/alertas.html">Alertas</a> · <a href="/privacidade.html">Privacidade</a></div></footer></body>'
+    if afp_digest:body=body.replace('<body class=', '<body data-fdg-afp-sha256="'+afp_digest+'" class=',1)
     return '<!doctype html><html lang="pt-BR" data-theme="dark">'+str(head)+body+'</html>'
 def apply(site,backup):
     assert not (site/"sl02").exists() and not backup.exists()
     backup.mkdir(parents=True);before=snapshot(site)
     original=read(site/"estatisticas.html")
+    afp=approved_payload()
+    afp_digest=__import__("hashlib").sha256(afp).hexdigest() if afp is not None else None
     # Native full statistics remain reachable and keep their original scripts.
     full=BeautifulSoup(original,"html.parser")
     rob=full.select_one('meta[name=robots]')
@@ -189,12 +193,13 @@ def apply(site,backup):
     for p in sorted(site.rglob("*.html")):
         rel=p.relative_to(site).as_posix()
         s=read(p)
-        changed=approved(original,site) if rel=="estatisticas.html" else native(s,rel,matches,details,highlights)
+        changed=approved(original,site,afp_digest) if rel=="estatisticas.html" else native(s,rel,matches,details,highlights)
         if changed!=s:
             if rel in before:
                 dest=backup/"original"/rel;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,dest)
             write(p,changed);native_count+=1
     assets=site/"sl02";assets.mkdir()
+    if afp is not None:(assets/"af-player.json").write_bytes(afp)
     for rel in ("app.js","design.css","shell.js","shell.css"):shutil.copy2(SRC/rel,assets/rel)
     write(assets/"match-summary.json",json.dumps(projection,ensure_ascii=False,separators=(",",":")))
     hist=site/"dados-br/historico-probabilidades.json"

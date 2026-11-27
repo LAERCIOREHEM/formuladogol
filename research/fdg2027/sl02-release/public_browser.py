@@ -82,7 +82,7 @@ async def browser(out):
             assert await page.get_by_text("2026 · Vigente",exact=True).count()==1
             assert await page.get_by_text("2027 · Em breve",exact=True).count()==1
             # R1: confirm the actual public revision, responsive default and original AF values.
-            assert await page.locator('script[src*="/sl02/app.js?v=sl02-ux-hf2-r1-4"]').count()==1
+            assert await page.locator('script[src*="/sl02/app.js?v=sl02-afp-ready-1"]').count()==1
             assert await page.locator("#sl02-pulse-details").count()==1
             assert not await page.locator("#sl02-pulse-details").evaluate("(e)=>e.open")
             assert not await page.locator("#sl02-freshness").is_visible()
@@ -135,6 +135,19 @@ async def browser(out):
             await page.get_by_role("tab",name="Jogadores",exact=True).click()
             await page.locator("#fdg-main[aria-busy=false]").wait_for()
             leaders=await page.evaluate("async()=>{const r=await fetch('/dados-br/lideres-jogadores.json',{cache:'no-cache'});if(!r.ok)throw Error('public players '+r.status);return r.json()}")
+            if await page.locator("body").get_attribute("data-fdg-afp-sha256"):
+                assert await page.locator(".afp-ranking").count()==1
+                ranking=await page.evaluate("async()=>{const r=await fetch('/sl02/af-player.json',{cache:'no-cache'});if(!r.ok)throw Error('AFP public');return r.json()}")
+                assert ranking["publication"] in ("EXPERIMENTAL_DERIVED","CERTIFIED_DERIVED")
+                assert await page.get_by_role("button",name="AF-Player",exact=True).get_attribute("aria-pressed")=="true"
+                assert await page.locator(".afp-ranking tbody tr").count()==len(ranking["seasons"]["2026"]["rows"])
+                await page.screenshot(path=str(out/f"producao-{width}-af-player.png"))
+                await page.locator(".afp-player-name").first.click()
+                await page.locator("#fdg-main[aria-busy=false]").wait_for()
+                assert await page.locator(".afp-detail").count()==1
+                await page.screenshot(path=str(out/f"producao-{width}-af-player-raiox.png"))
+                await page.get_by_role("button",name="Artilharia",exact=True).click()
+                await page.locator("#fdg-main[aria-busy=false]").wait_for()
             assert await page.locator(".ux-player-table tbody tr").count()==len(leaders["artilharia"])
             await page.get_by_role("button",name="Participações em gols",exact=True).click()
             await page.locator("#fdg-main[aria-busy=false]").wait_for()

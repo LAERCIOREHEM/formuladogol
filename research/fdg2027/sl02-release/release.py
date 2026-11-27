@@ -64,6 +64,10 @@ def stage(site,backup,selected):
     if selected=="sl02":
         ledger=apply(site,backup)
         assert ledger["protected_count"]>0 and ledger["publication"] is False
+        from afp_public import approved_payload
+        approved=approved_payload()
+        if approved is None:assert not (site/"sl02/af-player.json").exists()
+        else:assert (site/"sl02/af-player.json").read_bytes()==approved
     else:
         assert not backup.exists()
     verify(site,selected=="sl02")
@@ -71,6 +75,7 @@ def smoke(site):
     active=(site/"sl02/app.js").is_file()
     verify(site,active)
     paths=FRONTEND if active else ("estatisticas.html","index.html","aovivo.html","manifest.webmanifest","sw.js")
+    if active and (site/"sl02/af-player.json").is_file():paths=(*paths,"sl02/af-player.json")
     for path in paths:
         expected=sha(site/path)
         last=""
