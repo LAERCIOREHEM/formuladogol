@@ -8135,49 +8135,115 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: Atlético-MG x Corinthians, pelo Campeonato Brasileiro (36ª rodada), acontece em 25/11/2026, às 20h (horário de Brasília), na Arena MRV. A transmissão integral ao vivo indicada é exclusiva do Premiere entre os canais permitidos. O ge oferece acompanhamento em tempo real, que não configura transmissão da partida."
+    },
+    {
+      "event_id": "401841337",
+      "jogo": "Fluminense x Cruzeiro",
+      "data_iso": "2026-11-27T20:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-11-27T18:57:39-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "GE TV",
+        "Premiere",
+        "SporTV"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/agenda",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/06/cbf-divulga-datas-e-horarios-das-duas-ultimas-rodadas-do-brasileirao-veja-detalhes.ghtml",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/26/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-37a-rodada.ghtml",
+        "https://ge.globo.com/futebol/brasileirao-serie-a/jogo/27-11-2026/fluminense-cruzeiro.ghtml",
+        "https://ge.globo.com/futebol/brasileirao-serie-a/simulador-do-brasileirao-2026",
+        "https://ge.globo.com/futebol/index/feed/pagina-5.ghtml",
+        "https://ge.globo.com/futebol/times/cruzeiro",
+        "https://ge.globo.com/futebol/times/fluminense/noticia/2026/11/10/fluminense-divulga-informacoes-de-ingressos-para-ultimas-rodadas-do-brasileirao.ghtml",
+        "https://ge.globo.com/futebol/times/fluminense/noticia/2026/11/27/fluminense-e-cruzeiro-travam-duelo-de-aspirantes-a-desafiar-dominio-de-flamengo-e-palmeiras.ghtml",
+        "https://ge.globo.com/google/amp/futebol/times/fluminense/noticia/2026/11/27/fluminense-pode-garantir-vaga-na-fase-de-grupos-da-libertadores-contra-o-cruzeiro-veja-cenarios.ghtml",
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/11/27/fluminense-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/rj",
+        "https://www.youtube.com/myfamily/static/pdfs/parentguide_uk.pdf"
+      ],
+      "canais_depois": [
+        "Premiere",
+        "SporTV"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/11/27/fluminense-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/26/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-37a-rodada.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=MSajlBZ4TFA",
+          "scope": "pre_game",
+          "valid_for_match": false,
+          "reason": "O próprio título identificado no dossiê diz “AQUECIMENTO AO VIVO”; trata-se de conteúdo pré-jogo, sem evidência de transmissão integral da partida."
+        }
+      ],
+      "youtube_removidos": [
+        "https://www.youtube.com/watch?v=MSajlBZ4TFA"
+      ],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Fluminense x Cruzeiro, Brasileirão 2026 — 37ª rodada, fase única — nesta sexta-feira, 27/11/2026, às 20h (horário de Brasília), no Maracanã. A transmissão integral será de SporTV e Premiere. GE TV não integra a grade da partida: o vídeo do YouTube informado é de aquecimento ao vivo, não do jogo completo."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841319",
-    "jogo": "Atlético-MG x Corinthians",
-    "data_iso": "2026-11-25T20:00:00-03:00",
+    "event_id": "401841337",
+    "jogo": "Fluminense x Cruzeiro",
+    "data_iso": "2026-11-27T20:00:00-03:00",
     "checkpoint": -90,
-    "executado_em": "2026-11-25T18:37:37-03:00",
+    "executado_em": "2026-11-27T18:57:39-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "Premiere"
+      "GE TV",
+      "Premiere",
+      "SporTV"
     ],
-    "status": "confirmado",
+    "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/ba/futebol/times/vitoria/noticia/2026/11/25/vitoria-seca-o-corinthians-para-confirmar-permanencia-na-36a-rodada-da-serie-a.ghtml",
-      "https://ge.globo.com/cartola/noticia/2026/11/20/rodada-36-do-cartola-tera-nove-jogos-validos-saiba-o-horario-do-fechamento-do-mercado.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/09/27/cbf-desmembra-rodadas-do-brasileirao-com-duas-semanas-completas-de-jogos-veja-as-datas.ghtml",
-      "https://ge.globo.com/futebol/times/atletico-mg/agenda-de-jogos-do-atletico-mg",
-      "https://ge.globo.com/futebol/times/corinthians/noticia/2026/10/30/cbf-define-datas-para-jogos-do-corinthians-contra-botafogo-e-atletico-mg-pelo-brasileirao.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/21/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-36a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/futebol/times/atletico-mg/noticia/2026/11/25/atletico-mg-perde-vitao-para-jogo-contra-o-corinthians-e-critica-stjd-descaso.ghtml",
-      "https://ge.globo.com/google/amp/futebol/times/atletico-mg/noticia/2026/11/25/entenda-qual-o-peso-do-jogo-contra-o-corinthians-para-o-atletico-mg-se-aproximar-de-objetivo.ghtml",
-      "https://ge.globo.com/google/amp/futebol/times/corinthians/noticia/2026/11/24/com-garro-corinthians-chega-a-belo-horizonte-para-jogo-contra-o-atletico-mg-veja-relacionados.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/jogo/25-11-2026/atletico-mg-corinthians.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/11/25/atletico-mg-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/pr/futebol/times/athletico-pr/noticia/2026/11/25/athletico-seca-o-atletico-mg-para-se-garantir-na-libertadores-veja-as-contas.ghtml"
+      "https://ge.globo.com/agenda",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/06/cbf-divulga-datas-e-horarios-das-duas-ultimas-rodadas-do-brasileirao-veja-detalhes.ghtml",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/26/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-37a-rodada.ghtml",
+      "https://ge.globo.com/futebol/brasileirao-serie-a/jogo/27-11-2026/fluminense-cruzeiro.ghtml",
+      "https://ge.globo.com/futebol/brasileirao-serie-a/simulador-do-brasileirao-2026",
+      "https://ge.globo.com/futebol/index/feed/pagina-5.ghtml",
+      "https://ge.globo.com/futebol/times/cruzeiro",
+      "https://ge.globo.com/futebol/times/fluminense/noticia/2026/11/10/fluminense-divulga-informacoes-de-ingressos-para-ultimas-rodadas-do-brasileirao.ghtml",
+      "https://ge.globo.com/futebol/times/fluminense/noticia/2026/11/27/fluminense-e-cruzeiro-travam-duelo-de-aspirantes-a-desafiar-dominio-de-flamengo-e-palmeiras.ghtml",
+      "https://ge.globo.com/google/amp/futebol/times/fluminense/noticia/2026/11/27/fluminense-pode-garantir-vaga-na-fase-de-grupos-da-libertadores-contra-o-cruzeiro-veja-cenarios.ghtml",
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/11/27/fluminense-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/rj",
+      "https://www.youtube.com/myfamily/static/pdfs/parentguide_uk.pdf"
     ],
     "canais_depois": [
-      "Premiere"
+      "Premiere",
+      "SporTV"
     ],
     "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/11/25/atletico-mg-x-corinthians-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/11/21/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-36a-rodada.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/jogo/25-11-2026/atletico-mg-corinthians.ghtml"
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/11/27/fluminense-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/11/26/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-37a-rodada.ghtml"
     ],
-    "youtube": [],
-    "youtube_removidos": [],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=MSajlBZ4TFA",
+        "scope": "pre_game",
+        "valid_for_match": false,
+        "reason": "O próprio título identificado no dossiê diz “AQUECIMENTO AO VIVO”; trata-se de conteúdo pré-jogo, sem evidência de transmissão integral da partida."
+      }
+    ],
+    "youtube_removidos": [
+      "https://www.youtube.com/watch?v=MSajlBZ4TFA"
+    ],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: Atlético-MG x Corinthians, pelo Campeonato Brasileiro (36ª rodada), acontece em 25/11/2026, às 20h (horário de Brasília), na Arena MRV. A transmissão integral ao vivo indicada é exclusiva do Premiere entre os canais permitidos. O ge oferece acompanhamento em tempo real, que não configura transmissão da partida."
+    "resumo": "Confirmado para o Brasil: Fluminense x Cruzeiro, Brasileirão 2026 — 37ª rodada, fase única — nesta sexta-feira, 27/11/2026, às 20h (horário de Brasília), no Maracanã. A transmissão integral será de SporTV e Premiere. GE TV não integra a grade da partida: o vídeo do YouTube informado é de aquecimento ao vivo, não do jogo completo."
   },
-  "atualizado_em": "2026-11-25T18:37:37-03:00"
+  "atualizado_em": "2026-11-27T18:57:39-03:00"
 }

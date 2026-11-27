@@ -17,7 +17,7 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 4,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 47,
+    "candidatos_oficiais_encontrados": 45,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
@@ -163,12 +163,13 @@
       "video_id": "MSajlBZ4TFA",
       "url": "https://www.youtube.com/watch?v=MSajlBZ4TFA",
       "titulo": "FLUMINENSE X CRUZEIRO | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
-      "status": "upcoming",
-      "confianca": 0.9,
+      "status": "live",
+      "confianca": 0.95,
       "motivos": [
         "os dois clubes aparecem no título",
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
+        "transmissão já está ao vivo",
         "horário compatível (60 min de diferença)"
       ]
     },
@@ -433,16 +434,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "JsFfki4iSbE",
-      "url": "https://www.youtube.com/watch?v=JsFfki4iSbE",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: STADE BRESTOIS X PARIS FC | LIGUE 1 26/27 | 12ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-11-27T16:20:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "T2vDd5LDNMw",
       "url": "https://www.youtube.com/watch?v=T2vDd5LDNMw",
       "fonte": "cazetv",
@@ -553,16 +544,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "ro3Mu-Ki31k",
-      "url": "https://www.youtube.com/watch?v=ro3Mu-Ki31k",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: COPA DAVIS 2026 | COBOLLI X LEHEČKA | ITÁLIA X TCHÉQUIA | SEMIFINAL",
-      "status": "live",
-      "inicio_programado": "2026-11-27T11:45:00-03:00",
-      "motivo": "conteúdo reúne mais de uma partida"
-    },
-    {
       "video_id": "sWU9PF50c6w",
       "url": "https://www.youtube.com/watch?v=sWU9PF50c6w",
       "fonte": "cazetv",
@@ -655,5 +636,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-11-27T18:36:18-03:00"
+  "atualizado_em": "2026-11-27T18:56:14-03:00"
 }
