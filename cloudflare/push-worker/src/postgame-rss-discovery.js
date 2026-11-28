@@ -68,11 +68,12 @@ export function buildPostgameRssQueries(task) {
   const hasScore=task?.home_score!=null&&task?.away_score!=null
     &&Number.isInteger(Number(task.home_score))&&Number.isInteger(Number(task.away_score));
   const score=hasScore?home+' '+Number(task.home_score)+' x '+Number(task.away_score)+' '+away:home+' '+away;
+  const fields=Number(task?.publico)>0&&!(Number(task?.renda)>0)?'renda':Number(task?.renda)>0&&!(Number(task?.publico)>0)?'público presente':'público renda';
   return [
-    home+' '+away+' público renda',
-    score+' público renda '+year,
+    home+' '+away+' '+fields,
+    score+' '+fields+' '+day,
     '"'+home+'" "'+away+'" ficha técnica '+day,
-    'site:uol.com.br/esporte '+home+' '+away+' público renda '+day,
+    'site:uol.com.br/esporte '+home+' '+away+' '+fields+' '+day,
   ];
 }
 

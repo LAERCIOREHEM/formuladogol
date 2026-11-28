@@ -18,7 +18,7 @@ const MAX_API_EVENT_IDS = 40;
 const STATIC_SEED_INTERVAL_MS = 10 * 60_000;
 const RECENT_RESULT_WINDOW_MS = 48 * 60 * 60_000;
 const CLEANUP_WINDOW_DAYS = 30;
-export const POSTGAME_POLICY_VERSION = 16;
+export const POSTGAME_POLICY_VERSION = 17;
 
 /*
  * Postgame Fastlane v15 — R10R17.7 (Melhores Momentos Série A) + R10R17.1 (attendance eligibility) + R10R16.1 Factual Integrity + R10R15.1 SLA Migration Suppression:
@@ -48,10 +48,13 @@ export const POSTGAME_POLICY_VERSION = 16;
  */
 export const PUBLIC_POLICY = Object.freeze({
   aiStartMinutes: 3,
-  geminiScheduleMinutes: [3, 15, 45, 105],
-  openaiScheduleMinutes: [12, 50],
+  geminiScheduleMinutes: [3, 20, 40, 105],
+  openaiScheduleMinutes: [10, 50],
   deterministicEveryMinutes: 3,
-  overdueMinutes: 120,
+  targetMinutes: 10,
+  overdueMinutes: 60,
+  // Keep the old paid backstop clock: no increase in long-tail paid attempts.
+  paidBackstopAnchorMinutes: 120,
   migrationGraceMinutes: 15,
   overdueGeminiEveryMinutes: 120,
   overdueOpenaiEveryMinutes: 240,
@@ -471,10 +474,10 @@ export function publicSearchRequest(task, missing, env, phase = 'openai') {
   };
 }
 
-function missingPublicFields(values) {
+export function missingPublicFields(values) {
   const missing = [];
   if (!(Number(values.publico) > 0)) missing.push('público presente');
-  if (!(Number(values.publico_pagante) > 0)) missing.push('público pagante');
+  // Pagantes are optional: extract when documented, never spend a paid lookup solely on them.
   if (!(Number(values.renda) > 0)) missing.push('renda');
   return missing;
 }
@@ -1052,7 +1055,7 @@ async function cacheDiscoveredSources(env, eventId, urls, provider='gemini') {
   for (const raw of urls || []) {
     const url = normalizeUrl(raw); if (!url) continue;
     await env.DB.prepare(`INSERT INTO postgame_source_cache(event_id,url,provider,discovered_at) VALUES(?,?,?,CURRENT_TIMESTAMP)
-      ON CONFLICT(event_id,url) DO UPDATE SET provider=excluded.provider`).bind(text(eventId),url,text(provider)).run();
+      ON CONFLICT(event_id,url) DO NOTHING`).bind(text(eventId),url,text(provider)).run();
   }
 }
 async function cachedSources(env,eventId){
@@ -1336,8 +1339,8 @@ export function isPublicComplete(values) {
 function expectedGeminiAttempts(ageMinutes) {
   const a = Math.max(0, Number(ageMinutes || 0));
   let expected = PUBLIC_POLICY.geminiScheduleMinutes.filter((m) => a >= m).length;
-  if (a >= PUBLIC_POLICY.overdueMinutes + PUBLIC_POLICY.overdueGeminiEveryMinutes) {
-    expected += Math.floor((a - PUBLIC_POLICY.overdueMinutes) / PUBLIC_POLICY.overdueGeminiEveryMinutes);
+  if (a >= PUBLIC_POLICY.paidBackstopAnchorMinutes + PUBLIC_POLICY.overdueGeminiEveryMinutes) {
+    expected += Math.floor((a - PUBLIC_POLICY.paidBackstopAnchorMinutes) / PUBLIC_POLICY.overdueGeminiEveryMinutes);
   }
   return expected;
 }
@@ -1345,8 +1348,8 @@ function expectedGeminiAttempts(ageMinutes) {
 function expectedOpenAiAttempts(ageMinutes) {
   const a = Math.max(0, Number(ageMinutes || 0));
   let expected = PUBLIC_POLICY.openaiScheduleMinutes.filter((m) => a >= m).length;
-  if (a >= PUBLIC_POLICY.overdueMinutes + PUBLIC_POLICY.overdueOpenaiEveryMinutes) {
-    expected += Math.floor((a - PUBLIC_POLICY.overdueMinutes) / PUBLIC_POLICY.overdueOpenaiEveryMinutes);
+  if (a >= PUBLIC_POLICY.paidBackstopAnchorMinutes + PUBLIC_POLICY.overdueOpenaiEveryMinutes) {
+    expected += Math.floor((a - PUBLIC_POLICY.paidBackstopAnchorMinutes) / PUBLIC_POLICY.overdueOpenaiEveryMinutes);
   }
   return expected;
 }
@@ -1354,13 +1357,13 @@ function expectedOpenAiAttempts(ageMinutes) {
 function nextGeminiDueMinute(ai = {}) {
   const g = Number(ai?.mini_attempts || 0);
   if (g < PUBLIC_POLICY.geminiScheduleMinutes.length) return PUBLIC_POLICY.geminiScheduleMinutes[g];
-  return PUBLIC_POLICY.overdueMinutes + (g - PUBLIC_POLICY.geminiScheduleMinutes.length + 1) * PUBLIC_POLICY.overdueGeminiEveryMinutes;
+  return PUBLIC_POLICY.paidBackstopAnchorMinutes + (g - PUBLIC_POLICY.geminiScheduleMinutes.length + 1) * PUBLIC_POLICY.overdueGeminiEveryMinutes;
 }
 
 function nextOpenAiDueMinute(ai = {}) {
   const o = Number(ai?.sol_attempts || 0);
   if (o < PUBLIC_POLICY.openaiScheduleMinutes.length) return PUBLIC_POLICY.openaiScheduleMinutes[o];
-  return PUBLIC_POLICY.overdueMinutes + (o - PUBLIC_POLICY.openaiScheduleMinutes.length + 1) * PUBLIC_POLICY.overdueOpenaiEveryMinutes;
+  return PUBLIC_POLICY.paidBackstopAnchorMinutes + (o - PUBLIC_POLICY.openaiScheduleMinutes.length + 1) * PUBLIC_POLICY.overdueOpenaiEveryMinutes;
 }
 
 function budgetNumber(env, key, fallback) {
@@ -1399,13 +1402,14 @@ export function planPublicStep(task, ai, now = Date.now(), budget = { allowGemin
   return{phase:'deterministic',ageMinutes};
 }
 
-export function shouldImmediateOpenAiFallback({ageMinutes=0,forcedUpgrade=false,budget={allowOpenAI:true},complete=false}={}) {
+export function shouldImmediateOpenAiFallback({ageMinutes=0,forcedUpgrade=false,budget={allowOpenAI:true},complete=false,openAiAttempts=0}={}) {
   // Se depois do Gemini ainda faltam público OU renda, a partir de T+12 a
   // contingência OpenAI entra no mesmo ciclo. Na primeira passada da v10,
   // `forcedUpgrade` antecipa essa regra para qualquer pendência elegível. Não usamos
   // `found`/`sources` como trava: um resultado parcial também precisa de fallback.
   if(complete || budget?.allowOpenAI===false) return false;
-  return Boolean(forcedUpgrade) || Number(ageMinutes||0)>=12;
+  // Do not spend a second provider slot more than once per scheduled checkpoint.
+  return (Boolean(forcedUpgrade)&&Number(openAiAttempts)===0) || Number(openAiAttempts)<expectedOpenAiAttempts(ageMinutes);
 }
 
 export function nextPublicAttemptMs(task, phaseDone, nextPlan, now=Date.now(), ai={}) {
@@ -1452,7 +1456,7 @@ export function publicAlertMessage(task, values, sources, ai, lastError, env = {
   const budget = publicBudgetDecision(env, costSummary);
   const subject = `⚠️ Fórmula do Gol: público/renda ainda não localizados — ${home} x ${away}`;
   const body = [
-    'SLA de 2 horas excedido. A busca automática CONTINUA; esta mensagem é informativa e não encerra a partida.',
+    'SLA operacional de 60 minutos excedido. A busca automática CONTINUA; esta mensagem é informativa e não encerra a partida.',
     '',
     `Partida: ${home}${score}${away}`,
     `Rodada: ${text(task.round || task.rodada) || '—'}`,
@@ -1480,7 +1484,7 @@ export function publicAlertMessage(task, values, sources, ai, lastError, env = {
     '- Workers AI não entra nesta estimativa em USD; seu consumo aparece no billing Cloudflare.',
     '',
     `Próxima tentativa: ${nextAt ? brDateTime(nextAt) : 'calculando'}`,
-    'Depois de 2h o Hunter reconsulta fontes gratuitas a cada 5–15 min no primeiro dia (depois em intervalos maiores); IA continua limitada por circuit breaker e orçamento.',
+    'Depois de 60 minutos o Hunter reconsulta fontes gratuitas a cada 5–15 min no primeiro dia (depois em intervalos maiores); IA continua limitada por circuit breaker e orçamento.',
     'A partida só sai da fila quando público e renda estiverem resolvidos.'
   ].join('\n');
   return { subject, body };
@@ -1521,8 +1525,10 @@ async function processPublicTask(env, task, now = Date.now()) {
   if (!attendanceEligibility(task.league).required || ['not_applicable','eligibility_pending'].includes(text(task.public_status))) return {eventId, attempted:false, status:'skipped_competition_ineligible'};
   // Revalidar o D1 após o claim: um seed/retificação concorrente pode ter
   // alterado a competição entre a seleção e o início da busca.
-  const current = await env.DB.prepare('SELECT league,public_status FROM postgame_fastlane WHERE event_id=?').bind(eventId).first();
-  if (!current || !attendanceEligibility(current.league).required || ['not_applicable','eligibility_pending'].includes(text(current.public_status))) return {eventId, attempted:false, status:'skipped_competition_reclassified'};
+  const current = await env.DB.prepare('SELECT * FROM postgame_fastlane WHERE event_id=?').bind(eventId).first();
+  if (!current || !attendanceEligibility(current.league).required || ['resolved','not_applicable','eligibility_pending'].includes(text(current.public_status))) return {eventId, attempted:false, status:'skipped_already_resolved_or_reclassified'};
+  // Merge the latest persisted fields after claim, not the stale SELECT snapshot.
+  task={...task,...current};
   const [ai,diag]=await Promise.all([readPublicAiState(env,eventId),readSearchDiag(env,eventId)]);
   const values={publico:num(task.publico),publico_pagante:num(task.publico_pagante),renda:num(task.renda)};
   let sources=safeJson(task.public_sources_json,{})||{};
@@ -1548,8 +1554,8 @@ async function processPublicTask(env, task, now = Date.now()) {
 
   // Antes de uma busca paga/grounded, avalia o budget usando o ledger real.
   if(plan.phase==='gemini'||plan.phase==='openai'){
-    costSummary=await postgamePublicCostSummary(env,now,eventId);
-    budget=publicBudgetDecision(env,costSummary);
+    costSummary=await postgamePublicCostSummary(env,now,eventId).catch(()=>null);
+    budget=costSummary?publicBudgetDecision(env,costSummary):{allowGemini:false,allowOpenAI:false,reason:'cost_ledger_unavailable'};
     if(plan.forcedV10){
       if(budget.allowGemini===false) plan={phase:'budget_guard',ageMinutes:ageMinutesAtStart,forcedV10:true};
     }else plan=planPublicStep(task,ai,now,budget);
@@ -1560,7 +1566,7 @@ async function processPublicTask(env, task, now = Date.now()) {
   // OpenAI assume o mesmo slot quando o budget permitir.
   let geminiCircuit=await readGeminiCircuit(env,now);
   if(plan.phase==='gemini'&&geminiCircuit.open){
-    plan=budget.allowOpenAI!==false
+    plan=budget.allowOpenAI!==false && Number(ai.sol_attempts||0)<Math.max(1,expectedOpenAiAttempts(ageMinutesAtStart))
       ? {phase:'openai',ageMinutes:ageMinutesAtStart,geminiCircuitOpen:true,forcedV10:plan.forcedV10===true}
       : {phase:'budget_guard',ageMinutes:ageMinutesAtStart,geminiCircuitOpen:true,forcedV10:plan.forcedV10===true};
   }
@@ -1584,10 +1590,11 @@ async function processPublicTask(env, task, now = Date.now()) {
     // Throttle persistente por partida evita varredura em todo cron.
     const rssKey='public_free_rss_v1:'+eventId;
     const lastRss=Date.parse(text(await metaGet(env,rssKey)));
-    if(!Number.isFinite(lastRss)||now-lastRss>=8*60_000){
+    const rssInterval=ageMinutesAtStart<20?3:ageMinutesAtStart<60?10:ageMinutesAtStart<360?15:60;
+    if(!Number.isFinite(lastRss)||now-lastRss>=rssInterval*60_000){
       await metaPut(env,rssKey,nowIso(now));
       try {
-        const free=await discoverFreePublicNews(task);
+        const free=await discoverFreePublicNews({...task,...values});
         if(free.urls.length)await cacheDiscoveredSources(env,eventId,free.urls,'bing-rss');
       }catch(e){console.warn('postgame_free_rss:',text(e?.message||e).slice(0,140));}
     }
@@ -1633,7 +1640,12 @@ async function processPublicTask(env, task, now = Date.now()) {
     // que não resolva público+renda aciona OpenAI. Na primeira execução v10 isso
     // também vale imediatamente para pendências antigas, como a que motivou o hotfix.
     const geminiInfraFailure=Number(found.searchCalls||0)<1 || discovered.length<1 || Number(found.httpStatus||0)>=400;
-    immediateOpenAiFallback=shouldImmediateOpenAiFallback({ageMinutes:ageMinutesAtStart,forcedUpgrade:plan.forcedV10===true,budget,geminiResult:found,discoveredCount:discovered.length,refreshedFoundAny:refreshed.foundAny,complete:isPublicComplete(values)});
+    immediateOpenAiFallback=shouldImmediateOpenAiFallback({ageMinutes:ageMinutesAtStart,forcedUpgrade:plan.forcedV10===true,budget,openAiAttempts:next.sol_attempts,complete:isPublicComplete(values)});
+    if(immediateOpenAiFallback){
+      // Re-read the cost ledger AFTER Gemini; no fail-open when accounting is unavailable.
+      const freshCost=await postgamePublicCostSummary(env,now,eventId).catch(()=>null);
+      immediateOpenAiFallback=Boolean(freshCost&&publicBudgetDecision(env,freshCost).allowOpenAI);
+    }
     if(!isPublicComplete(values)&&geminiInfraFailure&&!immediateOpenAiFallback) forceRetrySoon=true;
   }
 
@@ -1715,9 +1727,10 @@ async function processPublicTask(env, task, now = Date.now()) {
     if(!next.alert_at) next.alert_status='recovered_by_verified_or_grounded_correction';
   }
 
-  const persisted = await env.DB.prepare(`UPDATE postgame_fastlane SET publico=?,publico_pagante=?,renda=?,public_sources_json=?,public_status=?,public_attempts=?,public_last_at=?,public_next_at=?,public_last_error=?,updated_at=CURRENT_TIMESTAMP WHERE event_id=? AND league='bra.1' AND public_status NOT IN ('not_applicable','eligibility_pending')`)
-    .bind(num(values.publico),num(values.publico_pagante),num(values.renda),JSON.stringify(sources),status,Number(task.public_attempts||0)+1,nowIso(now),nextAt,complete?'':text(lastError).slice(0,1000),eventId).run();
-  if (Number(persisted?.meta?.changes || 0) < 1) return {eventId, attempted:false, status:'skipped_competition_reclassified'};
+  // Compare-and-swap: a concurrent verified correction or lease renewal always wins.
+  const persisted = await env.DB.prepare(`UPDATE postgame_fastlane SET publico=?,publico_pagante=?,renda=?,public_sources_json=?,public_status=?,public_attempts=?,public_last_at=?,public_next_at=?,public_last_error=?,updated_at=CURRENT_TIMESTAMP WHERE event_id=? AND league='bra.1' AND public_status NOT IN ('resolved','not_applicable','eligibility_pending') AND public_next_at IS ? AND publico IS ? AND publico_pagante IS ? AND renda IS ? AND public_sources_json IS ?`)
+    .bind(num(values.publico),num(values.publico_pagante),num(values.renda),JSON.stringify(sources),status,Number(task.public_attempts||0)+1,nowIso(now),nextAt,complete?'':text(lastError).slice(0,1000),eventId,task.public_next_at??null,task.publico??null,task.publico_pagante??null,task.renda??null,task.public_sources_json??null).run();
+  if (Number(persisted?.meta?.changes || 0) < 1) return {eventId, attempted:false, status:'skipped_concurrent_update'};
   await writePublicAiState(env,eventId,next);
   if(complete) await recordPublicResolution(env,eventId,{at:now,channel:'hunter:'+text(plan.phase),sourceUrl:text(sources.publico||sources.renda)});
   return{eventId,phase:plan.phase,status,nextAt,model:next.last_model||'',alert:next.alert_status||'',reason:complete?'':lastError,budget:budget.reason||'',estimatedUsd:Number(costSummary?.event?.estimatedUsd||0)};
@@ -1858,6 +1871,8 @@ export async function ensurePolicyVersion(env, now = Date.now()) {
       .bind(isoNow,nowIso(now-48*60*60_000),isoNow).run();
   }
 
+  // v17: new timing applies only to pending recent matches; no reset of counters,
+  // no historical replay, no reopening of resolved events, and no shortening active leases.
   await metaPut(env, 'policy_version', String(POSTGAME_POLICY_VERSION));
   return true;
 }
@@ -2018,7 +2033,9 @@ export async function postgameStatus(env) {
     ok: true,
     engine: 'cloudflare-postgame-fastlane',
     version: POSTGAME_POLICY_VERSION,
-    hunterIntegrationRevision: 'R10R29.1',
+    hunterIntegrationRevision: 'R37-HF2',
+    attendanceTargetMinutes: PUBLIC_POLICY.targetMinutes,
+    attendanceOperationalSlaMinutes: PUBLIC_POLICY.overdueMinutes,
     storedPolicyVersion,
     publicPolicy: PUBLIC_POLICY,
     searchProfileVersion: POSTGAME_SEARCH_PROFILE_VERSION,
