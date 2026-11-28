@@ -34,7 +34,8 @@ jobs:
       FDG_PUSH_SMTP_USER: ${{ secrets.SMTP_USER }}
       FDG_PUSH_SMTP_PASS: ${{ secrets.SMTP_PASS }}
       FDG_PUSH_API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
-      FDG_PUSH_API_FOOTBALL_LEAGUE_ID: ${{ secrets.API_FOOTBALL_LEAGUE_ID }}
+      # API-Football v3: Brazilian Serie A league ID is public and stable, not a credential.
+      FDG_PUSH_API_FOOTBALL_LEAGUE_ID: '71'
       FDG_PUSH_YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
       FDG_PUSH_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       FDG_PUSH_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -77,7 +78,7 @@ jobs:
           # Desde o fallback continental v3, API-Football é a camada
           # prioritária de enriquecimento quando a ESPN vem incompleta.
           test -n "${FDG_PUSH_API_FOOTBALL_KEY:-}" || { echo 'ERRO: secret API_FOOTBALL_KEY ausente; fallback continental v3 não pode operar.'; exit 1; }
-          [[ "${FDG_PUSH_API_FOOTBALL_LEAGUE_ID:-}" =~ ^[0-9]+$ ]] || { echo 'ERRO: API_FOOTBALL_LEAGUE_ID ausente ou inválida.'; exit 1; }
+          [[ "${FDG_PUSH_API_FOOTBALL_LEAGUE_ID:-}" == "71" ]] || { echo 'ERRO: API_FOOTBALL_LEAGUE_ID ausente ou inválida.'; exit 1; }
           echo 'API_FOOTBALL_KEY e liga configuradas para contingência com orçamento diário.'
 
           # Resend é apenas o canal administrativo de contingência. A ausência
@@ -239,7 +240,7 @@ jobs:
           # acima impede o deploy sem chave; aqui sincronizamos o secret no Worker.
           printf '%s' "$FDG_PUSH_API_FOOTBALL_KEY" | npx wrangler secret put API_FOOTBALL_KEY --config wrangler.generated.jsonc
           echo 'Secret API_FOOTBALL_KEY atualizado.'
-          if [[ "${FDG_PUSH_API_FOOTBALL_LEAGUE_ID:-}" =~ ^[0-9]+$ ]]; then
+          if [[ "${FDG_PUSH_API_FOOTBALL_LEAGUE_ID:-}" == "71" ]]; then
             printf '%s' "$FDG_PUSH_API_FOOTBALL_LEAGUE_ID" | npx wrangler secret put API_FOOTBALL_LEAGUE_ID --config wrangler.generated.jsonc
           else
             echo '::error::API_FOOTBALL_LEAGUE_ID ausente/inválida'; exit 1
