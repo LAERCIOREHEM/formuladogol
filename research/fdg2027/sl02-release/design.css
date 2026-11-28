@@ -134,3 +134,23 @@
 .afp-ranking .ux-player-table{min-width:800px}.afp-player-name{background:transparent;border:0;padding:0;text-align:left;min-height:32px;font:inherit;font-weight:800;color:inherit;cursor:pointer}.afp-player-name:focus-visible{outline:2px solid var(--accent)}.afp-ranking .afp-detail td{text-align:left;white-space:normal;background:var(--raised);padding:12px}.afp-axes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0}.afp-axes span{border:1px solid var(--border);padding:8px;border-radius:8px}.afp-axes b{display:block;color:var(--accent);font-size:1.2rem}
 
 .afp-ranking .ux-player-table{min-width:0;width:100%;table-layout:auto}.afp-role-mobile{display:none}.afp-ranking .afp-axes{grid-template-columns:repeat(auto-fit,minmax(95px,1fr))}.afp-ranking .afp-axes span{min-width:0}.afp-ranking .afp-axes small{font-size:.75rem}.afp-ranking .afp-player-name{white-space:normal;overflow-wrap:anywhere}.afp-ranking .ux-player-table .club-cell{min-width:180px}.afp-ranking .ux-player-table td,.afp-ranking .ux-player-table th{padding:8px 10px}.afp-ranking .afp-detail td{position:static}.afp-ranking .ux-player-primary{font-size:1.12rem;white-space:nowrap}.afp-filters{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.afp-filters .field,.afp-filters select{min-width:0;width:100%}@media(max-width:700px){.afp-ranking .afp-role-desktop,.afp-ranking .afp-extra{display:none}.afp-role-mobile{display:block;color:var(--muted);font-size:.72rem}.afp-ranking .ux-player-table .club-cell{min-width:0;width:auto}.afp-ranking .ux-player-table th,.afp-ranking .ux-player-table td{padding:7px 6px}.afp-ranking .ux-player-table th:first-child,.afp-ranking .ux-player-table td:first-child{width:38px}.afp-ranking .ux-player-table th:last-of-type,.afp-ranking .ux-player-primary{min-width:52px}.afp-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.afp-ranking .ux-player-podium{display:grid;grid-template-columns:1fr;gap:5px}.afp-ranking .ux-player-leader{padding:6px 9px;min-height:0}.afp-ranking .afp-detail td{width:100%!important}.afp-ranking .afp-axes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* AFP-R2: scoped presentation; no changes to other ranking modes. */
+.afp-ranking .afp-index-explain{padding:10px 12px;margin:10px 0 14px;border:1px solid var(--border);border-radius:10px;background:var(--raised)}
+.afp-ranking .afp-index-explain p{margin:5px 0 0;color:var(--muted);font-size:.82rem;line-height:1.45}
+.afp-ranking .afp-leaders-title{font-size:.94rem;margin:0 0 8px}
+.afp-ranking .afp-leaders{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.afp-ranking .afp-role-leader{grid-template-columns:minmax(0,1fr) auto;gap:6px 8px;align-items:center;padding:10px}
+.afp-ranking .afp-leader-label{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;font-size:.72rem}
+.afp-ranking .afp-leader-person{display:grid;gap:5px;min-width:0}
+.afp-ranking .afp-leader-person>div{display:grid;gap:3px;min-width:0}
+.afp-ranking .afp-leader-person strong{overflow-wrap:anywhere;font-size:.92rem}
+.afp-ranking .afp-role-leader .ux-player-total strong{font-size:1.35rem;font-variant-numeric:tabular-nums}
+.afp-ranking .afp-player-identity{display:flex;align-items:center;gap:5px 9px;flex-wrap:wrap}
+.afp-ranking .afp-band{display:block;font-weight:500;font-size:.68rem;color:var(--muted);white-space:normal;line-height:1.2;margin-top:3px}
+.afp-ranking .afp-index-row td{font-variant-numeric:tabular-nums}
+.afp-ranking .afp-rank-cell{font-weight:700;white-space:nowrap}
+.afp-ranking .afp-index-row .ux-player-primary{min-width:76px}
+@media(max-width:1100px){.afp-ranking .afp-leaders{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.afp-ranking .afp-index-row .ux-player-primary{min-width:68px;font-size:1rem}.afp-ranking .afp-player-identity{display:grid;gap:2px}.afp-ranking .afp-player-name{min-height:24px}.afp-ranking .afp-mobile-confidence{line-height:1.3}.afp-ranking .afp-index-explain{padding:8px}.afp-ranking .afp-role-leader .ux-player-total strong{font-size:1.17rem}.afp-ranking .afp-index-row th,.afp-ranking .afp-index-row td{padding:7px 4px}.afp-ranking .ux-player-table th:first-child{font-size:.68rem;width:42px}.afp-ranking .afp-axes span{overflow-wrap:anywhere}}
+@media(max-width:480px){.afp-ranking .afp-leaders{grid-template-columns:1fr}.afp-ranking .afp-role-leader{grid-template-columns:minmax(0,1fr) auto;gap:3px 8px}.afp-ranking .afp-leader-label{grid-column:1/-1}}
