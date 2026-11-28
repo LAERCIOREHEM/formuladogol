@@ -736,7 +736,7 @@
     // mas o painel visível não deve herdar os zeros do pré-jogo.
     // Qualquer liga em andamento com gol pendente precisa de facts novos.
     // Antes, a atualização forçada era exclusiva do Brasileirão.
-    if (options.forceFresh || (game.state === "in" && expectedGoals > 0)) params.set("fresh", "1");
+    if (league !== "bra.1" && (options.forceFresh || (game.state === "in" && expectedGoals > 0))) params.set("fresh", "1");
     let gatewayError = null;
 
     try {
@@ -765,6 +765,8 @@
         stale: envelope.stale === true,
         ageMs: Number(envelope.ageMs || 0) || 0,
         observedState: String(envelope.observedState || ""),
+        statsObservedAt: Number(envelope.statsObservedAt || 0),
+        statsHealth: envelope.statsHealth || null,
         espnOnly: envelope.espnOnly === true
       };
 
@@ -778,7 +780,7 @@
         const gatewayScore = statsRowsFreshnessScore(gatewayRows);
         const meta = envelope.data.__fdgLiveMeta || {};
         const shouldConfirmDirect = gatewayRows.length <= PARTIAL_STATS_THRESHOLD || gatewayScore < 100 || meta.stale || /stale/i.test(meta.cacheStatus || "");
-        if (shouldConfirmDirect) {
+        if (shouldConfirmDirect && gatewayRows.length === 0 && !/api-football|thesportsdb/.test(meta.statsProvider || "")) {
           try {
             const directUrl = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/summary?event=" + encodeURIComponent(eventId) + "&_fdg_live=" + Date.now();
             const direct = await fetchJson(directUrl, {
@@ -2360,7 +2362,7 @@
     { keys:["saves","goalkeeper saves"], label:"Defesas", order:7 },
     { keys:["total passes","totalpasses","passes"], label:"Passes", order:8 },
     { keys:["accurate passes","accuratepasses","completed passes","passes completed"], label:"Passes certos", order:9 },
-    { keys:["pass pct","pass percent","pass percentage","pass accuracy","passpct","passaccuracy"], label:"Precisão de passe", order:10, percent01:true },
+    { keys:["pass pct","pass percent","pass percentage","pass accuracy","passpct","passaccuracy","pass completion pct","passcompletionpct"], label:"Precisão de passe", order:10, percent01:true },
     { keys:["tackles won","tackleswon","tackles"], label:"Desarmes", order:11 },
     { keys:["interceptions"], label:"Interceptações", order:12 },
     { keys:["crosses","total crosses","totalcrosses"], label:"Cruzamentos", order:13 },
@@ -2368,7 +2370,8 @@
     { keys:["corner kicks","cornerkicks","won corners","woncorners","corners"], label:"Escanteios", order:15 },
     { keys:["yellow cards","yellowcards"], label:"Amarelos", order:16 },
     { keys:["red cards","redcards"], label:"Vermelhos", order:17 },
-    { keys:["offsides","offside"], label:"Impedimentos", order:18 }
+    { keys:["offsides","offside"], label:"Impedimentos", order:18 },
+    { keys:["expected goals","expectedgoals","xg"], label:"Gols esperados (xG)", order:19 }
   ];
 
   function metricKey(s) {
@@ -2388,7 +2391,7 @@
     return null;
   }
   function rawStatValue(s) {
-    return s && s.displayValue != null ? String(s.displayValue) : String(s && s.value != null ? s.value : "");
+    return s && s.displayValue != null ? String(s.displayValue) : String(s && s.value != null ? s.value : s && s.rawValue != null ? s.rawValue : "");
   }
   function numericStat(v) {
     const m = String(v == null ? "" : v).replace(",", ".").replace("%", "").match(/-?\d+(?:\.\d+)?/);
@@ -2429,14 +2432,15 @@
         const rule = ruleForMetric(stat.displayName || stat.shortDisplayName || stat.name || stat.label || stat.abbreviation || "");
         if (!rule) continue;
         const value = formatStatValue(rule, rawStatValue(stat));
-        if (value !== "") current[rule.label] = value;
+        if (value !== "" && Number.isFinite(numericStat(value))) { if (!(numericStat(value) === 0 && numericStat(current[rule.label]) > 0)) current[rule.label] = value; }
       }
       byTeam[key] = current;
     };
 
     const comp = g.competition || getCompetition(g.raw || {});
     for (const c of (comp.competitors || [])) add(c.team || {}, c.statistics || []);
-    for (const t of (((summary || {}).boxscore || {}).teams || [])) add(t.team || {}, t.statistics || t.stats || []);
+    for (const c of ((summary?.header?.competitions?.[0] || summary?.competitions?.[0] || summary?.competition || {}).competitors || [])) add(c.team || {}, c.statistics || c.stats || []);
+    for (const t of (((summary || {}).boxscore || {}).teams || [])) add(t.team || t, t.statistics || t.stats || []);
 
     const side = (which) => {
       const team = g[which];
@@ -2501,12 +2505,14 @@
     // o boxscore completo. Atualizamos toda métrica presente, mas preservamos
     // temporariamente as ausentes para que uma resposta parcial não faça linhas
     // já válidas desaparecerem da tela.
+    const meaningfulSnapshot = statsRowsFreshnessScore(currentRows) >= 100;
     for (const row of (currentRows || [])) {
+      if (!meaningfulSnapshot && entry.metrics[row.label]) continue;
       entry.metrics[row.label] = {
         label: row.label, home: row.home, away: row.away, order: row.order
       };
     }
-    if ((currentRows || []).length) entry.updatedAt = Date.now();
+    if (meaningfulSnapshot) entry.updatedAt = Date.now();
     state.statsPorId[key] = entry;
 
     const now = Date.now();
@@ -2708,7 +2714,7 @@
       };
     }
     return {
-      badge: "ESPN SUMMARY",
+      badge: "ESPN",
       note: "Mostramos somente métricas disponibilizadas pela ESPN. O site não inventa dados ausentes."
     };
   }
@@ -2716,15 +2722,25 @@
   function renderStats(g, summary) {
     if (g && g.state === "pre") return '<div class="live-empty">As estatísticas serão exibidas após o início da partida.</div>';
     const rows = collectStats(g, summary);
-    const allZeroPlaceholder = g && g.state === "in" && rows.length > 0 && statsRowsFreshnessScore(rows) < 100;
-    if (!rows.length || allZeroPlaceholder) return '<div class="live-empty">A ESPN está atualizando as estatísticas deste jogo. O painel será preenchido automaticamente assim que os dados ao vivo forem publicados.</div>';
+    const allZeroPlaceholder = g && (g.state === "in" || g.state === "post") && rows.length > 0 && statsRowsFreshnessScore(rows) < 100;
+    if (!rows.length || allZeroPlaceholder) return '<div class="live-empty">Estatísticas ainda indisponíveis nas fontes consultadas. O painel será atualizado quando houver dados confirmados.</div>';
     const names = '<div class="live-stats-head"><div>' + esc(g.home.nome) + '</div><div>comparativo</div><div>' + esc(g.away.nome) + '</div></div>';
     const sourceMeta = statsSourceMeta(summary);
-    return '<div class="live-stats live-stats-complete">' + names + rows.map((r) => '<div class="live-stat-row">' +
+    const essential = new Set(['Posse','Finalizações','Chutes no gol','Escanteios','Faltas','Amarelos','Vermelhos']);
+    const main = rows.filter(r=>essential.has(r.label));
+    const extra = rows.filter(r=>!essential.has(r.label));
+    const previousDetails = document.querySelector('.live-stats-extra');
+    const fixtureKey = statsFixtureKey(g);
+    const expanded = previousDetails?.dataset.fixture===fixtureKey ? previousDetails.open : window.matchMedia('(min-width: 768px)').matches;
+    const rowHtml = (r) => '<div class="live-stat-row">' +
       '<div class="live-stat-value"><strong>' + esc(r.home) + '</strong><div class="live-stat-mini"><span style="width:' + r.pct.toFixed(1) + '%"></span></div></div>' +
       '<div class="live-stat-label">' + esc(r.label) + (r.label === "Aproveitamento dos chutes" ? ' <small title="Chutes no gol ÷ finalizações">ⓘ</small>' : '') + '</div>' +
       '<div class="live-stat-value right"><strong>' + esc(r.away) + '</strong><div class="live-stat-mini"><span style="width:' + (100-r.pct).toFixed(1) + '%"></span></div></div>' +
-      '</div>').join("") + '<div class="live-stats-note">' + esc(sourceMeta.note) + '</div></div>';
+      '</div>';
+    const meta = summary?.__fdgLiveMeta || {};
+    const observedAt=Number(meta.statsObservedAt||0);
+    const time = observedAt>0 ? ' · leitura válida mais antiga: '+new Date(observedAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '';
+    return '<div class="live-stats live-stats-complete">'+names+main.map(rowHtml).join('')+(extra.length?'<details class="live-stats-extra" data-fixture="'+esc(fixtureKey)+'"'+(expanded?' open':'')+'><summary>Estatísticas complementares ('+extra.length+')</summary>'+extra.map(rowHtml).join('')+'</details>':'')+'<div class="live-stats-note">'+esc(sourceMeta.note+time)+'</div></div>';
   }
 
   function renderNextList(all, selected) {

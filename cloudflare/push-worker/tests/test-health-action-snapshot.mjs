@@ -63,7 +63,8 @@ try{
   assert.equal(shot.indicators.find(i=>i.id==='site')?.severity,'green');
   assert.equal(shot.pagesAvailability.failedCycles,0);
   assert.equal(shot.healthActionCenterVersion,1);
-  assert.equal(shot.indicators.length,17);
+  assert.equal(shot.indicators.length,18);
+  assert.ok(shot.indicators.some(i=>i.id==='live-statistics'));
   assert.equal(shot.indicators.find(i=>i.id==='github')?.severity,'green');
   assert.equal(shot.indicators.find(i=>i.id==='continentais')?.severity,'green');
   assert.equal(shot.indicators.find(i=>i.id==='highlights')?.severity,'yellow');

@@ -4,7 +4,10 @@ import {
   fetchEspnSummaryGateway,
   mergeExternalStatisticsIntoSummary,
   summaryGoalCount,
-  summaryTeamMetricCoverage
+  summaryTeamMetricCoverage,
+  summaryHasMeaningfulStatistics,
+  summaryHasEssentialStatistics,
+  discardAllZeroStatistics
 } from './espn-source.js';
 import { fetchApiFootballPlayerDefenseFallback, fetchApiFootballStatsFallback } from './api-football-source.js';
 import { fetchTheSportsDbStatsFallback } from './thesportsdb-source.js';
@@ -18,6 +21,7 @@ const SUMMARY_HOT_TTL_SECONDS = 8;
 const SUMMARY_FALLBACK_TTL_SECONDS = 900;
 const STATS_FALLBACK_TTL_SECONDS = 120;
 const API_FOOTBALL_STATS_TTL_SECONDS = 300;
+const BR_API_STATS_TTL_SECONDS = 120;
 const API_FOOTBALL_PLAYER_TTL_SECONDS = 1_200;
 const STATS_FIXTURE_MAP_TTL_SECONDS = 86_400;
 const STATS_BEST_KNOWN_TTL_SECONDS = 28_800;
@@ -189,7 +193,9 @@ async function readLayeredCache(cache, localKey, statsStore, sharedKey, ttlSecon
   try {
     const shared = await statsStore.get(sharedKey);
     if (!shared) return null;
-    await writeCached(cache, localKey, shared, ttlSeconds);
+    const remaining = shared._storeExpiresAt == null ? ttlSeconds : Math.floor((Number(shared._storeExpiresAt) - Date.now()) / 1000);
+    if (remaining <= 0) return null;
+    await writeCached(cache, localKey, shared, Math.min(ttlSeconds, remaining));
     return shared;
   } catch (_) {
     return null;
@@ -367,7 +373,7 @@ export async function resolveLiveSummary(url, deps = {}) {
   };
 
   const previousSummaryEnvelope = await readCached(cache, fallbackKey);
-  const hot = forceFresh ? null : await readCached(cache, hotKey);
+  const hot = forceFresh && !isBrasileirao ? null : await readCached(cache, hotKey);
   if (acceptable(hot)) {
     return {
       status: 200,
@@ -378,15 +384,28 @@ export async function resolveLiveSummary(url, deps = {}) {
   try {
     const result = await fetchEspnSummaryGateway(league, eventId, fetchImpl, expectedGoals);
     let data = result.data || {};
+    const observedGameState = summaryState(data);
+    if (isBrasileirao && ['in','post'].includes(observedGameState) && !summaryHasMeaningfulStatistics(data)) data=discardAllZeroStatistics(data);
     const beforeCoverage = summaryTeamMetricCoverage(data);
+    let statsObservedAt = now;
     const providers = ['espn'];
     const statsFallbacks = [];
     const statsFallbackErrors = {};
     const gameState = summaryState(data);
-    const shouldTryStatsFallback = coverageBelow(beforeCoverage, target)
-      && (beforeCoverage.maxPerTeam > 0 || expectedGoals > 0 || gameState === 'in' || gameState === 'post');
+    const competition = data?.header?.competitions?.[0] || data?.competitions?.[0] || data?.competition || {};
+    const fixtureTime = Date.parse(competition.date || data?.header?.date || data?.gameInfo?.date || '');
+    const brEligible = isBrasileirao && Number.isFinite(fixtureTime) && now >= fixtureTime - 15*60_000 && now <= fixtureTime + 5*60*60_000 && (gameState === 'in' || gameState === 'post');
+    const shouldTryStatsFallback = (coverageBelow(beforeCoverage, target) || (isBrasileirao && (!summaryHasMeaningfulStatistics(data) || !summaryHasEssentialStatistics(data)))) && (isBrasileirao ? brEligible : (beforeCoverage.maxPerTeam > 0 || expectedGoals > 0 || gameState === 'in' || gameState === 'post'));
 
     const statsStore = deps.statsStore || null;
+    const sharedReady = Boolean(statsStore?.get && statsStore?.put && statsStore?.acquireLease && statsStore?.reserveApiCalls && statsStore?.getApiBudget);
+    const governed = typeof deps.allowExternalStats === 'function' || deps.externalStatsAllowed != null;
+    let policyAllows = deps.externalStatsAllowed !== false;
+    if (shouldTryStatsFallback && typeof deps.allowExternalStats === 'function') policyAllows = await Promise.resolve().then(() => deps.allowExternalStats()).then(v => v === true).catch(() => false);
+    const externalEnabled = isContinental ? policyAllows : (isBrasileirao && governed && policyAllows && sharedReady);
+    const apiLeagueId = isBrasileirao ? Number(deps.apiFootballLeagueId || 0) : 0;
+    const apiAllowed = externalEnabled && (!isBrasileirao || apiLeagueId > 0) && (!governed || sharedReady);
+    const apiStatsTtl = isBrasileirao ? BR_API_STATS_TTL_SECONDS : API_FOOTBALL_STATS_TTL_SECONDS;
     const dayKey = utcDayKey(now);
     const bestKey = preserveBestStats ? cacheKey('summary-stats-best', [league, eventId], 'best') : null;
     const bestSharedKey = `best:${league}:${eventId}`;
@@ -395,21 +414,20 @@ export async function resolveLiveSummary(url, deps = {}) {
       : null;
     const apiFootballKey = text(deps.apiFootballKey);
     const budgetKey = cacheKey('api-football-budget', [dayKey], 'daily');
-    let budgetState = isContinental
-      ? (statsStore?.getApiBudget ? await statsStore.getApiBudget(dayKey).catch(() => null) : await readCached(cache, budgetKey))
-      : null;
+    let budgetFailed = false;
+    let budgetState = apiAllowed && shouldTryStatsFallback ? (statsStore?.getApiBudget ? await statsStore.getApiBudget(dayKey).catch(() => { budgetFailed = true; return null; }) : await readCached(cache, budgetKey)) : null;
     let apiFixtureId = 0;
 
     // Nas competições continentais, API-Football tem prioridade sobre TheSportsDB,
     // mas só quando a ESPN está abaixo do alvo e respeitando o orçamento de 100/dia.
-    if (isContinental && shouldTryStatsFallback && apiFootballKey && budgetAllows(budgetState)) {
+    if (apiAllowed && shouldTryStatsFallback && apiFootballKey && !budgetFailed && budgetAllows(budgetState)) {
       const statsKey = cacheKey('summary-stats', [league, eventId], 'api-football');
       const mapKey = cacheKey('summary-stats-map', [league, eventId], 'api-football');
       const statsSharedKey = `api:${league}:${eventId}`;
       const mapSharedKey = `api-map:${league}:${eventId}`;
       let fallback = null;
       let fallbackError = '';
-      const cachedStats = await readLayeredCache(cache, statsKey, statsStore, statsSharedKey, API_FOOTBALL_STATS_TTL_SECONDS);
+      const cachedStats = await readLayeredCache(cache, statsKey, statsStore, statsSharedKey, apiStatsTtl);
       if (cachedStats?.unavailable === true) fallbackError = text(cachedStats.error).slice(0, 500);
       else if (cachedStats?.data) fallback = cachedStats;
 
@@ -418,16 +436,16 @@ export async function resolveLiveSummary(url, deps = {}) {
       if (!fallback && !fallbackError) {
         let allowedToCall = true;
         if (statsStore?.acquireLease) {
-          allowedToCall = await statsStore.acquireLease(`lease:${statsSharedKey}`, 30, now).catch(() => true);
+          allowedToCall = await statsStore.acquireLease(`lease:${statsSharedKey}`, 30, now).catch(() => false);
           if (!allowedToCall) fallbackError = 'atualização API-Football já em andamento em outro edge';
         }
         if (allowedToCall && statsStore?.reserveApiCalls) {
           const estimate = apiFixtureId ? 1 : 3;
           const reservation = await statsStore.reserveApiCalls(
             dayKey, estimate, API_FOOTBALL_DAILY_PLAN_BUDGET - API_FOOTBALL_BUDGET_RESERVE, now
-          ).catch(() => ({ allowed: true }));
+          ).catch(() => ({ allowed: false }));
           budgetState = reservation || budgetState;
-          allowedToCall = reservation?.allowed !== false && budgetAllows(budgetState);
+          allowedToCall = reservation?.allowed === true && budgetAllows(budgetState);
           if (!allowedToCall) fallbackError = 'orçamento diário global da API-Football protegido';
         }
         if (allowedToCall) {
@@ -436,8 +454,10 @@ export async function resolveLiveSummary(url, deps = {}) {
               apiKey: apiFootballKey,
               fetchImpl,
               now,
-              fixtureId: apiFixtureId || undefined
+              fixtureId: apiFixtureId || undefined,
+              leagueId: apiLeagueId || undefined
             });
+            fallback.observedAt=now;
             apiFixtureId = Number(fallback.fixtureId || 0) || apiFixtureId;
             if (statsStore?.updateApiBudget) {
               budgetState = await statsStore.updateApiBudget(dayKey, fallback.rateLimit, now).catch(() => quotaFromFallback(fallback, budgetState));
@@ -446,14 +466,14 @@ export async function resolveLiveSummary(url, deps = {}) {
               await writeCached(cache, budgetKey, budgetState, 93_600);
             }
             await Promise.all([
-              writeLayeredCache(cache, statsKey, statsStore, statsSharedKey, fallback, API_FOOTBALL_STATS_TTL_SECONDS, now),
+              writeLayeredCache(cache, statsKey, statsStore, statsSharedKey, fallback, apiStatsTtl, now),
               writeLayeredCache(cache, mapKey, statsStore, mapSharedKey, { fixtureId: apiFixtureId }, STATS_FIXTURE_MAP_TTL_SECONDS, now)
             ]);
           } catch (error) {
             fallbackError = text(error?.message || error).slice(0, 500);
             await writeLayeredCache(
               cache, statsKey, statsStore, statsSharedKey,
-              { unavailable: true, error: fallbackError }, API_FOOTBALL_STATS_TTL_SECONDS, now
+              { unavailable: true, error: fallbackError }, apiStatsTtl, now
             );
           }
         }
@@ -463,8 +483,9 @@ export async function resolveLiveSummary(url, deps = {}) {
         const previous = summaryTeamMetricCoverage(data);
         const enriched = mergeExternalStatisticsIntoSummary(data, fallback.data);
         const after = summaryTeamMetricCoverage(enriched);
-        if (after.totalUnique > previous.totalUnique) {
+        if (after.totalUnique > previous.totalUnique || JSON.stringify(statisticsSnapshot(enriched)) !== JSON.stringify(statisticsSnapshot(data))) {
           data = enriched;
+          statsObservedAt=Math.min(statsObservedAt,Number((fallback?.observedAt || fallback?._storeUpdatedAt) || now));
           pushProvider(providers, 'api-football');
           statsFallbacks.push({
             source: 'api-football',
@@ -475,16 +496,14 @@ export async function resolveLiveSummary(url, deps = {}) {
         }
       }
       if (fallbackError) statsFallbackErrors.apiFootball = fallbackError;
-    } else if (isContinental && shouldTryStatsFallback && !apiFootballKey) {
+    } else if (externalEnabled && shouldTryStatsFallback && !apiFootballKey) {
       statsFallbackErrors.apiFootball = 'API_FOOTBALL_KEY ausente';
-    } else if (isContinental && shouldTryStatsFallback && apiFootballKey && !budgetAllows(budgetState)) {
+    } else if (externalEnabled && shouldTryStatsFallback && apiFootballKey && (budgetFailed || !budgetAllows(budgetState))) {
       statsFallbackErrors.apiFootball = `orçamento diário protegido: ${Number(budgetState?.remaining)} requisições restantes`;
     }
 
-    // TheSportsDB fica restrito às competições continentais. No Brasileirão
-    // a cadeia volta a ser ESPN-only: múltiplas superfícies ESPN + preservação
-    // best-known, sem misturar fornecedores externos.
-    if (isContinental && shouldTryStatsFallback && coverageBelow(summaryTeamMetricCoverage(data), target)) {
+    // Secondary source: validated identity and no duplicate concurrent calls.
+    if (externalEnabled && shouldTryStatsFallback && (coverageBelow(summaryTeamMetricCoverage(data), target) || (isBrasileirao && (!summaryHasMeaningfulStatistics(data) || !summaryHasEssentialStatistics(data))))) {
       const statsKey = cacheKey('summary-stats', [league, eventId], 'thesportsdb');
       const mapKey = cacheKey('summary-stats-map', [league, eventId], 'thesportsdb');
       const statsSharedKey = `tsdb:${league}:${eventId}`;
@@ -495,14 +514,16 @@ export async function resolveLiveSummary(url, deps = {}) {
       if (cachedStats?.unavailable === true) fallbackError = text(cachedStats.error).slice(0, 500);
       else if (cachedStats?.data) fallback = cachedStats;
 
-      if (!fallback && !fallbackError) {
+      if (!fallback && !fallbackError && (!statsStore?.acquireLease || await statsStore.acquireLease(`lease:${statsSharedKey}`, 30, now).catch(() => false))) {
         const eventMap = await readLayeredCache(cache, mapKey, statsStore, mapSharedKey, STATS_FIXTURE_MAP_TTL_SECONDS);
         try {
           fallback = await fetchTheSportsDbStatsFallback(data, {
             fetchImpl,
             now,
-            eventId: Number(eventMap?.eventId || 0) || undefined
+            eventId: Number(eventMap?.eventId || 0) || undefined,
+            requireBrazil: isBrasileirao
           });
+          fallback.observedAt=now;
           await Promise.all([
             writeLayeredCache(cache, statsKey, statsStore, statsSharedKey, fallback, STATS_FALLBACK_TTL_SECONDS, now),
             writeLayeredCache(cache, mapKey, statsStore, mapSharedKey, { eventId: fallback.eventId }, STATS_FIXTURE_MAP_TTL_SECONDS, now)
@@ -520,8 +541,9 @@ export async function resolveLiveSummary(url, deps = {}) {
         const previous = summaryTeamMetricCoverage(data);
         const enriched = mergeExternalStatisticsIntoSummary(data, fallback.data);
         const after = summaryTeamMetricCoverage(enriched);
-        if (after.totalUnique > previous.totalUnique) {
+        if (after.totalUnique > previous.totalUnique || JSON.stringify(statisticsSnapshot(enriched)) !== JSON.stringify(statisticsSnapshot(data))) {
           data = enriched;
+          statsObservedAt=Math.min(statsObservedAt,Number((fallback?.observedAt || fallback?._storeUpdatedAt) || now));
           pushProvider(providers, 'thesportsdb');
           statsFallbacks.push({
             source: 'thesportsdb',
@@ -536,7 +558,7 @@ export async function resolveLiveSummary(url, deps = {}) {
     // Desarmes/interceptações dependem do endpoint de jogadores. Para caber no
     // plano Free, essa consulta tem TTL de 20 minutos e só ocorre se o painel
     // continental ainda estiver abaixo do alvo depois das fontes de equipe.
-    if (isContinental && shouldTryStatsFallback && apiFootballKey && apiFixtureId
+    if (isContinental && apiAllowed && !budgetFailed && shouldTryStatsFallback && apiFootballKey && apiFixtureId
         && coverageBelow(summaryTeamMetricCoverage(data), target) && budgetAllows(budgetState, API_FOOTBALL_BUDGET_RESERVE + 1)) {
       const playersKey = cacheKey('summary-stats', [league, eventId], 'api-football-players');
       const playersSharedKey = `api-players:${league}:${eventId}`;
@@ -551,15 +573,15 @@ export async function resolveLiveSummary(url, deps = {}) {
       if (!playerFallback && !playerError) {
         let allowedToCall = true;
         if (statsStore?.acquireLease) {
-          allowedToCall = await statsStore.acquireLease(`lease:${playersSharedKey}`, 30, now).catch(() => true);
+          allowedToCall = await statsStore.acquireLease(`lease:${playersSharedKey}`, 30, now).catch(() => false);
           if (!allowedToCall) playerError = 'atualização API-Football players já em andamento em outro edge';
         }
         if (allowedToCall && statsStore?.reserveApiCalls) {
           const reservation = await statsStore.reserveApiCalls(
             dayKey, 1, API_FOOTBALL_DAILY_PLAN_BUDGET - API_FOOTBALL_BUDGET_RESERVE, now
-          ).catch(() => ({ allowed: true }));
+          ).catch(() => ({ allowed: false }));
           budgetState = reservation || budgetState;
-          allowedToCall = reservation?.allowed !== false && budgetAllows(budgetState, API_FOOTBALL_BUDGET_RESERVE + 1);
+          allowedToCall = reservation?.allowed === true && budgetAllows(budgetState, API_FOOTBALL_BUDGET_RESERVE + 1);
           if (!allowedToCall) playerError = 'orçamento diário global protegido antes de consultar players';
         }
         if (allowedToCall) {
@@ -567,6 +589,7 @@ export async function resolveLiveSummary(url, deps = {}) {
             playerFallback = await fetchApiFootballPlayerDefenseFallback(data, {
               apiKey: apiFootballKey, fetchImpl, now, fixtureId: apiFixtureId
             });
+            playerFallback.observedAt=now;
             if (statsStore?.updateApiBudget) {
               budgetState = await statsStore.updateApiBudget(dayKey, playerFallback.rateLimit, now)
                 .catch(() => quotaFromFallback(playerFallback, budgetState));
@@ -592,8 +615,9 @@ export async function resolveLiveSummary(url, deps = {}) {
         const previous = summaryTeamMetricCoverage(data);
         const enriched = mergeExternalStatisticsIntoSummary(data, playerFallback.data);
         const after = summaryTeamMetricCoverage(enriched);
-        if (after.totalUnique > previous.totalUnique) {
+        if (after.totalUnique > previous.totalUnique || JSON.stringify(statisticsSnapshot(enriched)) !== JSON.stringify(statisticsSnapshot(data))) {
           data = enriched;
+          statsObservedAt=Math.min(statsObservedAt,Number((playerFallback?.observedAt || playerFallback?._storeUpdatedAt) || now));
           pushProvider(providers, 'api-football');
           statsFallbacks.push({
             source: 'api-football-players', fixtureId: apiFixtureId,
@@ -613,23 +637,41 @@ export async function resolveLiveSummary(url, deps = {}) {
       const previous = summaryTeamMetricCoverage(data);
       const preserved = mergeExternalStatisticsIntoSummary(data, previousBest.data);
       const after = summaryTeamMetricCoverage(preserved);
-      if (after.totalUnique > previous.totalUnique) {
+      if (after.totalUnique > previous.totalUnique || JSON.stringify(statisticsSnapshot(preserved)) !== JSON.stringify(statisticsSnapshot(data))) {
         data = preserved;
         bestKnownApplied = true;
+        statsObservedAt=Math.min(statsObservedAt,Number(previousBest?.updatedAt || now));
         for (const provider of (Array.isArray(previousBest.providers) ? previousBest.providers : [])) pushProvider(providers, provider);
       }
     }
 
     const finalCoverage = summaryTeamMetricCoverage(data);
-    if (preserveBestStats && bestKey && finalCoverage.maxPerTeam > 0) {
+    if (preserveBestStats && bestKey && finalCoverage.maxPerTeam > 0 && summaryHasMeaningfulStatistics(data) && gameState !== 'pre') {
       await writeLayeredCache(cache, bestKey, statsStore, bestSharedKey, {
         data: statisticsSnapshot(data),
         providers: providers.filter((provider) => provider !== 'espn'),
         coverage: finalCoverage,
-        updatedAt: now
+        updatedAt: statsObservedAt
       }, STATS_BEST_KNOWN_TTL_SECONDS, now);
     }
 
+    const meaningful=summaryHasMeaningfulStatistics(data);
+    const essential=summaryHasEssentialStatistics(data);
+    const late=gameState==='post'||(Number.isFinite(fixtureTime)&&now-fixtureTime>=30*60_000);
+    const statsHealth=!meaningful?(late?'RED':'YELLOW'):(coverageBelow(finalCoverage,target)||!essential||bestKnownApplied||providers.length>1?'YELLOW':'GREEN');
+    // Small, bounded health evidence. No extra sports calls and no per-visitor writes.
+    if (brEligible && statsStore?.put && statsStore?.acquireLease) {
+      const healthKey=cacheKey('summary-stats-health',[league,eventId],'sample');
+      if (!await readCached(cache,healthKey)) {
+        await writeCached(cache,healthKey,{sampled:true},120);
+        if(await statsStore.acquireLease(`lease:health:${league}:${eventId}`,120,now).catch(()=>false)) {
+          await statsStore.put(`health:${league}:${eventId}`,{
+            eventId,health:statsHealth,observedAt:now,statsObservedAt:meaningful?statsObservedAt:null,
+            state:gameState,coverage:finalCoverage,providers
+          },48*3600,now).catch(()=>null);
+        }
+      }
+    }
     const currentFacts = normalizeLiveFacts(data, {
       eventId,
       expectedGoals,
@@ -660,12 +702,14 @@ export async function resolveLiveSummary(url, deps = {}) {
       statsBestKnownApplied: bestKnownApplied,
       requestedState: requestedState || null,
       observedState: summaryState(data) || null,
-      espnOnly: isBrasileirao,
+      espnOnly: isBrasileirao && !externalEnabled,
+      statsObservedAt: meaningful ? statsObservedAt : null,
+      statsHealth,
       statsFallback: statsFallbacks.length ? statsFallbacks[statsFallbacks.length - 1] : null,
       statsFallbacks,
       statsFallbackError: Object.values(statsFallbackErrors).filter(Boolean).join(' | '),
       statsFallbackErrors,
-      apiFootballBudget: isContinental ? {
+      apiFootballBudget: apiAllowed ? {
         policyDailyBudget: API_FOOTBALL_DAILY_PLAN_BUDGET,
         reserve: API_FOOTBALL_BUDGET_RESERVE,
         knownRemaining: optionalNumber(budgetState?.remaining),

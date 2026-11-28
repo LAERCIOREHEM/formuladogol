@@ -125,12 +125,13 @@ function pairScore(row, identity) {
   return { direct: direct + timeBonus - timePenalty, swapped, distance };
 }
 
-function selectEvent(rows, identity) {
+function selectEvent(rows, identity, requireBrazil = false) {
   const candidates = [];
   for (const row of Array.isArray(rows) ? rows : []) {
     const eventId = Number(row?.idEvent);
     if (!Number.isFinite(eventId)) continue;
     if (text(row?.strSport) && text(row?.strSport).toLowerCase() !== 'soccer') continue;
+    if (requireBrazil && (!/brazil.*serie a|brasileir[aã]o|brazilian.*serie a/i.test(text(row?.strLeague)) || !Number.isFinite(eventTimestamp(row)) || Math.abs(eventTimestamp(row)-identity.timestamp)>6*60*60_000)) continue;
     const score = pairScore(row, identity);
     candidates.push({ row, ...score });
   }
@@ -146,7 +147,7 @@ function eventQuery(home, away) {
   return `${text(home).replace(/\s+/g, '_')}_vs_${text(away).replace(/\s+/g, '_')}`;
 }
 
-async function resolveSportsDbEvent(identity, fetchImpl) {
+async function resolveSportsDbEvent(identity, fetchImpl, requireBrazil = false) {
   const attempts = [];
   const queries = [
     eventQuery(identity.home.name, identity.away.name),
@@ -157,7 +158,7 @@ async function resolveSportsDbEvent(identity, fetchImpl) {
     try {
       const payload = await fetchSportsDbJson(`/searchevents.php?e=${encodeURIComponent(query)}`, fetchImpl);
       attempts.push({ source: 'thesportsdb_event_search', ok: true, query });
-      const match = selectEvent(payload?.event, identity);
+      const match = selectEvent(payload?.event, identity, requireBrazil);
       if (match) return { event: match, attempts };
     } catch (error) {
       attempts.push({ source: 'thesportsdb_event_search', ok: false, query, error: text(error?.message || error) });
@@ -257,7 +258,7 @@ export async function fetchTheSportsDbStatsFallback(summary, options = {}) {
   const providedEventId = Number(options.eventId || 0);
   const resolved = providedEventId > 0
     ? { event: { idEvent: providedEventId }, attempts: [{ source: 'thesportsdb_event_cache', ok: true }] }
-    : await resolveSportsDbEvent(identity, fetchImpl);
+    : await resolveSportsDbEvent(identity, fetchImpl, options.requireBrazil === true);
   const eventId = Number(resolved.event?.idEvent);
   if (!Number.isFinite(eventId)) throw new Error('TheSportsDB retornou evento sem ID');
   const attempts = [...resolved.attempts];

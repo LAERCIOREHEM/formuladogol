@@ -31,6 +31,7 @@ export function createLiveStatsStore(db) {
           payload_json=excluded.payload_json,
           updated_at=excluded.updated_at,
           expires_at=excluded.expires_at
+        WHERE excluded.updated_at >= live_stats_cache.updated_at
       `).bind(text(key), JSON.stringify(payload ?? null), updatedAt, expiresAt).run();
       return { updatedAt, expiresAt };
     },

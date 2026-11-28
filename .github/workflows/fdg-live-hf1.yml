@@ -1,0 +1,26 @@
+name: FDG LIVE HF1 - offline certification
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'cloudflare/push-worker/**'
+      - 'js/br-aovivo.js'
+      - 'br-aovivo.js'
+      - 'aovivo.html'
+      - '.github/workflows/fdg-live-hf1.yml'
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check js/br-aovivo.js && node --check br-aovivo.js
+      - run: npm install --no-audit --no-fund
+        working-directory: cloudflare/push-worker
+      - run: npm run check && npm run test:sports && npm run test:push && npm run test:hardening
+        working-directory: cloudflare/push-worker

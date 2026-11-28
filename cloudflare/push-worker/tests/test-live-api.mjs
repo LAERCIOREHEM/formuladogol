@@ -665,3 +665,47 @@ console.log('live-api tests: ok');
 }
 
 console.log('live-api Live Facts v6 integration: ok');
+
+ // HF1: synthetic fixture, explicitly governed, with matching league/time, cross-edge cache and denied quota.
+ {
+  const now = Date.parse('2026-11-28T00:00:00Z');
+  const date = new Date(now-3600000).toISOString();
+  const home = {id:'1', displayName:'Fluminense'}, away = {id:'2', displayName:'Cruzeiro'};
+  const live = {header:{competitions:[{date,status:{type:{state:'in'}},competitors:[{homeAway:'home',team:home},{homeAway:'away',team:away}]}]},plays:[{id:'start',text:'Kickoff'}]};
+  const rows = ['Ball Possession','Total Shots','Shots on Goal','Corner Kicks','Fouls','Yellow Cards','Red Cards','Total passes','Passes accurate','Goalkeeper Saves'];
+  let apiCalls = 0;
+  const fakeFetch = async (url) => {
+    const href=String(url);
+    if(href.includes('api-sports.io')){
+      apiCalls++;
+      const headers={'x-ratelimit-requests-limit':'7500','x-ratelimit-requests-remaining':'7490'};
+      if(href.includes('/fixtures?date=')) return Response.json({errors:[],response:[{fixture:{id:888,date},league:{id:71},teams:{home:{name:'Fluminense'},away:{name:'Cruzeiro'}}}]},{headers});
+      if(href.includes('/fixtures/statistics?fixture=888')) return Response.json({errors:[],response:[home,away].map((team,i)=>({team:{name:team.displayName},statistics:rows.map((type,j)=>({type,value:j===0?(i===0?'60%':'40%'):j===6?0:j+1}))}))},{headers});
+      throw new Error('Unexpected API call');
+    }
+    if(href.includes('thesportsdb.com')) return new Response('unavailable',{status:503});
+    if(href.includes('sports.core.api.espn.com')) return Response.json({items:live.plays});
+    if(href.includes('cdn.espn.com')) return Response.json({gamepackageJSON:live});
+    if(href.includes('site.api.espn.com')) return Response.json(live);
+    throw new Error('Unexpected URL '+href);
+  };
+  const url=new URL('https://x/v1/live/summary?league=bra.1&event=401999999&state=in&expectedGoals=0&fresh=1');
+  const statsStore=new SharedStatsStore();
+  const deps={statsStore,fetchImpl:fakeFetch,apiFootballKey:'mock',apiFootballLeagueId:71,externalStatsAllowed:true,now:()=>now};
+  const result=await resolveLiveSummary(url,{...deps,cache:new MemoryCache()});
+  assert.equal(result.status,200);
+  assert.equal(result.body.espnOnly,false);
+  assert.ok(result.body.statsProvider.includes('api-football'));
+  assert.ok(result.body.statsCoverage.minPerTeam>=10);
+  assert.equal(apiCalls,2);
+  const other=await resolveLiveSummary(url,{...deps,cache:new MemoryCache()});
+  assert.ok(other.body.statsProvider.includes('api-football'));
+  assert.equal(apiCalls,2);
+  const denied=new SharedStatsStore();
+  denied.reserveApiCalls=async()=>{throw new Error('D1 unavailable');};
+  await resolveLiveSummary(url,{...deps,statsStore:denied,cache:new MemoryCache()});
+  assert.equal(apiCalls,2,'quota error must fail closed');
+  await resolveLiveSummary(url,{...deps,externalStatsAllowed:false,statsStore:new SharedStatsStore(),cache:new MemoryCache()});
+  assert.equal(apiCalls,2,'Cost Shield must deny calls');
+ }
+ console.log('Brasileirao governed fallback: ok');
