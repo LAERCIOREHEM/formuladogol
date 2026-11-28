@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "_comentario": "Correções documentais verificadas manualmente. O coletor mescla somente os event_ids e campos explicitamente listados; não substitui o restante do snapshot.",
-  "verificado_em": "2026-11-19T07:20:00-03:00",
+  "verificado_em": "2026-11-27T23:54:31-03:00",
   "jogos": {
     "401841169": {
       "confronto": "São Paulo 1 x 2 Santos",
@@ -524,6 +524,23 @@
         "nao_pagantes": 314
       },
       "nota": "Bahia 0 x 1 Coritiba, 36ª rodada, 21/11/2026, Arena Fonte Nova: 10.780 bilheteria + 2.505 corporativo + 21.514 sócios = 34.799 pagantes; 314 não pagantes; 35.113 público total; renda bruta R$ 1.244.687,00. Transcrição literal do painel oficial fotografado, sem inferência."
+    },
+    "401841337": {
+      "confronto": "Fluminense 0 x 1 Cruzeiro",
+      "rodada": 37,
+      "data": "2026-11-27",
+      "tipo": "presente",
+      "publico": 35155,
+      "renda": 1561842,
+      "publico_status": "confirmado_presentes",
+      "pagantes_status": "nao_divulgado",
+      "renda_status": "confirmado_imprensa",
+      "fonte_publico": "https://ge.globo.com/gato-mestre/noticia/2026/11/27/fluminense-ultrapassa-a-marca-de-1-milhao-de-torcedores-nos-jogos-como-mandante-em-2026.ghtml",
+      "fonte_renda": "https://www.bol.uol.com.br/esporte/2026/11/27/cruzeiro-vence-fluminense-no-maracana-resiste-com-um-a-menos-e-garante-3-lugar-do-brasileirao.htm",
+      "fonte_confirmacao": "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/fluminense-x-cruzeiro/832251",
+      "origem": "ge/Gato Mestre (presentes) e Estadão Conteúdo/BOL (ficha técnica de público e renda)",
+      "verificado_em": "2026-11-27",
+      "nota": "Maracanã, 27/11/2026, CBF jogo 361, ESPN 401841337: 35.155 presentes e R$ 1.561.842,00 de renda divulgada. A CBF confirma identidade e placar, mas o borderô não foi localizado. Pagantes não inferidos; renda confirmada por imprensa, não por borderô."
     }
   }
 }
