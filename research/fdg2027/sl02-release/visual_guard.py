@@ -14,7 +14,7 @@ HOST="https://formuladogol.com.br"
 PREFIX="research/fdg2027/sl02-release/"
 MODE=PREFIX+"release-mode.json"
 VISUAL={PREFIX+x for x in ("app.js","design.css","shell.css","shell.js","overlay.py")}
-ALLOWED=VISUAL|{PREFIX+x for x in ("HF1.md","HF2.md","R1.md","UX-HF1.md","UX-HF2.md","UX-HF3.md","release.py","qa.py","public_browser.py","visual_guard.py")}|{".github/workflows/deploy.yml",".github/workflows/fdg2027-sl02-release.yml"}
+ALLOWED=VISUAL|{PREFIX+x for x in ("HF1.md","HF2.md","R1.md","UX-HF1.md","UX-HF2.md","UX-HF3.md","AFP-R2.md","test_afp_real_browser.py","test_afp_public_browser.py","release.py","qa.py","public_browser.py","visual_guard.py")}|{".github/workflows/deploy.yml",".github/workflows/fdg2027-sl02-release.yml"}
 def git(*args):return subprocess.check_output(["git",*args],text=True).strip()
 def is_visual(paths,before,after):
     return bool(paths&VISUAL) and paths<=ALLOWED and before==after=={"schema":1,"mode":"sl02","season":2026}
