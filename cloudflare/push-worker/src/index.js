@@ -667,11 +667,12 @@ export default {
         sportsMonitorSummaryScorerRecovery: true,
         liveStatePrimary: 'worker-espn',
         liveStateDirectFallback: true,
-        liveStatsFallbackVersion: 5,
+        liveStatsFallbackVersion: 6,
         theSportsDbStatsReady: true,
         apiFootballStatsReady: Boolean(env.API_FOOTBALL_KEY),
-        statsFallbackProviders: ['espn-multisurface-brasileirao', 'api-football-continental-budgeted', 'thesportsdb-continental-contingency'],
-        apiFootballContinentalOnly: true,
+        statsFallbackProviders: ['espn-multisurface', 'api-football-budgeted', 'thesportsdb-contingency'],
+        apiFootballContinentalOnly: false,
+        brasileiraoStatsFallbackReady: Boolean(env.API_FOOTBALL_KEY && Number(env.API_FOOTBALL_LEAGUE_ID)>0),
         apiFootballDailyBudgetPolicy: LIVE_API_CONSTANTS.API_FOOTBALL_DAILY_PLAN_BUDGET,
         apiFootballBudgetReserve: LIVE_API_CONSTANTS.API_FOOTBALL_BUDGET_RESERVE,
         continentalStatsTargetMinPerTeam: LIVE_API_CONSTANTS.CONTINENTAL_STATS_TARGET,
@@ -849,6 +850,8 @@ export default {
           : Promise.resolve(null);
         const resultPromise = isEspnEvent ? resolveLiveSummary(url, {
           apiFootballKey: env.API_FOOTBALL_KEY,
+          apiFootballLeagueId: env.API_FOOTBALL_LEAGUE_ID,
+          allowExternalStats: async () => { const shield = await readCostShield(env); return shield.optionalAllowed === true && (league !== 'bra.1' || shield.billingVerified === true); },
           statsStore: createLiveStatsStore(env.DB)
         }) : Promise.resolve({ status: 404, body: { ok: false, error: 'documentary_match_not_tracked' } });
         const [result, monitorResponse] = await Promise.all([resultPromise, monitorPromise]);

@@ -34,6 +34,7 @@ jobs:
       FDG_PUSH_SMTP_USER: ${{ secrets.SMTP_USER }}
       FDG_PUSH_SMTP_PASS: ${{ secrets.SMTP_PASS }}
       FDG_PUSH_API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+      FDG_PUSH_API_FOOTBALL_LEAGUE_ID: ${{ secrets.API_FOOTBALL_LEAGUE_ID }}
       FDG_PUSH_YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
       FDG_PUSH_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       FDG_PUSH_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -237,6 +238,11 @@ jobs:
           # acima impede o deploy sem chave; aqui sincronizamos o secret no Worker.
           printf '%s' "$FDG_PUSH_API_FOOTBALL_KEY" | npx wrangler secret put API_FOOTBALL_KEY --config wrangler.generated.jsonc
           echo 'Secret API_FOOTBALL_KEY atualizado.'
+          if [[ "${FDG_PUSH_API_FOOTBALL_LEAGUE_ID:-}" =~ ^[0-9]+$ ]]; then
+            printf '%s' "$FDG_PUSH_API_FOOTBALL_LEAGUE_ID" | npx wrangler secret put API_FOOTBALL_LEAGUE_ID --config wrangler.generated.jsonc
+          else
+            echo '::error::API_FOOTBALL_LEAGUE_ID ausente/inválida'; exit 1
+          fi
 
           printf '%s' "$FDG_PUSH_SUPABASE_URL" | npx wrangler secret put SUPABASE_URL --config wrangler.generated.jsonc
           printf '%s' "$FDG_PUSH_SUPABASE_SERVICE_ROLE_KEY" | npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY --config wrangler.generated.jsonc
@@ -510,7 +516,7 @@ jobs:
           if (h.liveStatePrimary !== 'worker-espn') problems.push(`liveStatePrimary=${h.liveStatePrimary}`);
           if (h.liveStateDirectFallback !== true) problems.push('liveStateDirectFallback!=true');
           if (h.theSportsDbStatsReady !== true) problems.push('theSportsDbStatsReady!=true');
-          if (h.apiFootballContinentalOnly !== true) problems.push('apiFootballContinentalOnly!=true');
+          if (h.apiFootballContinentalOnly !== false || h.brasileiraoStatsFallbackReady !== true) problems.push('Brasileirao multi-source fallback not configured');
           if (h.bestKnownStatsCache !== true) problems.push('bestKnownStatsCache!=true');
           if (process.env.API_FOOTBALL_EXPECTED === '1' && h.apiFootballStatsReady !== true) {
             problems.push('apiFootballStatsReady!=true apesar de API_FOOTBALL_KEY configurada');

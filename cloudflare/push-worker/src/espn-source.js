@@ -833,7 +833,8 @@ function teamToken(entry) {
 }
 
 function statValuePresent(stat) {
-  return stat && (stat.displayValue != null || stat.value != null || stat.rawValue != null);
+  const raw = stat?.displayValue ?? stat?.value ?? stat?.rawValue;
+  return raw != null && /\d/.test(text(raw));
 }
 
 function statNumericValue(stat) {
@@ -915,6 +916,10 @@ function summaryTeamStatCount(data) {
     }
   }
   return { unique: unique.size, valued };
+}
+
+export function summaryHasMeaningfulStatistics(data) {
+  return summaryTeamStatContainers(data).some(entry => (entry.statistics || []).some(stat => { const n = statNumericValue(stat); return Number.isFinite(n) && n > 0; }));
 }
 
 export function summaryTeamMetricCoverage(data) {

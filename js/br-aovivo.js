@@ -736,7 +736,7 @@
     // mas o painel visível não deve herdar os zeros do pré-jogo.
     // Qualquer liga em andamento com gol pendente precisa de facts novos.
     // Antes, a atualização forçada era exclusiva do Brasileirão.
-    if (options.forceFresh || (game.state === "in" && expectedGoals > 0)) params.set("fresh", "1");
+    if (league !== "bra.1" && (options.forceFresh || (game.state === "in" && expectedGoals > 0))) params.set("fresh", "1");
     let gatewayError = null;
 
     try {
@@ -765,6 +765,8 @@
         stale: envelope.stale === true,
         ageMs: Number(envelope.ageMs || 0) || 0,
         observedState: String(envelope.observedState || ""),
+        statsObservedAt: Number(envelope.statsObservedAt || envelope.fetchedAt || 0),
+        statsHealth: envelope.statsHealth || null,
         espnOnly: envelope.espnOnly === true
       };
 
@@ -778,7 +780,7 @@
         const gatewayScore = statsRowsFreshnessScore(gatewayRows);
         const meta = envelope.data.__fdgLiveMeta || {};
         const shouldConfirmDirect = gatewayRows.length <= PARTIAL_STATS_THRESHOLD || gatewayScore < 100 || meta.stale || /stale/i.test(meta.cacheStatus || "");
-        if (shouldConfirmDirect) {
+        if (shouldConfirmDirect && gatewayRows.length === 0 && !/api-football|thesportsdb/.test(meta.statsProvider || "")) {
           try {
             const directUrl = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/summary?event=" + encodeURIComponent(eventId) + "&_fdg_live=" + Date.now();
             const direct = await fetchJson(directUrl, {
@@ -2388,7 +2390,7 @@
     return null;
   }
   function rawStatValue(s) {
-    return s && s.displayValue != null ? String(s.displayValue) : String(s && s.value != null ? s.value : "");
+    return s && s.displayValue != null ? String(s.displayValue) : String(s && s.value != null ? s.value : s && s.rawValue != null ? s.rawValue : "");
   }
   function numericStat(v) {
     const m = String(v == null ? "" : v).replace(",", ".").replace("%", "").match(/-?\d+(?:\.\d+)?/);
@@ -2429,14 +2431,15 @@
         const rule = ruleForMetric(stat.displayName || stat.shortDisplayName || stat.name || stat.label || stat.abbreviation || "");
         if (!rule) continue;
         const value = formatStatValue(rule, rawStatValue(stat));
-        if (value !== "") current[rule.label] = value;
+        if (value !== "" && Number.isFinite(numericStat(value))) { if (!(numericStat(value) === 0 && numericStat(current[rule.label]) > 0)) current[rule.label] = value; }
       }
       byTeam[key] = current;
     };
 
     const comp = g.competition || getCompetition(g.raw || {});
     for (const c of (comp.competitors || [])) add(c.team || {}, c.statistics || []);
-    for (const t of (((summary || {}).boxscore || {}).teams || [])) add(t.team || {}, t.statistics || t.stats || []);
+    for (const c of ((summary?.header?.competitions?.[0] || summary?.competitions?.[0] || summary?.competition || {}).competitors || [])) add(c.team || {}, c.statistics || c.stats || []);
+    for (const t of (((summary || {}).boxscore || {}).teams || [])) add(t.team || t, t.statistics || t.stats || []);
 
     const side = (which) => {
       const team = g[which];
@@ -2501,12 +2504,14 @@
     // o boxscore completo. Atualizamos toda métrica presente, mas preservamos
     // temporariamente as ausentes para que uma resposta parcial não faça linhas
     // já válidas desaparecerem da tela.
+    const meaningfulSnapshot = statsRowsFreshnessScore(currentRows) >= 100;
     for (const row of (currentRows || [])) {
+      if (!meaningfulSnapshot && entry.metrics[row.label]) continue;
       entry.metrics[row.label] = {
         label: row.label, home: row.home, away: row.away, order: row.order
       };
     }
-    if ((currentRows || []).length) entry.updatedAt = Date.now();
+    if (meaningfulSnapshot) entry.updatedAt = Date.now();
     state.statsPorId[key] = entry;
 
     const now = Date.now();
@@ -2708,7 +2713,7 @@
       };
     }
     return {
-      badge: "ESPN SUMMARY",
+      badge: "ESPN",
       note: "Mostramos somente métricas disponibilizadas pela ESPN. O site não inventa dados ausentes."
     };
   }
@@ -2717,7 +2722,7 @@
     if (g && g.state === "pre") return '<div class="live-empty">As estatísticas serão exibidas após o início da partida.</div>';
     const rows = collectStats(g, summary);
     const allZeroPlaceholder = g && g.state === "in" && rows.length > 0 && statsRowsFreshnessScore(rows) < 100;
-    if (!rows.length || allZeroPlaceholder) return '<div class="live-empty">A ESPN está atualizando as estatísticas deste jogo. O painel será preenchido automaticamente assim que os dados ao vivo forem publicados.</div>';
+    if (!rows.length || allZeroPlaceholder) return '<div class="live-empty">Estatísticas ainda indisponíveis nas fontes consultadas. O painel será atualizado quando houver dados confirmados.</div>';
     const names = '<div class="live-stats-head"><div>' + esc(g.home.nome) + '</div><div>comparativo</div><div>' + esc(g.away.nome) + '</div></div>';
     const sourceMeta = statsSourceMeta(summary);
     return '<div class="live-stats live-stats-complete">' + names + rows.map((r) => '<div class="live-stat-row">' +

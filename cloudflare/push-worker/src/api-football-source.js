@@ -75,6 +75,7 @@ function extractEspnIdentity(summary, now = Date.now()) {
 
   return {
     date,
+    timestamp: Number.isFinite(parsed) ? parsed : null,
     home: {
       id: text(homeTeam?.id || home?.teamId || home?.id),
       name: homeName,
@@ -132,11 +133,15 @@ function fixturePairScore(row, identity) {
   return { direct, swapped };
 }
 
-function selectFixture(rows, identity) {
+function selectFixture(rows, identity, leagueId = 0) {
   const candidates = [];
   for (const row of Array.isArray(rows) ? rows : []) {
     const fixtureId = Number(row?.fixture?.id);
     if (!Number.isFinite(fixtureId)) continue;
+    if (leagueId) {
+      const fixtureTime = Date.parse(row?.fixture?.date || '');
+      if (Number(row?.league?.id) !== leagueId || !Number.isFinite(identity.timestamp) || !Number.isFinite(fixtureTime) || Math.abs(fixtureTime - identity.timestamp) > 6*60*60_000) continue;
+    }
     const score = fixturePairScore(row, identity);
     candidates.push({ row, score: score.direct, swapped: score.swapped });
   }
@@ -151,12 +156,12 @@ function attemptRate(source, ok, rateLimit, extra = {}) {
   return { source, ok, ...extra, rateLimit: rateLimit || null };
 }
 
-async function resolveApiFixture(identity, apiKey, fetchImpl) {
+async function resolveApiFixture(identity, apiKey, fetchImpl, leagueId = 0) {
   const attempts = [];
 
   // A data da partida já vem da ESPN. Procurar primeiro pelo dia custa uma
   // requisição e evita a antiga sequência live=all + detalhe do fixture.
-  const byDate = await fetchApiJson(`/fixtures?date=${encodeURIComponent(identity.date)}&timezone=${encodeURIComponent(TIMEZONE)}`, apiKey, fetchImpl)
+  const byDate = await fetchApiJson(`/fixtures?date=${encodeURIComponent(identity.date)}&timezone=${encodeURIComponent(TIMEZONE)}${leagueId ? `&league=${leagueId}&season=${identity.date.slice(0,4)}` : ''}`, apiKey, fetchImpl)
     .then((result) => {
       attempts.push(attemptRate('api_football_date', true, result.rateLimit));
       return result.payload?.response || [];
@@ -165,7 +170,7 @@ async function resolveApiFixture(identity, apiKey, fetchImpl) {
       attempts.push(attemptRate('api_football_date', false, null, { error: text(error?.message || error) }));
       return [];
     });
-  const dateMatch = selectFixture(byDate, identity);
+  const dateMatch = selectFixture(byDate, identity, leagueId);
   if (dateMatch) return { fixture: dateMatch, attempts };
 
   // Contingência para diferenças de timezone/data da fonte.
@@ -174,7 +179,7 @@ async function resolveApiFixture(identity, apiKey, fetchImpl) {
       attempts.push(attemptRate('api_football_live', true, result.rateLimit));
       return result.payload?.response || [];
     });
-  const liveMatch = selectFixture(live, identity);
+  const liveMatch = selectFixture(live, identity, leagueId);
   if (!liveMatch) throw Object.assign(new Error(`API-Football não encontrou ${identity.home.name} x ${identity.away.name}`), { attempts });
   return { fixture: liveMatch, attempts };
 }
@@ -205,7 +210,7 @@ const API_STAT_MAP = new Map([
   ['tackles', 'tackles'],
   ['interceptions', 'interceptions'],
   ['crosses', 'crosses'],
-  ['clearances', 'clearances']
+  ['clearances', 'clearances'], ['expected goals', 'expectedGoals'], ['xg', 'expectedGoals']
 ]);
 
 function apiStatToEspn(stat) {
@@ -247,6 +252,7 @@ function sumFinite(values) {
   let total = 0;
   let found = false;
   for (const value of values) {
+    if (value == null || text(value) === '') continue;
     const number = Number(value);
     if (!Number.isFinite(number)) continue;
     total += number;
@@ -308,7 +314,7 @@ export async function fetchApiFootballStatsFallback(summary, options = {}) {
   const providedFixtureId = Number(options.fixtureId || 0);
   const resolved = providedFixtureId > 0
     ? { fixture: { fixture: { id: providedFixtureId } }, attempts: [{ source: 'api_football_fixture_cache', ok: true, rateLimit: null }] }
-    : await resolveApiFixture(identity, apiKey, fetchImpl);
+    : await resolveApiFixture(identity, apiKey, fetchImpl, Number(options.leagueId || 0));
   const fixtureId = Number(resolved.fixture?.fixture?.id);
   if (!Number.isFinite(fixtureId)) throw new Error('API-Football retornou fixture sem ID');
   const attempts = [...resolved.attempts];
