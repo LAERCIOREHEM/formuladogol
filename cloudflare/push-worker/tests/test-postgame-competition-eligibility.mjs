@@ -117,8 +117,8 @@ assert.equal(unknown.highlight_status, 'pending', 'reclassificação explícita 
 assert.ok(unknown.highlight_next_at);
 
 const status = await postgameStatus(env);
-assert.equal(status.version, 16);
-assert.equal(status.storedPolicyVersion, 16);
+assert.equal(status.version, 17);
+assert.equal(status.storedPolicyVersion, 17);
 assert.equal(status.highlightRequiredLeague, 'bra.1');
 assert.equal(status.highlightEligibilityPolicyVersion, 1);
 assert.equal(status.highlightNotApplicable, 3);
@@ -152,3 +152,23 @@ assert.equal(healthCounts.public_overdue, status.publicOverdue);
 assert.equal(healthCounts.highlight_pending, status.highlightPending);
 assert.equal(healthCounts.highlight_overdue, status.highlightPending, 'somente brasileiros históricos podem ficar vencidos; Copa/CONMEBOL nunca entram');
 console.log('R10R17.7 SQLite integration: BR Série A, COPA/CONMEBOL dispensadas, reclassificação, D1 v13->v15, preservação histórica e Health: PASS');
+
+ // HF2: migration from v16 does not reopen already resolved events or reset counters.
+ sqlite.prepare("UPDATE postgame_meta SET value='16' WHERE key='policy_version'").run();
+ sqlite.prepare("UPDATE postgame_fastlane SET public_status='resolved',publico=35155,renda=1561842,public_attempts=7,public_next_at=NULL WHERE event_id='401841248'").run();
+ const beforeHF2=sqlite.prepare("SELECT * FROM postgame_fastlane WHERE event_id='401841248'").get();
+ assert.equal(await ensurePolicyVersion(env,end+200000),true);
+ assert.deepEqual(sqlite.prepare("SELECT * FROM postgame_fastlane WHERE event_id='401841248'").get(),beforeHF2);
+ assert.equal(await ensurePolicyVersion(env,end+200000),false);
+ // Exercise production CAS statement against real SQLite: a documented correction must win.
+ const fastlaneSource=readFileSync(new URL('../src/postgame-fastlane.js',import.meta.url),'utf8');
+ const cas=fastlaneSource.match(/const persisted = await env\.DB\.prepare\(`(UPDATE postgame_fastlane SET publico=\?[\s\S]*?public_sources_json IS \?)`\)/);
+ assert.ok(cas,'production attendance CAS');
+ const lease='2026-11-28T03:10:00.000Z';
+ sqlite.prepare("UPDATE postgame_fastlane SET public_status='pending',publico=NULL,publico_pagante=NULL,renda=NULL,public_sources_json='{}',public_next_at=? WHERE event_id='401841248'").run(lease);
+ const args=[35155,null,1561842,'{}','resolved',8,'2026-11-28T03:01:00.000Z',null,'','401841248',lease,null,null,null,'{}'];
+ sqlite.prepare("UPDATE postgame_fastlane SET public_status='resolved',publico=35155,renda=1561842,public_next_at=NULL WHERE event_id='401841248'").run();
+ assert.equal(Number(sqlite.prepare(cas[1]).run(...args).changes),0,'late search cannot overwrite resolved correction');
+ sqlite.prepare("UPDATE postgame_fastlane SET public_status='pending',publico=NULL,publico_pagante=NULL,renda=NULL,public_sources_json='{}',public_next_at=? WHERE event_id='401841248'").run(lease);
+ assert.equal(Number(sqlite.prepare(cas[1]).run(...args).changes),1,'valid lease and unchanged fields can persist');
+ console.log('R37-HF2 migration and concurrent correction CAS PASS');
