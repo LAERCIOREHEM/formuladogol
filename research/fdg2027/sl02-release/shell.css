@@ -159,3 +159,7 @@ html[data-fdg-release-theme=light] body[data-fdg-match-hf2] :is(.game-prob-grid 
   body:not([data-fdg-live-hf2]) .fdg-release-shell .brandline a{width:100%!important;max-width:none!important;min-width:0;display:block}
   body:not([data-fdg-live-hf2]) .fdg-release-shell .brandline img{display:block!important;width:100%!important;max-width:none!important;height:clamp(94px,8.2vw,132px)!important;max-height:none!important;min-height:0!important;object-fit:fill!important;object-position:center!important}
 }
+
+/* HF3: scoped runtime fallback for an old cached/dynamically inserted global banner.
+   The build removes the legacy banner from the HTML; never hide club crests or Copa branding. */
+body:has(.fdg-release-shell) img:is([src*="header-formula-do-gol."],[src*="header-formula-do-gol-v2."],[data-fdg-oldbrand]):not(.fdg-release-shell img){display:none!important;visibility:hidden!important;height:0!important;max-height:0!important;margin:0!important;padding:0!important}

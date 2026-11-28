@@ -6,13 +6,13 @@ from http.server import ThreadingHTTPServer
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
 from abrir_previa import Handler
-from overlay import snapshot,rollback,sha,match_projection,fact_value,valid_highlight
+from overlay import snapshot,rollback,sha,match_projection,fact_value,valid_highlight,verify_global_headers,strip_legacy_brand,legacy_brand_nodes
 from afp_public import approved_payload
 LABELS=["Estatísticas","Jogos","Ao vivo","Análises","Clubes","Mais"]
 ICONS=["📊","⚽","🔴","📰","🛡️","☰"]
 WIDTHS=(320,360,390,430,768,1024,1440)
 ROUTES=["stats/prob","stats/table","stats/performance","stats/players","stats/accuracy","games/next","games/results","articles","clubs","more","more/museum","more/sim","more/method"]
-NATIVE=["/jogos","/resultados","/tabela","/aovivo.html","/acuracia.html","/clubes.html","/analises/","/museu.html","/agenda.html","/alertas.html","/sobre.html","/copa2026/","/estatisticas-completas.html"]
+NATIVE=["/jogos","/resultados","/tabela","/aovivo.html","/acuracia.html","/clubes.html","/analises/","/museu.html","/agenda.html","/alertas.html","/sobre.html","/privacidade.html","/copa2026/","/estatisticas-completas.html"]
 def display_probability(d):
     from decimal import Decimal, ROUND_HALF_UP
     n=d.get("percentual_estimado")
@@ -77,6 +77,8 @@ def verify_native_media(soup,g,detail,highlight):
     else:assert play is None
 def verify_static(base,site,backup):
     b=snapshot(base);c=snapshot(site);ledger=readj(backup,"rollback.json")
+    assert verify_global_headers(site)==ledger['single_masthead']
+    test_masthead_normalization()
     assert all(c[k]==v for k,v in b.items() if not k.endswith(".html"))
     assert set(b)<=set(c)
     for rel in ["manifest.webmanifest","sw.js","robots.txt","sitemap.xml","news-sitemap.xml","CNAME","js/br-data-pulse.js","js/br-data-refresh.js","js/br-af-core-snapshot.js","js/br-data-manifest.js","js/br-pwa.js","js/br-push.js","js/br-aovivo.js","js/br-estatisticas.js","js/br-acuracia.js","dados-br/af-core-manifest.json"]:assert b[rel]==c[rel],rel
@@ -193,6 +195,47 @@ async def live_layout(page,width,fixture=False):
     assert not states["empty"]["contextVisible"] and states["empty"]["badgeInside"]
     return {"actual":m,"fixture":states}
 
+def test_masthead_normalization():
+    fixture='''<html><body><header class="hero"><a href="/"><picture><source srcset="/img/header-formula-do-gol-v2.webp"><img src="/img/header-formula-do-gol-v2.png"></picture></a></header><div data-fdg-release-shell></div><header class="hero"><img src="../img/header-formula-do-gol.png?v=2"><h1>Fluminense</h1><img src="/img/escudos/fluminense.png"></header><img src="/copa2026/img/header-copa26.png"><script>var keep="header-formula-do-gol-v2.png";</script></body></html>'''
+    output=strip_legacy_brand(fixture);doc=BeautifulSoup(output,"html.parser")
+    assert not legacy_brand_nodes(doc)
+    assert len(doc.select("[data-fdg-release-shell]"))==1
+    assert len(doc.select("header.hero"))==1 and doc.select_one("header.hero h1").text=="Fluminense"
+    assert doc.select_one('img[src*="escudos/fluminense"]') and doc.select_one('img[src*="header-copa26"]')
+    assert 'var keep="header-formula-do-gol-v2.png";' in output
+    assert strip_legacy_brand(output)==output
+    print("SINGLE MASTHEAD synthetic regression PASS",flush=True)
+async def single_masthead(page,active=None):
+    await page.locator(".fdg-release-shell .fdg-nav").wait_for(timeout=20000)
+    value=await page.evaluate("""()=>{const visible=e=>!!(e.getClientRects().length&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'),brand=e=>/header-formula-do-gol(?:-v2)?\\.(?:png|jpe?g|webp|avif|svg)(?:[?#]|$)/i.test(e.getAttribute('src')||'');const all=[...document.images].filter(brand),shell=document.querySelector('.fdg-release-shell');return {shells:document.querySelectorAll('.fdg-release-shell').length,logos:all.filter(visible).length,legacy:all.filter(e=>!shell.contains(e)).length,menus:[...document.querySelectorAll('.fdg-nav,nav.nav,nav.menu')].filter(visible).length,active:shell.querySelector('[aria-current=page]')?.dataset.section,themeButtons:shell.querySelectorAll('[data-action=theme]').length}}""")
+    assert value["shells"]==value["logos"]==value["menus"]==value["themeButtons"]==1 and value["legacy"]==0,(page.url,value)
+    if active:assert value["active"]==active,(page.url,value)
+    return value
+async def footer_journey(page,origin,out=None,width=None):
+    """Click all institutional footer links, preserve the main content and return."""
+    await page.goto(origin+"/estatisticas.html#stats/prob",wait_until="domcontentloaded")
+    await page.locator("#fdg-main[aria-busy=false]").wait_for(timeout=25000)
+    await single_masthead(page,"stats")
+    evidence=[]
+    for dest in ("sobre","alertas","privacidade"):
+        link=page.locator('.fdg-release-footer a[href="/'+dest+'.html"]')
+        assert await link.count()==1,(dest,"footer link")
+        await link.click()
+        await page.wait_for_url("**/"+dest+".html")
+        v=await single_masthead(page,"more")
+        assert await page.locator("main").count()>=1 or await page.locator("h1").count()>=1,(dest,"content absent")
+        assert await page.evaluate("document.documentElement.scrollWidth<=document.documentElement.clientWidth+1"),(dest,"document overflow")
+        if out is not None:await page.screenshot(path=str(out/f"rodape-{width}-{dest}.png"))
+        evidence.append({"destination":dest,**v})
+        await page.get_by_role("button",name="Alternar tema").click()
+        await single_masthead(page,"more")
+        if out is not None:await page.screenshot(path=str(out/f"rodape-{width}-{dest}-tema-alternativo.png"))
+        await page.get_by_role("button",name="Alternar tema").click()
+        await page.go_back(wait_until="domcontentloaded")
+        await page.locator("#fdg-main[aria-busy=false]").wait_for(timeout=25000)
+        await single_masthead(page,"stats")
+    print("SINGLE MASTHEAD FOOTER PASS",width,json.dumps(evidence,ensure_ascii=False),flush=True)
+    return evidence
 async def match_header(page,w):
     await page.locator(".fdg-nav").wait_for(timeout=15000)
     v=await page.evaluate("""()=>{const visible=e=>!!(e.getClientRects().length&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'),header=document.querySelector('.fdg-release-shell'),main=document.querySelector('main'),img=header.querySelector('.brandline img');return {logos:[...document.querySelectorAll('img[src*="header-formula-do-gol-v2.png"]')].filter(visible).length,legacy:document.querySelectorAll('header.hero img[src*="header-formula-do-gol-v2.png"]').length,active:header.querySelector('[aria-current=page]')?.dataset.section,headerHeight:header.getBoundingClientRect().height,logoHeight:img.getBoundingClientRect().height,logoWidth:img.getBoundingClientRect().width,brandWidth:header.querySelector(".brandline").getBoundingClientRect().width,logoFit:getComputedStyle(img).objectFit,mainTop:main.getBoundingClientRect().top,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth}}""")
@@ -295,6 +338,7 @@ async def run_browser(site,out,origin):
                 if theme=="light":await page.get_by_role("button",name="Alternar tema").click()
                 await page.wait_for_timeout(120)
                 m=await page.evaluate(MEASURE)
+                m['single_masthead']=await single_masthead(page)
                 label=("native-" if native else "")+route.strip("/").replace("/","-").replace(".","-")+"-"+str(w)+"-"+theme
                 validate(m,label,w,doc=not native)
                 if native and route=='/aovivo.html':
@@ -513,6 +557,45 @@ async def run_browser(site,out,origin):
             if kind not in pages:continue
             for w in (390,1440):
                 await one(pages[kind],w,native=True)
+        # Every club page on mobile and desktop, plus all seven resolutions in both themes for the reported route.
+        club_pages=sorted((site/"clube").rglob("index.html"))
+        assert len(club_pages)>=20
+        fluminense=next(x for x in club_pages if x.parent.name=="fluminense")
+        for club in club_pages:
+            route="/"+club.relative_to(site).as_posix()
+            for w in (390,1440):await one(route,w,native=True)
+        for w in WIDTHS:
+            for theme in ("dark","light"):
+                if w not in (390,1440) or theme=="light":await one("/"+fluminense.relative_to(site).as_posix(),w,theme,native=True)
+        # Reproduce the reported journey by clicking actual team links in a canonical match.
+        for w in (320,390,1440):
+            ctx=await browser.new_context(viewport={"width":w,"height":920},service_workers="block")
+            await ctx.route("**/*",handle);page=await ctx.new_page()
+            try:
+                await page.goto(origin+pages["embed"],wait_until="domcontentloaded")
+                await single_masthead(page,"games")
+                for side in (0,1):
+                    link=page.locator(".game-side[href^='/clube/']").nth(side)
+                    await link.click()
+                    await page.wait_for_url("**/clube/**")
+                    await single_masthead(page,"clubs")
+                    assert await page.locator(".club-hero-card").count()==1
+                    assert await page.locator(".club-nav").count()==1
+                    await page.get_by_role("button",name="Alternar tema").click()
+                    await single_masthead(page,"clubs")
+                    await page.go_back(wait_until="domcontentloaded")
+                    await single_masthead(page,"games")
+            except Exception as exc:fail.append("match-to-club journey @"+str(w)+":"+str(exc))
+            finally:await ctx.close()
+        for w in (320,390,1440):
+            ctx=await browser.new_context(viewport={"width":w,"height":920},service_workers="block")
+            await ctx.route("**/*",handle);page=await ctx.new_page()
+            footer_errors=[];page.on("pageerror",lambda e:footer_errors.append(str(e)))
+            try:
+                await footer_journey(page,origin,out,w)
+                assert not footer_errors,footer_errors
+            except Exception as exc:fail.append("institutional footer journey @"+str(w)+":"+str(exc))
+            finally:await ctx.close()
         # Representative generated club, match, article pages must retain native scripts and global shell.
         for rel in ("clube","jogo","analises"):
             candidates=sorted((site/rel).rglob("*.html"))

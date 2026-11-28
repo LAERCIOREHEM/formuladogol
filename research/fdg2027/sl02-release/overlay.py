@@ -21,11 +21,58 @@ def snapshot(site):
     return {p.relative_to(site).as_posix():sha(p) for p in sorted(site.rglob("*")) if p.is_file()}
 def read(p):return p.read_text(encoding="utf-8")
 def write(p,s):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s,encoding="utf-8")
-CSS='<link rel="stylesheet" href="/sl02/shell.css?v=sl02-afp-ready-1">'
-JS='<script defer src="/sl02/shell.js?v=sl02-afp-ready-1"></script>'
+CSS='<link rel="stylesheet" href="/sl02/shell.css?v=sl02-hf3-single-masthead-1">'
+JS='<script defer src="/sl02/shell.js?v=sl02-hf3-single-masthead-1"></script>'
 SHELL='<div data-fdg-release-shell></div>'
 NAV=re.compile(r'<nav\b(?P<attrs>[^>]*class=["\'][^"\']*["\'][^>]*)>.*?</nav\s*>',re.S|re.I)
 IMG=re.compile(r'<img\b[^>]*src=["\'][^"\']*header-formula-do-gol-v2\.png[^"\']*["\'][^>]*>',re.I)
+REDIRECTS={"jogos/index.html","tabela/index.html","resultados/index.html"}
+BRAND=re.compile(r"(?:^|/)header-formula-do-gol(?:-v2)?\.(?:png|jpe?g|webp|avif|svg)(?:[?#]|$)",re.I)
+SHELL_SELECTOR="[data-fdg-release-shell], [data-fdg-shell]"
+def global_brand(node):
+    return any(BRAND.search(url.strip()) for attr in ("src","data-src","srcset","data-srcset") for url in re.split(r"[,\s]+",str(node.get(attr,""))))
+def legacy_brand_nodes(doc):
+    return [node for node in doc.select("img,picture source") if global_brand(node) and not node.find_parent(attrs={"data-fdg-release-shell":True}) and not node.find_parent(attrs={"data-fdg-shell":True})]
+def strip_legacy_brand(s):
+    """Remove original global banner structurally, not through a fragile CSS override.
+    Preserve article content, local navigation, Copa artwork, crest images and scripts.
+    """
+    doc=BeautifulSoup(s,"html.parser")
+    if not doc.body or not doc.select_one(SHELL_SELECTOR):return s
+    nodes=legacy_brand_nodes(doc)
+    if not nodes:return s
+    for node in nodes:
+        if node.parent is None:continue
+        parent=node.parent
+        if node.name=="img" and parent.name=="picture":
+            node=parent;parent=node.parent
+        node.decompose()
+        # Collapse only the now-empty branding wrapper. Do not remove a real
+        # header with a title, local links, scripts, controls or the new shell.
+        while parent and parent.name in ("a","picture","header","div","figure","span"):
+            if parent.has_attr("data-fdg-release-shell") or parent.has_attr("data-fdg-shell"):break
+            if parent.get_text(strip=True) or parent.find(True):break
+            ancestor=parent.parent
+            parent.decompose();parent=ancestor
+    assert not legacy_brand_nodes(doc),"legacy brand survived structural normalization"
+    return str(doc)
+def verify_global_headers(site):
+    checked=0;redirects=0
+    for path in sorted(site.rglob("*.html")):
+        rel=path.relative_to(site).as_posix()
+        doc=BeautifulSoup(read(path),"html.parser")
+        if rel in REDIRECTS:
+            redirects+=1
+            continue
+        assert len(doc.select(SHELL_SELECTOR))==1,("global shell count",rel)
+        assert not legacy_brand_nodes(doc),("duplicate global branding",rel)
+        assert len(doc.select('script[src*="/sl02/shell.js"]'))==1,("shell script count",rel)
+        for nav in doc.select("nav.nav,nav.menu"):
+            assert nav.has_attr("data-fdg-oldnav"),("legacy global nav",rel)
+        checked+=1
+    assert checked>0
+    print("SINGLE MASTHEAD STATIC PASS",checked,"HTML pages;",redirects,"redirects",flush=True)
+    return {"pages":checked,"redirects":redirects}
 def navkind(m):
     soup=BeautifulSoup(m.group(),"html.parser")
     n=soup.find("nav")
@@ -97,7 +144,7 @@ def enrich_native_match(s,rel,matches,details,highlights):
 def native(s,rel,matches=None,details=None,highlights=None):
     # Keep the original anchors and IDs for legacy handlers; exclude the old
     # navigation from accessibility tree, layout and br-menu's floating clones.
-    if rel in ("jogos/index.html","tabela/index.html","resultados/index.html"):
+    if rel in REDIRECTS:
         return s
     nav_matches=[m for m in NAV.finditer(s) if navkind(m)]
     replacement=SHELL
@@ -121,7 +168,6 @@ def native(s,rel,matches=None,details=None,highlights=None):
     # is reused exactly once in the new global header.
     if rel=="agenda.html" or rel.startswith("jogo/"):
         s=enrich_native_match(s,rel,matches or {},details or {},highlights or {})
-    s=IMG.sub(lambda m:m[0].replace("<img","<img data-fdg-oldbrand hidden",1),s)
     if rel=="aovivo.html":
         # Replace the entire legacy hero, not only its image: legacy
         # !important rules otherwise resurrect the hidden image and its box.
@@ -137,6 +183,7 @@ def native(s,rel,matches=None,details=None,highlights=None):
         s=s.replace(SHELL,SHELL+nav,1)
     if rel=="museu.html":
         s=s.replace(SHELL,SHELL+'<div class="fdg-native-subnav"><a href="/copa2026/">Acervo da Copa 2026</a></div>',1)
+    s=strip_legacy_brand(s)
     s=re.sub(r'</head>',CSS+JS+'</head>',s,count=1,flags=re.I)
     return s
 def approved(original,site,afp_digest=None):
@@ -152,9 +199,9 @@ def approved(original,site,afp_digest=None):
         if x.get("type")=="application/ld+json" or "googletagmanager.com/gtag/js" in src or ("gtag(" in txt and "dataLayer" in txt):continue
         x.decompose()
     for rel in ("/css/br-pwa.css","/css/br-data-pulse.css","/sl02/design.css","/sl02/shell.css"):
-        head.append(BeautifulSoup('<link rel="stylesheet" href="'+rel+'?v=sl02-afp-ready-1">',"html.parser"))
+        head.append(BeautifulSoup('<link rel="stylesheet" href="'+rel+'?v=sl02-hf3-single-masthead-1">',"html.parser"))
     for rel in ("/js/br-config.js","/js/br-menu.js","/js/br-af-core-snapshot.js","/js/br-data-manifest.js","/js/br-data-refresh.js","/js/br-data-pulse.js","/sl02/shell.js","/sl02/app.js","/js/br-pwa.js","/js/br-push.js"):
-        head.append(BeautifulSoup('<script defer src="'+rel+'?v=sl02-afp-ready-1"></script>',"html.parser"))
+        head.append(BeautifulSoup('<script defer src="'+rel+'?v=sl02-hf3-single-masthead-1"></script>',"html.parser"))
     # Keep PWA version contract and a truthful, indexable initial content
     # snapshot. JS replaces this fallback on successful hydration.
     for tag in head.select('script[src],link[href]'):
@@ -209,6 +256,7 @@ def apply(site,backup):
         entry["clubes"]=[{k:v for k,v in c.items() if k=="clube" or k.endswith("_pct") and isinstance(v,(int,float,type(None)))} for c in x["clubes"]]
         slim["snapshots"].append(entry)
     write(assets/"history-slim.json",json.dumps(slim,ensure_ascii=False,separators=(",",":")))
+    masthead=verify_global_headers(site)
     after=snapshot(site)
     modified={k:{"before":v,"after":after[k]} for k,v in before.items() if after.get(k)!=v}
     added={k:v for k,v in after.items() if k not in before}
@@ -217,7 +265,7 @@ def apply(site,backup):
     assert all(k=="estatisticas-completas.html" or k.startswith("sl02/") for k in added)
     protected={k:v for k,v in before.items() if not k.endswith(".html")}
     assert all(after[k]==v for k,v in protected.items())
-    ledger={"schema":1,"modified":modified,"added":added,"protected_count":len(protected),"original_files":len(before),"native_html_touched":native_count,"history_source_bytes":hist.stat().st_size,"history_projection_bytes":(assets/"history-slim.json").stat().st_size,"publication":False}
+    ledger={"schema":1,"modified":modified,"added":added,"protected_count":len(protected),"original_files":len(before),"native_html_touched":native_count,"history_source_bytes":hist.stat().st_size,"history_projection_bytes":(assets/"history-slim.json").stat().st_size,"publication":False,"single_masthead":masthead}
     write(backup/"rollback.json",json.dumps(ledger,indent=2))
     print("Overlay verified",len(modified),"HTML files; preserved",len(protected),"non-HTML assets;",len(added),"additions",flush=True)
     return ledger
