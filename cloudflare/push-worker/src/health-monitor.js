@@ -411,12 +411,23 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   }
   const activeSearchAnomaly=(providers.byEvent||[]).some(r=>activePublicIds.has(text(r.eventId||r.event_id)) && n(r.searches)>8);
   const pagesAvailability=classifyPagesAvailability(site,previous,now);
+  // Query only the indexed health-key range; never call sports providers here.
+  const statEvidence=await Promise.resolve().then(()=>env.DB.prepare(
+    "SELECT payload_json FROM live_stats_cache WHERE cache_key>=? AND cache_key<? AND updated_at>=? ORDER BY updated_at DESC LIMIT 20"
+  ).bind('health:bra.1:','health:bra.1;',now-24*3600_000).all()).catch(()=>null);
+  const observedStats=(statEvidence?.results||[]).map(row=>safeJson(row.payload_json,null)).filter(Boolean);
+  const redStats=observedStats.filter(row=>row.health==='RED');
+  const yellowStats=observedStats.filter(row=>row.health==='YELLOW');
+  const statsSeverity=redStats.length?'red':(!statEvidence||yellowStats.length||(!observedStats.length&&active>0))?'yellow':'green';
+  const statsDetail=!statEvidence?'telemetria indisponível':!observedStats.length?'nenhuma partida observada pelo gateway nas últimas 24h':
+    `${observedStats.length} partida(s) observada(s) · ${redStats.length} crítica(s) · ${yellowStats.length} parcial(is)`;
   const indicators=[
     indicator('site','Site / Pages',pagesAvailability.severity,pagesAvailability.detail),
     indicator('orchestrator','Orchestrator',orchHealth.ok&&orchStatus.ok?'green':'red',orchHealth.ok?`${text(os.workloadMode)||'modo desconhecido'} · próximo: ${fmtDate(os.nextRelevantMatchAt)}`:'health/status indisponível'),
     indicator('github','GitHub Actions',githubSeverity.severity,githubSeverity.detail),
     indicator('brasileirao','Brasileirão / ESPN',m.ok===false?'red':'green',m.ok===false?'Sports Monitor reportou falha':'monitor esportivo operacional'),
     indicator('continentais','Agenda continental',continentalAgendaIndicator.severity,continentalAgendaIndicator.detail),
+    indicator('live-statistics','Estatísticas ao vivo',statsSeverity,statsDetail),
     // R10.1: readiness possui alerta dedicado por partida. O Health Monitor não
     // abre um segundo incidente CRÍTICO para a mesma causa. Só monitor ao vivo
     // realmente stale continua vermelho; readiness pendente aparece amarelo.
@@ -442,6 +453,7 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   const snapshot={policyVersion:HEALTH_POLICY_VERSION,at:iso(now),state:worst(indicators),indicators,pagesAvailability,ai,providers,aiStack:{gateway:text(env.AI_GATEWAY_ID)||'default',gatewayAuthConfigured:gatewayAuthReady,geminiConfigured:geminiReady,workersAiConfigured:workersAiReady,openaiConfigured:Boolean(text(env.OPENAI_API_KEY)),fineTuning:'not_used_by_design'},orchestrator:{workloadMode:text(os.workloadMode),nextRelevantMatchAt:text(os.nextRelevantMatchAt),pendingPostgameTasks:pendingOrchestrator,githubDispatchesLast24h:dispatches,errors:Array.isArray(os.errors)?os.errors.slice(0,6).map(x=>text(x).slice(0,300)):[]},reliabilityIntelligence:{sportingState:text(os.reliabilityState)||text(reliabilitySnapshot.state),factualAuditSchema:n(factualAudit.schema_version),factualCritical:n(factualAudit.total_criticos),factualWarnings:n(factualAudit.total_avisos),ragKnowledgeBaseReady:Number(ragManifest.schema_version||0)>=2&&Array.isArray(ragManifest.collections)&&ragManifest.collections.length>0,ragRuntimeEnabled:opsIntelligence?.rag?.ready===true,ragRuntimeVersion:n(opsIntelligence?.rag?.version),ragSourceCount:n(opsIntelligence?.rag?.sourceCount),ragChunkCount:n(opsIntelligence?.rag?.chunkCount),ragSourceSha256:text(opsIntelligence?.rag?.sourceSha256),mcpOpsEnabled:opsIntelligence?.mcp?.enabled===true,mcpOpsReadOnly:opsIntelligence?.mcp?.readOnly===true,mcpProtocolVersion:text(opsIntelligence?.mcp?.protocolVersion),mcpTools:n(opsIntelligence?.mcp?.tools),mcpResources:n(opsIntelligence?.mcp?.resources),fineTuning:'not_used_by_design'},postgame:{pending:postPending,searching:postSearching,overdue:postOverdue,budgetGuard:postBudget,resolved:postResolved,notApplicable:postExempt,eligibilityPending:postUnclassified,requiredLeague:'bra.1',seasonCoverage,highlightPending:highlight,persistentUntilResolved:true,pendingRows,cost:{...postCost,budget:{monthlyBudgetUsd,eventBudgetUsd,warningPct,monthPct:hunterBudgetPct}}},mail:{transport:cfg.transport,configured:cfg.configured,destino:maskAddress(cfg.to),remetente:cfg.from,fallbacks:cfg.fallbacks||[]},cloudflareBilling:cfBilling};
   snapshot.continentalAgenda={integrityOk:text(continentalAgenda?.integridade_continental?.status)==='ok' && !(continentalAgenda?.integridade_continental?.faltantes||[]).length,
     fallbacks:n(continentalAgenda?.integridade_continental?.fallbacks_documentais_ativos)};
+  snapshot.liveStatistics={observations:observedStats,red:redStats.length,yellow:yellowStats.length,coverage:'gateway observations only'};
   snapshot.postgame.highlightOverdue=highlightOverdue;
   snapshot.postgame.highlightPendingRows=highlightPendingRows;
   snapshot.providerFailureRows=providerFailureRows;

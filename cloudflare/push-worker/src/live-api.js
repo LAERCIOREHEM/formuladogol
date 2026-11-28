@@ -5,7 +5,9 @@ import {
   mergeExternalStatisticsIntoSummary,
   summaryGoalCount,
   summaryTeamMetricCoverage,
-  summaryHasMeaningfulStatistics
+  summaryHasMeaningfulStatistics,
+  summaryHasEssentialStatistics,
+  discardAllZeroStatistics
 } from './espn-source.js';
 import { fetchApiFootballPlayerDefenseFallback, fetchApiFootballStatsFallback } from './api-football-source.js';
 import { fetchTheSportsDbStatsFallback } from './thesportsdb-source.js';
@@ -382,7 +384,10 @@ export async function resolveLiveSummary(url, deps = {}) {
   try {
     const result = await fetchEspnSummaryGateway(league, eventId, fetchImpl, expectedGoals);
     let data = result.data || {};
+    const observedGameState = summaryState(data);
+    if (isBrasileirao && ['in','post'].includes(observedGameState) && !summaryHasMeaningfulStatistics(data)) data=discardAllZeroStatistics(data);
     const beforeCoverage = summaryTeamMetricCoverage(data);
+    let statsObservedAt = now;
     const providers = ['espn'];
     const statsFallbacks = [];
     const statsFallbackErrors = {};
@@ -390,7 +395,7 @@ export async function resolveLiveSummary(url, deps = {}) {
     const competition = data?.header?.competitions?.[0] || data?.competitions?.[0] || data?.competition || {};
     const fixtureTime = Date.parse(competition.date || data?.header?.date || data?.gameInfo?.date || '');
     const brEligible = isBrasileirao && Number.isFinite(fixtureTime) && now >= fixtureTime - 15*60_000 && now <= fixtureTime + 5*60*60_000 && (gameState === 'in' || gameState === 'post');
-    const shouldTryStatsFallback = (coverageBelow(beforeCoverage, target) || (isBrasileirao && !summaryHasMeaningfulStatistics(data))) && (isBrasileirao ? brEligible : (beforeCoverage.maxPerTeam > 0 || expectedGoals > 0 || gameState === 'in' || gameState === 'post'));
+    const shouldTryStatsFallback = (coverageBelow(beforeCoverage, target) || (isBrasileirao && (!summaryHasMeaningfulStatistics(data) || !summaryHasEssentialStatistics(data)))) && (isBrasileirao ? brEligible : (beforeCoverage.maxPerTeam > 0 || expectedGoals > 0 || gameState === 'in' || gameState === 'post'));
 
     const statsStore = deps.statsStore || null;
     const sharedReady = Boolean(statsStore?.get && statsStore?.put && statsStore?.acquireLease && statsStore?.reserveApiCalls && statsStore?.getApiBudget);
@@ -410,7 +415,7 @@ export async function resolveLiveSummary(url, deps = {}) {
     const apiFootballKey = text(deps.apiFootballKey);
     const budgetKey = cacheKey('api-football-budget', [dayKey], 'daily');
     let budgetFailed = false;
-    let budgetState = apiAllowed ? (statsStore?.getApiBudget ? await statsStore.getApiBudget(dayKey).catch(() => { budgetFailed = true; return null; }) : await readCached(cache, budgetKey)) : null;
+    let budgetState = apiAllowed && shouldTryStatsFallback ? (statsStore?.getApiBudget ? await statsStore.getApiBudget(dayKey).catch(() => { budgetFailed = true; return null; }) : await readCached(cache, budgetKey)) : null;
     let apiFixtureId = 0;
 
     // Nas competições continentais, API-Football tem prioridade sobre TheSportsDB,
@@ -452,6 +457,7 @@ export async function resolveLiveSummary(url, deps = {}) {
               fixtureId: apiFixtureId || undefined,
               leagueId: apiLeagueId || undefined
             });
+            fallback.observedAt=now;
             apiFixtureId = Number(fallback.fixtureId || 0) || apiFixtureId;
             if (statsStore?.updateApiBudget) {
               budgetState = await statsStore.updateApiBudget(dayKey, fallback.rateLimit, now).catch(() => quotaFromFallback(fallback, budgetState));
@@ -479,6 +485,7 @@ export async function resolveLiveSummary(url, deps = {}) {
         const after = summaryTeamMetricCoverage(enriched);
         if (after.totalUnique > previous.totalUnique || JSON.stringify(statisticsSnapshot(enriched)) !== JSON.stringify(statisticsSnapshot(data))) {
           data = enriched;
+          statsObservedAt=Math.min(statsObservedAt,Number((fallback?.observedAt || fallback?._storeUpdatedAt) || now));
           pushProvider(providers, 'api-football');
           statsFallbacks.push({
             source: 'api-football',
@@ -496,7 +503,7 @@ export async function resolveLiveSummary(url, deps = {}) {
     }
 
     // Secondary source: validated identity and no duplicate concurrent calls.
-    if (externalEnabled && shouldTryStatsFallback && (coverageBelow(summaryTeamMetricCoverage(data), target) || (isBrasileirao && !summaryHasMeaningfulStatistics(data)))) {
+    if (externalEnabled && shouldTryStatsFallback && (coverageBelow(summaryTeamMetricCoverage(data), target) || (isBrasileirao && (!summaryHasMeaningfulStatistics(data) || !summaryHasEssentialStatistics(data))))) {
       const statsKey = cacheKey('summary-stats', [league, eventId], 'thesportsdb');
       const mapKey = cacheKey('summary-stats-map', [league, eventId], 'thesportsdb');
       const statsSharedKey = `tsdb:${league}:${eventId}`;
@@ -516,6 +523,7 @@ export async function resolveLiveSummary(url, deps = {}) {
             eventId: Number(eventMap?.eventId || 0) || undefined,
             requireBrazil: isBrasileirao
           });
+          fallback.observedAt=now;
           await Promise.all([
             writeLayeredCache(cache, statsKey, statsStore, statsSharedKey, fallback, STATS_FALLBACK_TTL_SECONDS, now),
             writeLayeredCache(cache, mapKey, statsStore, mapSharedKey, { eventId: fallback.eventId }, STATS_FIXTURE_MAP_TTL_SECONDS, now)
@@ -535,6 +543,7 @@ export async function resolveLiveSummary(url, deps = {}) {
         const after = summaryTeamMetricCoverage(enriched);
         if (after.totalUnique > previous.totalUnique || JSON.stringify(statisticsSnapshot(enriched)) !== JSON.stringify(statisticsSnapshot(data))) {
           data = enriched;
+          statsObservedAt=Math.min(statsObservedAt,Number((fallback?.observedAt || fallback?._storeUpdatedAt) || now));
           pushProvider(providers, 'thesportsdb');
           statsFallbacks.push({
             source: 'thesportsdb',
@@ -580,6 +589,7 @@ export async function resolveLiveSummary(url, deps = {}) {
             playerFallback = await fetchApiFootballPlayerDefenseFallback(data, {
               apiKey: apiFootballKey, fetchImpl, now, fixtureId: apiFixtureId
             });
+            playerFallback.observedAt=now;
             if (statsStore?.updateApiBudget) {
               budgetState = await statsStore.updateApiBudget(dayKey, playerFallback.rateLimit, now)
                 .catch(() => quotaFromFallback(playerFallback, budgetState));
@@ -607,6 +617,7 @@ export async function resolveLiveSummary(url, deps = {}) {
         const after = summaryTeamMetricCoverage(enriched);
         if (after.totalUnique > previous.totalUnique || JSON.stringify(statisticsSnapshot(enriched)) !== JSON.stringify(statisticsSnapshot(data))) {
           data = enriched;
+          statsObservedAt=Math.min(statsObservedAt,Number((playerFallback?.observedAt || playerFallback?._storeUpdatedAt) || now));
           pushProvider(providers, 'api-football');
           statsFallbacks.push({
             source: 'api-football-players', fixtureId: apiFixtureId,
@@ -629,6 +640,7 @@ export async function resolveLiveSummary(url, deps = {}) {
       if (after.totalUnique > previous.totalUnique || JSON.stringify(statisticsSnapshot(preserved)) !== JSON.stringify(statisticsSnapshot(data))) {
         data = preserved;
         bestKnownApplied = true;
+        statsObservedAt=Math.min(statsObservedAt,Number(previousBest?.updatedAt || now));
         for (const provider of (Array.isArray(previousBest.providers) ? previousBest.providers : [])) pushProvider(providers, provider);
       }
     }
@@ -639,10 +651,27 @@ export async function resolveLiveSummary(url, deps = {}) {
         data: statisticsSnapshot(data),
         providers: providers.filter((provider) => provider !== 'espn'),
         coverage: finalCoverage,
-        updatedAt: bestKnownApplied ? Number(previousBest?.updatedAt || now) : now
+        updatedAt: statsObservedAt
       }, STATS_BEST_KNOWN_TTL_SECONDS, now);
     }
 
+    const meaningful=summaryHasMeaningfulStatistics(data);
+    const essential=summaryHasEssentialStatistics(data);
+    const late=gameState==='post'||(Number.isFinite(fixtureTime)&&now-fixtureTime>=30*60_000);
+    const statsHealth=!meaningful?(late?'RED':'YELLOW'):(coverageBelow(finalCoverage,target)||!essential||bestKnownApplied||providers.length>1?'YELLOW':'GREEN');
+    // Small, bounded health evidence. No extra sports calls and no per-visitor writes.
+    if (brEligible && statsStore?.put && statsStore?.acquireLease) {
+      const healthKey=cacheKey('summary-stats-health',[league,eventId],'sample');
+      if (!await readCached(cache,healthKey)) {
+        await writeCached(cache,healthKey,{sampled:true},120);
+        if(await statsStore.acquireLease(`lease:health:${league}:${eventId}`,120,now).catch(()=>false)) {
+          await statsStore.put(`health:${league}:${eventId}`,{
+            eventId,health:statsHealth,observedAt:now,statsObservedAt:meaningful?statsObservedAt:null,
+            state:gameState,coverage:finalCoverage,providers
+          },48*3600,now).catch(()=>null);
+        }
+      }
+    }
     const currentFacts = normalizeLiveFacts(data, {
       eventId,
       expectedGoals,
@@ -674,8 +703,8 @@ export async function resolveLiveSummary(url, deps = {}) {
       requestedState: requestedState || null,
       observedState: summaryState(data) || null,
       espnOnly: isBrasileirao && !externalEnabled,
-      statsObservedAt: bestKnownApplied ? Number(previousBest?.updatedAt || now) : now,
-      statsHealth: !summaryHasMeaningfulStatistics(data) ? 'RED' : (coverageBelow(finalCoverage, target) || bestKnownApplied || providers.length > 1 ? 'YELLOW' : 'GREEN'),
+      statsObservedAt: meaningful ? statsObservedAt : null,
+      statsHealth,
       statsFallback: statsFallbacks.length ? statsFallbacks[statsFallbacks.length - 1] : null,
       statsFallbacks,
       statsFallbackError: Object.values(statsFallbackErrors).filter(Boolean).join(' | '),

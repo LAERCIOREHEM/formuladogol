@@ -922,6 +922,28 @@ export function summaryHasMeaningfulStatistics(data) {
   return summaryTeamStatContainers(data).some(entry => (entry.statistics || []).some(stat => { const n = statNumericValue(stat); return Number.isFinite(n) && n > 0; }));
 }
 
+export function summaryHasEssentialStatistics(data) {
+  const required = ['possessionpct','totalshots','shotsontarget','corners','foulscommitted','yellowcards','redcards'];
+  const byTeam = new Map();
+  for (const entry of summaryTeamStatContainers(data)) {
+    const key=teamToken(entry); if (!key) continue;
+    const metrics=byTeam.get(key)||new Set(); byTeam.set(key,metrics);
+    for (const stat of entry.statistics||[]) if(statValuePresent(stat)) metrics.add(statToken(stat));
+  }
+  return byTeam.size === 2 && [...byTeam.values()].every(metrics=>required.every(key=>metrics.has(key)));
+}
+
+export function discardAllZeroStatistics(data) {
+  const clean = entry => ({...entry,statistics:[],stats:[]});
+  const comp = c => ({...c,competitors:Array.isArray(c?.competitors)?c.competitors.map(clean):c?.competitors});
+  return {...data,
+    ...(data?.boxscore ? {boxscore:{...data.boxscore,teams:(data.boxscore.teams||[]).map(clean)}} : {}),
+    ...(data?.header ? {header:{...data.header,...(Array.isArray(data.header.competitions)?{competitions:data.header.competitions.map(comp)}:{})}} : {}),
+    ...(Array.isArray(data?.competitions)?{competitions:data.competitions.map(comp)}:{}),
+    ...(data?.competition?{competition:comp(data.competition)}:{})
+  };
+}
+
 export function summaryTeamMetricCoverage(data) {
   const byTeam = new Map();
   for (const entry of summaryTeamStatContainers(data)) {

@@ -765,7 +765,7 @@
         stale: envelope.stale === true,
         ageMs: Number(envelope.ageMs || 0) || 0,
         observedState: String(envelope.observedState || ""),
-        statsObservedAt: Number(envelope.statsObservedAt || envelope.fetchedAt || 0),
+        statsObservedAt: Number(envelope.statsObservedAt || 0),
         statsHealth: envelope.statsHealth || null,
         espnOnly: envelope.espnOnly === true
       };
@@ -2362,7 +2362,7 @@
     { keys:["saves","goalkeeper saves"], label:"Defesas", order:7 },
     { keys:["total passes","totalpasses","passes"], label:"Passes", order:8 },
     { keys:["accurate passes","accuratepasses","completed passes","passes completed"], label:"Passes certos", order:9 },
-    { keys:["pass pct","pass percent","pass percentage","pass accuracy","passpct","passaccuracy"], label:"Precisão de passe", order:10, percent01:true },
+    { keys:["pass pct","pass percent","pass percentage","pass accuracy","passpct","passaccuracy","pass completion pct","passcompletionpct"], label:"Precisão de passe", order:10, percent01:true },
     { keys:["tackles won","tackleswon","tackles"], label:"Desarmes", order:11 },
     { keys:["interceptions"], label:"Interceptações", order:12 },
     { keys:["crosses","total crosses","totalcrosses"], label:"Cruzamentos", order:13 },
@@ -2370,7 +2370,8 @@
     { keys:["corner kicks","cornerkicks","won corners","woncorners","corners"], label:"Escanteios", order:15 },
     { keys:["yellow cards","yellowcards"], label:"Amarelos", order:16 },
     { keys:["red cards","redcards"], label:"Vermelhos", order:17 },
-    { keys:["offsides","offside"], label:"Impedimentos", order:18 }
+    { keys:["offsides","offside"], label:"Impedimentos", order:18 },
+    { keys:["expected goals","expectedgoals","xg"], label:"Gols esperados (xG)", order:19 }
   ];
 
   function metricKey(s) {
@@ -2725,11 +2726,21 @@
     if (!rows.length || allZeroPlaceholder) return '<div class="live-empty">Estatísticas ainda indisponíveis nas fontes consultadas. O painel será atualizado quando houver dados confirmados.</div>';
     const names = '<div class="live-stats-head"><div>' + esc(g.home.nome) + '</div><div>comparativo</div><div>' + esc(g.away.nome) + '</div></div>';
     const sourceMeta = statsSourceMeta(summary);
-    return '<div class="live-stats live-stats-complete">' + names + rows.map((r) => '<div class="live-stat-row">' +
+    const essential = new Set(['Posse','Finalizações','Chutes no gol','Escanteios','Faltas','Amarelos','Vermelhos']);
+    const main = rows.filter(r=>essential.has(r.label));
+    const extra = rows.filter(r=>!essential.has(r.label));
+    const previousDetails = document.querySelector('.live-stats-extra');
+    const fixtureKey = statsFixtureKey(g);
+    const expanded = previousDetails?.dataset.fixture===fixtureKey ? previousDetails.open : window.matchMedia('(min-width: 768px)').matches;
+    const rowHtml = (r) => '<div class="live-stat-row">' +
       '<div class="live-stat-value"><strong>' + esc(r.home) + '</strong><div class="live-stat-mini"><span style="width:' + r.pct.toFixed(1) + '%"></span></div></div>' +
       '<div class="live-stat-label">' + esc(r.label) + (r.label === "Aproveitamento dos chutes" ? ' <small title="Chutes no gol ÷ finalizações">ⓘ</small>' : '') + '</div>' +
       '<div class="live-stat-value right"><strong>' + esc(r.away) + '</strong><div class="live-stat-mini"><span style="width:' + (100-r.pct).toFixed(1) + '%"></span></div></div>' +
-      '</div>').join("") + '<div class="live-stats-note">' + esc(sourceMeta.note) + '</div></div>';
+      '</div>';
+    const meta = summary?.__fdgLiveMeta || {};
+    const observedAt=Number(meta.statsObservedAt||0);
+    const time = observedAt>0 ? ' · leitura válida mais antiga: '+new Date(observedAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '';
+    return '<div class="live-stats live-stats-complete">'+names+main.map(rowHtml).join('')+(extra.length?'<details class="live-stats-extra" data-fixture="'+esc(fixtureKey)+'"'+(expanded?' open':'')+'><summary>Estatísticas complementares ('+extra.length+')</summary>'+extra.map(rowHtml).join('')+'</details>':'')+'<div class="live-stats-note">'+esc(sourceMeta.note+time)+'</div></div>';
   }
 
   function renderNextList(all, selected) {

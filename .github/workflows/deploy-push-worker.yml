@@ -77,7 +77,8 @@ jobs:
           # Desde o fallback continental v3, API-Football é a camada
           # prioritária de enriquecimento quando a ESPN vem incompleta.
           test -n "${FDG_PUSH_API_FOOTBALL_KEY:-}" || { echo 'ERRO: secret API_FOOTBALL_KEY ausente; fallback continental v3 não pode operar.'; exit 1; }
-          echo 'API_FOOTBALL_KEY configurada para o fallback continental com orçamento diário.'
+          [[ "${FDG_PUSH_API_FOOTBALL_LEAGUE_ID:-}" =~ ^[0-9]+$ ]] || { echo 'ERRO: API_FOOTBALL_LEAGUE_ID ausente ou inválida.'; exit 1; }
+          echo 'API_FOOTBALL_KEY e liga configuradas para contingência com orçamento diário.'
 
           # Resend é apenas o canal administrativo de contingência. A ausência
           # dele NÃO pode bloquear o deploy nem os seis alertas esportivos.
