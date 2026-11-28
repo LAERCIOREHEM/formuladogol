@@ -6,7 +6,7 @@ const now=Date.parse('2026-11-04T18:10:15.367Z');
 const okResponse=(status=200,contentType='text/html; charset=utf-8')=>({
   status,headers:{get:(k)=>k.toLowerCase()==='content-type'?contentType:null}
 });
-assert.equal(HEALTH_POLICY_VERSION,14);
+assert.equal(HEALTH_POLICY_VERSION,15); // Main already uses policy 15; retain all outage behavior assertions.
 const direct=await probePagesAvailability('https://formuladogol.com.br',async()=>okResponse());
 assert.equal(direct.ok,true);
 assert.equal(direct.checks.length,1,'healthy primary path needs only one request');

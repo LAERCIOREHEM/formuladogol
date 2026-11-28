@@ -2722,7 +2722,7 @@
   function renderStats(g, summary) {
     if (g && g.state === "pre") return '<div class="live-empty">As estatísticas serão exibidas após o início da partida.</div>';
     const rows = collectStats(g, summary);
-    const allZeroPlaceholder = g && g.state === "in" && rows.length > 0 && statsRowsFreshnessScore(rows) < 100;
+    const allZeroPlaceholder = g && (g.state === "in" || g.state === "post") && rows.length > 0 && statsRowsFreshnessScore(rows) < 100;
     if (!rows.length || allZeroPlaceholder) return '<div class="live-empty">Estatísticas ainda indisponíveis nas fontes consultadas. O painel será atualizado quando houver dados confirmados.</div>';
     const names = '<div class="live-stats-head"><div>' + esc(g.home.nome) + '</div><div>comparativo</div><div>' + esc(g.away.nome) + '</div></div>';
     const sourceMeta = statsSourceMeta(summary);
