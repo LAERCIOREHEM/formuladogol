@@ -440,9 +440,9 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
           ? `${active} jogo(s) ativo(s) · ${n(m.readinessRed)} partida(s) com readiness pendente · alerta dedicado ativo`
           : active?`${active} jogo(s) ativo(s) · readiness OK`:'nenhum jogo ativo'
     ),
-    // OVERDUE é amarelo: o Hunter já envia um alerta específico em T+2h e
-    // continua pesquisando. Vermelho fica reservado ao budget guard.
-    indicator('postgame','Pós-jogo',postBudget>0&&postOverdue>0?'red':postBudget>0||postOverdue>0||postUnclassified>0?'yellow':'green',`${postPending} pendência(s) Brasileirão · ${postOverdue} >2h · ${postBudget} budget guard · ${postExempt} dispensada(s) · ${postUnclassified} sem competição identificada`),
+    // OVERDUE é amarelo a partir de T+60min; busca continua sem e-mail redundante.
+    // Vermelho fica reservado ao budget guard.
+    indicator('postgame','Pós-jogo',postBudget>0&&postOverdue>0?'red':postBudget>0||postOverdue>0||postUnclassified>0?'yellow':'green',`${postPending} pendência(s) Brasileirão · ${postOverdue} ≥60 min · ${postBudget} budget guard · ${postExempt} dispensada(s) · ${postUnclassified} sem competição identificada`),
     ...reliabilityIndicators,
     indicator('highlights','Melhores Momentos',highlightOverdue>0?'yellow':'green',`${highlight} pendência(s) no total · ${highlightOverdue} com mais de 2h${highlightPendingRows[0]?` · mais antiga: ${highlightPendingRows[0].home} x ${highlightPendingRows[0].away}`:''}`),
     indicator('editorial','Editorial / Transmissões',Array.isArray(os.errors)&&os.errors.length?'yellow':'green',Array.isArray(os.errors)&&os.errors.length?`${os.errors.length} erro(s) no último ciclo`:'sem erro reportado pelo Orchestrator'),
@@ -454,6 +454,10 @@ export async function collectHealthSnapshot(env, monitor = null, now = Date.now(
   snapshot.continentalAgenda={integrityOk:text(continentalAgenda?.integridade_continental?.status)==='ok' && !(continentalAgenda?.integridade_continental?.faltantes||[]).length,
     fallbacks:n(continentalAgenda?.integridade_continental?.fallbacks_documentais_ativos)};
   snapshot.liveStatistics={observations:observedStats,red:redStats.length,yellow:yellowStats.length,coverage:'gateway observations only'};
+  // Reuse pending rows already read for the daily digest, without extra provider calls.
+  snapshot.postgame.attendanceTargetMinutes=10;
+  snapshot.postgame.attendanceOperationalSlaMinutes=60;
+  snapshot.postgame.pendingBeyondTargetSample=pendingRows.filter(r=>Number.isFinite(Date.parse(r.finalAt))&&now-Date.parse(r.finalAt)>=10*60_000).length;
   snapshot.postgame.highlightOverdue=highlightOverdue;
   snapshot.postgame.highlightPendingRows=highlightPendingRows;
   snapshot.providerFailureRows=providerFailureRows;
@@ -534,8 +538,8 @@ export function postgameDigestLines(postgame={}, now=Date.now()) {
     coverageLine,
     `✅ Resolvidos no Brasileirão: ${resolved}`,
     `ℹ️ Dispensados (Copa do Brasil/internacionais): ${exempt} · sem competição identificada: ${unclassified}`,
-    `🟡 Em busca (<2h): ${searching}`,
-    `🔴 Atrasados (>2h): ${overdue}`,
+    `🟡 Em busca (antes do SLA de 60 min): ${searching}`,
+    `🟡 Atrasados (SLA de 60 min): ${overdue}`,
     `🛑 Budget guard: ${guard}`,
     `Persistência: ${postgame.persistentUntilResolved?'ATIVA — não existe GAVE_UP':'—'}`,
   ];

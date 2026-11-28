@@ -34,6 +34,7 @@ jobs:
         working-directory: cloudflare/push-worker
         run: node tests/test-hunter-live-sources.mjs
       - name: Hot test — Worker, D1, site and Gemini Google Search
+        if: github.event_name != 'pull_request'
         shell: bash
         run: |
           python -u - <<'PY'
@@ -64,7 +65,7 @@ jobs:
           st_status,st=inspect('hunter_status',BASE+'/v1/postgame/status',lambda s,d:s==200 and d.get('ok') is True)
           print('hunter_summary='+json.dumps({k:st.get(k) for k in ('version','publicPending','publicOverdue','publicResolved','publicBudgetGuard','searchProfileVersion','geminiCircuit')},ensure_ascii=False),flush=True)
           if os.getenv('VERIFY_INTEGRATION_REV')=='1':
-              integrated=(st_status==200 and st.get('hunterIntegrationRevision')=='R10R29.1')
+              integrated=(st_status==200 and st.get('hunterIntegrationRevision')=='R37-HF2' and st.get('version')==17 and h.get('postgameFastlaneVersion')==17 and st.get('attendanceTargetMinutes')==10 and st.get('attendanceOperationalSlaMinutes')==60)
               outcomes.append(('hunter_integrated_revision',integrated))
               print(('PASS' if integrated else 'FAIL')+' hunter_integrated_revision='+str(st.get('hunterIntegrationRevision')),flush=True)
           events={'401841296':(21492,21379,628385.5),'401841297':(13458,9760,378700)}
@@ -84,6 +85,12 @@ jobs:
               passed=all(a is not None and abs(float(a)-v)<.001 for a,v in zip(actual,expected))
               outcomes.append(('pages_event_'+eid,passed))
               print(('PASS' if passed else 'FAIL')+' pages_event_'+eid+' actual='+str(actual),flush=True)
+          # R37 regression: require the curated mandatory fields; never infer pagantes.
+          _,r37=inspect('R37_D1_event',BASE+'/v1/postgame?event_ids=401841337',lambda s,d:s==200 and d.get('ok') is True and any(str(x.get('event_id'))=='401841337' and x.get('publico')==35155 and x.get('renda')==1561842 and x.get('public_status')=='resolved' for x in d.get('rows',[])))
+          r37page=pages.get('jogos',{}).get('401841337',{})
+          passed=r37page.get('publico')==35155 and r37page.get('renda')==1561842
+          outcomes.append(('R37_Pages_event',passed))
+          print(('PASS' if passed else 'FAIL')+' R37_Pages_event',flush=True)
           # Uma chamada real de descoberta, sem modificar público/renda oficiais.
           # O endpoint possui cache de 15 minutos e circuit breaker.
           probe_status,probe=inspect('gemini_google_search_live',BASE+'/v1/postgame/search-probe',

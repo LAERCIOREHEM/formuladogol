@@ -57,3 +57,11 @@ assert.equal(seen[0],search[0]);
 console.log('PASS: Palmeiras x Remo discovery with generic/date/score/UOL queries');
 
 console.log('Hunter free generic RSS fallback, safe links, regional slug and fixture guard: PASS');
+
+const partial={home:'Fluminense',away:'Cruzeiro',kickoff:'2026-11-27T20:00:00-03:00',home_score:0,away_score:1,round:37,publico:35155,renda:null};
+assert.equal(buildPostgameRssQueries(partial)[0],'Fluminense Cruzeiro renda');
+assert.equal(buildPostgameRssQueries({...partial,publico:null,renda:1561842})[0],'Fluminense Cruzeiro público presente');
+const bol='https://www.bol.uol.com.br/esporte/2026/11/27/cruzeiro-vence-fluminense-no-maracana.htm';
+const flux='<rss><channel><item><title>Cruzeiro vence Fluminense; ficha técnica</title><link>'+bol+'</link></item></channel></rss>';
+assert.deepEqual(parsePublicSearchRss(flux,partial),[bol]);
+console.log('R37-HF2 field-specific free discovery PASS');

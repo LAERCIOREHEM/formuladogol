@@ -519,8 +519,9 @@ export function buildAttendanceSearchQueries(task) {
 
   // Primeiro imitar as buscas simples que encontram a ficha técnica logo após o FINAL.
   // NENHUMA consulta restringe o domínio: portais conhecidos são preferência, não cerca.
-  add(`${home} ${away} público renda`);
-  add(`${home} ${away} público renda ${dayBR || year}`);
+  const missing=Number(task?.publico)>0&&!(Number(task?.renda)>0)?'renda':Number(task?.renda)>0&&!(Number(task?.publico)>0)?'público presente':'público renda';
+  add(`${home} ${away} ${missing}`);
+  add(`${home} ${away} ${missing} ${dayBR || year}`);
   add(`"${home}" "${away}" público presente renda ${year}`);
   add(`"${home}" "${away}" público pagante renda ${year}`);
   if (score) add(`${home} ${score} ${away} público renda ${year}`);
