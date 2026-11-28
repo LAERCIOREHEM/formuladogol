@@ -33,7 +33,7 @@ const earlyFactsIndex = page.indexOf('renderMain(currentSelectedGame(), data, al
 const statsRetryIndex = page.indexOf('await waitWithSignal(PARTIAL_STATS_RETRY_DELAY_MS', firstSummaryIndex);
 assert.ok(firstSummaryIndex >= 0 && earlyFactsIndex > firstSummaryIndex && statsRetryIndex > earlyFactsIndex,
   'R10R17.3 deve exibir o autor assim que o gateway entrega facts, antes do retry das estatísticas');
-assert.match(fs.readFileSync('aovivo.html','utf8'), /br-aovivo\.js\?v=20261123-r36r3-scorer/);
+assert.match(fs.readFileSync('aovivo.html','utf8'), /br-aovivo\.js\?v=20261127-live-hf1/);
 
 // R36-R3: um placar 0x1 SEM facts mostra pendência no lado certo.
 {

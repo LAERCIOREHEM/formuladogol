@@ -20,6 +20,7 @@ jobs:
         with:
           node-version: '22'
       - run: node --check js/br-aovivo.js && node --check br-aovivo.js
+      - run: node tests/test-br-live-goal-sync.mjs
       - run: npm install --no-audit --no-fund
         working-directory: cloudflare/push-worker
       - run: npm run check && npm run test:sports && npm run test:push && npm run test:hardening

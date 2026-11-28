@@ -236,7 +236,7 @@ jobs:
           grep -q 'br-resultados-freshness.js?v=20261004-r10r9' index.html
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' estatisticas.html
           grep -q 'br-estatisticas.js?v=20261124-r36r6final' estatisticas.html
-          grep -q 'br-aovivo.js?v=20261123-r36r3-scorer' aovivo.html
+          grep -q 'br-aovivo.js?v=20261127-live-hf1' aovivo.html
           grep -q 'br-live-goal-sync.js?v=20261014-r10r17-2' aovivo.html
           echo 'OK: LiveState v7 + Live Facts v2 + R10R17.3 Goal Event Integrity + R10R17.2 ID documental.'
 
@@ -1083,7 +1083,7 @@ jobs:
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' _site/index.html
           grep -q 'br-classificacao-live.js?v=20260920-monitor-facts-v7' _site/estatisticas.html
           grep -q 'br-estatisticas.js?v=20261124-r36r6final' _site/estatisticas.html
-          grep -q 'br-aovivo.js?v=20261123-r36r3-scorer' _site/aovivo.html
+          grep -q 'br-aovivo.js?v=20261127-live-hf1' _site/aovivo.html
           grep -q 'const LIVE_STATE_VERSION = "7"' _site/js/br-classificacao-live.js
           echo 'OK: pacote público contém LiveState v6 / Live Facts v2 e cache-bust correto.'
 
@@ -1997,7 +1997,7 @@ jobs:
           ativos_live = [
               (HOST + "/", "br-classificacao-live.js?v=20260920-monitor-facts-v7"),
               (HOST + stats_path, "br-classificacao-live.js?v=20260920-monitor-facts-v7"),
-              (HOST + "/aovivo.html", "br-aovivo.js?v=20261123-r36r3-scorer"),
+              (HOST + "/aovivo.html", "br-aovivo.js?v=20261127-live-hf1"),
               (HOST + "/js/br-classificacao-live.js", 'const LIVE_STATE_VERSION = "7"'),
               (HOST + "/", "br-data-pulse.js?v=20261124-r36r6final"),
               (HOST + stats_path, "br-data-pulse.js?v=20261124-r36r6final"),
